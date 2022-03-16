@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -23,7 +22,6 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -37,46 +35,38 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class SwitchUserListener extends AbstractListener implements ListenerInterface
+class SwitchUserListener extends AbstractListener
 {
-    use LegacyListenerTrait;
-
     public const EXIT_VALUE = '_exit';
 
-    private $tokenStorage;
-    private $provider;
-    private $userChecker;
-    private $providerKey;
-    private $accessDecisionManager;
-    private $usernameParameter;
-    private $role;
-    private $logger;
-    private $dispatcher;
-    private $stateless;
+    private TokenStorageInterface $tokenStorage;
+    private UserProviderInterface $provider;
+    private UserCheckerInterface $userChecker;
+    private string $firewallName;
+    private AccessDecisionManagerInterface $accessDecisionManager;
+    private string $usernameParameter;
+    private string $role;
+    private ?LoggerInterface $logger;
+    private ?EventDispatcherInterface $dispatcher;
+    private bool $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
     {
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        if ('' === $firewallName) {
+            throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
 
         $this->tokenStorage = $tokenStorage;
         $this->provider = $provider;
         $this->userChecker = $userChecker;
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
         $this->logger = $logger;
-
-        if (null !== $dispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
-            $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
-        } else {
-            $this->dispatcher = $dispatcher;
-        }
-
+        $this->dispatcher = $dispatcher;
         $this->stateless = $stateless;
     }
 
@@ -150,7 +140,7 @@ class SwitchUserListener extends AbstractListener implements ListenerInterface
         $originalToken = $this->getOriginalToken($token);
 
         if (null !== $originalToken) {
-            if ($token->getUsername() === $username) {
+            if ($token->getUserIdentifier() === $username) {
                 return $token;
             }
 
@@ -158,20 +148,20 @@ class SwitchUserListener extends AbstractListener implements ListenerInterface
             $token = $this->attemptExitUser($request);
         }
 
-        $currentUsername = $token->getUsername();
+        $currentUsername = $token->getUserIdentifier();
         $nonExistentUsername = '_'.md5(random_bytes(8).$username);
 
         // To protect against user enumeration via timing measurements
         // we always load both successfully and unsuccessfully
         try {
-            $user = $this->provider->loadUserByUsername($username);
+            $user = $this->provider->loadUserByIdentifier($username);
 
             try {
-                $this->provider->loadUserByUsername($nonExistentUsername);
+                $this->provider->loadUserByIdentifier($nonExistentUsername);
             } catch (\Exception $e) {
             }
         } catch (AuthenticationException $e) {
-            $this->provider->loadUserByUsername($currentUsername);
+            $this->provider->loadUserByIdentifier($currentUsername);
 
             throw $e;
         }
@@ -183,16 +173,14 @@ class SwitchUserListener extends AbstractListener implements ListenerInterface
             throw $exception;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->info('Attempting to switch to user.', ['username' => $username]);
-        }
+        $this->logger?->info('Attempting to switch to user.', ['username' => $username]);
 
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $token, false);
-
-        $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
+        $roles[] = 'ROLE_PREVIOUS_ADMIN';
+        $originatedFromUri = str_replace('/&', '/?', preg_replace('#[&?]'.$this->usernameParameter.'=[^&]*#', '', $request->getRequestUri()));
+        $token = new SwitchUserToken($user, $this->firewallName, $roles, $token, $originatedFromUri);
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser(), $token);
@@ -230,12 +218,6 @@ class SwitchUserListener extends AbstractListener implements ListenerInterface
     {
         if ($token instanceof SwitchUserToken) {
             return $token->getOriginalToken();
-        }
-
-        foreach ($token->getRoles(false) as $role) {
-            if ($role instanceof SwitchUserRole) {
-                return $role->getSource();
-            }
         }
 
         return null;

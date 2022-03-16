@@ -51,4 +51,24 @@ class RequestTest extends TestCase
         $request = new Request('http://www.example.com/', 'get', [], [], [], ['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $request->getServer(), '->getServer() returns the server parameters of the request');
     }
+
+    public function testAllParameterValuesAreConvertedToString()
+    {
+        $parameters = [
+            'foo' => 1,
+            'bar' => [
+                'baz' => 2,
+            ],
+        ];
+
+        $expected = [
+            'foo' => '1',
+            'bar' => [
+                'baz' => '2',
+            ],
+        ];
+
+        $request = new Request('http://www.example.com/', 'get', $parameters);
+        $this->assertSame($expected, $request->getParameters());
+    }
 }

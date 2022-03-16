@@ -55,88 +55,39 @@ abstract class AbstractUriElement
 
     /**
      * Gets the node associated with this link.
-     *
-     * @return \DOMElement A \DOMElement instance
      */
-    public function getNode()
+    public function getNode(): \DOMElement
     {
         return $this->node;
     }
 
     /**
      * Gets the method associated with this link.
-     *
-     * @return string The method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method ?? 'GET';
     }
 
     /**
      * Gets the URI associated with this link.
-     *
-     * @return string The URI
      */
-    public function getUri()
+    public function getUri(): string
     {
-        $uri = trim($this->getRawUri());
-
-        // absolute URL?
-        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
-            return $uri;
-        }
-
-        // empty URI
-        if (!$uri) {
-            return $this->currentUri;
-        }
-
-        // an anchor
-        if ('#' === $uri[0]) {
-            return $this->cleanupAnchor($this->currentUri).$uri;
-        }
-
-        $baseUri = $this->cleanupUri($this->currentUri);
-
-        if ('?' === $uri[0]) {
-            return $baseUri.$uri;
-        }
-
-        // absolute URL with relative schema
-        if (str_starts_with($uri, '//')) {
-            return preg_replace('#^([^/]*)//.*$#', '$1', $baseUri).$uri;
-        }
-
-        $baseUri = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $baseUri);
-
-        // absolute path
-        if ('/' === $uri[0]) {
-            return $baseUri.$uri;
-        }
-
-        // relative path
-        $path = parse_url(substr($this->currentUri, \strlen($baseUri)), \PHP_URL_PATH);
-        $path = $this->canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
-
-        return $baseUri.('' === $path || '/' !== $path[0] ? '/' : '').$path;
+        return UriResolver::resolve($this->getRawUri(), $this->currentUri);
     }
 
     /**
      * Returns raw URI data.
-     *
-     * @return string
      */
-    abstract protected function getRawUri();
+    abstract protected function getRawUri(): string;
 
     /**
      * Returns the canonicalized URI path (see RFC 3986, section 5.2.4).
      *
      * @param string $path URI path
-     *
-     * @return string
      */
-    protected function canonicalizePath($path)
+    protected function canonicalizePath(string $path): string
     {
         if ('' === $path || '/' === $path) {
             return $path;
@@ -167,36 +118,4 @@ abstract class AbstractUriElement
      * @throws \LogicException If given node is not an anchor
      */
     abstract protected function setNode(\DOMElement $node);
-
-    /**
-     * Removes the query string and the anchor from the given uri.
-     */
-    private function cleanupUri(string $uri): string
-    {
-        return $this->cleanupQuery($this->cleanupAnchor($uri));
-    }
-
-    /**
-     * Remove the query string from the uri.
-     */
-    private function cleanupQuery(string $uri): string
-    {
-        if (false !== $pos = strpos($uri, '?')) {
-            return substr($uri, 0, $pos);
-        }
-
-        return $uri;
-    }
-
-    /**
-     * Remove the anchor from the uri.
-     */
-    private function cleanupAnchor(string $uri): string
-    {
-        if (false !== $pos = strpos($uri, '#')) {
-            return substr($uri, 0, $pos);
-        }
-
-        return $uri;
-    }
 }

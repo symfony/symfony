@@ -46,10 +46,13 @@ class ScalarNodeTest extends TestCase
     public function testSetDeprecated()
     {
         $childNode = new ScalarNode('foo');
-        $childNode->setDeprecated('"%node%" is deprecated');
+        $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
 
         $this->assertTrue($childNode->isDeprecated());
-        $this->assertSame('"foo" is deprecated', $childNode->getDeprecationMessage($childNode->getName(), $childNode->getPath()));
+        $deprecation = $childNode->getDeprecation($childNode->getName(), $childNode->getPath());
+        $this->assertSame('"foo" is deprecated', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
@@ -64,13 +67,19 @@ class ScalarNodeTest extends TestCase
         };
 
         $prevErrorHandler = set_error_handler($deprecationHandler);
-        $node->finalize([]);
-        restore_error_handler();
+        try {
+            $node->finalize([]);
+        } finally {
+            restore_error_handler();
+        }
         $this->assertSame(0, $deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
 
         $prevErrorHandler = set_error_handler($deprecationHandler);
-        $node->finalize(['foo' => '']);
-        restore_error_handler();
+        try {
+            $node->finalize(['foo' => '']);
+        } finally {
+            restore_error_handler();
+        }
         $this->assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 
@@ -98,7 +107,7 @@ class ScalarNodeTest extends TestCase
         $node = new ScalarNode('test');
 
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessage('Invalid type for path "test". Expected scalar, but got array.');
+        $this->expectExceptionMessage('Invalid type for path "test". Expected "scalar", but got "array".');
 
         $node->normalize([]);
     }
@@ -109,7 +118,7 @@ class ScalarNodeTest extends TestCase
         $node->setInfo('"the test value"');
 
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessage("Invalid type for path \"test\". Expected scalar, but got array.\nHint: \"the test value\"");
+        $this->expectExceptionMessage("Invalid type for path \"test\". Expected \"scalar\", but got \"array\".\nHint: \"the test value\"");
 
         $node->normalize([]);
     }

@@ -15,7 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
@@ -32,7 +32,7 @@ class ResizeFormListenerTest extends TestCase
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
         $this->form = $this->getBuilder()
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
     }
 
@@ -269,12 +269,12 @@ class ResizeFormListenerTest extends TestCase
         $this->form->setData(['0' => ['name' => 'John'], '1' => ['name' => 'Jane']]);
         $form1 = $this->getBuilder('0')
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $form1->add($this->getForm('name'));
         $form2 = $this->getBuilder('1')
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $form2->add($this->getForm('name'));
         $this->form->add($form1);

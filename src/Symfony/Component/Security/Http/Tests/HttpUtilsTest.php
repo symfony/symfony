@@ -282,13 +282,6 @@ class HttpUtilsTest extends TestCase
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
     }
 
-    public function testUrlMatcher()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface');
-        new HttpUtils($this->getUrlGenerator(), new \stdClass());
-    }
-
     public function testGenerateUriRemovesQueryString()
     {
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar'));

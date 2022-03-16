@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberTypeTest extends BaseTypeTest
@@ -78,32 +79,26 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using the Symfony\Component\Form\Extension\Core\Type\NumberType with float or int data when the "input" option is set to "string" is deprecated since Symfony 4.4 and will throw an exception in 5.0.
-     */
     public function testStringInputWithFloatData()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, 12345.6789, [
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a numeric string.');
+
+        $this->factory->create(static::TESTED_TYPE, 12345.6789, [
             'input' => 'string',
             'scale' => 2,
         ]);
-
-        $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using the Symfony\Component\Form\Extension\Core\Type\NumberType with float or int data when the "input" option is set to "string" is deprecated since Symfony 4.4 and will throw an exception in 5.0.
-     */
     public function testStringInputWithIntData()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, 12345, [
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a numeric string.');
+
+        $this->factory->create(static::TESTED_TYPE, 12345, [
             'input' => 'string',
             'scale' => 2,
         ]);
-
-        $this->assertSame('12345,00', $form->createView()->vars['value']);
     }
 
     public function testDefaultFormattingWithRounding()
@@ -206,5 +201,37 @@ class NumberTypeTest extends BaseTypeTest
             'grouping' => true,
             'html5' => true,
         ]);
+    }
+
+    public function testNumericInputmode()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'scale' => 0,
+            'html5' => false,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertSame('numeric', $form->createView()->vars['attr']['inputmode']);
+    }
+
+    public function testDecimalInputmode()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'scale' => 2,
+            'html5' => false,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertSame('decimal', $form->createView()->vars['attr']['inputmode']);
+    }
+
+    public function testNoInputmodeWithHtml5Widget()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => true,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertArrayNotHasKey('inputmode', $form->createView()->vars['attr']);
     }
 }

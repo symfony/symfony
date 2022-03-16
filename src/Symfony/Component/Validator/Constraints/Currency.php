@@ -22,23 +22,30 @@ use Symfony\Component\Validator\Exception\LogicException;
  * @author Miha Vrhovnik <miha.vrhovnik@pagein.si>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Currency extends Constraint
 {
     public const NO_SUCH_CURRENCY_ERROR = '69945ac1-2db4-405f-bec7-d2772f73df52';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NO_SUCH_CURRENCY_ERROR => 'NO_SUCH_CURRENCY_ERROR',
     ];
 
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
+
     public $message = 'This value is not a valid currency.';
 
-    public function __construct($options = null)
+    public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {
         if (!class_exists(Currencies::class)) {
-            // throw new LogicException('The Intl component is required to use the Currency constraint. Try running "composer require symfony/intl".');
-            @trigger_error(sprintf('Using the "%s" constraint without the "symfony/intl" component installed is deprecated since Symfony 4.2.', __CLASS__), \E_USER_DEPRECATED);
+            throw new LogicException('The Intl component is required to use the Currency constraint. Try running "composer require symfony/intl".');
         }
 
-        parent::__construct($options);
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
     }
 }

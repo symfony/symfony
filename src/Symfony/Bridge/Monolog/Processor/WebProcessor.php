@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Monolog\Processor;
 
 use Monolog\Processor\WebProcessor as BaseWebProcessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
 {
@@ -31,15 +31,15 @@ class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
         parent::__construct([], $extraFields);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $this->serverData = $event->getRequest()->server->all();
             $this->serverData['REMOTE_ADDR'] = $event->getRequest()->getClientIp();
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 4096],

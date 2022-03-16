@@ -30,70 +30,31 @@ interface ContainerInterface extends PsrContainerInterface
     public const IGNORE_ON_INVALID_REFERENCE = 3;
     public const IGNORE_ON_UNINITIALIZED_REFERENCE = 4;
 
-    /**
-     * Sets a service.
-     *
-     * @param string      $id      The service identifier
-     * @param object|null $service The service instance
-     */
-    public function set($id, $service);
+    public function set(string $id, ?object $service);
 
     /**
-     * Gets a service.
-     *
-     * @param string $id              The service identifier
-     * @param int    $invalidBehavior The behavior when the service does not exist
-     *
-     * @return object|null The associated service
-     *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
      *
      * @see Reference
      */
-    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object;
 
-    /**
-     * @param string $id The service identifier
-     *
-     * @return bool true if the service is defined, false otherwise
-     */
-    public function has($id);
+    public function has(string $id): bool;
 
     /**
      * Check for whether or not a service has been initialized.
-     *
-     * @param string $id
-     *
-     * @return bool true if the service has been initialized, false otherwise
      */
-    public function initialized($id);
+    public function initialized(string $id): bool;
 
     /**
-     * Gets a parameter.
-     *
-     * @param string $name The parameter name
-     *
      * @return array|bool|string|int|float|\UnitEnum|null
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
-    public function getParameter($name);
+    public function getParameter(string $name);
 
-    /**
-     * Checks if a parameter exists.
-     *
-     * @param string $name The parameter name
-     *
-     * @return bool The presence of parameter in container
-     */
-    public function hasParameter($name);
+    public function hasParameter(string $name): bool;
 
-    /**
-     * Sets a parameter.
-     *
-     * @param string                                     $name  The parameter name
-     * @param array|bool|string|int|float|\UnitEnum|null $value The parameter value
-     */
-    public function setParameter($name, $value);
+    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value);
 }

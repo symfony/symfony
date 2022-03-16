@@ -19,6 +19,13 @@ use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class EmailTest extends TestCase
 {
@@ -344,6 +351,14 @@ class EmailTest extends TestCase
         // 2 parts only, not 3 (text + embedded image once)
         $this->assertCount(2, $parts = $body->getParts());
         $this->assertStringMatchesFormat('html content <img src=3D"cid:%s@symfony">', $parts[0]->bodyToString());
+
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('<div background="cid:test.gif"></div>');
+        $e->embed($image, 'test.gif');
+        $body = $e->getBody();
+        $this->assertInstanceOf(RelatedPart::class, $body);
+        $this->assertCount(2, $parts = $body->getParts());
+        $this->assertStringMatchesFormat('<div background=3D"cid:%s@symfony"></div>', $parts[0]->bodyToString());
     }
 
     public function testAttachments()
@@ -383,5 +398,72 @@ class EmailTest extends TestCase
         $n = unserialize(serialize($e));
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());
         $this->assertEquals($e->getBody(), $n->getBody());
+    }
+
+    public function testSymfonySerialize()
+    {
+        // we don't add from/sender to check that validation is not triggered to serialize an email
+        $e = new Email();
+        $e->to('you@example.com');
+        $e->text('Text content');
+        $e->html('HTML <b>content</b>');
+        $e->attach('Some Text file', 'test.txt');
+        $expected = clone $e;
+
+        $expectedJson = <<<EOF
+{
+    "text": "Text content",
+    "textCharset": "utf-8",
+    "html": "HTML <b>content</b>",
+    "htmlCharset": "utf-8",
+    "attachments": [
+        {
+            "body": "Some Text file",
+            "name": "test.txt",
+            "content-type": null,
+            "inline": false
+        }
+    ],
+    "headers": {
+        "to": [
+            {
+                "addresses": [
+                    {
+                        "address": "you@example.com",
+                        "name": ""
+                    }
+                ],
+                "name": "To",
+                "lineLength": 76,
+                "lang": null,
+                "charset": "utf-8"
+            }
+        ]
+    },
+    "body": null,
+    "message": null
+}
+EOF;
+
+        $extractor = new PhpDocExtractor();
+        $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new MimeMessageNormalizer($propertyNormalizer),
+            new ObjectNormalizer(null, null, null, $extractor),
+            $propertyNormalizer,
+        ], [new JsonEncoder()]);
+
+        $serialized = $serializer->serialize($e, 'json');
+        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+
+        $n = $serializer->deserialize($serialized, Email::class, 'json');
+        $serialized = $serializer->serialize($e, 'json');
+        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+
+        $n->from('fabien@symfony.com');
+        $expected->from('fabien@symfony.com');
+        $this->assertEquals($expected->getHeaders(), $n->getHeaders());
+        $this->assertEquals($expected->getBody(), $n->getBody());
     }
 }

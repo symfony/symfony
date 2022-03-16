@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
+use Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionIntersectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
@@ -39,9 +40,24 @@ ReflectionClass {
 %Aimplements: array:%d [
 %A]
   constants: array:3 [
-    "IS_IMPLICIT_ABSTRACT" => 16
-    "IS_EXPLICIT_ABSTRACT" => %d
-    "IS_FINAL" => %d
+    0 => ReflectionClassConstant {
+      +name: "IS_IMPLICIT_ABSTRACT"
+      +class: "ReflectionClass"
+      modifiers: "public"
+      value: 16
+    }
+    1 => ReflectionClassConstant {
+      +name: "IS_EXPLICIT_ABSTRACT"
+      +class: "ReflectionClass"
+      modifiers: "public"
+      value: %d
+    }
+    2 => ReflectionClassConstant {
+      +name: "IS_FINAL"
+      +class: "ReflectionClass"
+      modifiers: "public"
+      value: %d
+    }
   ]
   properties: array:%d [
     "name" => ReflectionProperty {
@@ -78,7 +94,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "71 to 71"
+  line: "87 to 87"
 }
 EOTXT
             , $var
@@ -137,7 +153,7 @@ EOTXT
 
     public function testReflectionParameterScalar()
     {
-        $f = eval('return function (int $a) {};');
+        $f = function (int $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -152,12 +168,9 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReflectionParameterMixed()
     {
-        $f = eval('return function (mixed $a) {};');
+        $f = function (mixed $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -173,12 +186,9 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReflectionParameterUnion()
     {
-        $f = eval('return function (int|float $a) {};');
+        $f = function (int|float $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -193,12 +203,9 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReflectionParameterNullableUnion()
     {
-        $f = eval('return function (int|float|null $a) {};');
+        $f = function (int|float|null $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -214,12 +221,9 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testReflectionParameterIntersection()
     {
-        $f = eval('return function (Traversable&Countable $a) {};');
+        $f = function (\Traversable&\Countable $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -234,9 +238,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testReflectionPropertyScalar()
     {
         $var = new \ReflectionProperty(ReflectionNamedTypeFixture::class, 'a');
@@ -252,9 +253,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testReflectionNamedType()
     {
         $var = (new \ReflectionProperty(ReflectionNamedTypeFixture::class, 'a'))->getType();
@@ -270,9 +268,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReflectionUnionType()
     {
         $var = (new \ReflectionProperty(ReflectionUnionTypeFixture::class, 'a'))->getType();
@@ -298,9 +293,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testReflectionIntersectionType()
     {
         $var = (new \ReflectionProperty(ReflectionIntersectionTypeFixture::class, 'a'))->getType();
@@ -326,9 +318,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testExtendsReflectionType()
     {
         $var = new ExtendsReflectionTypeFixture();
@@ -342,28 +331,9 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP < 8
-     */
-    public function testLegacyExtendsReflectionType()
-    {
-        $var = new ExtendsReflectionTypeFixture();
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
-Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture {
-  name: "fake"
-  allowsNull: false
-  isBuiltin: false
-}
-EOTXT
-            , $var
-        );
-    }
-
     public function testReturnType()
     {
-        $f = eval('return function ():int {};');
-        $line = __LINE__ - 1;
+        $f = function ():int {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -371,21 +341,17 @@ Closure(): int {
   returnType: "int"
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
-  file: "%sReflectionCasterTest.php($line) : eval()'d code"
-  line: "1 to 1"
+  file: "%s"
+  line: "%s"
 }
 EOTXT
             , $f
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testMixedReturnType()
     {
-        $f = eval('return function (): mixed {};');
-        $line = __LINE__ - 1;
+        $f = function (): mixed {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -393,21 +359,17 @@ Closure(): mixed {
   returnType: "mixed"
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
-  file: "%sReflectionCasterTest.php($line) : eval()'d code"
-  line: "1 to 1"
+  file: "%s"
+  line: "%s"
 }
 EOTXT
             , $f
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionReturnType()
     {
-        $f = eval('return function (): int|float {};');
-        $line = __LINE__ - 1;
+        $f = function (): int|float {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -415,21 +377,17 @@ Closure(): int|float {
   returnType: "int|float"
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
-  file: "%sReflectionCasterTest.php($line) : eval()'d code"
-  line: "1 to 1"
+  file: "%s"
+  line: "%s"
 }
 EOTXT
             , $f
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testNullableUnionReturnType()
     {
-        $f = eval('return function (): int|float|null {};');
-        $line = __LINE__ - 1;
+        $f = function (): int|float|null {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -437,8 +395,8 @@ Closure(): int|float|null {
   returnType: "int|float|null"
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
-  file: "%sReflectionCasterTest.php($line) : eval()'d code"
-  line: "1 to 1"
+  file: "%s"
+  line: "%s"
 }
 EOTXT
             , $f
@@ -517,25 +475,135 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $generator);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testNewInInitializer()
     {
-        $f = eval('return function ($a = new stdClass()) {};');
-        $line = __LINE__ - 1;
+        $f = function ($a = new \stdClass()) {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
 Closure(\$a = new stdClass) {
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
-  file: "%sReflectionCasterTest.php($line) : eval()'d code"
-  line: "1 to 1"
+  file: "%s"
+  line: "%s"
 }
 EOTXT
             , $f
         );
+    }
+
+    public function testReflectionClassWithAttribute()
+    {
+        $var = new \ReflectionClass(LotsOfAttributes::class);
+
+        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+ReflectionClass {
+  +name: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
+%A  attributes: array:1 [
+    0 => ReflectionAttribute {
+      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      arguments: []
+    }
+  ]
+%A
+}
+EOTXT
+            , $var);
+    }
+
+    public function testReflectionMethodWithAttribute()
+    {
+        $var = new \ReflectionMethod(LotsOfAttributes::class, 'someMethod');
+
+        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+ReflectionMethod {
+  +name: "someMethod"
+  +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
+%A  attributes: array:1 [
+    0 => ReflectionAttribute {
+      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      arguments: array:1 [
+        0 => "two"
+      ]
+    }
+  ]
+%A
+}
+EOTXT
+            , $var);
+    }
+
+    public function testReflectionPropertyWithAttribute()
+    {
+        $var = new \ReflectionProperty(LotsOfAttributes::class, 'someProperty');
+
+        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+ReflectionProperty {
+  +name: "someProperty"
+  +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
+%A  attributes: array:1 [
+    0 => ReflectionAttribute {
+      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      arguments: array:2 [
+        0 => "one"
+        "extra" => "hello"
+      ]
+    }
+  ]
+}
+EOTXT
+            , $var);
+    }
+
+    public function testReflectionClassConstantWithAttribute()
+    {
+        $var = new \ReflectionClassConstant(LotsOfAttributes::class, 'SOME_CONSTANT');
+
+        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+ReflectionClassConstant {
+  +name: "SOME_CONSTANT"
+  +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
+  modifiers: "public"
+  value: "some value"
+  attributes: array:2 [
+    0 => ReflectionAttribute {
+      name: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
+      arguments: array:1 [
+        0 => "one"
+      ]
+    }
+    1 => ReflectionAttribute {
+      name: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
+      arguments: array:1 [
+        0 => "two"
+      ]
+    }
+  ]
+}
+EOTXT
+            , $var);
+    }
+
+    public function testReflectionParameterWithAttribute()
+    {
+        $var = new \ReflectionParameter([LotsOfAttributes::class, 'someMethod'], 'someParameter');
+
+        $this->assertDumpMatchesFormat(<<< 'EOTXT'
+ReflectionParameter {
+  +name: "someParameter"
+  position: 0
+  attributes: array:1 [
+    0 => ReflectionAttribute {
+      name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+      arguments: array:1 [
+        0 => "three"
+      ]
+    }
+  ]
+%A
+}
+EOTXT
+            , $var);
     }
 
     public static function stub(): void

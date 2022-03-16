@@ -3,7 +3,8 @@
 {% block body %}
 
     {% if error %}
-        <div>{{ error.message }}</div>
+        <div>{{ error.messageKey }}</div>
+        <div>{{ error.messageKey|replace(error.messageData) }}</div>
     {% endif %}
 
     <form action="{{ path('form_login_check') }}" method="post">

@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -20,13 +21,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @final
  */
-class LdapUser implements UserInterface, EquatableInterface
+class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private $entry;
-    private $username;
-    private $password;
-    private $roles;
-    private $extraFields;
+    private Entry $entry;
+    private string $username;
+    private ?string $password;
+    private array $roles;
+    private array $extraFields;
 
     public function __construct(Entry $entry, string $username, ?string $password, array $roles = [], array $extraFields = [])
     {
@@ -71,9 +72,14 @@ class LdapUser implements UserInterface, EquatableInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @internal for compatibility with Symfony 5.4
      */
     public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    public function getUserIdentifier(): string
     {
         return $this->username;
     }
@@ -113,7 +119,7 @@ class LdapUser implements UserInterface, EquatableInterface
             return false;
         }
 
-        if ($this->getUsername() !== $user->getUsername()) {
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
             return false;
         }
 

@@ -33,6 +33,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'foo' => ['string'],
             'base64' => ['string'],
             'bool' => ['bool'],
+            'not' => ['bool'],
             'const' => ['bool', 'int', 'float', 'string', 'array'],
             'csv' => ['array'],
             'file' => ['string'],
@@ -74,7 +75,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
 
 class SimpleProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv($prefix, $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         return $getEnv($name);
     }

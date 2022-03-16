@@ -16,14 +16,14 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class MemcachedCaster
 {
-    private static $optionConstants;
-    private static $defaultOptions;
+    private static array $optionConstants;
+    private static array $defaultOptions;
 
-    public static function castMemcached(\Memcached $c, array $a, Stub $stub, $isNested)
+    public static function castMemcached(\Memcached $c, array $a, Stub $stub, bool $isNested)
     {
         $a += [
             Caster::PREFIX_VIRTUAL.'servers' => $c->getServerList(),

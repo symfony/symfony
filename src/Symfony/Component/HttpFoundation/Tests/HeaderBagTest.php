@@ -108,19 +108,6 @@ class HeaderBagTest extends TestCase
         $this->assertNull($bag->get('baz', 'nope'), '->get return null although different default value is given');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a third argument to "Symfony\Component\HttpFoundation\HeaderBag::get()" is deprecated since Symfony 4.4, use method "all()" instead
-     */
-    public function testGetIsEqualToNewMethod()
-    {
-        $bag = new HeaderBag(['foo' => 'bar', 'fuzz' => 'bizz']);
-        $this->assertSame($bag->all('none'), $bag->get('none', [], false), '->get unknown values returns default as array');
-
-        $bag->set('foo', 'bor', false);
-        $this->assertSame(['bar', 'bor'], $bag->get('foo', 'nope', false), '->get return all values as array');
-    }
-
     public function testSetAssociativeArray()
     {
         $bag = new HeaderBag();

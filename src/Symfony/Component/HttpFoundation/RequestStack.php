@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 /**
  * Request stack that controls the lifecycle of requests.
  *
@@ -21,7 +24,7 @@ class RequestStack
     /**
      * @var Request[]
      */
-    private $requests = [];
+    private array $requests = [];
 
     /**
      * Pushes a Request on the stack.
@@ -41,10 +44,8 @@ class RequestStack
      *
      * This method should generally not be called directly as the stack
      * management should be taken care of by the application itself.
-     *
-     * @return Request|null
      */
-    public function pop()
+    public function pop(): ?Request
     {
         if (!$this->requests) {
             return null;
@@ -53,24 +54,19 @@ class RequestStack
         return array_pop($this->requests);
     }
 
-    /**
-     * @return Request|null
-     */
-    public function getCurrentRequest()
+    public function getCurrentRequest(): ?Request
     {
         return end($this->requests) ?: null;
     }
 
     /**
-     * Gets the master Request.
+     * Gets the main request.
      *
-     * Be warned that making your code aware of the master request
+     * Be warned that making your code aware of the main request
      * might make it un-compatible with other features of your framework
      * like ESI support.
-     *
-     * @return Request|null
      */
-    public function getMasterRequest()
+    public function getMainRequest(): ?Request
     {
         if (!$this->requests) {
             return null;
@@ -86,14 +82,26 @@ class RequestStack
      * might make it un-compatible with other features of your framework
      * like ESI support.
      *
-     * If current Request is the master request, it returns null.
-     *
-     * @return Request|null
+     * If current Request is the main request, it returns null.
      */
-    public function getParentRequest()
+    public function getParentRequest(): ?Request
     {
         $pos = \count($this->requests) - 2;
 
         return $this->requests[$pos] ?? null;
+    }
+
+    /**
+     * Gets the current session.
+     *
+     * @throws SessionNotFoundException
+     */
+    public function getSession(): SessionInterface
+    {
+        if ((null !== $request = end($this->requests) ?: null) && $request->hasSession()) {
+            return $request->getSession();
+        }
+
+        throw new SessionNotFoundException();
     }
 }

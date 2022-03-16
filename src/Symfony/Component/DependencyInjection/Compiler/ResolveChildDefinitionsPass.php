@@ -27,9 +27,9 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
  */
 class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {
-    private $currentPath;
+    private array $currentPath;
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition) {
             return parent::processValue($value, $isRoot);
@@ -63,7 +63,6 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             throw $e;
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
-            $r->setAccessible(true);
             $r->setValue($e, sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
 
             throw $e;
@@ -102,7 +101,8 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
         if ($parentDef->isDeprecated()) {
-            $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
+            $deprecation = $parentDef->getDeprecation('%service_id%');
+            $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
         $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
@@ -133,13 +133,14 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         if (isset($changes['public'])) {
             $def->setPublic($definition->isPublic());
         } else {
-            $def->setPrivate($definition->isPrivate() || $parentDef->isPrivate());
+            $def->setPublic($parentDef->isPublic());
         }
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
         }
-        if (isset($changes['deprecated'])) {
-            $def->setDeprecated($definition->isDeprecated(), $definition->getDeprecationMessage('%service_id%'));
+        if (isset($changes['deprecated']) && $definition->isDeprecated()) {
+            $deprecation = $definition->getDeprecation('%service_id%');
+            $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
         if (isset($changes['autowired'])) {
             $def->setAutowired($definition->isAutowired());

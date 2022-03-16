@@ -109,4 +109,18 @@ class MoneyTypeTest extends BaseTypeTest
 
         $this->assertSame('12345', $form->createView()->vars['value']);
     }
+
+    public function testHtml5EnablesSpecificFormatting()
+    {
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_CH');
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['html5' => true, 'scale' => 2]);
+        $form->setData('12345.6');
+
+        $this->assertSame('12345.60', $form->createView()->vars['value']);
+        $this->assertSame('number', $form->createView()->vars['type']);
+    }
 }

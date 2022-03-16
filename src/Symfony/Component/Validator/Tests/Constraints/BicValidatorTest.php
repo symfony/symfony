@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
@@ -69,6 +71,24 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testInvalidComparisonToPropertyPathFromAttribute()
+    {
+        $classMetadata = new ClassMetadata(BicDummy::class);
+        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+
+        [$constraint] = $classMetadata->properties['bic1']->constraints;
+
+        $this->setObject(new BicDummy());
+
+        $this->validator->validate('UNCRIT2B912', $constraint);
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '"UNCRIT2B912"')
+            ->setParameter('{{ iban }}', 'FR14 2004 1010 0505 0001 3M02 606')
+            ->setCode(Bic::INVALID_IBAN_COUNTRY_CODE_ERROR)
+            ->assertRaised();
+    }
+
     public function testValidComparisonToValue()
     {
         $constraint = new Bic(['iban' => 'FR14 2004 1010 0505 0001 3M02 606']);
@@ -83,6 +103,22 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Bic(['iban' => 'FR14 2004 1010 0505 0001 3M02 606']);
         $constraint->ibanMessage = 'Constraint Message';
+
+        $this->validator->validate('UNCRIT2B912', $constraint);
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '"UNCRIT2B912"')
+            ->setParameter('{{ iban }}', 'FR14 2004 1010 0505 0001 3M02 606')
+            ->setCode(Bic::INVALID_IBAN_COUNTRY_CODE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidComparisonToValueFromAttribute()
+    {
+        $classMetadata = new ClassMetadata(BicDummy::class);
+        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+
+        [$constraint] = $classMetadata->properties['bic1']->constraints;
 
         $this->validator->validate('UNCRIT2B912', $constraint);
 
@@ -112,6 +148,14 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             'iban' => 'value',
             'ibanPropertyPath' => 'propertyPath',
         ]);
+    }
+
+    public function testThrowsConstraintExceptionIfBothValueAndPropertyPathNamed()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time');
+
+        eval('new \Symfony\Component\Validator\Constraints\Bic(iban: "value", ibanPropertyPath: "propertyPath");');
     }
 
     public function testInvalidValuePath()
@@ -165,6 +209,21 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Bic([
             'message' => 'myMessage',
         ]);
+
+        $this->validator->validate($bic, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$bic.'"')
+            ->setCode($code)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getInvalidBics
+     */
+    public function testInvalidBicsNamed($bic, $code)
+    {
+        $constraint = new Bic(message: 'myMessage');
 
         $this->validator->validate($bic, $constraint);
 
@@ -258,4 +317,14 @@ class BicComparisonTestClass
     {
         return $this->value;
     }
+}
+
+class BicDummy
+{
+    #[Bic(iban: 'FR14 2004 1010 0505 0001 3M02 606', ibanMessage: 'Constraint Message')]
+    private $bic1;
+    #[Bic(ibanPropertyPath: 'iban', ibanMessage: 'Constraint Message')]
+    private $bic2;
+
+    private $iban = 'FR14 2004 1010 0505 0001 3M02 606';
 }

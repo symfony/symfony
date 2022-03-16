@@ -22,17 +22,15 @@ use Twig\Profiler\Dumper\HtmlDumper;
 use Twig\Profiler\Profile;
 
 /**
- * TwigDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $profile;
-    private $twig;
-    private $computed;
+    private Profile $profile;
+    private ?Environment $twig;
+    private array $computed;
 
     public function __construct(Profile $profile, Environment $twig = null)
     {
@@ -42,10 +40,8 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
 
     /**
      * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
     }
 
@@ -55,7 +51,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     public function reset()
     {
         $this->profile->reset();
-        $this->computed = null;
+        unset($this->computed);
         $this->data = [];
     }
 
@@ -144,18 +140,12 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
 
     public function getProfile()
     {
-        if (null === $this->profile) {
-            $this->profile = unserialize($this->data['profile'], ['allowed_classes' => ['Twig_Profiler_Profile', 'Twig\Profiler\Profile']]);
-        }
-
-        return $this->profile;
+        return $this->profile ??= unserialize($this->data['profile'], ['allowed_classes' => ['Twig_Profiler_Profile', Profile::class]]);
     }
 
     private function getComputedData(string $index)
     {
-        if (null === $this->computed) {
-            $this->computed = $this->computeData($this->getProfile());
-        }
+        $this->computed ??= $this->computeData($this->getProfile());
 
         return $this->computed[$index];
     }
@@ -200,7 +190,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'twig';
     }

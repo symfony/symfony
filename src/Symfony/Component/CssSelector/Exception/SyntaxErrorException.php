@@ -23,49 +23,27 @@ use Symfony\Component\CssSelector\Parser\Token;
  */
 class SyntaxErrorException extends ParseException
 {
-    /**
-     * @param string $expectedValue
-     *
-     * @return self
-     */
-    public static function unexpectedToken($expectedValue, Token $foundToken)
+    public static function unexpectedToken(string $expectedValue, Token $foundToken): self
     {
         return new self(sprintf('Expected %s, but %s found.', $expectedValue, $foundToken));
     }
 
-    /**
-     * @param string $pseudoElement
-     * @param string $unexpectedLocation
-     *
-     * @return self
-     */
-    public static function pseudoElementFound($pseudoElement, $unexpectedLocation)
+    public static function pseudoElementFound(string $pseudoElement, string $unexpectedLocation): self
     {
         return new self(sprintf('Unexpected pseudo-element "::%s" found %s.', $pseudoElement, $unexpectedLocation));
     }
 
-    /**
-     * @param int $position
-     *
-     * @return self
-     */
-    public static function unclosedString($position)
+    public static function unclosedString(int $position): self
     {
         return new self(sprintf('Unclosed/invalid string at %s.', $position));
     }
 
-    /**
-     * @return self
-     */
-    public static function nestedNot()
+    public static function nestedNot(): self
     {
         return new self('Got nested ::not().');
     }
 
-    /**
-     * @return self
-     */
-    public static function stringAsFunctionArgument()
+    public static function stringAsFunctionArgument(): self
     {
         return new self('String not allowed as function argument.');
     }

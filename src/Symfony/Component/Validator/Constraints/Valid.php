@@ -19,11 +19,12 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Valid extends Constraint
 {
     public $traverse = true;
 
-    public function __get($option)
+    public function __get(string $option): mixed
     {
         if ('groups' === $option) {
             // when this is reached, no groups have been configured
@@ -36,7 +37,7 @@ class Valid extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName(string $group)
     {
         if (null !== $this->groups) {
             parent::addImplicitGroupName($group);

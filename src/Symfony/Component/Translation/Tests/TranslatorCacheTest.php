@@ -59,6 +59,10 @@ class TranslatorCacheTest extends TestCase
      */
     public function testThatACacheIsUsed($debug)
     {
+        if (!class_exists(\MessageFormatter::class)) {
+            $this->markTestSkipped(sprintf('Skipping test as the required "%s" class does not exist. Consider installing the "intl" PHP extension or the "symfony/polyfill-intl-messageformatter" package.', \MessageFormatter::class));
+        }
+
         $locale = 'any_locale';
         $format = 'some_format';
         $msgid = 'test';
@@ -316,7 +320,7 @@ class TranslatorCacheTest extends TestCase
 
 class StaleResource implements SelfCheckingResourceInterface
 {
-    public function isFresh($timestamp): bool
+    public function isFresh(int $timestamp): bool
     {
         return false;
     }

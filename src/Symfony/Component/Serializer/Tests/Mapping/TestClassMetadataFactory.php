@@ -19,9 +19,9 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
  */
 class TestClassMetadataFactory
 {
-    public static function createClassMetadata($withParent = false, $withInterface = false)
+    public static function createClassMetadata(string $namespace, bool $withParent = false, bool $withInterface = false): ClassMetadata
     {
-        $expected = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+        $expected = new ClassMetadata($namespace.'\GroupDummy');
 
         $foo = new AttributeMetadata('foo');
         $foo->addGroup('a');
@@ -32,6 +32,10 @@ class TestClassMetadataFactory
         $bar->addGroup('c');
         $bar->addGroup('name_converter');
         $expected->addAttributeMetadata($bar);
+
+        $quux = new AttributeMetadata('quux');
+        $quux->addGroup('d');
+        $expected->addAttributeMetadata($quux);
 
         $fooBar = new AttributeMetadata('fooBar');
         $fooBar->addGroup('a');
@@ -64,9 +68,9 @@ class TestClassMetadataFactory
         return $expected;
     }
 
-    public static function createXmlCLassMetadata()
+    public static function createXmlCLassMetadata(): ClassMetadata
     {
-        $expected = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+        $expected = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy');
 
         $foo = new AttributeMetadata('foo');
         $foo->addGroup('group1');

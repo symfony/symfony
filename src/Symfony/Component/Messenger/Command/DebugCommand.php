@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,11 +26,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
+#[AsCommand(name: 'debug:messenger', description: 'List messages you can dispatch using the message buses')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:messenger';
-
-    private $mapping;
+    private array $mapping;
 
     public function __construct(array $mapping)
     {
@@ -43,7 +45,6 @@ class DebugCommand extends Command
     {
         $this
             ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of "%s")', implode('", "', array_keys($this->mapping))))
-            ->setDescription('List messages you can dispatch using the message buses')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all messages that can be
 dispatched using the message buses:
@@ -62,7 +63,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Messenger');
@@ -80,12 +81,20 @@ EOF
 
             $tableRows = [];
             foreach ($handlersByMessage as $message => $handlers) {
+                if ($description = self::getClassDescription($message)) {
+                    $tableRows[] = [sprintf('<comment>%s</>', $description)];
+                }
+
                 $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
                 foreach ($handlers as $handler) {
                     $tableRows[] = [
                         sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1]),
                     ];
+                    if ($handlerDescription = self::getClassDescription($handler[0])) {
+                        $tableRows[] = [sprintf('               <comment>%s</>', $handlerDescription)];
+                    }
                 }
+                $tableRows[] = [''];
             }
 
             if ($tableRows) {
@@ -112,5 +121,28 @@ EOF
         }
 
         return ' (when '.implode(', ', $optionsMapping).')';
+    }
+
+    private static function getClassDescription(string $class): string
+    {
+        try {
+            $r = new \ReflectionClass($class);
+
+            if ($docComment = $r->getDocComment()) {
+                $docComment = preg_split('#\n\s*\*\s*[\n@]#', substr($docComment, 3, -2), 2)[0];
+
+                return trim(preg_replace('#\s*\n\s*\*\s*#', ' ', $docComment));
+            }
+        } catch (\ReflectionException $e) {
+        }
+
+        return '';
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('bus')) {
+            $suggestions->suggestValues(array_keys($this->mapping));
+        }
     }
 }

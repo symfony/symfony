@@ -26,6 +26,7 @@ class NotificationEmailTest extends TestCase
             'markdown' => true,
             'raw' => false,
             'a' => 'b',
+            'footer_text' => 'Notification e-mail sent by Symfony',
         ], $email->getContext());
     }
 
@@ -47,6 +48,7 @@ class NotificationEmailTest extends TestCase
             'markdown' => false,
             'raw' => true,
             'a' => 'b',
+            'footer_text' => 'Notification e-mail sent by Symfony',
         ], $email->getContext());
     }
 
@@ -62,5 +64,56 @@ class NotificationEmailTest extends TestCase
         $email = (new NotificationEmail())->from('me@example.com')->subject('Foo');
         $headers = $email->getPreparedHeaders();
         $this->assertSame('[LOW] Foo', $headers->get('Subject')->getValue());
+    }
+
+    public function testPublicMail()
+    {
+        $email = NotificationEmail::asPublicEmail()
+            ->markdown('Foo')
+            ->action('Bar', 'http://example.com/')
+            ->context(['a' => 'b'])
+        ;
+
+        $this->assertEquals([
+            'importance' => null,
+            'content' => 'Foo',
+            'exception' => false,
+            'action_text' => 'Bar',
+            'action_url' => 'http://example.com/',
+            'markdown' => true,
+            'raw' => false,
+            'a' => 'b',
+            'footer_text' => null,
+        ], $email->getContext());
+
+        $email = (new NotificationEmail())
+            ->markAsPublic()
+            ->markdown('Foo')
+            ->action('Bar', 'http://example.com/')
+            ->context(['a' => 'b'])
+        ;
+
+        $this->assertEquals([
+            'importance' => null,
+            'content' => 'Foo',
+            'exception' => false,
+            'action_text' => 'Bar',
+            'action_url' => 'http://example.com/',
+            'markdown' => true,
+            'raw' => false,
+            'a' => 'b',
+            'footer_text' => null,
+        ], $email->getContext());
+    }
+
+    public function testPublicMailSubject()
+    {
+        $email = NotificationEmail::asPublicEmail()->from('me@example.com')->subject('Foo');
+        $headers = $email->getPreparedHeaders();
+        $this->assertSame('Foo', $headers->get('Subject')->getValue());
+
+        $email = (new NotificationEmail())->markAsPublic()->from('me@example.com')->subject('Foo');
+        $headers = $email->getPreparedHeaders();
+        $this->assertSame('Foo', $headers->get('Subject')->getValue());
     }
 }

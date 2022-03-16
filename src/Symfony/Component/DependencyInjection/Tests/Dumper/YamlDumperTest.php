@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -24,6 +25,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
@@ -131,9 +133,6 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_service_closure.yml', $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();
@@ -149,6 +148,17 @@ class YamlDumperTest extends TestCase
         $dumper = new YamlDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration.yml'), $dumper->dump());
+    }
+
+    public function testDumpServiceWithAbstractArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
+            ->setArgument('$bar', 'test');
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_abstract_argument.yml', $dumper->dump());
     }
 
     private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')

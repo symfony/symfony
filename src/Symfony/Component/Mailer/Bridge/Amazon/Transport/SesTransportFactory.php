@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
-use Symfony\Component\Mailer\Exception\LogicException;
+use AsyncAws\Core\Configuration;
+use AsyncAws\Ses\SesClient;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -19,32 +20,43 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
+ * @author Jérémy Derussé <jeremy@derusse.com>
  */
 final class SesTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $user = $this->getUser($dsn);
-        $password = $this->getPassword($dsn);
         $region = $dsn->getOption('region');
-        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-        $port = $dsn->getPort();
-
-        if ('ses+api' === $scheme) {
-            if (!\extension_loaded('simplexml')) {
-                throw new LogicException(sprintf('Cannot use "%s". Make sure you have "ext-simplexml" installed and enabled.', SesApiTransport::class));
-            }
-
-            return (new SesApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
-        }
-
-        if ('ses+https' === $scheme || 'ses' === $scheme) {
-            return (new SesHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
-        }
 
         if ('ses+smtp' === $scheme || 'ses+smtps' === $scheme) {
-            return new SesSmtpTransport($user, $password, $region, $this->dispatcher, $this->logger);
+            $transport = new SesSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $region, $this->dispatcher, $this->logger);
+
+            if (null !== $pingThreshold = $dsn->getOption('ping_threshold')) {
+                $transport->setPingThreshold((int) $pingThreshold);
+            }
+
+            return $transport;
+        }
+
+        switch ($scheme) {
+            case 'ses+api':
+                $class = SesApiAsyncAwsTransport::class;
+                // no break
+            case 'ses':
+            case 'ses+https':
+                $class ??= SesHttpAsyncAwsTransport::class;
+                $options = [
+                    'region' => $dsn->getOption('region') ?: 'eu-west-1',
+                    'accessKeyId' => $dsn->getUser(),
+                    'accessKeySecret' => $dsn->getPassword(),
+                ] + (
+                    'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://'.$dsn->getHost().($dsn->getPort() ? ':'.$dsn->getPort() : '')]
+                ) + (
+                    null === $dsn->getOption('session_token') ? [] : ['sessionToken' => $dsn->getOption('session_token')]
+                );
+
+                return new $class(new SesClient(Configuration::create($options), null, $this->client, $this->logger), $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'ses', $this->getSupportedSchemes());

@@ -21,25 +21,19 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new ExpressionFunction('is_anonymous', function () {
-                return '$trust_resolver->isAnonymous($token)';
-            }, function (array $variables) {
-                return $variables['trust_resolver']->isAnonymous($variables['token']);
-            }),
-
             new ExpressionFunction('is_authenticated', function () {
-                return '$token && !$trust_resolver->isAnonymous($token)';
+                return '$auth_checker->isGranted("IS_AUTHENTICATED")';
             }, function (array $variables) {
-                return $variables['token'] && !$variables['trust_resolver']->isAnonymous($variables['token']);
+                return $variables['auth_checker']->isGranted('IS_AUTHENTICATED');
             }),
 
             new ExpressionFunction('is_fully_authenticated', function () {
-                return '$trust_resolver->isFullFledged($token)';
+                return '$token && $auth_checker->isGranted("IS_AUTHENTICATED_FULLY")';
             }, function (array $variables) {
-                return $variables['trust_resolver']->isFullFledged($variables['token']);
+                return $variables['token'] && $variables['auth_checker']->isGranted('IS_AUTHENTICATED_FULLY');
             }),
 
             new ExpressionFunction('is_granted', function ($attributes, $object = 'null') {
@@ -49,19 +43,9 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }),
 
             new ExpressionFunction('is_remember_me', function () {
-                return '$trust_resolver->isRememberMe($token)';
+                return '$token && $auth_checker->isGranted("IS_REMEMBERED")';
             }, function (array $variables) {
-                return $variables['trust_resolver']->isRememberMe($variables['token']);
-            }),
-
-            new ExpressionFunction('has_role', function ($role) {
-                @trigger_error('Using the "has_role()" function in security expressions is deprecated since Symfony 4.2, use "is_granted()" instead.', \E_USER_DEPRECATED);
-
-                return sprintf('in_array(%s, $roles)', $role);
-            }, function (array $variables, $role) {
-                @trigger_error('Using the "has_role()" function in security expressions is deprecated since Symfony 4.2, use "is_granted()" instead.', \E_USER_DEPRECATED);
-
-                return \in_array($role, $variables['roles']);
+                return $variables['token'] && $variables['auth_checker']->isGranted('IS_REMEMBERED');
             }),
         ];
     }

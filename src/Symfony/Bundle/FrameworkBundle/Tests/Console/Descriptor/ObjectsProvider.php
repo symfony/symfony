@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -70,10 +71,6 @@ class ObjectsProvider
             'array' => [12, 'Hello world!', true],
         ]);
 
-        if (\PHP_VERSION_ID < 80100) {
-            return;
-        }
-
         yield 'parameters_enums' => new ParameterBag([
             'unit_enum' => FooUnitEnum::BAR,
             'backed_enum' => Suit::Hearts,
@@ -99,6 +96,24 @@ class ObjectsProvider
         return [
             'parameter' => $builder,
             'array_parameter' => $builder,
+        ];
+    }
+
+    public static function getContainerDeprecations()
+    {
+        $builderWithDeprecations = new ContainerBuilder();
+        $builderWithDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithDeprecations->setParameter('kernel.build_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithDeprecations->setParameter('kernel.container_class', 'KernelContainerWith');
+
+        $builderWithoutDeprecations = new ContainerBuilder();
+        $builderWithoutDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithoutDeprecations->setParameter('kernel.build_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithoutDeprecations->setParameter('kernel.container_class', 'KernelContainerWithout');
+
+        return [
+            'deprecations' => $builderWithDeprecations,
+            'deprecations_empty' => $builderWithoutDeprecations,
         ];
     }
 
@@ -142,6 +157,7 @@ class ObjectsProvider
                     new Reference('definition_1'),
                     new Reference('.definition_2'),
                 ]))
+                ->addArgument(new AbstractArgument('placeholder'))
                 ->setFactory(['Full\\Qualified\\FactoryClass', 'get']),
             '.definition_2' => $definition2
                 ->setPublic(false)
@@ -239,7 +255,7 @@ class ObjectsProvider
             'callable_5' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'],
             'callable_6' => function () { return 'Closure'; },
             'callable_7' => new CallableClass(),
-            'callable_from_callable' => \Closure::fromCallable(new CallableClass()),
+            'callable_from_callable' => (new CallableClass())(...),
         ];
     }
 }

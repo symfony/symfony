@@ -8,5 +8,5 @@ services:
         class: stdClass
         public: true
         tags:
-            - { name: proxy, interface: SomeInterface }
+            - proxy: { interface: SomeInterface }
         lazy: true

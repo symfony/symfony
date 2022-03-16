@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
@@ -79,7 +79,7 @@ class ValidationListenerTest extends TestCase
         $config->setCompound($compound);
 
         if ($compound) {
-            $config->setDataMapper(new PropertyPathMapper());
+            $config->setDataMapper(new DataMapper());
         }
 
         return new Form($config);

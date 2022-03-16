@@ -12,25 +12,15 @@ use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\WorkflowEvents;
 
 class WorkflowTest extends TestCase
 {
     use WorkflowBuilderTrait;
-
-    public function testGetMarkingWithInvalidStoreReturn()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
-        $subject = new Subject();
-        $workflow = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class));
-
-        $workflow->getMarking($subject);
-    }
 
     public function testGetMarkingWithEmptyDefinition()
     {
@@ -235,9 +225,12 @@ class WorkflowTest extends TestCase
         $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
             $event->setBlocked(true);
         });
+        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+            $event->setBlocked(true, 'You should not pass !!');
+        });
 
         $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't1');
-        $this->assertCount(4, $transitionBlockerList);
+        $this->assertCount(5, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
         $this->assertSame('Transition blocker 1', $blockers[0]->getMessage());
         $this->assertSame('blocker_1', $blockers[0]->getCode());
@@ -245,19 +238,29 @@ class WorkflowTest extends TestCase
         $this->assertSame('blocker_2', $blockers[1]->getCode());
         $this->assertSame('Transition blocker 3', $blockers[2]->getMessage());
         $this->assertSame('blocker_3', $blockers[2]->getCode());
-        $this->assertSame('Unknown reason.', $blockers[3]->getMessage());
+        $this->assertSame('The transition has been blocked by a guard (Symfony\Component\Workflow\Tests\WorkflowTest).', $blockers[3]->getMessage());
         $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[3]->getCode());
+        $this->assertSame('You should not pass !!', $blockers[4]->getMessage());
+        $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[4]->getCode());
     }
 
     public function testApplyWithNotExisingTransition()
     {
-        $this->expectException(UndefinedTransitionException::class);
-        $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
+        $context = [
+            'lorem' => 'ipsum',
+        ];
 
-        $workflow->apply($subject, '404 Not Found');
+        try {
+            $workflow->apply($subject, '404 Not Found', $context);
+
+            $this->fail('Should throw an exception');
+        } catch (UndefinedTransitionException $e) {
+            $this->assertSame('Transition "404 Not Found" is not defined for workflow "unnamed".', $e->getMessage());
+            $this->assertSame($e->getContext(), $context);
+        }
     }
 
     public function testApplyWithNotEnabledTransition()
@@ -265,9 +268,12 @@ class WorkflowTest extends TestCase
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
+        $context = [
+            'lorem' => 'ipsum',
+        ];
 
         try {
-            $workflow->apply($subject, 't2');
+            $workflow->apply($subject, 't2', $context);
 
             $this->fail('Should throw an exception');
         } catch (NotEnabledTransitionException $e) {
@@ -278,6 +284,7 @@ class WorkflowTest extends TestCase
             $this->assertSame($e->getWorkflow(), $workflow);
             $this->assertSame($e->getSubject(), $subject);
             $this->assertSame($e->getTransitionName(), 't2');
+            $this->assertSame($e->getContext(), $context);
         }
     }
 
@@ -376,6 +383,7 @@ class WorkflowTest extends TestCase
         $eventNameExpected = [
             'workflow.entered',
             'workflow.workflow_name.entered',
+            'workflow.workflow_name.entered.a',
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.t1',
@@ -410,6 +418,105 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
+    public function provideApplyWithEventDispatcherForAnnounceTests()
+    {
+        yield [false, [Workflow::DISABLE_ANNOUNCE_EVENT => true]];
+        yield [true, [Workflow::DISABLE_ANNOUNCE_EVENT => false]];
+        yield [true, []];
+    }
+
+    /** @dataProvider provideApplyWithEventDispatcherForAnnounceTests */
+    public function testApplyWithEventDispatcherForAnnounce(bool $fired, array $context)
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        $workflow->apply($subject, 't1', $context);
+
+        if ($fired) {
+            $this->assertContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
+        } else {
+            $this->assertNotContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
+        }
+    }
+
+    public function testApplyDispatchesWithDisableEventInContext()
+    {
+        $transitions[] = new Transition('a-b', 'a', 'b');
+        $transitions[] = new Transition('a-c', 'a', 'c');
+        $definition = new Definition(['a', 'b', 'c'], $transitions);
+
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        $eventNameExpected = [
+            'workflow.guard',
+            'workflow.workflow_name.guard',
+            'workflow.workflow_name.guard.a-b',
+            'workflow.transition',
+            'workflow.workflow_name.transition',
+            'workflow.workflow_name.transition.a-b',
+        ];
+
+        $workflow->apply($subject, 'a-b', [
+            Workflow::DISABLE_LEAVE_EVENT => true,
+            Workflow::DISABLE_ENTER_EVENT => true,
+            Workflow::DISABLE_ENTERED_EVENT => true,
+            Workflow::DISABLE_COMPLETED_EVENT => true,
+            Workflow::DISABLE_ANNOUNCE_EVENT => true,
+        ]);
+
+        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+    }
+
+    public function testApplyDispatchesNoEventsWhenSpecifiedByDefinition()
+    {
+        $transitions[] = new Transition('a-b', 'a', 'b');
+        $transitions[] = new Transition('a-c', 'a', 'c');
+        $definition = new Definition(['a', 'b', 'c'], $transitions);
+
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name', []);
+
+        $eventNameExpected = [
+            'workflow.guard',
+            'workflow.workflow_name.guard',
+            'workflow.workflow_name.guard.a-b',
+        ];
+
+        $workflow->apply($subject, 'a-b');
+
+        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+    }
+
+    public function testApplyOnlyDispatchesEventsThatHaveBeenSpecifiedByDefinition()
+    {
+        $transitions[] = new Transition('a-b', 'a', 'b');
+        $transitions[] = new Transition('a-c', 'a', 'c');
+        $definition = new Definition(['a', 'b', 'c'], $transitions);
+
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name', [WorkflowEvents::COMPLETED]);
+
+        $eventNameExpected = [
+            'workflow.guard',
+            'workflow.workflow_name.guard',
+            'workflow.workflow_name.guard.a-b',
+            'workflow.completed',
+            'workflow.workflow_name.completed',
+            'workflow.workflow_name.completed.a-b',
+        ];
+
+        $workflow->apply($subject, 'a-b');
+
+        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+    }
+
     public function testApplyDoesNotTriggerExtraGuardWithEventDispatcher()
     {
         $transitions[] = new Transition('a-b', 'a', 'b');
@@ -423,6 +530,7 @@ class WorkflowTest extends TestCase
         $eventNameExpected = [
             'workflow.entered',
             'workflow.workflow_name.entered',
+            'workflow.workflow_name.entered.a',
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.a-b',
@@ -493,6 +601,79 @@ class WorkflowTest extends TestCase
         $workflow->apply($subject, 't1');
     }
 
+    public function testEventContext()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $dispatcher = new EventDispatcher();
+        $name = 'workflow_name';
+        $context = ['context'];
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
+
+        $assertWorkflowContext = function (Event $event) use ($context) {
+            $this->assertEquals($context, $event->getContext());
+        };
+
+        $eventNames = [
+            'workflow.leave',
+            'workflow.transition',
+            'workflow.enter',
+            'workflow.entered',
+            'workflow.announce',
+        ];
+
+        foreach ($eventNames as $eventName) {
+            $dispatcher->addListener($eventName, $assertWorkflowContext);
+        }
+
+        $marking = $workflow->apply($subject, 't1', $context);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertSame($context, $marking->getContext());
+    }
+
+    public function testEventContextUpdated()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $dispatcher = new EventDispatcher();
+
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher);
+
+        $dispatcher->addListener('workflow.transition', function (TransitionEvent $event) {
+            $event->setContext(['foo' => 'bar']);
+        });
+
+        $marking = $workflow->apply($subject, 't1', ['initial']);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertSame(['foo' => 'bar'], $marking->getContext());
+    }
+
+    public function testEventDefaultInitialContext()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $dispatcher = new EventDispatcher();
+        $name = 'workflow_name';
+        $context = Workflow::DEFAULT_INITIAL_CONTEXT;
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
+
+        $assertWorkflowContext = function (Event $event) use ($context) {
+            $this->assertEquals($context, $event->getContext());
+        };
+
+        $eventNames = [
+            'workflow.workflow_name.entered.a',
+        ];
+
+        foreach ($eventNames as $eventName) {
+            $dispatcher->addListener($eventName, $assertWorkflowContext);
+        }
+
+        $workflow->apply($subject, 't1');
+    }
+
     public function testMarkingStateOnApplyWithEventDispatcher()
     {
         $definition = new Definition(range('a', 'f'), [new Transition('t', range('a', 'c'), range('d', 'f'))]);
@@ -552,6 +733,21 @@ class WorkflowTest extends TestCase
         $this->assertSame('t5', $transitions[0]->getName());
     }
 
+    public function testGetEnabledTransition()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $workflow = new Workflow($definition, new MethodMarkingStore());
+
+        $subject->setMarking(['d' => 1]);
+        $transition = $workflow->getEnabledTransition($subject, 't3');
+        $this->assertInstanceOf(Transition::class, $transition);
+        $this->assertSame('t3', $transition->getName());
+
+        $transition = $workflow->getEnabledTransition($subject, 'does_not_exist');
+        $this->assertNull($transition);
+    }
+
     public function testGetEnabledTransitionsWithSameNameTransition()
     {
         $definition = $this->createWorkflowWithSameNameTransition();
@@ -575,7 +771,7 @@ class EventDispatcherMock implements \Symfony\Contracts\EventDispatcher\EventDis
 {
     public $dispatchedEvents = [];
 
-    public function dispatch($event, string $eventName = null): Event
+    public function dispatch($event, string $eventName = null): object
     {
         $this->dispatchedEvents[] = $eventName;
 

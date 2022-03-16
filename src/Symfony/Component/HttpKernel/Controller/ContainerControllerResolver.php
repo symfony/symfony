@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
- * A controller resolver searching for a controller in a psr-11 container when using the "service:method" notation.
+ * A controller resolver searching for a controller in a psr-11 container when using the "service::method" notation.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
@@ -32,20 +32,10 @@ class ContainerControllerResolver extends ControllerResolver
         parent::__construct($logger);
     }
 
-    protected function createController($controller)
-    {
-        if (1 === substr_count($controller, ':')) {
-            $controller = str_replace(':', '::', $controller);
-            // TODO deprecate this in 5.1
-        }
-
-        return parent::createController($controller);
-    }
-
     /**
      * {@inheritdoc}
      */
-    protected function instantiateController($class)
+    protected function instantiateController(string $class): object
     {
         $class = ltrim($class, '\\');
 

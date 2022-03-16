@@ -9,6 +9,11 @@
             <constraint name="NotBlank">
                 <option name="groups">Registration</option>
             </constraint>
+            <constraint name="Length">
+                <option name="min">2</option>
+                <option name="max">120</option>
+                <option name="groups">Registration</option>
+            </constraint>
         </property>
     </class>
 </constraint-mapping>

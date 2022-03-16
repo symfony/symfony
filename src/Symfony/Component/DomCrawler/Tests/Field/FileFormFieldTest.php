@@ -96,7 +96,7 @@ class FileFormFieldTest extends FormFieldTestCase
         $this->assertEquals(\UPLOAD_ERR_FORM_SIZE, $value['error'], '->setErrorCode() sets the file input field error code');
 
         try {
-            $field->setErrorCode('foobar');
+            $field->setErrorCode(12345);
             $this->fail('->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');

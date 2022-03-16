@@ -43,10 +43,6 @@ class ResponseFunctionalTest extends TestCase
      */
     public function testCookie($fixture)
     {
-        if (\PHP_VERSION_ID >= 80000 && 'cookie_max_age' === $fixture) {
-            $this->markTestSkipped('This fixture produces a fatal error on PHP 8.');
-        }
-
         $result = file_get_contents(sprintf('http://localhost:8054/%s.php', $fixture));
         $this->assertStringMatchesFormatFile(__DIR__.sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
     }

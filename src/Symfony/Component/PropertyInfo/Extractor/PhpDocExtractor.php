@@ -29,14 +29,14 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  *
  * @final
  */
-class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface
+class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     public const PROPERTY = 0;
     public const ACCESSOR = 1;
     public const MUTATOR = 2;
 
     /**
-     * @var DocBlock[]
+     * @var array<string, array{DocBlock|null, int|null, string|null}>
      */
     private $docBlocks = [];
 
@@ -74,7 +74,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = []): ?string
+    public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
         [$docBlock] = $this->getDocBlock($class, $property);
@@ -104,7 +104,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = []): ?string
+    public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
         [$docBlock] = $this->getDocBlock($class, $property);
@@ -120,7 +120,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = []): ?array
+    public function getTypes(string $class, string $property, array $context = []): ?array
     {
         /** @var $docBlock DocBlock */
         [$docBlock, $source, $prefix] = $this->getDocBlock($class, $property);
@@ -128,19 +128,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return null;
         }
 
-        switch ($source) {
-            case self::PROPERTY:
-                $tag = 'var';
-                break;
-
-            case self::ACCESSOR:
-                $tag = 'return';
-                break;
-
-            case self::MUTATOR:
-                $tag = 'param';
-                break;
-        }
+        $tag = match ($source) {
+            self::PROPERTY => 'var',
+            self::ACCESSOR => 'return',
+            self::MUTATOR => 'param',
+        };
 
         $parentClass = null;
         $types = [];
@@ -155,7 +147,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                             break;
 
                         case 'parent':
-                            if (false !== $resolvedClass = $parentClass ?? $parentClass = get_parent_class($class)) {
+                            if (false !== $resolvedClass = $parentClass ??= get_parent_class($class)) {
                                 break;
                             }
                             // no break
@@ -165,7 +157,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                             continue 2;
                     }
 
-                    $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $type->isNullable(), $resolvedClass, $type->isCollection(), $type->getCollectionKeyType(), $type->getCollectionValueType());
+                    $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $type->isNullable(), $resolvedClass, $type->isCollection(), $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
                 }
             }
         }
@@ -181,6 +173,66 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0])];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypesFromConstructor(string $class, string $property): ?array
+    {
+        $docBlock = $this->getDocBlockFromConstructor($class, $property);
+
+        if (!$docBlock) {
+            return null;
+        }
+
+        $types = [];
+        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
+        foreach ($docBlock->getTagsByName('param') as $tag) {
+            if ($tag && null !== $tag->getType()) {
+                $types[] = $this->phpDocTypeHelper->getTypes($tag->getType());
+            }
+        }
+
+        if (!isset($types[0])) {
+            return null;
+        }
+
+        return array_merge([], ...$types);
+    }
+
+    private function getDocBlockFromConstructor(string $class, string $property): ?DocBlock
+    {
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+        $reflectionConstructor = $reflectionClass->getConstructor();
+        if (!$reflectionConstructor) {
+            return null;
+        }
+
+        try {
+            $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->contextFactory->createFromReflector($reflectionConstructor));
+
+            return $this->filterDocBlockParams($docBlock, $property);
+        } catch (\InvalidArgumentException $e) {
+            return null;
+        }
+    }
+
+    private function filterDocBlockParams(DocBlock $docBlock, string $allowedParam): DocBlock
+    {
+        $tags = array_values(array_filter($docBlock->getTagsByName('param'), function ($tag) use ($allowedParam) {
+            return $tag instanceof DocBlock\Tags\Param && $allowedParam === $tag->getVariableName();
+        }));
+
+        return new DocBlock($docBlock->getSummary(), $docBlock->getDescription(), $tags, $docBlock->getContext(),
+            $docBlock->getLocation(), $docBlock->isTemplateStart(), $docBlock->isTemplateEnd());
+    }
+
+    /**
+     * @return array{DocBlock|null, int|null, string|null}
+     */
     private function getDocBlock(string $class, string $property): array
     {
         $propertyHash = sprintf('%s::%s', $class, $property);
@@ -189,9 +241,19 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return $this->docBlocks[$propertyHash];
         }
 
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException $e) {
+            $reflectionProperty = null;
+        }
+
         $ucFirstProperty = ucfirst($property);
 
         switch (true) {
+            case $reflectionProperty?->isPromoted() && $docBlock = $this->getDocBlockFromConstructor($class, $property):
+                $data = [$docBlock, self::MUTATOR, null];
+                break;
+
             case $docBlock = $this->getDocBlockFromProperty($class, $property):
                 $data = [$docBlock, self::PROPERTY, null];
                 break;
@@ -230,13 +292,14 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflector));
-        } catch (\InvalidArgumentException $e) {
-            return null;
-        } catch (\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException $e) {
             return null;
         }
     }
 
+    /**
+     * @return array{DocBlock, string}|null
+     */
     private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
     {
         $prefixes = self::ACCESSOR === $type ? $this->accessorPrefixes : $this->mutatorPrefixes;
@@ -276,9 +339,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return [$this->docBlockFactory->create($reflectionMethod, $this->createFromReflector($reflector)), $prefix];
-        } catch (\InvalidArgumentException $e) {
-            return null;
-        } catch (\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException $e) {
             return null;
         }
     }

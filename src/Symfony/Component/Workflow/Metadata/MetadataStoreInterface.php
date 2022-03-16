@@ -35,5 +35,5 @@ interface MetadataStoreInterface
      *                                        Use a string (the place name) to get place metadata
      *                                        Use a Transition instance to get transition metadata
      */
-    public function getMetadata(string $key, $subject = null);
+    public function getMetadata(string $key, string|Transition $subject = null);
 }

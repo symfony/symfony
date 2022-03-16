@@ -12,13 +12,26 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\GuidType;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Uid\Uuid;
 
 class ORMQueryBuilderLoaderTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        if (Type::hasType('uuid')) {
+            Type::overrideType('uuid', GuidType::class);
+        }
+    }
+
     public function testIdentifierTypeIsStringArray()
     {
         $this->checkIdentifierType('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity', Connection::PARAM_STR_ARRAY);
@@ -131,6 +144,86 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', '', 'b98e8e11-2897-44df-ad24-d2627eb7f499']);
     }
 
+    /**
+     * @dataProvider provideUidEntityClasses
+     */
+    public function testFilterUid($entityClass)
+    {
+        if (Type::hasType('uuid')) {
+            Type::overrideType('uuid', UuidType::class);
+        } else {
+            Type::addType('uuid', UuidType::class);
+        }
+        if (!Type::hasType('ulid')) {
+            Type::addType('ulid', UlidType::class);
+        }
+
+        $em = DoctrineTestHelper::createTestEntityManager();
+
+        $query = $this->getMockBuilder(\QueryMock::class)
+            ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
+            ->getMock();
+
+        $query
+            ->method('getResult')
+            ->willReturn([]);
+
+        $query->expects($this->once())
+            ->method('setParameter')
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d')->toBinary(), Uuid::fromString('b98e8e11-2897-44df-ad24-d2627eb7f499')->toBinary()], Connection::PARAM_STR_ARRAY)
+            ->willReturn($query);
+
+        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+            ->setConstructorArgs([$em])
+            ->setMethods(['getQuery'])
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $qb->select('e')
+            ->from($entityClass, 'e');
+
+        $loader = new ORMQueryBuilderLoader($qb);
+        $loader->getEntitiesByIds('id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', '', 'b98e8e11-2897-44df-ad24-d2627eb7f499']);
+    }
+
+    /**
+     * @dataProvider provideUidEntityClasses
+     */
+    public function testUidThrowProperException($entityClass)
+    {
+        if (Type::hasType('uuid')) {
+            Type::overrideType('uuid', UuidType::class);
+        } else {
+            Type::addType('uuid', UuidType::class);
+        }
+        if (!Type::hasType('ulid')) {
+            Type::addType('ulid', UlidType::class);
+        }
+
+        $em = DoctrineTestHelper::createTestEntityManager();
+
+        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+            ->setConstructorArgs([$em])
+            ->setMethods(['getQuery'])
+            ->getMock();
+
+        $qb->expects($this->never())
+            ->method('getQuery');
+
+        $qb->select('e')
+            ->from($entityClass, 'e');
+
+        $loader = new ORMQueryBuilderLoader($qb);
+
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessageMatches('/^Failed to transform "hello" into "(uuid|ulid)"\.$/');
+
+        $loader->getEntitiesByIds('id', ['hello']);
+    }
+
     public function testEmbeddedIdentifierName()
     {
         if (Version::compare('2.5.0') > 0) {
@@ -174,6 +267,14 @@ class ORMQueryBuilderLoaderTest extends TestCase
         return [
             ['Symfony\Bridge\Doctrine\Tests\Fixtures\GuidIdEntity'],
             ['Symfony\Bridge\Doctrine\Tests\Fixtures\UuidIdEntity'],
+        ];
+    }
+
+    public function provideUidEntityClasses()
+    {
+        return [
+            ['Symfony\Bridge\Doctrine\Tests\Fixtures\UuidIdEntity'],
+            ['Symfony\Bridge\Doctrine\Tests\Fixtures\UlidIdEntity'],
         ];
     }
 }

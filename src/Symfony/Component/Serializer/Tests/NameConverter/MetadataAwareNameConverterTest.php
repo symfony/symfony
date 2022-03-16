@@ -18,8 +18,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
@@ -97,7 +97,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, SerializedNameDummy::class));
     }
 
-    public function attributeProvider()
+    public function attributeProvider(): array
     {
         return [
             ['foo', 'baz'],
@@ -107,7 +107,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         ];
     }
 
-    public function fallbackAttributeProvider()
+    public function fallbackAttributeProvider(): array
     {
         return [
             ['foo', 'baz'],

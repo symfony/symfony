@@ -19,31 +19,6 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
-    public function testGetControllerServiceWithSingleColon()
-    {
-        $service = new ControllerTestService('foo');
-
-        $container = $this->createMockContainer();
-        $container->expects($this->once())
-            ->method('has')
-            ->with('foo')
-            ->willReturn(true);
-        $container->expects($this->once())
-            ->method('get')
-            ->with('foo')
-            ->willReturn($service)
-        ;
-
-        $resolver = $this->createControllerResolver(null, $container);
-        $request = Request::create('/');
-        $request->attributes->set('_controller', 'foo:action');
-
-        $controller = $resolver->getController($request);
-
-        $this->assertSame($service, $controller[0]);
-        $this->assertSame('action', $controller[1]);
-    }
-
     public function testGetControllerService()
     {
         $service = new ControllerTestService('foo');
@@ -145,7 +120,6 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     {
         return [
             ['\\'.ControllerTestService::class.'::action'],
-            ['\\'.ControllerTestService::class.':action'],
         ];
     }
 

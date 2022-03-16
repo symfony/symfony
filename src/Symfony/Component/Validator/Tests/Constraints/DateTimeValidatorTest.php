@@ -37,28 +37,6 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Validating a \DateTimeInterface with "Symfony\Component\Validator\Constraints\DateTime" is deprecated since version 4.2. Use "Symfony\Component\Validator\Constraints\Type" instead or remove the constraint if the underlying model is already type hinted to \DateTimeInterface.
-     */
-    public function testDateTimeClassIsValid()
-    {
-        $this->validator->validate(new \DateTime(), new DateTime());
-
-        $this->assertNoViolation();
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Validating a \DateTimeInterface with "Symfony\Component\Validator\Constraints\DateTime" is deprecated since version 4.2. Use "Symfony\Component\Validator\Constraints\Type" instead or remove the constraint if the underlying model is already type hinted to \DateTimeInterface.
-     */
-    public function testDateTimeImmutableClassIsValid()
-    {
-        $this->validator->validate(new \DateTimeImmutable(), new DateTime());
-
-        $this->assertNoViolation();
-    }
-
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
@@ -136,6 +114,18 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
             ['Y-m-d H:i:s', '2010-01-01 00:60:00', DateTime::INVALID_TIME_ERROR],
             ['Y-m-d H:i:s', '2010-01-01 00:00:60', DateTime::INVALID_TIME_ERROR],
         ];
+    }
+
+    public function testInvalidDateTimeNamed()
+    {
+        $constraint = new DateTime(message: 'myMessage', format: 'Y-m-d');
+
+        $this->validator->validate('2010-01-01 00:00:00', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2010-01-01 00:00:00"')
+            ->setCode(DateTime::INVALID_FORMAT_ERROR)
+            ->assertRaised();
     }
 
     public function testDateTimeWithTrailingData()

@@ -15,8 +15,8 @@ use Symfony\Component\Messenger\Envelope;
 
 class HandlerFailedException extends RuntimeException
 {
-    private $exceptions;
-    private $envelope;
+    private array $exceptions;
+    private Envelope $envelope;
 
     /**
      * @param \Throwable[] $exceptions
@@ -25,10 +25,13 @@ class HandlerFailedException extends RuntimeException
     {
         $firstFailure = current($exceptions);
 
+        $message = sprintf('Handling "%s" failed: ', \get_class($envelope->getMessage()));
+
         parent::__construct(
-            1 === \count($exceptions)
+            $message.(1 === \count($exceptions)
                 ? $firstFailure->getMessage()
-                : sprintf('%d handlers failed. First failure is: "%s"', \count($exceptions), $firstFailure->getMessage()),
+                : sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
+            ),
             (int) $firstFailure->getCode(),
             $firstFailure
         );
@@ -48,5 +51,17 @@ class HandlerFailedException extends RuntimeException
     public function getNestedExceptions(): array
     {
         return $this->exceptions;
+    }
+
+    public function getNestedExceptionOfClass(string $exceptionClassName): array
+    {
+        return array_values(
+            array_filter(
+                $this->exceptions,
+                function ($exception) use ($exceptionClassName) {
+                    return is_a($exception, $exceptionClassName);
+                }
+            )
+        );
     }
 }

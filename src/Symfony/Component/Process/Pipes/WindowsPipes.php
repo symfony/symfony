@@ -35,7 +35,7 @@ class WindowsPipes extends AbstractPipes
     ];
     private $haveReadSupport;
 
-    public function __construct($input, bool $haveReadSupport)
+    public function __construct(mixed $input, bool $haveReadSupport)
     {
         $this->haveReadSupport = $haveReadSupport;
 
@@ -88,10 +88,7 @@ class WindowsPipes extends AbstractPipes
         parent::__construct($input);
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

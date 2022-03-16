@@ -18,33 +18,30 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
-use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 use Symfony\Component\Security\Http\ParameterBagUtils;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * LogoutListener logout users.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class LogoutListener extends AbstractListener implements ListenerInterface
+class LogoutListener extends AbstractListener
 {
-    use LegacyListenerTrait;
-
-    private $tokenStorage;
-    private $options;
-    private $handlers;
-    private $successHandler;
-    private $httpUtils;
-    private $csrfTokenManager;
+    private TokenStorageInterface $tokenStorage;
+    private array $options;
+    private HttpUtils $httpUtils;
+    private ?CsrfTokenManagerInterface $csrfTokenManager;
+    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * @param array $options An array of options to process a logout attempt
      */
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, EventDispatcherInterface $eventDispatcher, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
@@ -53,14 +50,8 @@ class LogoutListener extends AbstractListener implements ListenerInterface
             'csrf_token_id' => 'logout',
             'logout_path' => '/logout',
         ], $options);
-        $this->successHandler = $successHandler;
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->handlers = [];
-    }
-
-    public function addHandler(LogoutHandlerInterface $handler)
-    {
-        $this->handlers[] = $handler;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -92,16 +83,12 @@ class LogoutListener extends AbstractListener implements ListenerInterface
             }
         }
 
-        $response = $this->successHandler->onLogoutSuccess($request);
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('Logout Success Handler did not return a Response.');
-        }
+        $logoutEvent = new LogoutEvent($request, $this->tokenStorage->getToken());
+        $this->eventDispatcher->dispatch($logoutEvent);
 
-        // handle multiple logout attempts gracefully
-        if ($token = $this->tokenStorage->getToken()) {
-            foreach ($this->handlers as $handler) {
-                $handler->logout($request, $response, $token);
-            }
+        $response = $logoutEvent->getResponse();
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('No logout listener set the Response, make sure at least the DefaultLogoutListener is registered.');
         }
 
         $this->tokenStorage->setToken(null);
@@ -115,11 +102,14 @@ class LogoutListener extends AbstractListener implements ListenerInterface
      * The default implementation only processed requests to a specific path,
      * but a subclass could change this to logout requests where
      * certain parameters is present.
-     *
-     * @return bool
      */
-    protected function requiresLogout(Request $request)
+    protected function requiresLogout(Request $request): bool
     {
         return isset($this->options['logout_path']) && $this->httpUtils->checkRequestPath($request, $this->options['logout_path']);
+    }
+
+    public static function getPriority(): int
+    {
+        return -127;
     }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
@@ -61,25 +60,20 @@ trait BlockingStoreTestTrait
                 // This call should failed given the lock should already by acquired by the child
                 $store->save($key);
                 $this->fail('The store saves a locked key.');
-            } catch (NotSupportedException $e) {
             } catch (LockConflictedException $e) {
+            } finally {
+                // send the ready signal to the child
+                posix_kill($childPID, \SIGHUP);
             }
-
-            // send the ready signal to the child
-            posix_kill($childPID, \SIGHUP);
 
             // This call should be blocked by the child #1
-            try {
-                $store->waitAndSave($key);
-                $this->assertTrue($store->exists($key));
-                $store->delete($key);
+            $store->waitAndSave($key);
+            $this->assertTrue($store->exists($key));
+            $store->delete($key);
 
-                // Now, assert the child process worked well
-                pcntl_waitpid($childPID, $status1);
-                $this->assertSame(0, pcntl_wexitstatus($status1), 'The child process couldn\'t lock the resource');
-            } catch (NotSupportedException $e) {
-                $this->markTestSkipped(sprintf('The store %s does not support waitAndSave.', \get_class($store)));
-            }
+            // Now, assert the child process worked well
+            pcntl_waitpid($childPID, $status1);
+            $this->assertSame(0, pcntl_wexitstatus($status1), 'The child process couldn\'t lock the resource');
         } else {
             // Block SIGHUP signal
             pcntl_sigprocmask(\SIG_BLOCK, [\SIGHUP]);

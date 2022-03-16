@@ -19,8 +19,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
         ]);
 
         $cookies = $client->getResponse()->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-
-        $this->assertEquals($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
+        $this->assertSame($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
     }
 
     public function getSessionRememberMeSecureCookieFlagAutoHttpsMap()

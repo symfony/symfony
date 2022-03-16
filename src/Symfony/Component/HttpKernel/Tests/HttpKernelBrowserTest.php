@@ -59,7 +59,6 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new Response();
         $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
@@ -80,7 +79,6 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new StreamedResponse(function () {
             echo 'foo';
@@ -183,5 +181,16 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertEquals(0, $file->getSize());
 
         unlink($source);
+    }
+
+    public function testAcceptHeaderNotSet()
+    {
+        $client = new HttpKernelBrowser(new TestHttpKernel());
+
+        $client->request('GET', '/');
+        $this->assertFalse($client->getRequest()->headers->has('Accept'));
+
+        $client->request('GET', '/', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
+        $this->assertSame('application/ld+json', $client->getRequest()->headers->get('Accept'));
     }
 }

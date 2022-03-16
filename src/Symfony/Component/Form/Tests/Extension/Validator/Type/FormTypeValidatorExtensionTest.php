@@ -18,6 +18,7 @@ use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\TextTypeTest;
 use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -59,17 +60,28 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
     }
 
+    public function testValidConstraintsArray()
+    {
+        $form = $this->createForm(['constraints' => [$valid = new Valid()]]);
+
+        $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
+    }
+
+    public function testInvalidConstraint()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->createForm(['constraints' => ['foo' => 'bar']]);
+    }
+
     public function testGroupSequenceWithConstraintsOption()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         $form = Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
             ->getFormFactory()
             ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']] + $allowEmptyString),
+                    new Length(['min' => 10, 'groups' => ['First']]),
                     new NotBlank(['groups' => ['Second']]),
                 ],
             ])
@@ -85,8 +97,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     public function testManyFieldsGroupSequenceWithConstraintsOption()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))
             ->addPropertyConstraint('firstName', new NotBlank(['groups' => 'Second']))
@@ -118,7 +128,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             ->add('firstName', TextTypeTest::TESTED_TYPE)
             ->add('lastName', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']] + $allowEmptyString),
+                    new Length(['min' => 10, 'groups' => ['First']]),
                 ],
             ])
             ->add('australian', TextTypeTest::TESTED_TYPE, [
@@ -135,6 +145,13 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertCount(1, $errors);
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
         $this->assertSame('children[lastName].data', $errors[0]->getCause()->getPropertyPath());
+    }
+
+    public function testInvalidMessage()
+    {
+        $form = $this->createForm();
+
+        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 
     protected function createForm(array $options = [])

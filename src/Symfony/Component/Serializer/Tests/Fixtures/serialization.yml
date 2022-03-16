@@ -1,26 +1,60 @@
-'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy':
   attributes:
     foo:
       groups: ['group1', 'group2']
     bar:
       groups: ['group2']
-'Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy':
   attributes:
     foo:
       max_depth: 2
     bar:
       max_depth: 3
-'Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy':
   attributes:
     foo:
       serialized_name: 'baz'
     bar:
       serialized_name: 'qux'
-'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy':
+'Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy':
   discriminator_map:
     type_property: type
     mapping:
-      first: 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild'
-      second: 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild'
+      first: 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild'
+      second: 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild'
   attributes:
     foo: ~
+'Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy':
+  attributes:
+    ignored1:
+      ignore: true
+    ignored2:
+      ignore: true
+
+Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent:
+  attributes:
+    parentProperty:
+      contexts:
+        - { normalization_context: { prop: dummy_parent_value } }
+    overriddenParentProperty:
+      contexts:
+        - { normalization_context: { prop: dummy_parent_value } }
+
+Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy:
+  attributes:
+    foo:
+      contexts:
+        - context: { foo: value, bar: value, nested: { nested_key: nested_value }, array: [first, second] }
+        - context: { bar: value_for_group_a }
+          groups: [a]
+    bar:
+      contexts:
+        - normalization_context: { format: 'd/m/Y' }
+          denormalization_context: { format: 'm-d-Y H:i' }
+          groups: [a, b]
+    overriddenParentProperty:
+      contexts:
+        - normalization_context: { prop: dummy_value }
+    methodWithContext:
+      contexts:
+        - context: { method: method_with_context }

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle;
 
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -24,14 +23,6 @@ class TestBundle extends Bundle
         $container->setParameter('container.build_hash', 'test_bundle');
         $container->setParameter('container.build_time', time());
         $container->setParameter('container.build_id', 'test_bundle');
-
-        $container->addCompilerPass(new class() implements CompilerPassInterface {
-            public function process(ContainerBuilder $container)
-            {
-                $container->removeDefinition('twig.controller.exception');
-                $container->removeDefinition('twig.controller.preview_error');
-            }
-        });
 
         $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
     }

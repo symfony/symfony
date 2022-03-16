@@ -11,8 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 
 /**
  * @group functional
@@ -108,5 +110,27 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring', 'search' => 'ClassAlias']);
         $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $kernel = static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+        $command = (new Application($kernel))->add(new DebugAutowiringCommand());
+
+        $tester = new CommandCompletionTester($command);
+
+        $suggestions = $tester->complete($input);
+
+        foreach ($expectedSuggestions as $expectedSuggestion) {
+            $this->assertContains($expectedSuggestion, $suggestions);
+        }
+    }
+
+    public function provideCompletionSuggestions(): \Generator
+    {
+        yield 'search' => [[''], ['SessionHandlerInterface', 'Psr\\Log\\LoggerInterface', 'Psr\\Container\\ContainerInterface $parameterBag']];
     }
 }

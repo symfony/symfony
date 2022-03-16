@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
 use Symfony\Component\HttpKernel\UriSigner;
-use Symfony\Component\Templating\EngineInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
@@ -80,21 +79,5 @@ class HIncludeFragmentRendererTest extends TestCase
         $twig = new Environment($loader = new ArrayLoader());
         $strategy = new HIncludeFragmentRenderer($twig);
         $this->assertEquals('<hx:include src="/foo">loading...</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'loading...'])->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRenderWithDefaultTextLegacy()
-    {
-        $engine = $this->createMock(EngineInterface::class);
-        $engine->expects($this->once())
-            ->method('exists')
-            ->with('default')
-            ->willThrowException(new \InvalidArgumentException());
-
-        // only default
-        $strategy = new HIncludeFragmentRenderer($engine);
-        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default'])->getContent());
     }
 }

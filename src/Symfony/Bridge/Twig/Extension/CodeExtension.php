@@ -19,21 +19,14 @@ use Twig\TwigFilter;
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
-class CodeExtension extends AbstractExtension
+final class CodeExtension extends AbstractExtension
 {
-    private $fileLinkFormat;
-    private $charset;
-    private $projectDir;
+    private string|FileLinkFormatter|array|false $fileLinkFormat;
+    private string $charset;
+    private string $projectDir;
 
-    /**
-     * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
-     * @param string                   $projectDir     The project directory
-     * @param string                   $charset        The charset
-     */
-    public function __construct($fileLinkFormat, string $projectDir, string $charset)
+    public function __construct(string|FileLinkFormatter $fileLinkFormat, string $projectDir, string $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->projectDir = str_replace('\\', '/', $projectDir).'/';
@@ -42,26 +35,24 @@ class CodeExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
-            new TwigFilter('abbr_class', [$this, 'abbrClass'], ['is_safe' => ['html']]),
-            new TwigFilter('abbr_method', [$this, 'abbrMethod'], ['is_safe' => ['html']]),
-            new TwigFilter('format_args', [$this, 'formatArgs'], ['is_safe' => ['html']]),
-            new TwigFilter('format_args_as_text', [$this, 'formatArgsAsText']),
-            new TwigFilter('file_excerpt', [$this, 'fileExcerpt'], ['is_safe' => ['html']]),
-            new TwigFilter('format_file', [$this, 'formatFile'], ['is_safe' => ['html']]),
-            new TwigFilter('format_file_from_text', [$this, 'formatFileFromText'], ['is_safe' => ['html']]),
-            new TwigFilter('format_log_message', [$this, 'formatLogMessage'], ['is_safe' => ['html']]),
-            new TwigFilter('file_link', [$this, 'getFileLink']),
-            new TwigFilter('file_relative', [$this, 'getFileRelative']),
+            new TwigFilter('abbr_class', $this->abbrClass(...), ['is_safe' => ['html']]),
+            new TwigFilter('abbr_method', $this->abbrMethod(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_args', $this->formatArgs(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_args_as_text', $this->formatArgsAsText(...)),
+            new TwigFilter('file_excerpt', $this->fileExcerpt(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_file', $this->formatFile(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_file_from_text', $this->formatFileFromText(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_log_message', $this->formatLogMessage(...), ['is_safe' => ['html']]),
+            new TwigFilter('file_link', $this->getFileLink(...)),
+            new TwigFilter('file_relative', $this->getFileRelative(...)),
         ];
     }
 
-    public function abbrClass($class)
+    public function abbrClass(string $class): string
     {
         $parts = explode('\\', $class);
         $short = array_pop($parts);
@@ -69,7 +60,7 @@ class CodeExtension extends AbstractExtension
         return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
-    public function abbrMethod($method)
+    public function abbrMethod(string $method): string
     {
         if (str_contains($method, '::')) {
             [$class, $method] = explode('::', $method, 2);
@@ -85,12 +76,8 @@ class CodeExtension extends AbstractExtension
 
     /**
      * Formats an array as a string.
-     *
-     * @param array $args The argument array
-     *
-     * @return string
      */
-    public function formatArgs($args)
+    public function formatArgs(array $args): string
     {
         $result = [];
         foreach ($args as $key => $item) {
@@ -118,26 +105,16 @@ class CodeExtension extends AbstractExtension
 
     /**
      * Formats an array as a string.
-     *
-     * @param array $args The argument array
-     *
-     * @return string
      */
-    public function formatArgsAsText($args)
+    public function formatArgsAsText(array $args): string
     {
         return strip_tags($this->formatArgs($args));
     }
 
     /**
      * Returns an excerpt of a code file around the given line number.
-     *
-     * @param string $file       A file path
-     * @param int    $line       The selected line number
-     * @param int    $srcContext The number of displayed lines around or -1 for the whole file
-     *
-     * @return string An HTML string
      */
-    public function fileExcerpt($file, $line, $srcContext = 3)
+    public function fileExcerpt(string $file, int $line, int $srcContext = 3): ?string
     {
         if (is_file($file) && is_readable($file)) {
             // highlight_file could throw warnings
@@ -157,7 +134,7 @@ class CodeExtension extends AbstractExtension
             }
 
             for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, \count($content)); $i <= $max; ++$i) {
-                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" name="line'.$i.'"></a><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
+                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" id="line'.$i.'"></a><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
             return '<ol start="'.max($line - $srcContext, 1).'">'.implode("\n", $lines).'</ol>';
@@ -168,14 +145,8 @@ class CodeExtension extends AbstractExtension
 
     /**
      * Formats a file path.
-     *
-     * @param string $file An absolute file path
-     * @param int    $line The line number
-     * @param string $text Use this text for the link rather than the file path
-     *
-     * @return string
      */
-    public function formatFile($file, $line, $text = null)
+    public function formatFile(string $file, int $line, string $text = null): string
     {
         $file = trim($file);
 
@@ -198,15 +169,7 @@ class CodeExtension extends AbstractExtension
         return $text;
     }
 
-    /**
-     * Returns the link for a given file/line pair.
-     *
-     * @param string $file An absolute file path
-     * @param int    $line The line number
-     *
-     * @return string|false A link or false
-     */
-    public function getFileLink($file, $line)
+    public function getFileLink(string $file, int $line): string|false
     {
         if ($fmt = $this->fileLinkFormat) {
             return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
@@ -226,7 +189,7 @@ class CodeExtension extends AbstractExtension
         return null;
     }
 
-    public function formatFileFromText($text)
+    public function formatFileFromText(string $text): string
     {
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
             return 'in '.$this->formatFile($match[2], $match[3]);
@@ -254,15 +217,7 @@ class CodeExtension extends AbstractExtension
         return htmlspecialchars($message, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'code';
-    }
-
-    protected static function fixCodeMarkup($line)
+    protected static function fixCodeMarkup(string $line): string
     {
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');

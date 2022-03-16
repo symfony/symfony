@@ -21,17 +21,15 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  * It manages an environment made of application kernel and bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @method string getProjectDir() Gets the project dir (path of the project's composer file) - not defining it is deprecated since Symfony 4.2
  */
 interface KernelInterface extends HttpKernelInterface
 {
     /**
      * Returns an array of bundles to register.
      *
-     * @return iterable|BundleInterface[] An iterable of bundle instances
+     * @return iterable<mixed, BundleInterface>
      */
-    public function registerBundles();
+    public function registerBundles(): iterable;
 
     /**
      * Loads the container configuration.
@@ -53,20 +51,16 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Gets the registered bundle instances.
      *
-     * @return BundleInterface[] An array of registered bundle instances
+     * @return array<string, BundleInterface>
      */
-    public function getBundles();
+    public function getBundles(): array;
 
     /**
      * Returns a bundle.
      *
-     * @param string $name Bundle name
-     *
-     * @return BundleInterface A BundleInterface instance
-     *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
-    public function getBundle($name);
+    public function getBundle(string $name): BundleInterface;
 
     /**
      * Returns the file path for a given bundle resource.
@@ -80,79 +74,60 @@ interface KernelInterface extends HttpKernelInterface
      * where BundleName is the name of the bundle
      * and the remaining part is the relative path in the bundle.
      *
-     * @param string $name A resource name to locate
-     *
-     * @return string|array The absolute path of the resource or an array if $first is false (array return value is deprecated)
-     *
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe characters
      */
-    public function locateResource($name/*, $dir = null, $first = true*/);
-
-    /**
-     * Gets the name of the kernel.
-     *
-     * @return string The kernel name
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function getName();
+    public function locateResource(string $name): string;
 
     /**
      * Gets the environment.
-     *
-     * @return string The current environment
      */
-    public function getEnvironment();
+    public function getEnvironment(): string;
 
     /**
      * Checks if debug mode is enabled.
-     *
-     * @return bool true if debug mode is enabled, false otherwise
      */
-    public function isDebug();
+    public function isDebug(): bool;
 
     /**
-     * Gets the application root dir (path of the project's Kernel class).
-     *
-     * @return string The Kernel root dir
-     *
-     * @deprecated since Symfony 4.2
+     * Gets the project dir (path of the project's composer file).
      */
-    public function getRootDir();
+    public function getProjectDir(): string;
 
     /**
      * Gets the current container.
-     *
-     * @return ContainerInterface
      */
-    public function getContainer();
+    public function getContainer(): ContainerInterface;
 
     /**
      * Gets the request start time (not available if debug is disabled).
-     *
-     * @return float The request start timestamp
      */
-    public function getStartTime();
+    public function getStartTime(): float;
 
     /**
      * Gets the cache directory.
      *
-     * @return string The cache directory
+     * Since Symfony 5.2, the cache directory should be used for caches that are written at runtime.
+     * For caches and artifacts that can be warmed at compile-time and deployed as read-only,
+     * use the new "build directory" returned by the {@see getBuildDir()} method.
      */
-    public function getCacheDir();
+    public function getCacheDir(): string;
+
+    /**
+     * Returns the build directory.
+     *
+     * This directory should be used to store build artifacts, and can be read-only at runtime.
+     * Caches written at runtime should be stored in the "cache directory" ({@see KernelInterface::getCacheDir()}).
+     */
+    public function getBuildDir(): string;
 
     /**
      * Gets the log directory.
-     *
-     * @return string The log directory
      */
-    public function getLogDir();
+    public function getLogDir(): string;
 
     /**
      * Gets the charset of the application.
-     *
-     * @return string The charset
      */
-    public function getCharset();
+    public function getCharset(): string;
 }

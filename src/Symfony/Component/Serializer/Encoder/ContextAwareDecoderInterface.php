@@ -15,6 +15,8 @@ namespace Symfony\Component\Serializer\Encoder;
  * Adds the support of an extra $context parameter for the supportsDecoding method.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since symfony/serializer 6.1, use DecoderInterface instead
  */
 interface ContextAwareDecoderInterface extends DecoderInterface
 {
@@ -23,5 +25,5 @@ interface ContextAwareDecoderInterface extends DecoderInterface
      *
      * @param array $context options that decoders have access to
      */
-    public function supportsDecoding($format, array $context = []);
+    public function supportsDecoding(string $format, array $context = []): bool;
 }

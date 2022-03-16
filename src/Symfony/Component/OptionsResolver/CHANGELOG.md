@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `OptionsResolverIntrospector::getDeprecationMessage()`
+
+5.3
+---
+
+ * Add prototype definition for nested options
+
+5.1.0
+-----
+
+ * added fluent configuration of options using `OptionResolver::define()`
+ * added `setInfo()` and `getInfo()` methods
+ * updated the signature of method `OptionsResolver::setDeprecated()` to `OptionsResolver::setDeprecation(string $option, string $package, string $version, $message)`
+ * deprecated `OptionsResolverIntrospector::getDeprecationMessage()`, use `OptionsResolverIntrospector::getDeprecation()` instead
+
+5.0.0
+-----
+
+ * added argument `$triggerDeprecation` to `OptionsResolver::offsetGet()`
+
 4.3.0
 -----
 

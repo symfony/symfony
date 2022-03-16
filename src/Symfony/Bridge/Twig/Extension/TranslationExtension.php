@@ -13,16 +13,15 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
-use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
-use Twig\NodeVisitor\NodeVisitorInterface;
-use Twig\TokenParser\AbstractTokenParser;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(TranslatorInterface::class);
@@ -32,30 +31,19 @@ class_exists(TranslatorTrait::class);
  * Provides integration of the Translation component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.2
  */
-class TranslationExtension extends AbstractExtension
+final class TranslationExtension extends AbstractExtension
 {
-    private $translator;
-    private $translationNodeVisitor;
+    private ?TranslatorInterface $translator;
+    private ?TranslationNodeVisitor $translationNodeVisitor;
 
-    /**
-     * @param TranslatorInterface|null $translator
-     */
-    public function __construct($translator = null, NodeVisitorInterface $translationNodeVisitor = null)
+    public function __construct(TranslatorInterface $translator = null, TranslationNodeVisitor $translationNodeVisitor = null)
     {
-        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->translator = $translator;
         $this->translationNodeVisitor = $translationNodeVisitor;
     }
 
-    /**
-     * @return TranslatorInterface|null
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         if (null === $this->translator) {
             if (!interface_exists(TranslatorInterface::class)) {
@@ -72,32 +60,32 @@ class TranslationExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFunctions(): array
     {
         return [
-            new TwigFilter('trans', [$this, 'trans']),
-            new TwigFilter('transchoice', [$this, 'transchoice'], ['deprecated' => '4.2', 'alternative' => 'trans" with parameter "%count%']),
+            new TwigFunction('t', $this->createTranslatable(...)),
         ];
     }
 
     /**
-     * Returns the token parser instance to add to the existing list.
-     *
-     * @return AbstractTokenParser[]
+     * {@inheritdoc}
      */
-    public function getTokenParsers()
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('trans', $this->trans(...)),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTokenParsers(): array
     {
         return [
             // {% trans %}Symfony is great!{% endtrans %}
             new TransTokenParser(),
-
-            // {% transchoice count %}
-            //     {0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples
-            // {% endtranschoice %}
-            new TransChoiceTokenParser(),
 
             // {% trans_default_domain "foobar" %}
             new TransDefaultDomainTokenParser(),
@@ -106,21 +94,38 @@ class TranslationExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return NodeVisitorInterface[]
      */
-    public function getNodeVisitors()
+    public function getNodeVisitors(): array
     {
         return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];
     }
 
-    public function getTranslationNodeVisitor()
+    public function getTranslationNodeVisitor(): TranslationNodeVisitor
     {
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans($message, array $arguments = [], $domain = null, $locale = null, $count = null)
+    /**
+     * @param array|string $arguments Can be the locale as a string when $message is a TranslatableInterface
+     */
+    public function trans(string|\Stringable|TranslatableInterface|null $message, array|string $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
+        if ($message instanceof TranslatableInterface) {
+            if ([] !== $arguments && !\is_string($arguments)) {
+                throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a locale passed as a string when the message is a "%s", "%s" given.', __METHOD__, TranslatableInterface::class, get_debug_type($arguments)));
+            }
+
+            return $message->trans($this->getTranslator(), $locale ?? (\is_string($arguments) ? $arguments : null));
+        }
+
+        if (!\is_array($arguments)) {
+            throw new \TypeError(sprintf('Unless the message is a "%s", argument 2 passed to "%s()" must be an array of parameters, "%s" given.', TranslatableInterface::class, __METHOD__, get_debug_type($arguments)));
+        }
+
+        if ('' === $message = (string) $message) {
+            return '';
+        }
+
         if (null !== $count) {
             $arguments['%count%'] = $count;
         }
@@ -128,25 +133,12 @@ class TranslationExtension extends AbstractExtension
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
     }
 
-    /**
-     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
-     */
-    public function transchoice($message, $count, array $arguments = [], $domain = null, $locale = null)
+    public function createTranslatable(string $message, array $parameters = [], string $domain = null): TranslatableMessage
     {
-        $translator = $this->getTranslator();
-
-        if ($translator instanceof TranslatorInterface) {
-            return $translator->trans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
+        if (!class_exists(TranslatableMessage::class)) {
+            throw new \LogicException(sprintf('You cannot use the "%s" as the Translation Component is not installed. Try running "composer require symfony/translation".', __CLASS__));
         }
 
-        return $translator->transChoice($message, $count, array_merge(['%count%' => $count], $arguments), $domain, $locale);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'translator';
+        return new TranslatableMessage($message, $parameters, $domain);
     }
 }

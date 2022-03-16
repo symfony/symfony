@@ -60,7 +60,11 @@
                         "type": "service",
                         "id": ".definition_2"
                     }
-                ]
+                ],
+                {
+                    "type": "abstract",
+                    "text": "placeholder"
+                }
             ],
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",

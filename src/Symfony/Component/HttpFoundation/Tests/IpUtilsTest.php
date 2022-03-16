@@ -12,10 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\IpUtils;
 
 class IpUtilsTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @dataProvider getIpv4Data
      */
@@ -40,7 +43,6 @@ class IpUtilsTest extends TestCase
             [false, '1.2.3.4', '256.256.256/0'], // invalid CIDR notation
             [false, 'an_invalid_ip', '192.168.1.0/24'],
             [false, '', '1.2.3.4/1'],
-            [false, null, '1.2.3.4/1'],
         ];
     }
 
@@ -72,7 +74,6 @@ class IpUtilsTest extends TestCase
             [false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'],
             [false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'],
             [false, '', '::1'],
-            [false, null, '::1'],
         ];
     }
 

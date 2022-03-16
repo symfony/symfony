@@ -15,8 +15,6 @@ namespace Symfony\Contracts\HttpClient\Exception;
  * When any error happens at the transport level.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 1.1
  */
 interface TransportExceptionInterface extends ExceptionInterface
 {

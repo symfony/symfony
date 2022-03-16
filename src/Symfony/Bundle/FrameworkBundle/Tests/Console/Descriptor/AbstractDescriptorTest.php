@@ -122,9 +122,7 @@ abstract class AbstractDescriptorTest extends TestCase
             $definitionsWithArgs[str_replace('definition_', 'definition_arguments_', $key)] = $definition;
         }
 
-        if (\PHP_VERSION_ID >= 80100) {
-            $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
-        }
+        $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
 
         return $this->getDescriptionTestData($definitionsWithArgs);
     }
@@ -229,6 +227,19 @@ abstract class AbstractDescriptorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider getDeprecationsTestData
+     */
+    public function testGetDeprecations(ContainerBuilder $builder, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $builder, ['deprecations' => true]);
+    }
+
+    public function getDeprecationsTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerDeprecations());
+    }
+
     abstract protected function getDescriptor();
 
     abstract protected function getFormat();
@@ -320,7 +331,7 @@ abstract class AbstractDescriptorTest extends TestCase
             foreach ($variations as $suffix => $options) {
                 $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
-                $data[] = [$object, $description, $options, $file];
+                $data[] = [$object, $description, $options];
             }
         }
 

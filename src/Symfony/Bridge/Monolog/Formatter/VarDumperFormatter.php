@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 class VarDumperFormatter implements FormatterInterface
 {
-    private $cloner;
+    private VarCloner $cloner;
 
     public function __construct(VarCloner $cloner = null)
     {
@@ -28,10 +28,8 @@ class VarDumperFormatter implements FormatterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function format(array $record)
+    public function format(array $record): mixed
     {
         $record['context'] = $this->cloner->cloneVar($record['context']);
         $record['extra'] = $this->cloner->cloneVar($record['extra']);
@@ -41,10 +39,8 @@ class VarDumperFormatter implements FormatterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function formatBatch(array $records)
+    public function formatBatch(array $records): mixed
     {
         foreach ($records as $k => $record) {
             $record[$k] = $this->format($record);

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -109,29 +108,6 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('alias'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand" class is deprecated since Symfony 4.2, use "Symfony\Component\Console\Command\Command" with dependency injection instead.
-     */
-    public function testBundleCommandsHaveRightContainer()
-    {
-        $command = $this->getMockForAbstractClass(ContainerAwareCommand::class, ['foo'], '', true, true, true, ['setContainer']);
-        $command->setCode(function () {});
-        $command->expects($this->exactly(2))->method('setContainer');
-
-        $application = new Application($this->getKernel([], true));
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-        $application->add($command);
-        $tester = new ApplicationTester($application);
-
-        // set container is called here
-        $tester->run(['command' => 'foo']);
-
-        // as the container might have change between two runs, setContainer must called again
-        $tester->run(['command' => 'foo']);
-    }
-
     public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
     {
         $command = new Command('example');
@@ -171,7 +147,7 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'fine']);
         $output = $tester->getDisplay();
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('Some commands could not be registered:', $output);
         $this->assertStringContainsString('throwing', $output);
         $this->assertStringContainsString('fine', $output);
@@ -228,7 +204,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'list']);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $display = explode('List commands', $tester->getDisplay());
 
         $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
@@ -236,7 +212,7 @@ class ApplicationTest extends TestCase
 
     public function testSuggestingPackagesWithExactMatch()
     {
-        $result = $this->createEventForSuggestingPackages('server:dump', []);
+        $result = $this->createEventForSuggestingPackages('doctrine:fixtures', []);
         $this->assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
     }
 

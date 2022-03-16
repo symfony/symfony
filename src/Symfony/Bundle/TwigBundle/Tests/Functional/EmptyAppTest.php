@@ -61,10 +61,6 @@ class EmptyAppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('twig', [ // to be removed in 5.0 relying on default
-                'strict_variables' => false,
-                'exception_controller' => null,
-            ]);
             $container->register('error_renderer.html', HtmlErrorRenderer::class);
             $container->setAlias('error_renderer', 'error_renderer.html');
             $container->setParameter('debug.file_link_format', null);

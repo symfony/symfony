@@ -3,7 +3,6 @@ services:
         abstract: true
         lazy: true
         autowire: false
-        public: false
         tags: [from_parent]
 
     child_service:

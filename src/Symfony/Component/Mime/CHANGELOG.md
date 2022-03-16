@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `DataPart::getFilename()` and `DataPart::getContentType()`
+
+6.0
+---
+
+ * Remove `Address::fromString()`, use `Address::create()` instead
+ * Remove `Serializable` interface from `RawMessage`
+
+5.2.0
+-----
+
+ * Add support for DKIM
+ * Deprecated `Address::fromString()`, use `Address::create()` instead
+
 4.4.0
 -----
 

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
@@ -22,6 +23,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
 
 class WebTestCaseTest extends TestCase
 {
@@ -72,6 +74,20 @@ class WebTestCaseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessageMatches('#(:?\( )?is redirected and has header "Location" with value "https://example\.com/" (:?\) )?and status code is 301\.#');
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
+    }
+
+    public function testAssertResponseFormat()
+    {
+        if (!class_exists(ResponseFormatSame::class)) {
+            $this->markTestSkipped('Too old version of HttpFoundation.');
+        }
+
+        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']))->assertResponseFormatSame('custom');
+        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/ld+json']))->assertResponseFormatSame('jsonld');
+        $this->getResponseTester(new Response())->assertResponseFormatSame(null);
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Failed asserting that the Response format is jsonld.\nHTTP/1.0 200 OK");
+        $this->getResponseTester(new Response())->assertResponseFormatSame('jsonld');
     }
 
     public function testAssertResponseHasHeader()
@@ -219,6 +235,38 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="password" value="pa$$">'))->assertInputValueNotSame('password', 'pa$$');
     }
 
+    public function testAssertCheckboxChecked()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]" and has a node matching selector "input[name="rememberMe"]" with attribute "checked" of value "checked".');
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxChecked('rememberMe');
+    }
+
+    public function testAssertCheckboxNotChecked()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]" and does not have a node matching selector "input[name="rememberMe"]" with attribute "checked" of value "checked".');
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
+    }
+
+    public function testAssertFormValue()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Fabien');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two strings are identical.');
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Jane');
+    }
+
+    public function testAssertNoFormValue()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe">', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Field "rememberMe" has a value in form "#form".');
+        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe" checked>', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+    }
+
     public function testAssertRequestAttributeValueSame()
     {
         $this->getRequestTester()->assertRequestAttributeValueSame('foo', 'bar');
@@ -235,10 +283,25 @@ class WebTestCaseTest extends TestCase
         $this->getRequestTester()->assertRouteSame('articles');
     }
 
+    public function testExceptionOnServerError()
+    {
+        try {
+            $this->getResponseTester(new Response('', 500, ['X-Debug-Exception' => 'An exception has occurred', 'X-Debug-Exception-File' => '%2Fsrv%2Ftest.php:12']))->assertResponseIsSuccessful();
+        } catch (ExpectationFailedException $exception) {
+            $this->assertSame('An exception has occurred', $exception->getPrevious()->getMessage());
+            $this->assertSame('/srv/test.php', $exception->getPrevious()->getFile());
+            $this->assertSame(12, $exception->getPrevious()->getLine());
+        }
+    }
+
     private function getResponseTester(Response $response): WebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $client->expects($this->any())->method('getResponse')->willReturn($response);
+
+        $request = new Request();
+        $request->setFormat('custom', ['application/vnd.myformat']);
+        $client->expects($this->any())->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);
     }

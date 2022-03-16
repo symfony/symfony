@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -82,7 +82,7 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector = new FormDataCollector($this->dataExtractor);
         $this->dispatcher = new EventDispatcher();
         $this->factory = new FormFactory(new FormRegistry([new CoreExtension()], new ResolvedFormTypeFactory()));
-        $this->dataMapper = new PropertyPathMapper();
+        $this->dataMapper = new DataMapper();
         $this->form = $this->createForm('name');
         $this->childForm = $this->createForm('child');
         $this->view = new FormView();

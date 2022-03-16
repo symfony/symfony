@@ -8,6 +8,17 @@
             <span class="sf-toolbar-value">{{ collector.requestCount }}</span>
         {% endset %}
 
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Total requests</b>
+                <span>{{ collector.requestCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>HTTP errors</b>
+                <span class="sf-toolbar-status {{ collector.errorCount > 0 ? 'sf-toolbar-status-red' }}">{{ collector.errorCount }}</span>
+            </div>
+        {% endset %}
+
         {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
 {% endblock %}
@@ -54,6 +65,18 @@
                         {% else %}
                             <h4>Requests</h4>
                             {% for trace in client.traces %}
+                                {% set profiler_token = '' %}
+                                {% set profiler_link = '' %}
+                                {% if trace.info.response_headers is defined %}
+                                    {% for header in trace.info.response_headers %}
+                                        {% if header matches '/^x-debug-token: .*$/i' %}
+                                            {% set profiler_token = (header.getValue | slice('x-debug-token: ' | length)) %}
+                                        {% endif %}
+                                        {% if header matches '/^x-debug-token-link: .*$/i' %}
+                                            {% set profiler_link = (header.getValue | slice('x-debug-token-link: ' | length)) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
                                 <table>
                                     <thead>
                                     <tr>
@@ -66,6 +89,16 @@
                                                 {{ profiler_dump(trace.options, maxDepth=1) }}
                                             {% endif %}
                                         </th>
+                                        {% if profiler_token and profiler_link %}
+                                            <th>
+                                                Profile
+                                            </th>
+                                        {% endif %}
+                                        {% if trace.curlCommand is not null %}
+                                            <th>
+                                                <button class="btn btn-sm hidden label" title="Copy as cURL" data-clipboard-text="{{ trace.curlCommand }}">cURL</button>
+                                            </th>
+                                        {% endif %}
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -82,9 +115,14 @@
                                                 {{ trace.http_code }}
                                             </span>
                                         </th>
-                                        <td>
+                                        <td{% if trace.curlCommand %} colspan="2"{% endif %}>
                                             {{ profiler_dump(trace.info, maxDepth=1) }}
                                         </td>
+                                        {% if profiler_token and profiler_link %}
+                                            <td>
+                                                <span><a href="{{ profiler_link }}" target="_blank">{{ profiler_token }}</a></span>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                     </tbody>
                                 </table>

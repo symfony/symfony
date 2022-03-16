@@ -32,9 +32,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     protected $container;
     protected $currentId;
 
-    private $processExpressions = false;
-    private $expressionLanguage;
-    private $inExpression = false;
+    private bool $processExpressions = false;
+    private ExpressionLanguage $expressionLanguage;
+    private bool $inExpression = false;
 
     /**
      * {@inheritdoc}
@@ -68,12 +68,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     /**
      * Processes a value found in a definition tree.
      *
-     * @param mixed $value
-     * @param bool  $isRoot
-     *
-     * @return mixed The processed value
+     * @return mixed
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
@@ -106,13 +103,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param bool $required
-     *
-     * @return \ReflectionFunctionAbstract|null
-     *
      * @throws RuntimeException
      */
-    protected function getConstructor(Definition $definition, $required)
+    protected function getConstructor(Definition $definition, bool $required): ?\ReflectionFunctionAbstract
     {
         if ($definition->isSynthetic()) {
             return null;
@@ -178,13 +171,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param string $method
-     *
      * @throws RuntimeException
-     *
-     * @return \ReflectionFunctionAbstract
      */
-    protected function getReflectionMethod(Definition $definition, $method)
+    protected function getReflectionMethod(Definition $definition, string $method): \ReflectionFunctionAbstract
     {
         if ('__construct' === $method) {
             return $this->getConstructor($definition, true);
@@ -220,9 +209,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (null === $this->expressionLanguage) {
+        if (!isset($this->expressionLanguage)) {
             if (!class_exists(ExpressionLanguage::class)) {
-                throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+                throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
             }
 
             $providers = $this->container->getExpressionLanguageProviders();
@@ -233,7 +222,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                     $arg = $this->processValue(new Reference($id));
                     $this->inExpression = false;
                     if (!$arg instanceof Reference) {
-                        throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, "%s" returned for service("%s").', static::class, \is_object($arg) ? \get_class($arg) : \gettype($arg), $id));
+                        throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, "%s" returned for service("%s").', static::class, get_debug_type($arg), $id));
                     }
                     $arg = sprintf('"%s"', $arg);
                 }

@@ -12,7 +12,10 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\Exception\LogicException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataAccessor\CallbackAccessor;
+use Symfony\Component\Form\Extension\Core\DataAccessor\ChainAccessor;
+use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -21,14 +24,18 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class FormType extends BaseType
 {
-    private $propertyAccessor;
+    private DataMapper $dataMapper;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->dataMapper = new DataMapper(new ChainAccessor([
+            new CallbackAccessor(),
+            new PropertyPathAccessor($propertyAccessor ?? PropertyAccess::createPropertyAccessor()),
+        ]));
     }
 
     /**
@@ -51,13 +58,15 @@ class FormType extends BaseType
             ->setCompound($options['compound'])
             ->setData($isDataOptionSet ? $options['data'] : null)
             ->setDataLocked($isDataOptionSet)
-            ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
+            ->setDataMapper($options['compound'] ? $this->dataMapper : null)
             ->setMethod($options['method'])
             ->setAction($options['action']);
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
         }
+
+        $builder->setIsEmptyCallback($options['is_empty_callback']);
     }
 
     /**
@@ -81,6 +90,16 @@ class FormType extends BaseType
             }
 
             $helpTranslationParameters = array_merge($view->parent->vars['help_translation_parameters'], $helpTranslationParameters);
+
+            $rootFormAttrOption = $form->getRoot()->getConfig()->getOption('form_attr');
+            if ($options['form_attr'] || $rootFormAttrOption) {
+                $view->vars['attr']['form'] = \is_string($rootFormAttrOption) ? $rootFormAttrOption : $form->getRoot()->getName();
+                if (empty($view->vars['attr']['form'])) {
+                    throw new LogicException('"form_attr" option must be a string identifier on root form when it has no id.');
+                }
+            }
+        } elseif (\is_string($options['form_attr'])) {
+            $view->vars['id'] = $options['form_attr'];
         }
 
         $formConfig = $form->getConfig();
@@ -190,19 +209,33 @@ class FormType extends BaseType
             'help_attr' => [],
             'help_html' => false,
             'help_translation_parameters' => [],
+            'invalid_message' => 'This value is not valid.',
+            'invalid_message_parameters' => [],
+            'is_empty_callback' => null,
+            'getter' => null,
+            'setter' => null,
+            'form_attr' => false,
         ]);
 
         $resolver->setAllowedTypes('label_attr', 'array');
+        $resolver->setAllowedTypes('action', 'string');
         $resolver->setAllowedTypes('upload_max_size_message', ['callable']);
-        $resolver->setAllowedTypes('help', ['string', 'null']);
+        $resolver->setAllowedTypes('help', ['string', 'null', TranslatableMessage::class]);
         $resolver->setAllowedTypes('help_attr', 'array');
         $resolver->setAllowedTypes('help_html', 'bool');
+        $resolver->setAllowedTypes('is_empty_callback', ['null', 'callable']);
+        $resolver->setAllowedTypes('getter', ['null', 'callable']);
+        $resolver->setAllowedTypes('setter', ['null', 'callable']);
+        $resolver->setAllowedTypes('form_attr', ['bool', 'string']);
+
+        $resolver->setInfo('getter', 'A callable that accepts two arguments (the view data and the current form field) and must return a value.');
+        $resolver->setInfo('setter', 'A callable that accepts three arguments (a reference to the view data, the submitted value and the current form field).');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return null;
     }
@@ -210,7 +243,7 @@ class FormType extends BaseType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'form';
     }

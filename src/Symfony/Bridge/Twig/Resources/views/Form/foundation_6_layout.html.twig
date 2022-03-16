@@ -1,0 +1,50 @@
+{% extends "form_div_layout.html.twig" %}
+
+{%- block checkbox_row -%}
+    {%- set parent_class = parent_class|default(attr.class|default('')) -%}
+    {%- if 'switch-input' in parent_class -%}
+        {{- form_label(form) -}}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' switch-input')|trim}) -%}
+        {{- form_widget(form) -}}
+        <label class="switch-paddle" for="{{ form.vars.id }}"></label>
+        {{- form_errors(form) -}}
+    {%- else -%}
+        {{- block('form_row') -}}
+    {%- endif -%}
+{%- endblock checkbox_row -%}
+
+{% block money_widget -%}
+    {% set prepend = not (money_pattern starts with '{{') %}
+    {% set append = not (money_pattern ends with '}}') %}
+    {% if prepend or append %}
+        <div class="input-group">
+            {% if prepend %}
+                <span class="input-group-label">{{ money_pattern|form_encode_currency }}</span>
+            {% endif %}
+            {% set attr = attr|merge({class: (attr.class|default('') ~ ' input-group-field')|trim}) %}
+            {{- block('form_widget_simple') -}}
+            {% if append %}
+                <span class="input-group-label">{{ money_pattern|form_encode_currency }}</span>
+            {% endif %}
+        </div>
+    {% else %}
+        {{- block('form_widget_simple') -}}
+    {% endif %}
+{%- endblock money_widget %}
+
+{% block percent_widget -%}
+    {%- if symbol -%}
+        <div class="input-group">
+            {% set attr = attr|merge({class: (attr.class|default('') ~ ' input-group-field')|trim}) %}
+            {{- block('form_widget_simple') -}}
+            <span class="input-group-label">{{ symbol|default('%') }}</span>
+        </div>
+    {%- else -%}
+        {{- block('form_widget_simple') -}}
+    {%- endif -%}
+{%- endblock percent_widget %}
+
+{% block button_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' button')|trim}) %}
+    {{- parent() -}}
+{%- endblock button_widget %}

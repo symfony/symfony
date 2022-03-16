@@ -64,11 +64,11 @@ class TranslatorPassTest extends TestCase
         $debugCommand = $container->register('console.command.translation_debug')
             ->setArguments([null, null, null, null, null, [], []])
         ;
-        $updateCommand = $container->register('console.command.translation_update')
+        $updateCommand = $container->register('console.command.translation_extract')
             ->setArguments([null, null, null, null, null, null, [], []])
         ;
         $container->register('twig.template_iterator')
-            ->setArguments([null, null, ['other/templates' => null, 'tpl' => 'App']])
+            ->setArguments([null, ['other/templates' => null, 'tpl' => 'App']])
         ;
         $container->setParameter('twig.default_path', 'templates');
 
@@ -98,7 +98,7 @@ class TranslatorPassTest extends TestCase
                 null,
             ])
         ;
-        $updateCommand = $container->register('console.command.translation_update')
+        $updateCommand = $container->register('console.command.translation_extract')
             ->setArguments([
                 new Reference('translation.writer'),
                 new Reference('translation.reader'),
@@ -109,7 +109,7 @@ class TranslatorPassTest extends TestCase
             ])
         ;
         $container->register('twig.template_iterator')
-            ->setArguments([null, null, ['other/templates' => null, 'tpl' => 'App']])
+            ->setArguments([null, ['other/templates' => null, 'tpl' => 'App']])
         ;
         $container->setParameter('twig.default_path', 'templates');
 

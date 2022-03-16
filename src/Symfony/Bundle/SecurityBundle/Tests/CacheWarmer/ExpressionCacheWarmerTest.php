@@ -26,8 +26,8 @@ class ExpressionCacheWarmerTest extends TestCase
         $expressionLang->expects($this->exactly(2))
             ->method('parse')
             ->withConsecutive(
-                [$expressions[0], ['token', 'user', 'object', 'subject', 'roles', 'role_names', 'request', 'trust_resolver']],
-                [$expressions[1], ['token', 'user', 'object', 'subject', 'roles', 'role_names', 'request', 'trust_resolver']]
+                [$expressions[0], ['token', 'user', 'object', 'subject', 'role_names', 'request', 'trust_resolver']],
+                [$expressions[1], ['token', 'user', 'object', 'subject', 'role_names', 'request', 'trust_resolver']]
             );
 
         (new ExpressionCacheWarmer($expressions, $expressionLang))->warmUp('');

@@ -15,10 +15,12 @@ namespace Symfony\Component\Workflow;
  * A list of transition blockers.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @implements \IteratorAggregate<int, TransitionBlocker>
  */
 final class TransitionBlockerList implements \IteratorAggregate, \Countable
 {
-    private $blockers;
+    private array $blockers;
 
     /**
      * @param TransitionBlocker[] $blockers
@@ -58,11 +60,6 @@ final class TransitionBlockerList implements \IteratorAggregate, \Countable
         return !$this->blockers;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Traversable<TransitionBlocker>
-     */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->blockers);

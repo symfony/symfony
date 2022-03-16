@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Validator\ConstraintViolation;
 
@@ -27,6 +28,12 @@ use Symfony\Component\Validator\ConstraintViolation;
  * flatten the recursive structure into a flat list of errors.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T of FormError|FormErrorIterator
+ *
+ * @implements \ArrayAccess<int, T>
+ * @implements \RecursiveIterator<int, T>
+ * @implements \SeekableIterator<int, T>
  */
 class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable
 {
@@ -35,12 +42,15 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      */
     public const INDENTATION = '    ';
 
-    private $form;
-    private $errors;
+    private FormInterface $form;
 
     /**
-     * @param FormError[]|self[] $errors An array of form errors and instances
-     *                                   of FormErrorIterator
+     * @var list<T>
+     */
+    private array $errors;
+
+    /**
+     * @param list<T> $errors
      *
      * @throws InvalidArgumentException If the errors are invalid
      */
@@ -48,7 +58,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     {
         foreach ($errors as $error) {
             if (!($error instanceof FormError || $error instanceof self)) {
-                throw new InvalidArgumentException(sprintf('The errors must be instances of "Symfony\Component\Form\FormError" or "%s". Got: "%s".', __CLASS__, \is_object($error) ? \get_class($error) : \gettype($error)));
+                throw new InvalidArgumentException(sprintf('The errors must be instances of "Symfony\Component\Form\FormError" or "%s". Got: "%s".', __CLASS__, get_debug_type($error)));
             }
         }
 
@@ -58,10 +68,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Returns all iterated error messages as string.
-     *
-     * @return string The iterated error messages
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = '';
 
@@ -70,7 +78,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
                 $string .= 'ERROR: '.$error->getMessage()."\n";
             } else {
                 /* @var self $error */
-                $string .= $error->form->getName().":\n";
+                $string .= $error->getForm()->getName().":\n";
                 $string .= self::indent((string) $error);
             }
         }
@@ -80,10 +88,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Returns the iterated form.
-     *
-     * @return FormInterface The form whose errors are iterated by this object
      */
-    public function getForm()
+    public function getForm(): FormInterface
     {
         return $this->form;
     }
@@ -91,10 +97,9 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the current element of the iterator.
      *
-     * @return FormError|self An error or an iterator containing nested errors
+     * @return T An error or an iterator containing nested errors
      */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): FormError|self
     {
         return current($this->errors);
     }
@@ -102,30 +107,23 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Advances the iterator to the next position.
      */
-    #[\ReturnTypeWillChange]
-    public function next()
+    public function next(): void
     {
         next($this->errors);
     }
 
     /**
      * Returns the current position of the iterator.
-     *
-     * @return int The 0-indexed position
      */
-    #[\ReturnTypeWillChange]
-    public function key()
+    public function key(): int
     {
         return key($this->errors);
     }
 
     /**
      * Returns whether the iterator's position is valid.
-     *
-     * @return bool Whether the iterator is valid
      */
-    #[\ReturnTypeWillChange]
-    public function valid()
+    public function valid(): bool
     {
         return null !== key($this->errors);
     }
@@ -136,8 +134,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * This method detects if errors have been added to the form since the
      * construction of the iterator.
      */
-    #[\ReturnTypeWillChange]
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->errors);
     }
@@ -146,11 +143,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Returns whether a position exists in the iterator.
      *
      * @param int $position The position
-     *
-     * @return bool Whether that position exists
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($position)
+    public function offsetExists(mixed $position): bool
     {
         return isset($this->errors[$position]);
     }
@@ -160,12 +154,11 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @param int $position The position
      *
-     * @return FormError|FormErrorIterator The element at the given position
+     * @return T
      *
      * @throws OutOfBoundsException If the given position does not exist
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($position)
+    public function offsetGet(mixed $position): FormError|self
     {
         if (!isset($this->errors[$position])) {
             throw new OutOfBoundsException('The offset '.$position.' does not exist.');
@@ -177,12 +170,9 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Unsupported method.
      *
-     * @return void
-     *
      * @throws BadMethodCallException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($position, $value)
+    public function offsetSet(mixed $position, mixed $value): void
     {
         throw new BadMethodCallException('The iterator doesn\'t support modification of elements.');
     }
@@ -190,12 +180,9 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Unsupported method.
      *
-     * @return void
-     *
      * @throws BadMethodCallException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($position)
+    public function offsetUnset(mixed $position): void
     {
         throw new BadMethodCallException('The iterator doesn\'t support modification of elements.');
     }
@@ -203,24 +190,22 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns whether the current element of the iterator can be recursed
      * into.
-     *
-     * @return bool Whether the current element is an instance of this class
      */
-    #[\ReturnTypeWillChange]
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return current($this->errors) instanceof self;
     }
 
-    /**
-     * Alias of {@link current()}.
-     *
-     * @return self
-     */
-    #[\ReturnTypeWillChange]
-    public function getChildren()
+    public function getChildren(): self
     {
-        return current($this->errors);
+        if (!$this->hasChildren()) {
+            throw new LogicException(sprintf('The current element is not iterable. Use "%s" to get the current element.', self::class.'::current()'));
+        }
+
+        /** @var self $children */
+        $children = current($this->errors);
+
+        return $children;
     }
 
     /**
@@ -237,11 +222,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Alternatively, set the constructor argument $flatten to true as well.
      *
      *     $count = count($form->getErrors(true, true));
-     *
-     * @return int The number of iterated elements
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return \count($this->errors);
     }
@@ -249,14 +231,9 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Sets the position of the iterator.
      *
-     * @param int $position The new position
-     *
-     * @return void
-     *
      * @throws OutOfBoundsException If the position is invalid
      */
-    #[\ReturnTypeWillChange]
-    public function seek($position)
+    public function seek(int $position): void
     {
         if (!isset($this->errors[$position])) {
             throw new OutOfBoundsException('The offset '.$position.' does not exist.');
@@ -273,10 +250,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Creates iterator for errors with specific codes.
      *
      * @param string|string[] $codes The codes to find
-     *
-     * @return static new instance which contains only specific errors
      */
-    public function findByCodes($codes)
+    public function findByCodes(string|array $codes): static
     {
         $codes = (array) $codes;
         $errors = [];

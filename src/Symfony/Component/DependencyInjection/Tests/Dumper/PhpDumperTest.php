@@ -13,8 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -43,11 +45,13 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NewInInitializer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -58,6 +62,8 @@ require_once __DIR__.'/../Fixtures/includes/foo_lazy.php';
 
 class PhpDumperTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -216,11 +222,31 @@ class PhpDumperTest extends TestCase
             ->addError('No-no-no-no');
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot']), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
+    }
+
+    public function testDumpAsFilesWithTypedReference()
+    {
+        $container = include self::$fixturesPath.'/containers/container10.php';
+        $container->getDefinition('foo')->addTag('hot');
+        $container->register('bar', 'stdClass');
+        $container->register('closure', 'stdClass')
+            ->setProperty('closures', [
+                new ServiceClosureArgument(new TypedReference('foo', \stdClass::class, $container::IGNORE_ON_UNINITIALIZED_REFERENCE)),
+            ])
+            ->setPublic(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
+        }
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services10_as_files.txt', $dump);
     }
 
     public function testDumpAsFilesWithFactoriesInlined()
@@ -286,7 +312,8 @@ class PhpDumperTest extends TestCase
             ->setLazy(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__]), true);
+        $dumper->setProxyDumper(new \DummyProxyDumper());
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -395,24 +422,6 @@ class PhpDumperTest extends TestCase
         $this->assertSame($foo, $container->get('alias_for_alias'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "alias_for_foo_deprecated" service alias is deprecated. You should stop using it, as it will be removed in the future.
-     */
-    public function testAliasesDeprecation()
-    {
-        $container = include self::$fixturesPath.'/containers/container_alias_deprecation.php';
-        $container->compile();
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_alias_deprecation.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Aliases_Deprecation']));
-
-        require self::$fixturesPath.'/php/container_alias_deprecation.php';
-        $container = new \Symfony_DI_PhpDumper_Test_Aliases_Deprecation();
-        $container->get('alias_for_foo_non_deprecated');
-        $container->get('alias_for_foo_deprecated');
-    }
-
     public function testFrozenContainerWithoutAliases()
     {
         $container = new ContainerBuilder();
@@ -467,7 +476,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php']));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]));
 
         require self::$fixturesPath.'/php/services26.php';
         $container = new \Symfony_DI_PhpDumper_Test_EnvParameters();
@@ -679,7 +688,7 @@ class PhpDumperTest extends TestCase
     public function testInlinedDefinitionReferencingServiceContainer()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')->addMethodCall('add', [new Reference('service_container')])->setPublic(false);
+        $container->register('foo', 'stdClass')->addMethodCall('add', [new Reference('service_container')]);
         $container->register('bar', 'stdClass')->addArgument(new Reference('foo'))->setPublic(true);
         $container->compile();
 
@@ -831,7 +840,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo_service', 'stdClass')->setArguments([new Reference('baz_service')])->setPublic(true);
         $container->register('bar_service', 'stdClass')->setArguments([new Reference('baz_service')])->setPublic(true);
-        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->register('baz_service', 'stdClass');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -854,7 +863,6 @@ class PhpDumperTest extends TestCase
         // no method calls
         $container->register('translator.loader_1', 'stdClass')->setPublic(true);
         $container->register('translator.loader_1_locator', ServiceLocator::class)
-            ->setPublic(false)
             ->addArgument([
                 'translator.loader_1' => new ServiceClosureArgument(new Reference('translator.loader_1')),
             ]);
@@ -865,7 +873,6 @@ class PhpDumperTest extends TestCase
         // one method calls
         $container->register('translator.loader_2', 'stdClass')->setPublic(true);
         $container->register('translator.loader_2_locator', ServiceLocator::class)
-            ->setPublic(false)
             ->addArgument([
                 'translator.loader_2' => new ServiceClosureArgument(new Reference('translator.loader_2')),
             ]);
@@ -877,7 +884,6 @@ class PhpDumperTest extends TestCase
         // two method calls
         $container->register('translator.loader_3', 'stdClass')->setPublic(true);
         $container->register('translator.loader_3_locator', ServiceLocator::class)
-            ->setPublic(false)
             ->addArgument([
                 'translator.loader_3' => new ServiceClosureArgument(new Reference('translator.loader_3')),
             ]);
@@ -889,7 +895,7 @@ class PhpDumperTest extends TestCase
 
         $nil->setValues([null]);
         $container->register('bar_service', 'stdClass')->setArguments([new Reference('baz_service')])->setPublic(true);
-        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->register('baz_service', 'stdClass');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -911,8 +917,7 @@ class PhpDumperTest extends TestCase
         ;
         $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class)->setPublic(true);
 
-        $container->register(CustomDefinition::class, CustomDefinition::class)
-            ->setPublic(false);
+        $container->register(CustomDefinition::class, CustomDefinition::class);
 
         $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
 
@@ -922,8 +927,8 @@ class PhpDumperTest extends TestCase
              */
             public function process(ContainerBuilder $container)
             {
-                $container->setDefinition('late_alias', new Definition(TestDefinition1::class));
-                $container->setAlias(TestDefinition1::class, 'late_alias');
+                $container->setDefinition('late_alias', new Definition(TestDefinition1::class))->setPublic(true);
+                $container->setAlias(TestDefinition1::class, 'late_alias')->setPublic(true);
             }
         }, PassConfig::TYPE_AFTER_REMOVING);
 
@@ -931,11 +936,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        if (80100 <= \PHP_VERSION_ID) {
-            $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber_php81.php', $dumper->dump());
-        } else {
-            $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
-        }
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
     }
 
     public function testPrivateWithIgnoreOnInvalidReference()
@@ -943,8 +944,7 @@ class PhpDumperTest extends TestCase
         require_once self::$fixturesPath.'/includes/classes.php';
 
         $container = new ContainerBuilder();
-        $container->register('not_invalid', 'BazClass')
-            ->setPublic(false);
+        $container->register('not_invalid', 'BazClass');
         $container->register('bar', 'BarClass')
             ->setPublic(true)
             ->addMethodCall('setBaz', [new Reference('not_invalid', SymfonyContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
@@ -955,6 +955,24 @@ class PhpDumperTest extends TestCase
 
         $container = new \Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference();
         $this->assertInstanceOf(\BazClass::class, $container->get('bar')->getBaz());
+    }
+
+    public function testEnvExpressionFunction()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', 'BarClass')
+            ->setPublic(true)
+            ->setProperty('foo', new Expression('env("BAR_FOO")'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Env_Expression_Function']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Env_Expression_Function();
+
+        $_ENV['BAR_FOO'] = 'Foo value';
+
+        $this->assertEquals('Foo value', $container->get('bar')->foo);
     }
 
     public function testArrayParameters()
@@ -969,16 +987,14 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php'])));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false])));
     }
 
     public function testExpressionReferencingPrivateService()
     {
         $container = new ContainerBuilder();
-        $container->register('private_bar', 'stdClass')
-            ->setPublic(false);
-        $container->register('private_foo', 'stdClass')
-            ->setPublic(false);
+        $container->register('private_bar', 'stdClass');
+        $container->register('private_foo', 'stdClass');
         $container->register('public_foo', 'stdClass')
             ->setPublic(true)
             ->addArgument(new Expression('service("private_foo").bar'));
@@ -1189,9 +1205,6 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testNewInInitializer()
     {
         $container = new ContainerBuilder();
@@ -1207,9 +1220,6 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_new_in_initializer.php', $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();
@@ -1237,14 +1247,14 @@ class PhpDumperTest extends TestCase
 %A
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'unit_enum': $value = \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR; break;
-            case 'enum_array': $value = [
+        $value = match ($name) {
+            'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
+            'enum_array' => [
                 0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
                 1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
-            ]; break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+            ],
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
 %A
 PHP
             , $dumpedContainer
@@ -1283,32 +1293,6 @@ PHP
 
         $dumper = new PhpDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_adawson.php', $dumper->dump());
-    }
-
-    /**
-     * This test checks the trigger of a deprecation note and should not be removed in major releases.
-     *
-     * @group legacy
-     * @expectedDeprecation The "foo" service is deprecated. You should stop using it, as it will be removed in the future.
-     */
-    public function testPrivateServiceTriggersDeprecation()
-    {
-        $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')
-            ->setPublic(false)
-            ->setDeprecated(true);
-        $container->register('bar', 'stdClass')
-            ->setPublic(true)
-            ->setProperty('foo', new Reference('foo'));
-
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Private_Service_Triggers_Deprecation']));
-
-        $container = new \Symfony_DI_PhpDumper_Test_Private_Service_Triggers_Deprecation();
-
-        $container->get('bar');
     }
 
     public function testParameterWithMixedCase()
@@ -1439,34 +1423,98 @@ PHP
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "deprecated1" service alias is deprecated. You should stop using it, as it will be removed in the future.
-     * @expectedDeprecation The "deprecated2" service alias is deprecated. You should stop using it, as it will be removed in the future.
-     */
-    public function testMultipleDeprecatedAliasesWorking()
+    public function testWitherWithStaticReturnType()
     {
         $container = new ContainerBuilder();
-        $container->setDefinition('bar', new Definition('stdClass'))->setPublic(true);
-        $container->setAlias('deprecated1', 'bar')->setPublic(true)->setDeprecated('%alias_id% is deprecated');
-        $container->setAlias('deprecated2', 'bar')->setPublic(true)->setDeprecated('%alias_id% is deprecated');
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', WitherStaticReturnType::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_WitherStaticReturnType']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_staticreturntype.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_WitherStaticReturnType();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
+    public function testDumpServiceWithAbstractArgument()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Argument "$baz" of service "Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument" is abstract: should be defined by Pass.');
+
+        $container = new ContainerBuilder();
+
+        $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
+            ->setArgument('$bar', 'test')
+            ->setPublic(true);
+
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dump = $dumper->dump(['class' => $class = __FUNCTION__]);
+        $dumper->dump();
+    }
 
-        eval('?>'.$dump);
-        $container = new $class();
+    /**
+     * @group legacy
+     */
+    public function testDirectlyAccessingDeprecatedPublicService()
+    {
+        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
 
-        $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
-        $this->assertInstanceOf(\stdClass::class, $container->get('deprecated1'));
-        $this->assertInstanceOf(\stdClass::class, $container->get('deprecated2'));
+        $container = new ContainerBuilder();
+        $container
+            ->register('bar', \BarClass::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Directly_Accessing_Deprecated_Public_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Directly_Accessing_Deprecated_Public_Service();
+
+        $container->get('bar');
+    }
+
+    public function testReferencingDeprecatedPublicService()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('bar', \BarClass::class)
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '3.8']);
+        $container
+            ->register('bar_user', \BarUserClass::class)
+            ->setPublic(true)
+            ->addArgument(new Reference('bar'));
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Referencing_Deprecated_Public_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Referencing_Deprecated_Public_Service();
+
+        // No deprecation should be triggered.
+        $container->get('bar_user');
+
+        $this->addToAssertionCount(1);
     }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv($prefix, $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         return str_rot13($getEnv($name));
     }

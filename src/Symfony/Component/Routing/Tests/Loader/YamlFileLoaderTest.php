@@ -62,6 +62,9 @@ class YamlFileLoaderTest extends TestCase
             ['nonesense_resource_plus_path.yml'],
             ['nonesense_type_without_resource.yml'],
             ['bad_format.yml'],
+            ['alias/invalid-alias.yaml'],
+            ['alias/invalid-deprecated-no-package.yaml'],
+            ['alias/invalid-deprecated-no-version.yaml'],
         ];
     }
 
@@ -90,6 +93,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
         $this->assertEquals(['https'], $route->getSchemes());
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
+        $this->assertTrue($route->getDefault('_stateless'));
     }
 
     public function testLoadWithResource()
@@ -232,6 +236,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('/defaults', $defaultsRoute->getPath());
         $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
         $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+        $this->assertTrue($defaultsRoute->getDefault('_stateless'));
     }
 
     public function testLoadingImportedRoutesWithDefaults()
@@ -245,9 +250,11 @@ class YamlFileLoaderTest extends TestCase
         $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
         $localeRoute->setDefault('_locale', 'g_locale');
         $localeRoute->setDefault('_format', 'g_format');
+        $localeRoute->setDefault('_stateless', true);
         $expectedRoutes->add('two', $formatRoute = new Route('/defaults/two'));
         $formatRoute->setDefault('_locale', 'g_locale');
         $formatRoute->setDefault('_format', 'g_format');
+        $formatRoute->setDefault('_stateless', true);
         $formatRoute->setDefault('specific', 'imported');
 
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.yml'));
@@ -383,13 +390,72 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "\d+" of route "foo" in "%srequirements_without_placeholder_name.yml"?
-     */
     public function testRequirementsWithoutPlaceholderName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "\\d+" of route "foo"');
+
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load('requirements_without_placeholder_name.yml');
+    }
+
+    public function testImportingRoutesWithHostsInImporter()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-host.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
+    public function testImportingRoutesWithLocalesAndHostInImporter()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-locale-and-host.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-locale-and-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
+    public function testImportingRoutesWithoutHostInImporter()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-without-host.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-without-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
+    public function testImportingRoutesWithSingleHostInImporter()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-single-host.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
+    public function testWhenEnv()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
+        $routes = $loader->load('when-env.yml');
+
+        $this->assertSame(['b', 'a'], array_keys($routes->all()));
+        $this->assertSame('/b', $routes->get('b')->getPath());
+        $this->assertSame('/a1', $routes->get('a')->getPath());
+    }
+
+    public function testImportingAliases()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.yaml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('yaml'), $routes);
     }
 }

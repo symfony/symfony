@@ -24,10 +24,13 @@ use Symfony\Component\Mime\RawMessage;
  */
 class RoundRobinTransport implements TransportInterface
 {
-    private $deadTransports;
-    private $transports = [];
-    private $retryPeriod;
-    private $cursor = 0;
+    /**
+     * @var \SplObjectStorage<TransportInterface, float>
+     */
+    private \SplObjectStorage $deadTransports;
+    private array $transports = [];
+    private int $retryPeriod;
+    private int $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
@@ -66,6 +69,10 @@ class RoundRobinTransport implements TransportInterface
      */
     protected function getNextTransport(): ?TransportInterface
     {
+        if (-1 === $this->cursor) {
+            $this->cursor = $this->getInitialCursor();
+        }
+
         $cursor = $this->cursor;
         while (true) {
             $transport = $this->transports[$cursor];
@@ -93,6 +100,13 @@ class RoundRobinTransport implements TransportInterface
     protected function isTransportDead(TransportInterface $transport): bool
     {
         return $this->deadTransports->contains($transport);
+    }
+
+    protected function getInitialCursor(): int
+    {
+        // the cursor initial value is randomized so that
+        // when are not in a daemon, we are still rotating the transports
+        return mt_rand(0, \count($this->transports) - 1);
     }
 
     protected function getNameSymbol(): string

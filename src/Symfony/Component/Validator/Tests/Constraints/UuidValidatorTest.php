@@ -81,6 +81,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ['456daefb-5aa6-41b5-8dbc-068b05a8b201'], // Version 4 UUID in lowercase
             ['456daEFb-5AA6-41B5-8DBC-068B05A8B201'], // Version 4 UUID in mixed case
             ['456daEFb-5AA6-41B5-8DBC-068B05A8B201', [Uuid::V4_RANDOM]],
+            ['1eb01932-4c0b-6570-aa34-d179cdf481ae', [Uuid::V6_SORTABLE]],
         ];
     }
 
@@ -110,6 +111,16 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ["\x00456daEFb-5AA6-41B5-8DBC-068B05A8B201\x00"], // Version 4 UUID in mixed case
             ["\x0B\x0B456daEFb-5AA6-41B5-8DBC-068B05A8B201\x0B\x0B", [Uuid::V4_RANDOM]],
         ];
+    }
+
+    public function testValidStrictUuidWithWhitespacesNamed()
+    {
+        $this->validator->validate(
+            "\x09\x09216fff40-98d9-11e3-a5e2-0800200c9a66",
+            new Uuid(normalizer: 'trim', versions: [Uuid::V1_MAC])
+        );
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -148,7 +159,6 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ['216fff40-98d9-11e3-a5e2-0800200c9a6', Uuid::TOO_SHORT_ERROR],
             ['216fff40-98d9-11e3-a5e2-0800200c9a666', Uuid::TOO_LONG_ERROR],
             ['216fff40-98d9-01e3-a5e2-0800200c9a66', Uuid::INVALID_VERSION_ERROR],
-            ['216fff40-98d9-61e3-a5e2-0800200c9a66', Uuid::INVALID_VERSION_ERROR],
             ['216fff40-98d9-71e3-a5e2-0800200c9a66', Uuid::INVALID_VERSION_ERROR],
             ['216fff40-98d9-81e3-a5e2-0800200c9a66', Uuid::INVALID_VERSION_ERROR],
             ['216fff40-98d9-91e3-a5e2-0800200c9a66', Uuid::INVALID_VERSION_ERROR],
@@ -239,5 +249,18 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ['216fff40-98d9-11e3-a5e2-0800200c9a6', Uuid::TOO_SHORT_ERROR],
             ['216fff40-98d9-11e3-a5e2-0800200c9a666', Uuid::TOO_LONG_ERROR],
         ];
+    }
+
+    public function testInvalidNonStrictUuidNamed()
+    {
+        $this->validator->validate(
+            '216fff40-98d9-11e3-a5e2_0800200c9a66',
+            new Uuid(strict: false, message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"216fff40-98d9-11e3-a5e2_0800200c9a66"')
+            ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
     }
 }

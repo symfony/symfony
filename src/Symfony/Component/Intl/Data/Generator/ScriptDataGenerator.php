@@ -33,7 +33,7 @@ class ScriptDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $scriptCodes = [];
+    private array $scriptCodes = [];
 
     /**
      * {@inheritdoc}

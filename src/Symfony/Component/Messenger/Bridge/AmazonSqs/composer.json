@@ -1,0 +1,38 @@
+{
+    "name": "symfony/amazon-sqs-messenger",
+    "type": "symfony-messenger-bridge",
+    "description": "Symfony Amazon SQS extension Messenger Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "async-aws/core": "^1.5",
+        "async-aws/sqs": "^1.0",
+        "symfony/messenger": "^5.4|^6.0",
+        "symfony/service-contracts": "^1.1|^2|^3",
+        "psr/log": "^1|^2|^3"
+    },
+    "require-dev": {
+        "symfony/http-client-contracts": "^1|^2|^3",
+        "symfony/property-access": "^5.4|^6.0",
+        "symfony/serializer": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\AmazonSqs\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

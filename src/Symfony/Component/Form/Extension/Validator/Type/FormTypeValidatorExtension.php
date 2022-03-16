@@ -15,22 +15,26 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormTypeValidatorExtension extends BaseValidatorExtension
 {
-    private $validator;
-    private $violationMapper;
+    private ValidatorInterface $validator;
+    private ViolationMapper $violationMapper;
+    private bool $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {
         $this->validator = $validator;
-        $this->violationMapper = new ViolationMapper();
+        $this->violationMapper = new ViolationMapper($formRenderer, $translator);
     }
 
     /**
@@ -61,7 +65,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'allow_extra_fields' => false,
             'extra_fields_message' => 'This form should not contain extra fields.',
         ]);
-
+        $resolver->setAllowedTypes('constraints', [Constraint::class, Constraint::class.'[]']);
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }
 

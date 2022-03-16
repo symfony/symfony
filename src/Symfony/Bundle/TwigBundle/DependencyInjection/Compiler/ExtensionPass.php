@@ -11,12 +11,14 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Bridge\Twig\Extension\AssetExtension;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -25,30 +27,25 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!class_exists(\Symfony\Component\Asset\Packages::class)) {
+        if (!class_exists(Packages::class)) {
             $container->removeDefinition('twig.extension.assets');
         }
 
-        if (!class_exists(\Symfony\Component\ExpressionLanguage\Expression::class)) {
+        if (!class_exists(Expression::class)) {
             $container->removeDefinition('twig.extension.expression');
         }
 
-        if (!interface_exists(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)) {
+        if (!interface_exists(UrlGeneratorInterface::class)) {
             $container->removeDefinition('twig.extension.routing');
         }
 
-        if (!class_exists(\Symfony\Component\Yaml\Yaml::class)) {
+        if (!class_exists(Yaml::class)) {
             $container->removeDefinition('twig.extension.yaml');
         }
 
         $viewDir = \dirname((new \ReflectionClass(\Symfony\Bridge\Twig\Extension\FormExtension::class))->getFileName(), 2).'/Resources/views';
         $templateIterator = $container->getDefinition('twig.template_iterator');
-        $templatePaths = $templateIterator->getArgument(2);
-        $cacheWarmer = null;
-        if ($container->hasDefinition('twig.cache_warmer')) {
-            $cacheWarmer = $container->getDefinition('twig.cache_warmer');
-            $cacheWarmerPaths = $cacheWarmer->getArgument(2);
-        }
+        $templatePaths = $templateIterator->getArgument(1);
         $loader = $container->getDefinition('twig.loader.native_filesystem');
 
         if ($container->has('mailer')) {
@@ -56,9 +53,6 @@ class ExtensionPass implements CompilerPassInterface
             $loader->addMethodCall('addPath', [$emailPath, 'email']);
             $loader->addMethodCall('addPath', [$emailPath, '!email']);
             $templatePaths[$emailPath] = 'email';
-            if ($cacheWarmer) {
-                $cacheWarmerPaths[$emailPath] = 'email';
-            }
         }
 
         if ($container->has('form.extension')) {
@@ -67,15 +61,9 @@ class ExtensionPass implements CompilerPassInterface
             $coreThemePath = $viewDir.'/Form';
             $loader->addMethodCall('addPath', [$coreThemePath]);
             $templatePaths[$coreThemePath] = null;
-            if ($cacheWarmer) {
-                $cacheWarmerPaths[$coreThemePath] = null;
-            }
         }
 
-        $templateIterator->replaceArgument(2, $templatePaths);
-        if ($cacheWarmer) {
-            $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $cacheWarmerPaths);
-        }
+        $templateIterator->replaceArgument(1, $templatePaths);
 
         if ($container->has('router')) {
             $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
@@ -85,17 +73,11 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
             $container->getDefinition('twig.runtime.httpkernel')->addTag('twig.runtime');
 
-            // inject Twig in the hinclude service if Twig is the only registered templating engine
-            if ((!$container->hasParameter('templating.engines') || ['twig'] == $container->getParameter('templating.engines')) && $container->hasDefinition('fragment.renderer.hinclude')) {
+            if ($container->hasDefinition('fragment.renderer.hinclude')) {
                 $container->getDefinition('fragment.renderer.hinclude')
                     ->addTag('kernel.fragment_renderer', ['alias' => 'hinclude'])
-                    ->replaceArgument(0, new Reference('twig'))
                 ;
             }
-        }
-
-        if (!$container->has('http_kernel')) {
-            $container->removeDefinition('twig.controller.preview_error');
         }
 
         if ($container->has('request_stack')) {
@@ -115,21 +97,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.weblink')->addTag('twig.extension');
         }
 
-        $twigLoader = $container->getDefinition('twig.loader.native_filesystem');
-        if ($container->has('templating')) {
-            $loader = $container->getDefinition('twig.loader.filesystem');
-            $loader->setMethodCalls(array_merge($twigLoader->getMethodCalls(), $loader->getMethodCalls()));
-
-            if (!method_exists(AssetExtension::class, 'getName')) {
-                $container->removeDefinition('templating.engine.twig');
-            }
-
-            $twigLoader->clearTag('twig.loader');
-        } else {
-            $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
-            $container->removeDefinition('templating.engine.twig');
-            $container->removeDefinition('twig.cache_warmer');
-        }
+        $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
 
         if ($container->has('assets.packages')) {
             $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
@@ -151,6 +119,11 @@ class ExtensionPass implements CompilerPassInterface
             $container->removeDefinition('workflow.twig_extension');
         } else {
             $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');
+        }
+
+        if ($container->has('serializer')) {
+            $container->getDefinition('twig.runtime.serializer')->addTag('twig.runtime');
+            $container->getDefinition('twig.extension.serializer')->addTag('twig.extension');
         }
     }
 }

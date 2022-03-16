@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -199,7 +200,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
     public function testExceptionOnNonExistentTypeHint()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClass". Did you forget to add a use statement?');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
@@ -209,11 +210,17 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
+
+        $error = $container->getDefinition('argument_resolver.service')->getArgument(0);
+        $error = $container->getDefinition($error)->getArgument(0)['foo::fooAction']->getValues()[0];
+        $error = $container->getDefinition($error)->getArgument(0)['nonExistent']->getValues()[0];
+
+        $container->get($error);
     }
 
     public function testExceptionOnNonExistentTypeHintDifferentNamespace()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassDifferentNamespaceController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Acme\NonExistentClass".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
@@ -223,6 +230,12 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
+
+        $error = $container->getDefinition('argument_resolver.service')->getArgument(0);
+        $error = $container->getDefinition($error)->getArgument(0)['foo::fooAction']->getValues()[0];
+        $error = $container->getDefinition($error)->getArgument(0)['nonExistent']->getValues()[0];
+
+        $container->get($error);
     }
 
     public function testNoExceptionOnNonExistentTypeHintOptionalArg()
@@ -371,9 +384,23 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceOf(Reference::class, $locatorArgument);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
+    public function testAlias()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('foo', RegisterTestController::class)
+            ->addTag('controller.service_arguments');
+
+        $container->setAlias(RegisterTestController::class, 'foo')->setPublic(true);
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertEqualsCanonicalizing([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
+    }
+
     public function testEnumArgumentIsIgnored()
     {
         $container = new ContainerBuilder();
@@ -388,6 +415,31 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $this->assertEmpty(array_keys($locator), 'enum typed argument is ignored');
+    }
+
+    public function testBindWithTarget()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register(ControllerDummy::class, 'bar');
+        $container->register(ControllerDummy::class.' $imageStorage', 'baz');
+
+        $container->register('foo', WithTarget::class)
+            ->setBindings(['string $someApiKey' => new Reference('the_api_key')])
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+
+        $expected = [
+            'apiKey' => new ServiceClosureArgument(new Reference('the_api_key')),
+            'service1' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'imageStorage')),
+            'service2' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'service2')),
+        ];
+        $this->assertEquals($expected, $locator->getArgument(0));
     }
 }
 
@@ -455,5 +507,17 @@ class NonNullableEnumArgumentWithDefaultController
 {
     public function fooAction(Suit $suit = Suit::Spades)
     {
+    }
+}
+
+class WithTarget
+{
+    public function fooAction(
+        #[Target('some.api.key')]
+        string $apiKey,
+        #[Target('image.storage')]
+        ControllerDummy $service1,
+        ControllerDummy $service2
+    ) {
     }
 }

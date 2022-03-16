@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface as GuzzlePromiseInterface;
 use Http\Promise\Promise as HttplugPromiseInterface;
 use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
@@ -22,7 +23,7 @@ use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
  */
 final class HttplugPromise implements HttplugPromiseInterface
 {
-    private $promise;
+    private GuzzlePromiseInterface $promise;
 
     public function __construct(GuzzlePromiseInterface $promise)
     {
@@ -31,7 +32,10 @@ final class HttplugPromise implements HttplugPromiseInterface
 
     public function then(callable $onFulfilled = null, callable $onRejected = null): self
     {
-        return new self($this->promise->then($onFulfilled, $onRejected));
+        return new self($this->promise->then(
+            $this->wrapThenCallback($onFulfilled),
+            $this->wrapThenCallback($onRejected)
+        ));
     }
 
     public function cancel(): void
@@ -52,7 +56,7 @@ final class HttplugPromise implements HttplugPromiseInterface
      *
      * @return Psr7ResponseInterface|mixed
      */
-    public function wait($unwrap = true)
+    public function wait($unwrap = true): mixed
     {
         $result = $this->promise->wait($unwrap);
 
@@ -61,5 +65,16 @@ final class HttplugPromise implements HttplugPromiseInterface
         }
 
         return $result;
+    }
+
+    private function wrapThenCallback(?callable $callback): ?callable
+    {
+        if (null === $callback) {
+            return null;
+        }
+
+        return static function ($value) use ($callback) {
+            return Create::promiseFor($callback($value));
+        };
     }
 }

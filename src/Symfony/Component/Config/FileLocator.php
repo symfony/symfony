@@ -25,7 +25,7 @@ class FileLocator implements FileLocatorInterface
     /**
      * @param string|string[] $paths A path or an array of paths where to look for resources
      */
-    public function __construct($paths = [])
+    public function __construct(string|array $paths = [])
     {
         $this->paths = (array) $paths;
     }
@@ -33,9 +33,9 @@ class FileLocator implements FileLocatorInterface
     /**
      * {@inheritdoc}
      */
-    public function locate($name, $currentPath = null, $first = true)
+    public function locate(string $name, string $currentPath = null, bool $first = true)
     {
-        if ('' == $name) {
+        if ('' === $name) {
             throw new \InvalidArgumentException('An empty file name is not valid to be located.');
         }
 

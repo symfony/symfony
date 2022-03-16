@@ -186,7 +186,7 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
-        $controller = [$this, 'controllerWithFooAndDefaultBar'];
+        $controller = $this->controllerWithFooAndDefaultBar(...);
         $resolver->getArguments($request, $controller);
     }
 
@@ -194,7 +194,7 @@ class ArgumentResolverTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $request = Request::create('/');
-        $controller = [$this, 'controllerWithFoo'];
+        $controller = $this->controllerWithFoo(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -224,7 +224,7 @@ class ArgumentResolverTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithSession'];
+        $controller = $this->controllerWithSession(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
@@ -234,7 +234,7 @@ class ArgumentResolverTest extends TestCase
         $session = new ExtendingSession(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
@@ -244,7 +244,7 @@ class ArgumentResolverTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithSessionInterface'];
+        $controller = $this->controllerWithSessionInterface(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
@@ -255,7 +255,7 @@ class ArgumentResolverTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -266,7 +266,7 @@ class ArgumentResolverTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -275,7 +275,7 @@ class ArgumentResolverTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $request = Request::create('/');
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -292,31 +292,31 @@ class ArgumentResolverTest extends TestCase
     {
     }
 
-    protected function controllerWithFooAndDefaultBar($foo, $bar = null)
+    public function controllerWithFooAndDefaultBar($foo, $bar = null)
     {
     }
 
-    protected function controllerWithFooBarFoobar($foo, $bar, $foobar)
+    public function controllerWithFooBarFoobar($foo, $bar, $foobar)
     {
     }
 
-    protected function controllerWithRequest(Request $request)
+    public function controllerWithRequest(Request $request)
     {
     }
 
-    protected function controllerWithExtendingRequest(ExtendingRequest $request)
+    public function controllerWithExtendingRequest(ExtendingRequest $request)
     {
     }
 
-    protected function controllerWithSession(Session $session)
+    public function controllerWithSession(Session $session)
     {
     }
 
-    protected function controllerWithSessionInterface(SessionInterface $session)
+    public function controllerWithSessionInterface(SessionInterface $session)
     {
     }
 
-    protected function controllerWithExtendingSession(ExtendingSession $session)
+    public function controllerWithExtendingSession(ExtendingSession $session)
     {
     }
 }

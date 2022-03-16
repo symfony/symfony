@@ -65,9 +65,9 @@ class RegionDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $regionCodes = [];
+    private array $regionCodes = [];
 
-    public static function isValidCountryCode($region)
+    public static function isValidCountryCode(int|string|null $region)
     {
         if (isset(self::DENYLIST[$region])) {
             return false;

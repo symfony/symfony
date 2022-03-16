@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * @author Colin O'Dell <colinodell@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Uuid extends Constraint
 {
     public const TOO_SHORT_ERROR = 'aa314679-dac9-4f54-bf97-b2049df8f2a3';
@@ -29,7 +30,7 @@ class Uuid extends Constraint
     public const INVALID_VERSION_ERROR = '21ba13b4-b185-4882-ac6f-d147355987eb';
     public const INVALID_VARIANT_ERROR = '164ef693-2b9d-46de-ad7f-836201f0c2db';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
@@ -38,12 +39,27 @@ class Uuid extends Constraint
         self::INVALID_VARIANT_ERROR => 'INVALID_VARIANT_ERROR',
     ];
 
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
+
     // Possible versions defined by RFC 4122
     public const V1_MAC = 1;
     public const V2_DCE = 2;
     public const V3_MD5 = 3;
     public const V4_RANDOM = 4;
     public const V5_SHA1 = 5;
+    public const V6_SORTABLE = 6;
+
+    public const ALL_VERSIONS = [
+        self::V1_MAC,
+        self::V2_DCE,
+        self::V3_MD5,
+        self::V4_RANDOM,
+        self::V5_SHA1,
+        self::V6_SORTABLE,
+    ];
 
     /**
      * Message to display when validation fails.
@@ -68,22 +84,33 @@ class Uuid extends Constraint
      *
      * @var int[]
      */
-    public $versions = [
-        self::V1_MAC,
-        self::V2_DCE,
-        self::V3_MD5,
-        self::V4_RANDOM,
-        self::V5_SHA1,
-    ];
+    public $versions = self::ALL_VERSIONS;
 
     public $normalizer;
 
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
+    /**
+     * {@inheritdoc}
+     *
+     * @param int[]|null $versions
+     */
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        array $versions = null,
+        bool $strict = null,
+        callable $normalizer = null,
+        array $groups = null,
+        mixed $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->message = $message ?? $this->message;
+        $this->versions = $versions ?? $this->versions;
+        $this->strict = $strict ?? $this->strict;
+        $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', \is_object($this->normalizer) ? \get_class($this->normalizer) : \gettype($this->normalizer)));
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 }

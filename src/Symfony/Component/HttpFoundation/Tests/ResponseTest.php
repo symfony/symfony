@@ -20,15 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseTest extends ResponseTestCase
 {
-    public function testCreate()
-    {
-        $response = Response::create('foo', 301, ['Foo' => 'bar']);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('bar', $response->headers->get('foo'));
-    }
-
     public function testToString()
     {
         $response = new Response();
@@ -708,6 +699,25 @@ class ResponseTest extends ResponseTestCase
 
         $response->setCache(['immutable' => false]);
         $this->assertFalse($response->headers->hasCacheControlDirective('immutable'));
+
+        $directives = ['proxy_revalidate', 'must_revalidate', 'no_cache', 'no_store', 'no_transform'];
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => true]);
+
+            $this->assertTrue($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
+
+        foreach ($directives as $directive) {
+            $response->setCache([$directive => false]);
+
+            $this->assertFalse($response->headers->hasCacheControlDirective(str_replace('_', '-', $directive)));
+        }
+
+        $response = new DefaultResponse();
+
+        $options = ['etag' => '"whatever"'];
+        $response->setCache($options);
+        $this->assertSame($response->getEtag(), '"whatever"');
     }
 
     public function testSendContent()
@@ -836,7 +846,6 @@ class ResponseTest extends ResponseTestCase
         $response->setStatusCode($code, $text);
 
         $statusText = new \ReflectionProperty($response, 'statusText');
-        $statusText->setAccessible(true);
 
         $this->assertEquals($expectedText, $statusText->getValue($response));
     }
@@ -963,16 +972,6 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals((string) $content, $response->getContent());
     }
 
-    /**
-     * @dataProvider invalidContentProvider
-     */
-    public function testSetContentInvalid($content)
-    {
-        $this->expectException(\UnexpectedValueException::class);
-        $response = new Response();
-        $response->setContent($content);
-    }
-
     public function testSettersAreChainable()
     {
         $response = new Response();
@@ -1011,15 +1010,6 @@ class ResponseTest extends ResponseTestCase
             'obj' => [new StringableObject()],
             'string' => ['Foo'],
             'int' => [2],
-        ];
-    }
-
-    public function invalidContentProvider()
-    {
-        return [
-            'obj' => [new \stdClass()],
-            'array' => [[]],
-            'bool' => [true, '1'],
         ];
     }
 
@@ -1101,6 +1091,24 @@ class ResponseTest extends ResponseTestCase
     public function testReasonPhraseDefaultsAgainstIana($code, $reasonPhrase)
     {
         $this->assertEquals($reasonPhrase, Response::$statusTexts[$code]);
+    }
+
+    public function testSetContentSafe()
+    {
+        $response = new Response();
+
+        $this->assertFalse($response->headers->has('Preference-Applied'));
+        $this->assertFalse($response->headers->has('Vary'));
+
+        $response->setContentSafe();
+
+        $this->assertSame('safe', $response->headers->get('Preference-Applied'));
+        $this->assertSame('Prefer', $response->headers->get('Vary'));
+
+        $response->setContentSafe(false);
+
+        $this->assertFalse($response->headers->has('Preference-Applied'));
+        $this->assertSame('Prefer', $response->headers->get('Vary'));
     }
 }
 

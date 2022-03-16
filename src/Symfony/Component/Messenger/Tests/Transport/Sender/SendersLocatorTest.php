@@ -35,31 +35,6 @@ class SendersLocatorTest extends TestCase
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testItReturnsTheSenderBasedOnTheMessageClassLegacy()
-    {
-        $sender = $this->createMock(SenderInterface::class);
-        $locator = new SendersLocator([
-            DummyMessage::class => [$sender],
-        ]);
-        $this->assertSame([$sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
-        $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testItYieldsProvidedSenderAliasAsKeyLegacy()
-    {
-        $sender = $this->createMock(SenderInterface::class);
-        $locator = new SendersLocator([
-            DummyMessage::class => ['dummy' => $sender],
-        ]);
-        $this->assertSame(['dummy' => $sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
-    }
-
     private function createContainer(array $senders): ContainerInterface
     {
         $container = $this->createMock(ContainerInterface::class);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -36,22 +37,18 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlDumper extends Dumper
 {
-    private $dumper;
+    private YmlDumper $dumper;
 
     /**
      * Dumps the service container as an YAML string.
-     *
-     * @return string A YAML string representing of the service container
      */
-    public function dump(array $options = [])
+    public function dump(array $options = []): string
     {
-        if (!class_exists(\Symfony\Component\Yaml\Dumper::class)) {
+        if (!class_exists(YmlDumper::class)) {
             throw new LogicException('Unable to dump the container as the Symfony Yaml Component is not installed.');
         }
 
-        if (null === $this->dumper) {
-            $this->dumper = new YmlDumper();
-        }
+        $this->dumper ??= new YmlDumper();
 
         return $this->container->resolveEnvPlaceholders($this->addParameters()."\n".$this->addServices());
     }
@@ -60,7 +57,7 @@ class YamlDumper extends Dumper
     {
         $code = "    $id:\n";
         if ($class = $definition->getClass()) {
-            if ('\\' === substr($class, 0, 1)) {
+            if (str_starts_with($class, '\\')) {
                 $class = substr($class, 1);
             }
 
@@ -78,9 +75,9 @@ class YamlDumper extends Dumper
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s: %s', $this->dumper->dump($key), $this->dumper->dump($value));
                 }
-                $att = $att ? ', '.implode(', ', $att) : '';
+                $att = $att ? ': { '.implode(', ', $att).' }' : '';
 
-                $tagsCode .= sprintf("            - { name: %s%s }\n", $this->dumper->dump($name), $att);
+                $tagsCode .= sprintf("            - %s%s\n", $this->dumper->dump($name), $att);
             }
         }
         if ($tagsCode) {
@@ -96,7 +93,12 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->isDeprecated()) {
-            $code .= sprintf("        deprecated: %s\n", $this->dumper->dump($definition->getDeprecationMessage('%service_id%')));
+            $code .= "        deprecated:\n";
+            foreach ($definition->getDeprecation('%service_id%') as $key => $value) {
+                if ('' !== $value) {
+                    $code .= sprintf("            %s: %s\n", $key, $this->dumper->dump($value));
+                }
+            }
         }
 
         if ($definition->isAutowired()) {
@@ -161,13 +163,27 @@ class YamlDumper extends Dumper
 
     private function addServiceAlias(string $alias, Alias $id): string
     {
-        $deprecated = $id->isDeprecated() ? sprintf("        deprecated: %s\n", $id->getDeprecationMessage('%alias_id%')) : '';
+        $deprecated = '';
+
+        if ($id->isDeprecated()) {
+            $deprecated = "        deprecated:\n";
+
+            foreach ($id->getDeprecation('%alias_id%') as $key => $value) {
+                if ('' !== $value) {
+                    $deprecated .= sprintf("            %s: %s\n", $key, $value);
+                }
+            }
+        }
 
         if (!$id->isDeprecated() && $id->isPrivate()) {
             return sprintf("    %s: '@%s'\n", $alias, $id);
         }
 
-        return sprintf("    %s:\n        alias: %s\n        public: %s\n%s", $alias, $id, $id->isPublic() ? 'true' : 'false', $deprecated);
+        if ($id->isPublic()) {
+            $deprecated = "        public: true\n".$deprecated;
+        }
+
+        return sprintf("    %s:\n        alias: %s\n%s", $alias, $id, $deprecated);
     }
 
     private function addServices(): string
@@ -205,12 +221,8 @@ class YamlDumper extends Dumper
 
     /**
      * Dumps callable to YAML format.
-     *
-     * @param mixed $callable
-     *
-     * @return mixed
      */
-    private function dumpCallable($callable)
+    private function dumpCallable(mixed $callable): mixed
     {
         if (\is_array($callable)) {
             if ($callable[0] instanceof Reference) {
@@ -226,11 +238,9 @@ class YamlDumper extends Dumper
     /**
      * Dumps the value to YAML format.
      *
-     * @return mixed
-     *
      * @throws RuntimeException When trying to dump object or resource
      */
-    private function dumpValue($value)
+    private function dumpValue(mixed $value): mixed
     {
         if ($value instanceof ServiceClosureArgument) {
             $value = $value->getValues()[0];
@@ -265,7 +275,7 @@ class YamlDumper extends Dumper
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $tag = 'service_locator';
             } else {
-                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', \get_class($value)));
+                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_debug_type($value)));
             }
 
             return new TaggedValue($tag, $this->dumpValue($value->getValues()));
@@ -288,6 +298,8 @@ class YamlDumper extends Dumper
             return new TaggedValue('service', (new Parser())->parse("_:\n".$this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
         } elseif ($value instanceof \UnitEnum) {
             return new TaggedValue('php/const', sprintf('%s::%s', \get_class($value), $value->name));
+        } elseif ($value instanceof AbstractArgument) {
+            return new TaggedValue('abstract', $value->getText());
         } elseif (\is_object($value) || \is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }

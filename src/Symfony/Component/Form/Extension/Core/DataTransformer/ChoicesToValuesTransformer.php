@@ -20,7 +20,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ChoicesToValuesTransformer implements DataTransformerInterface
 {
-    private $choiceList;
+    private ChoiceListInterface $choiceList;
 
     public function __construct(ChoiceListInterface $choiceList)
     {
@@ -28,11 +28,9 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     }
 
     /**
-     * @return array
-     *
      * @throws TransformationFailedException if the given value is not an array
      */
-    public function transform($array)
+    public function transform(mixed $array): array
     {
         if (null === $array) {
             return [];
@@ -46,13 +44,11 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     }
 
     /**
-     * @return array
-     *
      * @throws TransformationFailedException if the given value is not an array
      *                                       or if no matching choice could be
      *                                       found for some given value
      */
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array): array
     {
         if (null === $array) {
             return [];

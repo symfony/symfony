@@ -509,7 +509,7 @@ test: Integers
 spec: 2.19
 yaml: |
   canonical: 12345
-  octal: 014
+  octal: 0o14
   hexadecimal: 0xC
 php: |
   [
@@ -1501,7 +1501,7 @@ ruby: |
 test: Integer
 yaml: |
    canonical: 12345
-   octal: 014
+   octal: 0o14
    hexadecimal: 0xC
 php: |
    [

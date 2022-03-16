@@ -37,6 +37,11 @@ class Request
     {
         $this->uri = $uri;
         $this->method = $method;
+
+        array_walk_recursive($parameters, static function (&$value) {
+            $value = (string) $value;
+        });
+
         $this->parameters = $parameters;
         $this->files = $files;
         $this->cookies = $cookies;
@@ -46,70 +51,56 @@ class Request
 
     /**
      * Gets the request URI.
-     *
-     * @return string The request URI
      */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->uri;
     }
 
     /**
      * Gets the request HTTP method.
-     *
-     * @return string The request HTTP method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
     /**
      * Gets the request parameters.
-     *
-     * @return array The request parameters
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
     /**
      * Gets the request server files.
-     *
-     * @return array The request files
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         return $this->files;
     }
 
     /**
      * Gets the request cookies.
-     *
-     * @return array The request cookies
      */
-    public function getCookies()
+    public function getCookies(): array
     {
         return $this->cookies;
     }
 
     /**
      * Gets the request server parameters.
-     *
-     * @return array The request server parameters
      */
-    public function getServer()
+    public function getServer(): array
     {
         return $this->server;
     }
 
     /**
      * Gets the request raw body data.
-     *
-     * @return string|null The request raw body data
      */
-    public function getContent()
+    public function getContent(): ?string
     {
         return $this->content;
     }

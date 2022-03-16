@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -25,11 +24,12 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class LogoutUrlGenerator
 {
-    private $requestStack;
-    private $router;
-    private $tokenStorage;
-    private $listeners = [];
-    private $currentFirewall;
+    private ?RequestStack $requestStack;
+    private ?UrlGeneratorInterface $router;
+    private ?TokenStorageInterface $tokenStorage;
+    private array $listeners = [];
+    private ?string $currentFirewallName = null;
+    private ?string $currentFirewallContext = null;
 
     public function __construct(RequestStack $requestStack = null, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
     {
@@ -47,48 +47,35 @@ class LogoutUrlGenerator
      * @param string|null $csrfParameter The CSRF token parameter name
      * @param string|null $context       The listener context
      */
-    public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null)
+    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null)
     {
         $this->listeners[$key] = [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context];
     }
 
     /**
      * Generates the absolute logout path for the firewall.
-     *
-     * @param string|null $key The firewall key or null to use the current firewall key
-     *
-     * @return string The logout path
      */
-    public function getLogoutPath($key = null)
+    public function getLogoutPath(string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
      * Generates the absolute logout URL for the firewall.
-     *
-     * @param string|null $key The firewall key or null to use the current firewall key
-     *
-     * @return string The logout URL
      */
-    public function getLogoutUrl($key = null)
+    public function getLogoutUrl(string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
-    /**
-     * @param string|null $key     The current firewall key
-     * @param string|null $context The current firewall context
-     */
-    public function setCurrentFirewall($key, $context = null)
+    public function setCurrentFirewall(?string $key, string $context = null)
     {
-        $this->currentFirewall = [$key, $context];
+        $this->currentFirewallName = $key;
+        $this->currentFirewallContext = $context;
     }
 
     /**
      * Generates the logout URL for the firewall.
-     *
-     * @return string The logout URL
      */
     private function generateLogoutUrl(?string $key, int $referenceType): string
     {
@@ -140,12 +127,8 @@ class LogoutUrlGenerator
         if (null !== $this->tokenStorage) {
             $token = $this->tokenStorage->getToken();
 
-            if ($token instanceof AnonymousToken) {
-                throw new \InvalidArgumentException('Unable to generate a logout url for an anonymous token.');
-            }
-
-            if (null !== $token && method_exists($token, 'getProviderKey')) {
-                $key = $token->getProviderKey();
+            if (null !== $token && method_exists($token, 'getFirewallName')) {
+                $key = $token->getFirewallName();
 
                 if (isset($this->listeners[$key])) {
                     return $this->listeners[$key];
@@ -154,14 +137,12 @@ class LogoutUrlGenerator
         }
 
         // Fetch from injected current firewall information, if possible
-        [$key, $context] = $this->currentFirewall;
-
-        if (isset($this->listeners[$key])) {
-            return $this->listeners[$key];
+        if (isset($this->listeners[$this->currentFirewallName])) {
+            return $this->listeners[$this->currentFirewallName];
         }
 
         foreach ($this->listeners as $listener) {
-            if (isset($listener[4]) && $context === $listener[4]) {
+            if (isset($listener[4]) && $this->currentFirewallContext === $listener[4]) {
                 return $listener;
             }
         }

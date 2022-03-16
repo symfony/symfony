@@ -18,5 +18,5 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 interface WorkflowSupportStrategyInterface
 {
-    public function supports(WorkflowInterface $workflow, $subject): bool;
+    public function supports(WorkflowInterface $workflow, object $subject): bool;
 }

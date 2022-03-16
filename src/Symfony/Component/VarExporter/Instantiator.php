@@ -53,11 +53,9 @@ final class Instantiator
      * @param array  $privateProperties The private properties to set on the instance,
      *                                  keyed by their declaring class
      *
-     * @return object The created instance
-     *
      * @throws ExceptionInterface When the instance cannot be created
      */
-    public static function instantiate(string $class, array $properties = [], array $privateProperties = [])
+    public static function instantiate(string $class, array $properties = [], array $privateProperties = []): object
     {
         $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
 
@@ -67,7 +65,7 @@ final class Instantiator
             $wrappedInstance = [$reflector->newInstanceWithoutConstructor()];
         } elseif (null === Registry::$prototypes[$class]) {
             throw new NotInstantiableTypeException($class);
-        } elseif ($reflector->implementsInterface('Serializable') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__unserialize'))) {
+        } elseif ($reflector->implementsInterface('Serializable') && !method_exists($class, '__unserialize')) {
             $wrappedInstance = [unserialize('C:'.\strlen($class).':"'.$class.'":0:{}')];
         } else {
             $wrappedInstance = [unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')];

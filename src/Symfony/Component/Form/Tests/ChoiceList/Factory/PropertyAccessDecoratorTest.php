@@ -70,6 +70,47 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertSame(['value' => 'value'], $this->factory->createListFromChoices($choices, new PropertyPath('property'))->getChoices());
     }
 
+    public function testCreateFromChoicesFilterPropertyPath()
+    {
+        $filteredChoices = [
+            'two' => (object) ['property' => 'value 2', 'filter' => true],
+        ];
+        $choices = [
+            'one' => (object) ['property' => 'value 1', 'filter' => false],
+        ] + $filteredChoices;
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createListFromChoices')
+            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
+            ->willReturnCallback(function ($choices, $value, $callback) {
+                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
+            });
+
+        $this->assertSame(['value 2' => 'value 2'], $this->factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
+    }
+
+    public function testCreateFromChoicesFilterPropertyPathInstance()
+    {
+        $filteredChoices = [
+            'two' => (object) ['property' => 'value 2', 'filter' => true],
+        ];
+        $choices = [
+                'one' => (object) ['property' => 'value 1', 'filter' => false],
+        ] + $filteredChoices;
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createListFromChoices')
+            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
+            ->willReturnCallback(function ($choices, $value, $callback) {
+                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
+            });
+
+        $this->assertSame(
+            ['value 2' => 'value 2'],
+            $this->factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices()
+        );
+    }
+
     public function testCreateFromLoaderPropertyPath()
     {
         $loader = $this->createMock(ChoiceLoaderInterface::class);
@@ -82,6 +123,26 @@ class PropertyAccessDecoratorTest extends TestCase
             });
 
         $this->assertSame(['value' => 'value'], $this->factory->createListFromLoader($loader, 'property')->getChoices());
+    }
+
+    public function testCreateFromLoaderFilterPropertyPath()
+    {
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $filteredChoices = [
+            'two' => (object) ['property' => 'value 2', 'filter' => true],
+        ];
+        $choices = [
+                'one' => (object) ['property' => 'value 1', 'filter' => false],
+        ] + $filteredChoices;
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createListFromLoader')
+            ->with($loader, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
+            ->willReturnCallback(function ($loader, $value, $callback) use ($choices) {
+                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
+            });
+
+        $this->assertSame(['value 2' => 'value 2'], $this->factory->createListFromLoader($loader, 'property', 'filter')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494

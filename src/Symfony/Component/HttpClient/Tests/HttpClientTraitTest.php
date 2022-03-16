@@ -44,6 +44,9 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/?a=2&b=b', '.?a=2'];
         yield ['http://example.com/?a=3&b=b', '.', ['a' => 3]];
         yield ['http://example.com/?a=3&b=b', '.?a=0', ['a' => 3]];
+        yield ['http://example.com/', 'http://example.com/', ['a' => null]];
+        yield ['http://example.com/?b=', 'http://example.com/', ['b' => '']];
+        yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
     }
 
     /**
@@ -196,7 +199,7 @@ class HttpClientTraitTest extends TestCase
     public function testInvalidAuthBearerOption()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option "auth_bearer" must be a string, "object" given.');
+        $this->expectExceptionMessage('Option "auth_bearer" must be a string, "stdClass" given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
@@ -266,7 +269,7 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizePeerFingerprintTypeException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, "object" given.');
+        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, "stdClass" given.');
         $fingerprint = new \stdClass();
 
         $this->normalizePeerFingerprint($fingerprint);

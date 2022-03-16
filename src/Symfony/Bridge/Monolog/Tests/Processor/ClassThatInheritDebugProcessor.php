@@ -12,16 +12,17 @@
 namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Component\HttpFoundation\Request;
 
 class ClassThatInheritDebugProcessor extends DebugProcessor
 {
-    public function getLogs(): array
+    public function getLogs(Request $request = null): array
     {
-        return parent::getLogs();
+        return parent::getLogs($request);
     }
 
-    public function countErrors(): int
+    public function countErrors(Request $request = null): int
     {
-        return parent::countErrors();
+        return parent::countErrors($request);
     }
 }

@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * make `PropertyAccessor::__construct()` accept a combination of bitwise flags as first and second arguments
+
+5.3.0
+-----
+
+ * deprecate passing a boolean as the second argument of `PropertyAccessor::__construct()`, expecting a combination of bitwise flags instead
+
+5.2.0
+-----
+
+ * deprecated passing a boolean as the first argument of `PropertyAccessor::__construct()`, expecting a combination of bitwise flags instead
+ * added the ability to disable usage of the magic `__get` & `__set` methods
+
+5.1.0
+-----
+
+ * Added an `UninitializedPropertyException`
+ * Linking to PropertyInfo extractor to remove a lot of duplicate code
+
 4.4.0
 -----
 

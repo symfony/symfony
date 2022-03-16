@@ -26,5 +26,5 @@ interface DumperInterface
      *
      * @param array $options Options that are used by the dumper
      */
-    public function dump(MessageCatalogue $messages, $options = []);
+    public function dump(MessageCatalogue $messages, array $options = []);
 }

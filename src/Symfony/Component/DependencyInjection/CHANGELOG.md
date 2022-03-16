@@ -1,6 +1,89 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
+ * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
+ * Add an `env` function to the expression language provider
+
+6.0
+---
+
+ * Remove `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+ * Remove `inline()` in favor of `inline_service()` and `ref()` in favor of `service()` when using the PHP-DSL
+ * Remove `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
+ * Remove `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
+ * Remove the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service
+
+5.4
+---
+ * Add `$defaultIndexMethod` and `$defaultPriorityMethod` to `TaggedIterator` and `TaggedLocator` attributes
+ * Add `service_closure()` to the PHP-DSL
+ * Add support for autoconfigurable attributes on methods, properties and parameters
+ * Make auto-aliases private by default
+ * Add support for autowiring union and intersection types
+
+5.3
+---
+
+ * Add `ServicesConfigurator::remove()` in the PHP-DSL
+ * Add `%env(not:...)%` processor to negate boolean values
+ * Add support for loading autoconfiguration rules via the `#[Autoconfigure]` and `#[AutoconfigureTag]` attributes on PHP 8
+ * Add `#[AsTaggedItem]` attribute for defining the index and priority of classes found in tagged iterators/locators
+ * Add autoconfigurable attributes
+ * Add support for autowiring tagged iterators and locators via attributes on PHP 8
+ * Add support for per-env configuration in XML and Yaml loaders
+ * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
+ * Add support an integer return value for default_index_method
+ * Add `#[When(env: 'foo')]` to skip autoregistering a class when the env doesn't match
+ * Add `env()` and `EnvConfigurator` in the PHP-DSL
+ * Add support for `ConfigBuilder` in the `PhpFileLoader`
+ * Add `ContainerConfigurator::env()` to get the current environment
+ * Add `#[Target]` to tell how a dependency is used and hint named autowiring aliases
+
+5.2.0
+-----
+
+ * added `param()` and `abstract_arg()` in the PHP-DSL
+ * deprecated `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+ * added support for the `#[Required]` attribute
+
+5.1.0
+-----
+
+ * deprecated `inline()` in favor of `inline_service()` and `ref()` in favor of `service()` when using the PHP-DSL
+ * allow decorators to reference their decorated service using the special `.inner` id
+ * added support to autowire public typed properties in php 7.4
+ * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
+ * added possibility to define abstract service arguments
+ * allowed mixing "parent" and instanceof-conditionals/defaults/bindings
+ * updated the signature of method `Definition::setDeprecated()` to `Definition::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `Alias::setDeprecated()` to `Alias::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `DeprecateTrait::deprecate()` to `DeprecateTrait::deprecation(string $package, string $version, string $message)`
+ * deprecated the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service,
+   configure them explicitly instead
+ * added class `Symfony\Component\DependencyInjection\Dumper\Preloader` to help with preloading on PHP 7.4+
+ * added tags `container.preload`/`.no_preload` to declare extra classes to preload/services to not preload
+ * allowed loading and dumping tags with an attribute named "name"
+ * deprecated `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
+ * deprecated `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
+ * added support of PHP8 static return type for withers
+ * added `AliasDeprecatedPublicServicesPass` to deprecate public services to private
+
+5.0.0
+-----
+
+ * removed support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`
+ * removed support for non-string default env() parameters
+ * moved `ServiceSubscriberInterface` to the `Symfony\Contracts\Service` namespace
+ * removed `RepeatedPass` and `RepeatablePassInterface`
+ * removed support for short factory/configurator syntax from `YamlFileLoader`
+ * removed `ResettableContainerInterface`, use `ResetInterface` instead
+ * added argument `$returnsClone` to `Definition::addMethodCall()`
+ * removed `tagged`, use `tagged_iterator` instead
+
 4.4.0
 -----
 

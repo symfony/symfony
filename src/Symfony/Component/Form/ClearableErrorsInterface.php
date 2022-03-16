@@ -22,6 +22,8 @@ interface ClearableErrorsInterface
      * Removes all the errors of this form.
      *
      * @param bool $deep Whether to remove errors from child forms as well
+     *
+     * @return $this
      */
-    public function clearErrors(bool $deep = false);
+    public function clearErrors(bool $deep = false): static;
 }

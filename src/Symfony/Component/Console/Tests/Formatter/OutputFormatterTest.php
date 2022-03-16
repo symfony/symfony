@@ -162,12 +162,15 @@ class OutputFormatterTest extends TestCase
     /**
      * @dataProvider provideInlineStyleOptionsCases
      */
-    public function testInlineStyleOptions(string $tag, string $expected = null, string $input = null)
+    public function testInlineStyleOptions(string $tag, string $expected = null, string $input = null, bool $truecolor = false)
     {
+        if ($truecolor && 'truecolor' !== getenv('COLORTERM')) {
+            $this->markTestSkipped('The terminal does not support true colors.');
+        }
+
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);
         $method = new \ReflectionMethod($formatter, 'createStyleFromString');
-        $method->setAccessible(true);
         $result = $method->invoke($formatter, $styleString);
         if (null === $expected) {
             $this->assertNull($result);
@@ -192,6 +195,7 @@ class OutputFormatterTest extends TestCase
             ['<fg=green;options=reverse;>', "\033[32;7m<a>\033[39;27m", '<a>'],
             ['<fg=green;options=bold,underscore>', "\033[32;1;4mz\033[39;22;24m", 'z'],
             ['<fg=green;options=bold,underscore,reverse;>', "\033[32;1;4;7md\033[39;22;24;27m", 'd'],
+            ['<fg=#00ff00;bg=#00f>', "\033[38;2;0;255;0;48;2;0;0;255m[test]\033[39;49m", '[test]', true],
         ];
     }
 
@@ -338,6 +342,7 @@ EOF
         $this->assertSame("pre\nfoo\nbar\nbaz\npos\nt", $formatter->formatAndWrap('pre <error>foo bar baz</error> post', 3));
         $this->assertSame("pre \nfoo \nbar \nbaz \npost", $formatter->formatAndWrap('pre <error>foo bar baz</error> post', 4));
         $this->assertSame("pre f\noo ba\nr baz\npost", $formatter->formatAndWrap('pre <error>foo bar baz</error> post', 5));
+        $this->assertSame('', $formatter->formatAndWrap(null, 5));
     }
 }
 

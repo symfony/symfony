@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -29,19 +28,13 @@ class SendMessageMiddleware implements MiddlewareInterface
 {
     use LoggerAwareTrait;
 
-    private $sendersLocator;
-    private $eventDispatcher;
+    private SendersLocatorInterface $sendersLocator;
+    private ?EventDispatcherInterface $eventDispatcher;
 
     public function __construct(SendersLocatorInterface $sendersLocator, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->sendersLocator = $sendersLocator;
-
-        if (null !== $eventDispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
-            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
-        } else {
-            $this->eventDispatcher = $eventDispatcher;
-        }
-
+        $this->eventDispatcher = $eventDispatcher;
         $this->logger = new NullLogger();
     }
 
@@ -70,7 +63,7 @@ class SendMessageMiddleware implements MiddlewareInterface
                     $shouldDispatchEvent = false;
                 }
 
-                $this->logger->info('Sending message {class} with {sender}', $context + ['sender' => \get_class($sender)]);
+                $this->logger->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => \get_class($sender)]);
                 $envelope = $sender->send($envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null)));
             }
         }

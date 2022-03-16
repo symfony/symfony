@@ -5,7 +5,5 @@
     <service id="foo" autoconfigure="true" abstract="true">
       <argument type="service" id="bar" on-invalid="ignore_uninitialized"/>
     </service>
-    <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
   </services>
 </container>

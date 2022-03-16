@@ -20,34 +20,21 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class SerializedNameTest extends TestCase
 {
-    public function testNotSetSerializedNameParameter()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" should be set.');
-        new SerializedName([]);
-    }
-
-    public function provideInvalidValues()
-    {
-        return [
-            [''],
-            [0],
-        ];
-    }
-
     /**
-     * @dataProvider provideInvalidValues
+     * @testWith    [""]
+     *              [0]
      */
     public function testNotAStringSerializedNameParameter($value)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" must be a non-empty string.');
-        new SerializedName(['value' => $value]);
+
+        new SerializedName($value);
     }
 
     public function testSerializedNameParameters()
     {
-        $maxDepth = new SerializedName(['value' => 'foo']);
+        $maxDepth = new SerializedName('foo');
         $this->assertEquals('foo', $maxDepth->getSerializedName());
     }
 }

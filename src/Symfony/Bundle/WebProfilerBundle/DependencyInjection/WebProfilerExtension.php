@@ -16,9 +16,8 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * WebProfilerExtension.
@@ -44,31 +43,29 @@ class WebProfilerExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('profiler.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('profiler.php');
 
         if ($config['toolbar'] || $config['intercept_redirects']) {
-            $loader->load('toolbar.xml');
+            $loader->load('toolbar.php');
             $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(4, $config['excluded_ajax_paths']);
             $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
             $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
         }
 
-        if (Kernel::VERSION_ID >= 40008 || (Kernel::VERSION_ID >= 30408 && Kernel::VERSION_ID < 40000)) {
-            $container->getDefinition('debug.file_link_formatter')
-                ->replaceArgument(3, new ServiceClosureArgument(new Reference('debug.file_link_formatter.url_format')));
-        }
+        $container->getDefinition('debug.file_link_formatter')
+            ->replaceArgument(3, new ServiceClosureArgument(new Reference('debug.file_link_formatter.url_format')));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/webprofiler';
     }

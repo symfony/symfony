@@ -20,69 +20,23 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class UsernamePasswordToken extends AbstractToken
 {
-    private $credentials;
-    private $providerKey;
+    private string $firewallName;
 
-    /**
-     * @param string|\Stringable|UserInterface $user        The username (like a nickname, email address, etc.) or a UserInterface instance
-     * @param mixed                            $credentials
-     * @param string[]                         $roles
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($user, $credentials, string $providerKey, array $roles = [])
+    public function __construct(UserInterface $user, string $firewallName, array $roles = [])
     {
         parent::__construct($roles);
 
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        if ('' === $firewallName) {
+            throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
 
         $this->setUser($user);
-        $this->credentials = $credentials;
-        $this->providerKey = $providerKey;
-
-        parent::setAuthenticated(\count($roles) > 0);
+        $this->firewallName = $firewallName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setAuthenticated($isAuthenticated)
+    public function getFirewallName(): string
     {
-        if ($isAuthenticated) {
-            throw new \LogicException('Cannot set this token to trusted after instantiation.');
-        }
-
-        parent::setAuthenticated(false);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCredentials()
-    {
-        return $this->credentials;
-    }
-
-    /**
-     * Returns the provider key.
-     *
-     * @return string The provider key
-     */
-    public function getProviderKey()
-    {
-        return $this->providerKey;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function eraseCredentials()
-    {
-        parent::eraseCredentials();
-
-        $this->credentials = null;
+        return $this->firewallName;
     }
 
     /**
@@ -90,7 +44,7 @@ class UsernamePasswordToken extends AbstractToken
      */
     public function __serialize(): array
     {
-        return [$this->credentials, $this->providerKey, parent::__serialize()];
+        return [null, $this->firewallName, parent::__serialize()];
     }
 
     /**
@@ -98,7 +52,7 @@ class UsernamePasswordToken extends AbstractToken
      */
     public function __unserialize(array $data): void
     {
-        [$this->credentials, $this->providerKey, $parentData] = $data;
+        [, $this->firewallName, $parentData] = $data;
         $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }

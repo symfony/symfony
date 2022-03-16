@@ -12,11 +12,12 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 
 class TraceableAccessDecisionManagerTest extends TestCase
 {
@@ -26,11 +27,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
     public function testDecideLog(array $expectedLog, array $attributes, $object, array $voterVotes, bool $result)
     {
         $token = $this->createMock(TokenInterface::class);
-
-        $admMock = $this
-            ->getMockBuilder(AccessDecisionManager::class)
-            ->setMethods(['decide'])
-            ->getMock();
+        $admMock = $this->createMock(AccessDecisionManagerInterface::class);
 
         $adm = new TraceableAccessDecisionManager($admMock);
 
@@ -276,5 +273,14 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'result' => true,
             ],
         ], $sut->getDecisionLog());
+    }
+
+    public function testCustomAccessDecisionManagerReturnsEmptyStrategy()
+    {
+        $admMock = $this->createMock(AccessDecisionManagerInterface::class);
+
+        $adm = new TraceableAccessDecisionManager($admMock);
+
+        $this->assertEquals('-', $adm->getStrategy());
     }
 }

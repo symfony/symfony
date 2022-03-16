@@ -72,7 +72,7 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'invalid_schema.xml', 'invalid_callback_or_file');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('XSD file or callable', $e->getMessage());
+            $this->assertStringContainsString('Invalid XSD file: "invalid_callback_or_file".', $e->getMessage());
         }
 
         $mock = $this->createMock(Validator::class);
@@ -150,7 +150,7 @@ class XmlUtilsTest extends TestCase
     /**
      * @dataProvider getDataForPhpize
      */
-    public function testPhpize($expected, $value)
+    public function testPhpize($expected, string $value)
     {
         $this->assertSame($expected, XmlUtils::phpize($value));
     }
@@ -202,9 +202,6 @@ class XmlUtilsTest extends TestCase
     // test for issue https://github.com/symfony/symfony/issues/9731
     public function testLoadWrongEmptyXMLWithErrorHandler()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $originalDisableEntities = libxml_disable_entity_loader(false);
-        }
         $errorReporting = error_reporting(-1);
 
         set_error_handler(function ($errno, $errstr) {
@@ -222,14 +219,6 @@ class XmlUtilsTest extends TestCase
         } finally {
             restore_error_handler();
             error_reporting($errorReporting);
-        }
-
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-            libxml_disable_entity_loader($disableEntities);
-
-            libxml_disable_entity_loader($originalDisableEntities);
-            $this->assertFalse($disableEntities);
         }
 
         // should not throw an exception

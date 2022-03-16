@@ -1,5 +1,9 @@
 imports:
-    - { resource: ../config/default.yml }
+    - { resource: default.yml }
+
+parameters:
+    env(LIFETIME_INTERVAL): 'PT10S'
+    env(LIFETIME_EXPRESSION): '13 seconds'
 
 framework:
     cache:
@@ -7,9 +11,11 @@ framework:
             cache.pool1:
                 public: true
                 adapter: cache.system
+                default_lifetime: '%env(LIFETIME_EXPRESSION)%'
             cache.pool2:
                 public: true
                 adapter: cache.pool3
+                default_lifetime: '%env(LIFETIME_INTERVAL)%'
             cache.pool3:
                 clearer: ~
             cache.pool4:

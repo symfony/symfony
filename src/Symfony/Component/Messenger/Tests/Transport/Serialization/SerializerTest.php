@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -29,9 +30,10 @@ class SerializerTest extends TestCase
     {
         $serializer = new Serializer();
 
-        $envelope = new Envelope(new DummyMessage('Hello'));
+        $decodedEnvelope = $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'))));
 
-        $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
+        $this->assertEquals(new DummyMessage('Hello'), $decodedEnvelope->getMessage());
+        $this->assertEquals(new SerializedMessageStamp('{"message":"Hello"}'), $decodedEnvelope->last(SerializedMessageStamp::class));
     }
 
     public function testEncodedWithStampsIsDecodable()
@@ -41,9 +43,21 @@ class SerializerTest extends TestCase
         $envelope = (new Envelope(new DummyMessage('Hello')))
             ->with(new SerializerStamp([ObjectNormalizer::GROUPS => ['foo']]))
             ->with(new ValidationStamp(['foo', 'bar']))
+            ->with(new SerializedMessageStamp('{"message":"Hello"}'))
         ;
 
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
+    }
+
+    public function testSerializedMessageStampIsUsedForEncoding()
+    {
+        $serializer = new Serializer();
+
+        $encoded = $serializer->encode(
+            new Envelope(new DummyMessage(''), [new SerializedMessageStamp('{"message":"Hello"}')])
+        );
+
+        $this->assertSame('{"message":"Hello"}', $encoded['body'] ?? null);
     }
 
     public function testEncodedIsHavingTheBodyAndTypeHeader()
@@ -64,8 +78,8 @@ class SerializerTest extends TestCase
         $message = new DummyMessage('Foo');
 
         $serializer = $this->createMock(SerializerComponent\SerializerInterface::class);
-        $serializer->expects($this->once())->method('serialize')->with($message, 'csv', ['foo' => 'bar'])->willReturn('Yay');
-        $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', ['foo' => 'bar'])->willReturn($message);
+        $serializer->expects($this->once())->method('serialize')->with($message, 'csv', ['foo' => 'bar', Serializer::MESSENGER_SERIALIZATION_CONTEXT => true])->willReturn('Yay');
+        $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', ['foo' => 'bar', Serializer::MESSENGER_SERIALIZATION_CONTEXT => true])->willReturn($message);
 
         $encoder = new Serializer($serializer, 'csv', ['foo' => 'bar']);
 
@@ -94,6 +108,7 @@ class SerializerTest extends TestCase
                 [$this->anything()],
                 [$message, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
+                    Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
                 ]]
             )
         ;
@@ -117,9 +132,10 @@ class SerializerTest extends TestCase
             ->expects($this->exactly(2))
             ->method('deserialize')
             ->withConsecutive(
-                ['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', []],
+                ['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', [Serializer::MESSENGER_SERIALIZATION_CONTEXT => true]],
                 ['{}', DummyMessage::class, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
+                    Serializer::MESSENGER_SERIALIZATION_CONTEXT => true,
                 ]]
             )
             ->willReturnOnConsecutiveCalls(
@@ -166,12 +182,12 @@ class SerializerTest extends TestCase
     {
         yield 'no_body' => [
             ['headers' => ['type' => 'bar']],
-            'Encoded envelope should have at least a "body" and some "headers".',
+            'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.',
         ];
 
         yield 'no_headers' => [
             ['body' => '{}'],
-            'Encoded envelope should have at least a "body" and some "headers".',
+            'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.',
         ];
 
         yield 'no_headers_type' => [

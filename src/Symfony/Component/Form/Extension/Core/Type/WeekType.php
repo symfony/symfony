@@ -155,6 +155,7 @@ class WeekType extends AbstractType
             },
             'compound' => $compound,
             'choice_translation_domain' => false,
+            'invalid_message' => 'Please enter a valid week.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -185,7 +186,7 @@ class WeekType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'week';
     }

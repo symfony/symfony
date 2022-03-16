@@ -7,7 +7,6 @@ use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -30,19 +29,14 @@ class RegistryTest extends TestCase
         $this->registry = null;
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\Workflow\Registry::add()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.
-     */
-    public function testAddIsDeprecated()
+    public function testHasWithMatch()
     {
-        $registry = new Registry();
+        $this->assertTrue($this->registry->has(new Subject1()));
+    }
 
-        $registry->add($w = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow1'), $this->createSupportStrategy(Subject1::class));
-
-        $workflow = $registry->get(new Subject1());
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow1', $workflow->getName());
+    public function testHasWithoutMatch()
+    {
+        $this->assertFalse($this->registry->has(new Subject1(), 'nope'));
     }
 
     public function testGetWithSuccess()
@@ -105,23 +99,6 @@ class RegistryTest extends TestCase
         $this->assertCount(0, $workflows);
     }
 
-    /**
-     * @group legacy
-     */
-    private function createSupportStrategy($supportedClassName)
-    {
-        $strategy = $this->createMock(SupportStrategyInterface::class);
-        $strategy->expects($this->any())->method('supports')
-            ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
-                return $subject instanceof $supportedClassName;
-            });
-
-        return $strategy;
-    }
-
-    /**
-     * @group legacy
-     */
     private function createWorkflowSupportStrategy($supportedClassName)
     {
         $strategy = $this->createMock(WorkflowSupportStrategyInterface::class);

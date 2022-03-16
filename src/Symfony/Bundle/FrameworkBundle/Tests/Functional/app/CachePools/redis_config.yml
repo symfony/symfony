@@ -1,5 +1,5 @@
 imports:
-    - { resource: ../config/default.yml }
+    - { resource: default.yml }
 
 parameters:
     env(REDIS_HOST): 'localhost'

@@ -22,8 +22,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * A (lazily retrieved) HTTP response.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 1.1
  */
 interface ResponseInterface
 {
@@ -107,5 +105,5 @@ interface ResponseInterface
      * @return mixed An array of all available info, or one of them when $type is
      *               provided, or null when an unsupported type is requested
      */
-    public function getInfo(string $type = null);
+    public function getInfo(string $type = null): mixed;
 }

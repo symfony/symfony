@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/routing-1.0.xsd">
+    <route id="imported">
+        <default key="_controller">ImportedController::someAction</default>
+        <path locale="nl">/voorbeeld</path>
+        <path locale="en">/example</path>
+        <host locale="nl">www.custom.nl</host>
+        <host locale="en">www.custom.com</host>
+    </route>
+    <route id="imported_not_localized" path="/here">
+        <default key="_controller">ImportedController::someAction</default>
+    </route>
+    <route id="imported_single_host" path="/here_again" host="www.custom.com">
+        <default key="_controller">ImportedController::someAction</default>
+    </route>
+</routes>

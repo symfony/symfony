@@ -30,16 +30,12 @@ class Connection extends AbstractConnection
     private const LDAP_TIMEOUT = 0x55;
     private const LDAP_ALREADY_EXISTS = 0x44;
 
-    /** @var bool */
-    private $bound = false;
+    private bool $bound = false;
 
     /** @var resource|LDAPConnection */
     private $connection;
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -57,7 +53,7 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function isBound()
+    public function isBound(): bool
     {
         return $this->bound;
     }
@@ -67,7 +63,7 @@ class Connection extends AbstractConnection
      *
      * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
      */
-    public function bind($dn = null, $password = null)
+    public function bind(string $dn = null, string $password = null)
     {
         if (!$this->connection) {
             $this->connect();
@@ -99,14 +95,14 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
-    public function setOption($name, $value)
+    public function setOption(string $name, array|string|int|bool $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
         }
     }
 
-    public function getOption($name)
+    public function getOption(string $name)
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
             throw new LdapException(sprintf('Could not retrieve value for option "%s".', $name));

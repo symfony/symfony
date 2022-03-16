@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Csrf\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
@@ -34,7 +34,7 @@ class CsrfValidationListenerTest extends TestCase
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
         $this->tokenManager = new CsrfTokenManager();
         $this->form = $this->getBuilder()
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
     }
 

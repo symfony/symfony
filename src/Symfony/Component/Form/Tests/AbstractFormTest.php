@@ -59,18 +59,12 @@ abstract class AbstractFormTest extends TestCase
         return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory, $options);
     }
 
-    /**
-     * @return MockObject&DataMapperInterface
-     */
-    protected function getDataMapper(): DataMapperInterface
+    protected function getDataMapper(): MockObject&DataMapperInterface
     {
         return $this->createMock(DataMapperInterface::class);
     }
 
-    /**
-     * @return MockObject&DataTransformerInterface
-     */
-    protected function getDataTransformer(): DataTransformerInterface
+    protected function getDataTransformer(): MockObject&DataTransformerInterface
     {
         return $this->createMock(DataTransformerInterface::class);
     }

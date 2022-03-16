@@ -33,16 +33,16 @@ class ClassMetadataFactoryTest extends TestCase
     public function testGetMetadataFor()
     {
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $classMetadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+        $classMetadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy');
 
-        $this->assertEquals(TestClassMetadataFactory::createClassMetadata(true, true), $classMetadata);
+        $this->assertEquals(TestClassMetadataFactory::createClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations', true, true), $classMetadata);
     }
 
     public function testHasMetadataFor()
     {
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy'));
-        $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummyParent'));
+        $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy'));
+        $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummyParent'));
         $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface'));
         $this->assertFalse($factory->hasMetadataFor('Dunglas\Entity'));
     }

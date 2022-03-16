@@ -19,7 +19,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
  */
 class StateMachineValidator implements DefinitionValidatorInterface
 {
-    public function validate(Definition $definition, $name)
+    public function validate(Definition $definition, string $name)
     {
         $transitionFromNames = [];
         foreach ($definition->getTransitions() as $transition) {
@@ -45,7 +45,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
 
         $initialPlaces = $definition->getInitialPlaces();
         if (2 <= \count($initialPlaces)) {
-            throw new InvalidDefinitionException(sprintf('The state machine "%s" can not store many places. But the definition has %d initial places. Only one is supported.', $name, \count($initialPlaces)));
+            throw new InvalidDefinitionException(sprintf('The state machine "%s" cannot store many places. But the definition has %d initial places. Only one is supported.', $name, \count($initialPlaces)));
         }
     }
 }

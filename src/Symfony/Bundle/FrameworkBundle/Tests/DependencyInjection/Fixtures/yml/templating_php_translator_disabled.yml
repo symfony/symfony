@@ -1,4 +1,0 @@
-framework:
-    translator: false
-    templating:
-        engines: [php]

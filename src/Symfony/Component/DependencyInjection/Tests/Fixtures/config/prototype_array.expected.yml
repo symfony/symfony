@@ -8,18 +8,24 @@ services:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
         public: true
         tags:
-            - { name: foo }
-            - { name: baz }
-        deprecated: '%service_id%'
+            - foo
+            - baz
+        deprecated:
+            package: vendor/package
+            version: '1.1'
+            message: '%service_id%'
         arguments: [1]
         factory: f
     Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar
         public: true
         tags:
-            - { name: foo }
-            - { name: baz }
-        deprecated: '%service_id%'
+            - foo
+            - baz
+        deprecated:
+            package: vendor/package
+            version: '1.1'
+            message: '%service_id%'
         lazy: true
         arguments: [1]
         factory: f

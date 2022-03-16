@@ -20,9 +20,6 @@ use Doctrine\DBAL\Types\Type;
  */
 class DoctrineFooType extends Type
 {
-    /**
-     * Type name.
-     */
     private const NAME = 'foo';
 
     /**
@@ -43,16 +40,14 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         if (null === $value) {
             return null;
         }
         if (!$value instanceof Foo) {
-            throw new ConversionException(sprintf('Expected "%s", got "%s"', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', \gettype($value)));
+            throw new ConversionException(sprintf('Expected "%s", got "%s"', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', get_debug_type($value)));
         }
 
         return $foo->bar;
@@ -60,10 +55,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         if (null === $value) {
             return null;

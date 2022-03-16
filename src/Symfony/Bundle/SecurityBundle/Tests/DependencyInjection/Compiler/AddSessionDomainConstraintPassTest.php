@@ -12,10 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Request;
 
 class AddSessionDomainConstraintPassTest extends TestCase
@@ -121,11 +125,11 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.bundles_metadata', []);
         $container->setParameter('kernel.cache_dir', __DIR__);
+        $container->setParameter('kernel.build_dir', __DIR__);
         $container->setParameter('kernel.charset', 'UTF-8');
         $container->setParameter('kernel.container_class', 'cc');
         $container->setParameter('kernel.debug', true);
         $container->setParameter('kernel.project_dir', __DIR__);
-        $container->setParameter('kernel.root_dir', __DIR__);
         $container->setParameter('kernel.secret', __DIR__);
         if (null !== $sessionStorageOptions) {
             $container->setParameter('session.storage.options', $sessionStorageOptions);
@@ -135,19 +139,23 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
         $config = [
             'security' => [
+                'enable_authenticator_manager' => true,
                 'providers' => ['some_provider' => ['id' => 'foo']],
                 'firewalls' => ['some_firewall' => ['security' => false]],
             ],
         ];
 
         $ext = new FrameworkExtension();
-        $ext->load(['framework' => ['csrf_protection' => false, 'router' => ['resource' => 'dummy']]], $container);
+        $ext->load(['framework' => ['csrf_protection' => false, 'router' => ['resource' => 'dummy', 'utf8' => true]]], $container);
 
         $ext = new SecurityExtension();
         $ext->load($config, $container);
 
         $pass = new AddSessionDomainConstraintPass();
         $pass->process($container);
+
+        $container->setDefinition('.service_subscriber.fallback_container', new Definition(Container::class));
+        $container->setAlias(ContainerInterface::class, new Alias('.service_subscriber.fallback_container', false));
 
         return $container;
     }

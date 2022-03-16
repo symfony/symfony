@@ -19,16 +19,13 @@ trait DecorateTrait
     /**
      * Sets the service that this service is decorating.
      *
-     * @param string|null $id              The decorated service id, use null to remove decoration
-     * @param string|null $renamedId       The new decorated service id
-     * @param int         $priority        The priority of decoration
-     * @param int         $invalidBehavior The behavior to adopt when decorated is invalid
+     * @param string|null $id The decorated service id, use null to remove decoration
      *
      * @return $this
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    final public function decorate(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): self
+    final public function decorate(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): static
     {
         $this->definition->setDecoratedService($id, $renamedId, $priority, $invalidBehavior);
 

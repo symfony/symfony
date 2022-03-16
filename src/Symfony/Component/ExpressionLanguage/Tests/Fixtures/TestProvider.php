@@ -13,7 +13,6 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Fixtures;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionPhpFunction;
 
 class TestProvider implements ExpressionFunctionProviderInterface
 {

@@ -26,14 +26,10 @@ interface LockInterface
      * Acquires the lock. If the lock is acquired by someone else, the parameter `blocking` determines whether or not
      * the call should block until the release of the lock.
      *
-     * @param bool $blocking Whether or not the Lock should wait for the release of someone else
-     *
-     * @return bool whether or not the lock had been acquired
-     *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
-     * @throws LockAcquiringException  If the lock can not be acquired
+     * @throws LockAcquiringException  If the lock cannot be acquired
      */
-    public function acquire($blocking = false);
+    public function acquire(bool $blocking = false): bool;
 
     /**
      * Increase the duration of an acquired lock.
@@ -41,33 +37,26 @@ interface LockInterface
      * @param float|null $ttl Maximum expected lock duration in seconds
      *
      * @throws LockConflictedException If the lock is acquired by someone else
-     * @throws LockAcquiringException  If the lock can not be refreshed
+     * @throws LockAcquiringException  If the lock cannot be refreshed
      */
-    public function refresh(/* $ttl = null */);
+    public function refresh(float $ttl = null);
 
     /**
      * Returns whether or not the lock is acquired.
-     *
-     * @return bool
      */
-    public function isAcquired();
+    public function isAcquired(): bool;
 
     /**
      * Release the lock.
      *
-     * @throws LockReleasingException If the lock can not be released
+     * @throws LockReleasingException If the lock cannot be released
      */
     public function release();
 
-    /**
-     * @return bool
-     */
-    public function isExpired();
+    public function isExpired(): bool;
 
     /**
-     * Returns the remaining lifetime.
-     *
-     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     * Returns the remaining lifetime in seconds.
      */
-    public function getRemainingLifetime();
+    public function getRemainingLifetime(): ?float;
 }

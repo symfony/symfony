@@ -43,6 +43,7 @@ class PhpFileLoaderTest extends TestCase
         foreach ($routes as $route) {
             $this->assertSame('/blog/{slug}', $route->getPath());
             $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertTrue($route->getDefault('_stateless'));
             $this->assertSame('{locale}.example.com', $route->getHost());
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
             $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
@@ -109,9 +110,11 @@ class PhpFileLoaderTest extends TestCase
         $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
         $localeRoute->setDefault('_locale', 'g_locale');
         $localeRoute->setDefault('_format', 'g_format');
+        $localeRoute->setDefault('_stateless', true);
         $expectedRoutes->add('two', $formatRoute = new Route('/defaults/two'));
         $formatRoute->setDefault('_locale', 'g_locale');
         $formatRoute->setDefault('_format', 'g_format');
+        $formatRoute->setDefault('_stateless', true);
         $formatRoute->setDefault('specific', 'imported');
 
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.php'));
@@ -172,7 +175,7 @@ class PhpFileLoaderTest extends TestCase
             ->setCondition('abc')
         );
         $expectedCollection->add('buz', (new Route('/zub'))
-            ->setDefaults(['_controller' => 'foo:act'])
+            ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
         );
         $expectedCollection->add('controller_class', (new Route('/controller'))
             ->setDefaults(['_controller' => ['Acme\MyApp\MyController', 'myAction']])
@@ -243,5 +246,55 @@ class PhpFileLoaderTest extends TestCase
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_i18n.php')));
 
         $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
+    public function testImportingRoutesWithHostsInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithLocalesAndHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-locale-and-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-locale-and-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithoutHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-without-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-without-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingRoutesWithSingleHostInImporter()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('importer-with-single-host.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingAliases()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
     }
 }

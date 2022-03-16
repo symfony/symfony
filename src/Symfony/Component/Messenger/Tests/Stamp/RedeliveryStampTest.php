@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class RedeliveryStampTest extends TestCase
@@ -22,15 +21,18 @@ class RedeliveryStampTest extends TestCase
         $stamp = new RedeliveryStamp(10);
         $this->assertSame(10, $stamp->getRetryCount());
         $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getRedeliveredAt());
-        $this->assertNull($stamp->getExceptionMessage());
-        $this->assertNull($stamp->getFlattenException());
     }
 
-    public function testGettersPopulated()
+    public function testSerialization()
     {
-        $flattenException = new FlattenException();
-        $stamp = new RedeliveryStamp(10, 'exception message', $flattenException);
-        $this->assertSame('exception message', $stamp->getExceptionMessage());
-        $this->assertSame($flattenException, $stamp->getFlattenException());
+        $stamp = new RedeliveryStamp(10, \DateTimeImmutable::createFromFormat(\DateTimeInterface::ISO8601, '2005-08-15T15:52:01+0000'));
+        $this->assertSame('2005-08-15T15:52:01+0000', $stamp->getRedeliveredAt()->format(\DateTimeInterface::ISO8601));
+    }
+
+    public function testRedeliveryAt()
+    {
+        $redeliveredAt = new \DateTimeImmutable('+2minutes');
+        $stamp = new RedeliveryStamp(10, $redeliveredAt);
+        $this->assertSame($redeliveredAt, $stamp->getRedeliveredAt());
     }
 }

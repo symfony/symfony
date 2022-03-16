@@ -13,25 +13,6 @@ class WorkflowValidatorTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testSinglePlaceWorkflowValidatorAndComplexWorkflow()
-    {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The marking store of workflow "foo" can not store many places.');
-        $definition = $this->createComplexWorkflowDefinition();
-
-        (new WorkflowValidator(true))->validate($definition, 'foo');
-    }
-
-    public function testSinglePlaceWorkflowValidatorAndSimpleWorkflow()
-    {
-        $definition = $this->createSimpleWorkflowDefinition();
-
-        (new WorkflowValidator(true))->validate($definition, 'foo');
-
-        // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
-        $this->addToAssertionCount(1);
-    }
-
     public function testWorkflowWithInvalidNames()
     {
         $this->expectException(InvalidDefinitionException::class);
@@ -46,18 +27,6 @@ class WorkflowValidatorTest extends TestCase
         $definition = new Definition($places, $transitions);
 
         (new WorkflowValidator())->validate($definition, 'foo');
-    }
-
-    public function testWithTooManyInitialPlaces()
-    {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The marking store of workflow "foo" can not store many places. But the definition has 2 initial places. Only one is supported.');
-        $places = range('a', 'c');
-        $transitions = [];
-
-        $definition = new Definition($places, $transitions, ['a', 'b']);
-
-        (new WorkflowValidator(true))->validate($definition, 'foo');
     }
 
     public function testSameTransitionNameButNotSamePlace()

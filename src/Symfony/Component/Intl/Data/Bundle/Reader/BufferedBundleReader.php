@@ -20,14 +20,10 @@ use Symfony\Component\Intl\Data\Util\RingBuffer;
  */
 class BufferedBundleReader implements BundleReaderInterface
 {
-    private $reader;
-    private $buffer;
+    private BundleReaderInterface $reader;
+    /** @var RingBuffer<string, mixed> */
+    private RingBuffer $buffer;
 
-    /**
-     * Buffers a given reader.
-     *
-     * @param int $bufferSize The number of entries to store in the buffer
-     */
     public function __construct(BundleReaderInterface $reader, int $bufferSize)
     {
         $this->reader = $reader;
@@ -37,7 +33,7 @@ class BufferedBundleReader implements BundleReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read($path, $locale)
+    public function read(string $path, string $locale): mixed
     {
         $hash = $path.'//'.$locale;
 

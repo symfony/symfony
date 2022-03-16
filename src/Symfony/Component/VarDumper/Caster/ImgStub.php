@@ -16,7 +16,7 @@ namespace Symfony\Component\VarDumper\Caster;
  */
 class ImgStub extends ConstStub
 {
-    public function __construct(string $data, string $contentType, string $size)
+    public function __construct(string $data, string $contentType, string $size = '')
     {
         $this->value = '';
         $this->attr['img-data'] = $data;

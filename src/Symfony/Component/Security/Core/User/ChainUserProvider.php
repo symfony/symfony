@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\User;
 
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
 /**
  * Chain User Provider.
@@ -24,10 +24,10 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
  */
 class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private $providers;
+    private iterable $providers;
 
     /**
-     * @param iterable|UserProviderInterface[] $providers
+     * @param iterable<array-key, UserProviderInterface> $providers
      */
     public function __construct(iterable $providers)
     {
@@ -35,9 +35,9 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     }
 
     /**
-     * @return array
+     * @return UserProviderInterface[]
      */
-    public function getProviders()
+    public function getProviders(): array
     {
         if ($this->providers instanceof \Traversable) {
             return iterator_to_array($this->providers);
@@ -47,58 +47,64 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     }
 
     /**
-     * {@inheritdoc}
+     * @internal for compatibility with Symfony 5.4
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername(string $username): UserInterface
+    {
+        return $this->loadUserByIdentifier($username);
+    }
+
+    public function loadUserByIdentifier(string $identifier): UserInterface
     {
         foreach ($this->providers as $provider) {
             try {
-                return $provider->loadUserByUsername($username);
-            } catch (UsernameNotFoundException $e) {
+                return $provider->loadUserByIdentifier($identifier);
+            } catch (UserNotFoundException $e) {
                 // try next one
             }
         }
 
-        $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
-        $ex->setUsername($username);
+        $ex = new UserNotFoundException(sprintf('There is no user with identifier "%s".', $identifier));
+        $ex->setUserIdentifier($identifier);
         throw $ex;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $supportedUserFound = false;
 
         foreach ($this->providers as $provider) {
             try {
-                if (!$provider->supportsClass(\get_class($user))) {
+                if (!$provider->supportsClass(get_debug_type($user))) {
                     continue;
                 }
 
                 return $provider->refreshUser($user);
             } catch (UnsupportedUserException $e) {
                 // try next one
-            } catch (UsernameNotFoundException $e) {
+            } catch (UserNotFoundException $e) {
                 $supportedUserFound = true;
                 // try next one
             }
         }
 
         if ($supportedUserFound) {
-            $e = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
-            $e->setUsername($user->getUsername());
+            $username = $user->getUserIdentifier();
+            $e = new UserNotFoundException(sprintf('There is no user with name "%s".', $username));
+            $e->setUserIdentifier($username);
             throw $e;
         } else {
-            throw new UnsupportedUserException(sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', \get_class($user)));
+            throw new UnsupportedUserException(sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', get_debug_type($user)));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class): bool
     {
         foreach ($this->providers as $provider) {
             if ($provider->supportsClass($class)) {
@@ -112,12 +118,12 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     /**
      * {@inheritdoc}
      */
-    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         foreach ($this->providers as $provider) {
             if ($provider instanceof PasswordUpgraderInterface) {
                 try {
-                    $provider->upgradePassword($user, $newEncodedPassword);
+                    $provider->upgradePassword($user, $newHashedPassword);
                 } catch (UnsupportedUserException $e) {
                     // ignore: password upgrades are opportunistic
                 }

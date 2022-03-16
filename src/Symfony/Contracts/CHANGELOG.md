@@ -1,6 +1,57 @@
 CHANGELOG
 =========
 
+3.0
+---
+
+ * Bump to PHP 8 minimum
+ * Add native return types
+ * Remove deprecated features
+
+2.5
+---
+
+ *  Add `SubscribedService` attribute, deprecate current `ServiceSubscriberTrait` usage
+
+2.4
+---
+
+ * Add `HttpClientInterface::withOptions()`
+ * Add `TranslatorInterface::getLocale()`
+
+2.3.0
+-----
+
+ * added `Translation\TranslatableInterface` to enable value-objects to be translated
+ * made `Translation\TranslatorTrait::getLocale()` fallback to intl's `Locale::getDefault()` when available
+
+2.2.0
+-----
+
+ * added `Service\Attribute\Required` attribute for PHP 8
+
+2.1.3
+-----
+
+ * fixed compat with PHP 8
+
+2.1.0
+-----
+
+ * added "symfony/deprecation-contracts"
+
+2.0.1
+-----
+
+ * added `/json` endpoints to the test mock HTTP server
+
+2.0.0
+-----
+
+ * bumped minimum PHP version to 7.2 and added explicit type hints
+ * made "psr/event-dispatcher" a required dependency of "symfony/event-dispatcher-contracts"
+ * made "symfony/http-client-contracts" not experimental anymore
+
 1.1.9
 -----
 

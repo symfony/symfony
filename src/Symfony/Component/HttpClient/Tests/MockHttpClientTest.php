@@ -26,6 +26,83 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class MockHttpClientTest extends HttpClientTestCase
 {
     /**
+     * @dataProvider mockingProvider
+     */
+    public function testMocking($factory, array $expectedResponses)
+    {
+        $client = new MockHttpClient($factory);
+        $this->assertSame(0, $client->getRequestsCount());
+
+        $urls = ['/foo', '/bar'];
+        foreach ($urls as $i => $url) {
+            $response = $client->request('POST', $url, ['body' => 'payload']);
+            $this->assertEquals($expectedResponses[$i], $response->getContent());
+        }
+
+        $this->assertSame(2, $client->getRequestsCount());
+    }
+
+    public function mockingProvider(): iterable
+    {
+        yield 'callable' => [
+            static function (string $method, string $url, array $options = []) {
+                return new MockResponse($method.': '.$url.' (body='.$options['body'].')');
+            },
+            [
+                'POST: https://example.com/foo (body=payload)',
+                'POST: https://example.com/bar (body=payload)',
+            ],
+        ];
+
+        yield 'array of callable' => [
+            [
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse($method.': '.$url.' (body='.$options['body'].') [1]');
+                },
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse($method.': '.$url.' (body='.$options['body'].') [2]');
+                },
+            ],
+            [
+                'POST: https://example.com/foo (body=payload) [1]',
+                'POST: https://example.com/bar (body=payload) [2]',
+            ],
+        ];
+
+        yield 'array of response objects' => [
+            [
+                new MockResponse('static response [1]'),
+                new MockResponse('static response [2]'),
+            ],
+            [
+                'static response [1]',
+                'static response [2]',
+            ],
+        ];
+
+        yield 'iterator' => [
+            new \ArrayIterator(
+                [
+                    new MockResponse('static response [1]'),
+                    new MockResponse('static response [2]'),
+                ]
+            ),
+            [
+                'static response [1]',
+                'static response [2]',
+            ],
+        ];
+
+        yield 'null' => [
+            null,
+            [
+                '',
+                '',
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider validResponseFactoryProvider
      */
     public function testValidResponseFactory($responseFactory)
@@ -44,6 +121,50 @@ class MockHttpClientTest extends HttpClientTestCase
             [new \ArrayIterator([new MockResponse()])],
             [null],
             [(static function (): \Generator { yield new MockResponse(); })()],
+        ];
+    }
+
+    /**
+     * @dataProvider transportExceptionProvider
+     */
+    public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
+    {
+        $client = new MockHttpClient($factory);
+
+        $client->request('POST', '/foo');
+        $client->request('POST', '/foo');
+
+        $this->expectException(TransportException::class);
+        $client->request('POST', '/foo');
+    }
+
+    public function transportExceptionProvider(): iterable
+    {
+        yield 'array of callable' => [
+            [
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse();
+                },
+                static function (string $method, string $url, array $options = []) {
+                    return new MockResponse();
+                },
+            ],
+        ];
+
+        yield 'array of response objects' => [
+            [
+                new MockResponse(),
+                new MockResponse(),
+            ],
+        ];
+
+        yield 'iterator' => [
+            new \ArrayIterator(
+                [
+                    new MockResponse(),
+                    new MockResponse(),
+                ]
+            ),
         ];
     }
 
@@ -160,6 +281,43 @@ class MockHttpClientTest extends HttpClientTestCase
         $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
     }
 
+    public function testExceptionDirectlyInBody()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse(['foo', new \RuntimeException('foo ccc')]),
+            new MockResponse((static function (): \Generator {
+                yield 'bar';
+                yield new TransportException('bar ccc');
+            })()),
+        ]);
+
+        try {
+            $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new \RuntimeException('foo ccc'), $e->getPrevious());
+            $this->assertSame('foo ccc', $e->getMessage());
+        }
+
+        $chunks = [];
+        try {
+            foreach ($mockHttpClient->stream($mockHttpClient->request('GET', 'https://symfony.com', [])) as $chunk) {
+                $chunks[] = $chunk;
+            }
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new TransportException('bar ccc'), $e->getPrevious());
+            $this->assertSame('bar ccc', $e->getMessage());
+        }
+
+        $this->assertCount(3, $chunks);
+        $this->assertEquals(new FirstChunk(0, ''), $chunks[0]);
+        $this->assertEquals(new DataChunk(0, 'bar'), $chunks[1]);
+        $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
+        $this->assertSame(3, $chunks[2]->getOffset());
+        $this->assertSame('bar ccc', $chunks[2]->getError());
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         $responses = [];
@@ -224,6 +382,16 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped("MockHttpClient doesn't cache handles");
                 break;
 
+            case 'testPause':
+            case 'testPauseReplace':
+            case 'testPauseDuringBody':
+                $this->markTestSkipped("MockHttpClient doesn't support pauses by default");
+                break;
+
+            case 'testDnsFailure':
+                $this->markTestSkipped("MockHttpClient doesn't use a DNS");
+                break;
+
             case 'testGetRequest':
                 array_unshift($headers, 'HTTP/1.1 200 OK');
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
@@ -249,6 +417,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testReentrantBufferCallback':
             case 'testThrowingBufferCallback':
             case 'testInfoOnCanceledResponse':
+            case 'testChangeResponseFactory':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
 
@@ -320,5 +489,57 @@ class MockHttpClientTest extends HttpClientTestCase
         }
 
         return new MockHttpClient($responses);
+    }
+
+    public function testHttp2PushVulcain()
+    {
+        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+    }
+
+    public function testHttp2PushVulcainWithUnusedResponse()
+    {
+        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+    }
+
+    public function testChangeResponseFactory()
+    {
+        /* @var MockHttpClient $client */
+        $client = $this->getHttpClient(__METHOD__);
+        $expectedBody = '{"foo": "bar"}';
+        $client->setResponseFactory(new MockResponse($expectedBody));
+
+        $response = $client->request('GET', 'http://localhost:8057');
+
+        $this->assertSame($expectedBody, $response->getContent());
+    }
+
+    public function testStringableBodyParam()
+    {
+        $client = new MockHttpClient();
+
+        $param = new class() {
+            public function __toString()
+            {
+                return 'bar';
+            }
+        };
+
+        $response = $client->request('GET', 'https://example.com', [
+            'body' => ['foo' => $param],
+        ]);
+
+        $this->assertSame('foo=bar', $response->getRequestOptions()['body']);
+    }
+
+    public function testResetsRequestCount()
+    {
+        $client = new MockHttpClient([new MockResponse()]);
+        $this->assertSame(0, $client->getRequestsCount());
+
+        $client->request('POST', '/url', ['body' => 'payload']);
+
+        $this->assertSame(1, $client->getRequestsCount());
+        $client->reset();
+        $this->assertSame(0, $client->getRequestsCount());
     }
 }

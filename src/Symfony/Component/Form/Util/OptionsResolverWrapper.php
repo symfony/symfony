@@ -22,12 +22,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OptionsResolverWrapper extends OptionsResolver
 {
-    private $undefined = [];
+    private array $undefined = [];
 
     /**
      * @return $this
      */
-    public function setNormalizer($option, \Closure $normalizer): self
+    public function setNormalizer(string $option, \Closure $normalizer): static
     {
         try {
             parent::setNormalizer($option, $normalizer);
@@ -41,7 +41,7 @@ class OptionsResolverWrapper extends OptionsResolver
     /**
      * @return $this
      */
-    public function setAllowedValues($option, $allowedValues): self
+    public function setAllowedValues(string $option, mixed $allowedValues): static
     {
         try {
             parent::setAllowedValues($option, $allowedValues);
@@ -55,7 +55,7 @@ class OptionsResolverWrapper extends OptionsResolver
     /**
      * @return $this
      */
-    public function addAllowedValues($option, $allowedValues): self
+    public function addAllowedValues(string $option, mixed $allowedValues): static
     {
         try {
             parent::addAllowedValues($option, $allowedValues);
@@ -71,7 +71,7 @@ class OptionsResolverWrapper extends OptionsResolver
      *
      * @return $this
      */
-    public function setAllowedTypes($option, $allowedTypes): self
+    public function setAllowedTypes(string $option, $allowedTypes): static
     {
         try {
             parent::setAllowedTypes($option, $allowedTypes);
@@ -87,7 +87,7 @@ class OptionsResolverWrapper extends OptionsResolver
      *
      * @return $this
      */
-    public function addAllowedTypes($option, $allowedTypes): self
+    public function addAllowedTypes(string $option, $allowedTypes): static
     {
         try {
             parent::addAllowedTypes($option, $allowedTypes);

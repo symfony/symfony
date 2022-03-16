@@ -18,20 +18,16 @@ class StringWrapperType extends StringType
 {
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         return $value instanceof StringWrapper ? $value->getString() : null;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         return new StringWrapper($value);
     }

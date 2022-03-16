@@ -42,7 +42,7 @@ class RouterTest extends TestCase
     {
         if (is_dir($this->cacheDir)) {
             array_map('unlink', glob($this->cacheDir.\DIRECTORY_SEPARATOR.'*'));
-            rmdir($this->cacheDir);
+            @rmdir($this->cacheDir);
         }
 
         $this->loader = null;
@@ -137,7 +137,6 @@ class RouterTest extends TestCase
         $matcher->expects($this->once())->method('match');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -149,7 +148,6 @@ class RouterTest extends TestCase
         $matcher->expects($this->once())->method('matchRequest');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -170,7 +168,6 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }
@@ -190,31 +187,6 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
-
-        $this->assertSame('hr', $p->getValue($generator));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDefaultLocaleIsPassedToNotCompiledGeneratorCacheClass()
-    {
-        $this->loader->expects($this->once())
-            ->method('load')->with('routing.yml', null)
-            ->willReturn(new RouteCollection());
-
-        $router = new Router($this->loader, 'routing.yml', [
-            'cache_dir' => $this->cacheDir,
-            'generator_class' => 'Symfony\Component\Routing\Generator\UrlGenerator',
-        ], null, null, 'hr');
-
-        $generator = $router->getGenerator();
-
-        $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
-
-        $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }

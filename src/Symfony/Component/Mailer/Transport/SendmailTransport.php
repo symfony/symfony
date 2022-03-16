@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
@@ -18,19 +19,23 @@ use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\ProcessStream;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SendmailTransport for sending mail through a Sendmail/Postfix (etc..) binary.
+ *
+ * Transport can be instanciated through SendmailTransportFactory or NativeTransportFactory:
+ *
+ * - SendmailTransportFactory to use most common sendmail path and recommanded options
+ * - NativeTransportFactory when configuration is set via php.ini
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Chris Corbyn
  */
 class SendmailTransport extends AbstractTransport
 {
-    private $command = '/usr/sbin/sendmail -bs';
-    private $stream;
-    private $transport;
+    private string $command = '/usr/sbin/sendmail -bs';
+    private ProcessStream $stream;
+    private ?SmtpTransport $transport = null;
 
     /**
      * Constructor.

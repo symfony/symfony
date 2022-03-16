@@ -283,7 +283,7 @@ class SessionTest extends TestCase
         $bag->setName('foo');
 
         $storage = new MockArraySessionStorage();
-        $storage->registerBag(new SessionBagProxy($bag, $data, $usageIndex));
+        $storage->registerBag(new SessionBagProxy($bag, $data, $usageIndex, null));
 
         $this->assertSame($bag, (new Session($storage))->getBag('foo'));
     }

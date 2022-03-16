@@ -2,9 +2,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-
 /**
  * Class BaseUser.
  */
@@ -41,14 +38,8 @@ class BaseUser
         return $this->username;
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    public function getUserIdentifier(): string
     {
-        $allowEmptyString = property_exists(Assert\Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
-        $metadata->addPropertyConstraint('username', new Assert\Length([
-            'min' => 2,
-            'max' => 120,
-            'groups' => ['Registration'],
-        ] + $allowEmptyString));
+        return $this->username;
     }
 }

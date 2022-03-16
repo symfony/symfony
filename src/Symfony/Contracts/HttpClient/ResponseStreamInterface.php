@@ -16,7 +16,7 @@ namespace Symfony\Contracts\HttpClient;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @experimental in 1.1
+ * @extends \Iterator<ResponseInterface, ChunkInterface>
  */
 interface ResponseStreamInterface extends \Iterator
 {

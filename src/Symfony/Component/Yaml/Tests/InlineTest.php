@@ -295,12 +295,13 @@ class InlineTest extends TestCase
             ['12_', 12],
             ['"quoted string"', 'quoted string'],
             ["'quoted string'", 'quoted string'],
+            ['1234.0', 1234.0],
             ['12.30e+02', 12.30e+02],
             ['123.45_67', 123.4567],
             ['0x4D2', 0x4D2],
             ['0x_4_D_2_', 0x4D2],
-            ['02333', 02333],
-            ['0_2_3_3_3', 02333],
+            ['0o2333', 02333],
+            ['0o_2_3_3_3', 02333],
             ['.Inf', -log(0)],
             ['-.Inf', log(0)],
             ["'686e444'", '686e444'],
@@ -379,7 +380,7 @@ class InlineTest extends TestCase
             ["'quoted string'", 'quoted string'],
             ['12.30e+02', 12.30e+02],
             ['0x4D2', 0x4D2],
-            ['02333', 02333],
+            ['0o2333', 02333],
             ['.Inf', -log(0)],
             ['-.Inf', log(0)],
             ["'686e444'", '686e444'],
@@ -458,7 +459,8 @@ class InlineTest extends TestCase
             ['_12', '_12'],
             ["'12_'", '12_'],
             ["'quoted string'", 'quoted string'],
-            ['!!float 1230', 12.30e+02],
+            ['1230.0', 12.30e+02],
+            ['1.23E+45', 12.30e+44],
             ['1234', 0x4D2],
             ['1243', 02333],
             ["'0x_4_D_2_'", '0x_4_D_2_'],
@@ -471,6 +473,10 @@ class InlineTest extends TestCase
             ["'foo # bar'", 'foo # bar'],
             ["'#cfcfcf'", '#cfcfcf'],
 
+            ["\"isn't it a nice single quote\"", "isn't it a nice single quote"],
+            ['\'this is "double quoted"\'', 'this is "double quoted"'],
+            ["\"one double, four single quotes: \\\"''''\"", 'one double, four single quotes: "\'\'\'\''],
+            ['\'four double, one single quote: """"\'\'\'', 'four double, one single quote: """"\''],
             ["'a \"string\" with ''quoted strings inside'''", 'a "string" with \'quoted strings inside\''],
 
             ["'-dash'", '-dash'],
@@ -578,9 +584,6 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::dump($dateTime));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpUnitEnum()
     {
         $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
@@ -756,62 +759,78 @@ class InlineTest extends TestCase
     public function getTestsForOctalNumbers()
     {
         return [
-            'positive octal number' => [28, '034'],
-            'negative octal number' => [-28, '-034'],
+            'positive octal number' => [28, '0o34'],
+            'positive octal number with sign' => [28, '+0o34'],
+            'negative octal number' => [-28, '-0o34'],
+        ];
+    }
+
+    /**
+     * @dataProvider getTestsForOctalNumbersYaml11Notation
+     */
+    public function testParseOctalNumbersYaml11Notation(string $expected, string $yaml)
+    {
+        self::assertSame($expected, Inline::parse($yaml));
+    }
+
+    public function getTestsForOctalNumbersYaml11Notation()
+    {
+        return [
+            'positive octal number' => ['034', '034'],
+            'positive octal number with separator' => ['02333', '0_2_3_3_3'],
+            'negative octal number' => ['-034', '-034'],
+            'invalid positive octal number' => ['0123456789', '0123456789'],
+            'invalid negative octal number' => ['-0123456789', '-0123456789'],
         ];
     }
 
     /**
      * @dataProvider phpObjectTagWithEmptyValueProvider
      */
-    public function testPhpObjectWithEmptyValue($expected, $value)
+    public function testPhpObjectWithEmptyValue(string $value)
     {
-        $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_OBJECT));
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Missing value for tag "!php/object" at line 1 (near "!php/object").');
+
+        Inline::parse($value, Yaml::PARSE_OBJECT);
     }
 
     public function phpObjectTagWithEmptyValueProvider()
     {
         return [
-            [false, '!php/object'],
-            [false, '!php/object '],
-            [false, '!php/object  '],
-            [[false], '[!php/object]'],
-            [[false], '[!php/object ]'],
-            [[false, 'foo'], '[!php/object  , foo]'],
+            ['!php/object'],
+            ['!php/object '],
+            ['!php/object  '],
+            ['[!php/object]'],
+            ['[!php/object ]'],
+            ['[!php/object  , foo]'],
         ];
     }
 
     /**
      * @dataProvider phpConstTagWithEmptyValueProvider
      */
-    public function testPhpConstTagWithEmptyValue($expected, $value)
+    public function testPhpConstTagWithEmptyValue(string $value)
     {
-        $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_CONSTANT));
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Missing value for tag "!php/const" at line 1 (near "!php/const").');
+
+        Inline::parse($value, Yaml::PARSE_CONSTANT);
     }
 
     public function phpConstTagWithEmptyValueProvider()
     {
         return [
-            ['', '!php/const'],
-            ['', '!php/const '],
-            ['', '!php/const  '],
-            [[''], '[!php/const]'],
-            [[''], '[!php/const ]'],
-            [['', 'foo'], '[!php/const  , foo]'],
-            [['' => 'foo'], '{!php/const: foo}'],
-            [['' => 'foo'], '{!php/const : foo}'],
-            [['' => 'foo', 'bar' => 'ccc'], '{!php/const  : foo, bar: ccc}'],
+            ['!php/const'],
+            ['!php/const '],
+            ['!php/const  '],
+            ['[!php/const]'],
+            ['[!php/const ]'],
+            ['[!php/const  , foo]'],
+            ['{!php/const: foo}'],
+            ['{!php/const : foo}'],
+            ['{!php/const  : foo, bar: ccc}'],
         ];
-    }
-
-    public function testParsePositiveOctalNumberContainingInvalidDigits()
-    {
-        self::assertSame('0123456789', Inline::parse('0123456789'));
-    }
-
-    public function testParseNegativeOctalNumberContainingInvalidDigits()
-    {
-        self::assertSame('-0123456789', Inline::parse('-0123456789'));
     }
 
     public function testParseCommentNotPrefixedBySpaces()

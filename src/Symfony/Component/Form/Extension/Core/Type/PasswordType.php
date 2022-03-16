@@ -36,13 +36,14 @@ class PasswordType extends AbstractType
         $resolver->setDefaults([
             'always_empty' => true,
             'trim' => false,
+            'invalid_message' => 'The password is invalid.',
         ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }
@@ -50,7 +51,7 @@ class PasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'password';
     }

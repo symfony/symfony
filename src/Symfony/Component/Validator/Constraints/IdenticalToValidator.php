@@ -22,7 +22,7 @@ class IdenticalToValidator extends AbstractComparisonValidator
     /**
      * {@inheritdoc}
      */
-    protected function compareValues($value1, $value2)
+    protected function compareValues(mixed $value1, mixed $value2): bool
     {
         return $value1 === $value2;
     }
@@ -30,7 +30,7 @@ class IdenticalToValidator extends AbstractComparisonValidator
     /**
      * {@inheritdoc}
      */
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return IdenticalTo::NOT_IDENTICAL_ERROR;
     }

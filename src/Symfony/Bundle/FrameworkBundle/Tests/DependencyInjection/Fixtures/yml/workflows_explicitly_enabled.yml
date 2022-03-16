@@ -12,5 +12,5 @@ framework:
                     - baz
                 transitions:
                     bar_baz:
-                        from: [foo]
+                        from: [bar]
                         to: [bar]

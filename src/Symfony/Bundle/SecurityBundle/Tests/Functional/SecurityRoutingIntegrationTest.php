@@ -14,33 +14,33 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 {
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideConfigs
      */
-    public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous($config)
+    public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
         $client->request('GET', '/protected_resource');
 
         $this->assertRedirect($client->getResponse(), '/login');
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideConfigs
      */
-    public function testRoutingErrorIsExposedWhenNotProtected($config)
+    public function testRoutingErrorIsExposedWhenNotProtected(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
         $client->request('GET', '/unprotected_resource');
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideConfigs
      */
-    public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights($config)
+    public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -53,38 +53,38 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideConfigs
      */
-    public function testSecurityConfigurationForSingleIPAddress($config)
+    public function testSecurityConfigurationForSingleIPAddress(array $options)
     {
-        $allowedClient = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '10.10.10.10']);
+        $allowedClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
 
         $this->ensureKernelShutdown();
 
-        $barredClient = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '10.10.20.10']);
+        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.20.10']);
 
         $this->assertAllowed($allowedClient, '/secured-by-one-ip');
         $this->assertRestricted($barredClient, '/secured-by-one-ip');
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideConfigs
      */
-    public function testSecurityConfigurationForMultipleIPAddresses($config)
+    public function testSecurityConfigurationForMultipleIPAddresses(array $options)
     {
-        $allowedClientA = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '1.1.1.1']);
+        $allowedClientA = $this->createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
 
         $this->ensureKernelShutdown();
 
-        $allowedClientB = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '2.2.2.2']);
+        $allowedClientB = $this->createClient($options, ['REMOTE_ADDR' => '2.2.2.2']);
 
         $this->ensureKernelShutdown();
 
-        $allowedClientC = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '203.0.113.0']);
+        $allowedClientC = $this->createClient($options, ['REMOTE_ADDR' => '203.0.113.0']);
 
         $this->ensureKernelShutdown();
 
-        $barredClient = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '192.168.1.1']);
+        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '192.168.1.1']);
 
         $this->assertAllowed($allowedClientA, '/secured-by-two-ips');
         $this->assertAllowed($allowedClientB, '/secured-by-two-ips');
@@ -97,19 +97,19 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideConfigs
      */
-    public function testSecurityConfigurationForExpression($config)
+    public function testSecurityConfigurationForExpression(array $options)
     {
-        $allowedClient = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['HTTP_USER_AGENT' => 'Firefox 1.0']);
+        $allowedClient = $this->createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);
         $this->assertAllowed($allowedClient, '/protected-via-expression');
         $this->ensureKernelShutdown();
 
-        $barredClient = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], []);
+        $barredClient = $this->createClient($options, []);
         $this->assertRestricted($barredClient, '/protected-via-expression');
         $this->ensureKernelShutdown();
 
-        $allowedClient = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], []);
+        $allowedClient = $this->createClient($options, []);
 
         $allowedClient->request('GET', '/protected-via-expression');
         $form = $allowedClient->followRedirect()->selectButton('login')->form();
@@ -131,12 +131,12 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     public function testPublicHomepage()
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml']);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
         $client->request('GET', '/en/');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
         $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::$container->get('session')->getUsageIndex());
+        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
     private function assertAllowed($client, $path)
@@ -151,8 +151,9 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
-    public function getConfigs()
+    public function provideConfigs()
     {
-        return [['config.yml'], ['routes_as_path.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 }

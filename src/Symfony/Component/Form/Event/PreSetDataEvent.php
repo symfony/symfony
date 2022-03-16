@@ -19,9 +19,7 @@ use Symfony\Component\Form\FormEvent;
  * It can be used to:
  *  - Modify the data given during pre-population;
  *  - Modify a form depending on the pre-populated data (adding or removing fields dynamically).
- *
- * @final since Symfony 4.4
  */
-class PreSetDataEvent extends FormEvent
+final class PreSetDataEvent extends FormEvent
 {
 }

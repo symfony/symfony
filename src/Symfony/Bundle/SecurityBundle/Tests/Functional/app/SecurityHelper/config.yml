@@ -7,7 +7,12 @@ services:
         alias: security.helper
         public: true
 
+    functional.test.security.token_storage:
+        alias: security.token_storage
+        public: true
+
 security:
+    enable_authenticator_manager: true
     providers:
         in_memory:
             memory:
@@ -15,4 +20,3 @@ security:
 
     firewalls:
         default:
-            anonymous: ~

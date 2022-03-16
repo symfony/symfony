@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection\Configurator;
 
 use Symfony\Bridge\Twig\UndefinedCallableHandler;
 use Twig\Environment;
+use Twig\Extension\CoreExtension;
 
 // BC/FC with namespaced Twig
 class_exists(Environment::class);
@@ -24,12 +25,12 @@ class_exists(Environment::class);
  */
 class EnvironmentConfigurator
 {
-    private $dateFormat;
-    private $intervalFormat;
-    private $timezone;
-    private $decimals;
-    private $decimalPoint;
-    private $thousandsSeparator;
+    private string $dateFormat;
+    private string $intervalFormat;
+    private ?string $timezone;
+    private int $decimals;
+    private string $decimalPoint;
+    private string $thousandsSeparator;
 
     public function __construct(string $dateFormat, string $intervalFormat, ?string $timezone, int $decimals, string $decimalPoint, string $thousandsSeparator)
     {
@@ -43,13 +44,13 @@ class EnvironmentConfigurator
 
     public function configure(Environment $environment)
     {
-        $environment->getExtension('Twig\Extension\CoreExtension')->setDateFormat($this->dateFormat, $this->intervalFormat);
+        $environment->getExtension(CoreExtension::class)->setDateFormat($this->dateFormat, $this->intervalFormat);
 
         if (null !== $this->timezone) {
-            $environment->getExtension('Twig\Extension\CoreExtension')->setTimezone($this->timezone);
+            $environment->getExtension(CoreExtension::class)->setTimezone($this->timezone);
         }
 
-        $environment->getExtension('Twig\Extension\CoreExtension')->setNumberFormat($this->decimals, $this->decimalPoint, $this->thousandsSeparator);
+        $environment->getExtension(CoreExtension::class)->setNumberFormat($this->decimals, $this->decimalPoint, $this->thousandsSeparator);
 
         // wrap UndefinedCallableHandler in closures for lazy-autoloading
         $environment->registerUndefinedFilterCallback(function ($name) { return UndefinedCallableHandler::onUndefinedFilter($name); });

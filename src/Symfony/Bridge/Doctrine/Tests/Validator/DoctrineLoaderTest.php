@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator;
 
 use Doctrine\ORM\Mapping\Column;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEntity;
@@ -48,8 +48,8 @@ class DoctrineLoaderTest extends TestCase
     public function testLoadClassMetadata()
     {
         $validator = Validation::createValidatorBuilder()
-            ->addMethodMapping('loadValidatorMetadata')
-            ->enableAnnotationMapping()
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()
         ;
@@ -151,9 +151,6 @@ class DoctrineLoaderTest extends TestCase
         $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {
@@ -162,7 +159,8 @@ class DoctrineLoaderTest extends TestCase
 
         $validator = Validation::createValidatorBuilder()
             ->addMethodMapping('loadValidatorMetadata')
-            ->enableAnnotationMapping()
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()
         ;
@@ -179,8 +177,8 @@ class DoctrineLoaderTest extends TestCase
     public function testFieldMappingsConfiguration()
     {
         $validator = Validation::createValidatorBuilder()
-            ->addMethodMapping('loadValidatorMetadata')
-            ->enableAnnotationMapping()
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
             ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
             ->addLoader(
                 new DoctrineLoader(
@@ -221,7 +219,8 @@ class DoctrineLoaderTest extends TestCase
     public function testClassNoAutoMapping()
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping()
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{.*}'))
             ->getValidator();
 

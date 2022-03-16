@@ -45,7 +45,7 @@ class SurrogateListenerTest extends TestCase
         $listener = new SurrogateListener(new Esi());
 
         $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
-        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('content="ESI/1.0"', $event->getResponse()->headers->get('Surrogate-Control'));
@@ -59,7 +59,7 @@ class SurrogateListenerTest extends TestCase
         $listener = new SurrogateListener(new Esi());
 
         $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
-        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));

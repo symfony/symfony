@@ -1,6 +1,76 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add method `__toString()` to `InputInterface`
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+
+6.0
+---
+
+ * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter and is final
+ * Remove `Helper::strlen()`, use `Helper::width()` instead
+ * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead
+ * `AddConsoleCommandPass` can not be configured anymore
+ * Remove `HelperSet::setCommand()` and `getCommand()` without replacement
+
+5.4
+---
+
+ * Add `TesterTrait::assertCommandIsSuccessful()` to test command
+ * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+
+5.3
+---
+
+ * Add `GithubActionReporter` to render annotations in a Github Action
+ * Add `InputOption::VALUE_NEGATABLE` flag to handle `--foo`/`--no-foo` options
+ * Add the `Command::$defaultDescription` static property and the `description` attribute
+   on the `console.command` tag to allow the `list` command to instantiate commands lazily
+ * Add option `--short` to the `list` command
+ * Add support for bright colors
+ * Add `#[AsCommand]` attribute for declaring commands on PHP 8
+ * Add `Helper::width()` and `Helper::length()`
+ * The `--ansi` and `--no-ansi` options now default to `null`.
+
+5.2.0
+-----
+
+ * Added `SingleCommandApplication::setAutoExit()` to allow testing via `CommandTester`
+ * added support for multiline responses to questions through `Question::setMultiline()`
+   and `Question::isMultiline()`
+ * Added `SignalRegistry` class to stack signals handlers
+ * Added support for signals:
+    * Added `Application::getSignalRegistry()` and `Application::setSignalsToDispatchEvent()` methods
+    * Added `SignalableCommandInterface` interface
+ * Added `TableCellStyle` class to customize table cell
+ * Removed `php ` prefix invocation from help messages.
+
+5.1.0
+-----
+
+ * `Command::setHidden()` is final since Symfony 5.1
+ * Add `SingleCommandApplication`
+ * Add `Cursor` class
+
+5.0.0
+-----
+
+ * removed support for finding hidden commands using an abbreviation, use the full name instead
+ * removed `TableStyle::setCrossingChar()` method in favor of `TableStyle::setDefaultCrossingChar()`
+ * removed `TableStyle::setHorizontalBorderChar()` method in favor of `TableStyle::setDefaultCrossingChars()`
+ * removed `TableStyle::getHorizontalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * removed `TableStyle::setVerticalBorderChar()` method in favor of `TableStyle::setVerticalBorderChars()`
+ * removed `TableStyle::getVerticalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * removed support for returning `null` from `Command::execute()`, return `0` instead
+ * `ProcessHelper::run()` accepts only `array|Symfony\Component\Process\Process` for its `command` argument
+ * `Application::setDispatcher` accepts only `Symfony\Contracts\EventDispatcher\EventDispatcherInterface`
+   for its `dispatcher` argument
+ * renamed `Application::renderException()` and `Application::doRenderException()`
+   to `renderThrowable()` and `doRenderThrowable()` respectively.
+
 4.4.0
 -----
 

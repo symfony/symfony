@@ -73,6 +73,18 @@ class ChoiceQuestionTest extends TestCase
                 'When used a string as default single answer on singleSelect, the defaultValidator must return this answer as a string',
                 'First response',
             ],
+            [
+                false,
+                [0],
+                'First response',
+                'When passed single answer using choice\'s key, the defaultValidator must return the choice value',
+            ],
+            [
+                true,
+                ['0, 2'],
+                ['First response', 'Third response'],
+                'When passed multiple answers using choices\' key, the defaultValidator must return the choice values in an array',
+            ],
         ];
     }
 
@@ -90,5 +102,65 @@ class ChoiceQuestionTest extends TestCase
         $question->setMultiselect(true);
 
         $this->assertSame(['First response ', ' Second response'], $question->getValidator()('First response , Second response'));
+    }
+
+    /**
+     * @dataProvider selectAssociativeChoicesProvider
+     */
+    public function testSelectAssociativeChoices($providedAnswer, $expectedValue)
+    {
+        $question = new ChoiceQuestion('A question', [
+            '0' => 'First choice',
+            'foo' => 'Foo',
+            '99' => 'N°99',
+            'string object' => new StringChoice('String Object'),
+        ]);
+
+        $this->assertSame($expectedValue, $question->getValidator()($providedAnswer));
+    }
+
+    public function selectAssociativeChoicesProvider()
+    {
+        return [
+            'select "0" choice by key' => ['0', '0'],
+            'select "0" choice by value' => ['First choice', '0'],
+            'select by key' => ['foo', 'foo'],
+            'select by value' => ['Foo', 'foo'],
+            'select by key, with numeric key' => ['99', '99'],
+            'select by value, with numeric key' => ['N°99', '99'],
+            'select by key, with string object value' => ['string object', 'string object'],
+            'select by value, with string object value' => ['String Object', 'string object'],
+        ];
+    }
+
+    public function testSelectWithNonStringChoices()
+    {
+        $question = new ChoiceQuestion('A question', [
+            $result1 = new StringChoice('foo'),
+            $result2 = new StringChoice('bar'),
+            $result3 = new StringChoice('baz'),
+        ]);
+
+        $this->assertSame($result1, $question->getValidator()('foo'), 'answer can be selected by its string value');
+        $this->assertSame($result1, $question->getValidator()(0), 'answer can be selected by index');
+
+        $question->setMultiselect(true);
+
+        $this->assertSame([$result3, $result2], $question->getValidator()('baz, bar'));
+    }
+}
+
+class StringChoice
+{
+    private $string;
+
+    public function __construct(string $string)
+    {
+        $this->string = $string;
+    }
+
+    public function __toString(): string
+    {
+        return $this->string;
     }
 }

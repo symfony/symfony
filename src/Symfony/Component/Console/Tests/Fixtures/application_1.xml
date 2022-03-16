@@ -1,6 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symfony>
   <commands>
+    <command id="_complete" name="_complete" hidden="1">
+      <usages>
+        <usage>_complete [-s|--shell SHELL] [-i|--input INPUT] [-c|--current CURRENT] [-S|--symfony SYMFONY]</usage>
+      </usages>
+      <description>Internal command to provide shell completion suggestions</description>
+      <help>Internal command to provide shell completion suggestions</help>
+      <arguments/>
+      <options>
+        <option name="--shell" shortcut="-s" accept_value="1" is_value_required="1" is_multiple="0">
+          <description>The shell type ("bash", "fish")</description>
+          <defaults/>
+        </option>
+        <option name="--input" shortcut="-i" accept_value="1" is_value_required="1" is_multiple="1">
+          <description>An array of input tokens (e.g. COMP_WORDS or argv)</description>
+          <defaults/>
+        </option>
+        <option name="--current" shortcut="-c" accept_value="1" is_value_required="1" is_multiple="0">
+          <description>The index of the "input" array that the cursor is in (e.g. COMP_CWORD)</description>
+          <defaults/>
+        </option>
+        <option name="--symfony" shortcut="-S" accept_value="1" is_value_required="1" is_multiple="0">
+          <description>The version of the completion script</description>
+          <defaults/>
+        </option>
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
+        </option>
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not output any message</description>
+        </option>
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+        </option>
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display this application version</description>
+        </option>
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Force (or disable --no-ansi) ANSI output</description>
+        </option>
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Negate the "--ansi" option</description>
+        </option>
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not ask any interactive question</description>
+        </option>
+      </options>
+    </command>
+    <command id="completion" name="completion" hidden="0">
+      <usages>
+        <usage>completion [--debug] [--] [&lt;shell&gt;]</usage>
+      </usages>
+      <description>Dump the shell completion script</description>
+      <help>The &lt;info&gt;completion&lt;/&gt; command dumps the shell completion script required
+ to use shell autocompletion (currently only bash completion is supported).
+ 
+ &lt;comment&gt;Static installation
+ -------------------&lt;/&gt;
+ 
+ Dump the script to a global completion file and restart your shell:
+ 
+     &lt;info&gt;%%PHP_SELF%% completion bash | sudo tee /etc/bash_completion.d/%%COMMAND_NAME%%&lt;/&gt;
+ 
+ Or dump the script to a local file and source it:
+ 
+     &lt;info&gt;%%PHP_SELF%% completion bash &gt; completion.sh&lt;/&gt;
+ 
+     &lt;comment&gt;# source the file whenever you use the project&lt;/&gt;
+     &lt;info&gt;source completion.sh&lt;/&gt;
+ 
+     &lt;comment&gt;# or add this line at the end of your "~/.bashrc" file:&lt;/&gt;
+     &lt;info&gt;source /path/to/completion.sh&lt;/&gt;
+ 
+ &lt;comment&gt;Dynamic installation
+ --------------------&lt;/&gt;
+ 
+ Add this to the end of your shell configuration file (e.g. &lt;info&gt;"~/.bashrc"&lt;/&gt;):
+ 
+     &lt;info&gt;eval "$(%%PHP_SELF_FULL%% completion bash)"&lt;/&gt;</help>
+      <arguments>
+        <argument name="shell" is_required="0" is_array="0">
+          <description>The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given</description>
+          <defaults/>
+        </argument>
+      </arguments>
+      <options>
+        <option name="--debug" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Tail the completion debug log</description>
+        </option>
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
+        </option>
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not output any message</description>
+        </option>
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+        </option>
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display this application version</description>
+        </option>
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Force (or disable --no-ansi) ANSI output</description>
+        </option>
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Negate the "--ansi" option</description>
+        </option>
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not ask any interactive question</description>
+        </option>
+      </options>
+    </command>
     <command id="help" name="help" hidden="0">
       <usages>
         <usage>help [--format FORMAT] [--raw] [--] [&lt;command_name&gt;]</usage>
@@ -8,11 +119,11 @@
       <description>Display help for a command</description>
       <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
-   &lt;info&gt;php app/console help list&lt;/info&gt;
+   &lt;info&gt;%%PHP_SELF%% help list&lt;/info&gt;
  
  You can also output the help in other formats by using the &lt;comment&gt;--format&lt;/comment&gt; option:
  
-   &lt;info&gt;php app/console help --format=xml list&lt;/info&gt;
+   &lt;info&gt;%%PHP_SELF%% help --format=xml list&lt;/info&gt;
  
  To display the list of available commands, please use the &lt;info&gt;list&lt;/info&gt; command.</help>
       <arguments>
@@ -34,7 +145,7 @@
           <description>To output raw command help</description>
         </option>
         <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Display this help message</description>
+          <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
         <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not output any message</description>
@@ -46,10 +157,10 @@
           <description>Display this application version</description>
         </option>
         <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Force ANSI output</description>
+          <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
         <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Disable ANSI output</description>
+          <description>Negate the "--ansi" option</description>
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
@@ -58,24 +169,24 @@
     </command>
     <command id="list" name="list" hidden="0">
       <usages>
-        <usage>list [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]</usage>
+        <usage>list [--raw] [--format FORMAT] [--short] [--] [&lt;namespace&gt;]</usage>
       </usages>
       <description>List commands</description>
       <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
-   &lt;info&gt;php app/console list&lt;/info&gt;
+   &lt;info&gt;%%PHP_SELF%% list&lt;/info&gt;
  
  You can also display the commands for a specific namespace:
  
-   &lt;info&gt;php app/console list test&lt;/info&gt;
+   &lt;info&gt;%%PHP_SELF%% list test&lt;/info&gt;
  
  You can also output the information in other formats by using the &lt;comment&gt;--format&lt;/comment&gt; option:
  
-   &lt;info&gt;php app/console list --format=xml&lt;/info&gt;
+   &lt;info&gt;%%PHP_SELF%% list --format=xml&lt;/info&gt;
  
  It's also possible to get raw list of commands (useful for embedding command runner):
  
-   &lt;info&gt;php app/console list --raw&lt;/info&gt;</help>
+   &lt;info&gt;%%PHP_SELF%% list --raw&lt;/info&gt;</help>
       <arguments>
         <argument name="namespace" is_required="0" is_array="0">
           <description>The namespace name</description>
@@ -92,11 +203,37 @@
             <default>txt</default>
           </defaults>
         </option>
+        <option name="--short" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>To skip describing commands' arguments</description>
+        </option>
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
+        </option>
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not output any message</description>
+        </option>
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+        </option>
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display this application version</description>
+        </option>
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Force (or disable --no-ansi) ANSI output</description>
+        </option>
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Negate the "--ansi" option</description>
+        </option>
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not ask any interactive question</description>
+        </option>
       </options>
     </command>
   </commands>
   <namespaces>
     <namespace id="_global">
+      <command>_complete</command>
+      <command>completion</command>
       <command>help</command>
       <command>list</command>
     </namespace>

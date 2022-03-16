@@ -12,16 +12,15 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * RoleVoter votes if any attribute starts with a given prefix.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RoleVoter implements VoterInterface
+class RoleVoter implements CacheableVoterInterface
 {
-    private $prefix;
+    private string $prefix;
 
     public function __construct(string $prefix = 'ROLE_')
     {
@@ -31,16 +30,12 @@ class RoleVoter implements VoterInterface
     /**
      * {@inheritdoc}
      */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
         $roles = $this->extractRoles($token);
 
         foreach ($attributes as $attribute) {
-            if ($attribute instanceof Role) {
-                $attribute = $attribute->getRole();
-            }
-
             if (!\is_string($attribute) || !str_starts_with($attribute, $this->prefix)) {
                 continue;
             }
@@ -56,14 +51,18 @@ class RoleVoter implements VoterInterface
         return $result;
     }
 
+    public function supportsAttribute(string $attribute): bool
+    {
+        return str_starts_with($attribute, $this->prefix);
+    }
+
+    public function supportsType(string $subjectType): bool
+    {
+        return true;
+    }
+
     protected function extractRoles(TokenInterface $token)
     {
-        if (method_exists($token, 'getRoleNames')) {
-            return $token->getRoleNames();
-        }
-
-        @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), \E_USER_DEPRECATED);
-
-        return array_map(function (Role $role) { return $role->getRole(); }, $token->getRoles(false));
+        return $token->getRoleNames();
     }
 }

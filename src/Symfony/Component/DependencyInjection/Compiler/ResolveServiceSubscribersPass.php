@@ -23,9 +23,9 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class ResolveServiceSubscribersPass extends AbstractRecursivePass
 {
-    private $serviceLocator;
+    private ?string $serviceLocator = null;
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof Reference && $this->serviceLocator && \in_array((string) $value, [ContainerInterface::class, ServiceProviderInterface::class], true)) {
             return new Reference($this->serviceLocator);

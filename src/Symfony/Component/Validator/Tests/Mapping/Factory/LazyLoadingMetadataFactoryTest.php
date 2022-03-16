@@ -17,19 +17,19 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
-use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
-use Symfony\Component\Validator\Mapping\Cache\Psr6Cache;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyGetter;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyGetterInterface;
 
 class LazyLoadingMetadataFactoryTest extends TestCase
 {
-    private const CLASS_NAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
-    private const PARENT_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
+    private const CLASS_NAME = Entity::class;
+    private const PARENT_CLASS = EntityParent::class;
     private const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';
 
     public function testLoadClassMetadataWithInterface()
@@ -107,64 +107,6 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedConstraints, $metadata->getConstraints());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWriteMetadataToLegacyCache()
-    {
-        $cache = new Psr6Cache(new ArrayAdapter());
-        $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
-
-        $parentClassConstraints = [
-            new ConstraintA(['groups' => ['Default', 'EntityParent']]),
-            new ConstraintA(['groups' => ['Default', 'EntityInterfaceA', 'EntityParent']]),
-        ];
-
-        $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
-
-        $this->assertEquals(self::PARENT_CLASS, $metadata->getClassName());
-        $this->assertEquals($parentClassConstraints, $metadata->getConstraints());
-        $this->assertInstanceOf(ClassMetadata::class, $cache->read(self::PARENT_CLASS));
-        $this->assertInstanceOf(ClassMetadata::class, $cache->read(self::INTERFACE_A_CLASS));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testReadMetadataFromLegacyCache()
-    {
-        $loader = $this->createMock(LoaderInterface::class);
-        $cache = $this->createMock(CacheInterface::class);
-        $factory = new LazyLoadingMetadataFactory($loader, $cache);
-
-        $metadata = new ClassMetadata(self::PARENT_CLASS);
-        $metadata->addConstraint(new ConstraintA());
-
-        $parentClass = self::PARENT_CLASS;
-        $interfaceClass = self::INTERFACE_A_CLASS;
-
-        $loader->expects($this->never())
-               ->method('loadClassMetadata');
-
-        $cache->expects($this->never())
-              ->method('has');
-        $cache->expects($this->exactly(2))
-              ->method('read')
-              ->withConsecutive(
-                  [self::PARENT_CLASS],
-                  [self::INTERFACE_A_CLASS]
-              )
-              ->willReturnCallback(function ($name) use ($metadata, $parentClass, $interfaceClass) {
-                  if ($parentClass == $name) {
-                      return $metadata;
-                  }
-
-                  return new ClassMetadata($interfaceClass);
-              });
-
-        $this->assertEquals($metadata, $factory->getMetadataFor(self::PARENT_CLASS));
-    }
-
     public function testNonClassNameStringValues()
     {
         $this->expectException(NoSuchMetadataException::class);
@@ -234,7 +176,7 @@ class TestLoader implements LoaderInterface
 
 class PropertyGetterInterfaceConstraintLoader implements LoaderInterface
 {
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (PropertyGetterInterface::class === $metadata->getClassName()) {
             $metadata->addGetterConstraint('property', new NotBlank());

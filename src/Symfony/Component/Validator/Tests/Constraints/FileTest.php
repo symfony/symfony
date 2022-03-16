@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 class FileTest extends TestCase
 {
@@ -138,4 +140,35 @@ class FileTest extends TestCase
             ['100Ki', false, false],
         ];
     }
+
+    public function testAttributes()
+    {
+        $metadata = new ClassMetadata(FileDummy::class);
+        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        self::assertNull($aConstraint->maxSize);
+
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        self::assertSame(100, $bConstraint->maxSize);
+        self::assertSame('myMessage', $bConstraint->notFoundMessage);
+        self::assertSame(['Default', 'FileDummy'], $bConstraint->groups);
+
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        self::assertSame(100000, $cConstraint->maxSize);
+        self::assertSame(['my_group'], $cConstraint->groups);
+        self::assertSame('some attached data', $cConstraint->payload);
+    }
+}
+
+class FileDummy
+{
+    #[File]
+    private $a;
+
+    #[File(maxSize: 100, notFoundMessage: 'myMessage')]
+    private $b;
+
+    #[File(maxSize: '100K', groups: ['my_group'], payload: 'some attached data')]
+    private $c;
 }

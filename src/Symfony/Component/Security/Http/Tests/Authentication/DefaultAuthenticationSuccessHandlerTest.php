@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class DefaultAuthenticationSuccessHandlerTest extends TestCase
 {
@@ -32,7 +32,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
         if ($request->hasSession()) {
-            $handler->setProviderKey('admin');
+            $handler->setFirewallName('admin');
         }
         $this->assertSame('http://localhost'.$redirectedUrl, $handler->onAuthenticationSuccess($request, $token)->getTargetUrl());
     }

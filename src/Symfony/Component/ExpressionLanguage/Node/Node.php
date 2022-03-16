@@ -33,10 +33,7 @@ class Node
         $this->attributes = $attributes;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         $attributes = [];
         foreach ($this->attributes as $name => $value) {
@@ -67,7 +64,7 @@ class Node
         }
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate(array $functions, array $values)
     {
         $results = [];
         foreach ($this->nodes as $node) {
@@ -93,7 +90,7 @@ class Node
         return $dump;
     }
 
-    protected function dumpString($value)
+    protected function dumpString(string $value)
     {
         return sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
     }

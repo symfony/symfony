@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\RememberMe;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -20,28 +20,34 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ResponseListener implements EventSubscriberInterface
 {
-    public function onKernelResponse(FilterResponseEvent $event)
+    /**
+     * This attribute name can be used by the implementation if it needs to set
+     * a cookie on the Request when there is no actual Response, yet.
+     */
+    public const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
+
+    public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        if ($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME)) {
-            $response->headers->setCookie($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+        if ($request->attributes->has(self::COOKIE_ATTR_NAME)) {
+            $response->headers->setCookie($request->attributes->get(self::COOKIE_ATTR_NAME));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [KernelEvents::RESPONSE => 'onKernelResponse'];
     }

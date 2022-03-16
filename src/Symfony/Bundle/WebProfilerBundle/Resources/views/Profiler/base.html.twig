@@ -15,10 +15,18 @@
     </head>
     <body>
         <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
-            document.body.classList.add(
-                localStorage.getItem('symfony/profiler/theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-dark' : 'theme-light'),
-                localStorage.getItem('symfony/profiler/width') || 'width-normal'
-            );
+            if (null === localStorage.getItem('symfony/profiler/theme') || 'theme-auto' === localStorage.getItem('symfony/profiler/theme')) {
+                document.body.classList.add((matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-dark' : 'theme-light'));
+                // needed to respond dynamically to OS changes without having to refresh the page
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    document.body.classList.remove('theme-light', 'theme-dark');
+                    document.body.classList.add(e.matches ? 'theme-dark' : 'theme-light');
+                });
+            } else {
+                document.body.classList.add(localStorage.getItem('symfony/profiler/theme'));
+            }
+
+            document.body.classList.add(localStorage.getItem('symfony/profiler/width') || 'width-normal');
         </script>
 
         {% block body '' %}

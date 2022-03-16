@@ -20,6 +20,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group time-sensitive
@@ -35,26 +36,7 @@ class TagAwareAdapterTest extends AdapterTestCase
 
     public static function tearDownAfterClass(): void
     {
-        FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
-    }
-
-    /**
-     * Test feature specific to TagAwareAdapter as it implicit needs to save deferred when also saving expiry info.
-     */
-    public function testInvalidateCommitsSeperatePools()
-    {
-        $pool1 = $this->createCachePool();
-
-        $foo = $pool1->getItem('foo');
-        $foo->tag('tag');
-
-        $pool1->saveDeferred($foo->set('foo'));
-        $pool1->invalidateTags(['tag']);
-
-        $pool2 = $this->createCachePool();
-        $foo = $pool2->getItem('foo');
-
-        $this->assertTrue($foo->isHit());
+        (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
     public function testPrune()
@@ -72,7 +54,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     public function testKnownTagVersionsTtl()
     {
         $itemsPool = new FilesystemAdapter('', 10);
-        $tagsPool = $this->createMock(AdapterInterface::class);
+        $tagsPool = new ArrayAdapter();
 
         $pool = new TagAwareAdapter($itemsPool, $tagsPool, 10);
 
@@ -80,12 +62,8 @@ class TagAwareAdapterTest extends AdapterTestCase
         $item->tag(['baz']);
         $item->expiresAfter(100);
 
-        $tag = $this->createMock(CacheItemInterface::class);
-        $tag->expects(self::exactly(2))->method('get')->willReturn(10);
-
-        $tagsPool->expects(self::exactly(2))->method('getItems')->willReturn([
-            'baz'.TagAwareAdapter::TAGS_PREFIX => $tag,
-        ]);
+        $tag = $tagsPool->getItem('baz'.TagAwareAdapter::TAGS_PREFIX);
+        $tagsPool->save($tag->set(10));
 
         $pool->save($item);
         $this->assertTrue($pool->getItem('foo')->isHit());
@@ -197,10 +175,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($item->isHit());
     }
 
-    /**
-     * @return PruneableInterface&MockObject
-     */
-    private function getPruneableMock(): PruneableInterface
+    private function getPruneableMock(): PruneableInterface&MockObject
     {
         $pruneable = $this->createMock(PrunableAdapter::class);
 
@@ -212,10 +187,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return PruneableInterface&MockObject
-     */
-    private function getFailingPruneableMock(): PruneableInterface
+    private function getFailingPruneableMock(): PruneableInterface&MockObject
     {
         $pruneable = $this->createMock(PrunableAdapter::class);
 
@@ -227,10 +199,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return AdapterInterface&MockObject
-     */
-    private function getNonPruneableMock(): AdapterInterface
+    private function getNonPruneableMock(): AdapterInterface&MockObject
     {
         return $this->createMock(AdapterInterface::class);
     }

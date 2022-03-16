@@ -22,14 +22,14 @@ class TestClassMagicGet
         $this->magicProperty = $value;
     }
 
-    public function __set($property, $value)
+    public function __set(string $property, $value)
     {
         if ('magicProperty' === $property) {
             $this->magicProperty = $value;
         }
     }
 
-    public function __get($property)
+    public function __get(string $property)
     {
         if ('magicProperty' === $property) {
             return $this->magicProperty;

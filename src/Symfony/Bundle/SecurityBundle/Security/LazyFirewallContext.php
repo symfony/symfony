@@ -14,8 +14,8 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
-use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 /**
@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
  */
 class LazyFirewallContext extends FirewallContext
 {
-    private $tokenStorage;
+    private TokenStorage $tokenStorage;
 
     public function __construct(iterable $listeners, ?ExceptionListener $exceptionListener, ?LogoutListener $logoutListener, ?FirewallConfig $config, TokenStorage $tokenStorage)
     {
@@ -46,13 +46,9 @@ class LazyFirewallContext extends FirewallContext
         $lazy = $request->isMethodCacheable();
 
         foreach (parent::getListeners() as $listener) {
-            if (!\is_callable($listener)) {
-                @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, extend "%s" instead.', \get_class($listener), AbstractListener::class), \E_USER_DEPRECATED);
-                $listeners[] = [$listener, 'handle'];
-                $lazy = false;
-            } elseif (!$lazy || !$listener instanceof AbstractListener) {
+            if (!$lazy || !$listener instanceof FirewallListenerInterface) {
                 $listeners[] = $listener;
-                $lazy = $lazy && $listener instanceof AbstractListener;
+                $lazy = $lazy && $listener instanceof FirewallListenerInterface;
             } elseif (false !== $supports = $listener->supports($request)) {
                 $listeners[] = [$listener, 'authenticate'];
                 $lazy = null === $supports;

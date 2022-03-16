@@ -19,7 +19,6 @@ use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -29,30 +28,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CoreExtension extends AbstractExtension
 {
-    private $propertyAccessor;
-    private $choiceListFactory;
-    private $translator;
+    private PropertyAccessorInterface $propertyAccessor;
+    private ChoiceListFactoryInterface $choiceListFactory;
+    private ?TranslatorInterface $translator;
 
-    /**
-     * @param TranslatorInterface|null $translator
-     */
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null, $translator = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
     {
-        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(new PropertyAccessDecorator(new DefaultChoiceListFactory(), $this->propertyAccessor));
         $this->translator = $translator;
     }
 
-    protected function loadTypes()
+    protected function loadTypes(): array
     {
         return [
             new Type\FormType($this->propertyAccessor),
             new Type\BirthdayType(),
             new Type\CheckboxType(),
-            new Type\ChoiceType($this->choiceListFactory),
+            new Type\ChoiceType($this->choiceListFactory, $this->translator),
             new Type\CollectionType(),
             new Type\CountryType(),
             new Type\DateIntervalType(),
@@ -82,12 +75,12 @@ class CoreExtension extends AbstractExtension
             new Type\ResetType(),
             new Type\CurrencyType(),
             new Type\TelType(),
-            new Type\ColorType(),
+            new Type\ColorType($this->translator),
             new Type\WeekType(),
         ];
     }
 
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new TransformationFailureExtension($this->translator),

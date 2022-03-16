@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `SetUpTearDownTrait`
+
+5.3
+---
+
+ * bumped the minimum PHP version to 7.1.3
+ * bumped the minimum PHPUnit version to 7.5
+ * deprecated the `SetUpTearDownTrait` trait, use original methods with "void" return typehint.
+ * added `logFile` option to write deprecations to a file instead of echoing them
+
+5.1.0
+-----
+
+ * ignore verbosity settings when the build fails because of deprecations
+ * added per-group verbosity
+ * added `ExpectDeprecationTrait` to be able to define an expected deprecation from inside a test
+ * deprecated the `@expectedDeprecation` annotation, use the `ExpectDeprecationTrait::expectDeprecation()` method instead
+
+5.0.0
+-----
+
+ * removed `weak_vendor` mode, use `max[self]=0` instead
+
 4.4.0
 -----
 

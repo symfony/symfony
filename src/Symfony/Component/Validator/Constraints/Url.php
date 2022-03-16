@@ -20,109 +20,43 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Url extends Constraint
 {
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_ANY = 'ANY';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_NONE = false;
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_A = 'A';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_A6 = 'A6';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_AAAA = 'AAAA';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_CNAME = 'CNAME';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_MX = 'MX';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_NAPTR = 'NAPTR';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_NS = 'NS';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_PTR = 'PTR';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_SOA = 'SOA';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_SRV = 'SRV';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public const CHECK_DNS_TYPE_TXT = 'TXT';
-
     public const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
     ];
 
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
+
     public $message = 'This value is not a valid URL.';
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public $dnsMessage = 'The host could not be resolved.';
     public $protocols = ['http', 'https'];
-
-    /**
-     * @deprecated since Symfony 4.1
-     */
-    public $checkDNS = self::CHECK_DNS_TYPE_NONE;
     public $relativeProtocol = false;
     public $normalizer;
 
-    public function __construct($options = null)
-    {
-        if (\is_array($options)) {
-            if (\array_key_exists('checkDNS', $options)) {
-                @trigger_error(sprintf('The "checkDNS" option in "%s" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.', self::class), \E_USER_DEPRECATED);
-            }
-            if (\array_key_exists('dnsMessage', $options)) {
-                @trigger_error(sprintf('The "dnsMessage" option in "%s" is deprecated since Symfony 4.1.', self::class), \E_USER_DEPRECATED);
-            }
-        }
+    public function __construct(
+        array $options = null,
+        string $message = null,
+        array $protocols = null,
+        bool $relativeProtocol = null,
+        callable $normalizer = null,
+        array $groups = null,
+        mixed $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
 
-        parent::__construct($options);
+        $this->message = $message ?? $this->message;
+        $this->protocols = $protocols ?? $this->protocols;
+        $this->relativeProtocol = $relativeProtocol ?? $this->relativeProtocol;
+        $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', \is_object($this->normalizer) ? \get_class($this->normalizer) : \gettype($this->normalizer)));
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 }

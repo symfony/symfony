@@ -12,7 +12,7 @@ class ValidValidatorTest extends TestCase
     public function testPropertyPathsArePassedToNestedContexts()
     {
         $validatorBuilder = new ValidatorBuilder();
-        $validator = $validatorBuilder->enableAnnotationMapping()->getValidator();
+        $validator = $validatorBuilder->enableAnnotationMapping()->addDefaultDoctrineAnnotationReader()->getValidator();
 
         $violations = $validator->validate(new Foo(), null, ['nested']);
 
@@ -23,7 +23,7 @@ class ValidValidatorTest extends TestCase
     public function testNullValues()
     {
         $validatorBuilder = new ValidatorBuilder();
-        $validator = $validatorBuilder->enableAnnotationMapping()->getValidator();
+        $validator = $validatorBuilder->enableAnnotationMapping()->addDefaultDoctrineAnnotationReader()->getValidator();
 
         $foo = new Foo();
         $foo->fooBar = null;

@@ -1,0 +1,30 @@
+{
+    "name": "symfony/zulip-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Zulip Notifier Bridge",
+    "keywords": ["zulip", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mohammad Emran Hasan",
+            "email": "phpfour@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Zulip\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

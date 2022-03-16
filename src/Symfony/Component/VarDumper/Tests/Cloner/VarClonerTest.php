@@ -393,7 +393,7 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
 EOTXT;
         ob_start();
         var_dump($clone);
-        $this->assertStringMatchesFormat(\PHP_VERSION_ID >= 70200 ? str_replace('"1"', '1', $expected) : $expected, ob_get_clean());
+        $this->assertStringMatchesFormat(str_replace('"1"', '1', $expected), ob_get_clean());
     }
 
     public function testCaster()
@@ -458,9 +458,6 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testPhp74()
     {
         $data = new Php74();
@@ -574,9 +571,6 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testPhp81Enums()
     {
         $data = new Php81Enums();

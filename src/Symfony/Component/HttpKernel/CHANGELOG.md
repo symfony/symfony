@@ -1,6 +1,99 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `BackedEnumValueResolver` to resolve backed enum cases from request attributes in controller arguments
+ * Deprecate StreamedResponseListener, it's not needed anymore
+ * Add `Profiler::isEnabled()` so collaborating collector services may elect to omit themselves.
+ * Add the `UidValueResolver` argument value resolver
+
+6.0
+---
+
+ * Remove `ArgumentInterface`
+ * Remove `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
+ * Remove support for returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
+ * Remove `KernelEvent::isMasterRequest()`, use `isMainRequest()` instead
+ * Remove support for `service:action` syntax to reference controllers, use `serviceOrFqcn::method` instead
+
+5.4
+---
+
+ * Add the ability to enable the profiler using a request query parameter, body parameter or attribute
+ * Deprecate `AbstractTestSessionListener` and `TestSessionListener`, use `AbstractSessionListener` and `SessionListener` instead
+ * Deprecate the `fileLinkFormat` parameter of `DebugHandlersListener`
+ * Add support for configuring log level, and status code by exception class
+ * Allow ignoring "kernel.reset" methods that don't exist with "on_invalid" attribute
+
+5.3
+---
+
+ * Deprecate `ArgumentInterface`
+ * Add `ArgumentMetadata::getAttributes()`
+ * Deprecate `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
+ * Mark the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
+ * Deprecate returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
+ * Deprecate `HttpKernelInterface::MASTER_REQUEST` and add `HttpKernelInterface::MAIN_REQUEST` as replacement
+ * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
+ * Add `#[AsController]` attribute for declaring standalone controllers on PHP 8
+ * Add `FragmentUriGeneratorInterface` and `FragmentUriGenerator` to generate the URI of a fragment
+
+5.2.0
+-----
+
+ * added session usage
+ * made the public `http_cache` service handle requests when available
+ * allowed enabling trusted hosts and proxies using new `kernel.trusted_hosts`,
+   `kernel.trusted_proxies` and `kernel.trusted_headers` parameters
+ * content of request parameter `_password` is now also hidden
+   in the request profiler raw content section
+ * Allowed adding attributes on controller arguments that will be passed to argument resolvers.
+ * kernels implementing the `ExtensionInterface` will now be auto-registered to the container
+ * added parameter `kernel.runtime_environment`, defined as `%env(default:kernel.environment:APP_RUNTIME_ENV)%`
+ * do not set a default `Accept` HTTP header when using `HttpKernelBrowser`
+
+5.1.0
+-----
+
+ * allowed to use a specific logger channel for deprecations
+ * made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+;
+   not returning an array is deprecated
+ * made kernels implementing `WarmableInterface` be part of the cache warmup stage
+ * deprecated support for `service:action` syntax to reference controllers, use `serviceOrFqcn::method` instead
+ * allowed using public aliases to reference controllers
+ * added session usage reporting when the `_stateless` attribute of the request is set to `true`
+ * added `AbstractSessionListener::onSessionUsage()` to report when the session is used while a request is stateless
+
+5.0.0
+-----
+
+ * removed support for getting the container from a non-booted kernel
+ * removed the first and second constructor argument of `ConfigDataCollector`
+ * removed `ConfigDataCollector::getApplicationName()`
+ * removed `ConfigDataCollector::getApplicationVersion()`
+ * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
+ * removed `TranslatorListener` in favor of `LocaleAwareListener`
+ * removed `getRootDir()` and `getName()` from `Kernel` and `KernelInterface`
+ * removed `FilterControllerArgumentsEvent`, use `ControllerArgumentsEvent` instead
+ * removed `FilterControllerEvent`, use `ControllerEvent` instead
+ * removed `FilterResponseEvent`, use `ResponseEvent` instead
+ * removed `GetResponseEvent`, use `RequestEvent` instead
+ * removed `GetResponseForControllerResultEvent`, use `ViewEvent` instead
+ * removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
+ * removed `PostResponseEvent`, use `TerminateEvent` instead
+ * removed `SaveSessionListener` in favor of `AbstractSessionListener`
+ * removed `Client`, use `HttpKernelBrowser` instead
+ * added method `getProjectDir()` to `KernelInterface`
+ * removed methods `serialize` and `unserialize` from `DataCollector`, store the serialized state in the data property instead
+ * made `ProfilerStorageInterface` internal
+ * removed the second and third argument of `KernelInterface::locateResource`
+ * removed the second and third argument of `FileLocator::__construct`
+ * removed loading resources from `%kernel.root_dir%/Resources` and `%kernel.root_dir%` as
+   fallback directories.
+ * removed class `ExceptionListener`, use `ErrorListener` instead
+
 4.4.0
 -----
 

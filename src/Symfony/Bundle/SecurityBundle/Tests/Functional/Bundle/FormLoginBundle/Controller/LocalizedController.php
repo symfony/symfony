@@ -11,15 +11,21 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Environment;
 
-class LocalizedController implements ContainerAwareInterface
+class LocalizedController implements ServiceSubscriberInterface
 {
-    use ContainerAwareTrait;
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function loginAction(Request $request)
     {
@@ -60,5 +66,15 @@ class LocalizedController implements ContainerAwareInterface
     public function homepageAction()
     {
         return (new Response('<html><body>Homepage</body></html>'))->setPublic();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'twig' => Environment::class,
+        ];
     }
 }

@@ -12,8 +12,9 @@
 namespace Symfony\Component\Security\Core\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class ChildCustomUserMessageAuthenticationException extends CustomUserMessageAuthenticationException
 {
@@ -45,7 +46,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
 
     public function testSharedSerializedData()
     {
-        $token = new AnonymousToken('foo', 'bar');
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_USER']), 'main', ['ROLE_USER']);
 
         $exception = new CustomUserMessageAuthenticationException();
         $exception->setToken($token);
@@ -59,7 +60,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
 
     public function testSharedSerializedDataFromChild()
     {
-        $token = new AnonymousToken('foo', 'bar');
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_USER']), 'main', ['ROLE_USER']);
 
         $exception = new ChildCustomUserMessageAuthenticationException();
         $exception->childMember = $token;

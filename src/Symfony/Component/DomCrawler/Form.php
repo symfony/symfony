@@ -21,20 +21,9 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
-    /**
-     * @var \DOMElement
-     */
-    private $button;
-
-    /**
-     * @var FormFieldRegistry
-     */
-    private $fields;
-
-    /**
-     * @var string
-     */
-    private $baseHref;
+    private \DOMElement $button;
+    private FormFieldRegistry $fields;
+    private ?string $baseHref;
 
     /**
      * @param \DOMElement $node       A \DOMElement instance
@@ -54,10 +43,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the form node associated with this form.
-     *
-     * @return \DOMElement A \DOMElement instance
      */
-    public function getFormNode()
+    public function getFormNode(): \DOMElement
     {
         return $this->node;
     }
@@ -69,7 +56,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return $this
      */
-    public function setValues(array $values)
+    public function setValues(array $values): static
     {
         foreach ($values as $name => $value) {
             $this->fields->set($name, $value);
@@ -82,10 +69,8 @@ class Form extends Link implements \ArrayAccess
      * Gets the field values.
      *
      * The returned array does not include file fields (@see getFiles).
-     *
-     * @return array An array of field values
      */
-    public function getValues()
+    public function getValues(): array
     {
         $values = [];
         foreach ($this->fields->all() as $name => $field) {
@@ -103,10 +88,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the file field values.
-     *
-     * @return array An array of file field values
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         if (!\in_array($this->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
             return [];
@@ -132,10 +115,8 @@ class Form extends Link implements \ArrayAccess
      *
      * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
-     *
-     * @return array An array of field values
      */
-    public function getPhpValues()
+    public function getPhpValues(): array
     {
         $values = [];
         foreach ($this->getValues() as $name => $value) {
@@ -143,11 +124,11 @@ class Form extends Link implements \ArrayAccess
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, \strlen(key($expandedValue)));
-                $values = array_replace_recursive($values, [$varName => current($expandedValue)]);
+                $values[] = [$varName => current($expandedValue)];
             }
         }
 
-        return $values;
+        return array_replace_recursive([], ...$values);
     }
 
     /**
@@ -159,10 +140,8 @@ class Form extends Link implements \ArrayAccess
      * (@see getPhpValues), rather than uploaded files found in $_FILES.
      * For a compound file field foo[bar] it will create foo[bar][name],
      * instead of foo[name][bar] which would be found in $_FILES.
-     *
-     * @return array An array of file field values
      */
-    public function getPhpFiles()
+    public function getPhpFiles(): array
     {
         $values = [];
         foreach ($this->getFiles() as $name => $value) {
@@ -182,11 +161,11 @@ class Form extends Link implements \ArrayAccess
 
                 reset($expandedValue);
 
-                $values = array_replace_recursive($values, [$varName => current($expandedValue)]);
+                $values[] = [$varName => current($expandedValue)];
             }
         }
 
-        return $values;
+        return array_replace_recursive([], ...$values);
     }
 
     /**
@@ -195,10 +174,8 @@ class Form extends Link implements \ArrayAccess
      * The returned URI is not the same as the form "action" attribute.
      * This method merges the value if the method is GET to mimics
      * browser behavior.
-     *
-     * @return string The URI
      */
-    public function getUri()
+    public function getUri(): string
     {
         $uri = parent::getUri();
 
@@ -219,7 +196,7 @@ class Form extends Link implements \ArrayAccess
         return $uri;
     }
 
-    protected function getRawUri()
+    protected function getRawUri(): string
     {
         // If the form was created from a button rather than the form node, check for HTML5 action overrides
         if ($this->button !== $this->node && $this->button->getAttribute('formaction')) {
@@ -233,10 +210,8 @@ class Form extends Link implements \ArrayAccess
      * Gets the form method.
      *
      * If no method is defined in the form, GET is returned.
-     *
-     * @return string The method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         if (null !== $this->method) {
             return $this->method;
@@ -262,22 +237,16 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Returns true if the named field exists.
-     *
-     * @param string $name The field name
-     *
-     * @return bool true if the field exists, false otherwise
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return $this->fields->has($name);
     }
 
     /**
      * Removes a field from the form.
-     *
-     * @param string $name The field name
      */
-    public function remove($name)
+    public function remove(string $name)
     {
         $this->fields->remove($name);
     }
@@ -285,13 +254,11 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets a named field.
      *
-     * @param string $name The field name
-     *
-     * @return FormField|FormField[]|FormField[][] The value of the field
+     * @return FormField|FormField[]|FormField[][]
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get($name)
+    public function get(string $name): FormField|array
     {
         return $this->fields->get($name);
     }
@@ -309,7 +276,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return FormField[]
      */
-    public function all()
+    public function all(): array
     {
         return $this->fields->all();
     }
@@ -318,11 +285,8 @@ class Form extends Link implements \ArrayAccess
      * Returns true if the named field exists.
      *
      * @param string $name The field name
-     *
-     * @return bool true if the field exists, false otherwise
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($name)
+    public function offsetExists(mixed $name): bool
     {
         return $this->has($name);
     }
@@ -332,12 +296,11 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return FormField|FormField[]|FormField[][] The value of the field
+     * @return FormField|FormField[]|FormField[][]
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($name)
+    public function offsetGet(mixed $name): FormField|array
     {
         return $this->fields->get($name);
     }
@@ -348,12 +311,9 @@ class Form extends Link implements \ArrayAccess
      * @param string       $name  The field name
      * @param string|array $value The value of the field
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($name, $value)
+    public function offsetSet(mixed $name, mixed $value): void
     {
         $this->fields->set($name, $value);
     }
@@ -362,11 +322,8 @@ class Form extends Link implements \ArrayAccess
      * Removes a field from the form.
      *
      * @param string $name The field name
-     *
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($name)
+    public function offsetUnset(mixed $name): void
     {
         $this->fields->remove($name);
     }
@@ -374,9 +331,9 @@ class Form extends Link implements \ArrayAccess
     /**
      * Disables validation.
      *
-     * @return self
+     * @return $this
      */
-    public function disableValidation()
+    public function disableValidation(): static
     {
         foreach ($this->fields->all() as $field) {
             if ($field instanceof Field\ChoiceFormField) {

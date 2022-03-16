@@ -21,34 +21,32 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Maxime Douailin <maxime.douailin@gmail.com>
+ *
+ * @internal
  */
-class RemoteUserFactory implements SecurityFactoryInterface
+class RemoteUserFactory implements AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public const PRIORITY = -10;
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
+        $authenticatorId = 'security.authenticator.remote_user.'.$firewallName;
         $container
-            ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.pre_authenticated'))
-            ->replaceArgument(0, new Reference($userProvider))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
-            ->addArgument($id)
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.remote_user'))
+            ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(2, $firewallName)
+            ->replaceArgument(3, $config['user'])
         ;
 
-        $listenerId = 'security.authentication.listener.remote_user.'.$id;
-        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.remote_user'));
-        $listener->replaceArgument(2, $id);
-        $listener->replaceArgument(3, $config['user']);
-        $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
-
-        return [$providerId, $listenerId, $defaultEntryPoint];
+        return $authenticatorId;
     }
 
-    public function getPosition()
+    public function getPriority(): int
     {
-        return 'pre_auth';
+        return self::PRIORITY;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'remote-user';
     }

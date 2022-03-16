@@ -1,0 +1,14 @@
+imports:
+    - { resource: ./config.yml }
+    - { resource: ./config_session.yml }
+
+framework:
+    session:
+        cookie_secure: auto
+        cookie_samesite: lax
+
+security:
+    enable_authenticator_manager: true
+    firewalls:
+        default:
+            stateless: true

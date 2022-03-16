@@ -157,23 +157,33 @@ EOF;
         );
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Not using a string as the error code in Symfony\Component\Validator\ConstraintViolation::__construct() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.
-     */
-    public function testNonStringCode()
+    public function testRetrievedPropertyPathIsAStringEvenIfNotSet()
     {
-        $violation = new ConstraintViolation(
-            '42 cannot be used here',
-            'this is the message template',
-            [],
-            ['some_value' => 42],
-            'some_value',
-            null,
-            null,
-            42
+        self::assertSame(
+            '',
+            (new ConstraintViolation(
+                'irrelevant',
+                '',
+                [],
+                'irrelevant',
+                null,
+                null
+            ))->getPropertyPath()
         );
+    }
 
-        self::assertSame(42, $violation->getCode());
+    public function testRetrievedMessageTemplateIsAStringEvenIfNotSet()
+    {
+        self::assertSame(
+            '',
+            (new ConstraintViolation(
+                'irrelevant',
+                null,
+                [],
+                'irrelevant',
+                'irrelevant',
+                null
+            ))->getMessageTemplate()
+        );
     }
 }

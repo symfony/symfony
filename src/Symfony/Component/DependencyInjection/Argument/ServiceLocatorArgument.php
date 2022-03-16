@@ -22,12 +22,12 @@ class ServiceLocatorArgument implements ArgumentInterface
 {
     use ReferenceSetArgumentTrait;
 
-    private $taggedIteratorArgument;
+    private ?TaggedIteratorArgument $taggedIteratorArgument = null;
 
     /**
      * @param Reference[]|TaggedIteratorArgument $values
      */
-    public function __construct($values = [])
+    public function __construct(array|TaggedIteratorArgument $values = [])
     {
         if ($values instanceof TaggedIteratorArgument) {
             $this->taggedIteratorArgument = $values;

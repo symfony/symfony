@@ -29,29 +29,26 @@ abstract class FileLoader extends Loader
 
     protected $locator;
 
-    private $currentDir;
+    private ?string $currentDir = null;
 
-    public function __construct(FileLocatorInterface $locator)
+    public function __construct(FileLocatorInterface $locator, string $env = null)
     {
         $this->locator = $locator;
+        parent::__construct($env);
     }
 
     /**
      * Sets the current directory.
-     *
-     * @param string $dir
      */
-    public function setCurrentDir($dir)
+    public function setCurrentDir(string $dir)
     {
         $this->currentDir = $dir;
     }
 
     /**
      * Returns the file locator used by this loader.
-     *
-     * @return FileLocatorInterface
      */
-    public function getLocator()
+    public function getLocator(): FileLocatorInterface
     {
         return $this->locator;
     }
@@ -71,13 +68,8 @@ abstract class FileLoader extends Loader
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
-    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null/*, $exclude = null*/)
+    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, string|array $exclude = null)
     {
-        if (\func_num_args() < 5 && __CLASS__ !== static::class && !str_starts_with(static::class, 'Symfony\Component\\') && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "$exclude = null" argument in version 5.0, not defining it is deprecated since Symfony 4.4.', __METHOD__), \E_USER_DEPRECATED);
-        }
-        $exclude = \func_num_args() >= 5 ? func_get_arg(4) : null;
-
         if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];
             foreach ((array) $exclude as $pattern) {
@@ -107,7 +99,7 @@ abstract class FileLoader extends Loader
     /**
      * @internal
      */
-    protected function glob(string $pattern, bool $recursive, &$resource = null, bool $ignoreErrors = false, bool $forExclusion = false, array $excluded = [])
+    protected function glob(string $pattern, bool $recursive, array|GlobResource &$resource = null, bool $ignoreErrors = false, bool $forExclusion = false, array $excluded = [])
     {
         if (\strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
@@ -139,7 +131,7 @@ abstract class FileLoader extends Loader
         yield from $resource;
     }
 
-    private function doImport($resource, string $type = null, bool $ignoreErrors = false, $sourceResource = null)
+    private function doImport(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null)
     {
         try {
             $loader = $this->resolve($resource, $type);

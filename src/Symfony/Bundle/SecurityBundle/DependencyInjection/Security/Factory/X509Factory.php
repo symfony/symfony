@@ -20,36 +20,33 @@ use Symfony\Component\DependencyInjection\Reference;
  * X509Factory creates services for X509 certificate authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
-class X509Factory implements SecurityFactoryInterface
+class X509Factory implements AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public const PRIORITY = -10;
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
+        $authenticatorId = 'security.authenticator.x509.'.$firewallName;
         $container
-            ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.pre_authenticated'))
-            ->replaceArgument(0, new Reference($userProvider))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
-            ->addArgument($id)
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.x509'))
+            ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(2, $firewallName)
+            ->replaceArgument(3, $config['user'])
+            ->replaceArgument(4, $config['credentials'])
         ;
 
-        // listener
-        $listenerId = 'security.authentication.listener.x509.'.$id;
-        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.x509'));
-        $listener->replaceArgument(2, $id);
-        $listener->replaceArgument(3, $config['user']);
-        $listener->replaceArgument(4, $config['credentials']);
-        $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
-
-        return [$providerId, $listenerId, $defaultEntryPoint];
+        return $authenticatorId;
     }
 
-    public function getPosition()
+    public function getPriority(): int
     {
-        return 'pre_auth';
+        return self::PRIORITY;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'x509';
     }

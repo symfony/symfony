@@ -15,7 +15,7 @@ return function (ContainerConfigurator $c) {
             ->parent(BarService::class)
             ->public()
             ->decorate('bar', 'b', 1)
-            ->args([ref('b')])
+            ->args([service('b')])
             ->class('Class2')
             ->file('file.php')
             ->parent('bar')

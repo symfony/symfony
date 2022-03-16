@@ -16,20 +16,16 @@ use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Test\ForwardCompatTestTrait;
-use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 class ConstraintViolationBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $root;
     private $violations;
     private $messageTemplate = '%value% is invalid';
     private $builder;
 
-    private function doSetUp()
+    protected function setUp(): void
     {
         $this->root = [
             'data' => [
@@ -103,20 +99,5 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->assertSame($expectedViolation->getCode(), $violation->getCode());
         $this->assertEquals($expectedViolation->getConstraint(), $violation->getConstraint());
         $this->assertSame($expectedViolation->getCause(), $violation->getCause());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Not using a string as the error code in Symfony\Component\Validator\Violation\ConstraintViolationBuilder::setCode() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.
-     * @expectedDeprecation Not using a string as the error code in Symfony\Component\Validator\ConstraintViolation::__construct() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.
-     */
-    public function testNonStringCode()
-    {
-        $constraintViolationList = new ConstraintViolationList();
-        (new ConstraintViolationBuilder($constraintViolationList, new ConstraintA(), 'invalid message', [], null, 'foo', 'baz', new IdentityTranslator()))
-            ->setCode(42)
-            ->addViolation();
-
-        self::assertSame(42, $constraintViolationList->get(0)->getCode());
     }
 }

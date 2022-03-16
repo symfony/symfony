@@ -1,0 +1,22 @@
+framework:
+    workflows:
+        my_workflow:
+            type: state_machine
+            initial_marking: one
+            events_to_dispatch: ['workflow.leave', 'workflow.completed']
+            marking_store:
+                type: method
+                property: state
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+            places:
+                - one
+                - two
+                - three
+            transitions:
+                count_to_two:
+                    from: one
+                    to: two
+                count_to_three:
+                    from: two
+                    to: three

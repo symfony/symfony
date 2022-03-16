@@ -18,7 +18,9 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolve
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 class UserValueResolverTest extends TestCase
@@ -35,7 +37,7 @@ class UserValueResolverTest extends TestCase
     public function testResolveNoUser()
     {
         $mock = $this->createMock(UserInterface::class);
-        $token = new UsernamePasswordToken('username', 'password', 'provider');
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password'), 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -56,8 +58,8 @@ class UserValueResolverTest extends TestCase
 
     public function testResolve()
     {
-        $user = $this->createMock(UserInterface::class);
-        $token = new UsernamePasswordToken($user, 'password', 'provider');
+        $user = new InMemoryUser('username', 'password');
+        $token = new UsernamePasswordToken($user, 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -68,10 +70,35 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
     }
 
+    public function testResolveWithAttribute()
+    {
+        $user = new InMemoryUser('username', 'password');
+        $token = new UsernamePasswordToken($user, 'provider');
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = $this->createMock(ArgumentMetadata::class);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
+
+        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
+        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+    }
+
+    public function testResolveWithAttributeAndNoUser()
+    {
+        $tokenStorage = new TokenStorage();
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
+
+        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+    }
+
     public function testIntegration()
     {
-        $user = $this->createMock(UserInterface::class);
-        $token = new UsernamePasswordToken($user, 'password', 'provider');
+        $user = new InMemoryUser('username', 'password');
+        $token = new UsernamePasswordToken($user, 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -81,9 +108,7 @@ class UserValueResolverTest extends TestCase
 
     public function testIntegrationNoUser()
     {
-        $token = new UsernamePasswordToken('username', 'password', 'provider');
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken($token);
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage), new DefaultValueResolver()]);
         $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null) {}));

@@ -23,15 +23,15 @@ final class CacheItem implements ItemInterface
 {
     private const METADATA_EXPIRY_OFFSET = 1527506807;
 
-    protected $key;
-    protected $value;
-    protected $isHit = false;
-    protected $expiry;
-    protected $metadata = [];
-    protected $newMetadata = [];
-    protected $innerItem;
-    protected $poolHash;
-    protected $isTaggable = false;
+    protected string $key;
+    protected mixed $value = null;
+    protected bool $isHit = false;
+    protected float|int|null $expiry = null;
+    protected array $metadata = [];
+    protected array $newMetadata = [];
+    protected ?ItemInterface $innerItem = null;
+    protected ?string $poolHash = null;
+    protected bool $isTaggable = false;
 
     /**
      * {@inheritdoc}
@@ -43,10 +43,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function get()
+    public function get(): mixed
     {
         return $this->value;
     }
@@ -64,7 +62,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function set($value): self
+    public function set($value): static
     {
         $this->value = $value;
 
@@ -76,15 +74,9 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAt($expiration): self
+    public function expiresAt(?\DateTimeInterface $expiration): static
     {
-        if (null === $expiration) {
-            $this->expiry = null;
-        } elseif ($expiration instanceof \DateTimeInterface) {
-            $this->expiry = (float) $expiration->format('U.u');
-        } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given.', \is_object($expiration) ? \get_class($expiration) : \gettype($expiration)));
-        }
+        $this->expiry = null !== $expiration ? (float) $expiration->format('U.u') : null;
 
         return $this;
     }
@@ -94,7 +86,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAfter($time): self
+    public function expiresAfter(mixed $time): static
     {
         if (null === $time) {
             $this->expiry = null;
@@ -103,7 +95,7 @@ final class CacheItem implements ItemInterface
         } elseif (\is_int($time)) {
             $this->expiry = $time + microtime(true);
         } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given.', \is_object($time) ? \get_class($time) : \gettype($time)));
+            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given.', get_debug_type($time)));
         }
 
         return $this;
@@ -112,7 +104,7 @@ final class CacheItem implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function tag($tags): ItemInterface
+    public function tag(mixed $tags): static
     {
         if (!$this->isTaggable) {
             throw new LogicException(sprintf('Cache item "%s" comes from a non tag-aware pool: you cannot tag it.', $this->key));
@@ -121,8 +113,8 @@ final class CacheItem implements ItemInterface
             $tags = [$tags];
         }
         foreach ($tags as $tag) {
-            if (!\is_string($tag) && !(\is_object($tag) && method_exists($tag, '__toString'))) {
-                throw new InvalidArgumentException(sprintf('Cache tag must be string or object that implements __toString(), "%s" given.', \is_object($tag) ? \get_class($tag) : \gettype($tag)));
+            if (!\is_string($tag) && !$tag instanceof \Stringable) {
+                throw new InvalidArgumentException(sprintf('Cache tag must be string or object that implements __toString(), "%s" given.', get_debug_type($tag)));
             }
             $tag = (string) $tag;
             if (isset($this->newMetadata[self::METADATA_TAGS][$tag])) {
@@ -149,18 +141,6 @@ final class CacheItem implements ItemInterface
     }
 
     /**
-     * Returns the list of tags bound to the value coming from the pool storage if any.
-     *
-     * @deprecated since Symfony 4.2, use the "getMetadata()" method instead.
-     */
-    public function getPreviousTags(): array
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        return $this->metadata[self::METADATA_TAGS] ?? [];
-    }
-
-    /**
      * Validates a cache key according to PSR-6.
      *
      * @param mixed $key The key to validate
@@ -170,7 +150,7 @@ final class CacheItem implements ItemInterface
     public static function validateKey($key): string
     {
         if (!\is_string($key)) {
-            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', \is_object($key) ? \get_class($key) : \gettype($key)));
+            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', get_debug_type($key)));
         }
         if ('' === $key) {
             throw new InvalidArgumentException('Cache key length must be greater than zero.');

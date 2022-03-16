@@ -15,8 +15,8 @@
 error_reporting(-1);
 
 global $argv, $argc;
-$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
-$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
+$argv = $_SERVER['argv'] ?? [];
+$argc = $_SERVER['argc'] ?? 0;
 $getEnvVar = function ($name, $default = false) use ($argv) {
     if (false !== $value = getenv($name)) {
         return $value;
@@ -99,18 +99,14 @@ if (\PHP_VERSION_ID >= 80000) {
 } elseif (\PHP_VERSION_ID >= 70200) {
     // PHPUnit 8 requires PHP 7.2+
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
-} elseif (\PHP_VERSION_ID >= 70100) {
-    // PHPUnit 7 requires PHP 7.1+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5') ?: '7.5';
-} elseif (\PHP_VERSION_ID >= 70000) {
-    // PHPUnit 6 requires PHP 7.0+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '6.5') ?: '6.5';
-} elseif (\PHP_VERSION_ID >= 50600) {
-    // PHPUnit 4 does not support PHP 7
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '5.7') ?: '5.7';
 } else {
-    // PHPUnit 5.1 requires PHP 5.6+
-    $PHPUNIT_VERSION = '4.8';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5') ?: '7.5';
+}
+
+$MAX_PHPUNIT_VERSION = $getEnvVar('SYMFONY_MAX_PHPUNIT_VERSION', false);
+
+if ($MAX_PHPUNIT_VERSION && version_compare($MAX_PHPUNIT_VERSION, $PHPUNIT_VERSION, '<')) {
+    $PHPUNIT_VERSION = $MAX_PHPUNIT_VERSION;
 }
 
 $PHPUNIT_REMOVE_RETURN_TYPEHINT = filter_var($getEnvVar('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT', '0'), \FILTER_VALIDATE_BOOLEAN);
@@ -137,6 +133,7 @@ $defaultEnvs = [
     'COMPOSER' => 'composer.json',
     'COMPOSER_VENDOR_DIR' => 'vendor',
     'COMPOSER_BIN_DIR' => 'bin',
+    'SYMFONY_SIMPLE_PHPUNIT_BIN_DIR' => __DIR__,
 ];
 
 foreach ($defaultEnvs as $envName => $envValue) {
@@ -171,7 +168,8 @@ if ($prevCacheDir) {
     }
 }
 $SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml' : ''));
-$configurationHash = md5(implode(\PHP_EOL, [md5_file(__FILE__), $SYMFONY_PHPUNIT_REMOVE, (int) $PHPUNIT_REMOVE_RETURN_TYPEHINT]));
+$SYMFONY_PHPUNIT_REQUIRE = $getEnvVar('SYMFONY_PHPUNIT_REQUIRE', '');
+$configurationHash = md5(implode(\PHP_EOL, [md5_file(__FILE__), $SYMFONY_PHPUNIT_REMOVE, $SYMFONY_PHPUNIT_REQUIRE, (int) $PHPUNIT_REMOVE_RETURN_TYPEHINT]));
 $PHPUNIT_VERSION_DIR = sprintf('phpunit-%s-%d', $PHPUNIT_VERSION, $PHPUNIT_REMOVE_RETURN_TYPEHINT);
 if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationHash !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION_DIR.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
@@ -228,6 +226,9 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     if ($SYMFONY_PHPUNIT_REMOVE) {
         $passthruOrFail("$COMPOSER remove --no-update --no-interaction ".$SYMFONY_PHPUNIT_REMOVE);
     }
+    if ($SYMFONY_PHPUNIT_REQUIRE) {
+        $passthruOrFail("$COMPOSER require --no-update --no-interaction ".$SYMFONY_PHPUNIT_REQUIRE);
+    }
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         $passthruOrFail("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
@@ -271,12 +272,12 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
         $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
     }
-    $alteredCode = preg_replace('/abstract class (?:TestCase|PHPUnit_Framework_TestCase)[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
+    $alteredCode = preg_replace('/abstract class TestCase[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
     file_put_contents($alteredFile, $alteredCode);
 
     // Mutate Assert code
     $alteredCode = file_get_contents($alteredFile = './src/Framework/Assert.php');
-    $alteredCode = preg_replace('/abstract class (?:Assert|PHPUnit_Framework_Assert)[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
+    $alteredCode = preg_replace('/abstract class Assert[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
     file_put_contents($alteredFile, $alteredCode);
 
     file_put_contents('phpunit', <<<'EOPHP'
@@ -373,7 +374,7 @@ if ('\\' === \DIRECTORY_SEPARATOR) {
 }
 
 if ($components) {
-    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
+    $skippedTests = $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] ?? false;
     $runningProcs = [];
 
     foreach ($components as $component) {

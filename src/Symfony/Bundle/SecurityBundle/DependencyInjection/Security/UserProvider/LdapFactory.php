@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LdapFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, string $id, array $config)
     {
         $container
             ->setDefinition($id, new ChildDefinition('security.user.provider.ldap'))

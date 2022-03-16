@@ -17,14 +17,19 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
+ * A special container used in tests. This gives access to both public and
+ * private services. The container will not include private services that has
+ * been inlined or removed. Private services will be removed when they are not
+ * used by other services.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
  */
 class TestContainer extends Container
 {
-    private $kernel;
-    private $privateServicesLocatorId;
+    private KernelInterface $kernel;
+    private string $privateServicesLocatorId;
 
     public function __construct(KernelInterface $kernel, string $privateServicesLocatorId)
     {
@@ -58,10 +63,8 @@ class TestContainer extends Container
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|bool|float|int|string|\UnitEnum|null
      */
-    public function getParameter($name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         return $this->getPublicContainer()->getParameter($name);
     }
@@ -69,7 +72,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function hasParameter($name): bool
+    public function hasParameter(string $name): bool
     {
         return $this->getPublicContainer()->hasParameter($name);
     }
@@ -77,7 +80,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function setParameter($name, $value)
+    public function setParameter(string $name, mixed $value)
     {
         $this->getPublicContainer()->setParameter($name, $value);
     }
@@ -85,7 +88,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function set($id, $service)
+    public function set(string $id, mixed $service)
     {
         $this->getPublicContainer()->set($id, $service);
     }
@@ -93,17 +96,15 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function has($id): bool
+    public function has(string $id): bool
     {
         return $this->getPublicContainer()->has($id) || $this->getPrivateContainer()->has($id);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return object|null
      */
-    public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object
     {
         return $this->getPrivateContainer()->has($id) ? $this->getPrivateContainer()->get($id) : $this->getPublicContainer()->get($id, $invalidBehavior);
     }
@@ -111,7 +112,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function initialized($id): bool
+    public function initialized(string $id): bool
     {
         return $this->getPublicContainer()->initialized($id);
     }

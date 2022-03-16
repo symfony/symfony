@@ -12,11 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
@@ -90,7 +89,7 @@ class FileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('sub_dir', 'Sub');
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
-        $loader->autoRegisterAliasesForSinglyImplementedInterfaces = false;
+        $loader->noAutoRegisterAliasesForSinglyImplementedInterfaces();
 
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*');
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*'); // loading twice should not be an issue
@@ -100,14 +99,7 @@ class FileLoaderTest extends TestCase
             ['service_container', Bar::class],
             array_keys($container->getDefinitions())
         );
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
     }
 
     public function testRegisterClassesWithExclude()
@@ -129,14 +121,7 @@ class FileLoaderTest extends TestCase
         $this->assertFalse($container->has(Foo::class));
         $this->assertFalse($container->has(DeeperBaz::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
 
         $loader->registerClasses(
             new Definition(),
@@ -171,37 +156,31 @@ class FileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
-        $prototype = new Definition();
-        $prototype->setPublic(true)->setPrivate(true);
+        $prototype = (new Definition())->setAutoconfigured(true);
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
 
         $this->assertTrue($container->has(Bar::class));
         $this->assertTrue($container->has(Baz::class));
         $this->assertTrue($container->has(Foo::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                FooInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([FooInterface::class], array_keys($container->getAliases()));
 
         $alias = $container->getAlias(FooInterface::class);
         $this->assertSame(Foo::class, (string) $alias);
         $this->assertFalse($alias->isPublic());
-        $this->assertFalse($alias->isPrivate());
+        $this->assertTrue($alias->isPrivate());
+
+        $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
     }
 
     public function testMissingParentClass()
     {
         $container = new ContainerBuilder();
         $container->setParameter('bad_classes_dir', 'BadClasses');
-        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), 'test');
 
         $loader->registerClasses(
-            (new Definition())->setPublic(false),
+            (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\\',
             'Prototype/%bad_classes_dir%/*'
         );
@@ -268,18 +247,40 @@ class FileLoaderTest extends TestCase
         yield ['Prototype/*/AnotherSub/*'];
         yield ['Prototype/OtherDir/AnotherSub/DeeperBaz.php'];
     }
+
+    /**
+     * @testWith ["prod", true]
+     *           ["dev", true]
+     *           ["bar", false]
+     *           [null, true]
+     */
+    public function testRegisterClassesWithWhenEnv(?string $env, bool $expected)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), $env);
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/{Foo.php}'
+        );
+
+        $this->assertSame($expected, $container->has(Foo::class));
+    }
 }
 
 class TestFileLoader extends FileLoader
 {
-    public $autoRegisterAliasesForSinglyImplementedInterfaces = true;
+    public function noAutoRegisterAliasesForSinglyImplementedInterfaces()
+    {
+        $this->autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    }
 
-    public function load($resource, $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         return $resource;
     }
 
-    public function supports($resource, $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return false;
     }

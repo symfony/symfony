@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
-    private $serviceLocatorContextIds = [];
+    private array $serviceLocatorContextIds = [];
 
     /**
      * {@inheritdoc}
@@ -43,7 +43,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         }
     }
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
@@ -64,7 +64,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
                     if ($k !== $id) {
                         $currentId = $k.'" in the container provided to "'.$currentId;
                     }
-                    throw new ServiceNotFoundException($id, $currentId);
+                    throw new ServiceNotFoundException($id, $currentId, null, $this->getAlternatives($id));
                 }
             }
         }
@@ -83,6 +83,23 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
             }
         }
 
-        throw new ServiceNotFoundException($id, $currentId);
+        throw new ServiceNotFoundException($id, $currentId, null, $this->getAlternatives($id));
+    }
+
+    private function getAlternatives(string $id): array
+    {
+        $alternatives = [];
+        foreach ($this->container->getServiceIds() as $knownId) {
+            if ('' === $knownId || '.' === $knownId[0]) {
+                continue;
+            }
+
+            $lev = levenshtein($id, $knownId);
+            if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
+                $alternatives[] = $knownId;
+            }
+        }
+
+        return $alternatives;
     }
 }

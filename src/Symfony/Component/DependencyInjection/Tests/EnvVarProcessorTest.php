@@ -64,6 +64,22 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
+    /**
+     * @dataProvider validBools
+     */
+    public function testGetEnvNot($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('not', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame(!$processed, $result);
+    }
+
     public function validBools()
     {
         return [
@@ -564,7 +580,7 @@ class EnvVarProcessorTest extends TestCase
         $container->compile();
 
         $processor = new EnvVarProcessor($container);
-        $getEnv = \Closure::fromCallable([$processor, 'getEnv']);
+        $getEnv = $processor->getEnv(...);
 
         $result = $processor->getEnv('resolve', 'foo', function ($name) use ($getEnv) {
             return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
@@ -582,7 +598,7 @@ class EnvVarProcessorTest extends TestCase
         $container->compile();
 
         $processor = new EnvVarProcessor($container);
-        $getEnv = \Closure::fromCallable([$processor, 'getEnv']);
+        $getEnv = $processor->getEnv(...);
 
         $result = $processor->getEnv('resolve', 'foo', function ($name) use ($getEnv) {
             return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
@@ -621,7 +637,7 @@ CSV;
             ['1', ['1']],
             ['1,2," 3 "', ['1', '2', ' 3 ']],
             ['\\,\\\\', ['\\', '\\\\']],
-            [$complex, \PHP_VERSION_ID >= 70400 ? ['', '"', 'foo"', '\\"', '\\', 'foo\\'] : ['', '"', 'foo"', '\\"",\\,foo\\']],
+            [$complex, ['', '"', 'foo"', '\\"', '\\', 'foo\\']],
             [null, null],
         ];
     }

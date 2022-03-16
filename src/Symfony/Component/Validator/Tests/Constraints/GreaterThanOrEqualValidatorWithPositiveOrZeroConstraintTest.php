@@ -48,9 +48,9 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     public function provideInvalidComparisons(): array
     {
         return [
-            [-1, '-1', 0, '0', 'integer'],
-            [-2, '-2', 0, '0', 'integer'],
-            [-2.5, '-2.5', 0, '0', 'integer'],
+            [-1, '-1', 0, '0', 'int'],
+            [-2, '-2', 0, '0', 'int'],
+            [-2.5, '-2.5', 0, '0', 'int'],
         ];
     }
 

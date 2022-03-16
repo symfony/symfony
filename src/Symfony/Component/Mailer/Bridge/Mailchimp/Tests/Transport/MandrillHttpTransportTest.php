@@ -16,6 +16,8 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillHttpTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -103,5 +105,24 @@ class MandrillHttpTransportTest extends TestCase
         $this->expectException(HttpTransportException::class);
         $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
+    }
+
+    public function testTagAndMetadataHeaders()
+    {
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('foo', 'bar');
+        $email->getHeaders()->add(new TagHeader('password-reset,user'));
+        $email->getHeaders()->add(new TagHeader('another'));
+        $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
+        $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
+
+        $transport = new MandrillHttpTransport('key');
+        $method = new \ReflectionMethod(MandrillHttpTransport::class, 'addMandrillHeaders');
+        $method->invoke($transport, $email);
+
+        $this->assertCount(3, $email->getHeaders()->toArray());
+        $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
+        $this->assertSame('X-MC-Tags: password-reset,user,another', $email->getHeaders()->get('X-MC-Tags')->toString());
+        $this->assertSame('X-MC-Metadata: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-MC-Metadata')->toString());
     }
 }

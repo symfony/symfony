@@ -29,7 +29,7 @@ class FakeMetadataFactory implements MetadataFactoryInterface
         }
 
         if (!\is_string($class)) {
-            throw new NoSuchMetadataException(sprintf('No metadata for type "%s".', \gettype($class)));
+            throw new NoSuchMetadataException(sprintf('No metadata for type "%s".', get_debug_type($class)));
         }
 
         if (!isset($this->metadatas[$class])) {

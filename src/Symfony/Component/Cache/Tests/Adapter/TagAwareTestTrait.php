@@ -131,20 +131,6 @@ trait TagAwareTestTrait
         $this->assertFalse($pool->getItem('foo')->isHit());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetPreviousTags()
-    {
-        $pool = $this->createCachePool();
-
-        $i = $pool->getItem('k');
-        $pool->save($i->tag('foo'));
-
-        $i = $pool->getItem('k');
-        $this->assertSame(['foo' => 'foo'], $i->getPreviousTags());
-    }
-
     public function testGetMetadata()
     {
         $pool = $this->createCachePool();

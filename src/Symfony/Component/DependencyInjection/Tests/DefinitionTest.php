@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
@@ -28,18 +27,6 @@ class DefinitionTest extends TestCase
 
         $def = new Definition('stdClass', ['foo']);
         $this->assertEquals(['foo'], $def->getArguments(), '__construct() takes an optional array of arguments as its second argument');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing an instance of Symfony\Component\DependencyInjection\Parameter as class name to Symfony\Component\DependencyInjection\Definition in deprecated in Symfony 4.4 and will result in a TypeError in 5.0. Please pass the string "%parameter%" instead.
-     */
-    public function testConstructorWithParameter()
-    {
-        $parameter = new Parameter('parameter');
-
-        $def = new Definition($parameter);
-        $this->assertSame($parameter, $def->getClass(), '__construct() accepts Parameter instances');
     }
 
     public function testSetGetFactory()
@@ -62,28 +49,6 @@ class DefinitionTest extends TestCase
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setClass('foo'), '->setClass() implements a fluent interface');
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing an instance of Symfony\Component\DependencyInjection\Parameter as class name to Symfony\Component\DependencyInjection\Definition in deprecated in Symfony 4.4 and will result in a TypeError in 5.0. Please pass the string "%parameter%" instead.
-     */
-    public function testSetGetClassWithParameter()
-    {
-        $def = new Definition();
-        $parameter = new Parameter('parameter');
-        $this->assertSame($parameter, $def->setClass($parameter)->getClass(), '->getClass() returns the parameterized class name');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The class name passed to Symfony\Component\DependencyInjection\Definition is expected to be a string. Passing a stdClass is deprecated in Symfony 4.4 and will result in a TypeError in 5.0.
-     */
-    public function testSetGetClassWithObject()
-    {
-        $def = new Definition();
-        $classObject = new \stdClass();
-        $this->assertSame($classObject, $def->setClass($classObject)->getClass(), '->getClass() returns the parameterized class name');
     }
 
     public function testSetGetDecoratedService()
@@ -177,9 +142,9 @@ class DefinitionTest extends TestCase
     public function testSetIsPublic()
     {
         $def = new Definition('stdClass');
-        $this->assertTrue($def->isPublic(), '->isPublic() returns true by default');
-        $this->assertSame($def, $def->setPublic(false), '->setPublic() implements a fluent interface');
-        $this->assertFalse($def->isPublic(), '->isPublic() returns false if the instance must not be public.');
+        $this->assertFalse($def->isPublic(), '->isPublic() returns false by default');
+        $this->assertSame($def, $def->setPublic(true), '->setPublic() implements a fluent interface');
+        $this->assertTrue($def->isPublic(), '->isPublic() returns true if the service is public.');
     }
 
     public function testSetIsSynthetic()
@@ -210,11 +175,13 @@ class DefinitionTest extends TestCase
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
-        $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
+        $this->assertSame($def, $def->setDeprecated('vendor/package', '1.1', '%service_id%'), '->setDeprecated() implements a fluent interface');
         $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
 
-        $def->setDeprecated(true, '%service_id%');
-        $this->assertSame('deprecated_service', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return given formatted message template');
+        $deprecation = $def->getDeprecation('deprecated_service');
+        $this->assertSame('deprecated_service', $deprecation['message'], '->getDeprecation() should return an array with the formatted message template');
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
     }
 
     /**
@@ -224,7 +191,7 @@ class DefinitionTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $def = new Definition('stdClass');
-        $def->setDeprecated(false, $message);
+        $def->setDeprecated('vendor/package', '1.1', $message);
     }
 
     public function invalidDeprecationMessageProvider()
@@ -317,7 +284,7 @@ class DefinitionTest extends TestCase
     public function testReplaceArgumentShouldCheckBounds()
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('The index "1" is not in the range [0, 0].');
+        $this->expectExceptionMessage('The index "1" is not in the range [0, 0] of the arguments of class "stdClass".');
         $def = new Definition('stdClass');
 
         $def->addArgument('foo');
@@ -327,7 +294,7 @@ class DefinitionTest extends TestCase
     public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('Cannot replace arguments if none have been configured yet.');
+        $this->expectExceptionMessage('Cannot replace arguments for class "stdClass" if none have been configured yet.');
         $def = new Definition('stdClass');
         $def->replaceArgument(0, 'bar');
     }
@@ -377,7 +344,7 @@ class DefinitionTest extends TestCase
         $def->setAutowired(true);
         $def->setConfigurator('configuration_func');
         $def->setDecoratedService(null);
-        $def->setDeprecated(true);
+        $def->setDeprecated('vendor/package', '1.1', '%service_id%');
         $def->setFactory('factory_func');
         $def->setFile('foo.php');
         $def->setLazy(true);

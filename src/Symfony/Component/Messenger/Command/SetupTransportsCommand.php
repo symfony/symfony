@@ -12,7 +12,10 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,12 +25,11 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
+#[AsCommand(name: 'messenger:setup-transports', description: 'Prepare the required infrastructure for the transport')]
 class SetupTransportsCommand extends Command
 {
-    protected static $defaultName = 'messenger:setup-transports';
-
-    private $transportLocator;
-    private $transportNames;
+    private ContainerInterface $transportLocator;
+    private array $transportNames;
 
     public function __construct(ContainerInterface $transportLocator, array $transportNames = [])
     {
@@ -41,7 +43,6 @@ class SetupTransportsCommand extends Command
     {
         $this
             ->addArgument('transport', InputArgument::OPTIONAL, 'Name of the transport to setup', null)
-            ->setDescription('Prepare the required infrastructure for the transport')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command setups the transports:
 
@@ -55,7 +56,7 @@ EOF
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -79,5 +80,14 @@ EOF
         }
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('transport')) {
+            $suggestions->suggestValues($this->transportNames);
+
+            return;
+        }
     }
 }

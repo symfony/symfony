@@ -12,6 +12,7 @@ class ComposerLoaderFake
         return [
             'App\\Services\\' => [__DIR__.'/../../fake_app/'],
             'acme\\lib\\' => [__DIR__.'/../acme/lib/'],
+            'bar\\lib\\' => [__DIR__.'/../bar/lib/'],
             'fcy\\lib\\' => [__DIR__.'/../fcy/lib/'],
         ];
     }

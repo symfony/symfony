@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ResponseHasHeader extends Constraint
 {
-    private $headerName;
+    private string $headerName;
 
     public function __construct(string $headerName)
     {

@@ -13,12 +13,11 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 
@@ -27,23 +26,23 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class AccessListener extends AbstractListener implements ListenerInterface
+class AccessListener extends AbstractListener
 {
-    use LegacyListenerTrait;
+    private TokenStorageInterface $tokenStorage;
+    private AccessDecisionManagerInterface $accessDecisionManager;
+    private AccessMapInterface $map;
 
-    private $tokenStorage;
-    private $accessDecisionManager;
-    private $map;
-    private $authManager;
-
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, bool $exceptionOnNoToken = false)
     {
+        if (false !== $exceptionOnNoToken) {
+            throw new \LogicException(sprintf('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__));
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
-        $this->authManager = $authManager;
     }
 
     /**
@@ -54,45 +53,56 @@ class AccessListener extends AbstractListener implements ListenerInterface
         [$attributes] = $this->map->getPatterns($request);
         $request->attributes->set('_access_control_attributes', $attributes);
 
-        return $attributes && [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes ? true : null;
+        if ($attributes && (
+            (\defined(AuthenticatedVoter::class.'::IS_AUTHENTICATED_ANONYMOUSLY') ? [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes : true)
+            && [AuthenticatedVoter::PUBLIC_ACCESS] !== $attributes
+        )) {
+            return true;
+        }
+
+        return null;
     }
 
     /**
      * Handles access authorization.
      *
      * @throws AccessDeniedException
-     * @throws AuthenticationCredentialsNotFoundException
      */
     public function authenticate(RequestEvent $event)
     {
-        if (!$event instanceof LazyResponseEvent && null === $token = $this->tokenStorage->getToken()) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
-        }
-
         $request = $event->getRequest();
 
         $attributes = $request->attributes->get('_access_control_attributes');
         $request->attributes->remove('_access_control_attributes');
 
-        if (!$attributes || ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes && $event instanceof LazyResponseEvent)) {
+        if (!$attributes || ((
+            (\defined(AuthenticatedVoter::class.'::IS_AUTHENTICATED_ANONYMOUSLY') ? [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes : false)
+            || [AuthenticatedVoter::PUBLIC_ACCESS] === $attributes
+        ) && $event instanceof LazyResponseEvent)) {
             return;
         }
 
-        if ($event instanceof LazyResponseEvent && null === $token = $this->tokenStorage->getToken()) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
-        }
-
-        if (!$token->isAuthenticated()) {
-            $token = $this->authManager->authenticate($token);
-            $this->tokenStorage->setToken($token);
+        $token = $this->tokenStorage->getToken();
+        if (null === $token) {
+            $token = new NullToken();
         }
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {
-            $exception = new AccessDeniedException();
-            $exception->setAttributes($attributes);
-            $exception->setSubject($request);
-
-            throw $exception;
+            throw $this->createAccessDeniedException($request, $attributes);
         }
+    }
+
+    private function createAccessDeniedException(Request $request, array $attributes)
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes($attributes);
+        $exception->setSubject($request);
+
+        return $exception;
+    }
+
+    public static function getPriority(): int
+    {
+        return -255;
     }
 }

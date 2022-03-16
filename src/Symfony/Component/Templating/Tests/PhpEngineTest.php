@@ -16,6 +16,7 @@ use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
@@ -211,7 +212,7 @@ class ProjectTemplateLoader extends Loader
         $this->templates[$template->getLogicalName()] = $content;
     }
 
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
         if (isset($this->templates[$template->getLogicalName()])) {
             return new StringStorage($this->templates[$template->getLogicalName()]);
@@ -220,7 +221,7 @@ class ProjectTemplateLoader extends Loader
         return false;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, $time): bool
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         return false;
     }

@@ -154,8 +154,6 @@ class HeaderUtils
      *                                 is semantically equivalent to $filename. If the filename is already ASCII,
      *                                 it can be omitted, or just copied from $filename
      *
-     * @return string A string suitable for use as a Content-Disposition field-value
-     *
      * @throws \InvalidArgumentException
      *
      * @see RFC 6266
@@ -191,6 +189,64 @@ class HeaderUtils
         }
 
         return $disposition.'; '.self::toString($params, ';');
+    }
+
+    /**
+     * Like parse_str(), but preserves dots in variable names.
+     */
+    public static function parseQuery(string $query, bool $ignoreBrackets = false, string $separator = '&'): array
+    {
+        $q = [];
+
+        foreach (explode($separator, $query) as $v) {
+            if (false !== $i = strpos($v, "\0")) {
+                $v = substr($v, 0, $i);
+            }
+
+            if (false === $i = strpos($v, '=')) {
+                $k = urldecode($v);
+                $v = '';
+            } else {
+                $k = urldecode(substr($v, 0, $i));
+                $v = substr($v, $i);
+            }
+
+            if (false !== $i = strpos($k, "\0")) {
+                $k = substr($k, 0, $i);
+            }
+
+            $k = ltrim($k, ' ');
+
+            if ($ignoreBrackets) {
+                $q[$k][] = urldecode(substr($v, 1));
+
+                continue;
+            }
+
+            if (false === $i = strpos($k, '[')) {
+                $q[] = bin2hex($k).$v;
+            } else {
+                $q[] = bin2hex(substr($k, 0, $i)).rawurlencode(substr($k, $i)).$v;
+            }
+        }
+
+        if ($ignoreBrackets) {
+            return $q;
+        }
+
+        parse_str(implode('&', $q), $q);
+
+        $query = [];
+
+        foreach ($q as $k => $v) {
+            if (false !== $i = strpos($k, '_')) {
+                $query[substr_replace($k, hex2bin(substr($k, 0, $i)).'[', 0, 1 + $i)] = $v;
+            } else {
+                $query[hex2bin($k)] = $v;
+            }
+        }
+
+        return $query;
     }
 
     private static function groupParts(array $matches, string $separators, bool $first = true): array

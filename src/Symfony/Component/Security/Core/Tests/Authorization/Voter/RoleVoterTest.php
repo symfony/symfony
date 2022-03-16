@@ -12,25 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Role\Role;
-use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 
 class RoleVoterTest extends TestCase
 {
-    /**
-     * @group legacy
-     * @dataProvider getVoteTests
-     */
-    public function testVote($roles, $attributes, $expected)
-    {
-        $voter = new RoleVoter();
-
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
-    }
-
     /**
      * @dataProvider getVoteTests
      */
@@ -58,35 +47,32 @@ class RoleVoterTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @dataProvider getLegacyVoteOnRoleObjectsTests
+     * @dataProvider provideAttributes
      */
-    public function testVoteOnRoleObjects($roles, $attributes, $expected)
+    public function testSupportsAttribute(string $prefix, string $attribute, bool $expected)
     {
-        $voter = new RoleVoter();
+        $voter = new RoleVoter($prefix);
 
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+        $this->assertSame($expected, $voter->supportsAttribute($attribute));
     }
 
-    public function getLegacyVoteOnRoleObjectsTests()
+    public function provideAttributes()
     {
-        return [
-            [['ROLE_BAR'], [new Role('ROLE_BAR')], VoterInterface::ACCESS_GRANTED],
-            [['ROLE_BAR'], [new Role('ROLE_FOO')], VoterInterface::ACCESS_DENIED],
-        ];
+        yield ['ROLE_', 'ROLE_foo', true];
+        yield ['ROLE_', 'ROLE_', true];
+        yield ['FOO_', 'FOO_bar', true];
+
+        yield ['ROLE_', '', false];
+        yield ['ROLE_', 'foo', false];
     }
 
-    protected function getToken(array $roles)
+    public function testSupportsType()
     {
-        foreach ($roles as $i => $role) {
-            $roles[$i] = new Role($role);
-        }
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())
-              ->method('getRoles')
-              ->willReturn($roles);
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        return $token;
+        $this->assertTrue($voter->supportsType(get_debug_type('foo')));
+        $this->assertTrue($voter->supportsType(get_debug_type(null)));
+        $this->assertTrue($voter->supportsType(get_debug_type(new \StdClass())));
     }
 
     protected function getTokenWithRoleNames(array $roles)

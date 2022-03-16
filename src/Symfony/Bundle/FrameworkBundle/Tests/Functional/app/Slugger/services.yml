@@ -1,0 +1,6 @@
+services:
+    _defaults:
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Slugger\SlugConstructArgService:
+        arguments: ['@slugger']

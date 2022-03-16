@@ -10,5 +10,5 @@
 {% endblock %}
 
 {% block panel %}
-    {{ render(path('_profiler_router', { token: token })) }}
+    {{ render(controller('web_profiler.controller.router::panelAction', { token: token })) }}
 {% endblock %}

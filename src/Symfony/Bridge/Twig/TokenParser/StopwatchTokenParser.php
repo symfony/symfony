@@ -21,22 +21,17 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the stopwatch tag.
  *
  * @author Wouter J <wouter@wouterj.nl>
- *
- * @final since Symfony 4.4
  */
-class StopwatchTokenParser extends AbstractTokenParser
+final class StopwatchTokenParser extends AbstractTokenParser
 {
-    protected $stopwatchIsAvailable;
+    private bool $stopwatchIsAvailable;
 
     public function __construct(bool $stopwatchIsAvailable)
     {
         $this->stopwatchIsAvailable = $stopwatchIsAvailable;
     }
 
-    /**
-     * @return Node
-     */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
@@ -47,7 +42,7 @@ class StopwatchTokenParser extends AbstractTokenParser
         $stream->expect(Token::BLOCK_END_TYPE);
 
         // {% endstopwatch %}
-        $body = $this->parser->subparse([$this, 'decideStopwatchEnd'], true);
+        $body = $this->parser->subparse($this->decideStopwatchEnd(...), true);
         $stream->expect(Token::BLOCK_END_TYPE);
 
         if ($this->stopwatchIsAvailable) {
@@ -57,15 +52,12 @@ class StopwatchTokenParser extends AbstractTokenParser
         return $body;
     }
 
-    public function decideStopwatchEnd(Token $token)
+    public function decideStopwatchEnd(Token $token): bool
     {
         return $token->test('endstopwatch');
     }
 
-    /**
-     * @return string
-     */
-    public function getTag()
+    public function getTag(): string
     {
         return 'stopwatch';
     }

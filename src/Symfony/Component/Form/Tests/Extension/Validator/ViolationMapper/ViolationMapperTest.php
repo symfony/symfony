@@ -16,18 +16,20 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FileUploadError;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper\Fixtures\Issue;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -82,7 +84,7 @@ class ViolationMapperTest extends TestCase
         $config->setInheritData($inheritData);
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);
-        $config->setDataMapper(new PropertyPathMapper());
+        $config->setDataMapper(new DataMapper());
         $config->setErrorBubbling($options['error_bubbling'] ?? false);
 
         if (!$synchronized) {
@@ -1592,6 +1594,255 @@ class ViolationMapperTest extends TestCase
         $this->assertEquals([$this->getFormError($violation1, $grandChild1)], iterator_to_array($grandChild1->getErrors()), $grandChild1->getName().' should have an error, but has none');
         $this->assertEquals([$this->getFormError($violation2, $grandChild2)], iterator_to_array($grandChild2->getErrors()), $grandChild2->getName().' should have an error, but has none');
         $this->assertEquals([$this->getFormError($violation3, $grandChild3)], iterator_to_array($grandChild3->getErrors()), $grandChild3->getName().' should have an error, but has none');
+    }
+
+    public function testMessageWithLabel1()
+    {
+        $renderer = $this->getMockBuilder(FormRenderer::class)
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['Name', [], null, null, 'Custom Name'],
+        ]);
+        $this->mapper = new ViolationMapper($renderer, $translator);
+
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('name', 'name');
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.name', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Custom Name', $error->getMessage());
+        }
+    }
+
+    public function testMessageWithLabel2()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['options_label', [], null, null, 'Translated Label'],
+        ]);
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $parent = $this->getForm('parent');
+
+        $config = new FormConfigBuilder('name', null, $this->dispatcher, [
+            'error_mapping' => [],
+            'label' => 'options_label',
+        ]);
+        $config->setMapped(true);
+        $config->setInheritData(false);
+        $config->setPropertyPath('name');
+        $config->setCompound(true);
+        $config->setDataMapper(new DataMapper());
+
+        $child = new Form($config);
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.name', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Translated Label', $error->getMessage());
+        }
+    }
+
+    public function testMessageWithLabelFormat1()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['form.custom', [], null, null, 'Translated 1st Custom Label'],
+        ]);
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $parent = $this->getForm('parent');
+
+        $config = new FormConfigBuilder('custom', null, $this->dispatcher, [
+            'error_mapping' => [],
+            'label_format' => 'form.%name%',
+        ]);
+        $config->setMapped(true);
+        $config->setInheritData(false);
+        $config->setPropertyPath('custom');
+        $config->setCompound(true);
+        $config->setDataMapper(new DataMapper());
+
+        $child = new Form($config);
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.custom', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Translated 1st Custom Label', $error->getMessage());
+        }
+    }
+
+    public function testMessageWithLabelFormat2()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['form_custom-id', [], null, null, 'Translated 2nd Custom Label'],
+        ]);
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $parent = $this->getForm('parent');
+
+        $config = new FormConfigBuilder('custom-id', null, $this->dispatcher, [
+            'error_mapping' => [],
+            'label_format' => 'form_%id%',
+        ]);
+        $config->setMapped(true);
+        $config->setInheritData(false);
+        $config->setPropertyPath('custom-id');
+        $config->setCompound(true);
+        $config->setDataMapper(new DataMapper());
+
+        $child = new Form($config);
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.custom-id', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Translated 2nd Custom Label', $error->getMessage());
+        }
+    }
+
+    public function testLabelFormatDefinedByParentType()
+    {
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_format' => 'form.%name%',
+        ]);
+        $child = $this->getForm('foo', 'foo');
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "form.foo"', $errors[0]->getMessage());
+    }
+
+    public function testLabelPlaceholderTranslatedWithTranslationDomainDefinedByParentType()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [], 'domain')
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'translation_domain' => 'domain',
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
+    public function testLabelPlaceholderTranslatedWithTranslationParametersMergedFromParentForm()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ])
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_translation_parameters' => [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child parent value',
+            ],
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+            'label_translation_parameters' => [
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ],
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
+    public function testTranslatorNotCalledWithoutLabel()
+    {
+        $renderer = $this->getMockBuilder(FormRenderer::class)
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->never())->method('trans');
+        $this->mapper = new ViolationMapper($renderer, $translator);
+
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('name', 'name');
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message without label', null, [], null, 'data.name', null);
+        $this->mapper->mapViolation($violation, $parent);
     }
 
     public function testFileUploadErrorIsNotRemovedIfNoFileSizeConstraintViolationWasRaised()

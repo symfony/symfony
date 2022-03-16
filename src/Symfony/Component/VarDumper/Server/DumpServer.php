@@ -24,9 +24,13 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DumpServer
 {
-    private $host;
+    private string $host;
+    private ?LoggerInterface $logger;
+
+    /**
+     * @var resource|null
+     */
     private $socket;
-    private $logger;
 
     public function __construct(string $host, LoggerInterface $logger = null)
     {
@@ -52,21 +56,19 @@ class DumpServer
         }
 
         foreach ($this->getMessages() as $clientId => $message) {
+            $this->logger?->info('Received a payload from client {clientId}', ['clientId' => $clientId]);
+
             $payload = @unserialize(base64_decode($message), ['allowed_classes' => [Data::class, Stub::class]]);
 
             // Impossible to decode the message, give up.
             if (false === $payload) {
-                if ($this->logger) {
-                    $this->logger->warning('Unable to decode a message from {clientId} client.', ['clientId' => $clientId]);
-                }
+                $this->logger?->warning('Unable to decode a message from {clientId} client.', ['clientId' => $clientId]);
 
                 continue;
             }
 
             if (!\is_array($payload) || \count($payload) < 2 || !$payload[0] instanceof Data || !\is_array($payload[1])) {
-                if ($this->logger) {
-                    $this->logger->warning('Invalid payload from {clientId} client. Expected an array of two elements (Data $data, array $context)', ['clientId' => $clientId]);
-                }
+                $this->logger?->warning('Invalid payload from {clientId} client. Expected an array of two elements (Data $data, array $context)', ['clientId' => $clientId]);
 
                 continue;
             }

@@ -111,33 +111,25 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertCount(2, $merged[$envName]);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation A non-string default value of env parameter "INT_VAR" is deprecated since 4.3, cast it to string instead.
-     */
-    public function testResolveEnvCastsIntToString()
+    public function testResolveEnvRequiresStrings()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, "int" given.');
+
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(INT_VAR)');
         $bag->set('env(INT_VAR)', 2);
         $bag->resolve();
-        $this->assertSame('2', $bag->all()['env(INT_VAR)']);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation A non-string default value of an env() parameter is deprecated since 4.3, cast "env(INT_VAR)" to string instead.
-     * @expectedDeprecation A non-string default value of env parameter "INT_VAR" is deprecated since 4.3, cast it to string instead.
-     */
     public function testGetDefaultScalarEnv()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "int" given to "env(INT_VAR)".');
+
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(INT_VAR)', 2);
-        $this->assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
-        $this->assertSame(2, $bag->all()['env(INT_VAR)']);
-        $bag->resolve();
-        $this->assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
-        $this->assertSame('2', $bag->all()['env(INT_VAR)']);
+        $bag->get('env(INT_VAR)');
     }
 
     public function testGetDefaultEnv()
@@ -164,7 +156,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testResolveThrowsOnBadDefaultValue()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be scalar or null, "array" given.');
+        $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, "array" given.');
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
         $bag->set('env(ARRAY_VAR)', []);
@@ -184,7 +176,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testGetThrowsOnBadDefaultValue()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The default value of an env() parameter must be scalar or null, but "array" given to "env(ARRAY_VAR)".');
+        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "array" given to "env(ARRAY_VAR)".');
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(ARRAY_VAR)', []);
         $bag->get('env(ARRAY_VAR)');
@@ -196,5 +188,12 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag = new EnvPlaceholderParameterBag();
         $bag->resolve();
         $this->assertNotNull($bag->get('env(default::BAR)'));
+    }
+
+    public function testExtraCharsInProcessor()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->resolve();
+        $this->assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
     }
 }

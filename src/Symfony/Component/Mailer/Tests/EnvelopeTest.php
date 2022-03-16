@@ -13,9 +13,11 @@ namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Header\PathHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
@@ -25,6 +27,13 @@ class EnvelopeTest extends TestCase
     {
         $e = new Envelope(new Address('fabien@symfony.com'), [new Address('thomas@symfony.com')]);
         $this->assertEquals(new Address('fabien@symfony.com'), $e->getSender());
+    }
+
+    public function testConstructorWithAddressSenderAndNonAsciiCharactersInLocalPartOfAddress()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid sender "fabièn@symfony.com": non-ASCII characters not supported in local-part of email.');
+        new Envelope(new Address('fabièn@symfony.com'), [new Address('thomas@symfony.com')]);
     }
 
     public function testConstructorWithNamedAddressSender()
@@ -70,6 +79,14 @@ class EnvelopeTest extends TestCase
         $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
         $this->assertEquals($from, $e->getSender());
+    }
+
+    public function testSenderFromHeadersFailsWithNonAsciiCharactersInLocalPart()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid sender "fabièn@symfony.com": non-ASCII characters not supported in local-part of email.');
+        $message = new Message(new Headers(new PathHeader('Return-Path', new Address('fabièn@symfony.com'))));
+        Envelope::create($message)->getSender();
     }
 
     public function testSenderFromHeadersWithoutFrom()

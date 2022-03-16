@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This is a general purpose authentication event.
@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationEvent extends Event
 {
-    private $authenticationToken;
+    private TokenInterface $authenticationToken;
 
     public function __construct(TokenInterface $token)
     {

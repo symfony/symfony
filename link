@@ -41,13 +41,12 @@ if (!is_dir("$pathToProject/vendor/symfony")) {
 $sfPackages = array('symfony/symfony' => __DIR__);
 
 $filesystem = new Filesystem();
-$braces = array('Bundle', 'Bridge', 'Component', 'Component/Security', 'Component/Mailer/Bridge', 'Component/Messenger/Bridge', 'Component/Notifier/Bridge', 'Contracts');
+$braces = array('Bundle', 'Bridge', 'Component', 'Component/Security', 'Component/Mailer/Bridge', 'Component/Messenger/Bridge', 'Component/Notifier/Bridge', 'Contracts', 'Component/Translation/Bridge');
 $directories = array_merge(...array_values(array_map(function ($part) {
     return glob(__DIR__.'/src/Symfony/'.$part.'/*', GLOB_ONLYDIR | GLOB_NOSORT);
 }, $braces)));
 
 $directories[] = __DIR__.'/src/Symfony/Contracts';
-
 foreach ($directories as $dir) {
     if ($filesystem->exists($composer = "$dir/composer.json")) {
         $sfPackages[json_decode(file_get_contents($composer))->name] = $dir;

@@ -14,12 +14,11 @@ namespace Symfony\Component\EventDispatcher\Tests\Debug;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class TraceableEventDispatcherTest extends TestCase
 {
@@ -126,6 +125,18 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertEquals([], $tdispatcher->getNotCalledListeners());
     }
 
+    public function testGetNotCalledClosureListeners()
+    {
+        $instantiationCount = 0;
+
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', [static function () use (&$instantiationCount) { ++$instantiationCount; }, 'onFoo']);
+
+        $tdispatcher->getNotCalledListeners();
+
+        $this->assertSame(0, $instantiationCount);
+    }
+
     public function testClearCalledListeners()
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
@@ -139,19 +150,6 @@ class TraceableEventDispatcherTest extends TestCase
         unset($listeners[0]['stub']);
         $this->assertEquals([], $tdispatcher->getCalledListeners());
         $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5]], $listeners);
-    }
-
-    public function testDispatchContractsEvent()
-    {
-        $expectedEvent = new ContractsEvent();
-        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $tdispatcher->addListener('foo', function ($event) use ($expectedEvent) {
-            $this->assertSame($event, $expectedEvent);
-        }, 5);
-        $tdispatcher->dispatch($expectedEvent, 'foo');
-
-        $listeners = $tdispatcher->getCalledListeners();
-        $this->assertArrayHasKey('stub', $listeners[0]);
     }
 
     public function testDispatchAfterReset()

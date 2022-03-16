@@ -14,8 +14,10 @@
     z-index: 99999;
 }
 
-.sf-minitoolbar a {
-    display: block;
+.sf-minitoolbar button {
+    background-color: transparent;
+    padding: 0;
+    border: none;
 }
 .sf-minitoolbar svg,
 .sf-minitoolbar img {
@@ -71,6 +73,10 @@
     display: inline-block;
 }
 
+.sf-toolbarreset .sf-cancel-button {
+    color: #444;
+}
+
 .sf-toolbarreset .hide-button {
     background: #444;
     display: block;
@@ -81,10 +87,13 @@
     height: 36px;
     cursor: pointer;
     text-align: center;
+    border: none;
+    margin: 0;
+    padding: 0;
 }
 .sf-toolbarreset .hide-button svg {
     max-height: 18px;
-    margin-top: 10px;
+    margin-top: 1px;
 }
 
 .sf-toolbar-block {
@@ -180,6 +189,9 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 }
 .sf-toolbar-block .sf-toolbar-info-piece span {
     font-size: 12px;
+}
+div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext a {
+    text-decoration: none;
 }
 
 .sf-toolbar-block .sf-toolbar-info {
@@ -538,6 +550,11 @@ div.sf-toolbar .sf-toolbar-block a:hover {
     float: left;
     padding: 5px 0;
     margin-right: 10px;
+}
+
+.sf-full-stack {
+    left: 0px;
+    font-size: 12px;
 }
 
 /***** Media query print: Do not print the Toolbar. *****/

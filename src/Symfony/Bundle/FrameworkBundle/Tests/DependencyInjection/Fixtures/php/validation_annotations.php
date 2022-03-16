@@ -7,3 +7,5 @@ $container->loadFromExtension('framework', [
         'enable_annotations' => true,
     ],
 ]);
+
+$container->setAlias('validator.alias', 'validator')->setPublic(true);

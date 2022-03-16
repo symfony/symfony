@@ -43,11 +43,8 @@ abstract class AbstractLoader implements LoaderInterface
      *     $this->addNamespaceAlias('mynamespace', '\\Acme\\Package\\Constraints\\');
      *
      *     $constraint = $this->newConstraint('mynamespace:NotNull');
-     *
-     * @param string $alias     The alias
-     * @param string $namespace The PHP namespace
      */
-    protected function addNamespaceAlias($alias, $namespace)
+    protected function addNamespaceAlias(string $alias, string $namespace)
     {
         $this->namespaces[$alias] = $namespace;
     }
@@ -63,14 +60,12 @@ abstract class AbstractLoader implements LoaderInterface
      *                        {@link addNamespaceAlias()}.
      * @param mixed  $options The constraint options
      *
-     * @return Constraint
-     *
      * @throws MappingException If the namespace prefix is undefined
      */
-    protected function newConstraint($name, $options = null)
+    protected function newConstraint(string $name, mixed $options = null): Constraint
     {
         if (str_contains($name, '\\') && class_exists($name)) {
-            $className = (string) $name;
+            $className = $name;
         } elseif (str_contains($name, ':')) {
             [$prefix, $className] = explode(':', $name, 2);
 

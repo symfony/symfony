@@ -27,28 +27,16 @@ abstract class ObjectLoader extends Loader
      *
      * For example, if your application uses a service container,
      * the $id may be a service id.
-     *
-     * @return object
      */
-    abstract protected function getObject(string $id);
+    abstract protected function getObject(string $id): object;
 
     /**
      * Calls the object method that will load the routes.
-     *
-     * @param string      $resource object_id::method
-     * @param string|null $type     The resource type
-     *
-     * @return RouteCollection
      */
-    public function load($resource, $type = null)
+    public function load(mixed $resource, string $type = null): RouteCollection
     {
-        if (!preg_match('/^[^\:]+(?:::?(?:[^\:]+))?$/', $resource)) {
+        if (!preg_match('/^[^\:]+(?:::(?:[^\:]+))?$/', $resource)) {
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the %s route loader: use the format "object_id::method" or "object_id" if your object class has an "__invoke" method.', $resource, \is_string($type) ? '"'.$type.'"' : 'object'));
-        }
-
-        if (1 === substr_count($resource, ':')) {
-            $resource = str_replace(':', '::', $resource);
-            @trigger_error(sprintf('Referencing object route loaders with a single colon is deprecated since Symfony 4.1. Use %s instead.', $resource), \E_USER_DEPRECATED);
         }
 
         $parts = explode('::', $resource);
@@ -57,19 +45,19 @@ abstract class ObjectLoader extends Loader
         $loaderObject = $this->getObject($parts[0]);
 
         if (!\is_object($loaderObject)) {
-            throw new \TypeError(sprintf('"%s:getObject()" must return an object: "%s" returned.', static::class, \gettype($loaderObject)));
+            throw new \TypeError(sprintf('"%s:getObject()" must return an object: "%s" returned.', static::class, get_debug_type($loaderObject)));
         }
 
         if (!\is_callable([$loaderObject, $method])) {
-            throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s".', $method, \get_class($loaderObject), $resource));
+            throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s".', $method, get_debug_type($loaderObject), $resource));
         }
 
-        $routeCollection = $loaderObject->$method($this);
+        $routeCollection = $loaderObject->$method($this, $this->env);
 
         if (!$routeCollection instanceof RouteCollection) {
-            $type = \is_object($routeCollection) ? \get_class($routeCollection) : \gettype($routeCollection);
+            $type = get_debug_type($routeCollection);
 
-            throw new \LogicException(sprintf('The "%s::%s()" method must return a RouteCollection: "%s" returned.', \get_class($loaderObject), $method, $type));
+            throw new \LogicException(sprintf('The "%s::%s()" method must return a RouteCollection: "%s" returned.', get_debug_type($loaderObject), $method, $type));
         }
 
         // make the object file tracked so that if it changes, the cache rebuilds

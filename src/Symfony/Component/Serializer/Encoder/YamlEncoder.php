@@ -28,9 +28,17 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
 
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
+    public const YAML_INLINE = 'yaml_inline';
+    public const YAML_INDENT = 'yaml_indent';
+    public const YAML_FLAGS = 'yaml_flags';
+
     private $dumper;
     private $parser;
-    private $defaultContext = ['yaml_inline' => 0, 'yaml_indent' => 0, 'yaml_flags' => 0];
+    private $defaultContext = [
+        self::YAML_INLINE => 0,
+        self::YAML_INDENT => 0,
+        self::YAML_FLAGS => 0,
+    ];
 
     public function __construct(Dumper $dumper = null, Parser $parser = null, array $defaultContext = [])
     {
@@ -46,21 +54,23 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = []): string
     {
         $context = array_merge($this->defaultContext, $context);
 
-        if (isset($context[self::PRESERVE_EMPTY_OBJECTS])) {
-            $context['yaml_flags'] |= Yaml::DUMP_OBJECT_AS_MAP;
+        if ($context[self::PRESERVE_EMPTY_OBJECTS] ?? false) {
+            $context[self::YAML_FLAGS] |= Yaml::DUMP_OBJECT_AS_MAP;
         }
 
-        return $this->dumper->dump($data, $context['yaml_inline'], $context['yaml_indent'], $context['yaml_flags']);
+        return $this->dumper->dump($data, $context[self::YAML_INLINE], $context[self::YAML_INDENT], $context[self::YAML_FLAGS]);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsEncoding($format)
+    public function supportsEncoding(string $format /*, array $context = [] */): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
@@ -68,17 +78,19 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = [])
+    public function decode(string $data, string $format, array $context = []): mixed
     {
         $context = array_merge($this->defaultContext, $context);
 
-        return $this->parser->parse($data, $context['yaml_flags']);
+        return $this->parser->parse($data, $context[self::YAML_FLAGS]);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding(string $format /*, array $context = [] */): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }

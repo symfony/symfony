@@ -13,14 +13,15 @@ namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\BlockingSharedLockStoreInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Store\ExpiringStoreTrait;
-use Symfony\Component\Lock\StoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -43,7 +44,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(false));
     }
 
-    public function testAcquireNoBlockingStoreInterface()
+    public function testAcquireNoBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -59,13 +60,10 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(false));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testPassingOldStoreInterface()
+    public function testAcquireBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(StoreInterface::class);
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -75,7 +73,29 @@ class LockTest extends TestCase
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquire(false));
+        $this->assertTrue($lock->acquire(true));
+    }
+
+    public function testAcquireBlockingRetryWithPersistingStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(static function () {
+                if (1 === random_int(0, 1)) {
+                    return;
+                }
+                throw new LockConflictedException('boom');
+            });
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquire(true));
     }
 
     public function testAcquireReturnsFalse()
@@ -112,7 +132,7 @@ class LockTest extends TestCase
         $this->assertFalse($lock->acquire(false));
     }
 
-    public function testAcquireBlocking()
+    public function testAcquireBlockingWithBlockingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->createMock(BlockingStoreInterface::class);
@@ -395,6 +415,68 @@ class LockTest extends TestCase
         yield [[-0.1, null], false];
     }
 
+    public function testAcquireReadNoBlockingWithSharedLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(SharedLockStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->once())
+            ->method('saveRead');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(false));
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testAcquireReadTwiceWithExpiration()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = new class() implements PersistingStoreInterface {
+            use ExpiringStoreTrait;
+            private $keys = [];
+            private $initialTtl = 30;
+
+            public function save(Key $key)
+            {
+                $key->reduceLifetime($this->initialTtl);
+                $this->keys[spl_object_hash($key)] = $key;
+                $this->checkNotExpired($key);
+
+                return true;
+            }
+
+            public function delete(Key $key)
+            {
+                unset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function exists(Key $key): bool
+            {
+                return isset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function putOffExpiration(Key $key, $ttl)
+            {
+                $key->reduceLifetime($ttl);
+                $this->checkNotExpired($key);
+            }
+        };
+        $ttl = 1;
+        $lock = new Lock($key, $store, $ttl);
+
+        $this->assertTrue($lock->acquireRead());
+        $lock->release();
+        sleep($ttl + 1);
+        $this->assertTrue($lock->acquireRead());
+        $lock->release();
+    }
+
     /**
      * @group time-sensitive
      */
@@ -420,7 +502,7 @@ class LockTest extends TestCase
                 unset($this->keys[spl_object_hash($key)]);
             }
 
-            public function exists(Key $key)
+            public function exists(Key $key): bool
             {
                 return isset($this->keys[spl_object_hash($key)]);
             }
@@ -439,5 +521,81 @@ class LockTest extends TestCase
         sleep($ttl + 1);
         $this->assertTrue($lock->acquire());
         $lock->release();
+    }
+
+    public function testAcquireReadBlockingWithBlockingSharedLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(BlockingSharedLockStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->once())
+            ->method('waitAndSaveRead');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
+    }
+
+    public function testAcquireReadBlockingWithSharedLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(SharedLockStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->any())
+            ->method('saveRead')
+            ->willReturnCallback(static function () {
+                if (1 === random_int(0, 1)) {
+                    return;
+                }
+                throw new LockConflictedException('boom');
+            });
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
+    }
+
+    public function testAcquireReadBlockingWithBlockingLockStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(BlockingStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->once())
+            ->method('waitAndSave');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
+    }
+
+    public function testAcquireReadBlockingWithPersistingStoreInterface()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(static function () {
+                if (1 === random_int(0, 1)) {
+                    return;
+                }
+                throw new LockConflictedException('boom');
+            });
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $this->assertTrue($lock->acquireRead(true));
     }
 }

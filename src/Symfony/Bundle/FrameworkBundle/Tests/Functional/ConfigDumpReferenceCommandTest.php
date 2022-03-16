@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -28,6 +30,14 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $kernel = static::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);
         $this->application->doRun(new ArrayInput([]), new NullOutput());
+    }
+
+    public function testDumpKernelExtension()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'foo']);
+        $this->assertStringContainsString('foo:', $tester->getDisplay());
+        $this->assertStringContainsString('    bar', $tester->getDisplay());
     }
 
     public function testDumpBundleName()
@@ -71,6 +81,23 @@ EOL
 
         $this->assertSame(1, $ret);
         $this->assertStringContainsString('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $this->application->add(new ConfigDumpReferenceCommand());
+        $tester = new CommandCompletionTester($this->application->get('config:dump-reference'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'name' => [[''], ['DefaultConfigTestBundle', 'default_config_test', 'ExtensionWithoutConfigTestBundle', 'extension_without_config_test', 'FrameworkBundle', 'framework', 'TestBundle', 'test']];
+        yield 'option --format' => [['--format', ''], ['yaml', 'xml']];
     }
 
     private function createCommandTester(): CommandTester

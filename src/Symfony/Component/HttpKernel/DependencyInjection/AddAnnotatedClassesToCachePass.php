@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 {
-    private $kernel;
+    private Kernel $kernel;
 
     public function __construct(Kernel $kernel)
     {
@@ -37,12 +37,14 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $annotatedClasses = $this->kernel->getAnnotatedClassesToCompile();
+        $annotatedClasses = [];
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof Extension) {
-                $annotatedClasses = array_merge($annotatedClasses, $extension->getAnnotatedClassesToCompile());
+                $annotatedClasses[] = $extension->getAnnotatedClassesToCompile();
             }
         }
+
+        $annotatedClasses = array_merge($this->kernel->getAnnotatedClassesToCompile(), ...$annotatedClasses);
 
         $existingClasses = $this->getClassesInComposerClassMaps();
 
@@ -115,7 +117,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
             $regex = strtr($regex, ['\\*\\*' => '.*?', '\\*' => '[^\\\\]*?']);
 
             // If this class does not end by a slash, anchor the end
-            if ('\\' !== substr($regex, -1)) {
+            if (!str_ends_with($regex, '\\')) {
                 $regex .= '$';
             }
 

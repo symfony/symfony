@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UploadValidatorExtensionTest extends TypeTestCase
@@ -38,14 +39,9 @@ class UploadValidatorExtensionTest extends TypeTestCase
     }
 }
 
-class DummyTranslator implements TranslatorInterface
+class DummyTranslator implements TranslatorInterface, LocaleAwareInterface
 {
     public function trans($id, array $parameters = [], $domain = null, $locale = null): string
-    {
-        return 'translated max {{ max }}!';
-    }
-
-    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
         return 'translated max {{ max }}!';
     }
@@ -54,7 +50,7 @@ class DummyTranslator implements TranslatorInterface
     {
     }
 
-    public function getLocale()
+    public function getLocale(): string
     {
         return 'en';
     }

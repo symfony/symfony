@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormRegistryInterface;
@@ -153,20 +152,6 @@ class FormFactoryTest extends TestCase
             ->with($this->builder, $resolvedOptions);
 
         $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', 'DATA', $options));
-    }
-
-    public function testCreateNamedBuilderThrowsUnderstandableException()
-    {
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "string", "stdClass" given');
-        $this->factory->createNamedBuilder('name', new \stdClass());
-    }
-
-    public function testCreateThrowsUnderstandableException()
-    {
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "string", "stdClass" given');
-        $this->factory->create(new \stdClass());
     }
 
     public function testCreateUsesBlockPrefixIfTypeGivenAsString()

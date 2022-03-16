@@ -16,10 +16,9 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 
 /**
@@ -27,15 +26,14 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class CombinedStore implements StoreInterface, LoggerAwareInterface
+class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
 {
     use ExpiringStoreTrait;
     use LoggerAwareTrait;
 
     /** @var PersistingStoreInterface[] */
-    private $stores;
-    /** @var StrategyInterface */
-    private $strategy;
+    private array $stores;
+    private StrategyInterface $strategy;
 
     /**
      * @param PersistingStoreInterface[] $stores The list of synchronized stores
@@ -46,7 +44,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     {
         foreach ($stores as $store) {
             if (!$store instanceof PersistingStoreInterface) {
-                throw new InvalidArgumentException(sprintf('The store must implement "%s". Got "%s".', PersistingStoreInterface::class, \get_class($store)));
+                throw new InvalidArgumentException(sprintf('The store must implement "%s". Got "%s".', PersistingStoreInterface::class, get_debug_type($store)));
             }
         }
 
@@ -69,7 +67,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
                 $store->save($key);
                 ++$successCount;
             } catch (\Exception $e) {
-                $this->logger->warning('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
+                $this->logger->debug('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
                 ++$failureCount;
             }
 
@@ -84,7 +82,45 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             return;
         }
 
-        $this->logger->warning('Failed to store the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
+        $this->logger->info('Failed to store the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
+
+        // clean up potential locks
+        $this->delete($key);
+
+        throw new LockConflictedException();
+    }
+
+    public function saveRead(Key $key)
+    {
+        $successCount = 0;
+        $failureCount = 0;
+        $storesCount = \count($this->stores);
+
+        foreach ($this->stores as $store) {
+            try {
+                if ($store instanceof SharedLockStoreInterface) {
+                    $store->saveRead($key);
+                } else {
+                    $store->save($key);
+                }
+                ++$successCount;
+            } catch (\Exception $e) {
+                $this->logger->debug('One store failed to save the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
+                ++$failureCount;
+            }
+
+            if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
+                break;
+            }
+        }
+
+        $this->checkNotExpired($key);
+
+        if ($this->strategy->isMet($successCount, $storesCount)) {
+            return;
+        }
+
+        $this->logger->info('Failed to store the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
 
         // clean up potential locks
         $this->delete($key);
@@ -94,19 +130,8 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.4.
      */
-    public function waitAndSave(Key $key)
-    {
-        @trigger_error(sprintf('%s() is deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', __METHOD__), \E_USER_DEPRECATED);
-        throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', static::class));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         $successCount = 0;
         $failureCount = 0;
@@ -116,7 +141,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
         foreach ($this->stores as $store) {
             try {
                 if (0.0 >= $adjustedTtl = $expireAt - microtime(true)) {
-                    $this->logger->warning('Stores took to long to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'ttl' => $ttl]);
+                    $this->logger->debug('Stores took to long to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'ttl' => $ttl]);
                     $key->reduceLifetime(0);
                     break;
                 }
@@ -124,7 +149,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
                 $store->putOffExpiration($key, $adjustedTtl);
                 ++$successCount;
             } catch (\Exception $e) {
-                $this->logger->warning('One store failed to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
+                $this->logger->debug('One store failed to put off the expiration of the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
                 ++$failureCount;
             }
 
@@ -139,7 +164,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             return;
         }
 
-        $this->logger->warning('Failed to define the expiration for the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
+        $this->logger->notice('Failed to define the expiration for the "{resource}" lock. Quorum has not been met.', ['resource' => $key, 'success' => $successCount, 'failure' => $failureCount]);
 
         // clean up potential locks
         $this->delete($key);
@@ -164,7 +189,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $successCount = 0;
         $failureCount = 0;

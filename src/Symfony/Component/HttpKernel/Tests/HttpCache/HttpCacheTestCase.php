@@ -55,9 +55,7 @@ class HttpCacheTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->cache) {
-            $this->cache->getStore()->cleanup();
-        }
+        $this->cache?->getStore()->cleanup();
         $this->kernel = null;
         $this->cache = null;
         $this->caches = null;
@@ -131,7 +129,7 @@ class HttpCacheTestCase extends TestCase
         $this->request = Request::create($uri, $method, [], $cookies, [], $server);
         $this->request->headers->add($headers);
 
-        $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);
+        $this->response = $this->cache->handle($this->request, HttpKernelInterface::MAIN_REQUEST, $this->catch);
 
         $this->responses[] = $this->response;
     }

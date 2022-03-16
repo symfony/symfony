@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Exception\LogicException;
 
 /**
  * HttpBasicFactory creates services for HTTP basic authentication.
@@ -22,10 +23,14 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @internal
  */
 class HttpBasicLdapFactory extends HttpBasicFactory
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    use LdapFactoryTrait;
+
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $provider = 'security.authentication.provider.ldap_bind.'.$id;
         $definition = $container
@@ -40,11 +45,18 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         ;
 
         // entry point
-        $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
+        $entryPointId = $defaultEntryPoint;
+
+        if (null === $entryPointId) {
+            $entryPointId = 'security.authentication.basic_entry_point.'.$id;
+            $container
+                ->setDefinition($entryPointId, new ChildDefinition('security.authentication.basic_entry_point'))
+                ->addArgument($config['realm']);
+        }
 
         if (!empty($config['query_string'])) {
             if ('' === $config['search_dn'] || '' === $config['search_password']) {
-                @trigger_error('Using the "query_string" config without using a "search_dn" and a "search_password" is deprecated since Symfony 4.4 and will throw an exception in Symfony 5.0.', \E_USER_DEPRECATED);
+                throw new LogicException('Using the "query_string" config without using a "search_dn" and a "search_password" is not supported.');
             }
             $definition->addMethodCall('setQueryString', [$config['query_string']]);
         }
@@ -71,10 +83,5 @@ class HttpBasicLdapFactory extends HttpBasicFactory
                 ->scalarNode('search_password')->defaultValue('')->end()
             ->end()
         ;
-    }
-
-    public function getKey()
-    {
-        return 'http-basic-ldap';
     }
 }

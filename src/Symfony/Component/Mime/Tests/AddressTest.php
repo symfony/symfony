@@ -13,7 +13,6 @@ namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Exception\InvalidArgumentException;
 
 class AddressTest extends TestCase
 {
@@ -44,9 +43,22 @@ class AddressTest extends TestCase
         $this->assertEquals($a, Address::create('fabien@symfony.com'));
     }
 
+    /**
+     * @dataProvider fromStringProvider
+     */
+    public function testCreateWithString($string, $displayName, $addrSpec)
+    {
+        $address = Address::create($string);
+        $this->assertEquals($displayName, $address->getName());
+        $this->assertEquals($addrSpec, $address->getAddress());
+        $fromToStringAddress = Address::create($address->toString());
+        $this->assertEquals($displayName, $fromToStringAddress->getName());
+        $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
+    }
+
     public function testCreateWrongArg()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         Address::create(new \stdClass());
     }
 
@@ -61,7 +73,7 @@ class AddressTest extends TestCase
 
     public function testCreateArrayWrongArg()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         Address::createArray([new \stdClass()]);
     }
 
@@ -77,25 +89,6 @@ class AddressTest extends TestCase
     public function nameEmptyDataProvider(): array
     {
         return [[''], [' '], [" \r\n "]];
-    }
-
-    /**
-     * @dataProvider fromStringProvider
-     */
-    public function testFromString($string, $displayName, $addrSpec)
-    {
-        $address = Address::fromString($string);
-        $this->assertEquals($displayName, $address->getName());
-        $this->assertEquals($addrSpec, $address->getAddress());
-        $fromToStringAddress = Address::fromString($address->toString());
-        $this->assertEquals($displayName, $fromToStringAddress->getName());
-        $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
-    }
-
-    public function testFromStringFailure()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        Address::fromString('Jane Doe <example@example.com');
     }
 
     public function fromStringProvider()

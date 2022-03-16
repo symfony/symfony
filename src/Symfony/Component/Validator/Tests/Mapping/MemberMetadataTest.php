@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
@@ -30,7 +31,7 @@ class MemberMetadataTest extends TestCase
     protected function setUp(): void
     {
         $this->metadata = new TestMemberMetadata(
-            'Symfony\Component\Validator\Tests\Fixtures\Entity',
+            Entity::class,
             'getLastName',
             'lastName'
         );
@@ -107,11 +108,11 @@ class MemberMetadataTest extends TestCase
 
 class TestMemberMetadata extends MemberMetadata
 {
-    public function getPropertyValue($object)
+    public function getPropertyValue($object): mixed
     {
     }
 
-    protected function newReflectionMember($object)
+    protected function newReflectionMember($object): \ReflectionMethod
     {
     }
 }
@@ -120,12 +121,12 @@ class PropertyCompositeConstraint extends Composite
 {
     public $nested;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return $this->getCompositeOption();
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'nested';
     }

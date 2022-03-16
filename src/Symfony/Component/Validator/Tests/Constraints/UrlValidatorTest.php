@@ -11,16 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\UrlValidator;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
- * @group dns-sensitive
- */
 class UrlValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
@@ -315,108 +310,6 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['file://127.0.0.1'],
             ['git://[::1]/'],
         ];
-    }
-
-    /**
-     * @dataProvider getCheckDns
-     * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
-     * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
-     */
-    public function testCheckDns($violation)
-    {
-        DnsMock::withMockedHosts(['example.com' => [['type' => $violation ? '' : 'A']]]);
-
-        $constraint = new Url([
-            'checkDNS' => 'ANY',
-            'dnsMessage' => 'myMessage',
-        ]);
-
-        $this->validator->validate('http://example.com', $constraint);
-
-        if (!$violation) {
-            $this->assertNoViolation();
-        } else {
-            $this->buildViolation('myMessage')
-                ->setParameter('{{ value }}', '"example.com"')
-                ->setCode(Url::INVALID_URL_ERROR)
-                ->assertRaised();
-        }
-    }
-
-    public function getCheckDns()
-    {
-        return [[true], [false]];
-    }
-
-    /**
-     * @dataProvider getCheckDnsTypes
-     * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
-     * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
-     */
-    public function testCheckDnsByType($type)
-    {
-        DnsMock::withMockedHosts(['example.com' => [['type' => $type]]]);
-
-        $constraint = new Url([
-            'checkDNS' => $type,
-            'dnsMessage' => 'myMessage',
-        ]);
-
-        $this->validator->validate('http://example.com', $constraint);
-
-        $this->assertNoViolation();
-    }
-
-    public function getCheckDnsTypes()
-    {
-        return [
-            ['ANY'],
-            ['A'],
-            ['A6'],
-            ['AAAA'],
-            ['CNAME'],
-            ['MX'],
-            ['NAPTR'],
-            ['NS'],
-            ['PTR'],
-            ['SOA'],
-            ['SRV'],
-            ['TXT'],
-        ];
-    }
-
-    /**
-     * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
-     * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
-     * @expectedDeprecation The "dnsMessage" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1.
-     */
-    public function testCheckDnsWithInvalidType()
-    {
-        $this->expectException(InvalidOptionsException::class);
-        DnsMock::withMockedHosts(['example.com' => [['type' => 'A']]]);
-
-        $constraint = new Url([
-            'checkDNS' => 'BOGUS',
-            'dnsMessage' => 'myMessage',
-        ]);
-
-        $this->validator->validate('http://example.com', $constraint);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
-     */
-    public function testCheckDnsOptionIsDeprecated()
-    {
-        $constraint = new Url([
-            'checkDNS' => Url::CHECK_DNS_TYPE_NONE,
-        ]);
-
-        $this->validator->validate('http://example.com', $constraint);
     }
 }
 

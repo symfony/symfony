@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -20,6 +21,45 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class Validation
 {
+    /**
+     * Creates a callable chain of constraints.
+     */
+    public static function createCallable(Constraint|ValidatorInterface $constraintOrValidator = null, Constraint ...$constraints): callable
+    {
+        $validator = self::createIsValidCallable($constraintOrValidator, ...$constraints);
+
+        return static function ($value) use ($validator) {
+            if (!$validator($value, $violations)) {
+                throw new ValidationFailedException($value, $violations);
+            }
+
+            return $value;
+        };
+    }
+
+    /**
+     * Creates a callable that returns true/false instead of throwing validation exceptions.
+     *
+     * @return callable(mixed $value, ConstraintViolationListInterface &$violations = null): bool
+     */
+    public static function createIsValidCallable(Constraint|ValidatorInterface $constraintOrValidator = null, Constraint ...$constraints): callable
+    {
+        $validator = $constraintOrValidator;
+
+        if ($constraintOrValidator instanceof Constraint) {
+            $constraints = \func_get_args();
+            $validator = null;
+        }
+
+        $validator ??= self::createValidator();
+
+        return static function (mixed $value, ConstraintViolationListInterface &$violations = null) use ($constraints, $validator): bool {
+            $violations = $validator->validate($value, $constraints);
+
+            return 0 === $violations->count();
+        };
+    }
+
     /**
      * Creates a new validator.
      *

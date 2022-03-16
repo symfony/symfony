@@ -34,7 +34,7 @@ class PhpSerializerTest extends TestCase
     public function testDecodingFailsWithMissingBodyKey()
     {
         $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessage('Encoded envelope should have at least a "body".');
+        $this->expectExceptionMessage('Encoded envelope should have at least a "body", or maybe you should implement your own serializer');
 
         $serializer = new PhpSerializer();
 

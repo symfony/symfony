@@ -309,6 +309,7 @@ class DateTimeTypeTest extends BaseTypeTest
     public function testSubmitDifferentPattern()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
             'date_format' => 'MM*yyyy*dd',
             'date_widget' => 'single_text',
             'time_widget' => 'single_text',
@@ -472,20 +473,6 @@ class DateTimeTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
             'html5' => false,
-        ])
-            ->createView();
-
-        $this->assertArrayNotHasKey('type', $view->vars);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDontPassHtml5TypeIfNotHtml5Format()
-    {
-        $view = $this->factory->create(static::TESTED_TYPE, null, [
-            'widget' => 'single_text',
-            'format' => 'yyyy-MM-dd HH:mm',
         ])
             ->createView();
 

@@ -87,7 +87,11 @@ class SMimeEncryptorTest extends SMimeTestCase
     private function assertMessageIsEncryptedProperly(Message $message, Message $originalMessage): void
     {
         $messageFile = $this->generateTmpFilename();
-        file_put_contents($messageFile, $message->toString());
+        file_put_contents($messageFile, $messageString = $message->toString());
+
+        // Ensure the proper line-ending is used for compatibility with the RFC
+        $this->assertStringContainsString("\n\r", $messageString);
+        $this->assertStringNotContainsString("\n\n", $messageString);
 
         $outputFile = $this->generateTmpFilename();
 

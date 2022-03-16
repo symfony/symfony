@@ -1,6 +1,39 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for phpDocumentor and PHPStan pseudo-types
+ * Add PHP 8.0 promoted properties `@param` mutation support to `PhpDocExtractor`
+
+6.0
+---
+
+ * Remove the `Type::getCollectionKeyType()` and `Type::getCollectionValueType()` methods, use `Type::getCollectionKeyTypes()` and `Type::getCollectionValueTypes()` instead
+ * Remove the `enable_magic_call_extraction` context option in `ReflectionExtractor::getWriteInfo()` and `ReflectionExtractor::getReadInfo()` in favor of `enable_magic_methods_extraction`
+
+5.4
+---
+
+ * Add PhpStanExtractor
+
+5.3
+---
+
+ * Add support for multiple types for collection keys & values
+ * Deprecate the `Type::getCollectionKeyType()` and `Type::getCollectionValueType()` methods, use `Type::getCollectionKeyTypes()` and `Type::getCollectionValueTypes()` instead
+
+5.2.0
+-----
+
+ * deprecated the `enable_magic_call_extraction` context option in `ReflectionExtractor::getWriteInfo()` and `ReflectionExtractor::getReadInfo()` in favor of `enable_magic_methods_extraction`
+
+5.1.0
+-----
+
+ * Add support for extracting accessor and mutator via PHP Reflection
+
 4.3.0
 -----
 

@@ -348,7 +348,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreVCS(false)->ignoreDotFiles(false));
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -375,7 +374,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->ignoreVCS(false)->ignoreVCS(false)->ignoreDotFiles(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -402,7 +400,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreVCS(true)->ignoreDotFiles(false));
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'test.php',
@@ -435,16 +432,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 ->ignoreDotFiles(true)
                 ->ignoreVCSIgnored(true)
         );
-        $this->assertIterator($this->toAbsolute([
-            'foo',
-            'foo/bar.tmp',
-            'test.py',
-            'toto',
-            'foo bar',
-            'qux',
-            'qux/baz_100_1.py',
-            'qux/baz_1_2.py',
-        ]), $finder->in(self::$tmpDir)->getIterator());
+
+        copy(__DIR__.'/Fixtures/gitignore/search_root/b.txt', __DIR__.'/Fixtures/gitignore/search_root/a.txt');
+        copy(__DIR__.'/Fixtures/gitignore/search_root/b.txt', __DIR__.'/Fixtures/gitignore/search_root/c.txt');
+        copy(__DIR__.'/Fixtures/gitignore/search_root/dir/a.txt', __DIR__.'/Fixtures/gitignore/search_root/dir/b.txt');
+        copy(__DIR__.'/Fixtures/gitignore/search_root/dir/a.txt', __DIR__.'/Fixtures/gitignore/search_root/dir/c.txt');
+
+        $this->assertIterator($this->toAbsoluteFixtures([
+            'gitignore/search_root/b.txt',
+            'gitignore/search_root/c.txt',
+            'gitignore/search_root/dir',
+            'gitignore/search_root/dir/a.txt',
+            'gitignore/search_root/dir/c.txt',
+        ]), $finder->in(__DIR__.'/Fixtures/gitignore/search_root')->getIterator());
     }
 
     public function testIgnoreVCSCanBeDisabledAfterFirstIteration()
@@ -454,7 +454,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->ignoreDotFiles(false);
 
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'qux',
@@ -478,7 +477,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder->ignoreVCS(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -508,7 +506,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreDotFiles(false)->ignoreVCS(false));
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             '.bar',
             '.foo',
@@ -535,7 +532,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->ignoreDotFiles(false)->ignoreDotFiles(false)->ignoreVCS(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             '.bar',
             '.foo',
@@ -605,7 +601,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder->ignoreDotFiles(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'qux',
@@ -907,7 +902,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $expected = [
             self::$tmpDir.\DIRECTORY_SEPARATOR.'test.php',
-            __DIR__.\DIRECTORY_SEPARATOR.'ClassThatInheritFinder.php',
             __DIR__.\DIRECTORY_SEPARATOR.'GitignoreTest.php',
             __DIR__.\DIRECTORY_SEPARATOR.'FinderTest.php',
             __DIR__.\DIRECTORY_SEPARATOR.'GlobTest.php',
@@ -1464,16 +1458,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         if ($couldRead) {
             $this->markTestSkipped('could read test files while test requires unreadable');
         }
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\Finder\Finder::sortByName()" method will have a new "bool $useNaturalSort = false" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassCallSortByNameWithNoArguments()
-    {
-        $finderChild = new ClassThatInheritFinder();
-        $finderChild->sortByName();
     }
 
     protected function buildFinder()

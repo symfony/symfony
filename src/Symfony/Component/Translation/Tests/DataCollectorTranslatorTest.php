@@ -84,31 +84,6 @@ class DataCollectorTranslatorTest extends TestCase
         $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCollectMessagesTransChoice()
-    {
-        $collector = $this->createCollector();
-        $collector->setFallbackLocales(['fr', 'ru']);
-        $collector->transChoice('choice', 0);
-
-        $expectedMessages = [];
-
-        $expectedMessages[] = [
-              'id' => 'choice',
-              'translation' => 'choice',
-              'locale' => 'en',
-              'fallbackLocale' => null,
-              'domain' => 'messages',
-              'state' => DataCollectorTranslator::MESSAGE_MISSING,
-              'parameters' => ['%count%' => 0],
-              'transChoiceNumber' => 0,
-        ];
-
-        $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
-    }
-
     private function createCollector()
     {
         $translator = new Translator('en');

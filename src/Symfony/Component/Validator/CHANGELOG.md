@@ -1,6 +1,97 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
+ * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
+
+6.0
+---
+
+ * Remove the `allowEmptyString` option from the `Length` constraint
+ * Remove the `NumberConstraintTrait` trait
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore
+
+5.4
+---
+
+ * Add a `Cidr` constraint to validate CIDR notations
+ * Add a `CssColor` constraint to validate CSS colors
+ * Add support for `ConstraintViolationList::createFromMessage()`
+ * Add error's uid to `Count` and `Length` constraints with "exactly" option enabled
+
+5.3
+---
+
+ * Add the `normalizer` option to the `Unique` constraint
+ * Add `Validation::createIsValidCallable()` that returns true/false instead of throwing exceptions
+
+5.2.0
+-----
+
+ * added a `Cascade` constraint to ease validating nested typed object properties
+ * deprecated the `allowEmptyString` option of the `Length` constraint
+
+   Before:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\Length(min=5, allowEmptyString=true)
+    */
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\AtLeastOneOf({
+    *     @Assert\Blank(),
+    *     @Assert\Length(min=5)
+    * })
+    */
+   ```
+ * added the `Isin` constraint and validator
+ * added the `ULID` constraint and validator
+ * added support for UUIDv6 in `Uuid` constraint
+ * enabled the validator to load constraints from PHP attributes
+ * deprecated the `NumberConstraintTrait` trait
+ * deprecated setting or creating a Doctrine annotation reader via `ValidatorBuilder::enableAnnotationMapping()`, pass `true` as first parameter and additionally call `setDoctrineAnnotationReader()` or `addDefaultDoctrineAnnotationReader()` to set up the annotation reader
+
+5.1.0
+-----
+
+ * added the `Hostname` constraint and validator
+ * added the `alpha3` option to the `Country` and `Language` constraints
+ * allow to define a reusable set of constraints by extending the `Compound` constraint
+ * added `Sequentially` constraint, to sequentially validate a set of constraints (any violation raised will prevent further validation of the nested constraints)
+ * added the `divisibleBy` option to the `Count` constraint
+ * added the `ExpressionLanguageSyntax` constraint
+
+5.0.0
+-----
+
+ * an `ExpressionLanguage` instance or null must be passed as the first argument of `ExpressionValidator::__construct()`
+ * removed the `checkDNS` and `dnsMessage` options of the `Url` constraint
+ * removed the `checkMX`, `checkHost` and `strict` options of the `Email` constraint
+ * removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`
+ * removed support for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl`
+ * removed support for using the `Email` constraint without `egulias/email-validator`
+ * removed support for using the `Expression` constraint without `symfony/expression-language`
+ * changed default value of `canonicalize` option of `Locale` constraint to `true`
+ * removed `ValidatorBuilderInterface`
+ * passing a null message when instantiating a `ConstraintViolation` is not allowed
+ * changed the default value of `Length::$allowEmptyString` to `false` and made it optional
+ * removed `Symfony\Component\Validator\Mapping\Cache\CacheInterface` in favor of PSR-6.
+ * removed `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
+
 4.4.0
 -----
 

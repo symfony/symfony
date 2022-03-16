@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add ability to style integer and double values independently
+ * Add casters for Symfony's UUIDs and ULIDs
+ * Add support for `Fiber`
+
+5.2.0
+-----
+
+ * added support for PHPUnit `--colors` option
+ * added `VAR_DUMPER_FORMAT=server` env var value support
+ * prevent replacing the handler when the `VAR_DUMPER_FORMAT` env var is set
+
+5.1.0
+-----
+
+ * added `RdKafka` support
+
 4.4.0
 -----
 

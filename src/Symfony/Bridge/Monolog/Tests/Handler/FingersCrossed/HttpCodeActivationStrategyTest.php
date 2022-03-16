@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Tests\Handler\FingersCrossed;
 
+use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy;
@@ -23,13 +24,13 @@ class HttpCodeActivationStrategyTest extends TestCase
     public function testExclusionsWithoutCode()
     {
         $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], Logger::WARNING);
+        new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], new ErrorLevelActivationStrategy(Logger::WARNING));
     }
 
     public function testExclusionsWithoutUrls()
     {
         $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], Logger::WARNING);
+        new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], new ErrorLevelActivationStrategy(Logger::WARNING));
     }
 
     /**
@@ -48,13 +49,13 @@ class HttpCodeActivationStrategyTest extends TestCase
                 ['code' => 405, 'urls' => []],
                 ['code' => 400, 'urls' => ['^/400/a', '^/400/b']],
             ],
-            Logger::WARNING
+            new ErrorLevelActivationStrategy(Logger::WARNING)
         );
 
-        $this->assertEquals($expected, $strategy->isHandlerActivated($record));
+        self::assertEquals($expected, $strategy->isHandlerActivated($record));
     }
 
-    public function isActivatedProvider()
+    public function isActivatedProvider(): array
     {
         return [
             ['/test',  ['level' => Logger::ERROR], true],
@@ -70,7 +71,7 @@ class HttpCodeActivationStrategyTest extends TestCase
         ];
     }
 
-    protected function getContextException($code)
+    private function getContextException(int $code): array
     {
         return ['exception' => new HttpException($code)];
     }

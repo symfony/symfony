@@ -25,8 +25,8 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
  */
 class RoutableMessageBus implements MessageBusInterface
 {
-    private $busLocator;
-    private $fallbackBus;
+    private ContainerInterface $busLocator;
+    private ?MessageBusInterface $fallbackBus;
 
     public function __construct(ContainerInterface $busLocator, MessageBusInterface $fallbackBus = null)
     {
@@ -34,7 +34,7 @@ class RoutableMessageBus implements MessageBusInterface
         $this->fallbackBus = $fallbackBus;
     }
 
-    public function dispatch($envelope, array $stamps = []): Envelope
+    public function dispatch(object $envelope, array $stamps = []): Envelope
     {
         if (!$envelope instanceof Envelope) {
             throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope.');

@@ -22,19 +22,15 @@ interface ConfigCacheInterface
 {
     /**
      * Gets the cache file path.
-     *
-     * @return string The cache file path
      */
-    public function getPath();
+    public function getPath(): string;
 
     /**
      * Checks if the cache is still fresh.
      *
      * This check should take the metadata passed to the write() method into consideration.
-     *
-     * @return bool Whether the cache is still fresh
      */
-    public function isFresh();
+    public function isFresh(): bool;
 
     /**
      * Writes the given content into the cache file. Metadata will be stored
@@ -45,5 +41,5 @@ interface ConfigCacheInterface
      *
      * @throws \RuntimeException When the cache file cannot be written
      */
-    public function write($content, array $metadata = null);
+    public function write(string $content, array $metadata = null);
 }

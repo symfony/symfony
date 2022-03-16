@@ -48,7 +48,7 @@ class BicValidator extends ConstraintValidator
         'VG' => 'GB', // British Virgin Islands
     ];
 
-    private $propertyAccessor;
+    private ?PropertyAccessor $propertyAccessor;
 
     public function __construct(PropertyAccessor $propertyAccessor = null)
     {
@@ -58,7 +58,7 @@ class BicValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Bic) {
             throw new UnexpectedTypeException($constraint, Bic::class);
@@ -68,7 +68,7 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -104,15 +104,7 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
-        // @deprecated since Symfony 4.2, will throw in 5.0
-        if (class_exists(Countries::class)) {
-            $validCountryCode = Countries::exists(substr($canonicalize, 4, 2));
-        } else {
-            $validCountryCode = ctype_alpha(substr($canonicalize, 4, 2));
-            // throw new LogicException('The Intl component is required to use the Bic constraint. Try running "composer require symfony/intl".');
-        }
-
-        if (!$validCountryCode) {
+        if (!Countries::exists(substr($canonicalize, 4, 2))) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Bic::INVALID_COUNTRY_CODE_ERROR)
@@ -138,7 +130,7 @@ class BicValidator extends ConstraintValidator
             try {
                 $iban = $this->getPropertyAccessor()->getValue($object, $path);
             } catch (NoSuchPropertyException $e) {
-                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: ', $path, \get_class($constraint)).$e->getMessage(), 0, $e);
+                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: ', $path, get_debug_type($constraint)).$e->getMessage(), 0, $e);
             }
         }
         if (!$iban) {

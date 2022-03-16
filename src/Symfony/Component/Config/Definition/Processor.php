@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Definition;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @final since version 4.1
+ * @final
  */
 class Processor
 {
@@ -24,10 +24,8 @@ class Processor
      * Processes an array of configurations.
      *
      * @param array $configs An array of configuration items to process
-     *
-     * @return array The processed configuration
      */
-    public function process(NodeInterface $configTree, array $configs)
+    public function process(NodeInterface $configTree, array $configs): array
     {
         $currentConfig = [];
         foreach ($configs as $config) {
@@ -42,10 +40,8 @@ class Processor
      * Processes an array of configurations.
      *
      * @param array $configs An array of configuration items to process
-     *
-     * @return array The processed configuration
      */
-    public function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    public function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
         return $this->process($configuration->getConfigTreeBuilder()->buildTree(), $configs);
     }
@@ -70,10 +66,8 @@ class Processor
      * @param array  $config A config array
      * @param string $key    The key to normalize
      * @param string $plural The plural form of the key if it is irregular
-     *
-     * @return array
      */
-    public static function normalizeConfig($config, $key, $plural = null)
+    public static function normalizeConfig(array $config, string $key, string $plural = null): array
     {
         if (null === $plural) {
             $plural = $key.'s';

@@ -13,6 +13,15 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceAttr;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFieldName;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFilter;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLabel;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceTranslationParameters;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceValue;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\GroupBy;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\PreferredChoice;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -36,28 +45,20 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceType extends AbstractType
 {
-    private $choiceListFactory;
-    private $translator;
+    private ChoiceListFactoryInterface $choiceListFactory;
+    private ?TranslatorInterface $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(ChoiceListFactoryInterface $choiceListFactory = null, $translator = null)
+    public function __construct(ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
     {
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(
             new PropertyAccessDecorator(
                 new DefaultChoiceListFactory()
             )
         );
-
-        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->translator = $translator;
     }
 
@@ -243,6 +244,7 @@ class ChoiceType extends AbstractType
             'separator' => '-------------------',
             'placeholder' => null,
             'choice_translation_domain' => $choiceTranslationDomain,
+            'choice_translation_parameters' => $options['choice_translation_parameters'],
         ]);
 
         // The decision, whether a choice is selected, is potentially done
@@ -351,11 +353,13 @@ class ChoiceType extends AbstractType
             'multiple' => false,
             'expanded' => false,
             'choices' => [],
+            'choice_filter' => null,
             'choice_loader' => null,
             'choice_label' => null,
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => null,
+            'choice_translation_parameters' => [],
             'preferred_choices' => [],
             'group_by' => null,
             'empty_data' => $emptyData,
@@ -368,6 +372,7 @@ class ChoiceType extends AbstractType
             'data_class' => null,
             'choice_translation_domain' => true,
             'trim' => false,
+            'invalid_message' => 'The selected choice is invalid.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -375,19 +380,21 @@ class ChoiceType extends AbstractType
 
         $resolver->setAllowedTypes('choices', ['null', 'array', \Traversable::class]);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
-        $resolver->setAllowedTypes('choice_loader', ['null', ChoiceLoaderInterface::class]);
-        $resolver->setAllowedTypes('choice_label', ['null', 'bool', 'callable', 'string', PropertyPath::class]);
-        $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', PropertyPath::class]);
-        $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', PropertyPath::class]);
-        $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', PropertyPath::class]);
-        $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class]);
-        $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class]);
+        $resolver->setAllowedTypes('choice_loader', ['null', ChoiceLoaderInterface::class, ChoiceLoader::class]);
+        $resolver->setAllowedTypes('choice_filter', ['null', 'callable', 'string', PropertyPath::class, ChoiceFilter::class]);
+        $resolver->setAllowedTypes('choice_label', ['null', 'bool', 'callable', 'string', PropertyPath::class, ChoiceLabel::class]);
+        $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', PropertyPath::class, ChoiceFieldName::class]);
+        $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', PropertyPath::class, ChoiceValue::class]);
+        $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', PropertyPath::class, ChoiceAttr::class]);
+        $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
+        $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
+        $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'choice';
     }
@@ -418,7 +425,9 @@ class ChoiceType extends AbstractType
         $choiceOpts = [
             'value' => $choiceView->value,
             'label' => $choiceView->label,
+            'label_html' => $options['label_html'],
             'attr' => $choiceView->attr,
+            'label_translation_parameters' => $choiceView->labelTranslationParameters,
             'translation_domain' => $options['choice_translation_domain'],
             'block_name' => 'entry',
         ];
@@ -440,14 +449,19 @@ class ChoiceType extends AbstractType
         if (null !== $options['choice_loader']) {
             return $this->choiceListFactory->createListFromLoader(
                 $options['choice_loader'],
-                $options['choice_value']
+                $options['choice_value'],
+                $options['choice_filter']
             );
         }
 
         // Harden against NULL values (like in EntityType and ModelType)
         $choices = null !== $options['choices'] ? $options['choices'] : [];
 
-        return $this->choiceListFactory->createListFromChoices($choices, $options['choice_value']);
+        return $this->choiceListFactory->createListFromChoices(
+            $choices,
+            $options['choice_value'],
+            $options['choice_filter']
+        );
     }
 
     private function createChoiceListView(ChoiceListInterface $choiceList, array $options)
@@ -458,7 +472,8 @@ class ChoiceType extends AbstractType
             $options['choice_label'],
             $options['choice_name'],
             $options['group_by'],
-            $options['choice_attr']
+            $options['choice_attr'],
+            $options['choice_translation_parameters']
         );
     }
 }

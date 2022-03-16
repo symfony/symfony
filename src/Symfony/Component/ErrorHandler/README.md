@@ -21,6 +21,9 @@ Debug::enable();
 //ErrorHandler::register();
 //DebugClassLoader::enable();
 
+// If you want a custom generic template when debug is not enabled
+// HtmlErrorRenderer::setTemplate('/path/to/custom/error.html.php');
+
 $data = ErrorHandler::call(static function () use ($filename, $datetimeFormat) {
     // if any code executed inside this anonymous function fails, a PHP exception
     // will be thrown, even if the code uses the '@' PHP silence operator

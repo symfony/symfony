@@ -28,17 +28,17 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements RepeatablePassInterface
+class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 {
-    private $graph;
-    private $currentDefinition;
-    private $onlyConstructorArguments;
-    private $hasProxyDumper;
-    private $lazy;
-    private $byConstructor;
-    private $byFactory;
-    private $definitions;
-    private $aliases;
+    private ServiceReferenceGraph $graph;
+    private ?Definition $currentDefinition = null;
+    private bool $onlyConstructorArguments;
+    private bool $hasProxyDumper;
+    private bool $lazy;
+    private bool $byConstructor;
+    private bool $byFactory;
+    private array $definitions;
+    private array $aliases;
 
     /**
      * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
@@ -48,14 +48,6 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         $this->onlyConstructorArguments = $onlyConstructorArguments;
         $this->hasProxyDumper = $hasProxyDumper;
         $this->enableExpressionProcessing();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
     }
 
     /**
@@ -84,7 +76,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         }
     }
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         $lazy = $this->lazy;
         $inExpression = $this->inExpression();
@@ -106,7 +98,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
                 $targetId,
                 $targetDefinition,
                 $value,
-                $this->lazy || ($this->hasProxyDumper && $targetDefinition && $targetDefinition->isLazy()),
+                $this->lazy || ($this->hasProxyDumper && $targetDefinition?->isLazy()),
                 ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior(),
                 $this->byConstructor
             );
@@ -118,7 +110,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
                     $targetId,
                     $targetDefinition,
                     $value,
-                    $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
+                    $this->lazy || $targetDefinition?->isLazy(),
                     true
                );
             }

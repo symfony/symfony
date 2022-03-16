@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\Type\LanguageType;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LanguageTypeTest extends BaseTypeTest
@@ -87,6 +87,52 @@ class LanguageTypeTest extends BaseTypeTest
         $this->assertNotContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }
 
+    /**
+     * @requires extension intl
+     */
+    public function testChoiceSelfTranslationOption()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'choice_self_translation' => true,
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertContainsEquals(new ChoiceView('cs', 'cs', 'čeština'), $choices);
+        $this->assertContainsEquals(new ChoiceView('es', 'es', 'español'), $choices);
+        $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'français'), $choices);
+        $this->assertContainsEquals(new ChoiceView('ta', 'ta', 'தமிழ்'), $choices);
+        $this->assertContainsEquals(new ChoiceView('uk', 'uk', 'українська'), $choices);
+        $this->assertContainsEquals(new ChoiceView('yi', 'yi', 'ייִדיש'), $choices);
+        $this->assertContainsEquals(new ChoiceView('zh', 'zh', '中文'), $choices);
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testChoiceSelfTranslationAndAlpha3Options()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'alpha3' => true,
+                'choice_self_translation' => true,
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertContainsEquals(new ChoiceView('spa', 'spa', 'español'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('yid', 'yid', 'ייִדיש'), $choices, '', false, false);
+    }
+
+    public function testSelfTranslationNotAllowedWithChoiceTranslation()
+    {
+        $this->expectException(LogicException::class);
+
+        $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_translation_locale' => 'es',
+            'choice_self_translation' => true,
+        ]);
+    }
+
     public function testMultipleLanguagesIsNotIncluded()
     {
         $choices = $this->factory->create(static::TESTED_TYPE, 'language')
@@ -103,15 +149,5 @@ class LanguageTypeTest extends BaseTypeTest
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en')
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInvalidChoiceValuesAreDropped()
-    {
-        $type = new LanguageType();
-
-        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

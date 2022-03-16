@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
@@ -26,7 +27,6 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class ExceptionListenerTest extends TestCase
 {
@@ -74,8 +74,17 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
+    /**
+     * This test should be removed in Symfony 7.0 when adding native return types to AuthenticationEntryPointInterface::start().
+     *
+     * @group legacy
+     */
     public function testExceptionWhenEntryPointReturnsBadValue()
     {
+        if ((new \ReflectionMethod(AuthenticationEntryPointInterface::class, 'start'))->hasReturnType()) {
+            $this->markTestSkipped('Native return type found');
+        }
+
         $event = $this->createEvent(new AuthenticationException());
 
         $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
@@ -203,7 +212,7 @@ class ExceptionListenerTest extends TestCase
             $kernel = $this->createMock(HttpKernelInterface::class);
         }
 
-        return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
+        return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }
 
     private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)

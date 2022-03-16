@@ -1,0 +1,34 @@
+{
+    "name": "symfony/gateway-api-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony GatewayApi Notifier Bridge",
+    "keywords": ["sms", "gatewayapi", "notifier"],
+    "homepage": "https://gatewayapi.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Piergiuseppe Longo",
+            "email": "piergiuseppe.longo@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\GatewayApi\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

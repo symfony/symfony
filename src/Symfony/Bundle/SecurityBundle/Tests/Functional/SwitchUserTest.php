@@ -21,7 +21,7 @@ class SwitchUserTest extends AbstractWebTestCase
      */
     public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus)
     {
-        $client = $this->createAuthenticatedClient($originalUser);
+        $client = $this->createAuthenticatedClient($originalUser, ['root_config' => 'switchuser.yml']);
 
         $client->request('GET', '/profile?_switch_user='.$targetUser);
 
@@ -73,9 +73,9 @@ class SwitchUserTest extends AbstractWebTestCase
         ];
     }
 
-    protected function createAuthenticatedClient($username)
+    protected function createAuthenticatedClient($username, array $options = [])
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'switchuser.yml']);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'switchuser.yml'] + $options);
         $client->followRedirects(true);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();

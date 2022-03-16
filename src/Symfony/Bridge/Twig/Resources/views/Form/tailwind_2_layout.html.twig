@@ -1,0 +1,69 @@
+{% use 'form_div_layout.html.twig' %}
+
+{%- block form_row -%}
+    {%- set row_attr = row_attr|merge({ class: row_attr.class|default(row_class|default('mb-6')) }) -%}
+    {{- parent() -}}
+{%- endblock form_row -%}
+
+{%- block widget_attributes -%}
+    {%- set attr = attr|merge({ class: attr.class|default(widget_class|default('mt-1 w-full')) ~ (disabled ? ' ' ~ widget_disabled_class|default('border-gray-300 text-gray-500')) ~ (errors|length ? ' ' ~ widget_errors_class|default('border-red-700')) }) -%}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block form_label -%}
+    {%- set label_attr = label_attr|merge({ class: label_attr.class|default(label_class|default('block text-gray-800')) }) -%}
+    {{- parent() -}}
+{%- endblock form_label -%}
+
+{%- block form_help -%}
+    {%- set help_attr = help_attr|merge({ class: help_attr.class|default(help_class|default('mt-1 text-gray-600')) }) -%}
+    {{- parent() -}}
+{%- endblock form_help -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul>
+            {%- for error in errors -%}
+                <li class="{{ error_item_class|default('text-red-700') }}">{{ error.message }}</li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block choice_widget_expanded -%}
+    {%- set attr = attr|merge({ class: attr.class|default('mt-2') }) -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            <div class="flex items-center">
+                {{- form_widget(child) -}}
+                {{- form_label(child, null, { translation_domain: choice_translation_domain }) -}}
+            </div>
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block checkbox_row -%}
+    {%- set row_attr = row_attr|merge({ class: row_attr.class|default(row_class|default('mb-6')) }) -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_errors(form) -}}
+        <div class="inline-flex items-center">
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_label(form) -}}
+        </div>
+        {{- form_help(form) -}}
+    </div>
+{%- endblock checkbox_row -%}
+
+{%- block checkbox_widget -%}
+    {%- set widget_class = widget_class|default('mr-2') -%}
+    {{- parent() -}}
+{%- endblock checkbox_widget -%}
+
+{%- block radio_widget -%}
+    {%- set widget_class = widget_class|default('mr-2') -%}
+    {{- parent() -}}
+{%- endblock radio_widget -%}

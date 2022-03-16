@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -19,27 +20,27 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-    private $handler;
+    private AuthenticationSuccessHandlerInterface $handler;
 
     /**
-     * @param array  $options     Options for processing a successful authentication attempt
-     * @param string $providerKey The provider key
+     * @param array $options Options for processing a successful authentication attempt
      */
-    public function __construct(AuthenticationSuccessHandlerInterface $handler, array $options, string $providerKey)
+    public function __construct(AuthenticationSuccessHandlerInterface $handler, array $options, string $firewallName)
     {
         $this->handler = $handler;
         if (method_exists($handler, 'setOptions')) {
             $this->handler->setOptions($options);
         }
-        if (method_exists($handler, 'setProviderKey')) {
-            $this->handler->setProviderKey($providerKey);
+
+        if (method_exists($handler, 'setFirewallName')) {
+            $this->handler->setFirewallName($firewallName);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
     {
         return $this->handler->onAuthenticationSuccess($request, $token);
     }

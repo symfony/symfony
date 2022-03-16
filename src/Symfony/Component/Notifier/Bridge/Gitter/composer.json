@@ -1,0 +1,31 @@
+{
+    "name": "symfony/gitter-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Gitter Notifier Bridge",
+    "keywords": ["chat", "gitter", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christin Gruber",
+            "email": "c.gruber@touchdesign.de"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-json": "*",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Gitter\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

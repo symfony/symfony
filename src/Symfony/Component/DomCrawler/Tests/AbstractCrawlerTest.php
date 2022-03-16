@@ -79,13 +79,6 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
 
-    public function testAddInvalidType()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $crawler = $this->createCrawler();
-        $crawler->add(1);
-    }
-
     public function testAddMultipleDocumentNode()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -267,15 +260,6 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertNotSame('Elsa <3', $crawler->text(null, false));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyNormalizeWhiteSpace()
-    {
-        $crawler = $this->createTestCrawler()->filterXPath('//p');
-        $this->assertNotSame('Elsa <3', $crawler->text());
-    }
-
     public function testEach()
     {
         $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
@@ -364,6 +348,14 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
+    public function testInnerText()
+    {
+        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element"]'));
+
+        self::assertSame('Parent text Child text', $crawler->text());
+        self::assertSame('Parent text', $crawler->innerText());
+    }
+
     public function testHtml()
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
@@ -383,11 +375,11 @@ abstract class AbstractCrawlerTest extends TestCase
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
 
-        $this->assertEquals(['One', 'Two', 'Three'], $crawler->extract('_text'), '->extract() returns an array of extracted data from the node list');
+        $this->assertEquals(['One', 'Two', 'Three'], $crawler->extract(['_text']), '->extract() returns an array of extracted data from the node list');
         $this->assertEquals([['One', 'first'], ['Two', ''], ['Three', '']], $crawler->extract(['_text', 'class']), '->extract() returns an array of extracted data from the node list');
         $this->assertEquals([[], [], []], $crawler->extract([]), '->extract() returns empty arrays if the attribute list is empty');
 
-        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->extract('_text'), '->extract() returns an empty array if the node list is empty');
+        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->extract(['_text']), '->extract() returns an empty array if the node list is empty');
 
         $this->assertEquals([['One', 'li'], ['Two', 'li'], ['Three', 'li']], $crawler->extract(['_text', '_name']), '->extract() returns an array of extracted data from the node list');
     }
@@ -425,7 +417,7 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertCount(6, $crawler->filterXPath('//li'), '->filterXPath() filters the node list with the XPath expression');
 
         $crawler = $this->createTestCrawler();
-        $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->parents(), '->filterXpath() preserves parents when chained');
+        $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->ancestors(), '->filterXpath() preserves ancestors when chained');
     }
 
     public function testFilterRemovesDuplicates()
@@ -1098,24 +1090,25 @@ HTML;
         $this->assertEquals(1, $foo->children('.ipsum')->count());
     }
 
-    public function testParents()
+    public function testAncestors()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
-        $this->assertNotSame($crawler, $crawler->parents(), '->parents() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->parents(), '->parents() returns a new instance of a crawler');
 
-        $nodes = $crawler->parents();
-        $this->assertEquals(3, $nodes->count());
+        $nodes = $crawler->ancestors();
 
-        $nodes = $this->createTestCrawler()->filterXPath('//html')->parents();
-        $this->assertEquals(0, $nodes->count());
+        $this->assertNotSame($crawler, $nodes, '->ancestors() returns a new instance of a crawler');
+        $this->assertInstanceOf(Crawler::class, $nodes, '->ancestors() returns a new instance of a crawler');
 
-        try {
-            $this->createTestCrawler()->filterXPath('//ol')->parents();
-            $this->fail('->parents() throws an \InvalidArgumentException if the node list is empty');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->parents() throws an \InvalidArgumentException if the node list is empty');
-        }
+        $this->assertEquals(3, $crawler->ancestors()->count());
+
+        $this->assertEquals(0, $this->createTestCrawler()->filterXPath('//html')->ancestors()->count());
+    }
+
+    public function testAncestorsThrowsIfNodeListIsEmpty()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->createTestCrawler()->filterXPath('//ol')->ancestors();
     }
 
     /**
@@ -1210,62 +1203,6 @@ HTML;
         $this->createCrawler()->evaluate('//form/input[1]');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\DomCrawler\Crawler::children()" method will have a new "string $selector = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassCallChildrenWithoutArgument()
-    {
-        $dom = new \DOMDocument();
-        $dom->loadHTML($this->getDoctype().'
-            <html>
-                <body>
-                    <a href="foo">Foo</a>
-                    <a href="/foo">   Fabien\'s Foo   </a>
-                    <a href="/foo">Fabien"s Foo</a>
-                    <a href="/foo">\' Fabien"s Foo</a>
-
-                    <a href="/bar"><img alt="Bar"/></a>
-                    <a href="/bar"><img alt="   Fabien\'s Bar   "/></a>
-                    <a href="/bar"><img alt="Fabien&quot;s Bar"/></a>
-                    <a href="/bar"><img alt="\' Fabien&quot;s Bar"/></a>
-
-                    <a href="?get=param">GetLink</a>
-
-                    <a href="/example">Klausi|Claudiu</a>
-
-                    <form action="foo" id="FooFormId">
-                        <input type="text" value="TextValue" name="TextName" />
-                        <input type="submit" value="FooValue" name="FooName" id="FooId" />
-                        <input type="button" value="BarValue" name="BarName" id="BarId" />
-                        <button value="ButtonValue" name="ButtonName" id="ButtonId" />
-                    </form>
-
-                    <input type="submit" value="FooBarValue" name="FooBarName" form="FooFormId" />
-                    <input type="text" value="FooTextValue" name="FooTextName" form="FooFormId" />
-
-                    <ul class="first">
-                        <li class="first">One</li>
-                        <li>Two</li>
-                        <li>Three</li>
-                    </ul>
-                    <ul>
-                        <li>One Bis</li>
-                        <li>Two Bis</li>
-                        <li>Three Bis</li>
-                    </ul>
-                    <div id="parent">
-                        <div id="child"></div>
-                        <div id="child2" xmlns:foo="http://example.com"></div>
-                    </div>
-                    <div id="sibling"><img /></div>
-                </body>
-            </html>
-        ');
-        $crawlerChild = new ClassThatInheritCrawler($dom);
-        $crawlerChild->children();
-    }
-
     public function testAddHtmlContentUnsupportedCharset()
     {
         $crawler = $this->createCrawler();
@@ -1323,6 +1260,10 @@ HTML;
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
+                    <div id="complex-element">
+                        Parent text
+                        <span>Child text</span>
+                    </div>
                 </body>
             </html>
         ');

@@ -20,8 +20,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
-          extensions: "json,memcached,mongodb,redis,xsl,ldap,dom"
+          php-version: '8.1'
+          extensions: "json,couchbase,memcached,mongodb,redis,xsl,ldap,dom"
           ini-values: "memory_limit=-1"
           coverage: none
 

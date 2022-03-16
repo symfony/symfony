@@ -396,7 +396,7 @@ class RouterTest extends TestCase
     public function testExceptionOnNonStringParameter()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "object".');
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
@@ -410,16 +410,24 @@ class RouterTest extends TestCase
 
     public function testExceptionOnNonStringParameterWithSfContainer()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "object".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
 
         $sc = $this->getServiceContainer($routes);
-        $sc->setParameter('object', new \stdClass());
 
-        $router = new Router($sc, 'foo');
+        $pc = $this->createMock(ContainerInterface::class);
+        $pc
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn(new \stdClass())
+        ;
+
+        $router = new Router($sc, 'foo', [], null, $pc);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
+
         $router->getRouteCollection()->get('foo');
     }
 
@@ -536,10 +544,6 @@ class RouterTest extends TestCase
 
             $cache = new ResourceCheckerConfigCache($cacheDir.\DIRECTORY_SEPARATOR.'url_matching_routes.php', $resourceCheckers);
 
-            if (!$cache->isFresh()) {
-                $cache = new ResourceCheckerConfigCache($cacheDir.\DIRECTORY_SEPARATOR.'UrlMatcher.php', $resourceCheckers);
-            }
-
             $this->assertTrue($cache->isFresh());
         } finally {
             if (is_dir($cacheDir)) {
@@ -547,6 +551,44 @@ class RouterTest extends TestCase
                 rmdir($cacheDir);
             }
         }
+    }
+
+    public function testResolvingSchemes()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('/test', [], [], [], '', ['%parameter.http%', '%parameter.https%']);
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag([
+            'parameter.http' => 'http',
+            'parameter.https' => 'https',
+        ]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertEquals(['http', 'https'], $route->getSchemes());
+    }
+
+    public function testResolvingMethods()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('/test', [], [], [], '', [], ['%parameter.get%', '%parameter.post%']);
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag([
+            'PARAMETER.GET' => 'GET',
+            'PARAMETER.POST' => 'POST',
+        ]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertEquals(['GET', 'POST'], $route->getMethods());
     }
 
     public function getContainerParameterForRoute()

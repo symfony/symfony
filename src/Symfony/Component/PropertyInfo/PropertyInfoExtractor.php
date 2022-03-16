@@ -27,11 +27,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     private $initializableExtractors;
 
     /**
-     * @param iterable|PropertyListExtractorInterface[]          $listExtractors
-     * @param iterable|PropertyTypeExtractorInterface[]          $typeExtractors
-     * @param iterable|PropertyDescriptionExtractorInterface[]   $descriptionExtractors
-     * @param iterable|PropertyAccessExtractorInterface[]        $accessExtractors
-     * @param iterable|PropertyInitializableExtractorInterface[] $initializableExtractors
+     * @param iterable<mixed, PropertyListExtractorInterface>          $listExtractors
+     * @param iterable<mixed, PropertyTypeExtractorInterface>          $typeExtractors
+     * @param iterable<mixed, PropertyDescriptionExtractorInterface>   $descriptionExtractors
+     * @param iterable<mixed, PropertyAccessExtractorInterface>        $accessExtractors
+     * @param iterable<mixed, PropertyInitializableExtractorInterface> $initializableExtractors
      */
     public function __construct(iterable $listExtractors = [], iterable $typeExtractors = [], iterable $descriptionExtractors = [], iterable $accessExtractors = [], iterable $initializableExtractors = [])
     {
@@ -45,7 +45,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = []): ?array
+    public function getProperties(string $class, array $context = []): ?array
     {
         return $this->extract($this->listExtractors, 'getProperties', [$class, $context]);
     }
@@ -53,7 +53,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = []): ?string
+    public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract($this->descriptionExtractors, 'getShortDescription', [$class, $property, $context]);
     }
@@ -61,7 +61,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = []): ?string
+    public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract($this->descriptionExtractors, 'getLongDescription', [$class, $property, $context]);
     }
@@ -69,7 +69,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = []): ?array
+    public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract($this->typeExtractors, 'getTypes', [$class, $property, $context]);
     }
@@ -77,7 +77,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = []): ?bool
+    public function isReadable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract($this->accessExtractors, 'isReadable', [$class, $property, $context]);
     }
@@ -85,7 +85,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = []): ?bool
+    public function isWritable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract($this->accessExtractors, 'isWritable', [$class, $property, $context]);
     }
@@ -101,9 +101,10 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * Iterates over registered extractors and return the first value found.
      *
-     * @return mixed
+     * @param iterable<mixed, object> $extractors
+     * @param list<mixed>             $arguments
      */
-    private function extract(iterable $extractors, string $method, array $arguments)
+    private function extract(iterable $extractors, string $method, array $arguments): mixed
     {
         foreach ($extractors as $extractor) {
             if (null !== $value = $extractor->{$method}(...$arguments)) {

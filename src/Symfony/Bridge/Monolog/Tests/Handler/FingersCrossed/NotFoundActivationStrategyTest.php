@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Tests\Handler\FingersCrossed;
 
+use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy;
@@ -23,17 +24,17 @@ class NotFoundActivationStrategyTest extends TestCase
     /**
      * @dataProvider isActivatedProvider
      */
-    public function testIsActivated($url, $record, $expected)
+    public function testIsActivated(string $url, array $record, bool $expected)
     {
         $requestStack = new RequestStack();
         $requestStack->push(Request::create($url));
 
-        $strategy = new NotFoundActivationStrategy($requestStack, ['^/foo', 'bar'], Logger::WARNING);
+        $strategy = new NotFoundActivationStrategy($requestStack, ['^/foo', 'bar'], new ErrorLevelActivationStrategy(Logger::WARNING));
 
-        $this->assertEquals($expected, $strategy->isHandlerActivated($record));
+        self::assertEquals($expected, $strategy->isHandlerActivated($record));
     }
 
-    public function isActivatedProvider()
+    public function isActivatedProvider(): array
     {
         return [
             ['/test',      ['level' => Logger::DEBUG], false],
@@ -48,7 +49,7 @@ class NotFoundActivationStrategyTest extends TestCase
         ];
     }
 
-    protected function getContextException($code)
+    protected function getContextException(int $code): array
     {
         return ['exception' => new HttpException($code)];
     }

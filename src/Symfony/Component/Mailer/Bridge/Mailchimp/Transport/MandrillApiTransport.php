@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -30,7 +32,7 @@ class MandrillApiTransport extends AbstractApiTransport
 {
     private const HOST = 'mandrillapp.com';
 
-    private $key;
+    private string $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -118,6 +120,21 @@ class MandrillApiTransport extends AbstractApiTransport
         $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'];
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            if ($header instanceof TagHeader) {
+                $payload['message']['tags'] = array_merge(
+                    $payload['message']['tags'] ?? [],
+                    explode(',', $header->getValue())
+                );
+
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $payload['message']['metadata'][$header->getKey()] = $header->getValue();
+
                 continue;
             }
 

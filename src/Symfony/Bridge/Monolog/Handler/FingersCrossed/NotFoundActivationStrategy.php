@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Handler\FingersCrossed;
 
-use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use Monolog\Handler\FingersCrossed\ActivationStrategyInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -20,33 +20,30 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Pierrick Vignand <pierrick.vignand@gmail.com>
  */
-class NotFoundActivationStrategy extends ErrorLevelActivationStrategy
+final class NotFoundActivationStrategy implements ActivationStrategyInterface
 {
-    private $exclude;
-    private $requestStack;
+    private string $exclude;
 
-    public function __construct(RequestStack $requestStack, array $excludedUrls, $actionLevel)
-    {
-        parent::__construct($actionLevel);
-
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private RequestStack $requestStack,
+        array $excludedUrls,
+        private ActivationStrategyInterface $inner
+    ) {
         $this->exclude = '{('.implode('|', $excludedUrls).')}i';
     }
 
-    /**
-     * @return bool
-     */
-    public function isHandlerActivated(array $record)
+    public function isHandlerActivated(array $record): bool
     {
-        $isActivated = parent::isHandlerActivated($record);
+        $isActivated = $this->inner->isHandlerActivated($record);
 
         if (
             $isActivated
             && isset($record['context']['exception'])
             && $record['context']['exception'] instanceof HttpException
             && 404 == $record['context']['exception']->getStatusCode()
-            && ($request = $this->requestStack->getMasterRequest())
+            && ($request = $this->requestStack->getMainRequest())
         ) {
             return !preg_match($this->exclude, $request->getPathInfo());
         }

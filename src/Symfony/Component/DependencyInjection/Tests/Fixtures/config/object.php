@@ -9,6 +9,6 @@ return new class() {
     {
         $s = $c->services()->defaults()->public();
         $s->set(BarService::class)
-            ->args([inline('FooClass')]);
+            ->args([inline_service('FooClass')]);
     }
 };

@@ -24,13 +24,13 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TokenStorage implements TokenStorageInterface, ResetInterface
 {
-    private $token;
-    private $initializer;
+    private ?TokenInterface $token = null;
+    private ?\Closure $initializer = null;
 
     /**
      * {@inheritdoc}
      */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         if ($initializer = $this->initializer) {
             $this->initializer = null;
@@ -45,10 +45,6 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
      */
     public function setToken(TokenInterface $token = null)
     {
-        if (null !== $token && !method_exists($token, 'getRoleNames') && !$token instanceof \PHPUnit\Framework\MockObject\MockObject && !$token instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$token instanceof \Mockery\MockInterface) {
-            @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), \E_USER_DEPRECATED);
-        }
-
         if ($token) {
             // ensure any initializer is called
             $this->getToken();
@@ -60,7 +56,7 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
 
     public function setInitializer(?callable $initializer): void
     {
-        $this->initializer = $initializer;
+        $this->initializer = null === $initializer ? null : $initializer(...);
     }
 
     public function reset()

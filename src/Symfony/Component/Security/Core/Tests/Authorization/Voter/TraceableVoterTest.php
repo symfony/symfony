@@ -12,10 +12,11 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Event\VoteEvent;
-use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class TraceableVoterTest extends TestCase
@@ -50,5 +51,57 @@ class TraceableVoterTest extends TestCase
         $result = $sut->vote($token, 'anysubject', ['attr1']);
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+    }
+
+    public function testSupportsAttributeOnCacheable()
+    {
+        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+
+        $voter
+            ->expects($this->once())
+            ->method('supportsAttribute')
+            ->with('foo')
+            ->willReturn(false);
+
+        $sut = new TraceableVoter($voter, $eventDispatcher);
+
+        $this->assertFalse($sut->supportsAttribute('foo'));
+    }
+
+    public function testSupportsTypeOnCacheable()
+    {
+        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+
+        $voter
+            ->expects($this->once())
+            ->method('supportsType')
+            ->with('foo')
+            ->willReturn(false);
+
+        $sut = new TraceableVoter($voter, $eventDispatcher);
+
+        $this->assertFalse($sut->supportsType('foo'));
+    }
+
+    public function testSupportsAttributeOnNonCacheable()
+    {
+        $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+
+        $sut = new TraceableVoter($voter, $eventDispatcher);
+
+        $this->assertTrue($sut->supportsAttribute('foo'));
+    }
+
+    public function testSupportsTypeOnNonCacheable()
+    {
+        $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+
+        $sut = new TraceableVoter($voter, $eventDispatcher);
+
+        $this->assertTrue($sut->supportsType('foo'));
     }
 }

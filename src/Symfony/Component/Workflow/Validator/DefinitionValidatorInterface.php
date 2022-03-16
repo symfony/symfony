@@ -21,9 +21,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 interface DefinitionValidatorInterface
 {
     /**
-     * @param string $name
-     *
      * @throws InvalidDefinitionException on invalid definition
      */
-    public function validate(Definition $definition, $name);
+    public function validate(Definition $definition, string $name);
 }

@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -28,11 +28,13 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MailgunHttpTransport extends AbstractHttpTransport
 {
+    use MailgunHeadersTrait;
+
     private const HOST = 'api.%region_dot%mailgun.net';
 
-    private $key;
-    private $domain;
-    private $region;
+    private string $key;
+    private string $domain;
+    private ?string $region;
 
     public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

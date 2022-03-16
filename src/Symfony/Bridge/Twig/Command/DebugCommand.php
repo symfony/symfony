@@ -11,7 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,23 +33,22 @@ use Twig\Loader\FilesystemLoader;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
+#[AsCommand(name: 'debug:twig', description: 'Show a list of twig functions, filters, globals and tests')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:twig';
-
-    private $twig;
-    private $projectDir;
-    private $bundlesMetadata;
-    private $twigDefaultPath;
-    private $rootDir;
-    private $filesystemLoaders;
-    private $fileLinkFormatter;
+    private Environment $twig;
+    private ?string $projectDir;
+    private array $bundlesMetadata;
+    private ?string $twigDefaultPath;
 
     /**
-     * @param FileLinkFormatter|null $fileLinkFormatter
-     * @param string|null            $rootDir
+     * @var FilesystemLoader[]
      */
-    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, $fileLinkFormatter = null, $rootDir = null)
+    private array $filesystemLoaders;
+
+    private ?FileLinkFormatter $fileLinkFormatter;
+
+    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
@@ -54,16 +56,7 @@ class DebugCommand extends Command
         $this->projectDir = $projectDir;
         $this->bundlesMetadata = $bundlesMetadata;
         $this->twigDefaultPath = $twigDefaultPath;
-
-        if (\is_string($fileLinkFormatter) || $rootDir instanceof FileLinkFormatter) {
-            @trigger_error(sprintf('Passing a string as "$fileLinkFormatter" 5th argument or an instance of FileLinkFormatter as "$rootDir" 6th argument of the "%s()" method is deprecated since Symfony 4.4, swap the variables position.', __METHOD__), \E_USER_DEPRECATED);
-
-            $this->rootDir = $fileLinkFormatter;
-            $this->fileLinkFormatter = $rootDir;
-        } else {
-            $this->fileLinkFormatter = $fileLinkFormatter;
-            $this->rootDir = $rootDir;
-        }
+        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     protected function configure()
@@ -74,7 +67,6 @@ class DebugCommand extends Command
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
             ])
-            ->setDescription('Show a list of twig functions, filters, globals and tests')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command outputs a list of twig functions,
 filters, globals and tests.
@@ -99,7 +91,7 @@ EOF
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
@@ -121,6 +113,17 @@ EOF
         }
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues(array_keys($this->getLoaderPaths()));
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(['text', 'json']);
+        }
     }
 
     private function displayPathsText(SymfonyStyle $io, string $name)
@@ -291,7 +294,7 @@ EOF
             }
 
             foreach ($namespaces as $namespace) {
-                $paths = array_map([$this, 'getRelativePath'], $loader->getPaths($namespace));
+                $paths = array_map($this->getRelativePath(...), $loader->getPaths($namespace));
 
                 if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
                     $namespace = '(None)';
@@ -306,7 +309,7 @@ EOF
         return $loaderPaths;
     }
 
-    private function getMetadata(string $type, $entity)
+    private function getMetadata(string $type, mixed $entity)
     {
         if ('globals' === $type) {
             return $entity;
@@ -364,7 +367,7 @@ EOF
         return null;
     }
 
-    private function getPrettyMetadata(string $type, $entity, bool $decorated): ?string
+    private function getPrettyMetadata(string $type, mixed $entity, bool $decorated): ?string
     {
         if ('tests' === $type) {
             return '';
@@ -404,22 +407,6 @@ EOF
     {
         $alternatives = [];
         $bundleNames = [];
-
-        if ($this->rootDir && $this->projectDir) {
-            $folders = glob($this->rootDir.'/Resources/*/views', \GLOB_ONLYDIR);
-            $relativePath = ltrim(substr($this->rootDir.\DIRECTORY_SEPARATOR.'Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
-            $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
-                if (str_starts_with($absolutePath, $this->projectDir)) {
-                    $name = basename(\dirname($absolutePath));
-                    $path = ltrim($relativePath.$name, \DIRECTORY_SEPARATOR);
-                    $carry[$name] = $path;
-
-                    @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $absolutePath, $this->twigDefaultPath.'/bundles/'.$name), \E_USER_DEPRECATED);
-                }
-
-                return $carry;
-            }, $bundleNames);
-        }
 
         if ($this->twigDefaultPath && $this->projectDir) {
             $folders = glob($this->twigDefaultPath.'/bundles/*', \GLOB_ONLYDIR);
@@ -586,7 +573,7 @@ EOF
      */
     private function getFilesystemLoaders(): array
     {
-        if (null !== $this->filesystemLoaders) {
+        if (isset($this->filesystemLoaders)) {
             return $this->filesystemLoaders;
         }
         $this->filesystemLoaders = [];

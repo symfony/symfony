@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <stack id="stack_a" public="true">
+            <service class="stdClass">
+                <property name="label">A</property>
+                <property name="inner" type="service" id=".inner" />
+            </service>
+            <service class="stdClass">
+                <property name="label">B</property>
+                <property name="inner" type="service" id=".inner" />
+            </service>
+            <service class="stdClass">
+                <property name="label">C</property>
+            </service>
+        </stack>
+
+        <stack id="stack_abstract">
+            <service class="stdClass" abstract="true">
+                <property name="label">A</property>
+                <property name="inner" type="service" id=".inner" />
+            </service>
+            <service class="stdClass">
+                <property name="label">B</property>
+                <property name="inner" type="service" id=".inner" />
+            </service>
+        </stack>
+
+        <stack id="stack_b" public="true">
+            <service alias="stack_abstract" />
+            <service class="stdClass">
+                <property name="label">C</property>
+            </service>
+        </stack>
+
+        <stack id="stack_c" public="true">
+            <service class="stdClass">
+                <property name="label">Z</property>
+                <property name="inner" type="service" id=".inner" />
+            </service>
+            <service alias="stack_a" />
+        </stack>
+
+        <stack id="stack_d" public="true">
+            <service parent="stack_abstract">
+                <property name="label">Z</property>
+            </service>
+            <service class="stdClass">
+                <property name="label">C</property>
+            </service>
+        </stack>
+    </services>
+</container>

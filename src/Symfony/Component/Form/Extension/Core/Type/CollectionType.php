@@ -72,8 +72,32 @@ class CollectionType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($form->getConfig()->hasAttribute('prototype') && $view->vars['prototype']->vars['multipart']) {
-            $view->vars['multipart'] = true;
+        $prefixOffset = -2;
+        // check if the entry type also defines a block prefix
+        /** @var FormInterface $entry */
+        foreach ($form as $entry) {
+            if ($entry->getConfig()->getOption('block_prefix')) {
+                --$prefixOffset;
+            }
+
+            break;
+        }
+
+        foreach ($view as $entryView) {
+            array_splice($entryView->vars['block_prefixes'], $prefixOffset, 0, 'collection_entry');
+        }
+
+        /** @var FormInterface $prototype */
+        if ($prototype = $form->getConfig()->getAttribute('prototype')) {
+            if ($view->vars['prototype']->vars['multipart']) {
+                $view->vars['multipart'] = true;
+            }
+
+            if ($prefixOffset > -3 && $prototype->getConfig()->getOption('block_prefix')) {
+                --$prefixOffset;
+            }
+
+            array_splice($view->vars['prototype']->vars['block_prefixes'], $prefixOffset, 0, 'collection_entry');
         }
     }
 
@@ -97,6 +121,7 @@ class CollectionType extends AbstractType
             'entry_type' => TextType::class,
             'entry_options' => [],
             'delete_empty' => false,
+            'invalid_message' => 'The collection is invalid.',
         ]);
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
@@ -106,7 +131,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'collection';
     }

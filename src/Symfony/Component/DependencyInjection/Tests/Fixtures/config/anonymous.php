@@ -13,7 +13,7 @@ return function (ContainerConfigurator $c) {
 
     $s->set(null, StdClassDecorator::class)
         ->decorate('decorated', 'decorator42')
-        ->args([ref('decorator42')]);
+        ->args([service('decorator42')]);
 
     $s->set('listener_aggregator', FooClass::class)->public()->args([tagged_iterator('listener')]);
 

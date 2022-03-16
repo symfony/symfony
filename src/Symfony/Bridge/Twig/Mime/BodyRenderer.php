@@ -22,9 +22,9 @@ use Twig\Environment;
  */
 final class BodyRenderer implements BodyRendererInterface
 {
-    private $twig;
-    private $context;
-    private $converter;
+    private Environment $twig;
+    private array $context;
+    private HtmlConverter $converter;
 
     public function __construct(Environment $twig, array $context = [])
     {
@@ -55,7 +55,7 @@ final class BodyRenderer implements BodyRendererInterface
         }
 
         if (isset($messageContext['email'])) {
-            throw new InvalidArgumentException(sprintf('A "%s" context cannot have an "email" entry as this is a reserved variable.', \get_class($message)));
+            throw new InvalidArgumentException(sprintf('A "%s" context cannot have an "email" entry as this is a reserved variable.', get_debug_type($message)));
         }
 
         $vars = array_merge($this->context, $messageContext, [
@@ -96,7 +96,7 @@ final class BodyRenderer implements BodyRendererInterface
 
     private function convertHtmlToText(string $html): string
     {
-        if (null !== $this->converter) {
+        if (isset($this->converter)) {
             return $this->converter->convert($html);
         }
 

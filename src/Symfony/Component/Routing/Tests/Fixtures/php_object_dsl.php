@@ -12,6 +12,7 @@ return new class() {
             ->options(['utf8' => true])
             ->add('buz', 'zub')
             ->controller('foo:act')
+            ->stateless(true)
             ->add('controller_class', '/controller')
             ->controller(['Acme\MyApp\MyController', 'myAction']);
 

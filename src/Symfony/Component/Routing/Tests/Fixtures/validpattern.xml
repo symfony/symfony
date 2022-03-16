@@ -6,6 +6,9 @@
 
     <route id="blog_show" path="/blog/{slug}" host="{locale}.example.com" methods="GET|POST  put,OpTiOnS" schemes="hTTps">
         <default key="_controller">MyBundle:Blog:show</default>
+        <default key="_stateless">
+            <bool>true</bool>
+        </default>
         <requirement key="locale">\w+</requirement>
         <option key="compiler_class">RouteCompiler</option>
         <condition>context.getMethod() == "GET"</condition>

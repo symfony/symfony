@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Monolog\Processor;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -22,12 +22,12 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Piotr Stankowski <git@trakos.pl>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class RouteProcessor implements EventSubscriberInterface, ResetInterface
 {
-    private $routeData;
-    private $includeParams;
+    private array $routeData = [];
+    private bool $includeParams;
 
     public function __construct(bool $includeParams = true)
     {
@@ -35,7 +35,7 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         $this->reset();
     }
 
-    public function __invoke(array $records)
+    public function __invoke(array $records): array
     {
         if ($this->routeData && !isset($records['extra']['requests'])) {
             $records['extra']['requests'] = array_values($this->routeData);
@@ -49,9 +49,9 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         $this->routeData = [];
     }
 
-    public function addRouteData(GetResponseEvent $event)
+    public function addRouteData(RequestEvent $event)
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $this->reset();
         }
 
@@ -78,7 +78,7 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         unset($this->routeData[$requestId]);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['addRouteData', 1],

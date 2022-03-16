@@ -22,7 +22,7 @@ class AliasTest extends TestCase
         $alias = new Alias('foo');
 
         $this->assertEquals('foo', (string) $alias);
-        $this->assertTrue($alias->isPublic());
+        $this->assertFalse($alias->isPublic());
     }
 
     public function testCanConstructANonPublicAlias()
@@ -39,7 +39,7 @@ class AliasTest extends TestCase
 
         $this->assertEquals('foo', (string) $alias);
         $this->assertFalse($alias->isPublic());
-        $this->assertFalse($alias->isPrivate());
+        $this->assertTrue($alias->isPrivate());
     }
 
     public function testCanSetPublic()
@@ -53,37 +53,20 @@ class AliasTest extends TestCase
     public function testCanDeprecateAnAlias()
     {
         $alias = new Alias('foo', false);
-        $alias->setDeprecated(true, 'The %alias_id% service is deprecated.');
+        $alias->setDeprecated('vendor/package', '1.1', 'The %alias_id% service is deprecated.');
 
         $this->assertTrue($alias->isDeprecated());
     }
 
-    public function testItHasADefaultDeprecationMessage()
+    public function testReturnsCorrectDeprecation()
     {
         $alias = new Alias('foo', false);
-        $alias->setDeprecated();
+        $alias->setDeprecated('vendor/package', '1.1', 'The "%alias_id%" is deprecated.');
 
-        $expectedMessage = 'The "foo" service alias is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertEquals($expectedMessage, $alias->getDeprecationMessage('foo'));
-    }
-
-    public function testReturnsCorrectDeprecationMessage()
-    {
-        $alias = new Alias('foo', false);
-        $alias->setDeprecated(true, 'The "%alias_id%" is deprecated.');
-
-        $expectedMessage = 'The "foo" is deprecated.';
-        $this->assertEquals($expectedMessage, $alias->getDeprecationMessage('foo'));
-    }
-
-    public function testCanOverrideDeprecation()
-    {
-        $alias = new Alias('foo', false);
-        $alias->setDeprecated();
-        $this->assertTrue($alias->isDeprecated());
-
-        $alias->setDeprecated(false);
-        $this->assertFalse($alias->isDeprecated());
+        $deprecation = $alias->getDeprecation('foo');
+        $this->assertEquals('The "foo" is deprecated.', $deprecation['message']);
+        $this->assertEquals('vendor/package', $deprecation['package']);
+        $this->assertEquals('1.1', $deprecation['version']);
     }
 
     /**
@@ -93,7 +76,7 @@ class AliasTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $def = new Alias('foo');
-        $def->setDeprecated(true, $message);
+        $def->setDeprecated('package', '1.1', $message);
     }
 
     public function invalidDeprecationMessageProvider()

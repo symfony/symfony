@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
-    private $serverParams;
+    private ServerParams $serverParams;
 
     public function __construct(ServerParams $serverParams = null)
     {
@@ -38,10 +38,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handleRequest(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, mixed $request = null)
     {
         if (!$request instanceof Request) {
-            throw new UnexpectedTypeException($request, 'Symfony\Component\HttpFoundation\Request');
+            throw new UnexpectedTypeException($request, Request::class);
         }
 
         $name = $form->getName();
@@ -63,7 +63,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                     return;
                 }
 
-                $data = $request->query->get($name);
+                $data = $request->query->all()[$name];
             }
         } else {
             // Mark the form with an error if the uploaded size was too large
@@ -87,7 +87,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $files = $request->files->all();
             } elseif ($request->request->has($name) || $request->files->has($name)) {
                 $default = $form->getConfig()->getCompound() ? [] : null;
-                $params = $request->request->get($name, $default);
+                $params = $request->request->all()[$name] ?? $default;
                 $files = $request->files->get($name, $default);
             } else {
                 // Don't submit the form if it is not present in the request
@@ -112,15 +112,12 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function isFileUpload($data)
+    public function isFileUpload(mixed $data): bool
     {
         return $data instanceof File;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getUploadFileError($data)
+    public function getUploadFileError(mixed $data): ?int
     {
         if (!$data instanceof UploadedFile || $data->isValid()) {
             return null;

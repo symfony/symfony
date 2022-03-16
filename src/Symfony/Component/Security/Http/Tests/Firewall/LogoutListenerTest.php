@@ -12,48 +12,51 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
-use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
-use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class LogoutListenerTest extends TestCase
 {
     public function testHandleUnmatchedPath()
     {
-        [$listener, , $httpUtils, $options] = $this->getListener();
+        $dispatcher = $this->getEventDispatcher();
+        [$listener, , $httpUtils, $options] = $this->getListener($dispatcher);
+
+        $logoutEventDispatched = false;
+        $dispatcher->addListener(LogoutEvent::class, function () use (&$logoutEventDispatched) {
+            $logoutEventDispatched = true;
+        });
 
         $request = new Request();
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $options['logout_path'])
             ->willReturn(false);
 
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
 
-        $this->assertNull($event->getResponse());
+        $this->assertFalse($logoutEventDispatched, 'LogoutEvent should not have been dispatched.');
     }
 
-    public function testHandleMatchedPathWithSuccessHandlerAndCsrfValidation()
+    public function testHandleMatchedPathWithCsrfValidation()
     {
-        $successHandler = $this->getSuccessHandler();
         $tokenManager = $this->getTokenManager();
+        $dispatcher = $this->getEventDispatcher();
 
-        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($successHandler, $tokenManager);
+        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($dispatcher, $tokenManager);
 
         $request = new Request();
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
-
         $request->query->set('_csrf_token', 'token');
 
         $httpUtils->expects($this->once())
@@ -65,91 +68,72 @@ class LogoutListenerTest extends TestCase
             ->method('isTokenValid')
             ->willReturn(true);
 
-        $successHandler->expects($this->once())
-            ->method('onLogoutSuccess')
-            ->with($request)
-            ->willReturn($response = new Response());
+        $response = new Response();
+        $dispatcher->addListener(LogoutEvent::class, function (LogoutEvent $event) use ($response) {
+            $event->setResponse($response);
+        });
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token = $this->getToken());
 
-        $handler = $this->getHandler();
-        $handler->expects($this->once())
-            ->method('logout')
-            ->with($request, $response, $token);
-
         $tokenStorage->expects($this->once())
             ->method('setToken')
             ->with(null);
 
-        $listener->addHandler($handler);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener($event);
 
         $this->assertSame($response, $event->getResponse());
     }
 
-    public function testHandleMatchedPathWithoutSuccessHandlerAndCsrfValidation()
+    public function testHandleMatchedPathWithoutCsrfValidation()
     {
-        $successHandler = $this->getSuccessHandler();
-
-        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($successHandler);
+        $dispatcher = $this->getEventDispatcher();
+        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($dispatcher);
 
         $request = new Request();
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $options['logout_path'])
             ->willReturn(true);
 
-        $successHandler->expects($this->once())
-            ->method('onLogoutSuccess')
-            ->with($request)
-            ->willReturn($response = new Response());
+        $response = new Response();
+        $dispatcher->addListener(LogoutEvent::class, function (LogoutEvent $event) use ($response) {
+            $event->setResponse($response);
+        });
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token = $this->getToken());
 
-        $handler = $this->getHandler();
-        $handler->expects($this->once())
-            ->method('logout')
-            ->with($request, $response, $token);
-
         $tokenStorage->expects($this->once())
             ->method('setToken')
             ->with(null);
 
-        $listener->addHandler($handler);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener($event);
 
         $this->assertSame($response, $event->getResponse());
     }
 
-    public function testSuccessHandlerReturnsNonResponse()
+    public function testNoResponseSet()
     {
         $this->expectException(\RuntimeException::class);
-        $successHandler = $this->getSuccessHandler();
 
-        [$listener, , $httpUtils, $options] = $this->getListener($successHandler);
+        [$listener, , $httpUtils, $options] = $this->getListener();
 
         $request = new Request();
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $options['logout_path'])
             ->willReturn(true);
 
-        $successHandler->expects($this->once())
-            ->method('onLogoutSuccess')
-            ->with($request)
-            ->willReturn(null);
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     /**
@@ -176,7 +160,7 @@ class LogoutListenerTest extends TestCase
             ->method('isTokenValid')
             ->willReturn(false);
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function provideInvalidCsrfTokens(): array
@@ -198,22 +182,17 @@ class LogoutListenerTest extends TestCase
         return $this->createMock(TokenStorageInterface::class);
     }
 
-    private function getHandler()
-    {
-        return $this->createMock(LogoutHandlerInterface::class);
-    }
-
     private function getHttpUtils()
     {
         return $this->createMock(HttpUtils::class);
     }
 
-    private function getListener($successHandler = null, $tokenManager = null)
+    private function getListener($eventDispatcher = null, $tokenManager = null)
     {
         $listener = new LogoutListener(
             $tokenStorage = $this->getTokenStorage(),
             $httpUtils = $this->getHttpUtils(),
-            $successHandler ?: $this->getSuccessHandler(),
+            $eventDispatcher ?? $this->getEventDispatcher(),
             $options = [
                 'csrf_parameter' => '_csrf_token',
                 'csrf_token_id' => 'logout',
@@ -226,9 +205,9 @@ class LogoutListenerTest extends TestCase
         return [$listener, $tokenStorage, $httpUtils, $options];
     }
 
-    private function getSuccessHandler()
+    private function getEventDispatcher()
     {
-        return $this->createMock(LogoutSuccessHandlerInterface::class);
+        return new EventDispatcher();
     }
 
     private function getToken()

@@ -182,7 +182,7 @@ class TestOutput extends Output
         $this->output = '';
     }
 
-    protected function doWrite($message, $newline)
+    protected function doWrite(string $message, bool $newline)
     {
         $this->output .= $message.($newline ? "\n" : '');
     }

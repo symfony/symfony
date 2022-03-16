@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
@@ -30,7 +31,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     protected $httpUtils;
     protected $options;
-    protected $providerKey;
+    protected $firewallName;
     protected $defaultOptions = [
         'always_use_default_target_path' => false,
         'default_target_path' => '/',
@@ -51,17 +52,15 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     /**
      * {@inheritdoc}
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
     {
         return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
     }
 
     /**
      * Gets the options.
-     *
-     * @return array An array of options
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -71,32 +70,20 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         $this->options = array_merge($this->defaultOptions, $options);
     }
 
-    /**
-     * Get the provider key.
-     *
-     * @return string
-     */
-    public function getProviderKey()
+    public function getFirewallName(): ?string
     {
-        return $this->providerKey;
+        return $this->firewallName;
     }
 
-    /**
-     * Set the provider key.
-     *
-     * @param string $providerKey
-     */
-    public function setProviderKey($providerKey)
+    public function setFirewallName(string $firewallName): void
     {
-        $this->providerKey = $providerKey;
+        $this->firewallName = $firewallName;
     }
 
     /**
      * Builds the target URL according to the defined options.
-     *
-     * @return string
      */
-    protected function determineTargetUrl(Request $request)
+    protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {
             return $this->options['default_target_path'];
@@ -106,8 +93,9 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $targetUrl;
         }
 
-        if (null !== $this->providerKey && $targetUrl = $this->getTargetPath($request->getSession(), $this->providerKey)) {
-            $this->removeTargetPath($request->getSession(), $this->providerKey);
+        $firewallName = $this->getFirewallName();
+        if (null !== $firewallName && $targetUrl = $this->getTargetPath($request->getSession(), $firewallName)) {
+            $this->removeTargetPath($request->getSession(), $firewallName);
 
             return $targetUrl;
         }

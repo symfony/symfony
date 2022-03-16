@@ -18,10 +18,10 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AcceptHeaderItem
 {
-    private $value;
-    private $quality = 1.0;
-    private $index = 0;
-    private $attributes = [];
+    private string $value;
+    private float $quality = 1.0;
+    private int $index = 0;
+    private array $attributes = [];
 
     public function __construct(string $value, array $attributes = [])
     {
@@ -33,14 +33,10 @@ class AcceptHeaderItem
 
     /**
      * Builds an AcceptHeaderInstance instance from a string.
-     *
-     * @param string $itemValue
-     *
-     * @return self
      */
-    public static function fromString($itemValue)
+    public static function fromString(?string $itemValue): self
     {
-        $parts = HeaderUtils::split($itemValue, ';=');
+        $parts = HeaderUtils::split($itemValue ?? '', ';=');
 
         $part = array_shift($parts);
         $attributes = HeaderUtils::combine($parts);
@@ -50,10 +46,8 @@ class AcceptHeaderItem
 
     /**
      * Returns header value's string representation.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = $this->value.($this->quality < 1 ? ';q='.$this->quality : '');
         if (\count($this->attributes) > 0) {
@@ -66,11 +60,9 @@ class AcceptHeaderItem
     /**
      * Set the item value.
      *
-     * @param string $value
-     *
      * @return $this
      */
-    public function setValue($value)
+    public function setValue(string $value): static
     {
         $this->value = $value;
 
@@ -79,10 +71,8 @@ class AcceptHeaderItem
 
     /**
      * Returns the item value.
-     *
-     * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -90,11 +80,9 @@ class AcceptHeaderItem
     /**
      * Set the item quality.
      *
-     * @param float $quality
-     *
      * @return $this
      */
-    public function setQuality($quality)
+    public function setQuality(float $quality): static
     {
         $this->quality = $quality;
 
@@ -103,10 +91,8 @@ class AcceptHeaderItem
 
     /**
      * Returns the item quality.
-     *
-     * @return float
      */
-    public function getQuality()
+    public function getQuality(): float
     {
         return $this->quality;
     }
@@ -114,11 +100,9 @@ class AcceptHeaderItem
     /**
      * Set the item index.
      *
-     * @param int $index
-     *
      * @return $this
      */
-    public function setIndex($index)
+    public function setIndex(int $index): static
     {
         $this->index = $index;
 
@@ -127,45 +111,32 @@ class AcceptHeaderItem
 
     /**
      * Returns the item index.
-     *
-     * @return int
      */
-    public function getIndex()
+    public function getIndex(): int
     {
         return $this->index;
     }
 
     /**
      * Tests if an attribute exists.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name): bool
     {
         return isset($this->attributes[$name]);
     }
 
     /**
      * Returns an attribute by its name.
-     *
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return $this->attributes[$name] ?? $default;
     }
 
     /**
      * Returns all attributes.
-     *
-     * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -173,17 +144,14 @@ class AcceptHeaderItem
     /**
      * Set an attribute.
      *
-     * @param string $name
-     * @param string $value
-     *
      * @return $this
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, string $value): static
     {
         if ('q' === $name) {
             $this->quality = (float) $value;
         } else {
-            $this->attributes[$name] = (string) $value;
+            $this->attributes[$name] = $value;
         }
 
         return $this;

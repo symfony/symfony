@@ -12,11 +12,10 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ToString;
 
 class ExpressionValidatorTest extends ConstraintValidatorTestCase
@@ -271,45 +270,6 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $validator->validate(null, $constraint);
 
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\ExpressionLanguage\ExpressionLanguage" instance should be passed as "Symfony\Component\Validator\Constraints\ExpressionValidator::__construct" first argument instead of second argument since 4.4.
-     */
-    public function testLegacyExpressionLanguageUsage()
-    {
-        $constraint = new Expression([
-            'expression' => 'false',
-        ]);
-
-        $expressionLanguage = $this->createMock(ExpressionLanguage::class);
-
-        $used = false;
-
-        $expressionLanguage->method('evaluate')
-            ->willReturnCallback(function () use (&$used) {
-                $used = true;
-
-                return true;
-            });
-
-        $validator = new ExpressionValidator(null, $expressionLanguage);
-        $validator->initialize($this->createContext());
-        $validator->validate(null, $constraint);
-
-        $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\Validator\Constraints\ExpressionValidator::__construct" first argument must be an instance of "Symfony\Component\ExpressionLanguage\ExpressionLanguage" or null since 4.4. "Symfony\Component\PropertyAccess\PropertyAccessor" given
-     */
-    public function testDeprecatedArgumentType()
-    {
-        $validator = new ExpressionValidator(PropertyAccess::createPropertyAccessor());
-        $validator->initialize($this->createContext());
-        $validator->validate(null, new Expression(['expression' => 'false']));
     }
 
     public function testPassingCustomValues()

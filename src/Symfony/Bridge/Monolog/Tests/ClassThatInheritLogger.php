@@ -12,16 +12,17 @@
 namespace Symfony\Bridge\Monolog\Tests;
 
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\HttpFoundation\Request;
 
 class ClassThatInheritLogger extends Logger
 {
-    public function getLogs(): array
+    public function getLogs(Request $request = null): array
     {
-        return parent::getLogs();
+        return parent::getLogs($request);
     }
 
-    public function countErrors(): int
+    public function countErrors(Request $request = null): int
     {
-        return parent::countErrors();
+        return parent::countErrors($request);
     }
 }

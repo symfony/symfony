@@ -21,11 +21,11 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $traceableBuses = [];
+    private array $traceableBuses = [];
 
     public function registerBus(string $name, TraceableMessageBus $bus)
     {
@@ -34,10 +34,8 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
 
     /**
      * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         // Noop. Everything is collected live by the traceable buses & cloned as late as possible.
     }
@@ -67,7 +65,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'messenger';
     }
@@ -86,7 +84,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * {@inheritdoc}
      */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         $casters = parent::getCasters();
 

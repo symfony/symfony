@@ -15,12 +15,17 @@ use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
 {
@@ -29,26 +34,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
 
-        $this->assertEquals(
-            array_merge(['secret' => 's3cr3t', 'trusted_hosts' => []], self::getBundleDefaultConfig()),
-            $config
-        );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDoNoDuplicateDefaultFormResources()
-    {
-        $input = ['templating' => [
-            'form' => ['resources' => ['FrameworkBundle:Form']],
-            'engines' => ['php'],
-        ]];
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [$input]);
-
-        $this->assertEquals(['FrameworkBundle:Form'], $config['templating']['form']['resources']);
+        $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
     public function getTestValidSessionName()
@@ -101,6 +87,7 @@ class ConfigurationTest extends TestCase
             'base_urls' => [],
             'packages' => [],
             'json_manifest_path' => null,
+            'strict_mode' => false,
         ];
 
         $this->assertEquals($defaultConfig, $config['assets']);
@@ -382,8 +369,18 @@ class ConfigurationTest extends TestCase
     {
         return [
             'http_method_override' => true,
-            'ide' => null,
+            'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
+            'enabled_locales' => [],
+            'set_locale_from_accept_language' => false,
+            'set_content_language_from_locale' => false,
+            'secret' => 's3cr3t',
+            'trusted_hosts' => [],
+            'trusted_headers' => [
+                'x-forwarded-for',
+                'x-forwarded-port',
+                'x-forwarded-proto',
+            ],
             'csrf_protection' => [
                 'enabled' => false,
             ],
@@ -404,9 +401,10 @@ class ConfigurationTest extends TestCase
             'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,
-                'only_master_requests' => false,
+                'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
+                'collect_parameter' => null,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -416,6 +414,15 @@ class ConfigurationTest extends TestCase
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
+                'pseudo_localization' => [
+                    'enabled' => false,
+                    'accents' => true,
+                    'expansion_factor' => 1.0,
+                    'brackets' => true,
+                    'parse_html' => false,
+                    'localizable_html_attributes' => [],
+                ],
+                'providers' => [],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -438,12 +445,16 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'serializer' => [
+                'default_context' => [],
                 'enabled' => !class_exists(FullStack::class),
                 'enable_annotations' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
             ],
             'property_access' => [
+                'enabled' => true,
                 'magic_call' => false,
+                'magic_get' => true,
+                'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
             ],
@@ -452,14 +463,15 @@ class ConfigurationTest extends TestCase
             ],
             'router' => [
                 'enabled' => false,
+                'default_uri' => null,
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
-                'utf8' => false,
+                'utf8' => true,
             ],
             'session' => [
                 'enabled' => false,
-                'storage_id' => 'session.storage.native',
+                'storage_factory_id' => 'session.storage.factory.native',
                 'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
                 'cookie_samesite' => null,
@@ -471,15 +483,6 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'formats' => [],
             ],
-            'templating' => [
-                'enabled' => false,
-                'hinclude_default_template' => null,
-                'form' => [
-                    'resources' => ['FrameworkBundle:Form'],
-                ],
-                'engines' => [],
-                'loaders' => [],
-            ],
             'assets' => [
                 'enabled' => !class_exists(FullStack::class),
                 'version_strategy' => null,
@@ -489,15 +492,18 @@ class ConfigurationTest extends TestCase
                 'base_urls' => [],
                 'packages' => [],
                 'json_manifest_path' => null,
+                'strict_mode' => false,
             ],
             'cache' => [
                 'pools' => [],
                 'app' => 'cache.adapter.filesystem',
                 'system' => 'cache.adapter.system',
-                'directory' => '%kernel.cache_dir%/pools',
+                'directory' => '%kernel.cache_dir%/pools/app',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
-                'default_pdo_provider' => class_exists(Connection::class) ? 'database_connection' : null,
+                'default_doctrine_dbal_provider' => 'database_connection',
+                'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null,
+                'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
             'workflows' => [
                 'enabled' => false,
@@ -532,6 +538,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'reset_on_message' => true,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
@@ -542,14 +549,40 @@ class ConfigurationTest extends TestCase
                 'dsn' => null,
                 'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+                'message_bus' => null,
+                'headers' => [],
+            ],
+            'notifier' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
+                'chatter_transports' => [],
+                'texter_transports' => [],
+                'channel_policy' => [],
+                'admin_recipients' => [],
+                'notification_on_failed_messages' => false,
             ],
             'error_controller' => 'error_controller',
             'secrets' => [
                 'enabled' => true,
-                'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
+                'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.runtime_environment%',
                 'local_dotenv_file' => '%kernel.project_dir%/.env.%kernel.environment%.local',
                 'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
             ],
+            'http_cache' => [
+                'enabled' => false,
+                'debug' => '%kernel.debug%',
+                'private_headers' => [],
+            ],
+            'rate_limiter' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
+                'limiters' => [],
+            ],
+            'uid' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
+                'default_uuid_version' => 6,
+                'name_based_uuid_version' => 5,
+                'time_based_uuid_version' => 6,
+            ],
+            'exceptions' => [],
         ];
     }
 }

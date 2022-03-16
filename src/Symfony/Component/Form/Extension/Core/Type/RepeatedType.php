@@ -57,6 +57,7 @@ class RepeatedType extends AbstractType
             'first_name' => 'first',
             'second_name' => 'second',
             'error_bubbling' => false,
+            'invalid_message' => 'The values do not match.',
         ]);
 
         $resolver->setAllowedTypes('options', 'array');
@@ -67,7 +68,7 @@ class RepeatedType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'repeated';
     }

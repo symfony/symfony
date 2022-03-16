@@ -25,14 +25,13 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setPublic(false)
         ;
         $container
             ->register('bar')
-            ->setPublic(false)
         ;
         $container
             ->register('moo')
+            ->setPublic(true)
             ->setArguments([new Reference('bar')])
         ;
 
@@ -48,12 +47,10 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setPublic(false)
         ;
         $container
             ->register('bar')
             ->setArguments([new Reference('foo')])
-            ->setPublic(false)
         ;
 
         $this->process($container);
@@ -67,10 +64,10 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setPublic(false)
         ;
         $container
             ->register('bar')
+            ->setPublic(true)
             ->setArguments([new Definition(null, [new Reference('foo')])])
         ;
 
@@ -87,15 +84,17 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $container
             ->register('foo', 'stdClass')
             ->setFactory(['stdClass', 'getInstance'])
-            ->setPublic(false);
+            ->setPublic(true)
+        ;
 
         $container
             ->register('bar', 'stdClass')
             ->setFactory([new Reference('foo'), 'getInstance'])
-            ->setPublic(false);
+        ;
 
         $container
             ->register('foobar')
+            ->setPublic(true)
             ->addArgument(new Reference('bar'));
 
         $this->process($container);
@@ -112,7 +111,6 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $container
             ->register('foo')
             ->setArguments(['%env(FOOBAR)%'])
-            ->setPublic(false)
         ;
 
         $resolvePass = new ResolveParameterPlaceHoldersPass();
@@ -152,7 +150,6 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->setDefinition('foo', $definition)
-            ->setPublic(false)
         ;
 
         $this->process($container);

@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\UriSigner;
@@ -29,12 +29,12 @@ use Symfony\Component\HttpKernel\UriSigner;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FragmentListener implements EventSubscriberInterface
 {
-    private $signer;
-    private $fragmentPath;
+    private UriSigner $signer;
+    private string $fragmentPath;
 
     /**
      * @param string $fragmentPath The path that triggers this listener
@@ -50,7 +50,7 @@ class FragmentListener implements EventSubscriberInterface
      *
      * @throws AccessDeniedHttpException if the request does not come from a trusted IP
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -65,7 +65,7 @@ class FragmentListener implements EventSubscriberInterface
             return;
         }
 
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $this->validateRequest($request);
         }
 
@@ -83,15 +83,14 @@ class FragmentListener implements EventSubscriberInterface
         }
 
         // is the Request signed?
-        // we cannot use $request->getUri() here as we want to work with the original URI (no query string reordering)
-        if ($this->signer->check($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo().(null !== ($qs = $request->server->get('QUERY_STRING')) ? '?'.$qs : ''))) {
+        if ($this->signer->checkRequest($request)) {
             return;
         }
 
         throw new AccessDeniedHttpException();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [['onKernelRequest', 48]],

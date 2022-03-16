@@ -27,13 +27,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface UserLoaderInterface
 {
     /**
-     * Loads the user for the given username.
+     * Loads the user for the given user identifier (e.g. username or email).
      *
      * This method must return null if the user is not found.
-     *
-     * @param string $username The username
-     *
-     * @return UserInterface|null
      */
-    public function loadUserByUsername($username);
+    public function loadUserByIdentifier(string $identifier): ?UserInterface;
 }

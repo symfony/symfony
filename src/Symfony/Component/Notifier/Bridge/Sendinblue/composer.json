@@ -1,0 +1,31 @@
+{
+    "name": "symfony/sendinblue-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Sendinblue Notifier Bridge",
+    "keywords": ["sms", "sendinblue", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pierre Tondereau",
+            "email": "pierre.tondereau@protonmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-json": "*",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sendinblue\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

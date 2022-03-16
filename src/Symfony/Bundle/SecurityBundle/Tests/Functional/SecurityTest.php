@@ -13,7 +13,8 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SecurityTest extends AbstractWebTestCase
@@ -25,27 +26,13 @@ class SecurityTest extends AbstractWebTestCase
         $container = $kernel->getContainer();
 
         // put a token into the storage so the final calls can function
-        $user = new User('foo', 'pass');
-        $token = new UsernamePasswordToken($user, '', 'provider', ['ROLE_USER']);
-        $container->get('security.token_storage')->setToken($token);
+        $user = new InMemoryUser('foo', 'pass');
+        $token = new UsernamePasswordToken($user, 'provider', ['ROLE_USER']);
+        $container->get('functional.test.security.token_storage')->setToken($token);
 
         $security = $container->get('functional_test.security.helper');
         $this->assertTrue($security->isGranted('ROLE_USER'));
         $this->assertSame($token, $security->getToken());
-    }
-
-    public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
-    {
-        return [
-            [
-                new User('user1', 'test', ['ROLE_ADMIN']),
-                new User('user1', 'test', ['ROLE_USER']),
-            ],
-            [
-                new UserWithoutEquatable('user1', 'test', ['ROLE_ADMIN']),
-                new UserWithoutEquatable('user1', 'test', ['ROLE_USER']),
-            ],
-        ];
     }
 
     /**
@@ -76,9 +63,23 @@ class SecurityTest extends AbstractWebTestCase
         $client->request('GET', '/admin');
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
+
+    public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
+    {
+        return [
+            [
+                new InMemoryUser('user1', 'test', ['ROLE_ADMIN']),
+                new InMemoryUser('user1', 'test', ['ROLE_USER']),
+            ],
+            [
+                new UserWithoutEquatable('user1', 'test', ['ROLE_ADMIN']),
+                new UserWithoutEquatable('user1', 'test', ['ROLE_USER']),
+            ],
+        ];
+    }
 }
 
-final class UserWithoutEquatable implements UserInterface
+final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface
 {
     private $username;
     private $password;
@@ -103,15 +104,15 @@ final class UserWithoutEquatable implements UserInterface
         $this->roles = $roles;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getUsername();
+        return $this->getUserIdentifier();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }
@@ -119,7 +120,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -127,15 +128,20 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getSalt()
+    public function getSalt(): string
     {
-        return null;
+        return '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUsername()
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function getUserIdentifier(): string
     {
         return $this->username;
     }
@@ -143,7 +149,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonExpired()
+    public function isAccountNonExpired(): bool
     {
         return $this->accountNonExpired;
     }
@@ -151,7 +157,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonLocked()
+    public function isAccountNonLocked(): bool
     {
         return $this->accountNonLocked;
     }
@@ -159,7 +165,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isCredentialsNonExpired()
+    public function isCredentialsNonExpired(): bool
     {
         return $this->credentialsNonExpired;
     }
@@ -167,7 +173,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->enabled;
     }
@@ -175,7 +181,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }

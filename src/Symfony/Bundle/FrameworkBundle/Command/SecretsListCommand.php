@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,12 +28,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @internal
  */
+#[AsCommand(name: 'secrets:list', description: 'List all secrets')]
 final class SecretsListCommand extends Command
 {
-    protected static $defaultName = 'secrets:list';
-
-    private $vault;
-    private $localVault;
+    private AbstractVault $vault;
+    private ?AbstractVault $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {
@@ -45,7 +45,6 @@ final class SecretsListCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('List all secrets.')
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command list all stored secrets.
@@ -71,7 +70,7 @@ EOF
         }
 
         $secrets = $this->vault->list($reveal);
-        $localSecrets = null !== $this->localVault ? $this->localVault->list($reveal) : null;
+        $localSecrets = $this->localVault?->list($reveal);
 
         $rows = [];
 

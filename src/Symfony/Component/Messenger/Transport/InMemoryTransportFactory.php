@@ -22,11 +22,13 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
     /**
      * @var InMemoryTransport[]
      */
-    private $createdTransports = [];
+    private array $createdTransports = [];
 
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
-        return $this->createdTransports[] = new InMemoryTransport();
+        ['serialize' => $serialize] = $this->parseDsn($dsn);
+
+        return $this->createdTransports[] = new InMemoryTransport($serialize ? $serializer : null);
     }
 
     public function supports(string $dsn, array $options): bool
@@ -39,5 +41,17 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
         foreach ($this->createdTransports as $transport) {
             $transport->reset();
         }
+    }
+
+    private function parseDsn(string $dsn): array
+    {
+        $query = [];
+        if ($queryAsString = strstr($dsn, '?')) {
+            parse_str(ltrim($queryAsString, '?'), $query);
+        }
+
+        return [
+            'serialize' => filter_var($query['serialize'] ?? false, \FILTER_VALIDATE_BOOLEAN),
+        ];
     }
 }

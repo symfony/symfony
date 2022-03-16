@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Templating\Loader\CacheLoader;
 use Symfony\Component\Templating\Loader\Loader;
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateReferenceInterface;
@@ -79,7 +80,7 @@ class ProjectTemplateLoaderVar extends Loader
         return 'Hello {{ name }}';
     }
 
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
         if (method_exists($this, $method = 'get'.ucfirst($template->get('name')).'Template')) {
             return new StringStorage($this->$method());
@@ -88,7 +89,7 @@ class ProjectTemplateLoaderVar extends Loader
         return false;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, $time): bool
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         return false;
     }

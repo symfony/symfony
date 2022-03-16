@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
-use Twig\Loader\SourceContextLoaderInterface;
 
 /**
  * @author Artur Wielogórski <wodor@wodor.net>
@@ -47,9 +46,9 @@ class TemplateManagerTest extends TestCase
         $this->profiler = $this->createMock(Profiler::class);
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = [
-            'data_collector.foo' => ['foo', 'FooBundle:Collector:foo'],
-            'data_collector.bar' => ['bar', 'FooBundle:Collector:bar'],
-            'data_collector.baz' => ['baz', 'FooBundle:Collector:baz'],
+            'data_collector.foo' => ['foo', '@Foo/Collector/foo.html.twig'],
+            'data_collector.bar' => ['bar', '@Foo/Collector/bar.html.twig'],
+            'data_collector.baz' => ['baz', '@Foo/Collector/baz.html.twig'],
         ];
 
         $this->templateManager = new TemplateManager($this->profiler, $twigEnvironment, $templates);
@@ -69,46 +68,38 @@ class TemplateManagerTest extends TestCase
         $this->profiler->expects($this->any())
             ->method('has')
             ->withAnyParameters()
-            ->willReturnCallback([$this, 'profilerHasCallback']);
+            ->willReturnCallback($this->profilerHasCallback(...));
 
-        $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
+        $this->assertEquals('@Foo/Collector/foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
     }
 
     public function profilerHasCallback($panel)
     {
-        switch ($panel) {
-            case 'foo':
-            case 'bar':
-                return true;
-            default:
-                return false;
-        }
+        return match ($panel) {
+            'foo',
+            'bar' => true,
+            default => false,
+        };
     }
 
     public function profileHasCollectorCallback($panel)
     {
-        switch ($panel) {
-            case 'foo':
-            case 'baz':
-                return true;
-            default:
-                return false;
-        }
+        return match ($panel) {
+            'foo',
+            'baz' => true,
+            default => false,
+        };
     }
 
     protected function mockTwigEnvironment()
     {
         $this->twigEnvironment = $this->createMock(Environment::class);
 
-        if (Environment::MAJOR_VERSION > 1) {
-            $loader = $this->createMock(LoaderInterface::class);
-            $loader
-                ->expects($this->any())
-                ->method('exists')
-                ->willReturn(true);
-        } else {
-            $loader = $this->createMock(SourceContextLoaderInterface::class);
-        }
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader
+            ->expects($this->any())
+            ->method('exists')
+            ->willReturn(true);
 
         $this->twigEnvironment->expects($this->any())->method('getLoader')->willReturn($loader);
 
@@ -123,14 +114,12 @@ class ProfileDummy extends Profile
         parent::__construct('token');
     }
 
-    public function hasCollector($name): bool
+    public function hasCollector(string $name): bool
     {
-        switch ($name) {
-            case 'foo':
-            case 'bar':
-                return true;
-            default:
-                return false;
-        }
+        return match ($name) {
+            'foo',
+            'bar' => true,
+            default => false,
+        };
     }
 }

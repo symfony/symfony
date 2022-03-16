@@ -11,14 +11,21 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Environment;
 
-class LoginController implements ContainerAwareInterface
+class LoginController implements ServiceSubscriberInterface
 {
-    use ContainerAwareTrait;
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function loginAction()
     {
@@ -42,5 +49,16 @@ class LoginController implements ContainerAwareInterface
     public function secureAction()
     {
         throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'form.factory' => FormFactoryInterface::class,
+            'twig' => Environment::class,
+        ];
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DecoratorServicePassTest extends TestCase
 {
@@ -26,7 +27,6 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $fooDefinition = $container
             ->register('foo')
-            ->setPublic(false)
         ;
         $fooExtendedDefinition = $container
             ->register('foo.extended')
@@ -91,7 +91,6 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $fooDefinition = $container
             ->register('foo')
-            ->setPublic(false)
         ;
         $barDefinition = $container
             ->register('bar')
@@ -280,9 +279,23 @@ class DecoratorServicePassTest extends TestCase
         $this->process($container);
     }
 
+    public function testGenericInnerReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+
+        $container->register('bar')
+            ->setDecoratedService('foo')
+            ->setProperty('prop', new Reference('.inner'));
+
+        $this->process($container);
+
+        $this->assertEquals(['prop' => new Reference('bar.inner')], $container->getDefinition('bar')->getProperties());
+    }
+
     protected function process(ContainerBuilder $container)
     {
-        $repeatedPass = new DecoratorServicePass();
-        $repeatedPass->process($container);
+        $pass = new DecoratorServicePass();
+        $pass->process($container);
     }
 }

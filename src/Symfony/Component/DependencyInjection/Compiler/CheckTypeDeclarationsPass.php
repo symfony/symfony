@@ -59,10 +59,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         'string' => true,
     ];
 
-    private $autoload;
-    private $skippedIds;
+    private bool $autoload;
+    private array $skippedIds;
 
-    private $expressionLanguage;
+    private ExpressionLanguage $expressionLanguage;
 
     /**
      * @param bool  $autoload   Whether services who's class in not loaded should be checked or not.
@@ -78,7 +78,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (isset($this->skippedIds[$this->currentId])) {
             return $value;
@@ -158,9 +158,9 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * @throws InvalidParameterTypeException When a parameter is not compatible with the declared type
      */
-    private function checkType(Definition $checkedDefinition, $value, \ReflectionParameter $parameter, ?string $envPlaceholderUniquePrefix, \ReflectionType $reflectionType = null): void
+    private function checkType(Definition $checkedDefinition, mixed $value, \ReflectionParameter $parameter, ?string $envPlaceholderUniquePrefix, \ReflectionType $reflectionType = null): void
     {
-        $reflectionType = $reflectionType ?? $parameter->getType();
+        $reflectionType ??= $parameter->getType();
 
         if ($reflectionType instanceof \ReflectionUnionType) {
             foreach ($reflectionType->getTypes() as $t) {
@@ -315,15 +315,11 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             }
         }
 
-        throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : \gettype($value), $parameter);
+        throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : get_debug_type($value), $parameter);
     }
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (null === $this->expressionLanguage) {
-            $this->expressionLanguage = new ExpressionLanguage(null, $this->container->getExpressionLanguageProviders());
-        }
-
-        return $this->expressionLanguage;
+        return $this->expressionLanguage ??= new ExpressionLanguage(null, $this->container->getExpressionLanguageProviders());
     }
 }

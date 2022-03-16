@@ -15,7 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,20 +22,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TransformationFailureListener implements EventSubscriberInterface
 {
-    private $translator;
+    private ?TranslatorInterface $translator;
 
-    /**
-     * @param TranslatorInterface|null $translator
-     */
-    public function __construct($translator = null)
+    public function __construct(TranslatorInterface $translator = null)
     {
-        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->translator = $translator;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::POST_SUBMIT => ['convertTransformationFailureToFormError', -1024],
@@ -57,15 +50,16 @@ class TransformationFailureListener implements EventSubscriberInterface
             }
         }
 
-        $clientDataAsString = is_scalar($form->getViewData()) ? (string) $form->getViewData() : \gettype($form->getViewData());
-        $messageTemplate = 'The value {{ value }} is not valid.';
+        $clientDataAsString = is_scalar($form->getViewData()) ? (string) $form->getViewData() : get_debug_type($form->getViewData());
+        $messageTemplate = $form->getConfig()->getOption('invalid_message', 'The value {{ value }} is not valid.');
+        $messageParameters = array_replace(['{{ value }}' => $clientDataAsString], $form->getConfig()->getOption('invalid_message_parameters', []));
 
         if (null !== $this->translator) {
-            $message = $this->translator->trans($messageTemplate, ['{{ value }}' => $clientDataAsString]);
+            $message = $this->translator->trans($messageTemplate, $messageParameters);
         } else {
-            $message = strtr($messageTemplate, ['{{ value }}' => $clientDataAsString]);
+            $message = strtr($messageTemplate, $messageParameters);
         }
 
-        $form->addError(new FormError($message, $messageTemplate, ['{{ value }}' => $clientDataAsString], null, $form->getTransformationFailure()));
+        $form->addError(new FormError($message, $messageTemplate, $messageParameters, null, $form->getTransformationFailure()));
     }
 }

@@ -256,6 +256,28 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus->dispatch($message);
     }
 
+    public function testDispatchOutOfAnotherHandlerDispatchesAndRemoveStamp()
+    {
+        $event = new DummyEvent('First event');
+
+        $middleware = new DispatchAfterCurrentBusMiddleware();
+        $handlingMiddleware = $this->createMock(MiddlewareInterface::class);
+
+        $handlingMiddleware
+            ->method('handle')
+            ->with($this->expectHandledMessage($event))
+            ->will($this->willHandleMessage());
+
+        $eventBus = new MessageBus([
+            $middleware,
+            $handlingMiddleware,
+        ]);
+
+        $enveloppe = $eventBus->dispatch($event, [new DispatchAfterCurrentBusStamp()]);
+
+        self::assertNull($enveloppe->last(DispatchAfterCurrentBusStamp::class));
+    }
+
     private function expectHandledMessage($message): Callback
     {
         return $this->callback(function (Envelope $envelope) use ($message) {

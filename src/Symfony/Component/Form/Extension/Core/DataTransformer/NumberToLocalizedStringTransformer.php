@@ -23,67 +23,18 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
-    /**
-     * Rounds a number towards positive infinity.
-     *
-     * Rounds 1.4 to 2 and -1.4 to -1.
-     */
-    public const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
-
-    /**
-     * Rounds a number towards negative infinity.
-     *
-     * Rounds 1.4 to 1 and -1.4 to -2.
-     */
-    public const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
-
-    /**
-     * Rounds a number away from zero.
-     *
-     * Rounds 1.4 to 2 and -1.4 to -2.
-     */
-    public const ROUND_UP = \NumberFormatter::ROUND_UP;
-
-    /**
-     * Rounds a number towards zero.
-     *
-     * Rounds 1.4 to 1 and -1.4 to -1.
-     */
-    public const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
-
-    /**
-     * Rounds to the nearest number and halves to the next even number.
-     *
-     * Rounds 2.5, 1.6 and 1.5 to 2 and 1.4 to 1.
-     */
-    public const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
-
-    /**
-     * Rounds to the nearest number and halves away from zero.
-     *
-     * Rounds 2.5 to 3, 1.6 and 1.5 to 2 and 1.4 to 1.
-     */
-    public const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
-
-    /**
-     * Rounds to the nearest number and halves towards zero.
-     *
-     * Rounds 2.5 and 1.6 to 2, 1.5 and 1.4 to 1.
-     */
-    public const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
-
     protected $grouping;
 
     protected $roundingMode;
 
-    private $scale;
-    private $locale;
+    private ?int $scale;
+    private ?string $locale;
 
-    public function __construct(int $scale = null, ?bool $grouping = false, ?int $roundingMode = self::ROUND_HALF_UP, string $locale = null)
+    public function __construct(int $scale = null, ?bool $grouping = false, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, string $locale = null)
     {
         $this->scale = $scale;
         $this->grouping = $grouping ?? false;
-        $this->roundingMode = $roundingMode ?? self::ROUND_HALF_UP;
+        $this->roundingMode = $roundingMode ?? \NumberFormatter::ROUND_HALFUP;
         $this->locale = $locale;
     }
 
@@ -92,12 +43,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param int|float|null $value Number value
      *
-     * @return string Localized value
-     *
      * @throws TransformationFailedException if the given value is not numeric
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
-    public function transform($value)
+    public function transform(mixed $value): string
     {
         if (null === $value) {
             return '';
@@ -125,12 +74,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param string $value The localized value
      *
-     * @return int|float|null The numeric value
-     *
      * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): int|float|null
     {
         if (null !== $value && !\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -203,10 +150,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Returns a preconfigured \NumberFormatter instance.
-     *
-     * @return \NumberFormatter
      */
-    protected function getNumberFormatter()
+    protected function getNumberFormatter(): \NumberFormatter
     {
         $formatter = new \NumberFormatter($this->locale ?? \Locale::getDefault(), \NumberFormatter::DECIMAL);
 
@@ -223,7 +168,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * @internal
      */
-    protected function castParsedValue($value)
+    protected function castParsedValue(int|float $value): int|float
     {
         if (\is_int($value) && $value === (int) $float = (float) $value) {
             return $float;
@@ -234,12 +179,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Rounds a number according to the configured scale and rounding mode.
-     *
-     * @param int|float $number A number
-     *
-     * @return int|float The rounded number
      */
-    private function round($number)
+    private function round(int|float $number): int|float
     {
         if (null !== $this->scale && null !== $this->roundingMode) {
             // shift number to maintain the correct scale during rounding
@@ -248,25 +189,25 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $number = (string) ($number * $roundingCoef);
 
             switch ($this->roundingMode) {
-                case self::ROUND_CEILING:
+                case \NumberFormatter::ROUND_CEILING:
                     $number = ceil($number);
                     break;
-                case self::ROUND_FLOOR:
+                case \NumberFormatter::ROUND_FLOOR:
                     $number = floor($number);
                     break;
-                case self::ROUND_UP:
+                case \NumberFormatter::ROUND_UP:
                     $number = $number > 0 ? ceil($number) : floor($number);
                     break;
-                case self::ROUND_DOWN:
+                case \NumberFormatter::ROUND_DOWN:
                     $number = $number > 0 ? floor($number) : ceil($number);
                     break;
-                case self::ROUND_HALF_EVEN:
+                case \NumberFormatter::ROUND_HALFEVEN:
                     $number = round($number, 0, \PHP_ROUND_HALF_EVEN);
                     break;
-                case self::ROUND_HALF_UP:
+                case \NumberFormatter::ROUND_HALFUP:
                     $number = round($number, 0, \PHP_ROUND_HALF_UP);
                     break;
-                case self::ROUND_HALF_DOWN:
+                case \NumberFormatter::ROUND_HALFDOWN:
                     $number = round($number, 0, \PHP_ROUND_HALF_DOWN);
                     break;
             }

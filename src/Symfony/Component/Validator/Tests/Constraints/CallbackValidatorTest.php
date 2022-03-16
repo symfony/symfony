@@ -230,22 +230,27 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     public function testPayloadIsPassedToCallback()
     {
         $object = new \stdClass();
-        $payloadCopy = null;
+        $payloadCopy = 'Replace me!';
+        $callback = function ($object, ExecutionContextInterface $constraint, $payload) use (&$payloadCopy) {
+            $payloadCopy = $payload;
+        };
 
         $constraint = new Callback([
-            'callback' => function ($object, ExecutionContextInterface $constraint, $payload) use (&$payloadCopy) {
-                $payloadCopy = $payload;
-            },
+            'callback' => $callback,
             'payload' => 'Hello world!',
         ]);
         $this->validator->validate($object, $constraint);
         $this->assertEquals('Hello world!', $payloadCopy);
 
-        $payloadCopy = null;
+        $payloadCopy = 'Replace me!';
+        $constraint = new Callback(callback: $callback, payload: 'Hello world!');
+        $this->validator->validate($object, $constraint);
+        $this->assertEquals('Hello world!', $payloadCopy);
+        $payloadCopy = 'Replace me!';
+
+        $payloadCopy = 'Replace me!';
         $constraint = new Callback([
-            'callback' => function ($object, ExecutionContextInterface $constraint, $payload) use (&$payloadCopy) {
-                $payloadCopy = $payload;
-            },
+            'callback' => $callback,
         ]);
         $this->validator->validate($object, $constraint);
         $this->assertNull($payloadCopy);

@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\FilesLoader;
 
 class FilesLoaderTest extends TestCase
@@ -30,7 +31,7 @@ class FilesLoaderTest extends TestCase
         $fileLoader->expects($this->exactly(4))
             ->method('loadClassMetadata');
         $loader = $this->getFilesLoader($fileLoader);
-        $loader->loadClassMetadata(new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity'));
+        $loader->loadClassMetadata(new ClassMetadata(Entity::class));
     }
 
     public function getFilesLoader(LoaderInterface $loader)

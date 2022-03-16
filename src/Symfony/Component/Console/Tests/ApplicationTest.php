@@ -13,8 +13,11 @@ namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
+use Symfony\Component\Console\Command\LazyCommand;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -35,9 +38,12 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\SignalRegistry\SignalRegistry;
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
 {
@@ -89,7 +95,7 @@ class ApplicationTest extends TestCase
     /**
      * Replaces the dynamic placeholders of the command help text with a static version.
      * The placeholder %command.full_name% includes the script path that is not predictable
-     * and can not be tested against.
+     * and cannot be tested against.
      */
     protected function ensureStaticCommandHelp(Application $application)
     {
@@ -103,7 +109,7 @@ class ApplicationTest extends TestCase
         $application = new Application('foo', 'bar');
         $this->assertEquals('foo', $application->getName(), '__construct() takes the application name as its first argument');
         $this->assertEquals('bar', $application->getVersion(), '__construct() takes the application version as its second argument');
-        $this->assertEquals(['help', 'list'], array_keys($application->all()), '__construct() registered the help and list commands by default');
+        $this->assertEquals(['help', 'list', '_complete', 'completion'], array_keys($application->all()), '__construct() registered the help and list commands by default');
     }
 
     public function testSetGetName()
@@ -228,7 +234,6 @@ class ApplicationTest extends TestCase
         // simulate --help
         $r = new \ReflectionObject($application);
         $p = $r->getProperty('wantHelps');
-        $p->setAccessible(true);
         $p->setValue($application, true);
         $command = $application->get('foo:bar');
         $this->assertInstanceOf(HelpCommand::class, $command, '->get() returns the help command if --help is provided as the input');
@@ -733,28 +738,14 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf(\FooHiddenCommand::class, $application->find('afoohidden'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Command "%s:hidden" is hidden, finding it using an abbreviation is deprecated since Symfony 4.4, use its full name instead.
-     * @dataProvider provideAbbreviationsForHiddenCommands
-     */
-    public function testFindHiddenWithAbbreviatedName($name)
+    public function testFindAmbiguousCommandsIfAllAlternativesAreHidden()
     {
         $application = new Application();
 
+        $application->add(new \FooCommand());
         $application->add(new \FooHiddenCommand());
-        $application->add(new \BarHiddenCommand());
 
-        $application->find($name);
-    }
-
-    public function provideAbbreviationsForHiddenCommands()
-    {
-        return [
-            ['foo:hidde'],
-            ['afoohidd'],
-            ['bar:hidde'],
-        ];
+        $this->assertInstanceOf(\FooCommand::class, $application->find('foo:'));
     }
 
     public function testSetCatchExceptions()
@@ -1044,6 +1035,12 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'list', '-vvv' => true]);
         $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
 
+        $tester->run(['command' => 'help', '--help' => true], ['decorated' => false]);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run5.txt', $tester->getDisplay(true), '->run() displays the help if --help is passed');
+
+        $tester->run(['command' => 'help', '-h' => true], ['decorated' => false]);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run5.txt', $tester->getDisplay(true), '->run() displays the help if -h is passed');
+
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
@@ -1289,7 +1286,8 @@ class ApplicationTest extends TestCase
         $this->assertTrue($inputDefinition->hasOption('verbose'));
         $this->assertTrue($inputDefinition->hasOption('version'));
         $this->assertTrue($inputDefinition->hasOption('ansi'));
-        $this->assertTrue($inputDefinition->hasOption('no-ansi'));
+        $this->assertTrue($inputDefinition->hasNegation('no-ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
         $this->assertTrue($inputDefinition->hasOption('no-interaction'));
     }
 
@@ -1309,7 +1307,7 @@ class ApplicationTest extends TestCase
         $this->assertFalse($inputDefinition->hasOption('verbose'));
         $this->assertFalse($inputDefinition->hasOption('version'));
         $this->assertFalse($inputDefinition->hasOption('ansi'));
-        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasNegation('no-ansi'));
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
 
         $this->assertTrue($inputDefinition->hasOption('custom'));
@@ -1333,7 +1331,7 @@ class ApplicationTest extends TestCase
         $this->assertFalse($inputDefinition->hasOption('verbose'));
         $this->assertFalse($inputDefinition->hasOption('version'));
         $this->assertFalse($inputDefinition->hasOption('ansi'));
-        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasNegation('no-ansi'));
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
 
         $this->assertTrue($inputDefinition->hasOption('custom'));
@@ -1684,7 +1682,7 @@ class ApplicationTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());
         $container
-            ->register('lazy-command', LazyCommand::class)
+            ->register('lazy-command', LazyTestCommand::class)
             ->addTag('console.command', ['command' => 'lazy:command'])
             ->addTag('console.command', ['command' => 'lazy:alias'])
             ->addTag('console.command', ['command' => 'lazy:alias2']);
@@ -1841,14 +1839,90 @@ class ApplicationTest extends TestCase
         $app->setCommandLoader($loader);
         $app->get('test');
     }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignal()
+    {
+        $command = new SignableCommand();
+
+        $dispatcherCalled = false;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.signal', function () use (&$dispatcherCalled) {
+            $dispatcherCalled = true;
+        });
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->setSignalsToDispatchEvent(\SIGALRM);
+        $application->add(new LazyCommand('signal', [], '', false, function () use ($command) { return $command; }, true));
+
+        $this->assertFalse($command->signaled);
+        $this->assertFalse($dispatcherCalled);
+
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+        $this->assertFalse($command->signaled);
+        $this->assertFalse($dispatcherCalled);
+
+        $command->loop = 100000;
+        pcntl_alarm(1);
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($command->signaled);
+        $this->assertTrue($dispatcherCalled);
+    }
+
+    public function testSignalableCommandInterfaceWithoutSignals()
+    {
+        $command = new SignableCommand();
+
+        $dispatcher = new EventDispatcher();
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->add($command);
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+    }
+
+    /**
+     * @group tty
+     */
+    public function testSignalableRestoresStty()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('stty not available');
+        }
+
+        if (!SignalRegistry::isSupported()) {
+            $this->markTestSkipped('pcntl signals not available');
+        }
+
+        $previousSttyMode = shell_exec('stty -g');
+
+        $p = new Process(['php', __DIR__.'/Fixtures/application_signalable.php']);
+        $p->setTty(true);
+        $p->start();
+
+        for ($i = 0; $i < 10 && shell_exec('stty -g') === $previousSttyMode; ++$i) {
+            usleep(100000);
+        }
+
+        $this->assertNotSame($previousSttyMode, shell_exec('stty -g'));
+        $p->signal(\SIGINT);
+        $p->wait();
+
+        $sttyMode = shell_exec('stty -g');
+        shell_exec('stty '.$previousSttyMode);
+
+        $this->assertSame($previousSttyMode, $sttyMode);
+    }
 }
 
 class CustomApplication extends Application
 {
     /**
      * Overwrites the default input definition.
-     *
-     * @return InputDefinition An InputDefinition instance
      */
     protected function getDefaultInputDefinition(): InputDefinition
     {
@@ -1857,8 +1931,6 @@ class CustomApplication extends Application
 
     /**
      * Gets the default helper set with the helpers that should always be available.
-     *
-     * @return HelperSet A HelperSet instance
      */
     protected function getDefaultHelperSet(): HelperSet
     {
@@ -1868,9 +1940,6 @@ class CustomApplication extends Application
 
 class CustomDefaultCommandApplication extends Application
 {
-    /**
-     * Overwrites the constructor in order to set a different default command.
-     */
     public function __construct()
     {
         parent::__construct();
@@ -1881,7 +1950,7 @@ class CustomDefaultCommandApplication extends Application
     }
 }
 
-class LazyCommand extends Command
+class LazyTestCommand extends Command
 {
     public function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -1896,5 +1965,34 @@ class DisabledCommand extends Command
     public function isEnabled(): bool
     {
         return false;
+    }
+}
+
+#[AsCommand(name: 'signal')]
+class SignableCommand extends Command implements SignalableCommandInterface
+{
+    public $signaled = false;
+    public $loop = 100;
+
+    public function getSubscribedSignals(): array
+    {
+        return SignalRegistry::isSupported() ? [\SIGALRM] : [];
+    }
+
+    public function handleSignal(int $signal): void
+    {
+        $this->signaled = true;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        for ($i = 0; $i < $this->loop; ++$i) {
+            usleep(100);
+            if ($this->signaled) {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 }

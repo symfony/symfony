@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -23,7 +24,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 abstract class KernelTestCase extends TestCase
 {
-    use ForwardCompatTestTrait;
+    use MailerAssertionsTrait;
 
     protected static $class;
 
@@ -32,14 +33,9 @@ abstract class KernelTestCase extends TestCase
      */
     protected static $kernel;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected static $container;
-
     protected static $booted = false;
 
-    private function doTearDown()
+    protected function tearDown(): void
     {
         static::ensureKernelShutdown();
         static::$class = null;
@@ -48,12 +44,10 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
-     * @return string The Kernel class name
-     *
      * @throws \RuntimeException
      * @throws \LogicException
      */
-    protected static function getKernelClass()
+    protected static function getKernelClass(): string
     {
         if (!isset($_SERVER['KERNEL_CLASS']) && !isset($_ENV['KERNEL_CLASS'])) {
             throw new \LogicException(sprintf('You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel in phpunit.xml / phpunit.xml.dist or override the "%1$s::createKernel()" or "%1$s::getKernelClass()" method.', static::class));
@@ -68,10 +62,8 @@ abstract class KernelTestCase extends TestCase
 
     /**
      * Boots the Kernel for this test.
-     *
-     * @return KernelInterface A KernelInterface instance
      */
-    protected static function bootKernel(array $options = [])
+    protected static function bootKernel(array $options = []): KernelInterface
     {
         static::ensureKernelShutdown();
 
@@ -80,10 +72,30 @@ abstract class KernelTestCase extends TestCase
         self::$kernel = $kernel;
         static::$booted = true;
 
-        $container = static::$kernel->getContainer();
-        static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
-
         return static::$kernel;
+    }
+
+    /**
+     * Provides a dedicated test container with access to both public and private
+     * services. The container will not include private services that have been
+     * inlined or removed. Private services will be removed when they are not
+     * used by other services.
+     *
+     * Using this method is the best way to get a container from your test code.
+     *
+     * @return TestContainer
+     */
+    protected static function getContainer(): ContainerInterface
+    {
+        if (!static::$booted) {
+            static::bootKernel();
+        }
+
+        try {
+            return self::$kernel->getContainer()->get('test.service_container');
+        } catch (ServiceNotFoundException $e) {
+            throw new \LogicException('Could not find service "test.service_container". Try updating the "framework.test" config to "true".', 0, $e);
+        }
     }
 
     /**
@@ -93,10 +105,8 @@ abstract class KernelTestCase extends TestCase
      *
      *  * environment
      *  * debug
-     *
-     * @return KernelInterface A KernelInterface instance
      */
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         if (null === static::$class) {
             static::$class = static::getKernelClass();
@@ -140,7 +150,5 @@ abstract class KernelTestCase extends TestCase
                 $container->reset();
             }
         }
-
-        static::$container = null;
     }
 }

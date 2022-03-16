@@ -29,7 +29,7 @@ class_exists(HttpHeaderSerializer::class);
  */
 class AddLinkHeaderListener implements EventSubscriberInterface
 {
-    private $serializer;
+    private HttpHeaderSerializer $serializer;
 
     public function __construct()
     {
@@ -38,7 +38,7 @@ class AddLinkHeaderListener implements EventSubscriberInterface
 
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

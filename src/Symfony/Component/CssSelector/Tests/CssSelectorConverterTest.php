@@ -27,12 +27,20 @@ class CssSelectorConverterTest extends TestCase
         $this->assertEquals("descendant-or-self::h1[@class and contains(concat(' ', normalize-space(@class), ' '), ' foo ')]", $converter->toXPath('h1.foo'));
         $this->assertEquals('descendant-or-self::foo:h1', $converter->toXPath('foo|h1'));
         $this->assertEquals('descendant-or-self::h1', $converter->toXPath('H1'));
+
+        // Test the cache layer
+        $converter = new CssSelectorConverter();
+        $this->assertEquals('descendant-or-self::h1', $converter->toXPath('H1'));
     }
 
     public function testCssToXPathXml()
     {
         $converter = new CssSelectorConverter(false);
 
+        $this->assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
+
+        $converter = new CssSelectorConverter(false);
+        // Test the cache layer
         $this->assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
     }
 

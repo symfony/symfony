@@ -14,8 +14,8 @@ namespace Symfony\Component\Security\Http\Tests\Session;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
-use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class SessionAuthenticationStrategyTest extends TestCase
 {

@@ -177,6 +177,19 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testInvalidIsbn10Named()
+    {
+        $this->validator->validate(
+            '978-2723442282',
+            new Isbn(type: Isbn::ISBN_10, isbn10Message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"978-2723442282"')
+            ->setCode(Isbn::TOO_LONG_ERROR)
+            ->assertRaised();
+    }
+
     /**
      * @dataProvider getValidIsbn13
      */
@@ -204,6 +217,19 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$isbn.'"')
             ->setCode($code)
+            ->assertRaised();
+    }
+
+    public function testInvalidIsbn13Named()
+    {
+        $this->validator->validate(
+            '2723442284',
+            new Isbn(type: Isbn::ISBN_13, isbn13Message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2723442284"')
+            ->setCode(Isbn::TOO_SHORT_ERROR)
             ->assertRaised();
     }
 

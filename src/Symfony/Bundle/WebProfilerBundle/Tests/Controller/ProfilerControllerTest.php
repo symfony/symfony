@@ -73,7 +73,7 @@ class ProfilerControllerTest extends WebTestCase
         $client->request('GET', '/');
         $client->request('GET', '/_profiler/latest');
 
-        $this->assertStringContainsString('kernel:homepageController', $client->getResponse()->getContent());
+        $this->assertStringContainsString('kernel::homepageController', $client->getResponse()->getContent());
     }
 
     public function testPanelActionWithoutValidToken()

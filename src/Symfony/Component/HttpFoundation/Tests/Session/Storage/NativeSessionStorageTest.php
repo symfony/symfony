@@ -175,11 +175,8 @@ class NativeSessionStorageTest extends TestCase
             'cookie_domain' => 'symfony.example.com',
             'cookie_secure' => true,
             'cookie_httponly' => false,
+            'cookie_samesite' => 'lax',
         ];
-
-        if (\PHP_VERSION_ID >= 70300) {
-            $options['cookie_samesite'] = 'lax';
-        }
 
         $this->getStorage($options);
         $temp = session_get_cookie_params();
@@ -195,21 +192,14 @@ class NativeSessionStorageTest extends TestCase
     public function testSessionOptions()
     {
         $options = [
-            'url_rewriter.tags' => 'a=href',
+            'trans_sid_tags' => 'a=href',
             'cache_expire' => '200',
         ];
 
         $this->getStorage($options);
 
-        $this->assertSame('a=href', ini_get('url_rewriter.tags'));
+        $this->assertSame('a=href', ini_get('session.trans_sid_tags'));
         $this->assertSame('200', ini_get('session.cache_expire'));
-    }
-
-    public function testSetSaveHandlerException()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $storage = $this->getStorage();
-        $storage->setSaveHandler(new \stdClass());
     }
 
     public function testSetSaveHandler()

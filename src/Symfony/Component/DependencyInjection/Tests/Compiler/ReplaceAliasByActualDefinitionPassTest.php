@@ -25,15 +25,14 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $aDefinition = $container->register('a', '\stdClass');
+        $aDefinition = $container->register('a', '\stdClass')->setPublic(true);
         $aDefinition->setFactory([new Reference('b'), 'createA']);
 
         $bDefinition = new Definition('\stdClass');
-        $bDefinition->setPublic(false);
         $container->setDefinition('b', $bDefinition);
 
-        $container->setAlias('a_alias', 'a');
-        $container->setAlias('b_alias', 'b');
+        $container->setAlias('a_alias', 'a')->setPublic(true)->setDeprecated('foo/bar', '1.2', '%alias_id%');
+        $container->setAlias('b_alias', 'b')->setPublic(true)->setDeprecated('foo/bar', '1.2', '%alias_id%');
 
         $container->setAlias('container', 'service_container');
 
@@ -41,11 +40,13 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
 
         $this->assertTrue($container->has('a'), '->process() does nothing to public definitions.');
         $this->assertTrue($container->hasAlias('a_alias'));
+        $this->assertTrue($container->getAlias('a_alias')->isDeprecated());
         $this->assertFalse($container->has('b'), '->process() removes non-public definitions.');
         $this->assertTrue(
             $container->has('b_alias') && !$container->hasAlias('b_alias'),
             '->process() replaces alias to actual.'
         );
+        $this->assertTrue($container->getDefinition('b_alias')->hasTag('container.private'));
 
         $this->assertTrue($container->has('container'));
 

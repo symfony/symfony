@@ -68,7 +68,7 @@ class CachePoolsTest extends AbstractWebTestCase
     private function doTestCachePools($options, $adapterClass)
     {
         static::bootKernel($options);
-        $container = static::$container;
+        $container = static::getContainer();
 
         $pool1 = $container->get('cache.pool1');
         $this->assertInstanceOf($adapterClass, $pool1);
@@ -86,7 +86,7 @@ class CachePoolsTest extends AbstractWebTestCase
         $pool2 = $container->get('cache.pool2');
         $pool2->save($item);
 
-        $container->get('cache_clearer')->clear($container->getParameter('kernel.cache_dir'));
+        $container->get('cache_clearer.alias')->clear($container->getParameter('kernel.cache_dir'));
         $item = $pool1->getItem($key);
         $this->assertFalse($item->isHit());
 

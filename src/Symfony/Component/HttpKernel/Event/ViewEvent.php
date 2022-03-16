@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+
 /**
  * Allows to create a response for the return value of a controller.
  *
@@ -19,9 +22,25 @@ namespace Symfony\Component\HttpKernel\Event;
  * response is set.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class ViewEvent extends GetResponseForControllerResultEvent
+final class ViewEvent extends RequestEvent
 {
+    private mixed $controllerResult;
+
+    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, mixed $controllerResult)
+    {
+        parent::__construct($kernel, $request, $requestType);
+
+        $this->controllerResult = $controllerResult;
+    }
+
+    public function getControllerResult(): mixed
+    {
+        return $this->controllerResult;
+    }
+
+    public function setControllerResult(mixed $controllerResult): void
+    {
+        $this->controllerResult = $controllerResult;
+    }
 }

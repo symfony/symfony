@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpClient\Internal;
  */
 final class Canary
 {
-    private $canceller;
+    private \Closure $canceller;
 
     public function __construct(\Closure $canceller)
     {
@@ -27,8 +27,9 @@ final class Canary
 
     public function cancel()
     {
-        if (($canceller = $this->canceller) instanceof \Closure) {
-            $this->canceller = null;
+        if (isset($this->canceller)) {
+            $canceller = $this->canceller;
+            unset($this->canceller);
             $canceller();
         }
     }

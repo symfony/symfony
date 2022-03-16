@@ -16,27 +16,12 @@ use Symfony\Component\Finder\Comparator\Comparator;
 
 class ComparatorTest extends TestCase
 {
-    public function testGetSetOperator()
-    {
-        $comparator = new Comparator();
-        $comparator->setOperator('>');
-        $this->assertEquals('>', $comparator->getOperator(), '->getOperator() returns the current operator');
-    }
-
     public function testInvalidOperator()
     {
-        $comparator = new Comparator();
-
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid operator "foo".');
-        $comparator->setOperator('foo');
-    }
 
-    public function testGetSetTarget()
-    {
-        $comparator = new Comparator();
-        $comparator->setTarget(8);
-        $this->assertEquals(8, $comparator->getTarget(), '->getTarget() returns the target');
+        new Comparator('some target', 'foo');
     }
 
     /**
@@ -44,9 +29,10 @@ class ComparatorTest extends TestCase
      */
     public function testTestSucceeds(string $operator, string $target, string $testedValue)
     {
-        $c = new Comparator();
-        $c->setOperator($operator);
-        $c->setTarget($target);
+        $c = new Comparator($target, $operator);
+
+        $this->assertSame($target, $c->getTarget());
+        $this->assertSame($operator, $c->getOperator());
 
         $this->assertTrue($c->test($testedValue));
     }
@@ -72,9 +58,7 @@ class ComparatorTest extends TestCase
      */
     public function testTestFails(string $operator, string $target, string $testedValue)
     {
-        $c = new Comparator();
-        $c->setOperator($operator);
-        $c->setTarget($target);
+        $c = new Comparator($target, $operator);
 
         $this->assertFalse($c->test($testedValue));
     }

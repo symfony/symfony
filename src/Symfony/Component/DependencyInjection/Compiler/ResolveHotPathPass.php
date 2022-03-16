@@ -23,13 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResolveHotPathPass extends AbstractRecursivePass
 {
-    private $tagName;
-    private $resolvedIds = [];
-
-    public function __construct(string $tagName = 'container.hot_path')
-    {
-        $this->tagName = $tagName;
-    }
+    private array $resolvedIds = [];
 
     /**
      * {@inheritdoc}
@@ -38,7 +32,7 @@ class ResolveHotPathPass extends AbstractRecursivePass
     {
         try {
             parent::process($container);
-            $container->getDefinition('service_container')->clearTag($this->tagName);
+            $container->getDefinition('service_container')->clearTag('container.hot_path');
         } finally {
             $this->resolvedIds = [];
         }
@@ -47,19 +41,34 @@ class ResolveHotPathPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof ArgumentInterface) {
             return $value;
         }
-        if ($value instanceof Definition && $isRoot && (isset($this->resolvedIds[$this->currentId]) || !$value->hasTag($this->tagName) || $value->isDeprecated())) {
-            return $value->isDeprecated() ? $value->clearTag($this->tagName) : $value;
+
+        if ($value instanceof Definition && $isRoot) {
+            if ($value->isDeprecated()) {
+                return $value->clearTag('container.hot_path');
+            }
+
+            $this->resolvedIds[$this->currentId] = true;
+
+            if (!$value->hasTag('container.hot_path')) {
+                return $value;
+            }
         }
-        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->has($id = (string) $value)) {
-            $definition = $this->container->findDefinition($id);
-            if (!$definition->hasTag($this->tagName) && !$definition->isDeprecated()) {
-                $this->resolvedIds[$id] = true;
-                $definition->addTag($this->tagName);
+
+        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->hasDefinition($id = (string) $value)) {
+            $definition = $this->container->getDefinition($id);
+
+            if ($definition->isDeprecated() || $definition->hasTag('container.hot_path')) {
+                return $value;
+            }
+
+            $definition->addTag('container.hot_path');
+
+            if (isset($this->resolvedIds[$id])) {
                 parent::processValue($definition, false);
             }
 

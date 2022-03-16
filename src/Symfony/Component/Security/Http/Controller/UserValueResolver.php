@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 /**
  * Supports the argument type of {@see UserInterface}.
@@ -25,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final class UserValueResolver implements ArgumentValueResolverInterface
 {
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(TokenStorageInterface $tokenStorage)
     {
@@ -34,20 +35,15 @@ final class UserValueResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        // only security user implementations are supported
-        if (UserInterface::class !== $argument->getType()) {
+        // with the attribute, the type can be any UserInterface implementation
+        // otherwise, the type must be UserInterface
+        if (UserInterface::class !== $argument->getType() && !$argument->getAttributes(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
             return false;
         }
 
         $token = $this->tokenStorage->getToken();
-        if (!$token instanceof TokenInterface) {
-            return false;
-        }
 
-        $user = $token->getUser();
-
-        // in case it's not an object we cannot do anything with it; E.g. "anon."
-        return $user instanceof UserInterface;
+        return $token instanceof TokenInterface;
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable

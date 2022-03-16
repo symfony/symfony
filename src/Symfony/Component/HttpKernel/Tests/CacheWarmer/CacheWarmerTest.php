@@ -49,14 +49,16 @@ class TestCacheWarmer extends CacheWarmer
 {
     protected $file;
 
-    public function __construct($file)
+    public function __construct(string $file)
     {
         $this->file = $file;
     }
 
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $this->writeCacheFile($this->file, 'content');
+
+        return [];
     }
 
     public function isOptional(): bool

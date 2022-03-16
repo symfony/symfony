@@ -13,8 +13,11 @@ namespace Symfony\Component\Mailer\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
+use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Message;
 
 /**
@@ -24,13 +27,38 @@ use Symfony\Component\Mime\Message;
  */
 class MessageListener implements EventSubscriberInterface
 {
-    private $headers;
-    private $renderer;
+    public const HEADER_SET_IF_EMPTY = 1;
+    public const HEADER_ADD = 2;
+    public const HEADER_REPLACE = 3;
+    public const DEFAULT_RULES = [
+        'from' => self::HEADER_SET_IF_EMPTY,
+        'return-path' => self::HEADER_SET_IF_EMPTY,
+        'reply-to' => self::HEADER_ADD,
+        'to' => self::HEADER_SET_IF_EMPTY,
+        'cc' => self::HEADER_ADD,
+        'bcc' => self::HEADER_ADD,
+    ];
 
-    public function __construct(Headers $headers = null, BodyRendererInterface $renderer = null)
+    private ?Headers $headers;
+    private array $headerRules = [];
+    private ?BodyRendererInterface $renderer;
+
+    public function __construct(Headers $headers = null, BodyRendererInterface $renderer = null, array $headerRules = self::DEFAULT_RULES)
     {
         $this->headers = $headers;
         $this->renderer = $renderer;
+        foreach ($headerRules as $headerName => $rule) {
+            $this->addHeaderRule($headerName, $rule);
+        }
+    }
+
+    public function addHeaderRule(string $headerName, int $rule): void
+    {
+        if ($rule < 1 || $rule > 3) {
+            throw new InvalidArgumentException(sprintf('The "%d" rule is not supported.', $rule));
+        }
+
+        $this->headerRules[strtolower($headerName)] = $rule;
     }
 
     public function onMessage(MessageEvent $event): void
@@ -54,14 +82,38 @@ class MessageListener implements EventSubscriberInterface
         foreach ($this->headers->all() as $name => $header) {
             if (!$headers->has($name)) {
                 $headers->add($header);
-            } else {
-                if (Headers::isUniqueHeader($name)) {
-                    continue;
-                }
-                $headers->add($header);
+
+                continue;
+            }
+
+            switch ($this->headerRules[$name] ?? self::HEADER_SET_IF_EMPTY) {
+                case self::HEADER_SET_IF_EMPTY:
+                    break;
+
+                case self::HEADER_REPLACE:
+                    $headers->remove($name);
+                    $headers->add($header);
+
+                    break;
+
+                case self::HEADER_ADD:
+                    if (!Headers::isUniqueHeader($name)) {
+                        $headers->add($header);
+
+                        break;
+                    }
+
+                    $h = $headers->get($name);
+                    if (!$h instanceof MailboxListHeader) {
+                        throw new RuntimeException(sprintf('Unable to set header "%s".', $name));
+                    }
+
+                    Headers::checkHeaderClass($header);
+                    foreach ($header->getAddresses() as $address) {
+                        $h->addAddress($address);
+                    }
             }
         }
-        $message->setHeaders($headers);
     }
 
     private function renderMessage(Message $message): void
@@ -73,7 +125,7 @@ class MessageListener implements EventSubscriberInterface
         $this->renderer->render($message);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             MessageEvent::class => 'onMessage',

@@ -10,8 +10,8 @@ $container->loadFromExtension('framework', [
             'places' => ['bar', 'baz'],
             'transitions' => [
                 'bar_baz' => [
-                    'from' => ['foo'],
-                    'to' => ['bar'],
+                    'from' => ['bar'],
+                    'to' => ['baz'],
                 ],
             ],
         ],

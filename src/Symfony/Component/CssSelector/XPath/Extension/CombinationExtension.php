@@ -31,10 +31,10 @@ class CombinationExtension extends AbstractExtension
     public function getCombinationTranslators(): array
     {
         return [
-            ' ' => [$this, 'translateDescendant'],
-            '>' => [$this, 'translateChild'],
-            '+' => [$this, 'translateDirectAdjacent'],
-            '~' => [$this, 'translateIndirectAdjacent'],
+            ' ' => $this->translateDescendant(...),
+            '>' => $this->translateChild(...),
+            '+' => $this->translateDirectAdjacent(...),
+            '~' => $this->translateIndirectAdjacent(...),
         ];
     }
 

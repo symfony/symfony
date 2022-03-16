@@ -32,10 +32,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
      */
     protected $redisClient;
 
-    /**
-     * @return \Redis|\RedisArray|\RedisCluster|\Predis\Client
-     */
-    abstract protected function createRedisClient(string $host);
+    abstract protected function createRedisClient(string $host): \Redis|\RedisArray|\RedisCluster|\Predis\Client;
 
     protected function setUp(): void
     {

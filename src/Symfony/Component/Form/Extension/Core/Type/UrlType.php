@@ -46,7 +46,10 @@ class UrlType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('default_protocol', 'http');
+        $resolver->setDefaults([
+            'default_protocol' => 'http',
+            'invalid_message' => 'Please enter a valid URL.',
+        ]);
 
         $resolver->setAllowedTypes('default_protocol', ['null', 'string']);
     }
@@ -54,7 +57,7 @@ class UrlType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }
@@ -62,7 +65,7 @@ class UrlType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'url';
     }

@@ -19,6 +19,8 @@ use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
  * Default implementation of {@link PropertyPathInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<int, string>
  */
 class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {
@@ -30,7 +32,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * The elements of the property path.
      *
-     * @var array
+     * @var list<string>
      */
     private $elements = [];
 
@@ -59,12 +61,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Constructs a property path from a string.
      *
-     * @param PropertyPath|string $propertyPath The property path as string or instance
-     *
      * @throws InvalidArgumentException     If the given path is not a string
      * @throws InvalidPropertyPathException If the syntax of the property path is not valid
      */
-    public function __construct($propertyPath)
+    public function __construct(self|string $propertyPath)
     {
         // Can be used as copy constructor
         if ($propertyPath instanceof self) {
@@ -75,9 +75,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->pathAsString = $propertyPath->pathAsString;
 
             return;
-        }
-        if (!\is_string($propertyPath)) {
-            throw new InvalidArgumentException(sprintf('The property path constructor needs a string or an instance of "Symfony\Component\PropertyAccess\PropertyPath". Got: "%s".', \is_object($propertyPath) ? \get_class($propertyPath) : \gettype($propertyPath)));
         }
 
         if ('' === $propertyPath) {
@@ -114,10 +111,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $this->length = \count($this->elements);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->pathAsString;
     }
@@ -125,7 +119,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getLength()
+    public function getLength(): int
     {
         return $this->length;
     }
@@ -133,7 +127,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?PropertyPathInterface
     {
         if ($this->length <= 1) {
             return null;
@@ -151,11 +145,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * Returns a new iterator for this path.
-     *
-     * @return PropertyPathIteratorInterface
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): PropertyPathIteratorInterface
     {
         return new PropertyPathIterator($this);
     }
@@ -163,7 +154,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getElements()
+    public function getElements(): array
     {
         return $this->elements;
     }
@@ -171,7 +162,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getElement($index)
+    public function getElement(int $index): string
     {
         if (!isset($this->elements[$index])) {
             throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));
@@ -183,7 +174,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isProperty($index)
+    public function isProperty(int $index): bool
     {
         if (!isset($this->isIndex[$index])) {
             throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));
@@ -195,7 +186,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isIndex($index)
+    public function isIndex(int $index): bool
     {
         if (!isset($this->isIndex[$index])) {
             throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));

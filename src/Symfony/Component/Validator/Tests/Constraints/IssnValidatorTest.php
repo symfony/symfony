@@ -178,4 +178,17 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
             ->setCode($code)
             ->assertRaised();
     }
+
+    public function testNamedArguments()
+    {
+        $this->validator->validate(
+            '2162321x',
+            new Issn(message: 'myMessage', caseSensitive: true, requireHyphen: true)
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2162321x"')
+            ->setCode(Issn::MISSING_HYPHEN_ERROR)
+            ->assertRaised();
+    }
 }

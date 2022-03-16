@@ -46,7 +46,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $currencyCodes = [];
+    private array $currencyCodes = [];
 
     /**
      * {@inheritdoc}
@@ -130,7 +130,9 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
     private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle): array
     {
-        $symbolNamePairs = iterator_to_array($rootBundle['Currencies']);
+        $symbolNamePairs = array_map(function ($pair) {
+            return \array_slice(iterator_to_array($pair), 0, 2);
+        }, iterator_to_array($rootBundle['Currencies']));
 
         // Remove unwanted currencies
         $symbolNamePairs = array_diff_key($symbolNamePairs, self::DENYLIST);

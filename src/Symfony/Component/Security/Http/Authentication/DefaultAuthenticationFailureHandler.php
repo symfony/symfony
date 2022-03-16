@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
@@ -52,10 +53,8 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
 
     /**
      * Gets the options.
-     *
-     * @return array An array of options
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -68,7 +67,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     /**
      * {@inheritdoc}
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         if ($failureUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['failure_path_parameter'])) {
             $this->options['failure_path'] = $failureUrl;
@@ -79,9 +78,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         }
 
         if ($this->options['failure_forward']) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Authentication failure, forward triggered.', ['failure_path' => $this->options['failure_path']]);
-            }
+            $this->logger?->debug('Authentication failure, forward triggered.', ['failure_path' => $this->options['failure_path']]);
 
             $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
             $subRequest->attributes->set(Security::AUTHENTICATION_ERROR, $exception);
@@ -89,9 +86,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
             return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Authentication failure, redirect triggered.', ['failure_path' => $this->options['failure_path']]);
-        }
+        $this->logger?->debug('Authentication failure, redirect triggered.', ['failure_path' => $this->options['failure_path']]);
 
         $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
 

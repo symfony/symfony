@@ -46,6 +46,16 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidNumberWithOrderedArguments()
+    {
+        $this->validator->validate(
+            '5555555555554444',
+            new CardScheme([CardScheme::MASTERCARD, CardScheme::VISA])
+        );
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @dataProvider getInvalidNumbers
      */
@@ -61,6 +71,19 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', \is_string($number) ? '"'.$number.'"' : $number)
             ->setCode($code)
+            ->assertRaised();
+    }
+
+    public function testInvalidNumberNamedArguments()
+    {
+        $this->validator->validate(
+            '2721001234567890',
+            eval('use Symfony\Component\Validator\Constraints\CardScheme; return new CardScheme(schemes: [CardScheme::MASTERCARD, CardScheme::VISA], message: "myMessage");')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2721001234567890"')
+            ->setCode(CardScheme::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
 

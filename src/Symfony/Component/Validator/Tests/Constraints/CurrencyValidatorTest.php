@@ -112,6 +112,21 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @dataProvider getInvalidCurrencies
+     */
+    public function testInvalidCurrenciesNamed($currency)
+    {
+        $constraint = new Currency(message: 'myMessage');
+
+        $this->validator->validate($currency, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$currency.'"')
+            ->setCode(Currency::NO_SUCH_CURRENCY_ERROR)
+            ->assertRaised();
+    }
+
     public function getInvalidCurrencies()
     {
         return [

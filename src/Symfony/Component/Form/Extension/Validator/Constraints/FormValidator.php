@@ -24,12 +24,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FormValidator extends ConstraintValidator
 {
-    private $resolvedGroups;
+    /**
+     * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>>
+     */
+    private \SplObjectStorage $resolvedGroups;
 
     /**
      * {@inheritdoc}
      */
-    public function validate($form, Constraint $formConstraint)
+    public function validate(mixed $form, Constraint $formConstraint)
     {
         if (!$formConstraint instanceof Form) {
             throw new UnexpectedTypeException($formConstraint, Form::class);
@@ -170,7 +173,7 @@ class FormValidator extends ConstraintValidator
             if ($childrenSynchronized) {
                 $clientDataAsString = is_scalar($form->getViewData())
                     ? (string) $form->getViewData()
-                    : \gettype($form->getViewData());
+                    : get_debug_type($form->getViewData());
 
                 $failure = $form->getTransformationFailure();
 
@@ -193,6 +196,7 @@ class FormValidator extends ConstraintValidator
             $this->context->setConstraint($formConstraint);
             $this->context->buildViolation($config->getOption('extra_fields_message', ''))
                 ->setParameter('{{ extra_fields }}', '"'.implode('", "', array_keys($form->getExtraData())).'"')
+                ->setPlural(\count($form->getExtraData()))
                 ->setInvalidValue($form->getExtraData())
                 ->setCode(Form::NO_SUCH_FIELD_ERROR)
                 ->addViolation();
@@ -202,9 +206,9 @@ class FormValidator extends ConstraintValidator
     /**
      * Returns the validation groups of the given form.
      *
-     * @return string|GroupSequence|array<string|GroupSequence> The validation groups
+     * @return string|GroupSequence|array<string|GroupSequence>
      */
-    private function getValidationGroups(FormInterface $form)
+    private function getValidationGroups(FormInterface $form): string|GroupSequence|array
     {
         // Determine the clicked button of the complete form tree
         $clickedButton = null;
@@ -243,9 +247,9 @@ class FormValidator extends ConstraintValidator
      *
      * @param string|GroupSequence|array<string|GroupSequence>|callable $groups The validation groups
      *
-     * @return GroupSequence|array<string|GroupSequence> The validation groups
+     * @return GroupSequence|array<string|GroupSequence>
      */
-    private static function resolveValidationGroups($groups, FormInterface $form)
+    private static function resolveValidationGroups(string|GroupSequence|array|callable $groups, FormInterface $form): GroupSequence|array
     {
         if (!\is_string($groups) && \is_callable($groups)) {
             $groups = $groups($form);
@@ -258,7 +262,7 @@ class FormValidator extends ConstraintValidator
         return (array) $groups;
     }
 
-    private static function getConstraintsInGroups($constraints, $group)
+    private static function getConstraintsInGroups(array $constraints, string|array $group): array
     {
         $groups = (array) $group;
 

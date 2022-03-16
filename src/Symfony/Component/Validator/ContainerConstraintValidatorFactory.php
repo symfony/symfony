@@ -22,8 +22,8 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  */
 class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-    private $container;
-    private $validators;
+    private ContainerInterface $container;
+    private array $validators;
 
     public function __construct(ContainerInterface $container)
     {
@@ -37,7 +37,7 @@ class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryI
      * @throws ValidatorException      When the validator class does not exist
      * @throws UnexpectedTypeException When the validator is not an instance of ConstraintValidatorInterface
      */
-    public function getInstance(Constraint $constraint)
+    public function getInstance(Constraint $constraint): ConstraintValidatorInterface
     {
         $name = $constraint->validatedBy();
 
@@ -46,7 +46,7 @@ class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryI
                 $this->validators[$name] = $this->container->get($name);
             } else {
                 if (!class_exists($name)) {
-                    throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, \get_class($constraint)));
+                    throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_debug_type($constraint)));
                 }
 
                 $this->validators[$name] = new $name();

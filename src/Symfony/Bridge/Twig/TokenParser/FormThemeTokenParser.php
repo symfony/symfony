@@ -21,17 +21,13 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the 'form_theme' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
-class FormThemeTokenParser extends AbstractTokenParser
+final class FormThemeTokenParser extends AbstractTokenParser
 {
     /**
-     * Parses a token and returns a node.
-     *
-     * @return Node
+     * {@inheritdoc}
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
@@ -59,11 +55,9 @@ class FormThemeTokenParser extends AbstractTokenParser
     }
 
     /**
-     * Gets the tag name associated with this token parser.
-     *
-     * @return string The tag name
+     * {@inheritdoc}
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'form_theme';
     }

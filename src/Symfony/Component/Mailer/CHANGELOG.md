@@ -1,6 +1,33 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+* Make `start()` and `stop()` methods public on `SmtpTransport`
+
+6.0
+---
+
+ * The `HttpTransportException` class takes a string at first argument
+
+5.4
+---
+
+ * Enable the mailer to operate on any PSR-14-compatible event dispatcher
+
+5.3
+---
+
+ * added the `mailer` monolog channel and set it on all transport definitions
+
+5.2.0
+-----
+
+ * added `NativeTransportFactory` to configure a transport based on php.ini settings
+ * added `local_domain`, `restart_threshold`, `restart_threshold_sleep` and `ping_threshold` options for `smtp`
+ * added `command` option for `sendmail`
+
 4.4.0
 -----
 
@@ -36,6 +63,7 @@ CHANGELOG
  * Added `Symfony\Component\Mailer\Test\TransportFactoryTestCase` to ease testing custom transport factories.
  * Added `SentMessage::getDebug()` and `TransportExceptionInterface::getDebug` to help debugging
  * Made `MessageEvent` final
+ * add DSN parameter `verify_peer` to disable TLS peer verification for SMTP transport
 
 4.3.0
 -----

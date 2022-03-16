@@ -11,19 +11,17 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\JsonException;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.3
  */
-class Response
+final class Response
 {
-    /** @internal */
-    protected $content;
-    /** @internal */
-    protected $status;
-    /** @internal */
-    protected $headers;
+    private string $content;
+    private int $status;
+    private array $headers;
+    private array $jsonData;
 
     /**
      * The headers array is a set of key/value pairs. If a header is present multiple times
@@ -42,10 +40,8 @@ class Response
 
     /**
      * Converts the response object to string containing all headers and the response content.
-     *
-     * @return string The response with headers and content
      */
-    public function __toString()
+    public function __toString(): string
     {
         $headers = '';
         foreach ($this->headers as $name => $value) {
@@ -61,45 +57,9 @@ class Response
         return $headers."\n".$this->content;
     }
 
-    /**
-     * Returns the build header line.
-     *
-     * @param string $name  The header name
-     * @param string $value The header value
-     *
-     * @return string The built header line
-     *
-     * @deprecated since Symfony 4.3
-     */
-    protected function buildHeader($name, $value)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3.', __METHOD__), \E_USER_DEPRECATED);
-
-        return sprintf("%s: %s\n", $name, $value);
-    }
-
-    /**
-     * Gets the response content.
-     *
-     * @return string The response content
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
-    }
-
-    /**
-     * Gets the response status code.
-     *
-     * @return int The response status code
-     *
-     * @deprecated since Symfony 4.3, use getStatusCode() instead
-     */
-    public function getStatus()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3, use getStatusCode() instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        return $this->status;
     }
 
     public function getStatusCode(): int
@@ -107,25 +67,15 @@ class Response
         return $this->status;
     }
 
-    /**
-     * Gets the response headers.
-     *
-     * @return array The response headers
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
 
     /**
-     * Gets a response header.
-     *
-     * @param string $header The header name
-     * @param bool   $first  Whether to return the first value or all header values
-     *
      * @return string|array|null The first header value if $first is true, an array of values otherwise
      */
-    public function getHeader($header, $first = true)
+    public function getHeader(string $header, bool $first = true): string|array|null
     {
         $normalizedHeader = str_replace('-', '_', strtolower($header));
         foreach ($this->headers as $key => $value) {
@@ -139,5 +89,24 @@ class Response
         }
 
         return $first ? null : [];
+    }
+
+    public function toArray(): array
+    {
+        if (isset($this->jsonData)) {
+            return $this->jsonData;
+        }
+
+        try {
+            $content = json_decode($this->content, true, flags: \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new JsonException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        if (!\is_array($content)) {
+            throw new JsonException(sprintf('JSON content was expected to decode to an array, "%s" returned.', get_debug_type($content)));
+        }
+
+        return $this->jsonData = $content;
     }
 }

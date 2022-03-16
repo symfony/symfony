@@ -3,12 +3,13 @@
 namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * Test methods from Symfony\Component\HttpClient\Response\ResponseTrait.
+ * Test methods from Symfony\Component\HttpClient\Response\*ResponseTrait.
  */
 class MockResponseTest extends TestCase
 {
@@ -52,6 +53,19 @@ class MockResponseTest extends TestCase
         $response->toArray();
     }
 
+    public function testUrlHttpMethodMockResponse()
+    {
+        $responseMock = new MockResponse(json_encode(['foo' => 'bar']));
+        $url = 'https://example.com/some-endpoint';
+        $response = MockResponse::fromRequest('GET', $url, [], $responseMock);
+
+        $this->assertSame('GET', $response->getInfo('http_method'));
+        $this->assertSame('GET', $responseMock->getRequestMethod());
+
+        $this->assertSame($url, $response->getInfo('url'));
+        $this->assertSame($url, $responseMock->getRequestUrl());
+    }
+
     public function toArrayErrors()
     {
         yield [
@@ -81,7 +95,7 @@ class MockResponseTest extends TestCase
         yield [
             'content' => '8',
             'responseHeaders' => [],
-            'message' => 'JSON content was expected to decode to an array, "integer" returned for "https://example.com/file.json".',
+            'message' => 'JSON content was expected to decode to an array, "int" returned for "https://example.com/file.json".',
         ];
     }
 
@@ -93,5 +107,13 @@ class MockResponseTest extends TestCase
         MockResponse::fromRequest('GET', 'https://symfony.com', [], new MockResponse('', [
             'error' => 'ccc error',
         ]))->getStatusCode();
+    }
+
+    public function testMustBeIssuedByMockHttpClient()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('MockResponse instances must be issued by MockHttpClient before processing.');
+
+        (new MockResponse())->getContent();
     }
 }

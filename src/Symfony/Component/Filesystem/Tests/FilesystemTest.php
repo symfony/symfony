@@ -376,7 +376,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400 ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
+        $this->assertFalse(is_dir($basePath.'dir-link'));
 
         $this->filesystem->remove($basePath);
 
@@ -409,7 +409,7 @@ class FilesystemTest extends FilesystemTestCase
         chdir($basePath);
         $file = str_repeat('T', $maxPathLength - \strlen($basePath) + 1);
         $path = $basePath.$file;
-        exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
+        exec('TYPE NUL >>'.$file); // equivalent of touch, we cannot use the php touch() here because it suffers from the same limitation
         $this->longPathNamesWindows[] = $path; // save this so we can clean up later
         chdir($oldPath);
         $this->filesystem->exists($path);
@@ -467,20 +467,6 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFilePermissions(753, $dir);
         $this->assertFilePermissions(400, $file);
-    }
-
-    public function testChmodWithWrongModLeavesPreviousPermissionsUntouched()
-    {
-        $this->markAsSkippedIfChmodIsMissing();
-
-        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'file';
-        touch($dir);
-
-        $permissions = fileperms($dir);
-
-        $this->filesystem->chmod($dir, 'Wrongmode');
-
-        $this->assertSame($permissions, fileperms($dir));
     }
 
     public function testChmodRecursive()
@@ -560,7 +546,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(753, $subdirectory);
     }
 
-    public function testChown()
+    public function testChownByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -573,7 +559,20 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame($owner, $this->getFileOwner($dir));
     }
 
-    public function testChownRecursive()
+    public function testChownById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $ownerId = $this->getFileOwnerId($dir);
+        $this->filesystem->chown($dir, $ownerId);
+
+        $this->assertSame($ownerId, $this->getFileOwnerId($dir));
+    }
+
+    public function testChownRecursiveByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -586,6 +585,21 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chown($dir, $owner, true);
 
         $this->assertSame($owner, $this->getFileOwner($file));
+    }
+
+    public function testChownRecursiveById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+        $file = $dir.\DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $ownerId = $this->getFileOwnerId($dir);
+        $this->filesystem->chown($dir, $ownerId, true);
+
+        $this->assertSame($ownerId, $this->getFileOwnerId($file));
     }
 
     public function testChownSymlink()
@@ -663,7 +677,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chown($dir, 'user'.time().mt_rand(1000, 9999));
     }
 
-    public function testChgrp()
+    public function testChgrpByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -674,6 +688,19 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chgrp($dir, $group);
 
         $this->assertSame($group, $this->getFileGroup($dir));
+    }
+
+    public function testChgrpById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $groupId = $this->getFileGroupId($dir);
+        $this->filesystem->chgrp($dir, $groupId);
+
+        $this->assertSame($groupId, $this->getFileGroupId($dir));
     }
 
     public function testChgrpRecursive()
@@ -691,7 +718,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame($group, $this->getFileGroup($file));
     }
 
-    public function testChgrpSymlink()
+    public function testChgrpSymlinkByName()
     {
         $this->markAsSkippedIfSymlinkIsMissing();
 
@@ -706,6 +733,23 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chgrp($link, $group);
 
         $this->assertSame($group, $this->getFileGroup($link));
+    }
+
+    public function testChgrpSymlinkById()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.\DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $groupId = $this->getFileGroupId($link);
+        $this->filesystem->chgrp($link, $groupId);
+
+        $this->assertSame($groupId, $this->getFileGroupId($link));
     }
 
     public function testChgrpLink()
@@ -1033,11 +1077,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertEquals($file, $this->filesystem->readlink($link1));
 
-        if (!('\\' == \DIRECTORY_SEPARATOR && \PHP_MAJOR_VERSION === 7 && \PHP_MINOR_VERSION === 3)) {
-            // Skip for Windows with PHP 7.3.*
-            $this->assertEquals($link1, $this->filesystem->readlink($link2));
-        }
-
+        $this->assertEquals($link1, $this->filesystem->readlink($link2));
         $this->assertEquals($file, $this->filesystem->readlink($link1, true));
         $this->assertEquals($file, $this->filesystem->readlink($link2, true));
         $this->assertEquals($file, $this->filesystem->readlink($file, true));
@@ -1402,15 +1442,6 @@ class FilesystemTest extends FilesystemTestCase
         ];
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::isAbsolutePath()" with a null in the $file argument is deprecated since Symfony 4.4.
-     */
-    public function testIsAbsolutePathWithNull()
-    {
-        $this->assertFalse($this->filesystem->isAbsolutePath(null));
-    }
-
     public function testTempnam()
     {
         $dirname = $this->workspace;
@@ -1508,6 +1539,22 @@ class FilesystemTest extends FilesystemTestCase
         @unlink($filename);
     }
 
+    public function testTempnamWithSuffix()
+    {
+        $dirname = $this->workspace;
+        $filename = $this->filesystem->tempnam($dirname, 'foo', '.bar');
+        $this->assertStringEndsWith('.bar', $filename);
+        $this->assertFileExists($filename);
+    }
+
+    public function testTempnamWithSuffix0()
+    {
+        $dirname = $this->workspace;
+        $filename = $this->filesystem->tempnam($dirname, 'foo', '0');
+        $this->assertStringEndsWith('0', $filename);
+        $this->assertFileExists($filename);
+    }
+
     public function testDumpFile()
     {
         $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
@@ -1526,20 +1573,6 @@ class FilesystemTest extends FilesystemTestCase
             $this->assertFilePermissions(664, $filename);
             umask($oldMask);
         }
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::dumpFile()" with an array in the $content argument is deprecated since Symfony 4.3.
-     */
-    public function testDumpFileWithArray()
-    {
-        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, ['bar']);
-
-        $this->assertFileExists($filename);
-        $this->assertStringEqualsFile($filename, 'bar');
     }
 
     public function testDumpFileWithResource()
@@ -1603,33 +1636,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->dumpFile($filename, 'foo');
 
         $this->filesystem->appendToFile($filename, 'bar');
-
-        $this->assertFileExists($filename);
-        $this->assertStringEqualsFile($filename, 'foobar');
-
-        // skip mode check on Windows
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->assertFilePermissions(664, $filename);
-            umask($oldMask);
-        }
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::appendToFile()" with an array in the $content argument is deprecated since Symfony 4.3.
-     */
-    public function testAppendToFileWithArray()
-    {
-        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'bar.txt';
-
-        // skip mode check on Windows
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $oldMask = umask(0002);
-        }
-
-        $this->filesystem->dumpFile($filename, 'foo');
-
-        $this->filesystem->appendToFile($filename, ['bar']);
 
         $this->assertFileExists($filename);
         $this->assertStringEqualsFile($filename, 'foobar');

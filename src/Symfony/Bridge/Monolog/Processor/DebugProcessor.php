@@ -19,9 +19,9 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
-    private $records = [];
-    private $errorCount = [];
-    private $requestStack;
+    private array $records = [];
+    private array $errorCount = [];
+    private ?RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
     {
@@ -32,8 +32,17 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
     {
         $hash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 
+        $timestamp = $timestampRfc3339 = false;
+        if ($record['datetime'] instanceof \DateTimeInterface) {
+            $timestamp = $record['datetime']->getTimestamp();
+            $timestampRfc3339 = $record['datetime']->format(\DateTimeInterface::RFC3339_EXTENDED);
+        } elseif (false !== $timestamp = strtotime($record['datetime'])) {
+            $timestampRfc3339 = (new \DateTimeImmutable($record['datetime']))->format(\DateTimeInterface::RFC3339_EXTENDED);
+        }
+
         $this->records[$hash][] = [
-            'timestamp' => $record['datetime'] instanceof \DateTimeInterface ? $record['datetime']->getTimestamp() : strtotime($record['datetime']),
+            'timestamp' => $timestamp,
+            'timestamp_rfc3339' => $timestampRfc3339,
             'message' => $record['message'],
             'priority' => $record['level'],
             'priorityName' => $record['level_name'],
@@ -58,16 +67,10 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param Request|null $request
      */
-    public function getLogs(/* Request $request = null */)
+    public function getLogs(Request $request = null): array
     {
-        if (\func_num_args() < 1 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
-        }
-
-        if (1 <= \func_num_args() && null !== $request = func_get_arg(0)) {
+        if (null !== $request) {
             return $this->records[spl_object_hash($request)] ?? [];
         }
 
@@ -80,16 +83,10 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param Request|null $request
      */
-    public function countErrors(/* Request $request = null */)
+    public function countErrors(Request $request = null): int
     {
-        if (\func_num_args() < 1 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
-        }
-
-        if (1 <= \func_num_args() && null !== $request = func_get_arg(0)) {
+        if (null !== $request) {
             return $this->errorCount[spl_object_hash($request)] ?? 0;
         }
 

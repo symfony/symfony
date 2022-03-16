@@ -23,6 +23,8 @@ use Symfony\Component\Lock\Store\RedisStore;
  */
 class RedisStoreTest extends AbstractRedisStoreTest
 {
+    use SharedLockStoreTestTrait;
+
     public static function setUpBeforeClass(): void
     {
         try {
@@ -32,7 +34,7 @@ class RedisStoreTest extends AbstractRedisStoreTest
         }
     }
 
-    protected function getRedisConnection()
+    protected function getRedisConnection(): \Redis
     {
         $redis = new \Redis();
         $redis->connect(...explode(':', getenv('REDIS_HOST')));

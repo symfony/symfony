@@ -14,7 +14,7 @@ class CoverageListenerTest extends TestCase
 
         exec('type phpdbg 2> /dev/null', $output, $returnCode);
 
-        if (\PHP_VERSION_ID >= 70000 && 0 === $returnCode) {
+        if (0 === $returnCode) {
             $php = 'phpdbg -qrr';
         } else {
             exec('php --ri xdebug -d zend_extension=xdebug.so 2> /dev/null', $output, $returnCode);

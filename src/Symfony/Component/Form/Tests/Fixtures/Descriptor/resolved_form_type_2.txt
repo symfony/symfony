@@ -19,21 +19,29 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
   disabled                      
   empty_data                    
   error_bubbling                
+  form_attr                     
+  getter                        
   help                          
   help_attr                     
   help_html                     
   help_translation_parameters   
   inherit_data                  
+  invalid_message               
+  invalid_message_parameters    
+  is_empty_callback             
   label                         
   label_attr                    
   label_format                  
+  label_html                    
   label_translation_parameters  
   mapped                        
   method                        
   post_max_size_message         
+  priority                      
   property_path                 
   required                      
   row_attr                      
+  setter                        
   translation_domain            
   trim                          
   upload_max_size_message       

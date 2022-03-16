@@ -24,10 +24,7 @@ trait ValidatorExtensionTrait
      */
     protected $validator;
 
-    /**
-     * @return ValidatorExtension
-     */
-    protected function getValidatorExtension()
+    protected function getValidatorExtension(): ValidatorExtension
     {
         if (!interface_exists(ValidatorInterface::class)) {
             throw new \Exception('In order to use the "ValidatorExtensionTrait", the symfony/validator component must be installed.');
@@ -42,6 +39,6 @@ trait ValidatorExtensionTrait
         $this->validator->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
         $this->validator->expects($this->any())->method('validate')->will($this->returnValue(new ConstraintViolationList()));
 
-        return new ValidatorExtension($this->validator);
+        return new ValidatorExtension($this->validator, false);
     }
 }

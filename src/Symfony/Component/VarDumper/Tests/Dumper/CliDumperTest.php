@@ -63,7 +63,7 @@ array:24 [
   6 => {$intMax}
   "str" => "déjà\\n"
   7 => b"""
-    é\\x00test\\t\\n
+    é\\x01test\\t\\n
     ing
     """
   "[]" => []
@@ -198,28 +198,6 @@ EOTXT;
         yield [$expected, CliDumper::DUMP_TRAILING_COMMA];
     }
 
-    /**
-     * @requires extension xml
-     * @requires PHP < 8.0
-     */
-    public function testXmlResource()
-    {
-        $var = xml_parser_create();
-
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
-xml resource {
-  current_byte_index: %i
-  current_column_number: %i
-  current_line_number: 1
-  error_code: XML_ERROR_NONE
-}
-EOTXT
-            ,
-            $var
-        );
-    }
-
     public function testJsonCast()
     {
         $var = (array) json_decode('{"0":{},"1":null}');
@@ -228,9 +206,8 @@ EOTXT
         $var[] = &$v;
         $var[''] = 2;
 
-        if (\PHP_VERSION_ID >= 70200) {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
 array:4 [
   0 => {}
   1 => &1 null
@@ -238,23 +215,9 @@ array:4 [
   "" => 2
 ]
 EOTXT
-                ,
-                $var
-            );
-        } else {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
-array:4 [
-  "0" => {}
-  "1" => &1 null
-  0 => &1 null
-  "" => 2
-]
-EOTXT
-                ,
-                $var
-            );
-        }
+            ,
+            $var
+        );
     }
 
     public function testObjectCast()
@@ -262,28 +225,15 @@ EOTXT
         $var = (object) [1 => 1];
         $var->{1} = 2;
 
-        if (\PHP_VERSION_ID >= 70200) {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
 {
   +"1": 2
 }
 EOTXT
-                ,
-                $var
-            );
-        } else {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
-{
-  +1: 1
-  +"1": 2
-}
-EOTXT
-                ,
-                $var
-            );
-        }
+            ,
+            $var
+        );
     }
 
     public function testClosedResource()
@@ -429,75 +379,6 @@ EOTXT
   +"foo": &1 "foo"
   +"bar": &1 "foo"
 }
-
-EOTXT
-            ,
-            $out
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @requires PHP < 8.1
-     */
-    public function testSpecialVars56()
-    {
-        $var = $this->getSpecialVars();
-
-        $this->assertDumpEquals(
-            <<<'EOTXT'
-array:3 [
-  0 => array:1 [
-    0 => &1 array:1 [
-      0 => &1 array:1 [&1]
-    ]
-  ]
-  1 => array:1 [
-    "GLOBALS" => & array:1 [ …1]
-  ]
-  2 => &3 array:1 [
-    "GLOBALS" => &3 array:1 [&3]
-  ]
-]
-EOTXT
-            ,
-            $var
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @requires PHP < 8.1
-     */
-    public function testGlobals()
-    {
-        $var = $this->getSpecialVars();
-        unset($var[0]);
-        $out = '';
-
-        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
-            if ($depth >= 0) {
-                $out .= str_repeat('  ', $depth).$line."\n";
-            }
-        });
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var);
-        $dumper->dump($data);
-
-        $this->assertSame(
-            <<<'EOTXT'
-array:2 [
-  1 => array:1 [
-    "GLOBALS" => & array:1 [ …1]
-  ]
-  2 => &2 array:1 [
-    "GLOBALS" => &2 array:1 [&2]
-  ]
-]
 
 EOTXT
             ,

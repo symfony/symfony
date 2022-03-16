@@ -1,6 +1,43 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `InvalidTokenConfigurationException`
+
+5.4
+---
+
+ * Add support for getting updated context after a transition
+
+5.3
+---
+
+ * Deprecate `InvalidTokenConfigurationException`
+ * Added `MermaidDumper` to dump Workflow graphs in the Mermaid.js flowchart format
+
+5.2.0
+-----
+
+ * Added `Workflow::getEnabledTransition()` to easily retrieve a specific transition object
+ * Added context to the event dispatched
+ * Dispatch an event when the subject enters in the workflow for the very first time
+ * Added a default context to the previous event
+ * Added support for specifying which events should be dispatched when calling `workflow->apply()`
+
+5.1.0
+-----
+
+ * Added context to `TransitionException` and its child classes whenever they are thrown in `Workflow::apply()`
+ * Added `Registry::has()` to check if a workflow exists
+ * Added support for `$context[Workflow::DISABLE_ANNOUNCE_EVENT] = true` when calling `workflow->apply()` to not fire the announce event
+
+5.0.0
+-----
+
+ * Added argument `$context` to `MarkingStoreInterface::setMarking()`
+
 4.4.0
 -----
 

@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -31,9 +33,9 @@ class MailgunApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.%region_dot%mailgun.net';
 
-    private $key;
-    private $domain;
-    private $region;
+    private string $key;
+    private string $domain;
+    private ?string $region;
 
     public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -120,7 +122,27 @@ class MailgunApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['h:'.$name] = $header->getBodyAsString();
+            if ($header instanceof TagHeader) {
+                $payload[] = ['o:tag' => $header->getValue()];
+
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $payload['v:'.$header->getKey()] = $header->getValue();
+
+                continue;
+            }
+
+            // Check if it is a valid prefix or header name according to Mailgun API
+            $prefix = substr($name, 0, 2);
+            if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
+                $headerName = $name;
+            } else {
+                $headerName = 'h:'.$name;
+            }
+
+            $payload[$headerName] = $header->getBodyAsString();
         }
 
         return $payload;
@@ -138,7 +160,6 @@ class MailgunApiTransport extends AbstractApiTransport
                     $new = basename($filename);
                     $html = str_replace('cid:'.$filename, 'cid:'.$new, $html);
                     $p = new \ReflectionProperty($attachment, 'filename');
-                    $p->setAccessible(true);
                     $p->setValue($attachment, $new);
                 }
                 $inlines[] = $attachment;

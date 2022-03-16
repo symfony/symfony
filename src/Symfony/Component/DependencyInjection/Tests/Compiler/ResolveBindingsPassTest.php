@@ -23,12 +23,14 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedEnumArgumentDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedIterableArgumentDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -66,9 +68,6 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testProcessEnum()
     {
         $container = new ContainerBuilder();
@@ -231,5 +230,17 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('bar')->getArgument(0));
 
         spl_autoload_unregister($autoloader);
+    }
+
+    public function testBindWithTarget()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('with_target', WithTarget::class)
+            ->setBindings([BarInterface::class.' $imageStorage' => new Reference('bar')]);
+
+        (new ResolveBindingsPass())->process($container);
+
+        $this->assertSame('bar', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 }

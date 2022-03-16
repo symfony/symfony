@@ -131,6 +131,26 @@ class Dummy extends ParentDummy
     public $nestedIterators;
 
     /**
+     * @var array<string,string>
+     */
+    public $arrayWithKeys;
+
+    /**
+     * @var array<string,array<integer,null|string>|null>
+     */
+    public $arrayWithKeysAndComplexValue;
+
+    /**
+     * @var array<string,mixed>
+     */
+    public $arrayOfMixed;
+
+    /**
+     * @var list<string>
+     */
+    public $listOfStrings;
+
+    /**
      * @var parent
      */
     public $parentAnnotation;
@@ -221,6 +241,10 @@ class Dummy extends ParentDummy
     }
 
     public function addDate(\DateTime $date)
+    {
+    }
+
+    public function hasElement(string $element): bool
     {
     }
 }

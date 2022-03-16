@@ -33,50 +33,20 @@ abstract class DataCollector implements DataCollectorInterface
      */
     protected $data = [];
 
-    /**
-     * @var ClonerInterface
-     */
-    private $cloner;
-
-    /**
-     * @deprecated since Symfony 4.3, store all the serialized state in the data property instead
-     */
-    public function serialize()
-    {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3, store all the serialized state in the data property instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        $trace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
-        $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
-
-        return $isCalledFromOverridingMethod ? $this->data : serialize($this->data);
-    }
-
-    /**
-     * @deprecated since Symfony 4.3, store all the serialized state in the data property instead
-     */
-    public function unserialize($data)
-    {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3, store all the serialized state in the data property instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        $this->data = \is_array($data) ? $data : unserialize($data);
-    }
+    private ClonerInterface $cloner;
 
     /**
      * Converts the variable into a serializable Data instance.
      *
      * This array can be displayed in the template using
      * the VarDumper component.
-     *
-     * @param mixed $var
-     *
-     * @return Data
      */
-    protected function cloneVar($var)
+    protected function cloneVar(mixed $var): Data
     {
         if ($var instanceof Data) {
             return $var;
         }
-        if (null === $this->cloner) {
+        if (!isset($this->cloner)) {
             $this->cloner = new VarCloner();
             $this->cloner->setMaxItems(-1);
             $this->cloner->addCasters($this->getCasters());
@@ -107,28 +77,26 @@ abstract class DataCollector implements DataCollectorInterface
         return $casters;
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
-        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
-            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3, store all the serialized state in the "data" property instead.', $c), \E_USER_DEPRECATED);
-            $this->data = $this->serialize();
-        }
-
         return ['data'];
     }
 
     public function __wakeup()
     {
-        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'unserialize'))->getDeclaringClass()->name) {
-            if (\is_object($this->data)) {
-                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-            }
+    }
 
-            @trigger_error(sprintf('Implementing the "%s::unserialize()" method is deprecated since Symfony 4.3, store all the serialized state in the "data" property instead.', $c), \E_USER_DEPRECATED);
-            $this->unserialize($this->data);
-        }
+    /**
+     * @internal to prevent implementing \Serializable
+     */
+    final protected function serialize()
+    {
+    }
+
+    /**
+     * @internal to prevent implementing \Serializable
+     */
+    final protected function unserialize(string $data)
+    {
     }
 }

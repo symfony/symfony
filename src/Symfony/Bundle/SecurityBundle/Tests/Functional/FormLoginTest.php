@@ -14,11 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class FormLoginTest extends AbstractWebTestCase
 {
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLogin($config)
+    public function testFormLogin(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -33,11 +33,11 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLogout($config)
+    public function testFormLogout(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -66,11 +66,11 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginWithCustomTargetPath($config)
+    public function testFormLoginWithCustomTargetPath(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -86,11 +86,11 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider getConfigs
+     * @dataProvider provideClientOptions
      */
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin(array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
+        $client = $this->createClient($options);
 
         $client->request('GET', '/protected_resource');
         $this->assertRedirect($client->getResponse(), '/login');
@@ -106,11 +106,50 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/protected_resource".', $text);
     }
 
-    public function getConfigs()
+    /**
+     * @group time-sensitive
+     */
+    public function testLoginThrottling()
     {
-        return [
-            ['config.yml'],
-            ['routes_as_path.yml'],
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml']);
+
+        $attempts = [
+            ['johannes', 'wrong'],
+            ['johannes', 'also_wrong'],
+            ['wrong', 'wrong'],
+            ['johannes', 'wrong_again'],
         ];
+        foreach ($attempts as $i => $attempt) {
+            $form = $client->request('GET', '/login')->selectButton('login')->form();
+            $form['_username'] = $attempt[0];
+            $form['_password'] = $attempt[1];
+            $client->submit($form);
+
+            $text = $client->followRedirect()->text(null, true);
+            switch ($i) {
+                case 0: // First attempt : Invalid credentials (OK)
+                    $this->assertStringContainsString('Invalid credentials', $text, 'Invalid response on 1st attempt');
+
+                    break;
+                case 1: // Second attempt : login throttling !
+                    $this->assertStringContainsString('Too many failed login attempts, please try again in 8 minutes.', $text, 'Invalid response on 2nd attempt');
+
+                    break;
+                case 2: // Third attempt with unexisting username
+                    $this->assertStringContainsString('Invalid credentials.', $text, 'Invalid response on 3rd attempt');
+
+                    break;
+                case 3: // Fourth attempt : still login throttling !
+                    $this->assertStringContainsString('Too many failed login attempts, please try again in 8 minutes.', $text, 'Invalid response on 4th attempt');
+
+                    break;
+            }
+        }
+    }
+
+    public function provideClientOptions()
+    {
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 }

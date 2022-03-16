@@ -23,7 +23,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilder;
-use Symfony\Component\Form\Test\ForwardCompatTestTrait;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
@@ -38,12 +37,10 @@ use Symfony\Component\Validator\Validation;
 
 class FormValidatorFunctionalTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $validator;
     private $formFactory;
 
-    private function doSetUp()
+    protected function setUp(): void
     {
         $this->validator = Validation::createValidatorBuilder()
             ->setMetadataFactory(new LazyLoadingMetadataFactory(new StaticMethodLoader()))
@@ -164,13 +161,11 @@ class FormValidatorFunctionalTest extends TestCase
 
     public function testFieldsValidateInSequence()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ])
             ->add('foo', TextType::class, [
-                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']] + $allowEmptyString)],
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
             ])
             ->add('bar', TextType::class, [
                 'constraints' => [new NotBlank(['groups' => ['group2']])],
@@ -187,16 +182,14 @@ class FormValidatorFunctionalTest extends TestCase
 
     public function testFieldsValidateInSequenceWithNestedGroupsArray()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence([['group1', 'group2'], 'group3']),
         ])
             ->add('foo', TextType::class, [
-                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']] + $allowEmptyString)],
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
             ])
             ->add('bar', TextType::class, [
-                'constraints' => [new Length(['min' => 10, 'groups' => ['group2']] + $allowEmptyString)],
+                'constraints' => [new Length(['min' => 10, 'groups' => ['group2']])],
             ])
             ->add('baz', TextType::class, [
                 'constraints' => [new NotBlank(['groups' => ['group3']])],
@@ -446,9 +439,9 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertTrue($form->isSubmitted());
         $this->assertFalse($form->isValid());
         $this->assertCount(2, $form->getErrors());
-        $this->assertSame('This value is not valid.', $form->getErrors()[0]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[0]->getMessage());
         $this->assertSame($form->get('year'), $form->getErrors()[0]->getOrigin());
-        $this->assertSame('This value is not valid.', $form->getErrors()[1]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[1]->getMessage());
         $this->assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
     }
 

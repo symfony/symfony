@@ -104,6 +104,68 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @dataProvider getValidAlpha3Countries
+     */
+    public function testValidAlpha3Countries($country)
+    {
+        $this->validator->validate($country, new Country([
+            'alpha3' => true,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidAlpha3Countries()
+    {
+        return [
+            ['GBR'],
+            ['ATA'],
+            ['MYT'],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidAlpha3Countries
+     */
+    public function testInvalidAlpha3Countries($country)
+    {
+        $constraint = new Country([
+            'alpha3' => true,
+            'message' => 'myMessage',
+        ]);
+
+        $this->validator->validate($country, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$country.'"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+            ->assertRaised();
+    }
+
+    public function getInvalidAlpha3Countries()
+    {
+        return [
+            ['foobar'],
+            ['GB'],
+            ['ZZZ'],
+            ['zzz'],
+        ];
+    }
+
+    public function testInvalidAlpha3CountryNamed()
+    {
+        $this->validator->validate(
+            'DE',
+            new Country(alpha3: true, message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"DE"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+            ->assertRaised();
+    }
+
     public function testValidateUsingCountrySpecificLocale()
     {
         // in order to test with "en_GB"

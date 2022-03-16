@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\ErrorHandler\Exception;
 
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -24,56 +22,27 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FlattenException extends LegacyFlattenException
+class FlattenException
 {
-    /** @var string */
-    private $message;
+    private string $message;
+    private string|int $code;
+    private ?self $previous = null;
+    private array $trace;
+    private string $traceAsString;
+    private string $class;
+    private int $statusCode;
+    private string $statusText;
+    private array $headers;
+    private string $file;
+    private int $line;
+    private ?string $asString = null;
 
-    /** @var int|string */
-    private $code;
-
-    /** @var self|null */
-    private $previous;
-
-    /** @var array */
-    private $trace;
-
-    /** @var string */
-    private $traceAsString;
-
-    /** @var string */
-    private $class;
-
-    /** @var int */
-    private $statusCode;
-
-    /** @var string */
-    private $statusText;
-
-    /** @var array */
-    private $headers;
-
-    /** @var string */
-    private $file;
-
-    /** @var int */
-    private $line;
-
-    /** @var string|null */
-    private $asString;
-
-    /**
-     * @return static
-     */
-    public static function create(\Exception $exception, $statusCode = null, array $headers = []): self
+    public static function create(\Exception $exception, int $statusCode = null, array $headers = []): static
     {
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 
-    /**
-     * @return static
-     */
-    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
+    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): static
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -100,7 +69,7 @@ class FlattenException extends LegacyFlattenException
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
         $e->setTraceFromThrowable($exception);
-        $e->setClass($exception instanceof FatalThrowableError ? $exception->getOriginalClassName() : \get_class($exception));
+        $e->setClass(get_debug_type($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
 
@@ -133,11 +102,9 @@ class FlattenException extends LegacyFlattenException
     }
 
     /**
-     * @param int $code
-     *
      * @return $this
      */
-    public function setStatusCode($code): self
+    public function setStatusCode(int $code): static
     {
         $this->statusCode = $code;
 
@@ -152,7 +119,7 @@ class FlattenException extends LegacyFlattenException
     /**
      * @return $this
      */
-    public function setHeaders(array $headers): self
+    public function setHeaders(array $headers): static
     {
         $this->headers = $headers;
 
@@ -165,13 +132,11 @@ class FlattenException extends LegacyFlattenException
     }
 
     /**
-     * @param string $class
-     *
      * @return $this
      */
-    public function setClass($class): self
+    public function setClass(string $class): static
     {
-        $this->class = false !== strpos($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
+        $this->class = str_contains($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
 
         return $this;
     }
@@ -182,11 +147,9 @@ class FlattenException extends LegacyFlattenException
     }
 
     /**
-     * @param string $file
-     *
      * @return $this
      */
-    public function setFile($file): self
+    public function setFile(string $file): static
     {
         $this->file = $file;
 
@@ -199,11 +162,9 @@ class FlattenException extends LegacyFlattenException
     }
 
     /**
-     * @param int $line
-     *
      * @return $this
      */
-    public function setLine($line): self
+    public function setLine(int $line): static
     {
         $this->line = $line;
 
@@ -215,7 +176,10 @@ class FlattenException extends LegacyFlattenException
         return $this->statusText;
     }
 
-    public function setStatusText(string $statusText): self
+    /**
+     * @return $this
+     */
+    public function setStatusText(string $statusText): static
     {
         $this->statusText = $statusText;
 
@@ -228,13 +192,11 @@ class FlattenException extends LegacyFlattenException
     }
 
     /**
-     * @param string $message
-     *
      * @return $this
      */
-    public function setMessage($message): self
+    public function setMessage(string $message): static
     {
-        if (false !== strpos($message, "@anonymous\0")) {
+        if (str_contains($message, "@anonymous\0")) {
             $message = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', function ($m) {
                 return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0];
             }, $message);
@@ -248,27 +210,22 @@ class FlattenException extends LegacyFlattenException
     /**
      * @return int|string int most of the time (might be a string with PDOException)
      */
-    public function getCode()
+    public function getCode(): int|string
     {
         return $this->code;
     }
 
     /**
-     * @param int|string $code
-     *
      * @return $this
      */
-    public function setCode($code): self
+    public function setCode(int|string $code): static
     {
         $this->code = $code;
 
         return $this;
     }
 
-    /**
-     * @return self|null
-     */
-    public function getPrevious()
+    public function getPrevious(): ?self
     {
         return $this->previous;
     }
@@ -276,7 +233,7 @@ class FlattenException extends LegacyFlattenException
     /**
      * @return $this
      */
-    final public function setPrevious(?LegacyFlattenException $previous): self
+    public function setPrevious(?self $previous): static
     {
         $this->previous = $previous;
 
@@ -303,19 +260,9 @@ class FlattenException extends LegacyFlattenException
     }
 
     /**
-     * @deprecated since 4.1, use {@see setTraceFromThrowable()} instead.
-     */
-    public function setTraceFromException(\Exception $exception)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use "setTraceFromThrowable()" instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        $this->setTraceFromThrowable($exception);
-    }
-
-    /**
      * @return $this
      */
-    public function setTraceFromThrowable(\Throwable $throwable): self
+    public function setTraceFromThrowable(\Throwable $throwable): static
     {
         $this->traceAsString = $throwable->getTraceAsString();
 
@@ -323,13 +270,9 @@ class FlattenException extends LegacyFlattenException
     }
 
     /**
-     * @param array       $trace
-     * @param string|null $file
-     * @param int|null    $line
-     *
      * @return $this
      */
-    public function setTrace($trace, $file, $line): self
+    public function setTrace(array $trace, ?string $file, ?int $line): static
     {
         $this->trace = [];
         $this->trace[] = [
@@ -374,10 +317,9 @@ class FlattenException extends LegacyFlattenException
                 return ['array', '*SKIPPED over 10000 entries*'];
             }
             if ($value instanceof \__PHP_Incomplete_Class) {
-                // is_object() returns false on PHP<=7.1
                 $result[$key] = ['incomplete-object', $this->getClassNameFromIncomplete($value)];
             } elseif (\is_object($value)) {
-                $result[$key] = ['object', \get_class($value)];
+                $result[$key] = ['object', get_debug_type($value)];
             } elseif (\is_array($value)) {
                 if ($level > 10) {
                     $result[$key] = ['array', '*DEEP NESTED ARRAY*'];
@@ -417,7 +359,7 @@ class FlattenException extends LegacyFlattenException
     /**
      * @return $this
      */
-    public function setAsString(?string $asString): self
+    public function setAsString(?string $asString): static
     {
         $this->asString = $asString;
 

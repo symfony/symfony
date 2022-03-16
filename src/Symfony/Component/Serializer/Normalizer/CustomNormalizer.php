@@ -25,7 +25,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return $object->normalize($this->serializer, $format, $context);
     }
@@ -33,7 +33,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         $object = $this->extractObjectToPopulate($type, $context) ?? new $type();
         $object->denormalize($this->serializer, $data, $format, $context);
@@ -44,12 +44,11 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * Checks if the given class implements the NormalizableInterface.
      *
-     * @param mixed  $data   Data to normalize
-     * @param string $format The format being (de-)serialized from or into
-     *
-     * @return bool
+     * @param mixed  $data    Data to normalize
+     * @param string $format  The format being (de-)serialized from or into
+     * @param array  $context
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
     {
         return $data instanceof NormalizableInterface;
     }
@@ -57,13 +56,12 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * Checks if the given class implements the DenormalizableInterface.
      *
-     * @param mixed  $data   Data to denormalize from
-     * @param string $type   The class to which the data should be denormalized
-     * @param string $format The format being deserialized from
-     *
-     * @return bool
+     * @param mixed  $data    Data to denormalize from
+     * @param string $type    The class to which the data should be denormalized
+     * @param string $format  The format being deserialized from
+     * @param array  $context
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */): bool
     {
         return is_subclass_of($type, DenormalizableInterface::class);
     }

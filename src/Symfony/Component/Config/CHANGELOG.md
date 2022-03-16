@@ -1,6 +1,37 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow using environment variables in `EnumNode`
+
+6.0
+---
+
+ * Remove `BaseNode::getDeprecationMessage()`
+
+5.3.0
+-----
+
+ * Add support for generating `ConfigBuilder` for extensions
+
+5.1.0
+-----
+
+ * updated the signature of method `NodeDefinition::setDeprecated()` to `NodeDefinition::setDeprecation(string $package, string $version, string $message)`
+ * updated the signature of method `BaseNode::setDeprecated()` to `BaseNode::setDeprecation(string $package, string $version, string $message)`
+ * deprecated passing a null message to `BaseNode::setDeprecated()` to un-deprecate a node
+ * deprecated `BaseNode::getDeprecationMessage()`, use `BaseNode::getDeprecation()` instead
+
+5.0.0
+-----
+
+ * Dropped support for constructing a `TreeBuilder` without passing root node information.
+ * Removed the `root()` method in `TreeBuilder`, pass the root node information to the constructor instead
+ * Added method `getChildNodeDefinitions()` to ParentNodeDefinitionInterface
+ * Removed `FileLoaderLoadException`, use `LoaderLoadException` instead
+
 4.4.0
 -----
 

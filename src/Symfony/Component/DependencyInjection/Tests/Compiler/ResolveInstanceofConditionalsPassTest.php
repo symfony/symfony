@@ -376,15 +376,15 @@ class DecoratorWithBehavior implements ResetInterface, ResourceCheckerInterface,
     {
     }
 
-    public function supports(ResourceInterface $metadata)
+    public function supports(ResourceInterface $metadata): bool
     {
     }
 
-    public function isFresh(ResourceInterface $resource, $timestamp)
+    public function isFresh(ResourceInterface $resource, $timestamp): bool
     {
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
     }
 }

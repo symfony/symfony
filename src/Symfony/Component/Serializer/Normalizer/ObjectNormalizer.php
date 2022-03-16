@@ -60,8 +60,12 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
+        if (\stdClass::class === \get_class($object)) {
+            return array_keys((array) $object);
+        }
+
         // If not using groups, detect manually
         $attributes = [];
 
@@ -122,14 +126,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
         $cacheKey = \get_class($object);
         if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {
             $this->discriminatorCache[$cacheKey] = null;
             if (null !== $this->classDiscriminatorResolver) {
                 $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);
-                $this->discriminatorCache[$cacheKey] = null === $mapping ? null : $mapping->getTypeProperty();
+                $this->discriminatorCache[$cacheKey] = $mapping?->getTypeProperty();
             }
         }
 
@@ -139,7 +143,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);
@@ -151,7 +155,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
     {
         if (false === $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString)) {
             return false;
@@ -164,9 +168,11 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             }
 
             if (null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
+                $attributes = [];
                 foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                    $allowedAttributes = array_merge($allowedAttributes, parent::getAllowedAttributes($mappedClass, $context, $attributesAsString));
+                    $attributes[] = parent::getAllowedAttributes($mappedClass, $context, $attributesAsString);
                 }
+                $allowedAttributes = array_merge($allowedAttributes, ...$attributes);
             }
         }
 

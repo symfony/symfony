@@ -31,7 +31,13 @@ class LoaderLoadExceptionTest extends TestCase
     public function testMessageCannotLoadResourceWithAnnotationType()
     {
         $exception = new LoaderLoadException('resource', null, 0, null, 'annotation');
-        $this->assertEquals('Cannot load resource "resource". Make sure annotations are installed and enabled.', $exception->getMessage());
+        $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "annotation" type.', $exception->getMessage());
+    }
+
+    public function testMessageCannotLoadResourceWithAttributeType()
+    {
+        $exception = new LoaderLoadException('resource', null, 0, null, 'attribute');
+        $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "attribute" type.', $exception->getMessage());
     }
 
     public function testMessageCannotImportResourceFromSource()

@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Forms;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\Validator\Validation;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
@@ -389,6 +387,20 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
+    public function testExpandedCheckboxesInhertLabelHtmlOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'expanded' => true,
+            'label_html' => true,
+            'multiple' => true,
+        ]);
+
+        foreach ($form as $child) {
+            $this->assertTrue($child->getConfig()->getOption('label_html'));
+        }
+    }
+
     public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -414,6 +426,20 @@ class ChoiceTypeTest extends BaseTypeTest
 
         foreach ($form as $child) {
             $this->assertFalse($child->isRequired());
+        }
+    }
+
+    public function testExpandedRadiosInhertLabelHtmlOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'expanded' => true,
+            'label_html' => true,
+            'multiple' => false,
+        ]);
+
+        foreach ($form as $child) {
+            $this->assertTrue($child->getConfig()->getOption('label_html'));
         }
     }
 
@@ -1795,14 +1821,26 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => [$obj1, $obj2, $obj3, $obj4],
             'choice_label' => 'label',
             'choice_value' => 'value',
+            'choice_attr' => [
+                ['attr1' => 'value1'],
+                ['attr2' => 'value2'],
+                ['attr3' => 'value3'],
+                ['attr4' => 'value4'],
+            ],
+            'choice_translation_parameters' => [
+                ['%placeholder1%' => 'value1'],
+                ['%placeholder2%' => 'value2'],
+                ['%placeholder3%' => 'value3'],
+                ['%placeholder4%' => 'value4'],
+            ],
         ])
             ->createView();
 
         $this->assertEquals([
-            new ChoiceView($obj1, 'a', 'A'),
-            new ChoiceView($obj2, 'b', 'B'),
-            new ChoiceView($obj3, 'c', 'C'),
-            new ChoiceView($obj4, 'd', 'D'),
+            new ChoiceView($obj1, 'a', 'A', ['attr1' => 'value1'], ['%placeholder1%' => 'value1']),
+            new ChoiceView($obj2, 'b', 'B', ['attr2' => 'value2'], ['%placeholder2%' => 'value2']),
+            new ChoiceView($obj3, 'c', 'C', ['attr3' => 'value3'], ['%placeholder3%' => 'value3']),
+            new ChoiceView($obj4, 'd', 'D', ['attr4' => 'value4'], ['%placeholder4%' => 'value4']),
         ], $view->vars['choices']);
     }
 
@@ -1820,10 +1858,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testInvalidMessageAwarenessForMultiple()
     {
-        $factory = Forms::createFormFactoryBuilder()
-            ->addExtensions([new ValidatorExtension(Validation::createValidator())])
-            ->getFormFactory();
-        $form = $factory->create(static::TESTED_TYPE, null, [
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -1836,10 +1871,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testInvalidMessageAwarenessForMultipleWithoutScalarOrArrayViewData()
     {
-        $factory = Forms::createFormFactoryBuilder()
-            ->addExtensions([new ValidatorExtension(Validation::createValidator())])
-            ->getFormFactory();
-        $form = $factory->create(static::TESTED_TYPE, null, [
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -1847,7 +1879,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         $form->submit(new \stdClass());
-        $this->assertEquals("ERROR: You are not able to use value \"object\"\n", (string) $form->getErrors(true));
+        $this->assertEquals("ERROR: You are not able to use value \"stdClass\"\n", (string) $form->getErrors(true));
     }
 
     // https://github.com/symfony/symfony/issues/3298
@@ -2164,5 +2196,55 @@ class ChoiceTypeTest extends BaseTypeTest
             'Nothing submitted / multiple / required / without a placeholder -> should be empty' => [true, null, true, true, null],
             'Placeholder submitted / single / not required / with a placeholder -> should not be empty' => [false, '', false, false, 'ccc'], // The placeholder is a selected value
         ];
+    }
+
+    public function testFilteredChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ], $form->createView()->vars['choices']);
+    }
+
+    public function testFilteredGroupedChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->groupedChoices,
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals(['Symfony' => new ChoiceGroupView('Symfony', [
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ])], $form->createView()->vars['choices']);
+    }
+
+    public function testFilteredChoiceLoader()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(function () {
+                return $this->choices;
+            }),
+            'choice_filter' => function ($choice) {
+                return \in_array($choice, range('a', 'c'), true);
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+        ], $form->createView()->vars['choices']);
     }
 }

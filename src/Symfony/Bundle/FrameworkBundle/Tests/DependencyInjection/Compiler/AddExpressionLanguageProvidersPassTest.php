@@ -22,16 +22,16 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
     public function testProcessForRouter()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
         $definition = new Definition('\stdClass');
         $definition->addTag('routing.expression_language_provider');
         $container->setDefinition('some_routing_provider', $definition->setPublic(true));
 
-        $container->register('router', '\stdClass')->setPublic(true);
+        $container->register('router.default', '\stdClass')->setPublic(true);
         $container->compile();
 
-        $router = $container->getDefinition('router');
+        $router = $container->getDefinition('router.default');
         $calls = $router->getMethodCalls();
         $this->assertCount(1, $calls);
         $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
@@ -41,14 +41,14 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
     public function testProcessForRouterAlias()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
+        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
         $definition = new Definition('\stdClass');
         $definition->addTag('routing.expression_language_provider');
         $container->setDefinition('some_routing_provider', $definition->setPublic(true));
 
         $container->register('my_router', '\stdClass')->setPublic(true);
-        $container->setAlias('router', 'my_router');
+        $container->setAlias('router.default', 'my_router');
         $container->compile();
 
         $router = $container->getDefinition('my_router');
@@ -56,89 +56,5 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertCount(1, $calls);
         $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
         $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Registering services tagged "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
-     */
-    public function testProcessForSecurity()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
-
-        $definition = new Definition('\stdClass');
-        $definition->addTag('security.expression_language_provider');
-        $container->setDefinition('some_security_provider', $definition->setPublic(true));
-
-        $container->register('security.expression_language', '\stdClass')->setPublic(true);
-        $container->compile();
-
-        $calls = $container->getDefinition('security.expression_language')->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('registerProvider', $calls[0][0]);
-        $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Registering services tagged "security.expression_language_provider" with "Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" is deprecated since Symfony 4.2, use the "Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass" instead.
-     */
-    public function testProcessForSecurityAlias()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
-
-        $definition = new Definition('\stdClass');
-        $definition->addTag('security.expression_language_provider');
-        $container->setDefinition('some_security_provider', $definition->setPublic(true));
-
-        $container->register('my_security.expression_language', '\stdClass')->setPublic(true);
-        $container->setAlias('security.expression_language', 'my_security.expression_language');
-        $container->compile();
-
-        $calls = $container->getDefinition('my_security.expression_language')->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('registerProvider', $calls[0][0]);
-        $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testProcessIgnoreSecurity()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
-
-        $definition = new Definition('\stdClass');
-        $definition->addTag('security.expression_language_provider');
-        $container->setDefinition('some_security_provider', $definition->setPublic(true));
-
-        $container->register('security.expression_language', '\stdClass')->setPublic(true);
-        $container->compile();
-
-        $calls = $container->getDefinition('security.expression_language')->getMethodCalls();
-        $this->assertCount(0, $calls);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testProcessIgnoreSecurityAlias()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
-
-        $definition = new Definition('\stdClass');
-        $definition->addTag('security.expression_language_provider');
-        $container->setDefinition('some_security_provider', $definition->setPublic(true));
-
-        $container->register('my_security.expression_language', '\stdClass')->setPublic(true);
-        $container->setAlias('security.expression_language', 'my_security.expression_language');
-        $container->compile();
-
-        $calls = $container->getDefinition('my_security.expression_language')->getMethodCalls();
-        $this->assertCount(0, $calls);
     }
 }

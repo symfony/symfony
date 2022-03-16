@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -19,124 +18,70 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @method array    __serialize()                                                                             Returns all the necessary state of the object for serialization purposes - not implementing it is deprecated since Symfony 4.3
- * @method void     __unserialize(array $data) Restores the object state from an array given by __serialize() - not implementing it is deprecated since Symfony 4.3
- * @method string[] getRoleNames()                                                                            The associated roles - not implementing it is deprecated since Symfony 4.3
  */
-interface TokenInterface extends \Serializable
+interface TokenInterface
 {
     /**
      * Returns a string representation of the Token.
      *
      * This is only to be used for debugging purposes.
-     *
-     * @return string
      */
-    public function __toString();
+    public function __toString(): string;
+
+    /**
+     * Returns the user identifier used during authentication (e.g. a user's email address or username).
+     */
+    public function getUserIdentifier(): string;
 
     /**
      * Returns the user roles.
      *
-     * @return Role[] An array of Role instances
-     *
-     * @deprecated since Symfony 4.3, use the getRoleNames() method instead
+     * @return string[]
      */
-    public function getRoles();
-
-    /**
-     * Returns the user credentials.
-     *
-     * @return mixed The user credentials
-     */
-    public function getCredentials();
+    public function getRoleNames(): array;
 
     /**
      * Returns a user representation.
      *
-     * @return string|\Stringable|UserInterface
-     *
      * @see AbstractToken::setUser()
      */
-    public function getUser();
+    public function getUser(): ?UserInterface;
 
     /**
-     * Sets the user in the token.
-     *
-     * The user can be a UserInterface instance, or an object implementing
-     * a __toString method or the username as a regular string.
-     *
-     * @param string|\Stringable|UserInterface $user
+     * Sets the authenticated user in the token.
      *
      * @throws \InvalidArgumentException
      */
-    public function setUser($user);
-
-    /**
-     * Returns the username.
-     *
-     * @return string
-     */
-    public function getUsername();
-
-    /**
-     * Returns whether the user is authenticated or not.
-     *
-     * @return bool true if the token has been authenticated, false otherwise
-     */
-    public function isAuthenticated();
-
-    /**
-     * Sets the authenticated flag.
-     *
-     * @param bool $isAuthenticated The authenticated flag
-     */
-    public function setAuthenticated($isAuthenticated);
+    public function setUser(UserInterface $user);
 
     /**
      * Removes sensitive information from the token.
      */
     public function eraseCredentials();
 
-    /**
-     * Returns the token attributes.
-     *
-     * @return array The token attributes
-     */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
-     * Sets the token attributes.
-     *
      * @param array $attributes The token attributes
      */
     public function setAttributes(array $attributes);
 
-    /**
-     * Returns true if the attribute exists.
-     *
-     * @param string $name The attribute name
-     *
-     * @return bool true if the attribute exists, false otherwise
-     */
-    public function hasAttribute($name);
+    public function hasAttribute(string $name): bool;
 
     /**
-     * Returns an attribute value.
-     *
-     * @param string $name The attribute name
-     *
-     * @return mixed The attribute value
-     *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute($name);
+    public function getAttribute(string $name): mixed;
+
+    public function setAttribute(string $name, mixed $value);
 
     /**
-     * Sets an attribute.
-     *
-     * @param string $name  The attribute name
-     * @param mixed  $value The attribute value
+     * Returns all the necessary state of the object for serialization purposes.
      */
-    public function setAttribute($name, $value);
+    public function __serialize(): array;
+
+    /**
+     * Restores the object state from an array given by __serialize().
+     */
+    public function __unserialize(array $data): void;
 }

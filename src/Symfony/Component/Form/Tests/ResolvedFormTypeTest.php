@@ -373,26 +373,17 @@ class ResolvedFormTypeTest extends TestCase
         ];
     }
 
-    /**
-     * @return MockObject&FormTypeInterface
-     */
-    private function getMockFormType($typeClass = AbstractType::class): FormTypeInterface
+    private function getMockFormType($typeClass = AbstractType::class): MockObject&FormTypeInterface
     {
         return $this->getMockBuilder($typeClass)->setMethods(['getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    /**
-     * @return MockObject&FormTypeExtensionInterface
-     */
-    private function getMockFormTypeExtension(): FormTypeExtensionInterface
+    private function getMockFormTypeExtension(): MockObject&FormTypeExtensionInterface
     {
-        return $this->getMockBuilder(AbstractTypeExtension::class)->setMethods(['getExtendedType', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
+        return $this->getMockBuilder(AbstractTypeExtension::class)->setMethods(['getExtendedTypes', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    /**
-     * @return MockObject&FormFactoryInterface
-     */
-    private function getMockFormFactory(): FormFactoryInterface
+    private function getMockFormFactory(): MockObject&FormFactoryInterface
     {
         return $this->createMock(FormFactoryInterface::class);
     }

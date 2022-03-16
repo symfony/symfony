@@ -1,6 +1,127 @@
 CHANGELOG
 =========
 
+The CHANGELOG for version 5.4 and newer can be found in the security sub-packages (e.g. `Http/`).
+
+5.3
+---
+
+ * Deprecate the Guard component
+ * Deprecate `AuthenticationManagerInterface`, `AuthenticationProviderManager`, `AnonymousAuthenticationProvider`,
+  `AuthenticationProviderInterface`, `DaoAuthenticationProvider`, `LdapBindAuthenticationProvider`,
+  `PreAuthenticatedAuthenticationProvider`, `RememberMeAuthenticationProvider`, `UserAuthenticationProvider` and
+  `AuthenticationFailureEvent` from security-core. Use the new authenticator system instead
+ * Deprecate `AbstractAuthenticationListener`, `AbstractPreAuthenticatedListener`, `AnonymousAuthenticationListener`,
+   `BasicAuthenticationListener`, `RememberMeListener`, `RemoteUserAuthenticationListener`,
+   `UsernamePasswordFormAuthenticationListener`, `UsernamePasswordJsonAuthenticationListener` and `X509AuthenticationListener`
+   from security-http, use the new authenticator system instead
+ * Add `getPassport()` method and a second `$passport` constructor argument to `AuthenticationTokenCreatedEvent`
+ * The authenticator system is no longer experimental
+ * Login Link functionality is no longer experimental
+ * Add `RememberMeConditionsListener` to check if remember me is requested and supported, and set priority of `RememberMeListener` to -63
+ * Add `RememberMeHandlerInterface` and implementations, used as a replacement of `RememberMeServicesInterface` when using the AuthenticatorManager
+ * Add `TokenDeauthenticatedEvent` that is dispatched when the current security token is deauthenticated
+ * [BC break] Change constructor signature of `LoginLinkHandler` to `__construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHashUtil, array $options)`
+ * Add `Core\Signature\SignatureHasher` and moved `Http\LoginLink\ExpiredLoginLinkStorage` to `Core\Signature\ExpiredLoginLinkStorage`
+ * Deprecate `PersistentTokenInterface::getUsername()` in favor of `PersistentTokenInterface::getUserIdentifier()`
+ * Deprecate `UsernameNotFoundException` in favor of `UserNotFoundException` and `getUsername()`/`setUsername()` in favor of `getUserIdentifier()`/`setUserIdentifier()`
+ * Deprecate `UserProviderInterface::loadUserByUsername()` in favor of `UserProviderInterface::loadUserByIdentifier()`
+ * Deprecate `TokenInterface::getUsername()` in favor of `TokenInterface::getUserIdentifier()`
+ * Deprecate `UserInterface::getUsername()` in favor of `getUserIdentifier()`
+ * Add `PassportInterface:getBadges()`, implemented by `PassportTrait`
+ * [BC BREAK] Remove method `checkIfCompletelyResolved()` from `PassportInterface`, checking that passport badges are
+   resolved is up to `AuthenticatorManager`
+ * Deprecate class `User`, use `InMemoryUser` instead
+ * Deprecate class `UserChecker`, use `InMemoryUserChecker` or your own implementation instead
+ * [BC break] Remove support for passing a `UserInterface` implementation to `Passport`, use the `UserBadge` instead.
+ * Add `PasswordAuthenticatedUserInterface` for user classes that use passwords
+ * Add `LegacyPasswordAuthenticatedUserInterface` for user classes that use user-provided salts in addition to passwords
+ * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
+ * Deprecate the `SessionInterface $session` constructor argument of `SessionTokenStorage`, inject a `\Symfony\Component\HttpFoundation\RequestStack $requestStack` instead
+ * Deprecate the `session` service provided by the ServiceLocator injected in `UsageTrackingTokenStorage`, provide a `request_stack` service instead
+ * Deprecate using `SessionTokenStorage` outside a request context, it will throw a `SessionNotFoundException` in Symfony 6.0
+ * Randomize CSRF tokens to harden BREACH attacks
+ * Deprecated voters that do not return a valid decision when calling the `vote` method.
+ * Flag `Serializable` implementation of `NullToken` as `@internal` and `@final`
+ * Add `TokenVerifierInterface` to allow fixing parallel requests handling in remember-me
+ * Add a `CacheTokenVerifier` implementation that stores outdated token in a cache, which is more correct and efficient as the default `DoctrineTokenProvider` implementation
+
+5.2.0
+-----
+
+ * Added attributes on `Passport`
+ * Changed `AuthorizationChecker` to call the access decision manager in unauthenticated sessions with a `NullToken`
+ * [BC break] Removed `AccessListener::PUBLIC_ACCESS` in favor of `AuthenticatedVoter::PUBLIC_ACCESS`
+ * Added `Passport` to `LoginFailureEvent`.
+ * Deprecated `setProviderKey()`/`getProviderKey()` in favor of `setFirewallName()/getFirewallName()` in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`, `DefaultAuthenticationSuccessHandler`; and deprecated the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
+ * Added `FirewallListenerInterface` to make the execution order of firewall listeners configurable
+ * Added translator to `\Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator` and `\Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener` to translate authentication failure messages
+ * Added a CurrentUser attribute to force the UserValueResolver to resolve an argument to the current user.
+ * Added `LoginThrottlingListener`.
+ * Added `LoginLinkAuthenticator`.
+ * Moved methods `supports()` and `authenticate()` from `AbstractListener` to `FirewallListenerInterface`.
+ * [BC break] `PasswordUpgradeBadge::getPasswordUpgrader()` changed its return type to return null or a `PasswordUpgraderInterface` implementation.
+
+5.1.0
+-----
+
+ * Added access decision strategy to override access decisions by voter service priority
+ * Added `IS_ANONYMOUS`, `IS_REMEMBERED`, `IS_IMPERSONATOR`
+ * Hash the persistent RememberMe token value in database.
+ * Added `LogoutEvent` to allow custom logout listeners.
+ * Deprecated `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface` in favor of listening on the `LogoutEvent`.
+ * Added experimental new security using `Http\Authenticator\AuthenticatorInterface`, `Http\Authentication\AuthenticatorManager` and `Http\Firewall\AuthenticatorManagerListener`.
+ * Added `CustomUserMessageAccountStatusException` to be used when extending `UserCheckerInterface`
+ * Deprecated `RememberMeServicesInterface` implementations without `logout(Request $request, Response $response, TokenInterface $token)` method, this method will be required in Symfony 6.0.
+
+5.0.0
+-----
+
+ * Dropped support for passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()` (and indirectly the `is_granted()` Twig and ExpressionLanguage function):
+
+   **Before**
+   ```php
+   if ($this->authorizationChecker->isGranted(['ROLE_USER', 'ROLE_ADMIN'])) {
+       // ...
+   }
+   ```
+
+   **After**
+   ```php
+   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
+   // or:
+   if ($this->authorizationChecker->isGranted('ROLE_USER')
+      || $this->authorizationChecker->isGranted('ROLE_ADMIN')
+   ) {}
+   ```
+ * Implementations of `Guard\AuthenticatorInterface::checkCredentials()` must return
+   a boolean value now. Please explicitly return `false` to indicate invalid credentials.
+ * The `LdapUserProvider` class has been removed, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
+ * The `FirewallMapInterface::getListeners()` method must return an array of 3 elements.
+ * Removed the `ContextListener::setLogoutOnUserChange()` method.
+ * Removed the `ListenerInterface`, turn your listeners into callables instead.
+ * Removed the `Firewall::handleRequest()` method, use `Firewall::callListeners()` instead.
+ * Removed the `AdvancedUserInterface`, use a custom user checker instead.
+ * Removed `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
+ * Removed `BcryptPasswordEncoder`, use `NativePasswordEncoder` instead
+ * Removed the `has_role()` function from security expressions, use `is_granted()` instead.
+ * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
+   `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
+   `SimplePreAuthenticationListener` have been removed. Use Guard instead.
+ * Removed the `Role` and `SwitchUserRole` classes. Use strings for roles instead.
+ * Removed the `getReachableRoles()` method from the `RoleHierarchyInterface`. Role hierarchies must implement
+   the `getReachableRoleNames()` method instead and return roles as strings.
+ * Removed the `getRoles()` method from the `TokenInterface`. Tokens must implement the `getRoleNames()` method
+   instead and return roles as strings.
+ * Made the `serialize` and `unserialize` methods of `AbstractToken` final and internal
+ * Removed the `serialize` and `unserialize` methods from `AuthenticationException`
+ * Added method `__serialize` and `__unserialize` to `TokenInterface`
+ * Added method `needsRehash` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
+ * Removed `ExpressionVoter::addExpressionLanguageProvider()`
+ * Made `Security::getUser()` return null when the user is not an instanceof `UserInterface`,
+   use `getToken()->getUser()` instead
+ * Removed the `AuthenticationTrustResolver` constructor arguments
+
 4.4.0
 -----
 

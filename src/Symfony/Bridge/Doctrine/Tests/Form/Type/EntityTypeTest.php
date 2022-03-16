@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity;
@@ -29,7 +29,7 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\RuntimeException;
@@ -1241,13 +1241,13 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ]);
 
-        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
-        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
-        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
+        $choiceList1 = $form->get('property1')->getConfig()->getAttribute('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf(ChoiceLoaderInterface::class, $choiceLoader1);
-        $this->assertSame($choiceLoader1, $choiceLoader2);
-        $this->assertSame($choiceLoader1, $choiceLoader3);
+        $this->assertInstanceOf(LazyChoiceList::class, $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
     }
 
     public function testLoaderCachingWithParameters()
@@ -1301,19 +1301,16 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ]);
 
-        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
-        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
-        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
+        $choiceList1 = $form->get('property1')->getConfig()->getAttribute('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf(ChoiceLoaderInterface::class, $choiceLoader1);
-        $this->assertSame($choiceLoader1, $choiceLoader2);
-        $this->assertSame($choiceLoader1, $choiceLoader3);
+        $this->assertInstanceOf(LazyChoiceList::class, $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
     }
 
-    /**
-     * @return MockObject&ManagerRegistry
-     */
-    protected function createRegistryMock($name, $em): ManagerRegistry
+    protected function createRegistryMock($name, $em): MockObject&ManagerRegistry
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())

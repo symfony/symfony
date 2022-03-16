@@ -10,6 +10,7 @@
     <service id="foo" class="Bar\FooClass" public="true">
       <tag name="foo" foo="foo"/>
       <tag name="foo" bar="bar" baz="baz"/>
+      <tag name="bar" baz="baz">foo</tag>
       <tag name="nullable" bar="bar" baz=""/>
       <argument>foo</argument>
       <argument type="service" id="foo.baz"/>
@@ -68,7 +69,7 @@
         <argument type="service" id="inlined"/>
       </call>
     </service>
-    <service id="inlined" class="Bar" public="false">
+    <service id="inlined" class="Bar">
       <property name="pub">pub</property>
       <call method="setBaz">
         <argument type="service" id="baz"/>
@@ -80,7 +81,7 @@
       </call>
     </service>
     <service id="request" class="Request" public="true" synthetic="true"/>
-    <service id="configurator_service" class="ConfClass" public="false">
+    <service id="configurator_service" class="ConfClass">
       <call method="setFoo">
         <argument type="service" id="baz"/>
       </call>
@@ -88,7 +89,7 @@
     <service id="configured_service" class="stdClass" public="true">
       <configurator service="configurator_service" method="configureStdClass"/>
     </service>
-    <service id="configurator_service_simple" class="ConfClass" public="false">
+    <service id="configurator_service_simple" class="ConfClass">
       <argument>bar</argument>
     </service>
     <service id="configured_service_simple" class="stdClass" public="true">
@@ -98,9 +99,9 @@
     <service id="decorator_service" class="stdClass" public="true" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" public="true" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
     <service id="deprecated_service" class="stdClass" public="true">
-      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
-    <service id="new_factory" class="FactoryClass" public="false">
+    <service id="new_factory" class="FactoryClass">
       <property name="foo">bar</property>
     </service>
     <service id="factory_service" class="Bar" public="true">
@@ -113,9 +114,9 @@
     <service id="service_from_static_method" class="Bar\FooClass" public="true">
       <factory class="Bar\FooClass" method="getInstance"/>
     </service>
-    <service id="factory_simple" class="SimpleFactoryClass" public="false">
+    <service id="factory_simple" class="SimpleFactoryClass">
       <argument>foo</argument>
-      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
     </service>
     <service id="factory_service_simple" class="Bar" public="true">
       <factory service="factory_simple" method="getInstance"/>
@@ -139,7 +140,7 @@
     </service>
     <service id="bar2" class="stdClass" public="true"/>
     <service id="BAR2" class="stdClass" public="true"/>
-    <service id="tagged_iterator_foo" class="Bar" public="false">
+    <service id="tagged_iterator_foo" class="Bar">
       <tag name="foo"/>
     </service>
     <service id="tagged_iterator" class="Bar" public="true">
@@ -149,8 +150,10 @@
       <argument type="service" id="errored_definition"/>
     </service>
     <service id="errored_definition" class="stdClass"/>
-    <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
+    <service id="preload_sidekick" class="stdClass" public="true">
+      <tag name="container.preload" class="Some\Sidekick1"/>
+      <tag name="container.preload" class="Some\Sidekick2"/>
+    </service>
     <service id="alias_for_foo" alias="foo" public="true"/>
     <service id="alias_for_alias" alias="foo" public="true"/>
   </services>

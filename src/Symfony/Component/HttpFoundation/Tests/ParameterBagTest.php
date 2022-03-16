@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterBagTest extends TestCase
@@ -25,6 +26,21 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $bag->all(), '->all() gets all the input');
+    }
+
+    public function testAllWithInputKey()
+    {
+        $bag = new ParameterBag(['foo' => ['bar', 'baz'], 'null' => null]);
+
+        $this->assertEquals(['bar', 'baz'], $bag->all('foo'), '->all() gets the value of a parameter');
+        $this->assertEquals([], $bag->all('unknown'), '->all() returns an empty array if a parameter is not defined');
+    }
+
+    public function testAllThrowsForNonArrayValues()
+    {
+        $this->expectException(BadRequestException::class);
+        $bag = new ParameterBag(['foo' => 'bar', 'null' => null]);
+        $bag->all('foo');
     }
 
     public function testKeys()
@@ -158,6 +174,25 @@ class ParameterBagTest extends TestCase
         ]), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertEquals(['bang'], $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
+    }
+
+    public function testFilterCallback()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A Closure must be passed to "Symfony\Component\HttpFoundation\ParameterBag::filter()" when FILTER_CALLBACK is used, "string" given.');
+
+        $bag = new ParameterBag(['foo' => 'bar']);
+        $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']);
+    }
+
+    public function testFilterClosure()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => function ($value) {
+            return strtoupper($value);
+        }]);
+
+        $this->assertSame('BAR', $result);
     }
 
     public function testGetIterator()

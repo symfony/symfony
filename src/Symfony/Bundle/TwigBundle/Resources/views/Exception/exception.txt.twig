@@ -1,8 +1,0 @@
-{% deprecated 'The template "' ~ _self ~'" is deprecated since Symfony 4.4, will be removed in 5.0.' %}
-[exception] {{ status_code ~ ' | ' ~ status_text ~ ' | ' ~ exception.class }}
-[message] {{ exception.message }}
-{% for i, e in exception.toarray %}
-[{{ i + 1 }}] {{ e.class }}: {{ e.message }}
-{{ include('@Twig/Exception/traces.txt.twig', { exception: e }, with_context = false) }}
-
-{% endfor %}

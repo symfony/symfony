@@ -28,23 +28,15 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
      * @param int         $roundingMode One of the ROUND_ constants in this class
      * @param string|null $locale       locale used for transforming
      */
-    public function __construct($grouping = false, $roundingMode = self::ROUND_DOWN, $locale = null)
+    public function __construct(?bool $grouping = false, ?int $roundingMode = \NumberFormatter::ROUND_DOWN, string $locale = null)
     {
-        if (\is_int($grouping) || \is_bool($roundingMode) || \is_int($locale)) {
-            @trigger_error(sprintf('Passing a precision as the first value to %s::__construct() is deprecated since Symfony 4.2 and support for it will be dropped in 5.0.', __CLASS__), \E_USER_DEPRECATED);
-
-            $grouping = $roundingMode;
-            $roundingMode = $locale ?? self::ROUND_DOWN;
-            $locale = null;
-        }
-
         parent::__construct(0, $grouping, $roundingMode, $locale);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): int|float|null
     {
         $decimalSeparator = $this->getNumberFormatter()->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
 
@@ -60,7 +52,7 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
     /**
      * @internal
      */
-    protected function castParsedValue($value)
+    protected function castParsedValue(int|float $value): int|float
     {
         return $value;
     }

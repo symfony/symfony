@@ -35,7 +35,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = []): ?bool
+    public function isReadable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isReadable', [$class, $property, $context]);
     }
@@ -43,7 +43,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = []): ?bool
+    public function isWritable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isWritable', [$class, $property, $context]);
     }
@@ -51,7 +51,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = []): ?string
+    public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract('getShortDescription', [$class, $property, $context]);
     }
@@ -59,7 +59,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = []): ?string
+    public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract('getLongDescription', [$class, $property, $context]);
     }
@@ -67,7 +67,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = []): ?array
+    public function getProperties(string $class, array $context = []): ?array
     {
         return $this->extract('getProperties', [$class, $context]);
     }
@@ -75,7 +75,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = []): ?array
+    public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract('getTypes', [$class, $property, $context]);
     }
@@ -90,10 +90,8 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
 
     /**
      * Retrieves the cached data if applicable or delegates to the decorated extractor.
-     *
-     * @return mixed
      */
-    private function extract(string $method, array $arguments)
+    private function extract(string $method, array $arguments): mixed
     {
         try {
             $serializedArguments = serialize($arguments);

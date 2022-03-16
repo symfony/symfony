@@ -108,6 +108,22 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
+    public function testProcessThrowsExceptionOnInvalidReferenceWithAlternatives()
+    {
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The service "a" has a dependency on a non-existent service "@ccc". Did you mean this: "ccc"?');
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a', '\stdClass')
+            ->addArgument(new Reference('@ccc'));
+
+        $container
+            ->register('ccc', '\stdClass');
+
+        $this->process($container);
+    }
+
     private function process(ContainerBuilder $container)
     {
         $pass = new CheckExceptionOnInvalidReferenceBehaviorPass();

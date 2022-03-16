@@ -16,19 +16,17 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 class NodeBuilder extends BaseNodeBuilder
 {
-    public function barNode($name): NodeDefinition
+    public function barNode(?string $name): NodeDefinition
     {
         return $this->node($name, 'bar');
     }
 
-    protected function getNodeClass($type): string
+    protected function getNodeClass(string $type): string
     {
-        switch ($type) {
-            case 'bar':
-            case 'variable':
-                return __NAMESPACE__.'\\'.ucfirst($type).'NodeDefinition';
-            default:
-                return parent::getNodeClass($type);
-        }
+        return match ($type) {
+            'bar',
+            'variable' => __NAMESPACE__ . '\\' . ucfirst($type) . 'NodeDefinition',
+            default => parent::getNodeClass($type),
+        };
     }
 }

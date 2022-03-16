@@ -1,6 +1,6 @@
 services:
     _instanceof:
-        FooInterface:
+        stdClass:
             autowire: true
 
     parent_service:

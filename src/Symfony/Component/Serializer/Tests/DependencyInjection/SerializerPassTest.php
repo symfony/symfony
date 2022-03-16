@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
@@ -67,5 +68,19 @@ class SerializerPassTest extends TestCase
         ];
         $this->assertEquals($expected, $definition->getArgument(0));
         $this->assertEquals($expected, $definition->getArgument(1));
+    }
+
+    public function testBindSerializerDefaultContext()
+    {
+        $container = new ContainerBuilder();
+        $container->register('serializer')->setArguments([null, null]);
+        $container->setParameter('serializer.default_context', ['enable_max_depth' => true]);
+        $definition = $container->register('n1')->addTag('serializer.normalizer')->addTag('serializer.encoder');
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $bindings = $definition->getBindings();
+        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument(['enable_max_depth' => true], false));
     }
 }

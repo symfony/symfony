@@ -100,7 +100,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 
     public function testFloatToIntConversionMismatchOnTransform()
     {
-        $transformer = new MoneyToLocalizedStringTransformer(null, null, MoneyToLocalizedStringTransformer::ROUND_DOWN, 100);
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_DOWN, 100);
         IntlTestHelper::requireFullIntl($this, false);
         \Locale::setDefault('de_AT');
 

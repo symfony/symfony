@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+6.1
+-----
+
+ * Support lexing numbers with the numeric literal separator `_`
+ * Support lexing decimals with no leading zero
+
+5.1.0
+-----
+
+ * added `lint` method to `ExpressionLanguage` class
+ * added `lint` method to `Parser` class
+
 4.0.0
 -----
 

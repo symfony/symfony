@@ -16,24 +16,23 @@ namespace Symfony\Component\VarDumper\Cloner;
  */
 class VarCloner extends AbstractCloner
 {
-    private static $gid;
-    private static $arrayCache = [];
+    private static string $gid;
+    private static array $arrayCache = [];
 
     /**
      * {@inheritdoc}
      */
-    protected function doClone($var)
+    protected function doClone(mixed $var): array
     {
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the minimum depth
         $refsCounter = 0;               // Hard references counter
-        $queue = [[$var]];    // This breadth-first queue is the return value
-        $indexedArrays = [];       // Map of queue indexes that hold numerically indexed arrays
-        $hardRefs = [];            // Map of original zval ids to stub objects
-        $objRefs = [];             // Map of original object handles to their stub object counterpart
-        $objects = [];             // Keep a ref to objects to ensure their handle cannot be reused while cloning
-        $resRefs = [];             // Map of original resource handles to their stub object counterpart
-        $values = [];              // Map of stub objects' ids to original values
+        $queue = [[$var]];              // This breadth-first queue is the return value
+        $hardRefs = [];                 // Map of original zval ids to stub objects
+        $objRefs = [];                  // Map of original object handles to their stub object counterpart
+        $objects = [];                  // Keep a ref to objects to ensure their handle cannot be reused while cloning
+        $resRefs = [];                  // Map of original resource handles to their stub object counterpart
+        $values = [];                   // Map of stub objects' ids to original values
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
         $minDepth = $this->minDepth;
@@ -45,9 +44,7 @@ class VarCloner extends AbstractCloner
         $stub = null;                   // Stub capturing the main properties of an original item value
                                         // or null if the original value is used directly
 
-        if (!$gid = self::$gid) {
-            $gid = self::$gid = md5(random_bytes(6)); // Unique string used to detect the special $GLOBALS variable
-        }
+        $gid = self::$gid ??= md5(random_bytes(6)); // Unique string used to detect the special $GLOBALS variable
         $arrayStub = new Stub();
         $arrayStub->type = Stub::TYPE_ARRAY;
         $fromObjCast = false;
@@ -63,40 +60,16 @@ class VarCloner extends AbstractCloner
             }
 
             $refs = $vals = $queue[$i];
-            if (\PHP_VERSION_ID < 70200 && empty($indexedArrays[$i])) {
-                // see https://wiki.php.net/rfc/convert_numeric_keys_in_object_array_casts
-                foreach ($vals as $k => $v) {
-                    if (\is_int($k)) {
-                        continue;
-                    }
-                    foreach ([$k => true] as $gk => $gv) {
-                    }
-                    if ($gk !== $k) {
-                        $fromObjCast = true;
-                        $refs = $vals = array_values($queue[$i]);
-                        break;
-                    }
-                }
-            }
             foreach ($vals as $k => $v) {
                 // $v is the original value or a stub object in case of hard references
 
-                if (\PHP_VERSION_ID >= 70400) {
-                    $zvalRef = ($r = \ReflectionReference::fromArrayElement($vals, $k)) ? $r->getId() : null;
-                } else {
-                    $refs[$k] = $cookie;
-                    $zvalRef = $vals[$k] === $cookie;
-                }
+                $zvalRef = ($r = \ReflectionReference::fromArrayElement($vals, $k)) ? $r->getId() : null;
 
                 if ($zvalRef) {
                     $vals[$k] = &$stub;         // Break hard references to make $queue completely
                     unset($stub);               // independent from the original structure
-                    if (\PHP_VERSION_ID >= 70400 ? null !== $vals[$k] = $hardRefs[$zvalRef] ?? null : $v instanceof Stub && isset($hardRefs[spl_object_id($v)])) {
-                        if (\PHP_VERSION_ID >= 70400) {
-                            $v = $vals[$k];
-                        } else {
-                            $refs[$k] = $vals[$k] = $v;
-                        }
+                    if (null !== $vals[$k] = $hardRefs[$zvalRef] ?? null) {
+                        $v = $vals[$k];
                         if ($v->value instanceof Stub && (Stub::TYPE_OBJECT === $v->value->type || Stub::TYPE_RESOURCE === $v->value->type)) {
                             ++$v->value->refCount;
                         }
@@ -106,17 +79,9 @@ class VarCloner extends AbstractCloner
                     $vals[$k] = new Stub();
                     $vals[$k]->value = $v;
                     $vals[$k]->handle = ++$refsCounter;
-
-                    if (\PHP_VERSION_ID >= 70400) {
-                        $hardRefs[$zvalRef] = $vals[$k];
-                    } else {
-                        $refs[$k] = $vals[$k];
-                        $h = spl_object_id($refs[$k]);
-                        $hardRefs[$h] = &$refs[$k];
-                        $values[$h] = $v;
-                    }
+                    $hardRefs[$zvalRef] = $vals[$k];
                 }
-                // Create $stub when the original value $v can not be used directly
+                // Create $stub when the original value $v cannot be used directly
                 // If $v is a nested structure, put that structure in array $a
                 switch (true) {
                     case null === $v:
@@ -155,51 +120,12 @@ class VarCloner extends AbstractCloner
                             continue 2;
                         }
                         $stub = $arrayStub;
-                        $stub->class = Stub::ARRAY_INDEXED;
 
-                        $j = -1;
-                        foreach ($v as $gk => $gv) {
-                            if ($gk !== ++$j) {
-                                $stub->class = Stub::ARRAY_ASSOC;
-                                break;
-                            }
-                        }
+                        $stub->class = array_is_list($v) ? Stub::ARRAY_INDEXED : Stub::ARRAY_ASSOC;
                         $a = $v;
-
-                        if (Stub::ARRAY_ASSOC === $stub->class) {
-                            // Copies of $GLOBALS have very strange behavior,
-                            // let's detect them with some black magic
-                            if (\PHP_VERSION_ID < 80100 && ($a[$gid] = true) && isset($v[$gid])) {
-                                unset($v[$gid]);
-                                $a = [];
-                                foreach ($v as $gk => &$gv) {
-                                    if ($v === $gv && (\PHP_VERSION_ID < 70400 || !isset($hardRefs[\ReflectionReference::fromArrayElement($v, $gk)->getId()]))) {
-                                        unset($v);
-                                        $v = new Stub();
-                                        $v->value = [$v->cut = \count($gv), Stub::TYPE_ARRAY => 0];
-                                        $v->handle = -1;
-                                        if (\PHP_VERSION_ID >= 70400) {
-                                            $gv = &$a[$gk];
-                                            $hardRefs[\ReflectionReference::fromArrayElement($a, $gk)->getId()] = &$gv;
-                                        } else {
-                                            $gv = &$hardRefs[spl_object_id($v)];
-                                        }
-                                        $gv = $v;
-                                    }
-
-                                    $a[$gk] = &$gv;
-                                }
-                                unset($gv);
-                            } else {
-                                $a = $v;
-                            }
-                        } elseif (\PHP_VERSION_ID < 70200) {
-                            $indexedArrays[$len] = true;
-                        }
                         break;
 
                     case \is_object($v):
-                    case $v instanceof \__PHP_Incomplete_Class:
                         if (empty($objRefs[$h = spl_object_id($v)])) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_OBJECT;
@@ -287,10 +213,8 @@ class VarCloner extends AbstractCloner
 
                 if (!$zvalRef) {
                     $vals[$k] = $stub;
-                } elseif (\PHP_VERSION_ID >= 70400) {
-                    $hardRefs[$zvalRef]->value = $stub;
                 } else {
-                    $refs[$k]->value = $stub;
+                    $hardRefs[$zvalRef]->value = $stub;
                 }
             }
 

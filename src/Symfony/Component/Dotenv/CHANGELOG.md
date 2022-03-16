@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `dotenv:dump` command to compile the contents of the .env files into a PHP-optimized file called `.env.local.php`
+ * Add `debug:dotenv` command to list all dotenv files with variables and values
+ * Add `$overrideExistingVars` on `Dotenv::bootEnv()` and `Dotenv::loadEnv()`
+
+5.1.0
+-----
+
+ * added `Dotenv::bootEnv()` to check for `.env.local.php` before calling `Dotenv::loadEnv()`
+ * added `Dotenv::setProdEnvs()` and `Dotenv::usePutenv()`
+ * made Dotenv's constructor accept `$envKey` and `$debugKey` arguments, to define
+   the name of the env vars that configure the env name and debug settings
+ * deprecated passing `$usePutenv` argument to Dotenv's constructor
+
+5.0.0
+-----
+
+ * using `putenv()` is disabled by default
+
 4.3.0
 -----
 

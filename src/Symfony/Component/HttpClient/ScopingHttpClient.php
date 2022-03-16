@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -22,13 +24,13 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Anthony Martin <anthony.martin@sensiolabs.com>
  */
-class ScopingHttpClient implements HttpClientInterface, ResetInterface
+class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {
     use HttpClientTrait;
 
-    private $client;
-    private $defaultOptionsByRegexp;
-    private $defaultRegexp;
+    private HttpClientInterface $client;
+    private array $defaultOptionsByRegexp;
+    private ?string $defaultRegexp;
 
     public function __construct(HttpClientInterface $client, array $defaultOptionsByRegexp, string $defaultRegexp = null)
     {
@@ -41,7 +43,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
         }
     }
 
-    public static function forBaseUri(HttpClientInterface $client, string $baseUri, array $defaultOptions = [], $regexp = null): self
+    public static function forBaseUri(HttpClientInterface $client, string $baseUri, array $defaultOptions = [], string $regexp = null): self
     {
         if (null === $regexp) {
             $regexp = preg_quote(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($baseUri))));
@@ -94,7 +96,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         return $this->client->stream($responses, $timeout);
     }
@@ -104,5 +106,26 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        if ($this->client instanceof LoggerAwareInterface) {
+            $this->client->setLogger($logger);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withOptions(array $options): static
+    {
+        $clone = clone $this;
+        $clone->client = $this->client->withOptions($options);
+
+        return $clone;
     }
 }

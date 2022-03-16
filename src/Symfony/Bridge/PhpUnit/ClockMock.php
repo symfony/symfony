@@ -92,7 +92,7 @@ class ClockMock
 
     public static function register($class)
     {
-        $self = \get_called_class();
+        $self = static::class;
 
         $mockedNs = [substr($class, 0, strrpos($class, '\\'))];
         if (0 < strpos($class, '\\Tests\\')) {

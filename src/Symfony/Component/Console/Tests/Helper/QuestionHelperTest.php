@@ -445,6 +445,85 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals(' 8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' 8AM')), $this->createOutputInterface(), $question));
     }
 
+    public function testAskMultilineResponseWithEOF()
+    {
+        $essay = <<<'EOD'
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque pretium lectus quis suscipit porttitor. Sed pretium bibendum vestibulum.
+
+Etiam accumsan, justo vitae imperdiet aliquet, neque est sagittis mauris, sed interdum massa leo id leo.
+
+Aliquam rhoncus, libero ac blandit convallis, est sapien hendrerit nulla, vitae aliquet tellus orci a odio. Aliquam gravida ante sit amet massa lacinia, ut condimentum purus venenatis.
+
+Vivamus et erat dictum, euismod neque in, laoreet odio. Aenean vitae tellus at leo vestibulum auctor id eget urna.
+EOD;
+
+        $response = $this->getInputStream($essay);
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertSame($essay, $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithSingleNewline()
+    {
+        $response = $this->getInputStream(\PHP_EOL);
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertNull($dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithDataAfterNewline()
+    {
+        $response = $this->getInputStream(\PHP_EOL.'this is text');
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertNull($dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithMultipleNewlinesAtEnd()
+    {
+        $typedText = 'This is a body'.\PHP_EOL.\PHP_EOL;
+        $response = $this->getInputStream($typedText);
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertSame('This is a body', $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultilineResponseWithWithCursorInMiddleOfSeekableInputStream()
+    {
+        $input = <<<EOD
+This
+is
+some
+input
+EOD;
+        $response = $this->getInputStream($input);
+        fseek($response, 8);
+
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Write an essay');
+        $question->setMultiline(true);
+
+        $this->assertSame("some\ninput", $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
+        $this->assertSame(8, ftell($response));
+    }
+
     /**
      * @dataProvider getAskConfirmationData
      */
@@ -573,41 +652,6 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         return [
             ['.', ['.']],
             ['., src', ['.', 'src']],
-        ];
-    }
-
-    /**
-     * @dataProvider mixedKeysChoiceListAnswerProvider
-     */
-    public function testChoiceFromChoicelistWithMixedKeys($providedAnswer, $expectedValue)
-    {
-        $possibleChoices = [
-            '0' => 'No environment',
-            '1' => 'My environment 1',
-            'env_2' => 'My environment 2',
-            3 => 'My environment 3',
-        ];
-
-        $dialog = new QuestionHelper();
-        $helperSet = new HelperSet([new FormatterHelper()]);
-        $dialog->setHelperSet($helperSet);
-
-        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
-        $question->setMaxAttempts(1);
-        $answer = $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream($providedAnswer."\n")), $this->createOutputInterface(), $question);
-
-        $this->assertSame($expectedValue, $answer);
-    }
-
-    public function mixedKeysChoiceListAnswerProvider()
-    {
-        return [
-            ['0', '0'],
-            ['No environment', '0'],
-            ['1', '1'],
-            ['env_2', 'env_2'],
-            [3, '3'],
-            ['My environment 1', '1'],
         ];
     }
 
@@ -828,7 +872,6 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
             $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
         } finally {
             $reflection = new \ReflectionProperty(QuestionHelper::class, 'stty');
-            $reflection->setAccessible(true);
             $reflection->setValue(null, true);
         }
     }
@@ -866,6 +909,25 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals(['FooBundle', 'AsseticBundle', 'SecurityBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals(['SecurityBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals(['AcmeDemoBundle', 'AsseticBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function testAutocompleteMoveCursorBackwards()
+    {
+        // F<TAB><BACKSPACE><BACKSPACE><BACKSPACE>
+        $inputStream = $this->getInputStream("F\t\177\177\177");
+
+        $dialog = new QuestionHelper();
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new Question('Question?', 'F⭐Y');
+        $question->setAutocompleterValues(['F⭐Y']);
+
+        $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question);
+
+        $stream = $output->getStream();
+        rewind($stream);
+        $this->assertStringEndsWith("\033[1D\033[K\033[2D\033[K\033[1D\033[K", stream_get_contents($stream));
     }
 
     protected function getInputStream($input)

@@ -15,33 +15,37 @@ use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\TransitionBlockerList;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @final since Symfony 4.4
  */
-class GuardEvent extends Event
+final class GuardEvent extends Event
 {
-    private $transitionBlockerList;
+    private TransitionBlockerList $transitionBlockerList;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($subject, Marking $marking, Transition $transition, $workflowName = null)
+    public function __construct(object $subject, Marking $marking, Transition $transition, WorkflowInterface $workflow = null)
     {
-        parent::__construct($subject, $marking, $transition, $workflowName);
+        parent::__construct($subject, $marking, $transition, $workflow);
 
         $this->transitionBlockerList = new TransitionBlockerList();
     }
 
-    public function isBlocked()
+    public function getTransition(): Transition
+    {
+        return parent::getTransition();
+    }
+
+    public function isBlocked(): bool
     {
         return !$this->transitionBlockerList->isEmpty();
     }
 
-    public function setBlocked($blocked)
+    public function setBlocked(bool $blocked, string $message = null): void
     {
         if (!$blocked) {
             $this->transitionBlockerList->clear();
@@ -49,7 +53,7 @@ class GuardEvent extends Event
             return;
         }
 
-        $this->transitionBlockerList->add(TransitionBlocker::createUnknown());
+        $this->transitionBlockerList->add(TransitionBlocker::createUnknown($message));
     }
 
     public function getTransitionBlockerList(): TransitionBlockerList

@@ -215,24 +215,32 @@ class OptionsResolverIntrospectorTest extends TestCase
         $debug->getNormalizers('foo');
     }
 
-    public function testGetDeprecationMessage()
+    public function testGetDeprecation()
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
-        $resolver->setDeprecated('foo', 'The option "foo" is deprecated.');
+        $resolver->setDeprecated('foo', 'vendor/package', '1.1', 'The option "foo" is deprecated.');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('The option "foo" is deprecated.', $debug->getDeprecationMessage('foo'));
+        $this->assertSame([
+            'package' => 'vendor/package',
+            'version' => '1.1',
+            'message' => 'The option "foo" is deprecated.',
+        ], $debug->getDeprecation('foo'));
     }
 
-    public function testGetClosureDeprecationMessage()
+    public function testGetClosureDeprecation()
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
-        $resolver->setDeprecated('foo', $closure = function (Options $options, $value) {});
+        $resolver->setDeprecated('foo', 'vendor/package', '1.1', $closure = function (Options $options, $value) {});
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame($closure, $debug->getDeprecationMessage('foo'));
+        $this->assertSame([
+            'package' => 'vendor/package',
+            'version' => '1.1',
+            'message' => $closure,
+        ], $debug->getDeprecation('foo'));
     }
 
     public function testGetDeprecationMessageThrowsOnNoConfiguredValue()
@@ -243,7 +251,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver->setDefined('foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getDeprecationMessage('foo'));
+        $debug->getDeprecation('foo');
     }
 
     public function testGetDeprecationMessageThrowsOnNotDefinedOption()
@@ -253,6 +261,6 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getDeprecationMessage('foo'));
+        $debug->getDeprecation('foo');
     }
 }

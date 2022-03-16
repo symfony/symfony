@@ -23,7 +23,7 @@ trait ParentTrait
      *
      * @throws InvalidArgumentException when parent cannot be set
      */
-    final public function parent(string $parent): self
+    final public function parent(string $parent): static
     {
         if (!$this->allowParent) {
             throw new InvalidArgumentException(sprintf('A parent cannot be defined when either "_instanceof" or "_defaults" are also defined for service prototype "%s".', $this->id));
@@ -31,10 +31,6 @@ trait ParentTrait
 
         if ($this->definition instanceof ChildDefinition) {
             $this->definition->setParent($parent);
-        } elseif ($this->definition->isAutoconfigured()) {
-            throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.', $this->id));
-        } elseif ($this->definition->getBindings()) {
-            throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also "bind" arguments.', $this->id));
         } else {
             // cast Definition to ChildDefinition
             $definition = serialize($this->definition);

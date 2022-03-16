@@ -1,12 +1,47 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Add `github` format & autodetection to render errors as annotations when
+  running the Twig linter command in a Github Actions environment.
+
+5.3
+---
+
+ * Add a new `markAsPublic` method on `NotificationEmail` to change the `importance` context option to null after creation
+ * Add a new `fragment_uri()` helper to generate the URI of a fragment
+ * Add support of Bootstrap 5 for form theming
+ * Add a new `serialize` filter to serialize objects using the Serializer component
+
+5.2.0
+-----
+
+ * added the `impersonation_exit_url()` and `impersonation_exit_path()` functions. They return a URL that allows to switch back to the original user.
+ * added the `workflow_transition()` function to easily retrieve a specific transition object
+ * added support for translating `TranslatableInterface` objects
+ * added the `t()` function to easily create `TranslatableMessage` objects
+ * Added support for extracting messages from the `t()` function
+ * Added `field_*` Twig functions to access string values from Form fields
+ * changed the `importance` context option of `NotificationEmail` to allow `null`
+
+5.0.0
+-----
+
+ * removed `TwigEngine` class, use `\Twig\Environment` instead.
+ * removed `transChoice` filter and token
+ * `HttpFoundationExtension` requires a `UrlHelper` on instantiation
+ * removed support for implicit STDIN usage in the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
+ * added form theme for Foundation 6
+ * added support for Foundation 6 switches: add the `switch-input` class to the attributes of a `CheckboxType`
+
 4.4.0
 -----
 
  * added a new `TwigErrorRenderer` for `html` format, integrated with the `ErrorHandler` component
  * marked all classes extending twig as `@final`
- * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
+ * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the
    `DebugCommand::__construct()` method, swap the variables position.
  * the `LintCommand` lints all the templates stored in all configured Twig paths if none argument is provided
  * deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
@@ -19,7 +54,7 @@ CHANGELOG
 
  * added the `form_parent()` function that allows to reliably retrieve the parent form in Twig templates
  * added the `workflow_transition_blockers()` function
- * deprecated the `$requestStack` and `$requestContext` arguments of the 
+ * deprecated the `$requestStack` and `$requestContext` arguments of the
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead
 

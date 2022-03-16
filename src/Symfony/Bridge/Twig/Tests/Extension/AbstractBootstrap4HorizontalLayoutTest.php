@@ -132,6 +132,39 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         );
     }
 
+    public function testLabelHtmlDefaultIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => '<b>Bolded label</b>',
+        ]);
+
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
+                'class' => 'my&class',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"][.="[trans]<b>Bolded label</b>[/trans]"]');
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"]/b[.="Bolded label"]', 0);
+    }
+
+    public function testLabelHtmlIsTrue()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => '<b>Bolded label</b>',
+            'label_html' => true,
+        ]);
+
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
+                'class' => 'my&class',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"]/b[.="Bolded label"]');
+    }
+
     public function testLegendOnExpandedType()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [

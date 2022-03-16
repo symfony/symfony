@@ -81,6 +81,16 @@ class WorkflowExtensionTest extends TestCase
         $this->assertSame('t1', $transitions[0]->getName());
     }
 
+    public function testGetEnabledTransition()
+    {
+        $subject = new Subject();
+
+        $transition = $this->extension->getEnabledTransition($subject, 't1');
+
+        $this->assertInstanceOf(Transition::class, $transition);
+        $this->assertSame('t1', $transition->getName());
+    }
+
     public function testHasMarkedPlace()
     {
         $subject = new Subject(['ordered' => 1, 'waiting_for_payment' => 1]);

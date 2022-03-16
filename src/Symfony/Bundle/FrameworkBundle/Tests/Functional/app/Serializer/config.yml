@@ -2,5 +2,13 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    serializer: { enabled: true }
+    serializer:
+        enabled: true
+        default_context:
+            enable_max_depth: true
     property_info: { enabled: true }
+
+services:
+    serializer.alias:
+        alias: serializer
+        public: true

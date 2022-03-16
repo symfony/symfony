@@ -1,7 +1,7 @@
 namespaces:
   custom: Symfony\Component\Validator\Tests\Fixtures\
 
-Symfony\Component\Validator\Tests\Fixtures\Entity:
+Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity:
   group_sequence:
     - Foo
     - Entity
@@ -58,5 +58,5 @@ Symfony\Component\Validator\Tests\Fixtures\Entity:
     permissions:
       - "IsTrue": ~
 
-Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity:
+Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity:
   group_sequence_provider: true

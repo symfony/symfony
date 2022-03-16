@@ -46,7 +46,7 @@ class CsrfTokenManagerTest extends TestCase
 
         $this->assertInstanceOf(CsrfToken::class, $token);
         $this->assertSame('token_id', $token->getId());
-        $this->assertSame('TOKEN', $token->getValue());
+        $this->assertNotSame('TOKEN', $token->getValue());
     }
 
     /**
@@ -68,7 +68,34 @@ class CsrfTokenManagerTest extends TestCase
 
         $this->assertInstanceOf(CsrfToken::class, $token);
         $this->assertSame('token_id', $token->getId());
-        $this->assertSame('TOKEN', $token->getValue());
+        $this->assertNotSame('TOKEN', $token->getValue());
+    }
+
+    /**
+     * @dataProvider getManagerGeneratorAndStorage
+     */
+    public function testRandomizeTheToken($namespace, $manager, $storage)
+    {
+        $storage->expects($this->any())
+            ->method('hasToken')
+            ->with($namespace.'token_id')
+            ->willReturn(true);
+
+        $storage->expects($this->any())
+            ->method('getToken')
+            ->with($namespace.'token_id')
+            ->willReturn('TOKEN');
+
+        $values = [];
+        $lengths = [];
+        for ($i = 0; $i < 10; ++$i) {
+            $token = $manager->getToken('token_id');
+            $values[] = $token->getValue();
+            $lengths[] = \strlen($token->getValue());
+        }
+
+        $this->assertCount(10, array_unique($values));
+        $this->assertGreaterThan(2, \count(array_unique($lengths)));
     }
 
     /**
@@ -91,13 +118,33 @@ class CsrfTokenManagerTest extends TestCase
 
         $this->assertInstanceOf(CsrfToken::class, $token);
         $this->assertSame('token_id', $token->getId());
-        $this->assertSame('TOKEN', $token->getValue());
+        $this->assertNotSame('TOKEN', $token->getValue());
     }
 
     /**
      * @dataProvider getManagerGeneratorAndStorage
      */
     public function testMatchingTokenIsValid($namespace, $manager, $storage)
+    {
+        $storage->expects($this->exactly(2))
+            ->method('hasToken')
+            ->with($namespace.'token_id')
+            ->willReturn(true);
+
+        $storage->expects($this->exactly(2))
+            ->method('getToken')
+            ->with($namespace.'token_id')
+            ->willReturn('TOKEN');
+
+        $token = $manager->getToken('token_id');
+        $this->assertNotSame('TOKEN', $token->getValue());
+        $this->assertTrue($manager->isTokenValid($token));
+    }
+
+    /**
+     * @dataProvider getManagerGeneratorAndStorage
+     */
+    public function testMatchingTokenIsValidWithLegacyToken($namespace, $manager, $storage)
     {
         $storage->expects($this->once())
             ->method('hasToken')
@@ -162,6 +209,7 @@ class CsrfTokenManagerTest extends TestCase
     public function testNamespaced()
     {
         $generator = $this->createMock(TokenGeneratorInterface::class);
+        $generator->expects($this->once())->method('generateToken')->willReturn('random');
         $storage = $this->createMock(TokenStorageInterface::class);
 
         $requestStack = new RequestStack();

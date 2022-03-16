@@ -28,10 +28,7 @@ class TestSingularAndPluralProps
         return $this->email;
     }
 
-    /**
-     * @param string|null $email
-     */
-    public function setEmail($email)
+    public function setEmail(?string $email)
     {
         $this->email = $email;
     }
@@ -41,18 +38,12 @@ class TestSingularAndPluralProps
         return $this->emails;
     }
 
-    /**
-     * @param string $email
-     */
-    public function addEmail($email)
+    public function addEmail(string $email)
     {
         $this->emails[] = $email;
     }
 
-    /**
-     * @param string $email
-     */
-    public function removeEmail($email)
+    public function removeEmail(string $email)
     {
         $this->emails = array_diff($this->emails, [$email]);
     }

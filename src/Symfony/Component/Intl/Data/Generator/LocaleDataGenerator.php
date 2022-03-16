@@ -29,9 +29,9 @@ class LocaleDataGenerator extends AbstractDataGenerator
 {
     use FallbackTrait;
 
-    private $locales = [];
-    private $localeAliases = [];
-    private $localeParents = [];
+    private array $locales = [];
+    private array $localeAliases = [];
+    private array $localeParents = [];
 
     /**
      * {@inheritdoc}

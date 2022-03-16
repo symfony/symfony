@@ -22,11 +22,10 @@ class RememberMeTokenTest extends TestCase
         $user = $this->getUser();
         $token = new RememberMeToken($user, 'fookey', 'foo');
 
-        $this->assertEquals('fookey', $token->getProviderKey());
+        $this->assertEquals('fookey', $token->getFirewallName());
         $this->assertEquals('foo', $token->getSecret());
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertSame($user, $token->getUser());
-        $this->assertTrue($token->isAuthenticated());
     }
 
     public function testConstructorSecretCannotBeEmptyString()

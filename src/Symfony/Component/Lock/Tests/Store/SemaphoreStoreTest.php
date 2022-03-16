@@ -23,6 +23,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 class SemaphoreStoreTest extends AbstractStoreTest
 {
     use BlockingStoreTestTrait;
+    use UnserializableTestTrait;
 
     /**
      * {@inheritdoc}

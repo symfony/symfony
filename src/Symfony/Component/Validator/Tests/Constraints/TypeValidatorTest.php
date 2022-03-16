@@ -184,29 +184,26 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getInvalidValuesMultipleTypes
+     * @dataProvider provideConstraintsWithMultipleTypes
      */
-    public function testInvalidValuesMultipleTypes($value, $types, $valueAsString)
+    public function testInvalidValuesMultipleTypes(Type $constraint)
     {
-        $constraint = new Type([
-            'type' => $types,
-            'message' => 'myMessage',
-        ]);
-
-        $this->validator->validate($value, $constraint);
+        $this->validator->validate('12345', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', $valueAsString)
-            ->setParameter('{{ type }}', implode('|', $types))
+            ->setParameter('{{ value }}', '"12345"')
+            ->setParameter('{{ type }}', implode('|', ['boolean', 'array']))
             ->setCode(Type::INVALID_TYPE_ERROR)
             ->assertRaised();
     }
 
-    public function getInvalidValuesMultipleTypes()
+    public function provideConstraintsWithMultipleTypes()
     {
-        return [
-            ['12345', ['boolean', 'array'], '"12345"'],
-        ];
+        yield 'Doctrine style' => [new Type([
+            'type' => ['boolean', 'array'],
+            'message' => 'myMessage',
+        ])];
+        yield 'named arguments' => [new Type(type: ['boolean', 'array'], message: 'myMessage')];
     }
 
     protected function createFile()

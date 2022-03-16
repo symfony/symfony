@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for `X-SES-MESSAGE-TAGS`
+
+6.0
+---
+
+ * Remove the `SesApiTransport` class, use `SesApiAsyncAwsTransport` instead
+ * Remove the `SesHttpTransport` class, use `SesHttpAsyncAwsTransport` instead
+
+5.3
+---
+
+ * Add support for `X-SES-SOURCE-ARN`
+
+5.1.0
+-----
+
+ * Added `async-aws/ses` to communicate with AWS API.
+
 4.4.0
 -----
 

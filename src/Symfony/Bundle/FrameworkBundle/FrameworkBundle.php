@@ -14,12 +14,12 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SessionPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
@@ -34,8 +34,8 @@ use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
-use Symfony\Component\Debug\ErrorHandler as LegacyErrorHandler;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\RegisterReverseContainerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -90,16 +90,9 @@ class FrameworkBundle extends Bundle
     public function boot()
     {
         ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
-        if (class_exists(LegacyErrorHandler::class, false)) {
-            LegacyErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
-        }
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
-        }
-
-        if ($trustedHosts = $this->container->getParameter('kernel.trusted_hosts')) {
-            Request::setTrustedHosts($trustedHosts);
         }
     }
 
@@ -107,14 +100,23 @@ class FrameworkBundle extends Bundle
     {
         parent::build($container);
 
-        $hotPathEvents = [
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->setHotPathEvents([
             KernelEvents::REQUEST,
             KernelEvents::CONTROLLER,
             KernelEvents::CONTROLLER_ARGUMENTS,
             KernelEvents::RESPONSE,
             KernelEvents::FINISH_REQUEST,
-        ];
+        ]);
+        if (class_exists(ConsoleEvents::class)) {
+            $registerListenersPass->setNoPreloadEvents([
+                ConsoleEvents::COMMAND,
+                ConsoleEvents::TERMINATE,
+                ConsoleEvents::ERROR,
+            ]);
+        }
 
+        $container->addCompilerPass(new AssetsContextPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -123,8 +125,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ProfilerPass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters
-        $container->addCompilerPass((new RegisterListenersPass())->setHotPathEvents($hotPathEvents), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new TemplatingPass());
+        $container->addCompilerPass($registerListenersPass, PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class);
         $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_AFTER_REMOVING, -255);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
@@ -156,7 +157,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, AddAutoMappingConfigurationPass::class);
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new SessionPass());
+        $container->addCompilerPass(new RemoveUnusedSessionMarshallingHandlerPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);

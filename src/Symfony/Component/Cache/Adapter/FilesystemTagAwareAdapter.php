@@ -44,7 +44,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     /**
      * {@inheritdoc}
      */
-    protected function doClear($namespace)
+    protected function doClear(string $namespace): bool
     {
         $ok = $this->doClearCache($namespace);
 
@@ -65,11 +65,11 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                 }
 
                 for ($i = 0; $i < 38; ++$i) {
-                    if (!file_exists($dir.$chars[$i])) {
+                    if (!is_dir($dir.$chars[$i])) {
                         continue;
                     }
                     for ($j = 0; $j < 38; ++$j) {
-                        if (!file_exists($d = $dir.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
+                        if (!is_dir($d = $dir.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j])) {
                             continue;
                         }
                         foreach (scandir($d, \SCANDIR_SORT_NONE) ?: [] as $link) {
@@ -136,11 +136,11 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     {
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            if (!file_exists($file) || !$h = @fopen($file, 'r')) {
+            if (!is_file($file) || !$h = @fopen($file, 'r')) {
                 continue;
             }
 
-            if ((\PHP_VERSION_ID >= 70300 || '\\' !== \DIRECTORY_SEPARATOR) && !@unlink($file)) {
+            if (!@unlink($file)) {
                 fclose($h);
                 continue;
             }
@@ -165,10 +165,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
             }
 
             fclose($h);
-
-            if (\PHP_VERSION_ID < 70300 && '\\' === \DIRECTORY_SEPARATOR) {
-                @unlink($file);
-            }
         }
     }
 
@@ -193,7 +189,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     protected function doInvalidate(array $tagIds): bool
     {
         foreach ($tagIds as $tagId) {
-            if (!file_exists($tagFolder = $this->getTagFolder($tagId))) {
+            if (!is_dir($tagFolder = $this->getTagFolder($tagId))) {
                 continue;
             }
 

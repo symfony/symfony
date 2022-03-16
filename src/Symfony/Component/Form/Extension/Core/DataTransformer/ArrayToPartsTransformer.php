@@ -19,14 +19,14 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ArrayToPartsTransformer implements DataTransformerInterface
 {
-    private $partMapping;
+    private array $partMapping;
 
     public function __construct(array $partMapping)
     {
         $this->partMapping = $partMapping;
     }
 
-    public function transform($array)
+    public function transform(mixed $array): mixed
     {
         if (null === $array) {
             $array = [];
@@ -49,7 +49,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
         return $result;
     }
 
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array): mixed
     {
         if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');

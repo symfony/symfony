@@ -19,6 +19,7 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class GroupSequenceProvider
 {
 }

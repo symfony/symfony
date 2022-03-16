@@ -59,12 +59,12 @@ class TestMultiplePcreFilterIterator extends MultiplePcreFilterIterator
         throw new \BadFunctionCallException('Not implemented');
     }
 
-    public function isRegex($str): bool
+    public function isRegex(string $str): bool
     {
         return parent::isRegex($str);
     }
 
-    public function toRegex($str): string
+    public function toRegex(string $str): string
     {
         throw new \BadFunctionCallException('Not implemented');
     }

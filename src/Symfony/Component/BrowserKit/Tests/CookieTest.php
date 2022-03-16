@@ -47,6 +47,7 @@ class CookieTest extends TestCase
         return [
             ['foo=bar; path=/'],
             ['foo=bar; path=/foo'],
+            ['foo="Test"; path=/'],
             ['foo=bar; domain=example.com; path=/'],
             ['foo=bar; domain=example.com; path=/; secure', 'https://example.com/'],
             ['foo=bar; path=/; httponly'],

@@ -12,5 +12,6 @@ return function (InputInterface $input, OutputInterface $output) {
     $output->error('Error');
     $output->success('Success');
     $output->note('Note');
+    $output->info('Info');
     $output->block('Custom block', 'CUSTOM', 'fg=white;bg=green', 'X ', true);
 };

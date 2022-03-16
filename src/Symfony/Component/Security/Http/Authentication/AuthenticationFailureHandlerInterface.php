@@ -30,8 +30,6 @@ interface AuthenticationFailureHandlerInterface
      * This is called when an interactive authentication attempt fails. This is
      * called by authentication listeners inheriting from
      * AbstractAuthenticationListener.
-     *
-     * @return Response The response to return, never null
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception);
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response;
 }

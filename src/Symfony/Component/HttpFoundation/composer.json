@@ -16,14 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=7.1.3",
-        "symfony/mime": "^4.3|^5.0",
-        "symfony/polyfill-mbstring": "~1.1",
-        "symfony/polyfill-php80": "^1.16"
+        "php": ">=8.1",
+        "symfony/deprecation-contracts": "^2.1|^3",
+        "symfony/polyfill-mbstring": "~1.1"
     },
     "require-dev": {
         "predis/predis": "~1.0",
-        "symfony/expression-language": "^3.4|^4.0|^5.0"
+        "symfony/cache": "^5.4|^6.0",
+        "symfony/mime": "^5.4|^6.0",
+        "symfony/expression-language": "^5.4|^6.0"
+    },
+    "suggest" : {
+        "symfony/mime": "To use the file extension guesser"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },

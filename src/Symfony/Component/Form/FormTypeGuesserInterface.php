@@ -19,32 +19,23 @@ interface FormTypeGuesserInterface
     /**
      * Returns a field guess for a property name of a class.
      *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     *
-     * @return Guess\TypeGuess|null A guess for the field's type and options
+     * @return Guess\TypeGuess|null
      */
-    public function guessType($class, $property);
+    public function guessType(string $class, string $property);
 
     /**
      * Returns a guess whether a property of a class is required.
      *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     *
-     * @return Guess\ValueGuess|null A guess for the field's required setting
+     * @return Guess\ValueGuess|null
      */
-    public function guessRequired($class, $property);
+    public function guessRequired(string $class, string $property);
 
     /**
      * Returns a guess about the field's maximum length.
      *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     *
-     * @return Guess\ValueGuess|null A guess for the field's maximum length
+     * @return Guess\ValueGuess|null
      */
-    public function guessMaxLength($class, $property);
+    public function guessMaxLength(string $class, string $property);
 
     /**
      * Returns a guess about the field's pattern.
@@ -56,10 +47,7 @@ interface FormTypeGuesserInterface
      *
      * @see https://github.com/symfony/symfony/pull/3927
      *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     *
-     * @return Guess\ValueGuess|null A guess for the field's required pattern
+     * @return Guess\ValueGuess|null
      */
-    public function guessPattern($class, $property);
+    public function guessPattern(string $class, string $property);
 }

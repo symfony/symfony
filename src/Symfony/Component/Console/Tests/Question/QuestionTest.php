@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\Question;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Question\Question;
 
 class QuestionTest extends TestCase
@@ -150,10 +149,7 @@ class QuestionTest extends TestCase
      */
     public function testSetAutocompleterValuesInvalid($values)
     {
-        self::expectException(InvalidArgumentException::class);
-        self::expectExceptionMessage(
-            'Autocompleter values can be either an array, "null" or a "Traversable" object.'
-        );
+        self::expectException(\TypeError::class);
 
         $this->question->setAutocompleterValues($values);
     }
@@ -271,7 +267,7 @@ class QuestionTest extends TestCase
 
     public function providerSetMaxAttemptsInvalid()
     {
-        return [['Potato'], [0], [-1]];
+        return [[0], [-1]];
     }
 
     /**
@@ -300,5 +296,19 @@ class QuestionTest extends TestCase
     public function testGetNormalizerDefault()
     {
         self::assertNull($this->question->getNormalizer());
+    }
+
+    /**
+     * @dataProvider providerTrueFalse
+     */
+    public function testSetMultiline(bool $multiline)
+    {
+        self::assertSame($this->question, $this->question->setMultiline($multiline));
+        self::assertSame($multiline, $this->question->isMultiline());
+    }
+
+    public function testIsMultilineDefault()
+    {
+        self::assertFalse($this->question->isMultiline());
     }
 }

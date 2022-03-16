@@ -23,17 +23,13 @@ interface LoaderInterface
 {
     /**
      * Loads a template.
-     *
-     * @return Storage|false false if the template cannot be loaded, a Storage instance otherwise
      */
-    public function load(TemplateReferenceInterface $template);
+    public function load(TemplateReferenceInterface $template): Storage|false;
 
     /**
      * Returns true if the template is still fresh.
      *
      * @param int $time The last modification time of the cached template (timestamp)
-     *
-     * @return bool
      */
-    public function isFresh(TemplateReferenceInterface $template, $time);
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool;
 }

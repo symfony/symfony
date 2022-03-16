@@ -13,9 +13,9 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 class MainConfigurationTest extends TestCase
 {
@@ -119,7 +119,7 @@ class MainConfigurationTest extends TestCase
     {
         $config = [
             'access_decision_manager' => [
-                'strategy' => AccessDecisionManager::STRATEGY_UNANIMOUS,
+                'strategy' => MainConfiguration::STRATEGY_UNANIMOUS,
             ],
         ];
         $config = array_merge(static::$minimalConfig, $config);
@@ -130,6 +130,16 @@ class MainConfigurationTest extends TestCase
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [$config, $config2]);
 
-        $this->assertSame(AccessDecisionManager::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
+        $this->assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
+    }
+
+    public function testFirewalls()
+    {
+        $factory = $this->createMock(AuthenticatorFactoryInterface::class);
+        $factory->expects($this->once())->method('addConfiguration');
+        $factory->method('getKey')->willReturn('key');
+
+        $configuration = new MainConfiguration(['stub' => $factory], []);
+        $configuration->getConfigTreeBuilder();
     }
 }

@@ -696,7 +696,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $tmp[0][1]['date'] = $time->format(\DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
-        $m->setAccessible(true);
         $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
@@ -746,7 +745,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $tmp[0][1]['date'] = $time->format(\DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
-        $m->setAccessible(true);
         $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
@@ -806,7 +804,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $tmp[0][1]['expires'] = $time->format(\DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
-        $m->setAccessible(true);
         $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         // build subsequent request; should be found but miss due to freshness
@@ -1209,7 +1206,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $responses = [
             [
                 'status' => 200,
-                'body' => 'I am a long-lived master response, but I embed a short-lived resource: <esi:include src="/foo" />',
+                'body' => 'I am a long-lived main response, but I embed a short-lived resource: <esi:include src="/foo" />',
                 'headers' => [
                     'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
@@ -1267,7 +1264,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $responses = [
             [
                 'status' => 200,
-                'body' => 'I am the master response and use expiration caching, but I embed another resource: <esi:include src="/foo" />',
+                'body' => 'I am the main response and use expiration caching, but I embed another resource: <esi:include src="/foo" />',
                 'headers' => [
                     'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
@@ -1363,7 +1360,7 @@ class HttpCacheTest extends HttpCacheTestCase
      */
     public function testHttpCacheIsSetAsATrustedProxy(array $existing)
     {
-        Request::setTrustedProxies($existing, Request::HEADER_X_FORWARDED_ALL);
+        Request::setTrustedProxies($existing, Request::HEADER_X_FORWARDED_FOR);
 
         $this->setNextResponse();
         $this->request('GET', '/', ['REMOTE_ADDR' => '10.0.0.1']);
@@ -1511,7 +1508,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $request->server->set('REMOTE_ADDR', '10.0.0.1');
 
         // Main request
-        $cache->handle($request, HttpKernelInterface::MASTER_REQUEST);
+        $cache->handle($request, HttpKernelInterface::MAIN_REQUEST);
 
         // Main request was now modified by HttpCache
         // The surrogate will ask for the request using $this->cache->getRequest()
@@ -1734,7 +1731,7 @@ class TestKernel implements HttpKernelInterface
         $this->terminateCalled = true;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
     }
 }

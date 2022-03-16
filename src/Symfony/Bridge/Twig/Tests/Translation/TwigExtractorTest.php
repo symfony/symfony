@@ -41,22 +41,16 @@ class TwigExtractorTest extends TestCase
         $catalogue = new MessageCatalogue('en');
 
         $m = new \ReflectionMethod($extractor, 'extractTemplate');
-        $m->setAccessible(true);
         $m->invoke($extractor, $template, $catalogue);
+
+        if (0 === \count($messages)) {
+            $this->assertSame($catalogue->all(), $messages);
+        }
 
         foreach ($messages as $key => $domain) {
             $this->assertTrue($catalogue->has($key, $domain));
             $this->assertEquals('prefix'.$key, $catalogue->get($key, $domain));
         }
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider getLegacyExtractData
-     */
-    public function testLegacyExtract($template, $messages)
-    {
-        $this->testExtract($template, $messages);
     }
 
     public function getExtractData()
@@ -70,6 +64,10 @@ class TwigExtractorTest extends TestCase
             ['{% trans from "domain" %}new key{% endtrans %}', ['new key' => 'domain']],
             ['{% set foo = "new key" | trans %}', ['new key' => 'messages']],
             ['{{ 1 ? "new key" | trans : "another key" | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
+            ['{{ t("new key") | trans() }}', ['new key' => 'messages']],
+            ['{% set foo = t("new key") %}', ['new key' => 'messages']],
+            ['{{ t("new key", {}, "domain") | trans() }}', ['new key' => 'domain']],
+            ['{{ 1 ? t("new key") | trans : t("another key") | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
 
             // make sure 'trans_default_domain' tag is supported
             ['{% trans_default_domain "domain" %}{{ "new key"|trans }}', ['new key' => 'domain']],
@@ -77,24 +75,15 @@ class TwigExtractorTest extends TestCase
 
             // make sure this works with twig's named arguments
             ['{{ "new key" | trans(domain="domain") }}', ['new key' => 'domain']],
-        ];
-    }
 
-    /**
-     * @group legacy
-     */
-    public function getLegacyExtractData()
-    {
-        return [
-            ['{{ "new key" | transchoice(1) }}', ['new key' => 'messages']],
-            ['{{ "new key" | transchoice(1) | upper }}', ['new key' => 'messages']],
-            ['{{ "new key" | transchoice(1, {}, "domain") }}', ['new key' => 'domain']],
-
-            // make sure 'trans_default_domain' tag is supported
-            ['{% trans_default_domain "domain" %}{{ "new key"|transchoice }}', ['new key' => 'domain']],
-
-            // make sure this works with twig's named arguments
-            ['{{ "new key" | transchoice(domain="domain", count=1) }}', ['new key' => 'domain']],
+            // concat translations
+            ['{{ ("new" ~ " key") | trans() }}', ['new key' => 'messages']],
+            ['{{ ("another " ~ "new " ~ "key") | trans() }}', ['another new key' => 'messages']],
+            ['{{ ("new" ~ " key") | trans(domain="domain") }}', ['new key' => 'domain']],
+            ['{{ ("another " ~ "new " ~ "key") | trans(domain="domain") }}', ['another new key' => 'domain']],
+            // if it has a variable or other expression, we cannot extract it
+            ['{% set foo = "new" %} {{ ("new " ~ foo ~ "key") | trans() }}', []],
+            ['{{ ("foo " ~ "new"|trans ~ "key") | trans() }}', ['new' => 'messages']],
         ];
     }
 

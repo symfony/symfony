@@ -51,37 +51,13 @@ class DateTimeNormalizerTest extends TestCase
 
     public function testNormalizeUsingFormatPassedInConstructor()
     {
-        $this->doTestNormalizeUsingFormatPassedInConstructor();
-    }
-
-    public function testLegacyNormalizeUsingFormatPassedInConstructor()
-    {
-        $this->doTestNormalizeUsingFormatPassedInConstructor(true);
-    }
-
-    private function doTestNormalizeUsingFormatPassedInConstructor(bool $legacy = false)
-    {
-        $normalizer = $legacy ? new DateTimeNormalizer('y') : new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'y']);
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'y']);
         $this->assertEquals('16', $normalizer->normalize(new \DateTime('2016/01/01', new \DateTimeZone('UTC'))));
     }
 
     public function testNormalizeUsingTimeZonePassedInConstructor()
     {
-        $this->doTestNormalizeUsingTimeZonePassedInConstructor();
-    }
-
-    public function testLegacyNormalizeUsingTimeZonePassedInConstructor()
-    {
-        $this->doTestNormalizeUsingTimeZonePassedInConstructor(true);
-    }
-
-    private function doTestNormalizeUsingTimeZonePassedInConstructor(bool $legacy = false)
-    {
-        if ($legacy) {
-            $normalizer = new DateTimeNormalizer(\DateTime::RFC3339, new \DateTimeZone('Japan'));
-        } else {
-            $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Japan')]);
-        }
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Japan')]);
 
         $this->assertSame('2016-12-01T00:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('Japan'))));
         $this->assertSame('2016-12-01T09:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('UTC'))));
@@ -206,19 +182,9 @@ class DateTimeNormalizerTest extends TestCase
 
     public function testDenormalizeUsingTimezonePassedInConstructor()
     {
-        $this->doTestDenormalizeUsingTimezonePassedInConstructor();
-    }
-
-    public function testLegacyDenormalizeUsingTimezonePassedInConstructor()
-    {
-        $this->doTestDenormalizeUsingTimezonePassedInConstructor(true);
-    }
-
-    private function doTestDenormalizeUsingTimezonePassedInConstructor(bool $legacy = false)
-    {
         $timezone = new \DateTimeZone('Japan');
         $expected = new \DateTime('2016/12/01 17:35:00', $timezone);
-        $normalizer = $legacy ? new DateTimeNormalizer(null, $timezone) : new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => $timezone]);
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => $timezone]);
 
         $this->assertEquals($expected, $normalizer->denormalize('2016.12.01 17:35:00', \DateTime::class, null, [
             DateTimeNormalizer::FORMAT_KEY => 'Y.m.d H:i:s',

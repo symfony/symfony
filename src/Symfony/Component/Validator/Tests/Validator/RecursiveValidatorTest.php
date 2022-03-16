@@ -16,6 +16,7 @@ use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -28,6 +29,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Traverse;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -42,12 +44,14 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildA;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildB;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\EntityParent;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
+use Symfony\Component\Validator\Tests\Fixtures\CascadedChild;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\EntityWithGroupedConstraintOnMethods;
 use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
-use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\LazyProperty;
@@ -1755,6 +1759,79 @@ class RecursiveValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
+    public function testReferenceCascadeDisabledByDefault()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $this->fail('Should not be called');
+        };
+
+        $this->referenceMetadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group',
+        ]));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
+    public function testReferenceCascadeEnabledIgnoresUntyped()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $this->metadata->addConstraint(new Cascade());
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $this->fail('Should not be called');
+        };
+
+        $this->referenceMetadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group',
+        ]));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
+    public function testTypedReferenceCascadeEnabled()
+    {
+        $entity = new CascadingEntity();
+        $entity->requiredChild = new CascadedChild();
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $context->buildViolation('Invalid child')
+                ->atPath('name')
+                ->addViolation()
+            ;
+        };
+
+        $cascadingMetadata = new ClassMetadata(CascadingEntity::class);
+        $cascadingMetadata->addConstraint(new Cascade());
+
+        $cascadedMetadata = new ClassMetadata(CascadedChild::class);
+        $cascadedMetadata->addConstraint(new Callback([
+            'callback' => $callback,
+            'groups' => 'Group',
+        ]));
+
+        $this->metadataFactory->addMetadata($cascadingMetadata);
+        $this->metadataFactory->addMetadata($cascadedMetadata);
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertInstanceOf(Callback::class, $violations->get(0)->getConstraint());
+    }
+
     public function testAddCustomizedViolation()
     {
         $entity = new Entity();
@@ -2055,7 +2132,7 @@ class RecursiveValidatorTest extends TestCase
     public function testCollectionConstraintValidateAllGroupsForNestedConstraints()
     {
         $this->metadata->addPropertyConstraint('data', new Collection(['fields' => [
-            'one' => [new NotBlank(['groups' => 'one']), new Length(['min' => 2, 'groups' => 'two', 'allowEmptyString' => false])],
+            'one' => [new NotBlank(['groups' => 'one']), new Length(['min' => 2, 'groups' => 'two'])],
             'two' => [new NotBlank(['groups' => 'two'])],
         ]]));
 
@@ -2117,7 +2194,7 @@ class RecursiveValidatorTest extends TestCase
     {
         $this->metadata->addPropertyConstraint('data', new All(['constraints' => [
             new NotBlank(['groups' => 'one']),
-            new Length(['min' => 2, 'groups' => 'two', 'allowEmptyString' => false]),
+            new Length(['min' => 2, 'groups' => 'two']),
         ]]));
 
         $entity = new Entity();
@@ -2143,6 +2220,106 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate([], new Optional());
 
         $this->assertCount(0, $violations);
+    }
+
+    public function testValidateDoNotCascadeNestedObjectsAndArraysByDefault()
+    {
+        $this->metadataFactory->addMetadata(new ClassMetadata(CascadingEntity::class));
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
+            ->addPropertyConstraint('name', new NotNull())
+        );
+
+        $entity = new CascadingEntity();
+        $entity->requiredChild = new CascadedChild();
+        $entity->optionalChild = new CascadedChild();
+        $entity->children[] = new CascadedChild();
+        CascadingEntity::$staticChild = new CascadedChild();
+
+        $violations = $this->validator->validate($entity);
+
+        $this->assertCount(0, $violations);
+
+        CascadingEntity::$staticChild = null;
+    }
+
+    public function testValidateTraverseNestedArrayByDefaultIfConstrainedWithoutCascading()
+    {
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
+            ->addPropertyConstraint('children', new All([
+                new Type(CascadedChild::class),
+            ]))
+        );
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
+            ->addPropertyConstraint('name', new NotNull())
+        );
+
+        $entity = new CascadingEntity();
+        $entity->children[] = new \stdClass();
+        $entity->children[] = new CascadedChild();
+
+        $violations = $this->validator->validate($entity);
+
+        $this->assertCount(1, $violations);
+        $this->assertInstanceOf(Type::class, $violations->get(0)->getConstraint());
+    }
+
+    public function testValidateCascadeWithValid()
+    {
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
+            ->addPropertyConstraint('requiredChild', new Valid())
+            ->addPropertyConstraint('optionalChild', new Valid())
+            ->addPropertyConstraint('staticChild', new Valid())
+            ->addPropertyConstraint('children', new Valid())
+        );
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
+            ->addPropertyConstraint('name', new NotNull())
+        );
+
+        $entity = new CascadingEntity();
+        $entity->requiredChild = new CascadedChild();
+        $entity->children[] = new CascadedChild();
+        $entity->children[] = null;
+        CascadingEntity::$staticChild = new CascadedChild();
+
+        $violations = $this->validator->validate($entity);
+
+        $this->assertCount(3, $violations);
+        $this->assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
+        $this->assertInstanceOf(NotNull::class, $violations->get(1)->getConstraint());
+        $this->assertInstanceOf(NotNull::class, $violations->get(2)->getConstraint());
+        $this->assertSame('requiredChild.name', $violations->get(0)->getPropertyPath());
+        $this->assertSame('staticChild.name', $violations->get(1)->getPropertyPath());
+        $this->assertSame('children[0].name', $violations->get(2)->getPropertyPath());
+
+        CascadingEntity::$staticChild = null;
+    }
+
+    public function testValidateWithExplicitCascade()
+    {
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
+            ->addConstraint(new Cascade())
+        );
+        $this->metadataFactory->addMetadata((new ClassMetadata(CascadedChild::class))
+            ->addPropertyConstraint('name', new NotNull())
+        );
+
+        $entity = new CascadingEntity();
+        $entity->requiredChild = new CascadedChild();
+        $entity->children[] = new CascadedChild();
+        $entity->children[] = null;
+        CascadingEntity::$staticChild = new CascadedChild();
+
+        $violations = $this->validator->validate($entity);
+
+        $this->assertCount(3, $violations);
+        $this->assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
+        $this->assertInstanceOf(NotNull::class, $violations->get(1)->getConstraint());
+        $this->assertInstanceOf(NotNull::class, $violations->get(2)->getConstraint());
+        $this->assertSame('requiredChild.name', $violations->get(0)->getPropertyPath());
+        $this->assertSame('staticChild.name', $violations->get(1)->getPropertyPath());
+        $this->assertSame('children[0].name', $violations->get(2)->getPropertyPath());
+
+        CascadingEntity::$staticChild = null;
     }
 
     public function testValidatedConstraintsHashesDoNotCollide()

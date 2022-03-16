@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -421,7 +421,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $builder->setCompound($compound);
 
         if ($compound) {
-            $builder->setDataMapper(new PropertyPathMapper());
+            $builder->setDataMapper(new DataMapper());
         }
 
         return $builder;

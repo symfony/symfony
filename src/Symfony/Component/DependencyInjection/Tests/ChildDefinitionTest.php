@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 
 class ChildDefinitionTest extends TestCase
 {
@@ -55,9 +54,9 @@ class ChildDefinitionTest extends TestCase
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertTrue($def->isPublic());
-        $this->assertSame($def, $def->setPublic(false));
         $this->assertFalse($def->isPublic());
+        $this->assertSame($def, $def->setPublic(true));
+        $this->assertTrue($def->isPublic());
         $this->assertSame(['public' => true], $def->getChanges());
     }
 
@@ -128,17 +127,20 @@ class ChildDefinitionTest extends TestCase
         $def->getArgument(1);
     }
 
-    public function testCannotCallSetAutoconfigured()
+    public function testAutoconfigured()
     {
-        $this->expectException(BadMethodCallException::class);
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
+
+        $this->assertTrue($def->isAutoconfigured());
     }
 
-    public function testCannotCallSetInstanceofConditionals()
+    public function testInstanceofConditionals()
     {
-        $this->expectException(BadMethodCallException::class);
+        $conditionals = ['Foo' => new ChildDefinition('')];
         $def = new ChildDefinition('foo');
-        $def->setInstanceofConditionals(['Foo' => new ChildDefinition('')]);
+        $def->setInstanceofConditionals($conditionals);
+
+        $this->assertSame($conditionals, $def->getInstanceofConditionals());
     }
 }

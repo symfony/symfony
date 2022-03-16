@@ -20,15 +20,16 @@ use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Loads validation metadata using a Doctrine annotation {@link Reader}.
+ * Loads validation metadata using a Doctrine annotation {@link Reader} or using PHP 8 attributes.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Alexander M. Turek <me@derrabus.de>
  */
 class AnnotationLoader implements LoaderInterface
 {
     protected $reader;
 
-    public function __construct(Reader $reader)
+    public function __construct(Reader $reader = null)
     {
         $this->reader = $reader;
     }
@@ -36,13 +37,13 @@ class AnnotationLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $reflClass = $metadata->getReflectionClass();
         $className = $reflClass->name;
         $success = false;
 
-        foreach ($this->reader->getClassAnnotations($reflClass) as $constraint) {
+        foreach ($this->getAnnotations($reflClass) as $constraint) {
             if ($constraint instanceof GroupSequence) {
                 $metadata->setGroupSequence($constraint->groups);
             } elseif ($constraint instanceof GroupSequenceProvider) {
@@ -56,7 +57,7 @@ class AnnotationLoader implements LoaderInterface
 
         foreach ($reflClass->getProperties() as $property) {
             if ($property->getDeclaringClass()->name === $className) {
-                foreach ($this->reader->getPropertyAnnotations($property) as $constraint) {
+                foreach ($this->getAnnotations($property) as $constraint) {
                     if ($constraint instanceof Constraint) {
                         $metadata->addPropertyConstraint($property->name, $constraint);
                     }
@@ -68,7 +69,7 @@ class AnnotationLoader implements LoaderInterface
 
         foreach ($reflClass->getMethods() as $method) {
             if ($method->getDeclaringClass()->name === $className) {
-                foreach ($this->reader->getMethodAnnotations($method) as $constraint) {
+                foreach ($this->getAnnotations($method) as $constraint) {
                     if ($constraint instanceof Callback) {
                         $constraint->callback = $method->getName();
 
@@ -87,5 +88,34 @@ class AnnotationLoader implements LoaderInterface
         }
 
         return $success;
+    }
+
+    /**
+     * @param \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflection
+     */
+    private function getAnnotations(object $reflection): iterable
+    {
+        foreach ($reflection->getAttributes(GroupSequence::class) as $attribute) {
+            yield $attribute->newInstance();
+        }
+        foreach ($reflection->getAttributes(GroupSequenceProvider::class) as $attribute) {
+            yield $attribute->newInstance();
+        }
+        foreach ($reflection->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            yield $attribute->newInstance();
+        }
+        if (!$this->reader) {
+            return;
+        }
+
+        if ($reflection instanceof \ReflectionClass) {
+            yield from $this->reader->getClassAnnotations($reflection);
+        }
+        if ($reflection instanceof \ReflectionMethod) {
+            yield from $this->reader->getMethodAnnotations($reflection);
+        }
+        if ($reflection instanceof \ReflectionProperty) {
+            yield from $this->reader->getPropertyAnnotations($reflection);
+        }
     }
 }

@@ -22,17 +22,17 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  */
 final class Definition
 {
-    private $places = [];
-    private $transitions = [];
-    private $initialPlaces = [];
-    private $metadataStore;
+    private array $places = [];
+    private array $transitions = [];
+    private array $initialPlaces = [];
+    private MetadataStoreInterface $metadataStore;
 
     /**
      * @param string[]             $places
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, string|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -45,20 +45,6 @@ final class Definition
         $this->setInitialPlaces($initialPlaces);
 
         $this->metadataStore = $metadataStore ?? new InMemoryMetadataStore();
-    }
-
-    /**
-     * @deprecated since Symfony 4.3. Use getInitialPlaces() instead.
-     */
-    public function getInitialPlace(): ?string
-    {
-        @trigger_error(sprintf('Calling %s::getInitialPlace() is deprecated since Symfony 4.3. Call getInitialPlaces() instead.', __CLASS__), \E_USER_DEPRECATED);
-
-        if (!$this->initialPlaces) {
-            return null;
-        }
-
-        return reset($this->initialPlaces);
     }
 
     /**
@@ -90,7 +76,7 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces($places = null)
+    private function setInitialPlaces(string|array $places = null)
     {
         if (!$places) {
             return;

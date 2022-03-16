@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class RequestAttributeValueSame extends Constraint
 {
-    private $name;
-    private $value;
+    private string $name;
+    private string $value;
 
     public function __construct(string $name, string $value)
     {

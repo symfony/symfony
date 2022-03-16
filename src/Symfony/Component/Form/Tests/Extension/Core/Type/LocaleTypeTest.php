@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LocaleTypeTest extends BaseTypeTest
@@ -61,15 +60,5 @@ class LocaleTypeTest extends BaseTypeTest
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en')
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInvalidChoiceValuesAreDropped()
-    {
-        $type = new LocaleType();
-
-        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

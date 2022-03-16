@@ -20,9 +20,15 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.1', '8.0']
+        php: ['8.1']
 
     services:
+      postgres:
+        image: postgres:9.6-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: 'password'
       ldap:
         image: bitnami/openldap
         ports:
@@ -66,6 +72,34 @@ jobs:
         image: rabbitmq:3.8.3
         ports:
           - 5672:5672
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+      couchbase:
+        image: couchbase:6.5.1
+        ports:
+          - 8091:8091
+          - 8092:8092
+          - 8093:8093
+          - 8094:8094
+          - 11210:11210
+      sqs:
+        image: asyncaws/testing-sqs
+        ports:
+          - 9494:9494
+      zookeeper:
+        image: wurstmeister/zookeeper:3.4.6
+      kafka:
+        image: wurstmeister/kafka:2.12-2.4.1
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
+          KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
+          KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+          KAFKA_ADVERTISED_PORT: 9092
 
     steps:
       - name: Checkout
@@ -78,19 +112,32 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::install tools & libraries"
-          sudo apt-get install redis-server
+          sudo apt-get install librdkafka-dev redis-server
           sudo -- sh -c 'echo unixsocket /var/run/redis/redis-server.sock >> /etc/redis/redis.conf'
           sudo -- sh -c 'echo unixsocketperm 777 >> /etc/redis/redis.conf'
           sudo service redis-server restart
           echo "::endgroup::"
 
+      - name: Configure Couchbase
+        run: |
+          curl -s -u 'username=Administrator&password=111111' -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex%2Cfts'
+          curl -s -X POST http://localhost:8091/settings/web -d 'username=Administrator&password=111111&port=SAME'
+          curl -s -u Administrator:111111 -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
+          curl -s -u Administrator:111111 -X POST  http://localhost:8091/pools/default -d 'memoryQuota=256'
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "memcached,redis-5.3.4,xsl,ldap"
+          extensions: "json,couchbase,memcached,mongodb-1.12.0,redis-5.3.4,rdkafka,xsl,ldap"
           ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
+          tools: pecl
+
+      - name: Display versions
+        run: |
+          php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+          php -i
 
       - name: Load fixtures
         uses: docker://bitnami/openldap
@@ -106,6 +153,7 @@ jobs:
           echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
 
           echo "::group::composer update"
+          composer require --dev --no-update mongodb/mongodb:"^1.11"
           composer update --no-progress --ansi
           echo "::endgroup::"
 
@@ -122,13 +170,17 @@ jobs:
           REDIS_SENTINEL_SERVICE: redis_sentinel
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
+          MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
+          MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
+          KAFKA_BROKER: 127.0.0.1:9092
+          POSTGRES_HOST: localhost
 
       #- name: Run HTTP push tests
-      #  if: matrix.php == '8.0'
+      #  if: matrix.php == '8.1'
       #  run: |
       #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
       #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
-      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.0-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
+      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 

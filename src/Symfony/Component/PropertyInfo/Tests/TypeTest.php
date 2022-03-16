@@ -28,13 +28,15 @@ class TypeTest extends TestCase
         $this->assertEquals('ArrayObject', $type->getClassName());
         $this->assertTrue($type->isCollection());
 
-        $collectionKeyType = $type->getCollectionKeyType();
-        $this->assertInstanceOf(Type::class, $collectionKeyType);
-        $this->assertEquals(Type::BUILTIN_TYPE_INT, $collectionKeyType->getBuiltinType());
+        $collectionKeyTypes = $type->getCollectionKeyTypes();
+        $this->assertIsArray($collectionKeyTypes);
+        $this->assertContainsOnlyInstancesOf('Symfony\Component\PropertyInfo\Type', $collectionKeyTypes);
+        $this->assertEquals(Type::BUILTIN_TYPE_INT, $collectionKeyTypes[0]->getBuiltinType());
 
-        $collectionValueType = $type->getCollectionValueType();
-        $this->assertInstanceOf(Type::class, $collectionValueType);
-        $this->assertEquals(Type::BUILTIN_TYPE_STRING, $collectionValueType->getBuiltinType());
+        $collectionValueTypes = $type->getCollectionValueTypes();
+        $this->assertIsArray($collectionValueTypes);
+        $this->assertContainsOnlyInstancesOf('Symfony\Component\PropertyInfo\Type', $collectionValueTypes);
+        $this->assertEquals(Type::BUILTIN_TYPE_STRING, $collectionValueTypes[0]->getBuiltinType());
     }
 
     public function testIterable()
@@ -48,5 +50,39 @@ class TypeTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"foo" is not a valid PHP type.');
         new Type('foo');
+    }
+
+    public function testArrayCollection()
+    {
+        $type = new Type('array', false, null, true, [new Type('int'), new Type('string')], [new Type('object', false, \ArrayObject::class, true), new Type('array', false, null, true)]);
+
+        $this->assertEquals(Type::BUILTIN_TYPE_ARRAY, $type->getBuiltinType());
+        $this->assertFalse($type->isNullable());
+        $this->assertTrue($type->isCollection());
+
+        [$firstKeyType, $secondKeyType] = $type->getCollectionKeyTypes();
+        $this->assertEquals(Type::BUILTIN_TYPE_INT, $firstKeyType->getBuiltinType());
+        $this->assertFalse($firstKeyType->isNullable());
+        $this->assertFalse($firstKeyType->isCollection());
+        $this->assertEquals(Type::BUILTIN_TYPE_STRING, $secondKeyType->getBuiltinType());
+        $this->assertFalse($secondKeyType->isNullable());
+        $this->assertFalse($secondKeyType->isCollection());
+
+        [$firstValueType, $secondValueType] = $type->getCollectionValueTypes();
+        $this->assertEquals(Type::BUILTIN_TYPE_OBJECT, $firstValueType->getBuiltinType());
+        $this->assertEquals(\ArrayObject::class, $firstValueType->getClassName());
+        $this->assertFalse($firstValueType->isNullable());
+        $this->assertTrue($firstValueType->isCollection());
+        $this->assertEquals(Type::BUILTIN_TYPE_ARRAY, $secondValueType->getBuiltinType());
+        $this->assertFalse($secondValueType->isNullable());
+        $this->assertTrue($firstValueType->isCollection());
+    }
+
+    public function testInvalidCollectionValueArgument()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('"Symfony\Component\PropertyInfo\Type::validateCollectionArgument()": Argument #5 ($collectionKeyType) must be of type "Symfony\Component\PropertyInfo\Type[]", "Symfony\Component\PropertyInfo\Type" or "null", array value "array" given.');
+
+        new Type('array', false, null, true, [new \stdClass()], [new Type('string')]);
     }
 }

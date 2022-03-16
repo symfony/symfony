@@ -1,5 +1,5 @@
 framework:
     secret: s3cr3t
     csrf_protection: ~
-    form: ~
-    session: ~
+    session:
+        storage_factory_id: session.storage.factory.native

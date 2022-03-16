@@ -12,28 +12,16 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Currencies;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CurrencyType extends AbstractType implements ChoiceLoaderInterface
+class CurrencyType extends AbstractType
 {
-    /**
-     * Currency loaded choice list.
-     *
-     * The choices are lazy loaded and generated from the Intl component.
-     *
-     * {@link \Symfony\Component\Intl\Intl::getCurrencyBundle()}.
-     *
-     * @var ArrayChoiceList
-     *
-     * @deprecated since Symfony 4.1
-     */
-    private $choiceList;
-
     /**
      * {@inheritdoc}
      */
@@ -41,14 +29,19 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
     {
         $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
+                if (!class_exists(Intl::class)) {
+                    throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s". Try running "composer require symfony/intl".', static::class));
+                }
+
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
+                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
                     return array_flip(Currencies::getNames($choiceTranslationLocale));
-                });
+                }), $choiceTranslationLocale);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
+            'invalid_message' => 'Please select a valid currency.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
@@ -57,7 +50,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -65,65 +58,8 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'currency';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.1
-     */
-    public function loadChoiceList($value = null)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        if (null !== $this->choiceList) {
-            return $this->choiceList;
-        }
-
-        return $this->choiceList = new ArrayChoiceList(array_flip(Currencies::getNames()), $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.1
-     */
-    public function loadChoicesForValues(array $values, $value = null)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        // Optimize
-        $values = array_filter($values);
-        if (empty($values)) {
-            return [];
-        }
-
-        return $this->loadChoiceList($value)->getChoicesForValues($values);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.1
-     */
-    public function loadValuesForChoices(array $choices, $value = null)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
-
-        // Optimize
-        $choices = array_filter($choices);
-        if (empty($choices)) {
-            return [];
-        }
-
-        // If no callable is set, choices are the same as values
-        if (null === $value) {
-            return $choices;
-        }
-
-        return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 }

@@ -65,7 +65,6 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidPasswordButDisabled()
     {
         $r = new \ReflectionProperty($this->validator, 'enabled');
-        $r->setAccessible(true);
         $r->setValue($this->validator, false);
 
         $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
@@ -93,11 +92,20 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testThresholdNotReached()
+    /**
+     * @dataProvider provideConstraintsWithThreshold
+     */
+    public function testThresholdNotReached(NotCompromisedPassword $constraint)
     {
-        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(['threshold' => 10]));
+        $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public function provideConstraintsWithThreshold(): iterable
+    {
+        yield 'Doctrine style' => [new NotCompromisedPassword(['threshold' => 10])];
+        yield 'named arguments' => [new NotCompromisedPassword(threshold: 10)];
     }
 
     public function testValidPassword()
@@ -172,10 +180,19 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
     }
 
-    public function testApiErrorSkipped()
+    /**
+     * @dataProvider provideErrorSkippingConstraints
+     */
+    public function testApiErrorSkipped(NotCompromisedPassword $constraint)
     {
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(['skipOnError' => true]));
+        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, $constraint);
         $this->assertTrue(true); // No exception have been thrown
+    }
+
+    public function provideErrorSkippingConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new NotCompromisedPassword(['skipOnError' => true])];
+        yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
     }
 
     private function createHttpClientStub(): HttpClientInterface

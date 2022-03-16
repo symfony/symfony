@@ -12,18 +12,15 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpClientTest extends TestCase
 {
     public function testCreateClient()
     {
-        if (\extension_loaded('curl')) {
-            $this->assertInstanceOf(CurlHttpClient::class, HttpClient::create());
-        } else {
-            $this->assertInstanceOf(NativeHttpClient::class, HttpClient::create());
-        }
+        $this->assertInstanceOf(HttpClientInterface::class, HttpClient::create());
+        $this->assertNotInstanceOf(NativeHttpClient::class, HttpClient::create());
     }
 }

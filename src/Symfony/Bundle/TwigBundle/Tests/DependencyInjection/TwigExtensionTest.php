@@ -31,10 +31,7 @@ class TwigExtensionTest extends TestCase
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
-            'exception_controller' => null, // to be removed in 5.0
-        ]);
+        $container->loadFromExtension('twig');
         $this->compileContainer($container);
 
         $this->assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
@@ -158,8 +155,6 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig', [
             'globals' => $globals,
-            'strict_variables' => false, // // to be removed in 5.0 relying on default
-            'exception_controller' => null, // to be removed in 5.0 relying on default
         ]);
         $this->compileContainer($container);
 
@@ -204,43 +199,6 @@ class TwigExtensionTest extends TestCase
         ], $paths);
     }
 
-    /**
-     * @group legacy
-     * @dataProvider getFormats
-     * @expectedDeprecation Loading Twig templates for "AcmeBundle" from the "%s/Resources/AcmeBundle/views" directory is deprecated since Symfony 4.2, use "%s/templates/bundles/AcmeBundle" instead.
-     * @expectedDeprecation Loading Twig templates from the "%s/Resources/views" directory is deprecated since Symfony 4.2, use "%s/templates" instead.
-     */
-    public function testLegacyTwigLoaderPaths($format)
-    {
-        $container = $this->createContainer(__DIR__.'/../Fixtures/templates');
-        $container->registerExtension(new TwigExtension());
-        $this->loadFromFile($container, 'full', $format);
-        $this->loadFromFile($container, 'extra', $format);
-        $this->compileContainer($container);
-
-        $def = $container->getDefinition('twig.loader.native_filesystem');
-        $paths = [];
-        foreach ($def->getMethodCalls() as $call) {
-            if ('addPath' === $call[0] && !str_contains($call[1][0], 'Form')) {
-                $paths[] = $call[1];
-            }
-        }
-
-        $this->assertEquals([
-            ['path1'],
-            ['path2'],
-            ['namespaced_path1', 'namespace1'],
-            ['namespaced_path2', 'namespace2'],
-            ['namespaced_path3', 'namespace3'],
-            [__DIR__.'/../Fixtures/templates/Resources/AcmeBundle/views', 'Acme'],
-            [__DIR__.'/Fixtures/templates/bundles/AcmeBundle', 'Acme'],
-            [__DIR__.'/AcmeBundle/Resources/views', 'Acme'],
-            [__DIR__.'/AcmeBundle/Resources/views', '!Acme'],
-            [__DIR__.'/../Fixtures/templates/Resources/views'],
-            [__DIR__.'/Fixtures/templates'],
-        ], $paths);
-    }
-
     public function getFormats()
     {
         return [
@@ -261,16 +219,12 @@ class TwigExtensionTest extends TestCase
             $container->register('debug.stopwatch', 'Symfony\Component\Stopwatch\Stopwatch');
         }
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
-            'exception_controller' => null, // to be removed in 5.0 relying on default
-        ]);
+        $container->loadFromExtension('twig');
         $container->setAlias('test.twig.extension.debug.stopwatch', 'twig.extension.debug.stopwatch')->setPublic(true);
         $this->compileContainer($container);
 
         $tokenParsers = $container->get('test.twig.extension.debug.stopwatch')->getTokenParsers();
         $stopwatchIsAvailable = new \ReflectionProperty($tokenParsers[0], 'stopwatchIsAvailable');
-        $stopwatchIsAvailable->setAccessible(true);
 
         $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }
@@ -285,23 +239,15 @@ class TwigExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @group legacy
-     */
     public function testRuntimeLoader()
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
-            'exception_controller' => null, // to be removed in 5.0 relying on default
-        ]);
+        $container->loadFromExtension('twig');
         $container->setParameter('kernel.environment', 'test');
         $container->setParameter('debug.file_link_format', 'test');
         $container->setParameter('foo', 'FooClass');
         $container->register('http_kernel', 'FooClass');
-        $container->register('templating.locator', 'FooClass');
-        $container->register('templating.name_parser', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
         $container->register('error_renderer.html', HtmlErrorRenderer::class);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -317,11 +263,10 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
     }
 
-    private function createContainer(string $rootDir = __DIR__.'/Fixtures')
+    private function createContainer()
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
-            'kernel.root_dir' => $rootDir,
             'kernel.project_dir' => __DIR__,
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
@@ -351,19 +296,11 @@ class TwigExtensionTest extends TestCase
     {
         $locator = new FileLocator(__DIR__.'/Fixtures/'.$format);
 
-        switch ($format) {
-            case 'php':
-                $loader = new PhpFileLoader($container, $locator);
-                break;
-            case 'xml':
-                $loader = new XmlFileLoader($container, $locator);
-                break;
-            case 'yml':
-                $loader = new YamlFileLoader($container, $locator);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported format: "%s"', $format));
-        }
+        $loader = match ($format) {
+            'php' => new PhpFileLoader($container, $locator),
+            'xml' => new XmlFileLoader($container, $locator),
+            'yml' => new YamlFileLoader($container, $locator),
+        };
 
         $loader->load($file.'.'.$format);
     }

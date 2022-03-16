@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -21,19 +22,19 @@ use Twig\TwigFunction;
  * SecurityExtension exposes security context features.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
-class SecurityExtension extends AbstractExtension
+final class SecurityExtension extends AbstractExtension
 {
-    private $securityChecker;
+    private ?AuthorizationCheckerInterface $securityChecker;
+    private ?ImpersonateUrlGenerator $impersonateUrlGenerator;
 
-    public function __construct(AuthorizationCheckerInterface $securityChecker = null)
+    public function __construct(AuthorizationCheckerInterface $securityChecker = null, ImpersonateUrlGenerator $impersonateUrlGenerator = null)
     {
         $this->securityChecker = $securityChecker;
+        $this->impersonateUrlGenerator = $impersonateUrlGenerator;
     }
 
-    public function isGranted($role, $object = null, $field = null)
+    public function isGranted(mixed $role, mixed $object = null, string $field = null): bool
     {
         if (null === $this->securityChecker) {
             return false;
@@ -50,23 +51,33 @@ class SecurityExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return TwigFunction[]
-     */
-    public function getFunctions()
+    public function getImpersonateExitUrl(string $exitTo = null): string
     {
-        return [
-            new TwigFunction('is_granted', [$this, 'isGranted']),
-        ];
+        if (null === $this->impersonateUrlGenerator) {
+            return '';
+        }
+
+        return $this->impersonateUrlGenerator->generateExitUrl($exitTo);
+    }
+
+    public function getImpersonateExitPath(string $exitTo = null): string
+    {
+        if (null === $this->impersonateUrlGenerator) {
+            return '';
+        }
+
+        return $this->impersonateUrlGenerator->generateExitPath($exitTo);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getFunctions(): array
     {
-        return 'security';
+        return [
+            new TwigFunction('is_granted', $this->isGranted(...)),
+            new TwigFunction('impersonation_exit_url', $this->getImpersonateExitUrl(...)),
+            new TwigFunction('impersonation_exit_path', $this->getImpersonateExitPath(...)),
+        ];
     }
 }

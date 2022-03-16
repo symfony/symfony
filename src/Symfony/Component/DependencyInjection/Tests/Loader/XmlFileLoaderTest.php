@@ -19,6 +19,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Config\Util\Exception\XmlParsingException;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -39,6 +40,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -73,7 +75,6 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('parseFileToDOM');
-        $m->setAccessible(true);
 
         try {
             $m->invoke($loader, self::$fixturesPath.'/ini/parameters.ini');
@@ -107,17 +108,9 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadWithExternalEntitiesDisabled()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-        }
-
         $containerBuilder = new ContainerBuilder();
         $loader = new XmlFileLoader($containerBuilder, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services2.xml');
-
-        if (\LIBXML_VERSION < 20900) {
-            libxml_disable_entity_loader($disableEntities);
-        }
 
         $this->assertGreaterThan(0, $containerBuilder->getParameterBag()->all(), 'Parameters can be read from the config file.');
     }
@@ -228,6 +221,43 @@ class XmlFileLoaderTest extends TestCase
         }
     }
 
+    public function testLoadWithEnvironment()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'dev');
+        $loader->load('services29.xml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on dev',
+            'root_parameter' => 'value when on dev',
+        ], $container->getParameterBag()->all());
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'test');
+        $loader->load('services29.xml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on test',
+            'root_parameter' => 'value when on test',
+        ], $container->getParameterBag()->all());
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'prod');
+        $loader->load('services29.xml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on prod',
+            'root_parameter' => 'value when on prod',
+        ], $container->getParameterBag()->all());
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'other');
+        $loader->load('services29.xml');
+
+        self::assertSame([
+            'imported_parameter' => 'default value',
+            'root_parameter' => 'default value',
+        ], $container->getParameterBag()->all());
+    }
+
     public function testLoadAnonymousServices()
     {
         $container = new ContainerBuilder();
@@ -317,10 +347,10 @@ class XmlFileLoaderTest extends TestCase
         $aliases = $container->getAliases();
         $this->assertArrayHasKey('alias_for_foo', $aliases, '->load() parses <service> elements');
         $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
-        $this->assertTrue($aliases['alias_for_foo']->isPublic());
+        $this->assertFalse($aliases['alias_for_foo']->isPublic());
         $this->assertArrayHasKey('another_alias_for_foo', $aliases);
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
-        $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
+        $this->assertTrue($aliases['another_alias_for_foo']->isPublic());
 
         $this->assertEquals(['decorated', null, 0], $services['decorator_service']->getDecoratedService());
         $this->assertEquals(['decorated', 'decorated.pif-pouf', 0], $services['decorator_service_with_name']->getDecoratedService());
@@ -413,11 +443,11 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getDefinition('foo')->isDeprecated());
         $message = 'The "foo" service is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getDefinition('foo')->getDeprecationMessage('foo'));
+        $this->assertSame($message, $container->getDefinition('foo')->getDeprecation('foo')['message']);
 
         $this->assertTrue($container->getDefinition('bar')->isDeprecated());
         $message = 'The "bar" service is deprecated.';
-        $this->assertSame($message, $container->getDefinition('bar')->getDeprecationMessage('bar'));
+        $this->assertSame($message, $container->getDefinition('bar')->getDeprecation('bar')['message']);
     }
 
     public function testDeprecatedAliases()
@@ -428,11 +458,11 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
         $message = 'The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecationMessage('alias_for_foo'));
+        $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecation('alias_for_foo')['message']);
 
         $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
         $message = 'The "alias_for_foobar" service alias is deprecated.';
-        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
+        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar')['message']);
     }
 
     public function testConvertDomElementToArray()
@@ -829,9 +859,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame(['foo' => [[]], 'bar' => [[]]], $definition->getTags());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testEnumeration()
     {
         $container = new ContainerBuilder();
@@ -843,9 +870,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testInvalidEnumeration()
     {
         $container = new ContainerBuilder();
@@ -855,34 +879,34 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('services_with_invalid_enumeration.xml');
     }
 
-    public function testInstanceOfAndChildDefinitionNotAllowed()
+    public function testInstanceOfAndChildDefinition()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "child_service" cannot use the "parent" option in the same file where "instanceof" configuration is defined as using both is not supported. Move your child definitions to a separate file.');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_instanceof_with_parent.xml');
         $container->compile();
+
+        $this->assertTrue($container->getDefinition('child_service')->isAutowired());
     }
 
-    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    public function testAutoConfigureAndChildDefinition()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "child_service" cannot have a "parent" and also have "autoconfigure". Try setting autoconfigure="false" for the service.');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_autoconfigure_with_parent.xml');
         $container->compile();
+
+        $this->assertTrue($container->getDefinition('child_service')->isAutoconfigured());
     }
 
-    public function testDefaultsAndChildDefinitionNotAllowed()
+    public function testDefaultsAndChildDefinition()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attribute "autowire" on service "child_service" cannot be inherited from "defaults" when a "parent" is set. Move your child definitions to a separate file or define this attribute explicitly.');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_defaults_with_parent.xml');
         $container->compile();
+
+        $this->assertTrue($container->getDefinition('child_service')->isAutowired());
     }
 
     public function testAutoConfigureInstanceof()
@@ -1036,5 +1060,57 @@ class XmlFileLoaderTest extends TestCase
         $alias = $container->getAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class);
 
         $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
+    }
+
+    public function testLoadServiceWithAbstractArgument()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('service_with_abstract_argument.xml');
+
+        $this->assertTrue($container->hasDefinition(FooWithAbstractArgument::class));
+        $arguments = $container->getDefinition(FooWithAbstractArgument::class)->getArguments();
+        $this->assertInstanceOf(AbstractArgument::class, $arguments['$baz']);
+    }
+
+    public function testStack()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('stack.xml');
+
+        $container->compile();
+
+        $expected = (object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'C',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $container->get('stack_a'));
+        $this->assertEquals($expected, $container->get('stack_b'));
+
+        $expected = (object) [
+            'label' => 'Z',
+            'inner' => $expected,
+        ];
+        $this->assertEquals($expected, $container->get('stack_c'));
+
+        $expected = $expected->inner;
+        $expected->label = 'Z';
+        $this->assertEquals($expected, $container->get('stack_d'));
+    }
+
+    public function testWhenEnv()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'some-env');
+        $loader->load('when-env.xml');
+
+        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
 }

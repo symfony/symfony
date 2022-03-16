@@ -12,19 +12,18 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
@@ -34,14 +33,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  *
  * @internal
  */
+#[AsCommand(name: 'debug:container', description: 'Display current services for an application')]
 class ContainerDebugCommand extends Command
 {
-    protected static $defaultName = 'debug:container';
-
-    /**
-     * @var ContainerBuilder|null
-     */
-    protected $containerBuilder;
+    use BuildDebugContainerTrait;
 
     /**
      * {@inheritdoc}
@@ -51,7 +46,6 @@ class ContainerDebugCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Show public *and* private services (deprecated)'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Show arguments in services'),
                 new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Show hidden (internal) services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
@@ -63,12 +57,16 @@ class ContainerDebugCommand extends Command
                 new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Display environment variables used in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
+                new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Display deprecations generated when compiling and warming up the container'),
             ])
-            ->setDescription('Display current services for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
   <info>php %command.full_name%</info>
+
+To see deprecations generated during container compilation and cache warmup, use the <info>--deprecations</info> option:
+
+  <info>php %command.full_name% --deprecations</info>
 
 To get specific information about a service, specify its name:
 
@@ -121,15 +119,12 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($input->getOption('show-private')) {
-            @trigger_error('The "--show-private" option no longer has any effect and is deprecated since Symfony 4.1.', \E_USER_DEPRECATED);
-        }
-
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
         $this->validateInput($input);
-        $object = $this->getContainerBuilder();
+        $kernel = $this->getApplication()->getKernel();
+        $object = $this->getContainerBuilder($kernel);
 
         if ($input->getOption('env-vars')) {
             $options = ['env-vars' => true];
@@ -137,7 +132,7 @@ EOF
             $options = ['env-vars' => true, 'name' => $envVar];
         } elseif ($input->getOption('types')) {
             $options = [];
-            $options['filter'] = [$this, 'filterToServiceTypes'];
+            $options['filter'] = $this->filterToServiceTypes(...);
         } elseif ($input->getOption('parameters')) {
             $parameters = [];
             foreach ($object->getParameterBag()->all() as $k => $v) {
@@ -154,6 +149,8 @@ EOF
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
             $options = ['id' => $name];
+        } elseif ($input->getOption('deprecations')) {
+            $options = ['deprecations' => true];
         } else {
             $options = [];
         }
@@ -164,12 +161,12 @@ EOF
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
-        $options['is_debug'] = $this->getApplication()->getKernel()->isDebug();
+        $options['is_debug'] = $kernel->isDebug();
 
         try {
             $helper->describe($io, $object, $options);
 
-            if (isset($options['id']) && isset($this->getApplication()->getKernel()->getContainer()->getRemovedIds()[$options['id']])) {
+            if (isset($options['id']) && isset($kernel->getContainer()->getRemovedIds()[$options['id']])) {
                 $errorIo->note(sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
             }
         } catch (ServiceNotFoundException $e) {
@@ -185,12 +182,50 @@ EOF
                 $errorIo->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
             } elseif ($input->getOption('parameters')) {
                 $errorIo->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
-            } else {
+            } elseif (!$input->getOption('deprecations')) {
                 $errorIo->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
             }
         }
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $helper = new DescriptorHelper();
+            $suggestions->suggestValues($helper->getFormats());
+
+            return;
+        }
+
+        $kernel = $this->getApplication()->getKernel();
+        $object = $this->getContainerBuilder($kernel);
+
+        if ($input->mustSuggestArgumentValuesFor('name')
+            && !$input->getOption('tag') && !$input->getOption('tags')
+            && !$input->getOption('parameter') && !$input->getOption('parameters')
+            && !$input->getOption('env-var') && !$input->getOption('env-vars')
+            && !$input->getOption('types') && !$input->getOption('deprecations')
+        ) {
+            $suggestions->suggestValues($this->findServiceIdsContaining(
+                $object,
+                $input->getCompletionValue(),
+                (bool) $input->getOption('show-hidden')
+            ));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('tag')) {
+            $suggestions->suggestValues($object->findTags());
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('parameter')) {
+            $suggestions->suggestValues(array_keys($object->getParameterBag()->all()));
+        }
     }
 
     /**
@@ -211,38 +246,10 @@ EOF
 
         $name = $input->getArgument('name');
         if ((null !== $name) && ($optionsCount > 0)) {
-            throw new InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
+            throw new InvalidArgumentException('The options tags, tag, parameters & parameter cannot be combined with the service name argument.');
         } elseif ((null === $name) && $optionsCount > 1) {
-            throw new InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
+            throw new InvalidArgumentException('The options tags, tag, parameters & parameter cannot be combined together.');
         }
-    }
-
-    /**
-     * Loads the ContainerBuilder from the cache.
-     *
-     * @throws \LogicException
-     */
-    protected function getContainerBuilder(): ContainerBuilder
-    {
-        if ($this->containerBuilder) {
-            return $this->containerBuilder;
-        }
-
-        $kernel = $this->getApplication()->getKernel();
-
-        if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
-            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
-            $container = $buildContainer();
-            $container->getCompilerPassConfig()->setRemovingPasses([]);
-            $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
-            $container->compile();
-        } else {
-            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
-            $locatorPass = new ServiceLocatorTagPass();
-            $locatorPass->process($container);
-        }
-
-        return $this->containerBuilder = $container;
     }
 
     private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $name, bool $showHidden): string
@@ -276,7 +283,7 @@ EOF
             if (false !== stripos(str_replace('\\', '', $serviceId), $name)) {
                 $foundServiceIdsIgnoringBackslashes[] = $serviceId;
             }
-            if (false !== stripos($serviceId, $name)) {
+            if ('' === $name || false !== stripos($serviceId, $name)) {
                 $foundServiceIds[] = $serviceId;
             }
         }

@@ -187,7 +187,7 @@ class ContainerTest extends TestCase
     {
         $sc = new Container();
         $sc->set('foo', new \stdClass());
-        $sc->get('foo', null);
+        $sc->get('foo');
         $sc->set('foo', null);
         $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
 
@@ -291,19 +291,6 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testScalarService()
-    {
-        $c = new Container();
-
-        $c->set('foo', 'some value');
-
-        $this->assertTrue($c->has('foo'));
-        $this->assertSame('some value', $c->get('foo'));
-    }
-
     public function testInitialized()
     {
         $sc = new ProjectServiceContainer();
@@ -382,7 +369,6 @@ class ContainerTest extends TestCase
     protected function getField($obj, $field)
     {
         $reflection = new \ReflectionProperty($obj, $field);
-        $reflection->setAccessible(true);
 
         return $reflection->getValue($obj);
     }
@@ -426,16 +412,6 @@ class ProjectServiceContainer extends Container
     public $__foo_bar;
     public $__foo_baz;
     public $__internal;
-    protected $privates;
-    protected $methodMap = [
-        'bar' => 'getBarService',
-        'foo_bar' => 'getFooBarService',
-        'foo.baz' => 'getFoo_BazService',
-        'circular' => 'getCircularService',
-        'throw_exception' => 'getThrowExceptionService',
-        'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
-        'internal_dependency' => 'getInternalDependencyService',
-    ];
 
     public function __construct()
     {
@@ -447,6 +423,15 @@ class ProjectServiceContainer extends Container
         $this->__internal = new \stdClass();
         $this->privates = [];
         $this->aliases = ['alias' => 'bar'];
+        $this->methodMap = [
+            'bar' => 'getBarService',
+            'foo_bar' => 'getFooBarService',
+            'foo.baz' => 'getFoo_BazService',
+            'circular' => 'getCircularService',
+            'throw_exception' => 'getThrowExceptionService',
+            'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
+            'internal_dependency' => 'getInternalDependencyService',
+        ];
     }
 
     protected function getInternalService()

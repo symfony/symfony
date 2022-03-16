@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -42,10 +41,11 @@ class ServiceConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'services';
 
-    private $container;
-    private $instanceof;
-    private $allowParent;
-    private $path;
+    private ContainerBuilder $container;
+    private array $instanceof;
+    private bool $allowParent;
+    private ?string $path;
+    private bool $destructed = false;
 
     public function __construct(ContainerBuilder $container, array $instanceof, bool $allowParent, ServicesConfigurator $parent, Definition $definition, ?string $id, array $defaultTags, string $path = null)
     {
@@ -59,14 +59,14 @@ class ServiceConfigurator extends AbstractServiceConfigurator
 
     public function __destruct()
     {
+        if ($this->destructed) {
+            return;
+        }
+        $this->destructed = true;
+
         parent::__destruct();
 
         $this->container->removeBindings($this->id);
-
-        if (!$this->definition instanceof ChildDefinition) {
-            $this->container->setDefinition($this->id, $this->definition->setInstanceofConditionals($this->instanceof));
-        } else {
-            $this->container->setDefinition($this->id, $this->definition);
-        }
+        $this->container->setDefinition($this->id, $this->definition->setInstanceofConditionals($this->instanceof));
     }
 }

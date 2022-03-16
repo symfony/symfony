@@ -13,9 +13,13 @@ namespace Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
+use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
+use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
 
 class ConfigurationTest extends TestCase
 {
+    private $files;
+
     public function testItThrowsOnStringishValue()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -47,122 +51,122 @@ class ConfigurationTest extends TestCase
     public function testItNoticesExceededTotalThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[total]=3');
-        $this->assertTrue($configuration->tolerates([
-            'unsilencedCount' => 1,
-            'remaining selfCount' => 0,
-            'legacyCount' => 1,
-            'otherCount' => 0,
-            'remaining directCount' => 1,
-            'remaining indirectCount' => 1,
-        ]));
-        $this->assertFalse($configuration->tolerates([
-            'unsilencedCount' => 1,
-            'remaining selfCount' => 1,
-            'legacyCount' => 1,
-            'otherCount' => 0,
-            'remaining directCount' => 1,
-            'remaining indirectCount' => 1,
-        ]));
+        $this->assertTrue($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1,
+            'self' => 0,
+            'legacy' => 1,
+            'other' => 0,
+            'direct' => 1,
+            'indirect' => 1,
+        ])));
+        $this->assertFalse($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1,
+            'self' => 1,
+            'legacy' => 1,
+            'other' => 0,
+            'direct' => 1,
+            'indirect' => 1,
+        ])));
     }
 
     public function testItNoticesExceededSelfThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[self]=1');
-        $this->assertTrue($configuration->tolerates([
-            'unsilencedCount' => 1234,
-            'remaining selfCount' => 1,
-            'legacyCount' => 23,
-            'otherCount' => 13,
-            'remaining directCount' => 124,
-            'remaining indirectCount' => 3244,
-        ]));
-        $this->assertFalse($configuration->tolerates([
-            'unsilencedCount' => 1234,
-            'remaining selfCount' => 2,
-            'legacyCount' => 23,
-            'otherCount' => 13,
-            'remaining directCount' => 124,
-            'remaining indirectCount' => 3244,
-        ]));
+        $this->assertTrue($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1234,
+            'self' => 1,
+            'legacy' => 23,
+            'other' => 13,
+            'direct' => 124,
+            'indirect' => 3244,
+        ])));
+        $this->assertFalse($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1234,
+            'self' => 2,
+            'legacy' => 23,
+            'other' => 13,
+            'direct' => 124,
+            'indirect' => 3244,
+        ])));
     }
 
     public function testItNoticesExceededDirectThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[direct]=1&max[self]=999999');
-        $this->assertTrue($configuration->tolerates([
-            'unsilencedCount' => 1234,
-            'remaining selfCount' => 123,
-            'legacyCount' => 23,
-            'otherCount' => 13,
-            'remaining directCount' => 1,
-            'remaining indirectCount' => 3244,
-        ]));
-        $this->assertFalse($configuration->tolerates([
-            'unsilencedCount' => 1234,
-            'remaining selfCount' => 124,
-            'legacyCount' => 23,
-            'otherCount' => 13,
-            'remaining directCount' => 2,
-            'remaining indirectCount' => 3244,
-        ]));
+        $this->assertTrue($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1234,
+            'self' => 123,
+            'legacy' => 23,
+            'other' => 13,
+            'direct' => 1,
+            'indirect' => 3244,
+        ])));
+        $this->assertFalse($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1234,
+            'self' => 124,
+            'legacy' => 23,
+            'other' => 13,
+            'direct' => 2,
+            'indirect' => 3244,
+        ])));
     }
 
     public function testItNoticesExceededIndirectThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[indirect]=1&max[direct]=999999&max[self]=999999');
-        $this->assertTrue($configuration->tolerates([
-            'unsilencedCount' => 1234,
-            'remaining selfCount' => 123,
-            'legacyCount' => 23,
-            'otherCount' => 13,
-            'remaining directCount' => 1234,
-            'remaining indirectCount' => 1,
-        ]));
-        $this->assertFalse($configuration->tolerates([
-            'unsilencedCount' => 1234,
-            'remaining selfCount' => 124,
-            'legacyCount' => 23,
-            'otherCount' => 13,
-            'remaining directCount' => 2324,
-            'remaining indirectCount' => 2,
-        ]));
+        $this->assertTrue($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1234,
+            'self' => 123,
+            'legacy' => 23,
+            'other' => 13,
+            'direct' => 1234,
+            'indirect' => 1,
+        ])));
+        $this->assertFalse($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 1234,
+            'self' => 124,
+            'legacy' => 23,
+            'other' => 13,
+            'direct' => 2324,
+            'indirect' => 2,
+        ])));
     }
 
     public function testIndirectThresholdIsUsedAsADefaultForDirectAndSelfThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[indirect]=1');
-        $this->assertTrue($configuration->tolerates([
-            'unsilencedCount' => 0,
-            'remaining selfCount' => 1,
-            'legacyCount' => 0,
-            'otherCount' => 0,
-            'remaining directCount' => 0,
-            'remaining indirectCount' => 0,
-        ]));
-        $this->assertFalse($configuration->tolerates([
-            'unsilencedCount' => 0,
-            'remaining selfCount' => 2,
-            'legacyCount' => 0,
-            'otherCount' => 0,
-            'remaining directCount' => 0,
-            'remaining indirectCount' => 0,
-        ]));
-        $this->assertTrue($configuration->tolerates([
-            'unsilencedCount' => 0,
-            'remaining selfCount' => 0,
-            'legacyCount' => 0,
-            'otherCount' => 0,
-            'remaining directCount' => 1,
-            'remaining indirectCount' => 0,
-        ]));
-        $this->assertFalse($configuration->tolerates([
-            'unsilencedCount' => 0,
-            'remaining selfCount' => 0,
-            'legacyCount' => 0,
-            'otherCount' => 0,
-            'remaining directCount' => 2,
-            'remaining indirectCount' => 0,
-        ]));
+        $this->assertTrue($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 0,
+            'self' => 1,
+            'legacy' => 0,
+            'other' => 0,
+            'direct' => 0,
+            'indirect' => 0,
+        ])));
+        $this->assertFalse($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 0,
+            'self' => 2,
+            'legacy' => 0,
+            'other' => 0,
+            'direct' => 0,
+            'indirect' => 0,
+        ])));
+        $this->assertTrue($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 0,
+            'self' => 0,
+            'legacy' => 0,
+            'other' => 0,
+            'direct' => 1,
+            'indirect' => 0,
+        ])));
+        $this->assertFalse($configuration->tolerates($this->buildGroups([
+            'unsilenced' => 0,
+            'self' => 0,
+            'legacy' => 0,
+            'other' => 0,
+            'direct' => 2,
+            'indirect' => 0,
+        ])));
     }
 
     public function testItCanTellWhetherToDisplayAStackTrace()
@@ -175,21 +179,237 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($configuration->shouldDisplayStackTrace('interesting'));
     }
 
-    public function testItCanBeDisabled()
+    public function provideItCanBeDisabled(): array
     {
-        $configuration = Configuration::fromUrlEncodedString('disabled');
-        $this->assertFalse($configuration->isEnabled());
+        return [
+            ['disabled', false],
+            ['disabled=1', false],
+            ['disabled=0', true],
+        ];
+    }
+
+    /**
+     * @dataProvider provideItCanBeDisabled
+     */
+    public function testItCanBeDisabled(string $encodedString, bool $expectedEnabled)
+    {
+        $configuration = Configuration::fromUrlEncodedString($encodedString);
+        $this->assertSame($expectedEnabled, $configuration->isEnabled());
     }
 
     public function testItCanBeShushed()
     {
         $configuration = Configuration::fromUrlEncodedString('verbose');
-        $this->assertFalse($configuration->verboseOutput());
+        $this->assertFalse($configuration->verboseOutput('unsilenced'));
+        $this->assertFalse($configuration->verboseOutput('direct'));
+        $this->assertFalse($configuration->verboseOutput('indirect'));
+        $this->assertFalse($configuration->verboseOutput('self'));
+        $this->assertFalse($configuration->verboseOutput('other'));
+    }
+
+    public function testItCanBePartiallyShushed()
+    {
+        $configuration = Configuration::fromUrlEncodedString('quiet[]=unsilenced&quiet[]=indirect&quiet[]=other');
+        $this->assertFalse($configuration->verboseOutput('unsilenced'));
+        $this->assertTrue($configuration->verboseOutput('direct'));
+        $this->assertFalse($configuration->verboseOutput('indirect'));
+        $this->assertTrue($configuration->verboseOutput('self'));
+        $this->assertFalse($configuration->verboseOutput('other'));
+    }
+
+    public function testItThrowsOnUnknownVerbosityGroup()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('made-up');
+        Configuration::fromUrlEncodedString('quiet[]=made-up');
     }
 
     public function testOutputIsNotVerboseInWeakMode()
     {
         $configuration = Configuration::inWeakMode();
-        $this->assertFalse($configuration->verboseOutput());
+        $this->assertFalse($configuration->verboseOutput('unsilenced'));
+        $this->assertFalse($configuration->verboseOutput('direct'));
+        $this->assertFalse($configuration->verboseOutput('indirect'));
+        $this->assertFalse($configuration->verboseOutput('self'));
+        $this->assertFalse($configuration->verboseOutput('other'));
+    }
+
+    private function buildGroups($counts)
+    {
+        $groups = [];
+        foreach ($counts as $name => $count) {
+            $groups[$name] = new DeprecationGroup();
+            $i = 0;
+            while ($i++ < $count) {
+                $groups[$name]->addNotice();
+            }
+        }
+
+        return $groups;
+    }
+
+    public function testBaselineGenerationEmptyFile()
+    {
+        $filename = $this->createFile();
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
+        $this->assertTrue($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $configuration->writeBaseline();
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+        $expected_baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 2,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+        ];
+        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+    }
+
+    public function testBaselineGenerationNoFile()
+    {
+        $filename = $this->createFile();
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
+        $this->assertTrue($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $configuration->writeBaseline();
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+        $expected_baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 2,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 2,
+            ],
+        ];
+        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+    }
+
+    public function testExistingBaseline()
+    {
+        $filename = $this->createFile();
+        $baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 1,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+        ];
+        file_put_contents($filename, json_encode($baseline));
+
+        $configuration = Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
+        $this->assertFalse($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertFalse($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+    }
+
+    public function testExistingBaselineAndGeneration()
+    {
+        $filename = $this->createFile();
+        $baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 1',
+                'count' => 1,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+        ];
+        file_put_contents($filename, json_encode($baseline));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
+        $this->assertTrue($configuration->isGeneratingBaseline());
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
+        $configuration->writeBaseline();
+        $this->assertEquals($filename, $configuration->getBaselineFile());
+        $expected_baseline = [
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 2',
+                'count' => 1,
+            ],
+            [
+                'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
+                'message' => 'Test message 3',
+                'count' => 1,
+            ],
+        ];
+        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+    }
+
+    public function testBaselineArgumentException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('You cannot use the "generateBaseline" configuration option without providing a "baselineFile" configuration option.');
+        Configuration::fromUrlEncodedString('generateBaseline=true');
+    }
+
+    public function testBaselineFileException()
+    {
+        $filename = $this->createFile();
+        unlink($filename);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The baselineFile "%s" does not exist.', $filename));
+        Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
+    }
+
+    public function testBaselineFileWriteError()
+    {
+        $filename = $this->createFile();
+        chmod($filename, 0444);
+        $this->expectError();
+        $this->expectErrorMessageMatches('/[Ff]ailed to open stream: Permission denied/');
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
+        $configuration->writeBaseline();
+    }
+
+    protected function setUp(): void
+    {
+        $this->files = [];
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->files as $file) {
+            if (file_exists($file)) {
+                @unlink($file);
+            }
+        }
+    }
+
+    private function createFile()
+    {
+        $filename = tempnam(sys_get_temp_dir(), 'sf-');
+        $this->files[] = $filename;
+
+        return $filename;
     }
 }

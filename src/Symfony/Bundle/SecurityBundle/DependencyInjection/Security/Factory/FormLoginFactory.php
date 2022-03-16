@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,24 +22,30 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @internal
  */
 class FormLoginFactory extends AbstractFactory
 {
+    public const PRIORITY = -30;
+
     public function __construct()
     {
         $this->addOption('username_parameter', '_username');
         $this->addOption('password_parameter', '_password');
         $this->addOption('csrf_parameter', '_csrf_token');
         $this->addOption('csrf_token_id', 'authenticate');
+        $this->addOption('enable_csrf', false);
         $this->addOption('post_only', true);
+        $this->addOption('form_only', false);
     }
 
-    public function getPosition()
+    public function getPriority(): int
     {
-        return 'form';
+        return self::PRIORITY;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'form-login';
     }
@@ -54,46 +61,25 @@ class FormLoginFactory extends AbstractFactory
         ;
     }
 
-    protected function getListenerId()
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        return 'security.authentication.listener.form';
-    }
+        if (isset($config['csrf_token_generator'])) {
+            throw new InvalidConfigurationException('The "csrf_token_generator" on "form_login" does not exist, use "enable_csrf" instead.');
+        }
 
-    protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
-    {
-        $provider = 'security.authentication.provider.dao.'.$id;
-        $container
-            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
-            ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
-            ->replaceArgument(2, $id)
-        ;
+        $authenticatorId = 'security.authenticator.form_login.'.$firewallName;
+        $options = array_intersect_key($config, $this->options);
+        $authenticator = $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
+            ->replaceArgument(1, new Reference($userProviderId))
+            ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
+            ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
+            ->replaceArgument(4, $options);
 
-        return $provider;
-    }
+        if ($options['use_forward'] ?? false) {
+            $authenticator->addMethodCall('setHttpKernel', [new Reference('http_kernel')]);
+        }
 
-    protected function createListener($container, $id, $config, $userProvider)
-    {
-        $listenerId = parent::createListener($container, $id, $config, $userProvider);
-
-        $container
-            ->getDefinition($listenerId)
-            ->addArgument(isset($config['csrf_token_generator']) ? new Reference($config['csrf_token_generator']) : null)
-        ;
-
-        return $listenerId;
-    }
-
-    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
-    {
-        $entryPointId = 'security.authentication.form_entry_point.'.$id;
-        $container
-            ->setDefinition($entryPointId, new ChildDefinition('security.authentication.form_entry_point'))
-            ->addArgument(new Reference('security.http_utils'))
-            ->addArgument($config['login_path'])
-            ->addArgument($config['use_forward'])
-        ;
-
-        return $entryPointId;
+        return $authenticatorId;
     }
 }

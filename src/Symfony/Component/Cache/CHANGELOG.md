@@ -1,6 +1,51 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for ACL auth in RedisAdapter
+
+6.0
+---
+
+ * Remove `DoctrineProvider` and `DoctrineAdapter`
+ * Remove support of Doctrine DBAL in `PdoAdapter`
+
+5.4
+---
+
+ * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
+ * Add `DoctrineDbalAdapter` identical to `PdoAdapter` for `Doctrine\DBAL\Connection` or DBAL URL
+ * Deprecate usage of `PdoAdapter` with `Doctrine\DBAL\Connection` or DBAL URL
+
+5.3
+---
+
+ * added support for connecting to Redis Sentinel clusters when using the Redis PHP extension
+ * add support for a custom serializer to the `ApcuAdapter` class
+
+5.2.0
+-----
+
+ * added integration with Messenger to allow computing cached values in a worker
+ * allow ISO 8601 time intervals to specify default lifetime
+
+5.1.0
+-----
+
+ * added max-items + LRU + max-lifetime capabilities to `ArrayCache`
+ * added `CouchbaseBucketAdapter`
+ * added context `cache-adapter` to log messages
+
+5.0.0
+-----
+
+ * removed all PSR-16 implementations in the `Simple` namespace
+ * removed `SimpleCacheAdapter`
+ * removed `AbstractAdapter::unserialize()`
+ * removed `CacheItem::getPreviousTags()`
+
 4.4.0
 -----
 
@@ -12,6 +57,7 @@ CHANGELOG
  * removed support for phpredis 4 `compression`
  * [BC BREAK] `RedisTagAwareAdapter` is not compatible with `RedisCluster` from `Predis` anymore, use `phpredis` instead
  * Marked the `CacheDataCollector` class as `@final`.
+ * added `SodiumMarshaller` to encrypt/decrypt values using libsodium
 
 4.3.0
 -----

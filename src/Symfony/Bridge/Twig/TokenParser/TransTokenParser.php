@@ -24,17 +24,13 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the 'trans' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
-class TransTokenParser extends AbstractTokenParser
+final class TransTokenParser extends AbstractTokenParser
 {
     /**
      * {@inheritdoc}
-     *
-     * @return Node
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
@@ -73,7 +69,7 @@ class TransTokenParser extends AbstractTokenParser
 
         // {% trans %}message{% endtrans %}
         $stream->expect(Token::BLOCK_END_TYPE);
-        $body = $this->parser->subparse([$this, 'decideTransFork'], true);
+        $body = $this->parser->subparse($this->decideTransFork(...), true);
 
         if (!$body instanceof TextNode && !$body instanceof AbstractExpression) {
             throw new SyntaxError('A message inside a trans tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext());
@@ -84,17 +80,15 @@ class TransTokenParser extends AbstractTokenParser
         return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }
 
-    public function decideTransFork($token)
+    public function decideTransFork(Token $token): bool
     {
         return $token->test(['endtrans']);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'trans';
     }

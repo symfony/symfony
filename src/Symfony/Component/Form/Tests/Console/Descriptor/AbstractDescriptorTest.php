@@ -163,7 +163,7 @@ class FooType extends AbstractType
     {
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');
-        $resolver->setDeprecated('bar');
+        $resolver->setDeprecated('bar', 'vendor/package', '1.1');
         $resolver->setDefault('empty_data', function (Options $options, $value) {
             $foo = $options['foo'];
 

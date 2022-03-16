@@ -166,6 +166,80 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertEquals(0, $sut->getRequestCount());
     }
 
+    /**
+     * @requires extension openssl
+     */
+    public function testItGeneratesCurlCommandsAsExpected()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+                [
+                    'method' => 'GET',
+                    'url' => 'https://symfony.com/releases.json',
+                ],
+            ]));
+        $sut->collect(new Request(), new Response());
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertEquals(sprintf('curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttps://symfony.com/releases.json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient/Native%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
+        );
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function testItDoesNotFollowRedirectionsWhenGeneratingCurlCommands()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+                [
+                    'method' => 'GET',
+                    'url' => 'http://symfony.com/releases.json',
+                ],
+            ]));
+        $sut->collect(new Request(), new Response());
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertEquals(sprintf('curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttp://symfony.com/releases.json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient/Native%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
+        );
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function testItDoesNotGeneratesCurlCommandsForUnsupportedBodyType()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+                [
+                    'method' => 'GET',
+                    'url' => 'https://symfony.com/releases.json',
+                    'options' => [
+                        'body' => static fn (int $size): string => '',
+                    ],
+                ],
+            ]));
+        $sut->collect(new Request(), new Response());
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNull($curlCommand);
+    }
+
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient
     {
         $httpClient = new TraceableHttpClient(new NativeHttpClient());

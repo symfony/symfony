@@ -18,15 +18,16 @@ use Symfony\Component\Console\Exception\RuntimeException;
  * InputInterface is the interface implemented by all input classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @method string __toString() Returns a stringified representation of the args passed to the command.
+ *                             InputArguments MUST be escaped as well as the InputOption values passed to the command.
  */
 interface InputInterface
 {
     /**
      * Returns the first argument from the raw parameters (not parsed).
-     *
-     * @return string|null The value of the first argument or null otherwise
      */
-    public function getFirstArgument();
+    public function getFirstArgument(): ?string;
 
     /**
      * Returns true if the raw parameters (not parsed) contain a value.
@@ -38,10 +39,8 @@ interface InputInterface
      *
      * @param string|array $values     The values to look for in the raw parameters (can be an array)
      * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
-     *
-     * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values, $onlyParams = false);
+    public function hasParameterOption(string|array $values, bool $onlyParams = false): bool;
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -55,9 +54,9 @@ interface InputInterface
      * @param string|bool|int|float|array|null $default    The default value to return if no result is found
      * @param bool                             $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
-     * @return mixed The option value
+     * @return mixed
      */
-    public function getParameterOption($values, $default = false, $onlyParams = false);
+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
@@ -78,86 +77,64 @@ interface InputInterface
      *
      * @return array<string|bool|int|float|array|null>
      */
-    public function getArguments();
+    public function getArguments(): array;
 
     /**
      * Returns the argument value for a given argument name.
-     *
-     * @param string $name The argument name
      *
      * @return mixed
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument($name);
+    public function getArgument(string $name);
 
     /**
      * Sets an argument value by name.
      *
-     * @param string $name  The argument name
-     * @param mixed  $value The argument value
-     *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function setArgument($name, $value);
+    public function setArgument(string $name, mixed $value);
 
     /**
      * Returns true if an InputArgument object exists by name or position.
-     *
-     * @param string $name The argument name
-     *
-     * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument($name);
+    public function hasArgument(string $name): bool;
 
     /**
      * Returns all the given options merged with the default values.
      *
      * @return array<string|bool|int|float|array|null>
      */
-    public function getOptions();
+    public function getOptions(): array;
 
     /**
      * Returns the option value for a given option name.
-     *
-     * @param string $name The option name
      *
      * @return mixed
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption($name);
+    public function getOption(string $name);
 
     /**
      * Sets an option value by name.
      *
-     * @param string $name  The option name
-     * @param mixed  $value The option value
-     *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function setOption($name, $value);
+    public function setOption(string $name, mixed $value);
 
     /**
      * Returns true if an InputOption object exists by name.
-     *
-     * @param string $name The InputOption name
-     *
-     * @return bool true if the InputOption object exists, false otherwise
      */
-    public function hasOption($name);
+    public function hasOption(string $name): bool;
 
     /**
      * Is this input means interactive?
-     *
-     * @return bool
      */
-    public function isInteractive();
+    public function isInteractive(): bool;
 
     /**
      * Sets the input interactivity.
-     *
-     * @param bool $interactive If the input should be interactive
      */
-    public function setInteractive($interactive);
+    public function setInteractive(bool $interactive);
 }

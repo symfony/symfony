@@ -11,21 +11,21 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use Doctrine\Common\Annotations\PsrCachedReader;
+use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
-use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
-use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\ValidatorBuilder;
-use Symfony\Component\Validator\ValidatorBuilderInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
     /**
-     * @var ValidatorBuilderInterface
+     * @var ValidatorBuilder
      */
     protected $builder;
 
@@ -81,9 +81,34 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($this->builder, $this->builder->addMethodMappings([]));
     }
 
-    public function testEnableAnnotationMapping()
+    public function testEnableAnnotationMappingWithDefaultDoctrineAnnotationReader()
     {
         $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
+        $this->assertSame($this->builder, $this->builder->addDefaultDoctrineAnnotationReader());
+
+        $loaders = $this->builder->getLoaders();
+        $this->assertCount(1, $loaders);
+        $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
+
+        $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
+
+        $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
+    }
+
+    public function testEnableAnnotationMappingWithCustomDoctrineAnnotationReader()
+    {
+        $reader = $this->createMock(Reader::class);
+
+        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
+        $this->assertSame($this->builder, $this->builder->setDoctrineAnnotationReader($reader));
+
+        $loaders = $this->builder->getLoaders();
+        $this->assertCount(1, $loaders);
+        $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
+
+        $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
+
+        $this->assertSame($reader, $r->getValue($loaders[0]));
     }
 
     public function testDisableAnnotationMapping()
@@ -94,17 +119,6 @@ class ValidatorBuilderTest extends TestCase
     public function testSetMappingCache()
     {
         $this->assertSame($this->builder, $this->builder->setMappingCache($this->createMock(CacheItemPoolInterface::class)));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Symfony\Component\Validator\ValidatorBuilder::setMetadataCache is deprecated since Symfony 4.4. Use setMappingCache() instead.
-     */
-    public function testSetMetadataCache()
-    {
-        $this->assertSame($this->builder, $this->builder->setMetadataCache(
-            $this->createMock(CacheInterface::class))
-        );
     }
 
     public function testSetConstraintValidatorFactory()
@@ -119,14 +133,6 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($this->builder, $this->builder->setTranslator(
             $this->createMock(TranslatorInterface::class))
         );
-    }
-
-    public function testLegacyTranslatorProxy()
-    {
-        $proxy = $this->createMock(LegacyTranslatorProxy::class);
-        $proxy->expects($this->once())->method('getTranslator');
-
-        $this->builder->setTranslator($proxy);
     }
 
     public function testSetTranslationDomain()

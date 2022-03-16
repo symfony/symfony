@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 use Symfony\Component\Validator\Constraint;
 
 /** @Annotation */
+#[\Attribute]
 class ConstraintA extends Constraint
 {
     public $property1;
@@ -24,7 +25,7 @@ class ConstraintA extends Constraint
         return 'property2';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT];
     }

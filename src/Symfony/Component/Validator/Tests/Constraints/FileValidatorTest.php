@@ -286,6 +286,26 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testBinaryFormatNamed()
+    {
+        fseek($this->file, 10, \SEEK_SET);
+        fwrite($this->file, '0');
+        fclose($this->file);
+
+        $constraint = new File(maxSize: 10, binaryFormat: true, maxSizeMessage: 'myMessage');
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ limit }}', '10')
+            ->setParameter('{{ size }}', '11')
+            ->setParameter('{{ suffix }}', 'bytes')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
+            ->setCode(File::TOO_LARGE_ERROR)
+            ->assertRaised();
+    }
+
     public function testValidMimeType()
     {
         $file = $this
@@ -334,7 +354,10 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidMimeType()
+    /**
+     * @dataProvider provideMimeTypeConstraints
+     */
+    public function testInvalidMimeType(File $constraint)
     {
         $file = $this
             ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
@@ -349,11 +372,6 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('application/pdf');
 
-        $constraint = new File([
-            'mimeTypes' => ['image/png', 'image/jpg'],
-            'mimeTypesMessage' => 'myMessage',
-        ]);
-
         $this->validator->validate($file, $constraint);
 
         $this->buildViolation('myMessage')
@@ -363,6 +381,17 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
+    }
+
+    public function provideMimeTypeConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new File([
+            'mimeTypes' => ['image/png', 'image/jpg'],
+            'mimeTypesMessage' => 'myMessage',
+        ])];
+        yield 'named arguments' => [
+            new File(mimeTypes: ['image/png', 'image/jpg'], mimeTypesMessage: 'myMessage'),
+        ];
     }
 
     public function testInvalidWildcardMimeType()
@@ -396,13 +425,12 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDisallowEmpty()
+    /**
+     * @dataProvider provideDisallowEmptyConstraints
+     */
+    public function testDisallowEmpty(File $constraint)
     {
         ftruncate($this->file, 0);
-
-        $constraint = new File([
-            'disallowEmptyMessage' => 'myMessage',
-        ]);
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -411,6 +439,16 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ name }}', '"'.basename($this->path).'"')
             ->setCode(File::EMPTY_ERROR)
             ->assertRaised();
+    }
+
+    public function provideDisallowEmptyConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new File([
+            'disallowEmptyMessage' => 'myMessage',
+        ])];
+        yield 'named arguments' => [
+            new File(disallowEmptyMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -460,7 +498,6 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             // access FileValidator::factorizeSizes() private method to format max file size
             $reflection = new \ReflectionClass(\get_class(new FileValidator()));
             $method = $reflection->getMethod('factorizeSizes');
-            $method->setAccessible(true);
             [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
             // it correctly parses the maxSize option and not only uses simple string comparison

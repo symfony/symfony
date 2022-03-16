@@ -13,9 +13,11 @@ namespace Symfony\Component\Mime\Tests\Header;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Header\DateHeader;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\IdentificationHeader;
 use Symfony\Component\Mime\Header\MailboxListHeader;
+use Symfony\Component\Mime\Header\PathHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 
 class HeadersTest extends TestCase
@@ -61,6 +63,31 @@ class HeadersTest extends TestCase
         $headers = new Headers();
         $headers->addPathHeader('Return-Path', 'some@path');
         $this->assertNotNull($headers->get('Return-Path'));
+    }
+
+    public function testAddHeader()
+    {
+        $headers = new Headers();
+        $headers->addHeader('from', ['from@example.com']);
+        $headers->addHeader('return-path', 'return@example.com');
+        $headers->addHeader('foo', 'bar');
+        $headers->addHeader('date', $now = new \DateTimeImmutable());
+        $headers->addHeader('message-id', 'id@id');
+
+        $this->assertInstanceOf(MailboxListHeader::class, $headers->get('from'));
+        $this->assertEquals([new Address('from@example.com')], $headers->get('from')->getBody());
+
+        $this->assertInstanceOf(PathHeader::class, $headers->get('return-path'));
+        $this->assertEquals(new Address('return@example.com'), $headers->get('return-path')->getBody());
+
+        $this->assertInstanceOf(UnstructuredHeader::class, $headers->get('foo'));
+        $this->assertSame('bar', $headers->get('foo')->getBody());
+
+        $this->assertInstanceOf(DateHeader::class, $headers->get('date'));
+        $this->assertSame($now, $headers->get('date')->getBody());
+
+        $this->assertInstanceOf(IdentificationHeader::class, $headers->get('message-id'));
+        $this->assertSame(['id@id'], $headers->get('message-id')->getBody());
     }
 
     public function testHasReturnsFalseWhenNoHeaders()
@@ -212,6 +239,15 @@ class HeadersTest extends TestCase
         $this->assertFalse($headers->has('Message-ID'));
     }
 
+    public function testAddHeaderIsNotCaseSensitive()
+    {
+        $headers = new Headers();
+        $headers->addHeader('From', ['from@example.com']);
+
+        $this->assertInstanceOf(MailboxListHeader::class, $headers->get('from'));
+        $this->assertEquals([new Address('from@example.com')], $headers->get('from')->getBody());
+    }
+
     public function testIsUniqueHeaderIsNotCaseSensitive()
     {
         $this->assertTrue(Headers::isUniqueHeader('From'));
@@ -256,5 +292,40 @@ class HeadersTest extends TestCase
         $headers = new Headers();
         $headers->addTextHeader('References' , 'foobar');
         $this->assertEquals('foobar', $headers->get('References')->getBody());
+    }
+
+    public function testHeaderBody()
+    {
+        $headers = new Headers();
+        $this->assertNull($headers->getHeaderBody('Content-Type'));
+        $headers->setHeaderBody('Text', 'Content-Type', 'type');
+        $this->assertSame('type', $headers->getHeaderBody('Content-Type'));
+    }
+
+    public function testHeaderParameter()
+    {
+        $headers = new Headers();
+        $this->assertNull($headers->getHeaderParameter('Content-Disposition', 'name'));
+
+        $headers->addParameterizedHeader('Content-Disposition', 'name');
+        $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
+        $this->assertSame('foo', $headers->getHeaderParameter('Content-Disposition', 'name'));
+    }
+
+    public function testHeaderParameterNotDefined()
+    {
+        $headers = new Headers();
+
+        $this->expectException(\LogicException::class);
+        $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
+    }
+
+    public function testSetHeaderParameterNotParameterized()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('Content-Disposition', 'name');
+
+        $this->expectException(\LogicException::class);
+        $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
     }
 }

@@ -54,18 +54,18 @@ class TestClassWithTargetPathTrait
 {
     use TargetPathTrait;
 
-    public function doSetTargetPath(SessionInterface $session, $providerKey, $uri)
+    public function doSetTargetPath(SessionInterface $session, $firewallName, $uri)
     {
-        $this->saveTargetPath($session, $providerKey, $uri);
+        $this->saveTargetPath($session, $firewallName, $uri);
     }
 
-    public function doGetTargetPath(SessionInterface $session, $providerKey)
+    public function doGetTargetPath(SessionInterface $session, $firewallName)
     {
-        return $this->getTargetPath($session, $providerKey);
+        return $this->getTargetPath($session, $firewallName);
     }
 
-    public function doRemoveTargetPath(SessionInterface $session, $providerKey)
+    public function doRemoveTargetPath(SessionInterface $session, $firewallName)
     {
-        $this->removeTargetPath($session, $providerKey);
+        $this->removeTargetPath($session, $firewallName);
     }
 }

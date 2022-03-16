@@ -1,6 +1,65 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs.
+ * Automatically resolve handled message type when method different from `__invoke` is used as handler.
+
+6.0
+---
+
+ * Remove deprecated classes `Symfony/Component/Messenger/Transport/AmqpExt`, `Symfony/Component/Messenger/Transport/Doctrine` and `Symfony/Component/Messenger/Transport/Redis`.
+ * Class `MessengerPass` cannot be configured with constructor arguments
+ * Remove constructor arguments and getters for `RedeliveryStamp`'s properties `exceptionMessage` and `flattenException`
+
+5.4
+---
+
+ * Add `AsMessageHandler` attribute for declaring message handlers on PHP 8.
+ * Add support for handling messages in batches with `BatchHandlerInterface` and corresponding trait
+ * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+ * Add support for resetting container services after each messenger message.
+ * Added `WorkerMetadata` class which allows you to access the configuration details of a worker, like `queueNames` and `transportNames` it consumes from.
+ * New method `getMetadata()` was added to `Worker` class which returns the `WorkerMetadata` object.
+ * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
+ * Add log when worker should stop.
+ * Add log when `SIGTERM` is received.
+
+5.3
+---
+
+ * Add the `RouterContextMiddleware` to restore the original router context when handling a message
+ * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
+ * Added `queues` option to `Worker` to only fetch messages from a specific queue from a receiver implementing `QueueReceiverInterface`.
+
+5.2.0
+-----
+
+ * The `RedeliveryStamp` will no longer be populated with error data. This information is now stored in the `ErrorDetailsStamp` instead.
+ * Added `FlattenExceptionNormalizer` to give more information about the exception on Messenger background processes. The `FlattenExceptionNormalizer` has a higher priority than `ProblemNormalizer` and it is only used when the Messenger serialization context is set.
+ * Added factory methods `DelayStamp::delayFor(\DateInterval)` and `DelayStamp::delayUntil(\DateTimeInterface)`.
+ * Removed the exception when dispatching a message with a `DispatchAfterCurrentBusStamp` and not in a context of another dispatch call
+ * Added `WorkerMessageRetriedEvent`
+ * Added `WorkerMessageReceivedEvent::setEnvelope()` and made event mutable
+
+5.1.0
+-----
+
+ * Moved AmqpExt transport to package `symfony/amqp-messenger`. All classes in `Symfony\Component\Messenger\Transport\AmqpExt` have been moved to `Symfony\Component\Messenger\Bridge\Amqp\Transport`
+ * Moved Doctrine transport to package `symfony/doctrine-messenger`. All classes in `Symfony\Component\Messenger\Transport\Doctrine` have been moved to `Symfony\Component\Messenger\Bridge\Doctrine\Transport`
+ * Moved RedisExt transport to package `symfony/redis-messenger`. All classes in `Symfony\Component\Messenger\Transport\RedisExt` have been moved to `Symfony\Component\Messenger\Bridge\Redis\Transport`
+ * Added support for passing a `\Throwable` argument to `RetryStrategyInterface` methods. This allows to define strategies based on the reason of the handling failure.
+ * Added `StopWorkerOnFailureLimitListener` to stop the worker after a specified amount of failed messages is reached.
+ * Added `RecoverableExceptionInterface` interface to force retry.
+
+5.0.0
+-----
+
+ * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
+ * made `SendersLocator` require a `ContainerInterface` as 2nd argument
+
 4.4.0
 -----
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -105,5 +106,33 @@ error',
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($list));
+    }
+
+    /**
+     * @dataProvider payloadFieldsProvider
+     */
+    public function testNormalizePayloadFields($fields, array $expected = null)
+    {
+        $constraint = new NotNull();
+        $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, null, $constraint),
+        ]);
+
+        $violation = $this->normalizer->normalize($list, null, [ConstraintViolationListNormalizer::PAYLOAD_FIELDS => $fields])['violations'][0];
+        if ([] === $fields) {
+            $this->assertArrayNotHasKey('payload', $violation);
+
+            return;
+        }
+        $this->assertSame($expected, $violation['payload']);
+    }
+
+    public function payloadFieldsProvider(): iterable
+    {
+        yield [['severity', 'anotherField1'], ['severity' => 'warning']];
+        yield [null, ['severity' => 'warning', 'anotherField2' => 'aValue']];
+        yield [true, ['severity' => 'warning', 'anotherField2' => 'aValue']];
+        yield [[]];
     }
 }

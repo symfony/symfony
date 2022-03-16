@@ -12,11 +12,11 @@ services:
         public: true
 
         tags:
-            - { name: foo_tag, tag_option: from_service }
+            - foo_tag: { tag_option: from_service }
             # these 2 are from instanceof
-            - { name: foo_tag, tag_option: from_instanceof }
-            - { name: bar_tag }
-            - { name: from_defaults }
+            - foo_tag: { tag_option: from_instanceof }
+            - bar_tag
+            - from_defaults
         # calls from instanceof are kept, but this comes later
         calls:
             # first call is from instanceof

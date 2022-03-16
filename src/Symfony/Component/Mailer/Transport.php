@@ -11,17 +11,22 @@
 
 namespace Symfony\Component\Mailer;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
+use Symfony\Component\Mailer\Transport\NativeTransportFactory;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
@@ -29,25 +34,27 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport\Transports;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
-class Transport
+final class Transport
 {
     private const FACTORY_CLASSES = [
-        SesTransportFactory::class,
         GmailTransportFactory::class,
-        MandrillTransportFactory::class,
         MailgunTransportFactory::class,
+        MailjetTransportFactory::class,
+        MandrillTransportFactory::class,
         PostmarkTransportFactory::class,
         SendgridTransportFactory::class,
+        SendinblueTransportFactory::class,
+        OhMySmtpTransportFactory::class,
+        SesTransportFactory::class,
     ];
 
-    private $factories;
+    private iterable $factories;
 
     public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
     {
@@ -149,7 +156,10 @@ class Transport
         throw new UnsupportedSchemeException($dsn);
     }
 
-    private static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable
+    /**
+     * @return \Traversable<int, TransportFactoryInterface>
+     */
+    public static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): \Traversable
     {
         foreach (self::FACTORY_CLASSES as $factoryClass) {
             if (class_exists($factoryClass)) {
@@ -162,5 +172,7 @@ class Transport
         yield new SendmailTransportFactory($dispatcher, $client, $logger);
 
         yield new EsmtpTransportFactory($dispatcher, $client, $logger);
+
+        yield new NativeTransportFactory($dispatcher, $client, $logger);
     }
 }

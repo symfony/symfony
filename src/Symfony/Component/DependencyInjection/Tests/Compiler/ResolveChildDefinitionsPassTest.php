@@ -299,7 +299,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('deprecated_parent')
-            ->setDeprecated(true)
+            ->setDeprecated('vendor/package', '1.1', '%service_id%')
         ;
 
         $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'));
@@ -307,22 +307,6 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $this->assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
-    }
-
-    public function testDecoratedServiceCanOverwriteDeprecatedParentStatus()
-    {
-        $container = new ContainerBuilder();
-        $container->register('deprecated_parent')
-            ->setDeprecated(true)
-        ;
-
-        $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'))
-            ->setDeprecated(false)
-        ;
-
-        $this->process($container);
-
-        $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
     public function testProcessResolvesAliases()

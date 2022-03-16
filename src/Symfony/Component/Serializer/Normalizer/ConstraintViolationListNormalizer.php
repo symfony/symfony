@@ -28,6 +28,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     public const STATUS = 'status';
     public const TITLE = 'title';
     public const TYPE = 'type';
+    public const PAYLOAD_FIELDS = 'payload_fields';
 
     private $defaultContext;
     private $nameConverter;
@@ -40,11 +41,21 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
+        if (\array_key_exists(self::PAYLOAD_FIELDS, $context)) {
+            $payloadFieldsToSerialize = $context[self::PAYLOAD_FIELDS];
+        } elseif (\array_key_exists(self::PAYLOAD_FIELDS, $this->defaultContext)) {
+            $payloadFieldsToSerialize = $this->defaultContext[self::PAYLOAD_FIELDS];
+        } else {
+            $payloadFieldsToSerialize = [];
+        }
+
+        if (\is_array($payloadFieldsToSerialize) && [] !== $payloadFieldsToSerialize) {
+            $payloadFieldsToSerialize = array_flip($payloadFieldsToSerialize);
+        }
+
         $violations = [];
         $messages = [];
         foreach ($object as $violation) {
@@ -57,6 +68,17 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             ];
             if (null !== $code = $violation->getCode()) {
                 $violationEntry['type'] = sprintf('urn:uuid:%s', $code);
+            }
+
+            $constraint = $violation->getConstraint();
+            if (
+                [] !== $payloadFieldsToSerialize &&
+                $constraint &&
+                $constraint->payload &&
+                // If some or all payload fields are whitelisted, add them
+                $payloadFields = null === $payloadFieldsToSerialize || true === $payloadFieldsToSerialize ? $constraint->payload : array_intersect_key($constraint->payload, $payloadFieldsToSerialize)
+            ) {
+                $violationEntry['payload'] = $payloadFields;
             }
 
             $violations[] = $violationEntry;
@@ -84,8 +106,10 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
     {
         return $data instanceof ConstraintViolationListInterface;
     }

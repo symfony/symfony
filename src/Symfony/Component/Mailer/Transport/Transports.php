@@ -23,19 +23,19 @@ use Symfony\Component\Mime\RawMessage;
  */
 final class Transports implements TransportInterface
 {
-    private $transports;
-    private $default;
+    /**
+     * @var array<string, TransportInterface>
+     */
+    private array $transports = [];
+    private TransportInterface $default;
 
     /**
-     * @param TransportInterface[] $transports
+     * @param iterable<string, TransportInterface> $transports
      */
     public function __construct(iterable $transports)
     {
-        $this->transports = [];
         foreach ($transports as $name => $transport) {
-            if (null === $this->default) {
-                $this->default = $transport;
-            }
+            $this->default ??= $transport;
             $this->transports[$name] = $transport;
         }
 

@@ -22,6 +22,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslatorTest extends TestCase
 {
@@ -65,19 +66,6 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testTransChoiceWithoutCaching()
-    {
-        $translator = $this->getTranslator($this->getLoader());
-        $translator->setLocale('fr');
-        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
-
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
-    }
-
     public function testTransWithCaching()
     {
         // prime the cache
@@ -110,31 +98,6 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testTransChoiceWithCaching()
-    {
-        // prime the cache
-        $translator = $this->getTranslator($this->getLoader(), ['cache_dir' => $this->tmpDir]);
-        $translator->setLocale('fr');
-        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
-
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
-
-        // do it another time as the cache is primed now
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->never())->method('load');
-
-        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir]);
-        $translator->setLocale('fr');
-        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
-
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
     }
 
     public function testTransWithCachingWithInvalidLocale()
@@ -348,9 +311,9 @@ class TranslatorTest extends TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = Translator::class, $defaultLocale = 'en')
+    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = Translator::class, $defaultLocale = 'en', array $enabledLocales = []): TranslatorInterface
     {
-        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale);
+        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale, $enabledLocales);
 
         if ('loader' === $loaderFomat) {
             $translator->addResource('loader', 'foo', 'fr');
@@ -390,6 +353,31 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
+    public function testEnabledLocales()
+    {
+        $loader = new YamlFileLoader();
+        $resourceFiles = [
+            'fr' => [
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ],
+        ];
+
+        // prime the cache without configuring the enabled locales
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml', Translator::class, 'en', []);
+        $translator->setFallbackLocales(['fr']);
+        $translator->warmup($this->tmpDir);
+
+        $this->assertCount(2, glob($this->tmpDir.'/catalogue.*.*.php'), 'Both "en" and "fr" catalogues are generated.');
+
+        // prime the cache and configure the enabled locales
+        $this->deleteTmpDir();
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml', Translator::class, 'en', ['fr']);
+        $translator->setFallbackLocales(['fr']);
+        $translator->warmup($this->tmpDir);
+
+        $this->assertCount(1, glob($this->tmpDir.'/catalogue.*.*.php'), 'Only the "fr" catalogue is generated.');
+    }
+
     public function testLoadingTranslationFilesWithDotsInMessageDomain()
     {
         $loader = new YamlFileLoader();
@@ -405,14 +393,15 @@ class TranslatorTest extends TestCase
         $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
     }
 
-    private function createTranslator($loader, $options, $translatorClass = Translator::class, $loaderFomat = 'loader', $defaultLocale = 'en')
+    private function createTranslator($loader, $options, $translatorClass = Translator::class, $loaderFomat = 'loader', $defaultLocale = 'en', array $enabledLocales = [])
     {
         if (null === $defaultLocale) {
             return new $translatorClass(
                 $this->getContainer($loader),
                 new MessageFormatter(),
                 [$loaderFomat => [$loaderFomat]],
-                $options
+                $options,
+                $enabledLocales
             );
         }
 
@@ -421,7 +410,8 @@ class TranslatorTest extends TestCase
             new MessageFormatter(),
             $defaultLocale,
             [$loaderFomat => [$loaderFomat]],
-            $options
+            $options,
+            $enabledLocales
         );
     }
 }

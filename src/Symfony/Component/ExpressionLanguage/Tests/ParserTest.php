@@ -189,6 +189,10 @@ class ParserTest extends TestCase
                 new Node\BinaryNode('..', new Node\ConstantNode(0), new Node\ConstantNode(3)),
                 '0..3',
             ],
+            [
+                new Node\BinaryNode('+', new Node\ConstantNode(0), new Node\ConstantNode(0.1)),
+                '0+.1',
+            ],
         ];
     }
 
@@ -238,5 +242,99 @@ class ParserTest extends TestCase
         $parser = new Parser([]);
 
         $parser->parse($lexer->tokenize('foo > bar'), ['foo', 'baz']);
+    }
+
+    /**
+     * @dataProvider getLintData
+     */
+    public function testLint($expression, $names, string $exception = null)
+    {
+        if ($exception) {
+            $this->expectException(SyntaxError::class);
+            $this->expectExceptionMessage($exception);
+        }
+
+        $lexer = new Lexer();
+        $parser = new Parser([]);
+        $parser->lint($lexer->tokenize($expression), $names);
+
+        // Parser does't return anything when the correct expression is passed
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function getLintData(): array
+    {
+        return [
+            'valid expression' => [
+                'expression' => 'foo["some_key"].callFunction(a ? b)',
+                'names' => ['foo', 'a', 'b'],
+            ],
+            'allow expression without names' => [
+                'expression' => 'foo.bar',
+                'names' => null,
+            ],
+            'disallow expression without names' => [
+                'expression' => 'foo.bar',
+                'names' => [],
+                'exception' => 'Variable "foo" is not valid around position 1 for expression `foo.bar',
+            ],
+            'operator collisions' => [
+                'expression' => 'foo.not in [bar]',
+                'names' => ['foo', 'bar'],
+            ],
+            'incorrect expression ending' => [
+                'expression' => 'foo["a"] foo["b"]',
+                'names' => ['foo'],
+                'exception' => 'Unexpected token "name" of value "foo" '.
+                    'around position 10 for expression `foo["a"] foo["b"]`.',
+            ],
+            'incorrect operator' => [
+                'expression' => 'foo["some_key"] // 2',
+                'names' => ['foo'],
+                'exception' => 'Unexpected token "operator" of value "/" '.
+                    'around position 18 for expression `foo["some_key"] // 2`.',
+            ],
+            'incorrect array' => [
+                'expression' => '[value1, value2 value3]',
+                'names' => ['value1', 'value2', 'value3'],
+                'exception' => 'An array element must be followed by a comma. '.
+                    'Unexpected token "name" of value "value3" ("punctuation" expected with value ",") '.
+                    'around position 17 for expression `[value1, value2 value3]`.',
+            ],
+            'incorrect array element' => [
+                'expression' => 'foo["some_key")',
+                'names' => ['foo'],
+                'exception' => 'Unclosed "[" around position 3 for expression `foo["some_key")`.',
+            ],
+            'missed array key' => [
+                'expression' => 'foo[]',
+                'names' => ['foo'],
+                'exception' => 'Unexpected token "punctuation" of value "]" around position 5 for expression `foo[]`.',
+            ],
+            'missed closing bracket in sub expression' => [
+                'expression' => 'foo[(bar ? bar : "default"]',
+                'names' => ['foo', 'bar'],
+                'exception' => 'Unclosed "(" around position 4 for expression `foo[(bar ? bar : "default"]`.',
+            ],
+            'incorrect hash following' => [
+                'expression' => '{key: foo key2: bar}',
+                'names' => ['foo', 'bar'],
+                'exception' => 'A hash value must be followed by a comma. '.
+                    'Unexpected token "name" of value "key2" ("punctuation" expected with value ",") '.
+                    'around position 11 for expression `{key: foo key2: bar}`.',
+            ],
+            'incorrect hash assign' => [
+                'expression' => '{key => foo}',
+                'names' => ['foo'],
+                'exception' => 'Unexpected character "=" around position 5 for expression `{key => foo}`.',
+            ],
+            'incorrect array as hash using' => [
+                'expression' => '[foo: foo]',
+                'names' => ['foo'],
+                'exception' => 'An array element must be followed by a comma. '.
+                    'Unexpected token "punctuation" of value ":" ("punctuation" expected with value ",") '.
+                    'around position 5 for expression `[foo: foo]`.',
+            ],
+        ];
     }
 }

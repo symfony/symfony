@@ -14,17 +14,17 @@ namespace Symfony\Component\Security\Core\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class SecurityTest extends TestCase
 {
     public function testGetToken()
     {
-        $token = new UsernamePasswordToken('foo', 'bar', 'provider');
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar'), 'provider');
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $tokenStorage->expects($this->once())
@@ -62,34 +62,8 @@ class SecurityTest extends TestCase
     {
         yield [null, null];
 
-        yield ['string_username', null];
-
-        //yield [new StringishUser(), null]; // 5.0 behavior
-
-        $user = new User('nice_user', 'foo');
+        $user = new InMemoryUser('nice_user', 'foo');
         yield [$user, $user];
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Accessing the user object "Symfony\Component\Security\Core\Tests\StringishUser" that is not an instance of "Symfony\Component\Security\Core\User\UserInterface" from "Symfony\Component\Security\Core\Security::getUser()" is deprecated since Symfony 4.2, use "getToken()->getUser()" instead.
-     */
-    public function testGetUserLegacy()
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->any())
-            ->method('getUser')
-            ->willReturn($user = new StringishUser());
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-
-        $tokenStorage->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $container = $this->createContainer('security.token_storage', $tokenStorage);
-
-        $security = new Security($container);
-        $this->assertSame($user, $security->getUser());
     }
 
     public function testIsGranted()
@@ -117,13 +91,5 @@ class SecurityTest extends TestCase
             ->willReturn($serviceObject);
 
         return $container;
-    }
-}
-
-class StringishUser
-{
-    public function __toString(): string
-    {
-        return 'stringish_user';
     }
 }

@@ -46,6 +46,21 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @dataProvider getInvalidValues
+     */
+    public function testInvalidValuesNamed($value, $valueAsString)
+    {
+        $constraint = new IsNull(message: 'myMessage');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $valueAsString)
+            ->setCode(IsNull::NOT_NULL_ERROR)
+            ->assertRaised();
+    }
+
     public function getInvalidValues()
     {
         return [

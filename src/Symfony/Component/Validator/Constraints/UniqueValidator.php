@@ -24,7 +24,7 @@ class UniqueValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Unique) {
             throw new UnexpectedTypeException($constraint, Unique::class);
@@ -39,7 +39,10 @@ class UniqueValidator extends ConstraintValidator
         }
 
         $collectionElements = [];
+        $normalizer = $this->getNormalizer($constraint);
         foreach ($value as $element) {
+            $element = $normalizer($element);
+
             if (\in_array($element, $collectionElements, true)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
@@ -50,5 +53,16 @@ class UniqueValidator extends ConstraintValidator
             }
             $collectionElements[] = $element;
         }
+    }
+
+    private function getNormalizer(Unique $unique): callable
+    {
+        if (null === $unique->normalizer) {
+            return static function ($value) {
+                return $value;
+            };
+        }
+
+        return $unique->normalizer;
     }
 }

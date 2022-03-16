@@ -41,7 +41,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($propertyName, string $class = null, string $format = null, array $context = []): string
+    public function normalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
     {
         if (null === $class) {
             return $this->normalizeFallback($propertyName, $class, $format, $context);
@@ -57,7 +57,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($propertyName, string $class = null, string $format = null, array $context = []): string
+    public function denormalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
     {
         if (null === $class) {
             return $this->denormalizeFallback($propertyName, $class, $format, $context);

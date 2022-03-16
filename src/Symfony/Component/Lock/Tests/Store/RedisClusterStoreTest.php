@@ -31,7 +31,7 @@ class RedisClusterStoreTest extends AbstractRedisStoreTest
         }
     }
 
-    protected function getRedisConnection()
+    protected function getRedisConnection(): \RedisCluster
     {
         return new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
     }

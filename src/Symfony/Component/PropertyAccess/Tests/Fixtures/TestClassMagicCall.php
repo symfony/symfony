@@ -20,7 +20,7 @@ class TestClassMagicCall
         $this->magicCallProperty = $value;
     }
 
-    public function __call($method, array $args)
+    public function __call(string $method, array $args)
     {
         if ('getMagicCallProperty' === $method) {
             return $this->magicCallProperty;

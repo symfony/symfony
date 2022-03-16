@@ -12,9 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app;
 
 use Psr\Log\NullLogger;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -23,7 +25,7 @@ use Symfony\Component\HttpKernel\Kernel;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class AppKernel extends Kernel
+class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInterface
 {
     private $varDir;
     private $testCase;
@@ -104,12 +106,31 @@ class AppKernel extends Kernel
         return $parameters;
     }
 
-    public function getContainer(): ContainerInterface
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        if (!$this->container) {
-            throw new \LogicException('Cannot access the container on a non-booted kernel. Did you forget to boot it?');
-        }
+        $treeBuilder = new TreeBuilder('foo');
+        $rootNode = $treeBuilder->getRootNode();
+        $rootNode->children()->scalarNode('foo')->defaultValue('bar')->end()->end();
 
-        return parent::getContainer();
+        return $treeBuilder;
+    }
+
+    public function load(array $configs, ContainerBuilder $container)
+    {
+    }
+
+    public function getNamespace(): string
+    {
+        return '';
+    }
+
+    public function getXsdValidationBasePath(): string|false
+    {
+        return false;
+    }
+
+    public function getAlias(): string
+    {
+        return 'foo';
     }
 }

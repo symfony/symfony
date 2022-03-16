@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+
 /**
  * Allows filtering of a controller callable.
  *
@@ -21,9 +24,25 @@ namespace Symfony\Component\HttpKernel\Event;
  * Controllers should be callables.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class ControllerEvent extends FilterControllerEvent
+final class ControllerEvent extends KernelEvent
 {
+    private string|array|object $controller;
+
+    public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, ?int $requestType)
+    {
+        parent::__construct($kernel, $request, $requestType);
+
+        $this->setController($controller);
+    }
+
+    public function getController(): callable
+    {
+        return $this->controller;
+    }
+
+    public function setController(callable $controller): void
+    {
+        $this->controller = $controller;
+    }
 }

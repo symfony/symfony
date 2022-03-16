@@ -17,6 +17,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableCellStyle;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -626,6 +627,212 @@ TABLE
             ,
                 true,
             ],
+            'TabeCellStyle with align. Also with rowspan and colspan > 1' => [
+               [
+                   new TableCell(
+                       'ISBN',
+                       [
+                           'style' => new TableCellStyle([
+                               'align' => 'right',
+                           ]),
+                       ]
+                   ),
+                   'Title',
+                   new TableCell(
+                       'Author',
+                       [
+                           'style' => new TableCellStyle([
+                               'align' => 'center',
+                           ]),
+                       ]
+                   ),
+               ],
+               [
+                   [
+                       new TableCell(
+                           '<fg=red>978</>',
+                           [
+                               'style' => new TableCellStyle([
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                       'De Monarchia',
+                       new TableCell(
+                           "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
+                           [
+                               'rowspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                   ],
+                   [
+                       '<info>99921-58-10-7</info>',
+                       'Divine Comedy',
+                   ],
+                   new TableSeparator(),
+                   [
+                       new TableCell(
+                           '<error>test</error>',
+                           [
+                               'colspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                       new TableCell(
+                           'tttt',
+                           [
+                               'style' => new TableCellStyle([
+                                   'align' => 'right',
+                               ]),
+                           ]
+                       ),
+                   ],
+               ],
+               'default',
+<<<'TABLE'
++---------------+---------------+-------------------------------------------+
+|          ISBN | Title         |                  Author                   |
++---------------+---------------+-------------------------------------------+
+|      978      | De Monarchia  |             Dante Alighieri               |
+| 99921-58-10-7 | Divine Comedy | spans multiple rows rows Dante Alighieri  |
+|               |               |         spans multiple rows rows          |
++---------------+---------------+-------------------------------------------+
+|             test              |                                      tttt |
++---------------+---------------+-------------------------------------------+
+
+TABLE
+               ,
+           ],
+            'TabeCellStyle with fg,bg. Also with rowspan and colspan > 1' => [
+                [],
+                [
+                   [
+                       new TableCell(
+                           '<fg=red>978</>',
+                           [
+                               'style' => new TableCellStyle([
+                                   'fg' => 'black',
+                                   'bg' => 'green',
+                               ]),
+                           ]
+                       ),
+                       'De Monarchia',
+                       new TableCell(
+                           "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
+                           [
+                               'rowspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'fg' => 'red',
+                                   'bg' => 'green',
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                   ],
+
+                   [
+                       '<info>99921-58-10-7</info>',
+                       'Divine Comedy',
+                   ],
+                   new TableSeparator(),
+                   [
+                       new TableCell(
+                           '<error>test</error>',
+                           [
+                               'colspan' => 2,
+                               'style' => new TableCellStyle([
+                                   'fg' => 'red',
+                                   'bg' => 'green',
+                                   'align' => 'center',
+                               ]),
+                           ]
+                       ),
+                       new TableCell(
+                           'tttt',
+                           [
+                               'style' => new TableCellStyle([
+                                   'fg' => 'red',
+                                   'bg' => 'green',
+                                   'align' => 'right',
+                               ]),
+                           ]
+                       ),
+                   ],
+                ],
+                'default',
+<<<'TABLE'
++---------------+---------------+-------------------------------------------+
+[39;49m| [39;49m[31m978[39m[39;49m           | De Monarchia  |[39;49m[31;42m             Dante Alighieri               [39;49m[39;49m|[39;49m
+[39;49m| [39;49m[32m99921-58-10-7[39m[39;49m | Divine Comedy |[39;49m[31;42m spans multiple rows rows Dante Alighieri  [39;49m[39;49m|[39;49m
+|               |               |[31;42m         spans multiple rows rows          [39;49m|
++---------------+---------------+-------------------------------------------+
+|             [37;41mtest[39;49m              |[31;42m                                      tttt [39;49m|
++---------------+---------------+-------------------------------------------+
+
+TABLE
+            ,
+            true,
+           ],
+            'TabeCellStyle with cellFormat. Also with rowspan and colspan > 1' => [
+                [
+                    new TableCell(
+                        'ISBN',
+                        [
+                            'style' => new TableCellStyle([
+                                'cellFormat' => '<fg=black;bg=cyan>%s</>',
+                            ]),
+                        ]
+                    ),
+                    'Title',
+                    'Author',
+                ],
+                [
+                    [
+                        '978-0521567817',
+                        'De Monarchia',
+                        new TableCell(
+                            "Dante Alighieri\nspans multiple rows",
+                            [
+                                'rowspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'cellFormat' => '<info>%s</info>',
+                                ]),
+                            ]
+                        ),
+                    ],
+                    ['978-0804169127', 'Divine Comedy'],
+                    [
+                        new TableCell(
+                            'test',
+                            [
+                                'colspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'cellFormat' => '<error>%s</error>',
+                                ]),
+                            ]
+                        ),
+                        'tttt',
+                    ],
+                ],
+                'default',
+<<<'TABLE'
++----------------+---------------+---------------------+
+|[30;46m ISBN           [39;49m|[32m Title         [39m|[32m Author              [39m|
++----------------+---------------+---------------------+
+[39;49m| 978-0521567817 | De Monarchia  |[39;49m[32m Dante Alighieri     [39m[39;49m|[39;49m
+| 978-0804169127 | Divine Comedy |[32m spans multiple rows [39m|
+|[37;41m test                           [39;49m| tttt                |
++----------------+---------------+---------------------+
+
+TABLE
+                ,
+                true,
+           ],
         ];
     }
 

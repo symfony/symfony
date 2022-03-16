@@ -2,8 +2,9 @@ imports:
     - { resource: ./../config/default.yml }
 
 security:
-    encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
+    enable_authenticator_manager: true
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
     providers:
         in_memory:
@@ -17,4 +18,3 @@ security:
                 login_path: localized_login_path
                 check_path: localized_check_path
                 failure_handler: localized_form_failure_handler
-            anonymous: ~

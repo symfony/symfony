@@ -11,15 +11,17 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Kevin Verschaeve
  */
 class MailgunSmtpTransport extends EsmtpTransport
 {
+    use MailgunHeadersTrait;
+
     public function __construct(string $username, string $password, string $region = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('us' !== ($region ?: 'us') ? sprintf('smtp.%s.mailgun.org', $region) : 'smtp.mailgun.org', 465, true, $dispatcher, $logger);

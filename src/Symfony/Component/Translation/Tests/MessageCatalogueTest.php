@@ -25,17 +25,6 @@ class MessageCatalogueTest extends TestCase
         $this->assertEquals('en', $catalogue->getLocale());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing "null" to the first argument of the "Symfony\Component\Translation\MessageCatalogue::__construct" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
-     */
-    public function testGetNullLocale()
-    {
-        $catalogue = new MessageCatalogue(null);
-
-        $this->assertNull($catalogue->getLocale());
-    }
-
     public function testGetDomains()
     {
         $catalogue = new MessageCatalogue('en', ['domain1' => [], 'domain2' => [], 'domain2+intl-icu' => [], 'domain3+intl-icu' => []]);

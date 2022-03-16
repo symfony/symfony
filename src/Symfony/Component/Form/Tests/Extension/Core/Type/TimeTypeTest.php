@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -476,12 +477,11 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertSame(['hour' => '16', 'minute' => '9', 'second' => '10'], $form->getViewData());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is deprecated since Symfony 4.4.
-     */
     public function testSetDataDifferentTimezonesWithoutReferenceDate()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is not supported.');
+
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',
             'view_timezone' => 'Europe/Berlin',
@@ -909,6 +909,15 @@ class TimeTypeTest extends BaseTypeTest
         ]);
 
         $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('model_timezone'));
+    }
+
+    public function testViewTimezoneDefaultsToModelTimezoneIfProvided()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'Europe/Berlin',
+        ]);
+
+        $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('view_timezone'));
     }
 
     public function testPassDefaultChoiceTranslationDomain()

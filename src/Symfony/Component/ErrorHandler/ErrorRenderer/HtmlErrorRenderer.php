@@ -33,33 +33,26 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private const GHOST_HEART = 'M125.91386369681868,8.305165958366445 C128.95033202169043,-0.40540639102854037 140.8469835342744,8.305165958366445 125.91386369681868,19.504526138305664 C110.98208663272044,8.305165958366445 122.87795231771452,-0.40540639102854037 125.91386369681868,8.305165958366445 z';
     private const GHOST_PLUS = 'M111.36824226379395,8.969108581542969 L118.69175148010254,8.969108581542969 L118.69175148010254,1.6455793380737305 L126.20429420471191,1.6455793380737305 L126.20429420471191,8.969108581542969 L133.52781105041504,8.969108581542969 L133.52781105041504,16.481630325317383 L126.20429420471191,16.481630325317383 L126.20429420471191,23.805158615112305 L118.69175148010254,23.805158615112305 L118.69175148010254,16.481630325317383 L111.36824226379395,16.481630325317383 z';
 
-    private $debug;
-    private $charset;
-    private $fileLinkFormat;
-    private $projectDir;
-    private $outputBuffer;
-    private $logger;
+    private bool|\Closure $debug;
+    private string $charset;
+    private string|array|FileLinkFormatter|false $fileLinkFormat;
+    private ?string $projectDir;
+    private string|\Closure $outputBuffer;
+    private ?LoggerInterface $logger;
+
+    private static string $template = 'views/error.html.php';
 
     /**
-     * @param bool|callable                 $debug          The debugging mode as a boolean or a callable that should return it
-     * @param string|FileLinkFormatter|null $fileLinkFormat
-     * @param bool|callable                 $outputBuffer   The output buffer as a string or a callable that should return it
+     * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
+     * @param string|callable $outputBuffer The output buffer as a string or a callable that should return it
      */
-    public function __construct($debug = false, string $charset = null, $fileLinkFormat = null, string $projectDir = null, $outputBuffer = '', LoggerInterface $logger = null)
+    public function __construct(bool|callable $debug = false, string $charset = null, string|FileLinkFormatter $fileLinkFormat = null, string $projectDir = null, string|callable $outputBuffer = '', LoggerInterface $logger = null)
     {
-        if (!\is_bool($debug) && !\is_callable($debug)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a boolean or a callable, "%s" given.', __METHOD__, \is_object($debug) ? \get_class($debug) : \gettype($debug)));
-        }
-
-        if (!\is_string($outputBuffer) && !\is_callable($outputBuffer)) {
-            throw new \TypeError(sprintf('Argument 5 passed to "%s()" must be a string or a callable, "%s" given.', __METHOD__, \is_object($outputBuffer) ? \get_class($outputBuffer) : \gettype($outputBuffer)));
-        }
-
-        $this->debug = $debug;
+        $this->debug = \is_bool($debug) ? $debug : $debug(...);
         $this->charset = $charset ?: (ini_get('default_charset') ?: 'UTF-8');
         $this->fileLinkFormat = $fileLinkFormat ?: (ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format'));
         $this->projectDir = $projectDir;
-        $this->outputBuffer = $outputBuffer;
+        $this->outputBuffer = \is_string($outputBuffer) ? $outputBuffer : $outputBuffer(...);
         $this->logger = $logger;
     }
 
@@ -68,9 +61,13 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(\Throwable $exception): FlattenException
     {
-        $exception = FlattenException::createFromThrowable($exception, null, [
-            'Content-Type' => 'text/html; charset='.$this->charset,
-        ]);
+        $headers = ['Content-Type' => 'text/html; charset='.$this->charset];
+        if (\is_bool($this->debug) ? $this->debug : ($this->debug)($exception)) {
+            $headers['X-Debug-Exception'] = rawurlencode($exception->getMessage());
+            $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
+        }
+
+        $exception = FlattenException::createFromThrowable($exception, null, $headers);
 
         return $exception->setAsString($this->renderException($exception));
     }
@@ -132,7 +129,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $statusCode = $this->escape($exception->getStatusCode());
 
         if (!$debug) {
-            return $this->include('views/error.html.php', [
+            return $this->include(self::$template, [
                 'statusText' => $statusText,
                 'statusCode' => $statusCode,
             ]);
@@ -150,9 +147,6 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         ]);
     }
 
-    /**
-     * Formats an array as a string.
-     */
     private function formatArgs(array $args): string
     {
         $result = [];
@@ -199,19 +193,14 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     {
         $file = str_replace('\\', '/', $file);
 
-        if (null !== $this->projectDir && 0 === strpos($file, $this->projectDir)) {
+        if (null !== $this->projectDir && str_starts_with($file, $this->projectDir)) {
             return ltrim(substr($file, \strlen($this->projectDir)), '/');
         }
 
         return null;
     }
 
-    /**
-     * Returns the link for a given file/line pair.
-     *
-     * @return string|false A link or false
-     */
-    private function getFileLink(string $file, int $line)
+    private function getFileLink(string $file, int $line): string|false
     {
         if ($fmt = $this->fileLinkFormat) {
             return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
@@ -256,8 +245,6 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      * @param string $file       A file path
      * @param int    $line       The selected line number
      * @param int    $srcContext The number of displayed lines around or -1 for the whole file
-     *
-     * @return string An HTML string
      */
     private function fileExcerpt(string $file, int $line, int $srcContext = 3): string
     {
@@ -279,7 +266,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             }
 
             for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, \count($content)); $i <= $max; ++$i) {
-                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" name="line'.$i.'"></a><code>'.$this->fixCodeMarkup($content[$i - 1]).'</code></li>';
+                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.$this->fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
             return '<ol start="'.max($line - $srcContext, 1).'">'.implode("\n", $lines).'</ol>';
@@ -298,9 +285,9 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         }
 
         // missing </span> tag at the end of line
-        $opening = strpos($line, '<span');
-        $closing = strpos($line, '</span>');
-        if (false !== $opening && (false === $closing || $closing > $opening)) {
+        $opening = strrpos($line, '<span');
+        $closing = strrpos($line, '</span>');
+        if (false !== $opening && (false === $closing || $closing < $opening)) {
             $line .= '</span>';
         }
 
@@ -316,7 +303,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function formatLogMessage(string $message, array $context)
     {
-        if ($context && false !== strpos($message, '{')) {
+        if ($context && str_contains($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
                 if (is_scalar($val)) {
@@ -345,8 +332,19 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     {
         extract($context, \EXTR_SKIP);
         ob_start();
-        include __DIR__.'/../Resources/'.$name;
+
+        include is_file(\dirname(__DIR__).'/Resources/'.$name) ? \dirname(__DIR__).'/Resources/'.$name : $name;
 
         return trim(ob_get_clean());
+    }
+
+    /**
+     * Allows overriding the default non-debug template.
+     *
+     * @param string $template path to the custom template file to render
+     */
+    public static function setTemplate(string $template): void
+    {
+        self::$template = $template;
     }
 }

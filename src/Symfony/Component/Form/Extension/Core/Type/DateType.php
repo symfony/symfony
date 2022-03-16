@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
@@ -22,7 +23,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -299,6 +299,7 @@ class DateType extends AbstractType
             },
             'choice_translation_domain' => false,
             'input_format' => 'Y-m-d',
+            'invalid_message' => 'Please enter a valid date.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -323,30 +324,19 @@ class DateType extends AbstractType
         $resolver->setAllowedTypes('days', 'array');
         $resolver->setAllowedTypes('input_format', 'string');
 
-        foreach (['html5', 'widget', 'format'] as $option) {
-            $resolver->setDeprecated($option, static function (Options $options, $value) use ($option): string {
-                try {
-                    $html5 = 'html5' === $option ? $value : $options['html5'];
-                    $widget = 'widget' === $option ? $value : $options['widget'];
-                    $format = 'format' === $option ? $value : $options['format'];
-                } catch (OptionDefinitionException $e) {
-                    return '';
-                }
+        $resolver->setNormalizer('html5', function (Options $options, $html5) {
+            if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {
+                throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is enabled.', self::class));
+            }
 
-                if ($html5 && 'single_text' === $widget && self::HTML5_FORMAT !== $format) {
-                    return sprintf('Using a custom format when the "html5" option of %s is enabled is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                    //throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
-                }
-
-                return '';
-            });
-        }
+            return $html5;
+        });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'date';
     }

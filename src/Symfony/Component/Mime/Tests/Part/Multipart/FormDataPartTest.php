@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Tests\Part\Multipart;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Mime\Part\TextPart;
@@ -21,7 +22,6 @@ class FormDataPartTest extends TestCase
     public function testConstructor()
     {
         $r = new \ReflectionProperty(TextPart::class, 'encoding');
-        $r->setAccessible(true);
 
         $b = new TextPart('content');
         $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
@@ -58,21 +58,126 @@ class FormDataPartTest extends TestCase
                     'qux' => clone $p1,
                 ],
             ],
+            'quux' => [
+                clone $p1,
+                clone $p1,
+            ],
+            'quuz' => [
+                'corge' => [
+                    clone $p1,
+                    clone $p1,
+                ],
+            ],
+            '2' => clone $p1,
+            '0' => clone $p1,
+
+            'bar2' => [
+                ['baz' => clone $p1],
+                'baz' => [
+                    'qux' => clone $p1,
+                ],
+            ],
+            ['quux2' => clone $p1],
+            ['quux2' => clone $p1],
+            'quuz2' => [
+                ['corge' => clone $p1],
+                ['corge' => clone $p1],
+            ],
+            ['2' => clone $p1],
+            ['2' => clone $p1],
+            ['0' => clone $p1],
+            ['0' => clone $p1],
+
+            ['2[0]' => clone $p1],
+            ['2[1]' => clone $p1],
+            ['0[0]' => clone $p1],
+            ['0[1]' => clone $p1],
         ]);
 
         $this->assertEquals('multipart', $f->getMediaType());
         $this->assertEquals('form-data', $f->getMediaSubtype());
 
+        $parts = [];
+
+        $parts[] = $p1;
         $p1->setName('foo');
         $p1->setDisposition('form-data');
 
-        $p2 = clone $p1;
+        $parts[] = $p2 = clone $p1;
         $p2->setName('bar[baz][0]');
 
-        $p3 = clone $p1;
+        $parts[] = $p3 = clone $p1;
         $p3->setName('bar[baz][qux]');
 
-        $this->assertEquals([$p1, $p2, $p3], $f->getParts());
+        $parts[] = $p4 = clone $p1;
+        $p4->setName('quux[0]');
+        $parts[] = $p5 = clone $p1;
+        $p5->setName('quux[1]');
+
+        $parts[] = $p6 = clone $p1;
+        $p6->setName('quuz[corge][0]');
+        $parts[] = $p7 = clone $p1;
+        $p7->setName('quuz[corge][1]');
+
+        $parts[] = $p8 = clone $p1;
+        $p8->setName('2');
+
+        $parts[] = $p9 = clone $p1;
+        $p9->setName('0');
+
+        $parts[] = $p10 = clone $p1;
+        $p10->setName('bar2[baz]');
+
+        $parts[] = $p11 = clone $p1;
+        $p11->setName('bar2[baz][qux]');
+
+        $parts[] = $p12 = clone $p1;
+        $p12->setName('quux2');
+        $parts[] = $p13 = clone $p1;
+        $p13->setName('quux2');
+
+        $parts[] = $p14 = clone $p1;
+        $p14->setName('quuz2[corge]');
+        $parts[] = $p15 = clone $p1;
+        $p15->setName('quuz2[corge]');
+
+        $parts[] = $p16 = clone $p1;
+        $p16->setName('2');
+        $parts[] = $p17 = clone $p1;
+        $p17->setName('2');
+
+        $parts[] = $p18 = clone $p1;
+        $p18->setName('0');
+        $parts[] = $p19 = clone $p1;
+        $p19->setName('0');
+
+        $parts[] = $p16 = clone $p1;
+        $p16->setName('2[0]');
+        $parts[] = $p17 = clone $p1;
+        $p17->setName('2[1]');
+
+        $parts[] = $p18 = clone $p1;
+        $p18->setName('0[0]');
+        $parts[] = $p19 = clone $p1;
+        $p19->setName('0[1]');
+
+        $this->assertEquals($parts, $f->getParts());
+    }
+
+    public function testExceptionOnFormFieldsWithIntegerKeysAndMultipleValues()
+    {
+        $p1 = new TextPart('content', 'utf-8', 'plain', '8bit');
+        $f = new FormDataPart([
+            [
+                clone $p1,
+                clone $p1,
+            ],
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Form field values with integer keys can only have one array element, the key being the field name and the value being the field value, 2 provided.');
+
+        $f->getParts();
     }
 
     public function testToString()

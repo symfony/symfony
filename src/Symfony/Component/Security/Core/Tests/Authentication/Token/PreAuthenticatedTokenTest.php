@@ -13,36 +13,20 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class PreAuthenticatedTokenTest extends TestCase
 {
     public function testConstructor()
     {
-        $token = new PreAuthenticatedToken('foo', 'bar', 'key');
-        $this->assertFalse($token->isAuthenticated());
-
-        $token = new PreAuthenticatedToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertTrue($token->isAuthenticated());
+        $token = new PreAuthenticatedToken(new InMemoryUser('foo', 'bar', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertEquals('key', $token->getProviderKey());
-    }
-
-    public function testGetCredentials()
-    {
-        $token = new PreAuthenticatedToken('foo', 'bar', 'key');
-        $this->assertEquals('bar', $token->getCredentials());
+        $this->assertEquals('key', $token->getFirewallName());
     }
 
     public function testGetUser()
     {
-        $token = new PreAuthenticatedToken('foo', 'bar', 'key');
-        $this->assertEquals('foo', $token->getUser());
-    }
-
-    public function testEraseCredentials()
-    {
-        $token = new PreAuthenticatedToken('foo', 'bar', 'key');
-        $token->eraseCredentials();
-        $this->assertEquals('', $token->getCredentials());
+        $token = new PreAuthenticatedToken($user = new InMemoryUser('foo', 'bar'), 'key');
+        $this->assertEquals($user, $token->getUser());
     }
 }

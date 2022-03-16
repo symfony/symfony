@@ -27,18 +27,16 @@ class TemplateIteratorTest extends TestCase
         $kernel->expects($this->any())->method('getBundles')->willReturn([
             $bundle,
         ]);
-        $iterator = new TemplateIterator($kernel, __DIR__.'/Fixtures/templates', [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
+        $iterator = new TemplateIterator($kernel, [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
 
         $sorted = iterator_to_array($iterator);
         sort($sorted);
         $this->assertEquals(
             [
-                '@Bar/base.html.twig',
                 '@Bar/index.html.twig',
                 '@Bar/layout.html.twig',
                 '@Foo/index.html.twig',
                 'layout.html.twig',
-                'sub/sub.html.twig',
             ],
             $sorted
         );

@@ -1,6 +1,52 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * In cases where it will likely improve readability, strings containing single quotes will be double-quoted.
+
+5.4
+---
+
+ * Add new `lint:yaml dirname --exclude=/dirname/foo.yaml --exclude=/dirname/bar.yaml`
+   option to exclude one or more specific files from multiple file list
+ * Allow negatable for the parse tags option with `--no-parse-tags`
+
+5.3
+---
+
+ * Added `github` format support & autodetection to render errors as annotations
+   when running the YAML linter command in a Github Action environment.
+
+5.1.0
+-----
+
+ * Added support for parsing numbers prefixed with `0o` as octal numbers.
+ * Deprecated support for parsing numbers starting with `0` as octal numbers. They will be parsed as strings as of Symfony 6.0. Prefix numbers with `0o`
+   so that they are parsed as octal numbers.
+
+   Before:
+
+   ```yaml
+   Yaml::parse('072');
+   ```
+
+   After:
+
+   ```yaml
+   Yaml::parse('0o72');
+   ```
+
+ * Added `yaml-lint` binary.
+ * Deprecated using the `!php/object` and `!php/const` tags without a value.
+
+5.0.0
+-----
+
+ * Removed support for mappings inside multi-line strings.
+ * removed support for implicit STDIN usage in the `lint:yaml` command, use `lint:yaml -` (append a dash) instead to make it explicit.
+
 4.4.0
 -----
 

@@ -1,0 +1,11 @@
+security_profile:
+    path:     /main/user_profile
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SecurityController::profileAction }
+
+security_custom_profile:
+    path:     /custom/user_profile
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SecurityController::profileAction }
+
+security_stateless_profile:
+    path:     /stateless/user_profile
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SecurityController::profileAction }

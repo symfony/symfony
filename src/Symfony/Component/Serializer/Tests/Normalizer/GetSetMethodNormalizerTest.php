@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -29,10 +28,10 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksObject;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
@@ -40,10 +39,13 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValuesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 
 class GetSetMethodNormalizerTest extends TestCase
 {
+    use CacheableObjectAttributesTestTrait;
     use CallbacksTestTrait;
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
@@ -51,6 +53,7 @@ class GetSetMethodNormalizerTest extends TestCase
     use IgnoredAttributesTestTrait;
     use MaxDepthTestTrait;
     use ObjectToPopulateTestTrait;
+    use SkipUninitializedValuesTestTrait;
     use TypeEnforcementTestTrait;
 
     /**
@@ -241,20 +244,6 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
     }
 
-    /**
-     * @dataProvider provideNormalizeCallbacks
-     */
-    public function testLegacyCallbacks($callbacks, $value, $result)
-    {
-        $this->normalizer->setCallbacks($callbacks);
-
-        $obj = new CallbacksObject($value);
-        $this->assertEquals(
-            $result,
-            $this->normalizer->normalize($obj, 'any')
-        );
-    }
-
     protected function getNormalizerForCircularReference(array $defaultContext): GetSetMethodNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -267,34 +256,6 @@ class GetSetMethodNormalizerTest extends TestCase
     protected function getSelfReferencingModel()
     {
         return new CircularReferenceDummy();
-    }
-
-    public function testLegacyUnableToNormalizeCircularReference()
-    {
-        $this->normalizer->setCircularReferenceLimit(2);
-        $this->serializer = new Serializer([$this->normalizer]);
-        $this->normalizer->setSerializer($this->serializer);
-
-        $obj = new CircularReferenceDummy();
-
-        $this->expectException(CircularReferenceException::class);
-        $this->normalizer->normalize($obj);
-    }
-
-    public function testLegacyCircularReferenceHandler()
-    {
-        $handler = function ($obj) {
-            return \get_class($obj);
-        };
-
-        $this->normalizer->setCircularReferenceHandler($handler);
-        $this->serializer = new Serializer([$this->normalizer]);
-        $this->normalizer->setSerializer($this->serializer);
-
-        $obj = new CircularReferenceDummy();
-
-        $expected = ['me' => CircularReferenceDummy::class];
-        $this->assertEquals($expected, $this->normalizer->normalize($obj));
     }
 
     protected function getDenormalizerForConstructArguments(): GetSetMethodNormalizer
@@ -358,7 +319,7 @@ class GetSetMethodNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
-            ], 'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy', null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
+            ], 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy', null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
         );
     }
 
@@ -412,22 +373,6 @@ class GetSetMethodNormalizerTest extends TestCase
         new Serializer([$normalizer]);
 
         return $normalizer;
-    }
-
-    public function testLegacyIgnoredAttributes()
-    {
-        $ignoredAttributes = ['foo', 'bar', 'baz', 'camelCase', 'object'];
-        $this->normalizer->setIgnoredAttributes($ignoredAttributes);
-
-        $obj = new GetSetDummy();
-        $obj->setFoo('foo');
-        $obj->setBar('bar');
-        $obj->setBaz(true);
-
-        $this->assertEquals(
-            ['fooBar' => 'foobar'],
-            $this->normalizer->normalize($obj, 'any')
-        );
     }
 
     public function testUnableToNormalizeObjectAttribute()
@@ -506,6 +451,27 @@ class GetSetMethodNormalizerTest extends TestCase
             ['foo' => true],
             $this->normalizer->normalize($obj, 'any')
         );
+    }
+
+    protected function getObjectCollectionWithExpectedArray(): array
+    {
+        return [[
+            new TypedPropertiesObjectWithGetters(),
+            (new TypedPropertiesObjectWithGetters())->setUninitialized('value2'),
+        ], [
+            ['initialized' => 'value', 'initialized2' => 'value'],
+            ['unInitialized' => 'value2', 'initialized' => 'value', 'initialized2' => 'value'],
+        ]];
+    }
+
+    protected function getNormalizerForCacheableObjectAttributesTest(): GetSetMethodNormalizer
+    {
+        return new GetSetMethodNormalizer();
+    }
+
+    protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface
+    {
+        return new GetSetMethodNormalizer(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
     }
 }
 

@@ -17,20 +17,15 @@ use Twig\Node\Node;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
-class TransDefaultDomainNode extends Node
+final class TransDefaultDomainNode extends Node
 {
     public function __construct(AbstractExpression $expr, int $lineno = 0, string $tag = null)
     {
         parent::__construct(['expr' => $expr], [], $lineno, $tag);
     }
 
-    /**
-     * @return void
-     */
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         // noop as this node is just a marker for TranslationDefaultDomainNodeVisitor
     }

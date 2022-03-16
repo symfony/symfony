@@ -12,12 +12,12 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimpleFormFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimplePreAuthenticationFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
@@ -27,9 +27,21 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
  */
 class MainConfiguration implements ConfigurationInterface
 {
-    private $factories;
-    private $userProviderFactories;
+    /** @internal */
+    public const STRATEGY_AFFIRMATIVE = 'affirmative';
+    /** @internal */
+    public const STRATEGY_CONSENSUS = 'consensus';
+    /** @internal */
+    public const STRATEGY_UNANIMOUS = 'unanimous';
+    /** @internal */
+    public const STRATEGY_PRIORITY = 'priority';
 
+    private array $factories;
+    private array $userProviderFactories;
+
+    /**
+     * @param array<array-key, AuthenticatorFactoryInterface> $factories
+     */
     public function __construct(array $factories, array $userProviderFactories)
     {
         $this->factories = $factories;
@@ -38,10 +50,8 @@ class MainConfiguration implements ConfigurationInterface
 
     /**
      * Generates the configuration tree builder.
-     *
-     * @return TreeBuilder The tree builder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $tb = new TreeBuilder('security');
         $rootNode = $tb->getRootNode();
@@ -54,27 +64,36 @@ class MainConfiguration implements ConfigurationInterface
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
-                ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
+                ->booleanNode('enable_authenticator_manager')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('strategy')
-                            ->values([AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS])
+                            ->values($this->getAccessDecisionStrategies())
                         ->end()
                         ->scalarNode('service')->end()
+                        ->scalarNode('strategy_service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['strategy']) && isset($v['service']); })
+                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['service']); })
                         ->thenInvalid('"strategy" and "service" cannot be used together.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['strategy_service']); })
+                        ->thenInvalid('"strategy" and "strategy_service" cannot be used together.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['service'], $v['strategy_service']); })
+                        ->thenInvalid('"service" and "strategy_service" cannot be used together.')
                     ->end()
                 ->end()
             ->end()
         ;
 
-        $this->addEncodersSection($rootNode);
+        $this->addPasswordHashersSection($rootNode);
         $this->addProvidersSection($rootNode);
         $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
@@ -115,6 +134,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->fixXmlConfig('ip')
                         ->fixXmlConfig('method')
                         ->children()
+                            ->scalarNode('request_matcher')->defaultNull()->end()
                             ->scalarNode('requires_channel')->defaultNull()->end()
                             ->scalarNode('path')
                                 ->defaultNull()
@@ -146,6 +166,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param array<array-key, AuthenticatorFactoryInterface> $factories
+     */
     private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
     {
         $firewallNodeBuilder = $rootNode
@@ -157,6 +180,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->disallowNewKeysInSubsequentConfigs()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
+                        ->fixXmlConfig('required_badge')
                         ->children()
         ;
 
@@ -176,15 +200,13 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('request_matcher')->end()
             ->scalarNode('access_denied_url')->end()
             ->scalarNode('access_denied_handler')->end()
-            ->scalarNode('entry_point')->end()
+            ->scalarNode('entry_point')
+                ->info(sprintf('An enabled authenticator name or a service id that implements "%s"', AuthenticationEntryPointInterface::class))
+            ->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
+            ->booleanNode('lazy')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
-            ->booleanNode('logout_on_user_change')
-                ->defaultTrue()
-                ->info('When true, it will trigger a logout for the user if something has changed. Note: No-Op option since 4.0. Will always be true.')
-                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.1.')
-            ->end()
             ->arrayNode('logout')
                 ->treatTrueLike([])
                 ->canBeUnset()
@@ -194,7 +216,6 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
-                    ->scalarNode('success_handler')->end()
                     ->booleanNode('invalidate_session')->defaultTrue()->end()
                 ->end()
                 ->fixXmlConfig('delete_cookie')
@@ -204,22 +225,6 @@ class MainConfiguration implements ConfigurationInterface
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return \is_array($v) && \is_int(key($v)); })
                             ->then(function ($v) { return array_map(function ($v) { return ['name' => $v]; }, $v); })
-                        ->end()
-                        ->beforeNormalization()
-                            ->ifArray()->then(function ($v) {
-                                foreach ($v as $originalName => $cookieConfig) {
-                                    if (str_contains($originalName, '-')) {
-                                        $normalizedName = str_replace('-', '_', $originalName);
-                                        @trigger_error(sprintf('Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "%s" cookie configured in "logout.delete_cookies" will delete the "%s" cookie instead of the "%s" cookie.', $originalName, $originalName, $normalizedName), \E_USER_DEPRECATED);
-
-                                        // normalize cookie names manually for BC reasons. Remove it in Symfony 5.0.
-                                        $v[$normalizedName] = $cookieConfig;
-                                        unset($v[$originalName]);
-                                    }
-                                }
-
-                                return $v;
-                            })
                         ->end()
                         ->useAttributeAsKey('name')
                         ->prototype('array')
@@ -232,12 +237,6 @@ class MainConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->fixXmlConfig('handler')
-                ->children()
-                    ->arrayNode('handlers')
-                        ->prototype('scalar')->end()
-                    ->end()
-                ->end()
             ->end()
             ->arrayNode('switch_user')
                 ->canBeUnset()
@@ -245,32 +244,45 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('provider')->end()
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
-                    ->booleanNode('stateless')
-                        ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.1.')
-                        ->defaultValue(false)
-                    ->end()
                 ->end()
+            ->end()
+            ->arrayNode('required_badges')
+                ->info('A list of badges that must be present on the authenticated passport.')
+                ->validate()
+                    ->always()
+                    ->then(function ($requiredBadges) {
+                        return array_map(function ($requiredBadge) {
+                            if (class_exists($requiredBadge)) {
+                                return $requiredBadge;
+                            }
+
+                            if (!str_contains($requiredBadge, '\\')) {
+                                $fqcn = 'Symfony\Component\Security\Http\Authenticator\Passport\Badge\\'.$requiredBadge;
+                                if (class_exists($fqcn)) {
+                                    return $fqcn;
+                                }
+                            }
+
+                            throw new InvalidConfigurationException(sprintf('Undefined security Badge class "%s" set in "security.firewall.required_badges".', $requiredBadge));
+                        }, $requiredBadges);
+                    })
+                ->end()
+                ->prototype('scalar')->end()
             ->end()
         ;
 
         $abstractFactoryKeys = [];
-        foreach ($factories as $factoriesAtPosition) {
-            foreach ($factoriesAtPosition as $factory) {
-                $name = str_replace('-', '_', $factory->getKey());
-                $factoryNode = $firewallNodeBuilder->arrayNode($name)
-                    ->canBeUnset()
-                ;
+        foreach ($factories as $factory) {
+            $name = str_replace('-', '_', $factory->getKey());
+            $factoryNode = $firewallNodeBuilder->arrayNode($name)
+                ->canBeUnset()
+            ;
 
-                if ($factory instanceof SimplePreAuthenticationFactory || $factory instanceof SimpleFormFactory) {
-                    $factoryNode->setDeprecated(sprintf('The "%s" security listener is deprecated Symfony 4.2, use Guard instead.', $name));
-                }
-
-                if ($factory instanceof AbstractFactory) {
-                    $abstractFactoryKeys[] = $name;
-                }
-
-                $factory->addConfiguration($factoryNode);
+            if ($factory instanceof AbstractFactory) {
+                $abstractFactoryKeys[] = $name;
             }
+
+            $factory->addConfiguration($factoryNode);
         }
 
         // check for unreachable check paths
@@ -356,12 +368,12 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addEncodersSection(ArrayNodeDefinition $rootNode)
+    private function addPasswordHashersSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
-            ->fixXmlConfig('encoder')
+            ->fixXmlConfig('password_hasher')
             ->children()
-                ->arrayNode('encoders')
+                ->arrayNode('password_hashers')
                     ->example([
                         'App\Entity\User1' => 'auto',
                         'App\Entity\User2' => [
@@ -400,15 +412,20 @@ class MainConfiguration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('memory_cost')->defaultNull()->end()
                             ->scalarNode('time_cost')->defaultNull()->end()
-                            ->scalarNode('threads')
-                                ->defaultNull()
-                                ->setDeprecated('The "%path%.%node%" configuration key has no effect since Symfony 4.3 and will be removed in 5.0.')
-                            ->end()
                             ->scalarNode('id')->end()
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+        ->end();
+    }
+
+    private function getAccessDecisionStrategies(): array
+    {
+        return [
+            self::STRATEGY_AFFIRMATIVE,
+            self::STRATEGY_CONSENSUS,
+            self::STRATEGY_UNANIMOUS,
+            self::STRATEGY_PRIORITY,
+        ];
     }
 }

@@ -14,8 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 
 class ArrayDenormalizerTest extends TestCase
 {
@@ -25,15 +24,15 @@ class ArrayDenormalizerTest extends TestCase
     private $denormalizer;
 
     /**
-     * @var MockObject&SerializerInterface
+     * @var MockObject&ContextAwareDenormalizerInterface
      */
     private $serializer;
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock(Serializer::class);
+        $this->serializer = $this->createMock(ContextAwareDenormalizerInterface::class);
         $this->denormalizer = new ArrayDenormalizer();
-        $this->denormalizer->setSerializer($this->serializer);
+        $this->denormalizer->setDenormalizer($this->serializer);
     }
 
     public function testDenormalize()
@@ -70,7 +69,7 @@ class ArrayDenormalizerTest extends TestCase
     {
         $this->serializer->expects($this->once())
             ->method('supportsDenormalization')
-            ->with($this->anything(), ArrayDummy::class, $this->anything())
+            ->with($this->anything(), ArrayDummy::class, 'json', ['con' => 'text'])
             ->willReturn(true);
 
         $this->assertTrue(
@@ -79,7 +78,9 @@ class ArrayDenormalizerTest extends TestCase
                     ['foo' => 'one', 'bar' => 'two'],
                     ['foo' => 'three', 'bar' => 'four'],
                 ],
-                __NAMESPACE__.'\ArrayDummy[]'
+                __NAMESPACE__.'\ArrayDummy[]',
+                'json',
+                ['con' => 'text']
             )
         );
     }

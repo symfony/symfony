@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\app;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -36,10 +35,13 @@ class AppKernel extends Kernel
         $this->testCase = $testCase;
 
         $fs = new Filesystem();
-        if (!$fs->isAbsolutePath($rootConfig) && !is_file($rootConfig = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
-            throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $rootConfig));
+        foreach ((array) $rootConfig as $config) {
+            if (!$fs->isAbsolutePath($config) && !is_file($config = __DIR__.'/'.$testCase.'/'.$config)) {
+                throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $config));
+            }
+
+            $this->rootConfig[] = $config;
         }
-        $this->rootConfig = $rootConfig;
 
         parent::__construct($environment, $debug);
     }
@@ -49,7 +51,7 @@ class AppKernel extends Kernel
      */
     public function getContainerClass(): string
     {
-        return parent::getContainerClass().substr(md5($this->rootConfig), -16);
+        return parent::getContainerClass().substr(md5(implode('', $this->rootConfig)), -16);
     }
 
     public function registerBundles(): iterable
@@ -78,7 +80,9 @@ class AppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load($this->rootConfig);
+        foreach ($this->rootConfig as $config) {
+            $loader->load($config);
+        }
     }
 
     public function serialize()
@@ -98,14 +102,5 @@ class AppKernel extends Kernel
         $parameters['kernel.test_case'] = $this->testCase;
 
         return $parameters;
-    }
-
-    public function getContainer(): ContainerInterface
-    {
-        if (!$this->container) {
-            throw new \LogicException('Cannot access the container on a non-booted kernel. Did you forget to boot it?');
-        }
-
-        return parent::getContainer();
     }
 }

@@ -8,16 +8,22 @@
     <framework:config>
         <framework:cache>
             <framework:pool name="cache.foo" adapter="cache.adapter.apcu" default-lifetime="30" />
-            <framework:pool name="cache.bar" adapter="cache.adapter.doctrine" default-lifetime="5" provider="app.doctrine_cache_provider" />
             <framework:pool name="cache.baz" adapter="cache.adapter.filesystem" default-lifetime="7" />
             <framework:pool name="cache.foobar" adapter="cache.adapter.psr6" default-lifetime="10" provider="app.cache_pool" />
-            <framework:pool name="cache.def" default-lifetime="11" />
+            <framework:pool name="cache.def" default-lifetime="PT11S" />
+            <framework:pool name="cache.expr" default-lifetime="13 seconds" />
             <framework:pool name="cache.chain" default-lifetime="12">
                 <framework:adapter name="cache.adapter.array" />
                 <framework:adapter name="cache.adapter.filesystem" />
                 <framework:adapter name="cache.adapter.redis" provider="redis://foo" />
             </framework:pool>
             <framework:pool name="cache.ccc" adapter="cache.adapter.array" default-lifetime="410" tags="true" />
+            <framework:pool name="cache.redis_tag_aware.foo" adapter="cache.adapter.redis_tag_aware" />
+            <framework:pool name="cache.redis_tag_aware.foo2" tags="true" adapter="cache.adapter.redis_tag_aware" />
+            <framework:pool name="cache.redis_tag_aware.bar" adapter="cache.redis_tag_aware.foo" />
+            <framework:pool name="cache.redis_tag_aware.bar2" tags="true" adapter="cache.redis_tag_aware.foo" />
+            <framework:pool name="cache.redis_tag_aware.baz" adapter="cache.redis_tag_aware.foo2" />
+            <framework:pool name="cache.redis_tag_aware.baz2" tags="true" adapter="cache.redis_tag_aware.foo2" />
         </framework:cache>
     </framework:config>
 </container>

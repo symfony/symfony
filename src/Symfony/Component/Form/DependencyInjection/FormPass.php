@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Form\FormTypeExtensionInterface;
 
 /**
  * Adds all services with the tags "form.type", "form.type_extension" and
@@ -31,31 +30,13 @@ class FormPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    private $formExtensionService;
-    private $formTypeTag;
-    private $formTypeExtensionTag;
-    private $formTypeGuesserTag;
-    private $formDebugCommandService;
-
-    public function __construct(string $formExtensionService = 'form.extension', string $formTypeTag = 'form.type', string $formTypeExtensionTag = 'form.type_extension', string $formTypeGuesserTag = 'form.type_guesser', string $formDebugCommandService = 'console.command.form_debug')
-    {
-        $this->formExtensionService = $formExtensionService;
-        $this->formTypeTag = $formTypeTag;
-        $this->formTypeExtensionTag = $formTypeExtensionTag;
-        $this->formTypeGuesserTag = $formTypeGuesserTag;
-        $this->formDebugCommandService = $formDebugCommandService;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->formExtensionService)) {
+        if (!$container->hasDefinition('form.extension')) {
             return;
         }
 
-        $definition = $container->getDefinition($this->formExtensionService);
-        if (new IteratorArgument([]) != $definition->getArgument(2)) {
-            return;
-        }
+        $definition = $container->getDefinition('form.extension');
         $definition->replaceArgument(0, $this->processFormTypes($container));
         $definition->replaceArgument(1, $this->processFormTypeExtensions($container));
         $definition->replaceArgument(2, $this->processFormTypeGuessers($container));
@@ -68,15 +49,15 @@ class FormPass implements CompilerPassInterface
         $namespaces = ['Symfony\Component\Form\Extension\Core\Type' => true];
 
         // Builds an array with fully-qualified type class names as keys and service IDs as values
-        foreach ($container->findTaggedServiceIds($this->formTypeTag, true) as $serviceId => $tag) {
+        foreach ($container->findTaggedServiceIds('form.type', true) as $serviceId => $tag) {
             // Add form type service to the service locator
             $serviceDefinition = $container->getDefinition($serviceId);
             $servicesMap[$formType = $serviceDefinition->getClass()] = new Reference($serviceId);
             $namespaces[substr($formType, 0, strrpos($formType, '\\'))] = true;
         }
 
-        if ($container->hasDefinition($this->formDebugCommandService)) {
-            $commandDefinition = $container->getDefinition($this->formDebugCommandService);
+        if ($container->hasDefinition('console.command.form_debug')) {
+            $commandDefinition = $container->getDefinition('console.command.form_debug');
             $commandDefinition->setArgument(1, array_keys($namespaces));
             $commandDefinition->setArgument(2, array_keys($servicesMap));
         }
@@ -88,21 +69,17 @@ class FormPass implements CompilerPassInterface
     {
         $typeExtensions = [];
         $typeExtensionsClasses = [];
-        foreach ($this->findAndSortTaggedServices($this->formTypeExtensionTag, $container) as $reference) {
+        foreach ($this->findAndSortTaggedServices('form.type_extension', $container) as $reference) {
             $serviceId = (string) $reference;
             $serviceDefinition = $container->getDefinition($serviceId);
 
-            $tag = $serviceDefinition->getTag($this->formTypeExtensionTag);
+            $tag = $serviceDefinition->getTag('form.type_extension');
             $typeExtensionClass = $container->getParameterBag()->resolveValue($serviceDefinition->getClass());
 
             if (isset($tag[0]['extended_type'])) {
-                if (!method_exists($typeExtensionClass, 'getExtendedTypes')) {
-                    @trigger_error(sprintf('Not implementing the "%s::getExtendedTypes()" method in "%s" is deprecated since Symfony 4.2.', FormTypeExtensionInterface::class, $typeExtensionClass), \E_USER_DEPRECATED);
-                }
-
                 $typeExtensions[$tag[0]['extended_type']][] = new Reference($serviceId);
                 $typeExtensionsClasses[] = $typeExtensionClass;
-            } elseif (method_exists($typeExtensionClass, 'getExtendedTypes')) {
+            } else {
                 $extendsTypes = false;
 
                 $typeExtensionsClasses[] = $typeExtensionClass;
@@ -114,8 +91,6 @@ class FormPass implements CompilerPassInterface
                 if (!$extendsTypes) {
                     throw new InvalidArgumentException(sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));
                 }
-            } else {
-                throw new InvalidArgumentException(sprintf('"%s" tagged services have to implement the static getExtendedTypes() method. Class "%s" for service "%s" does not implement it.', $this->formTypeExtensionTag, $typeExtensionClass, $serviceId));
             }
         }
 
@@ -123,8 +98,8 @@ class FormPass implements CompilerPassInterface
             $typeExtensions[$extendedType] = new IteratorArgument($extensions);
         }
 
-        if ($container->hasDefinition($this->formDebugCommandService)) {
-            $commandDefinition = $container->getDefinition($this->formDebugCommandService);
+        if ($container->hasDefinition('console.command.form_debug')) {
+            $commandDefinition = $container->getDefinition('console.command.form_debug');
             $commandDefinition->setArgument(3, $typeExtensionsClasses);
         }
 
@@ -135,15 +110,15 @@ class FormPass implements CompilerPassInterface
     {
         $guessers = [];
         $guessersClasses = [];
-        foreach ($container->findTaggedServiceIds($this->formTypeGuesserTag, true) as $serviceId => $tags) {
+        foreach ($container->findTaggedServiceIds('form.type_guesser', true) as $serviceId => $tags) {
             $guessers[] = new Reference($serviceId);
 
             $serviceDefinition = $container->getDefinition($serviceId);
             $guessersClasses[] = $serviceDefinition->getClass();
         }
 
-        if ($container->hasDefinition($this->formDebugCommandService)) {
-            $commandDefinition = $container->getDefinition($this->formDebugCommandService);
+        if ($container->hasDefinition('console.command.form_debug')) {
+            $commandDefinition = $container->getDefinition('console.command.form_debug');
             $commandDefinition->setArgument(4, $guessersClasses);
         }
 

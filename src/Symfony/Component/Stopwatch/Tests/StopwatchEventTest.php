@@ -193,12 +193,24 @@ class StopwatchEventTest extends TestCase
     public function testHumanRepresentation()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
-        $this->assertEquals('default: 0.00 MiB - 0 ms', (string) $event);
+        $this->assertEquals('default/default: 0.00 MiB - 0 ms', (string) $event);
         $event->start();
         $event->stop();
         $this->assertEquals(1, preg_match('/default: [0-9\.]+ MiB - [0-9]+ ms/', (string) $event));
 
         $event = new StopwatchEvent(microtime(true) * 1000, 'foo');
-        $this->assertEquals('foo: 0.00 MiB - 0 ms', (string) $event);
+        $this->assertEquals('foo/default: 0.00 MiB - 0 ms', (string) $event);
+
+        $event = new StopwatchEvent(microtime(true) * 1000, 'foo', false, 'name');
+        $this->assertEquals('foo/name: 0.00 MiB - 0 ms', (string) $event);
+    }
+
+    public function testGetName()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $this->assertEquals('default', $event->getName());
+
+        $event = new StopwatchEvent(microtime(true) * 1000, 'cat', false, 'name');
+        $this->assertEquals('name', $event->getName());
     }
 }

@@ -23,24 +23,24 @@ trait TargetPathTrait
      *
      * Usually, you do not need to set this directly.
      */
-    private function saveTargetPath(SessionInterface $session, string $providerKey, string $uri)
+    private function saveTargetPath(SessionInterface $session, string $firewallName, string $uri)
     {
-        $session->set('_security.'.$providerKey.'.target_path', $uri);
+        $session->set('_security.'.$firewallName.'.target_path', $uri);
     }
 
     /**
      * Returns the URL (if any) the user visited that forced them to login.
      */
-    private function getTargetPath(SessionInterface $session, string $providerKey): ?string
+    private function getTargetPath(SessionInterface $session, string $firewallName): ?string
     {
-        return $session->get('_security.'.$providerKey.'.target_path');
+        return $session->get('_security.'.$firewallName.'.target_path');
     }
 
     /**
      * Removes the target path from the session.
      */
-    private function removeTargetPath(SessionInterface $session, string $providerKey)
+    private function removeTargetPath(SessionInterface $session, string $firewallName)
     {
-        $session->remove('_security.'.$providerKey.'.target_path');
+        $session->remove('_security.'.$firewallName.'.target_path');
     }
 }

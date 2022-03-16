@@ -21,11 +21,9 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 abstract class WebTestCase extends KernelTestCase
 {
-    use ForwardCompatTestTrait;
-    use MailerAssertionsTrait;
     use WebTestAssertionsTrait;
 
-    private function doTearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         self::getClient(null);
@@ -36,13 +34,11 @@ abstract class WebTestCase extends KernelTestCase
      *
      * @param array $options An array of options to pass to the createKernel method
      * @param array $server  An array of server parameters
-     *
-     * @return KernelBrowser A KernelBrowser instance
      */
-    protected static function createClient(array $options = [], array $server = [])
+    protected static function createClient(array $options = [], array $server = []): KernelBrowser
     {
         if (static::$booted) {
-            @trigger_error(sprintf('Calling "%s()" while a kernel has been booted is deprecated since Symfony 4.4 and will throw an exception in 5.0, ensure the kernel is shut down before calling the method.', __METHOD__), \E_USER_DEPRECATED);
+            throw new \LogicException(sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));
         }
 
         $kernel = static::bootKernel($options);

@@ -99,13 +99,11 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function guessRequiredProvider()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
         return [
             [new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
             [new NotBlank(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
             [new IsTrue(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
-            [new Length(['min' => 10, 'max' => 10] + $allowEmptyString), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
+            [new Length(['min' => 10, 'max' => 10]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
             [new Range(['min' => 1, 'max' => 20]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
         ];
     }
@@ -141,9 +139,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMaxLengthForConstraintWithMinValue()
     {
-        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
-
-        $constraint = new Length(['min' => '2'] + $allowEmptyString);
+        $constraint = new Length(['min' => '2']);
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertNull($result);

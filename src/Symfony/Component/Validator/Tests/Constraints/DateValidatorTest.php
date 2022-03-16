@@ -37,28 +37,6 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Validating a \DateTimeInterface with "Symfony\Component\Validator\Constraints\Date" is deprecated since version 4.2. Use "Symfony\Component\Validator\Constraints\Type" instead or remove the constraint if the underlying model is already type hinted to \DateTimeInterface.
-     */
-    public function testDateTimeClassIsValid()
-    {
-        $this->validator->validate(new \DateTime(), new Date());
-
-        $this->assertNoViolation();
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Validating a \DateTimeInterface with "Symfony\Component\Validator\Constraints\Date" is deprecated since version 4.2. Use "Symfony\Component\Validator\Constraints\Type" instead or remove the constraint if the underlying model is already type hinted to \DateTimeInterface.
-     */
-    public function testDateTimeImmutableClassIsValid()
-    {
-        $this->validator->validate(new \DateTimeImmutable(), new Date());
-
-        $this->assertNoViolation();
-    }
-
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
@@ -98,6 +76,18 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$date.'"')
             ->setCode($code)
+            ->assertRaised();
+    }
+
+    public function testInvalidDateNamed()
+    {
+        $constraint = new Date(message: 'myMessage');
+
+        $this->validator->validate('foobar', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"foobar"')
+            ->setCode(Date::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
 

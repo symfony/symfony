@@ -1,0 +1,30 @@
+{
+    "name": "symfony/firebase-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Firebase Notifier Bridge",
+    "keywords": ["firebase", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jeroen Spee",
+            "homepage": "https://github.com/Jeroeny"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Firebase\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

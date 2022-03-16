@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 
 /**
@@ -19,17 +18,13 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class RedeliveryStamp implements StampInterface
 {
-    private $retryCount;
-    private $redeliveredAt;
-    private $exceptionMessage;
-    private $flattenException;
+    private int $retryCount;
+    private \DateTimeInterface $redeliveredAt;
 
-    public function __construct(int $retryCount, string $exceptionMessage = null, FlattenException $flattenException = null)
+    public function __construct(int $retryCount, \DateTimeInterface $redeliveredAt = null)
     {
         $this->retryCount = $retryCount;
-        $this->exceptionMessage = $exceptionMessage;
-        $this->flattenException = $flattenException;
-        $this->redeliveredAt = new \DateTimeImmutable();
+        $this->redeliveredAt = $redeliveredAt ?? new \DateTimeImmutable();
     }
 
     public static function getRetryCountFromEnvelope(Envelope $envelope): int
@@ -43,16 +38,6 @@ final class RedeliveryStamp implements StampInterface
     public function getRetryCount(): int
     {
         return $this->retryCount;
-    }
-
-    public function getExceptionMessage(): ?string
-    {
-        return $this->exceptionMessage;
-    }
-
-    public function getFlattenException(): ?FlattenException
-    {
-        return $this->flattenException;
     }
 
     public function getRedeliveredAt(): \DateTimeInterface

@@ -44,7 +44,7 @@ class FirewallTest extends TestCase
             ->willReturn([[], $listener, null])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $firewall = new Firewall($map, $dispatcher);
         $firewall->onKernelRequest($event);
@@ -69,7 +69,7 @@ class FirewallTest extends TestCase
             ->willReturn([[$first, $second], null, null])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST);
         $event->setResponse(new Response());
 
         $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
@@ -96,34 +96,5 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
 
         $this->assertFalse($event->hasResponse());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Not returning an array of 3 elements from Symfony\Component\Security\Http\FirewallMapInterface::getListeners() is deprecated since Symfony 4.2, the 3rd element must be an instance of Symfony\Component\Security\Http\Firewall\LogoutListener or null.
-     */
-    public function testMissingLogoutListener()
-    {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $listener = $this->createMock(ExceptionListener::class);
-        $listener
-            ->expects($this->once())
-            ->method('register')
-            ->with($this->equalTo($dispatcher))
-        ;
-
-        $request = new Request();
-
-        $map = $this->createMock(FirewallMapInterface::class);
-        $map
-            ->expects($this->once())
-            ->method('getListeners')
-            ->with($this->equalTo($request))
-            ->willReturn([[], $listener])
-        ;
-
-        $firewall = new Firewall($map, $dispatcher);
-        $firewall->onKernelRequest(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 }

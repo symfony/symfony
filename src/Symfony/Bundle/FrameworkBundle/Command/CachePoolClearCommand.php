@@ -12,7 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,17 +28,21 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'cache:pool:clear', description: 'Clear cache pools')]
 final class CachePoolClearCommand extends Command
 {
-    protected static $defaultName = 'cache:pool:clear';
+    private Psr6CacheClearer $poolClearer;
+    private ?array $poolNames;
 
-    private $poolClearer;
-
-    public function __construct(Psr6CacheClearer $poolClearer)
+    /**
+     * @param string[]|null $poolNames
+     */
+    public function __construct(Psr6CacheClearer $poolClearer, array $poolNames = null)
     {
         parent::__construct();
 
         $this->poolClearer = $poolClearer;
+        $this->poolNames = $poolNames;
     }
 
     /**
@@ -47,7 +54,6 @@ final class CachePoolClearCommand extends Command
             ->setDefinition([
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
             ])
-            ->setDescription('Clear cache pools')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 
@@ -88,18 +94,36 @@ EOF
             $clearer->clear($kernel->getContainer()->getParameter('kernel.cache_dir'));
         }
 
+        $failure = false;
         foreach ($pools as $id => $pool) {
             $io->comment(sprintf('Clearing cache pool: <info>%s</info>', $id));
 
             if ($pool instanceof CacheItemPoolInterface) {
-                $pool->clear();
+                if (!$pool->clear()) {
+                    $io->warning(sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $failure = true;
+                }
             } else {
-                $this->poolClearer->clearPool($id);
+                if (false === $this->poolClearer->clearPool($id)) {
+                    $io->warning(sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $failure = true;
+                }
             }
+        }
+
+        if ($failure) {
+            return 1;
         }
 
         $io->success('Cache was successfully cleared.');
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if (\is_array($this->poolNames) && $input->mustSuggestArgumentValuesFor('pools')) {
+            $suggestions->suggestValues($this->poolNames);
+        }
     }
 }

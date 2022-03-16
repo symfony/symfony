@@ -98,11 +98,9 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
-     * @param int|array|string|null $args
-     *
      * @dataProvider providePrototypedArrayNodeDefaults
      */
-    public function testPrototypedArrayNodeDefault($args, bool $shouldThrowWhenUsingAttrAsKey, bool $shouldThrowWhenNotUsingAttrAsKey, array $defaults)
+    public function testPrototypedArrayNodeDefault(int|array|string|null $args, bool $shouldThrowWhenUsingAttrAsKey, bool $shouldThrowWhenNotUsingAttrAsKey, array $defaults)
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -336,13 +334,16 @@ class ArrayNodeDefinitionTest extends TestCase
         $node = new ArrayNodeDefinition('root');
         $node
             ->children()
-                ->arrayNode('foo')->setDeprecated('The "%path%" node is deprecated.')->end()
+                ->arrayNode('foo')->setDeprecated('vendor/package', '1.1', 'The "%path%" node is deprecated.')->end()
             ->end()
         ;
         $deprecatedNode = $node->getNode()->getChildren()['foo'];
 
         $this->assertTrue($deprecatedNode->isDeprecated());
-        $this->assertSame('The "root.foo" node is deprecated.', $deprecatedNode->getDeprecationMessage($deprecatedNode->getName(), $deprecatedNode->getPath()));
+        $deprecation = $deprecatedNode->getDeprecation($deprecatedNode->getName(), $deprecatedNode->getPath());
+        $this->assertSame('The "root.foo" node is deprecated.', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
     }
 
     public function testCannotBeEmptyOnConcreteNode()
@@ -434,13 +435,9 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertSame($expectedName, $this->getField($actualNode, 'name'));
     }
 
-    /**
-     * @param object $object
-     */
-    protected function getField($object, string $field)
+    protected function getField(object $object, string $field)
     {
         $reflection = new \ReflectionProperty($object, $field);
-        $reflection->setAccessible(true);
 
         return $reflection->getValue($object);
     }

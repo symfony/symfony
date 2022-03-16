@@ -22,7 +22,7 @@ class InvalidCsrfTokenException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Invalid CSRF token.';
     }

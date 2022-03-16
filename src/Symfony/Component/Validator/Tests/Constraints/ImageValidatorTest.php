@@ -18,16 +18,11 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @requires extension fileinfo
+ *
+ * @extends ConstraintValidatorTestCase<ImageValidator>
  */
 class ImageValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-
-    /**
-     * @var ImageValidator
-     */
-    protected $validator;
-
     protected $path;
     protected $image;
     protected $imageLandscape;
@@ -76,19 +71,29 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testFileNotFound()
+    /**
+     * Checks that the logic from FileValidator still works.
+     *
+     * @dataProvider provideConstraintsWithNotFoundMessage
+     */
+    public function testFileNotFound(Image $constraint)
     {
-        // Check that the logic from FileValidator still works
-        $constraint = new Image([
-            'notFoundMessage' => 'myMessage',
-        ]);
-
         $this->validator->validate('foobar', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ file }}', '"foobar"')
             ->setCode(Image::NOT_FOUND_ERROR)
             ->assertRaised();
+    }
+
+    public function provideConstraintsWithNotFoundMessage(): iterable
+    {
+        yield 'Doctrine style' => [new Image([
+            'notFoundMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(notFoundMessage: 'myMessage'),
+        ];
     }
 
     public function testValidSize()
@@ -105,13 +110,11 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testWidthTooSmall()
+    /**
+     * @dataProvider provideMinWidthConstraints
+     */
+    public function testWidthTooSmall(Image $constraint)
     {
-        $constraint = new Image([
-            'minWidth' => 3,
-            'minWidthMessage' => 'myMessage',
-        ]);
-
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -121,13 +124,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testWidthTooBig()
+    public function provideMinWidthConstraints(): iterable
     {
-        $constraint = new Image([
-            'maxWidth' => 1,
-            'maxWidthMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'minWidth' => 3,
+            'minWidthMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(minWidth: 3, minWidthMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideMaxWidthConstraints
+     */
+    public function testWidthTooBig(Image $constraint)
+    {
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -137,13 +149,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testHeightTooSmall()
+    public function provideMaxWidthConstraints(): iterable
     {
-        $constraint = new Image([
-            'minHeight' => 3,
-            'minHeightMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'maxWidth' => 1,
+            'maxWidthMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(maxWidth: 1, maxWidthMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideMinHeightConstraints
+     */
+    public function testHeightTooSmall(Image $constraint)
+    {
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -153,13 +174,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testHeightTooBig()
+    public function provideMinHeightConstraints(): iterable
     {
-        $constraint = new Image([
-            'maxHeight' => 1,
-            'maxHeightMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'minHeight' => 3,
+            'minHeightMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(minHeight: 3, minHeightMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideMaxHeightConstraints
+     */
+    public function testHeightTooBig(Image $constraint)
+    {
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -169,13 +199,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPixelsTooFew()
+    public function provideMaxHeightConstraints(): iterable
     {
-        $constraint = new Image([
-            'minPixels' => 5,
-            'minPixelsMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'maxHeight' => 1,
+            'maxHeightMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(maxHeight: 1, maxHeightMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideMinPixelsConstraints
+     */
+    public function testPixelsTooFew(Image $constraint)
+    {
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -187,13 +226,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPixelsTooMany()
+    public function provideMinPixelsConstraints(): iterable
     {
-        $constraint = new Image([
-            'maxPixels' => 3,
-            'maxPixelsMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'minPixels' => 5,
+            'minPixelsMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(minPixels: 5, minPixelsMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideMaxPixelsConstraints
+     */
+    public function testPixelsTooMany(Image $constraint)
+    {
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -203,6 +251,17 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ width }}', '2')
             ->setCode(Image::TOO_MANY_PIXEL_ERROR)
             ->assertRaised();
+    }
+
+    public function provideMaxPixelsConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new Image([
+            'maxPixels' => 3,
+            'maxPixelsMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(maxPixels: 3, maxPixelsMessage: 'myMessage'),
+        ];
     }
 
     public function testInvalidMinWidth()
@@ -265,13 +324,11 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($this->image, $constraint);
     }
 
-    public function testRatioTooSmall()
+    /**
+     * @dataProvider provideMinRatioConstraints
+     */
+    public function testRatioTooSmall(Image $constraint)
     {
-        $constraint = new Image([
-            'minRatio' => 2,
-            'minRatioMessage' => 'myMessage',
-        ]);
-
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -281,13 +338,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testRatioTooBig()
+    public function provideMinRatioConstraints(): iterable
     {
-        $constraint = new Image([
-            'maxRatio' => 0.5,
-            'maxRatioMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'minRatio' => 2,
+            'minRatioMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(minRatio: 2, minRatioMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideMaxRatioConstraints
+     */
+    public function testRatioTooBig(Image $constraint)
+    {
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -295,6 +361,17 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ max_ratio }}', 0.5)
             ->setCode(Image::RATIO_TOO_BIG_ERROR)
             ->assertRaised();
+    }
+
+    public function provideMaxRatioConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new Image([
+            'maxRatio' => 0.5,
+            'maxRatioMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(maxRatio: 0.5, maxRatioMessage: 'myMessage'),
+        ];
     }
 
     public function testMaxRatioUsesTwoDecimalsOnly()
@@ -350,13 +427,11 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($this->image, $constraint);
     }
 
-    public function testSquareNotAllowed()
+    /**
+     * @dataProvider provideAllowSquareConstraints
+     */
+    public function testSquareNotAllowed(Image $constraint)
     {
-        $constraint = new Image([
-            'allowSquare' => false,
-            'allowSquareMessage' => 'myMessage',
-        ]);
-
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('myMessage')
@@ -366,13 +441,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testLandscapeNotAllowed()
+    public function provideAllowSquareConstraints(): iterable
     {
-        $constraint = new Image([
-            'allowLandscape' => false,
-            'allowLandscapeMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'allowSquare' => false,
+            'allowSquareMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(allowSquare: false, allowSquareMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideAllowLandscapeConstraints
+     */
+    public function testLandscapeNotAllowed(Image $constraint)
+    {
         $this->validator->validate($this->imageLandscape, $constraint);
 
         $this->buildViolation('myMessage')
@@ -382,13 +466,22 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPortraitNotAllowed()
+    public function provideAllowLandscapeConstraints(): iterable
     {
-        $constraint = new Image([
-            'allowPortrait' => false,
-            'allowPortraitMessage' => 'myMessage',
-        ]);
+        yield 'Doctrine style' => [new Image([
+            'allowLandscape' => false,
+            'allowLandscapeMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'),
+        ];
+    }
 
+    /**
+     * @dataProvider provideAllowPortraitConstraints
+     */
+    public function testPortraitNotAllowed(Image $constraint)
+    {
         $this->validator->validate($this->imagePortrait, $constraint);
 
         $this->buildViolation('myMessage')
@@ -398,16 +491,25 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testCorrupted()
+    public function provideAllowPortraitConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new Image([
+            'allowPortrait' => false,
+            'allowPortraitMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(allowPortrait: false, allowPortraitMessage: 'myMessage'),
+        ];
+    }
+
+    /**
+     * @dataProvider provideDetectCorruptedConstraints
+     */
+    public function testCorrupted(Image $constraint)
     {
         if (!\function_exists('imagecreatefromstring')) {
             $this->markTestSkipped('This test require GD extension');
         }
-
-        $constraint = new Image([
-            'detectCorrupted' => true,
-            'corruptedMessage' => 'myMessage',
-        ]);
 
         $this->validator->validate($this->image, $constraint);
 
@@ -433,5 +535,16 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ name }}', '"ccc.txt"')
             ->setCode(Image::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
+    }
+
+    public function provideDetectCorruptedConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new Image([
+            'detectCorrupted' => true,
+            'corruptedMessage' => 'myMessage',
+        ])];
+        yield 'Named arguments' => [
+            new Image(detectCorrupted: true, corruptedMessage: 'myMessage'),
+        ];
     }
 }

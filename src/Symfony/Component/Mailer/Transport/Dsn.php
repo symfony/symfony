@@ -18,12 +18,12 @@ use Symfony\Component\Mailer\Exception\InvalidArgumentException;
  */
 final class Dsn
 {
-    private $scheme;
-    private $host;
-    private $user;
-    private $password;
-    private $port;
-    private $options;
+    private string $scheme;
+    private string $host;
+    private ?string $user;
+    private ?string $password;
+    private ?int $port;
+    private array $options;
 
     public function __construct(string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [])
     {
@@ -82,7 +82,7 @@ final class Dsn
         return $this->port ?? $default;
     }
 
-    public function getOption(string $key, $default = null)
+    public function getOption(string $key, mixed $default = null)
     {
         return $this->options[$key] ?? $default;
     }

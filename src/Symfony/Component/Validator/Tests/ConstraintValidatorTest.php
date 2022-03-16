@@ -68,7 +68,7 @@ final class TestFormatValueConstraintValidator extends ConstraintValidator
 
 final class TestToStringObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'ccc';
     }

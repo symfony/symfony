@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
+
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -59,6 +61,16 @@ class ParentDummy
     public $parentAnnotationNoParent;
 
     /**
+     * @var RootDummyItem[]
+     */
+    public $rootDummyItems;
+
+    /**
+     * @var \Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem
+     */
+    public $rootDummyItem;
+
+    /**
      * @return bool|null
      */
     public function isC()
@@ -66,9 +78,37 @@ class ParentDummy
     }
 
     /**
+     * @return true|null
+     */
+    public function isCt()
+    {
+    }
+
+    /**
+     * @return false|null
+     */
+    public function isCf()
+    {
+    }
+
+    /**
      * @return bool
      */
     public function canD()
+    {
+    }
+
+    /**
+     * @return true
+     */
+    public function canDt()
+    {
+    }
+
+    /**
+     * @return false
+     */
+    public function canDf()
     {
     }
 

@@ -155,12 +155,12 @@ class TestFileLoader extends FileLoader
 {
     private $supports = true;
 
-    public function load($resource, $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         return $resource;
     }
 
-    public function supports($resource, $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return $this->supports;
     }

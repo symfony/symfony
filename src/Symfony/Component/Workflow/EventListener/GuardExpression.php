@@ -15,14 +15,10 @@ use Symfony\Component\Workflow\Transition;
 
 class GuardExpression
 {
-    private $transition;
+    private Transition $transition;
+    private string $expression;
 
-    private $expression;
-
-    /**
-     * @param string $expression
-     */
-    public function __construct(Transition $transition, $expression)
+    public function __construct(Transition $transition, string $expression)
     {
         $this->transition = $transition;
         $this->expression = $expression;

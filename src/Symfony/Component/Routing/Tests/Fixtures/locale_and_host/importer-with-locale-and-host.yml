@@ -1,0 +1,9 @@
+---
+i_need:
+    resource: ./imported.yml
+    prefix:
+        nl: /nl
+        en: /en
+    host:
+        nl: www.example.nl
+        en: www.example.com

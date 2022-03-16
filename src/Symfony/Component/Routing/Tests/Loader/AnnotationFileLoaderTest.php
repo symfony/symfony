@@ -51,7 +51,7 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
 
     public function testLoadVariadic()
     {
-        $route = new Route(['path' => '/path/to/{id}']);
+        $route = new Route('/path/to/{id}');
         $this->reader->expects($this->once())->method('getClassAnnotation');
         $this->reader->expects($this->once())->method('getMethodAnnotations')
             ->willReturn([$route]);
@@ -83,12 +83,10 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertFalse($this->loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
         $this->assertTrue($this->loader->supports($fixture, 'annotation'), '->supports() checks the resource type if specified');
+        $this->assertTrue($this->loader->supports($fixture, 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports($fixture, 'foo'), '->supports() checks the resource type if specified');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testLoadAttributesClassAfterComma()
     {
         $this->reader->expects($this->once())->method('getClassAnnotation');
@@ -103,9 +101,6 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterCommaController.php');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testLoadAttributesQuotedClassAfterComma()
     {
         $this->reader->expects($this->once())->method('getClassAnnotation');
@@ -120,9 +115,6 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineQuotedAfterCommaController.php');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testLoadAttributesClassAfterParenthesis()
     {
         $this->reader->expects($this->once())->method('getClassAnnotation');
@@ -137,9 +129,6 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterParenthesisController.php');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testLoadAttributesQuotedClassAfterParenthesis()
     {
         $this->reader->expects($this->once())->method('getClassAnnotation');

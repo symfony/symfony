@@ -18,7 +18,8 @@ namespace Symfony\Component\Workflow;
  */
 class Marking
 {
-    private $places = [];
+    private array $places = [];
+    private ?array $context = null;
 
     /**
      * @param int[] $representation Keys are the place name and values should be 1
@@ -30,17 +31,17 @@ class Marking
         }
     }
 
-    public function mark($place)
+    public function mark(string $place)
     {
         $this->places[$place] = 1;
     }
 
-    public function unmark($place)
+    public function unmark(string $place)
     {
         unset($this->places[$place]);
     }
 
-    public function has($place)
+    public function has(string $place)
     {
         return isset($this->places[$place]);
     }
@@ -48,5 +49,21 @@ class Marking
     public function getPlaces()
     {
         return $this->places;
+    }
+
+    /**
+     * @internal
+     */
+    public function setContext(array $context): void
+    {
+        $this->context = $context;
+    }
+
+    /**
+     * Returns the context after the subject has transitioned.
+     */
+    public function getContext(): ?array
+    {
+        return $this->context;
     }
 }

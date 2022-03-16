@@ -18,36 +18,21 @@ interface AdapterInterface
 {
     /**
      * Returns the current connection.
-     *
-     * @return ConnectionInterface
      */
-    public function getConnection();
+    public function getConnection(): ConnectionInterface;
 
     /**
      * Creates a new Query.
-     *
-     * @param string $dn
-     * @param string $query
-     *
-     * @return QueryInterface
      */
-    public function createQuery($dn, $query, array $options = []);
+    public function createQuery(string $dn, string $query, array $options = []): QueryInterface;
 
     /**
      * Fetches the entry manager instance.
-     *
-     * @return EntryManagerInterface
      */
-    public function getEntryManager();
+    public function getEntryManager(): EntryManagerInterface;
 
     /**
      * Escape a string for use in an LDAP filter or DN.
-     *
-     * @param string $subject
-     * @param string $ignore
-     * @param int    $flags
-     *
-     * @return string
      */
-    public function escape($subject, $ignore = '', $flags = 0);
+    public function escape(string $subject, string $ignore = '', int $flags = 0): string;
 }

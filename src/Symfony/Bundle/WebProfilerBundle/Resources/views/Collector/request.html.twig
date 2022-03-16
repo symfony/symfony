@@ -59,6 +59,11 @@
                 <b>Has session</b>
                 <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
             </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Stateless Check</b>
+                <span>{% if collector.statelesscheck %}yes{% else %}no{% endif %}</span>
+            </div>
         </div>
 
         {% if redirect_handler is defined -%}
@@ -228,7 +233,7 @@
         </div>
 
         <div class="tab {{ collector.sessionmetadata is empty ? 'disabled' }}">
-            <h3 class="tab-title">Session</h3>
+            <h3 class="tab-title">Session{% if collector.sessionusages is not empty %} <span class="badge">{{ collector.sessionusages|length }}</span>{% endif %}</h3>
 
             <div class="tab-content">
                 <h3>Session Metadata</h3>
@@ -249,6 +254,54 @@
                     </div>
                 {% else %}
                     {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionattributes, labels: ['Attribute', 'Value'] }, with_context = false) }}
+                {% endif %}
+
+                <h3>Session Usage</h3>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="value">{{ collector.sessionusages|length }}</span>
+                        <span class="label">Usages</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.statelesscheck ? 'yes' : 'no') ~ '.svg') }}</span>
+                        <span class="label">Stateless check enabled</span>
+                    </div>
+                </div>
+
+                {% if collector.sessionusages is empty %}
+                    <div class="empty">
+                        <p>Session not used.</p>
+                    </div>
+                {% else %}
+                    <table class="session_usages">
+                        <thead>
+                        <tr>
+                            <th class="full-width">Usage</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for key, usage in collector.sessionusages %}
+                            <tr>
+                                <td class="font-normal">
+                                    {%- set link = usage.file|file_link(usage.line) %}
+                                    {%- if link %}<a href="{{ link }}" title="{{ usage.name }}">{% else %}<span title="{{ usage.name }}">{% endif %}
+                                        {{ usage.name }}
+                                    {%- if link %}</a>{% else %}</span>{% endif %}
+                                    <div class="text-small font-normal">
+                                        {% set usage_id = 'session-usage-trace-' ~ key %}
+                                        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ usage_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
+                                    </div>
+                                    <div id="{{ usage_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                                        {{ profiler_dump(usage.trace, maxDepth=2) }}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 {% endif %}
             </div>
         </div>

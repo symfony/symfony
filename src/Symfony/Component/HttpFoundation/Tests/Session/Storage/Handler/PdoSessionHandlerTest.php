@@ -137,7 +137,7 @@ class PdoSessionHandlerTest extends TestCase
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->willReturn([[$stream, 42, time()]]);
+            ->willReturn([[$stream, time() + 42]]);
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');
@@ -165,7 +165,7 @@ class PdoSessionHandlerTest extends TestCase
 
         $selectStmt->expects($this->atLeast(2))->method('fetchAll')
             ->willReturnCallback(function () use (&$exception, $stream) {
-                return $exception ? [[$stream, 42, time()]] : [];
+                return $exception ? [[$stream, time() + 42]] : [];
             });
 
         $insertStmt->expects($this->once())->method('execute')
@@ -296,7 +296,6 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
@@ -306,7 +305,6 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler('sqlite::memory:');
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
@@ -324,7 +322,6 @@ class PdoSessionHandlerTest extends TestCase
                 continue;
             }
             $property = $reflection->getProperty($property);
-            $property->setAccessible(true);
             $this->assertSame($expectedValue, $property->getValue($storage));
         }
     }
@@ -332,6 +329,8 @@ class PdoSessionHandlerTest extends TestCase
     public function provideUrlDsnPairs()
     {
         yield ['mysql://localhost/test', 'mysql:host=localhost;dbname=test;'];
+        yield ['mysql://localhost/test?charset=utf8mb4', 'mysql:charset=utf8mb4;host=localhost;dbname=test;'];
+        yield ['mysql://localhost/test?unix_socket=socket.sock&charset=utf8mb4', 'mysql:charset=utf8mb4;unix_socket=socket.sock;dbname=test;'];
         yield ['mysql://localhost:56/test', 'mysql:host=localhost;port=56;dbname=test;'];
         yield ['mysql2://root:pwd@localhost/test', 'mysql:host=localhost;dbname=test;', 'root', 'pwd'];
         yield ['postgres://localhost/test', 'pgsql:host=localhost;dbname=test;'];
@@ -371,11 +370,7 @@ class MockPdo extends \PDO
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function getAttribute($attribute)
+    public function getAttribute($attribute): mixed
     {
         if (\PDO::ATTR_ERRMODE === $attribute) {
             return $this->errorMode;
@@ -388,11 +383,7 @@ class MockPdo extends \PDO
         return parent::getAttribute($attribute);
     }
 
-    /**
-     * @return false|\PDOStatement
-     */
-    #[\ReturnTypeWillChange]
-    public function prepare($statement, $driverOptions = [])
+    public function prepare($statement, $driverOptions = []): \PDOStatement|false
     {
         return \is_callable($this->prepareResult)
             ? ($this->prepareResult)($statement, $driverOptions)

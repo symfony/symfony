@@ -3,5 +3,5 @@
 <constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
-  <class name="Symfony\Component\Validator\Tests\Fixtures\Entity" />
+  <class name="Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity" />
 </constraint-mapping>

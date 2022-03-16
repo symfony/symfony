@@ -4,7 +4,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
 
 /**
  * Test AbstractNormalizer::GROUPS.

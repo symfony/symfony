@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
-use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
@@ -21,12 +22,10 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 trait TraceableListenerTrait
 {
-    use LegacyListenerTrait;
-
-    private $response;
-    private $listener;
-    private $time;
-    private $stub;
+    private ?Response $response = null;
+    private mixed $listener;
+    private ?float $time = null;
+    private object $stub;
 
     /**
      * Proxies all method calls to the original listener.
@@ -46,7 +45,7 @@ trait TraceableListenerTrait
         return [
             'response' => $this->response,
             'time' => $this->time,
-            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener),
+            'stub' => $this->stub ??= ClassStub::wrapCallable($this->listener instanceof TraceableAuthenticatorManagerListener ? $this->listener->getAuthenticatorManagerListener() : $this->listener),
         ];
     }
 }

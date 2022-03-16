@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntlTimeZoneToStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Timezones;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -47,22 +48,25 @@ class TimezoneType extends AbstractType
                 $input = $options['input'];
 
                 if ($options['intl']) {
+                    if (!class_exists(Intl::class)) {
+                        throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s" with option "intl=true". Try running "composer require symfony/intl".', static::class));
+                    }
+
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
+                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
                         return self::getIntlTimezones($input, $choiceTranslationLocale);
-                    });
+                    }), [$input, $choiceTranslationLocale]);
                 }
 
-                $regions = $options->offsetGet('regions', false);
-
-                return new CallbackChoiceLoader(function () use ($regions, $input) {
-                    return self::getPhpTimezones($regions, $input);
-                });
+                return ChoiceList::lazy($this, function () use ($input) {
+                    return self::getPhpTimezones($input);
+                }, $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
+            'invalid_message' => 'Please select a valid timezone.',
             'regions' => \DateTimeZone::ALL,
         ]);
 
@@ -85,22 +89,12 @@ class TimezoneType extends AbstractType
 
             return $value;
         });
-
-        $resolver->setAllowedTypes('regions', 'int');
-        $resolver->setDeprecated('regions', 'The option "%name%" is deprecated since Symfony 4.2.');
-        $resolver->setNormalizer('regions', function (Options $options, $value) {
-            if ($options['intl'] && \DateTimeZone::ALL !== (\DateTimeZone::ALL & $value)) {
-                throw new LogicException('The "regions" option can only be used if the "intl" option is set to false.');
-            }
-
-            return $value;
-        });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -108,16 +102,16 @@ class TimezoneType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'timezone';
     }
 
-    private static function getPhpTimezones(int $regions, string $input): array
+    private static function getPhpTimezones(string $input): array
     {
         $timezones = [];
 
-        foreach (\DateTimeZone::listIdentifiers($regions) as $timezone) {
+        foreach (\DateTimeZone::listIdentifiers(\DateTimeZone::ALL) as $timezone) {
             if ('intltimezone' === $input && 'Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
                 continue;
             }

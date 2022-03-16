@@ -21,8 +21,8 @@ use Symfony\Component\Mime\Part\TextPart;
  */
 class Message extends RawMessage
 {
-    private $headers;
-    private $body;
+    private Headers $headers;
+    private ?AbstractPart $body;
 
     public function __construct(Headers $headers = null, AbstractPart $body = null)
     {
@@ -42,7 +42,7 @@ class Message extends RawMessage
     /**
      * @return $this
      */
-    public function setBody(AbstractPart $body = null)
+    public function setBody(AbstractPart $body = null): static
     {
         $this->body = $body;
 
@@ -57,7 +57,7 @@ class Message extends RawMessage
     /**
      * @return $this
      */
-    public function setHeaders(Headers $headers)
+    public function setHeaders(Headers $headers): static
     {
         $this->headers = $headers;
 
@@ -80,7 +80,9 @@ class Message extends RawMessage
             $headers->addMailboxListHeader('From', [$headers->get('Sender')->getAddress()]);
         }
 
-        $headers->addTextHeader('MIME-Version', '1.0');
+        if (!$headers->has('MIME-Version')) {
+            $headers->addTextHeader('MIME-Version', '1.0');
+        }
 
         if (!$headers->has('Date')) {
             $headers->addDateHeader('Date', new \DateTimeImmutable());

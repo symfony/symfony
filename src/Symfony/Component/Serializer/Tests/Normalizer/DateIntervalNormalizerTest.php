@@ -65,20 +65,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testNormalizeUsingFormatPassedInConstructor($format, $output, $input)
     {
-        $this->doTestNormalizeUsingFormatPassedInConstructor($format, $output, $input);
-    }
-
-    /**
-     * @dataProvider dataProviderISO
-     */
-    public function testLegacyNormalizeUsingFormatPassedInConstructor($format, $output, $input)
-    {
-        $this->doTestNormalizeUsingFormatPassedInConstructor($format, $output, $input, true);
-    }
-
-    private function doTestNormalizeUsingFormatPassedInConstructor($format, $output, $input, bool $legacy = false)
-    {
-        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
+        $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
         $this->assertEquals($output, $normalizer->normalize($this->getInterval($input)));
     }
 
@@ -113,15 +100,8 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
     {
-        $this->doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output);
-    }
-
-    /**
-     * @dataProvider dataProviderISO
-     */
-    public function testLegacyDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
-    {
-        $this->doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output, true);
+        $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
+        $this->assertDateIntervalEquals($this->getInterval($output), $normalizer->denormalize($input, \DateInterval::class));
     }
 
     public function testDenormalizeIntervalsWithOmittedPartsBeingZero()
@@ -130,12 +110,6 @@ class DateIntervalNormalizerTest extends TestCase
 
         $this->assertDateIntervalEquals($this->getInterval('P3Y2M4DT0H0M0S'), $normalizer->denormalize('P3Y2M4D', \DateInterval::class));
         $this->assertDateIntervalEquals($this->getInterval('P0Y0M0DT12H34M0S'), $normalizer->denormalize('PT12H34M', \DateInterval::class));
-    }
-
-    private function doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output, bool $legacy = false)
-    {
-        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
-        $this->assertDateIntervalEquals($this->getInterval($output), $normalizer->denormalize($input, \DateInterval::class));
     }
 
     public function testDenormalizeExpectsString()

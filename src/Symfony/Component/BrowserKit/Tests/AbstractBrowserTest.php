@@ -12,8 +12,8 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
@@ -23,16 +23,6 @@ class AbstractBrowserTest extends TestCase
     public function getBrowser(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         return new TestClient($server, $history, $cookieJar);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAbstractBrowserIsAClient()
-    {
-        $browser = $this->getBrowser();
-
-        $this->assertInstanceOf(Client::class, $browser);
     }
 
     public function testGetHistory()
@@ -55,12 +45,11 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals('http://example.com/', $client->getRequest()->getUri(), '->getCrawler() returns the Request of the last request');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
-     */
     public function testGetRequestNull()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getRequest()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getRequest());
     }
@@ -71,6 +60,17 @@ class AbstractBrowserTest extends TestCase
         $client->xmlHttpRequest('GET', 'http://example.com/', [], [], [], null, true);
         $this->assertSame('XMLHttpRequest', $client->getRequest()->getServer()['HTTP_X_REQUESTED_WITH']);
         $this->assertFalse($client->getServerParameter('HTTP_X_REQUESTED_WITH', false));
+    }
+
+    public function testJsonRequest()
+    {
+        $client = $this->getBrowser();
+        $client->jsonRequest('GET', 'http://example.com/', ['param' => 1], [], true);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['CONTENT_TYPE']);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['HTTP_ACCEPT']);
+        $this->assertFalse($client->getServerParameter('CONTENT_TYPE', false));
+        $this->assertFalse($client->getServerParameter('HTTP_ACCEPT', false));
+        $this->assertSame('{"param":1}', $client->getRequest()->getContent());
     }
 
     public function testGetRequestWithIpAsHttpHost()
@@ -93,22 +93,20 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf(Response::class, $client->getResponse(), '->getCrawler() returns the Response of the last request');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
-     */
     public function testGetResponseNull()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getResponse()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getResponse());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getInternalResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
-     */
     public function testGetInternalResponseNull()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalResponse()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalResponse());
     }
@@ -131,12 +129,11 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($crawler, $client->getCrawler(), '->getCrawler() returns the Crawler of the last request');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getCrawler()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
-     */
     public function testGetCrawlerNull()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getCrawler()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getCrawler());
     }
@@ -845,24 +842,12 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf(Request::class, $client->getInternalRequest());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
-     */
     public function testInternalRequestNull()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalRequest()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalRequest());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\BrowserKit\Tests\ClassThatInheritClient::submit()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassCallSubmitWithTwoArguments()
-    {
-        $clientChild = new ClassThatInheritClient();
-        $clientChild->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
-        $clientChild->submit($clientChild->request('GET', 'http://www.example.com/foo/foobar')->filter('input')->form());
     }
 }

@@ -24,7 +24,7 @@ class IniFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         $path = $this->locator->locate($resource);
 
@@ -44,12 +44,20 @@ class IniFileLoader extends FileLoader
                 $this->container->setParameter($key, $this->phpize($value));
             }
         }
+
+        if ($this->env && \is_array($result['parameters@'.$this->env] ?? null)) {
+            foreach ($result['parameters@'.$this->env] as $key => $value) {
+                $this->container->setParameter($key, $this->phpize($value));
+            }
+        }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports(mixed $resource, string $type = null): bool
     {
         if (!\is_string($resource)) {
             return false;
@@ -66,10 +74,8 @@ class IniFileLoader extends FileLoader
      * Note that the following features are not supported:
      *  * strings with escaped quotes are not supported "foo\"bar";
      *  * string concatenation ("foo" "bar").
-     *
-     * @return mixed
      */
-    private function phpize(string $value)
+    private function phpize(string $value): mixed
     {
         // trim on the right as comments removal keep whitespaces
         if ($value !== $v = rtrim($value)) {
@@ -77,21 +83,18 @@ class IniFileLoader extends FileLoader
         }
         $lowercaseValue = strtolower($value);
 
-        switch (true) {
-            case \defined($value):
-                return \constant($value);
-            case 'yes' === $lowercaseValue || 'on' === $lowercaseValue:
-                return true;
-            case 'no' === $lowercaseValue || 'off' === $lowercaseValue || 'none' === $lowercaseValue:
-                return false;
-            case isset($value[1]) && (
+        return match (true) {
+            \defined($value) => \constant($value),
+            'yes' === $lowercaseValue,
+            'on' === $lowercaseValue => true,
+            'no' === $lowercaseValue,
+            'off' === $lowercaseValue,
+            'none' === $lowercaseValue => false,
+            isset($value[1]) && (
                 ("'" === $value[0] && "'" === $value[\strlen($value) - 1]) ||
                 ('"' === $value[0] && '"' === $value[\strlen($value) - 1])
-            ):
-                // quoted string
-                return substr($value, 1, -1);
-            default:
-                return XmlUtils::phpize($value);
-        }
+            ) => substr($value, 1, -1), // quoted string
+            default => XmlUtils::phpize($value),
+        };
     }
 }

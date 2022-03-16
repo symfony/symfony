@@ -12,7 +12,9 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -27,6 +29,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -95,7 +99,7 @@ class CommandTest extends TestCase
     public function testSetHidden()
     {
         $command = new \TestCommand();
-        $command->setHidden(true);
+        $command->setHidden();
         $this->assertTrue($command->isHidden());
     }
 
@@ -154,7 +158,7 @@ class CommandTest extends TestCase
     public function testGetProcessedHelp()
     {
         $command = new \TestCommand();
-        $command->setHelp('The %command.name% command does... Example: php %command.full_name%.');
+        $command->setHelp('The %command.name% command does... Example: %command.full_name%.');
         $this->assertStringContainsString('The namespace:name command does...', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.name% correctly');
         $this->assertStringNotContainsString('%command.full_name%', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.full_name%');
 
@@ -163,7 +167,7 @@ class CommandTest extends TestCase
         $this->assertStringContainsString('description', $command->getProcessedHelp(), '->getProcessedHelp() falls back to the description');
 
         $command = new \TestCommand();
-        $command->setHelp('The %command.name% command does... Example: php %command.full_name%.');
+        $command->setHelp('The %command.name% command does... Example: %command.full_name%.');
         $application = new Application();
         $application->add($command);
         $application->setDefaultCommand('namespace:name', true);
@@ -178,13 +182,6 @@ class CommandTest extends TestCase
         $ret = $command->setAliases(['name1']);
         $this->assertEquals($command, $ret, '->setAliases() implements a fluent interface');
         $this->assertEquals(['name1'], $command->getAliases(), '->setAliases() sets the aliases');
-    }
-
-    public function testSetAliasesNull()
-    {
-        $command = new \TestCommand();
-        $this->expectException(\InvalidArgumentException::class);
-        $command->setAliases(null);
     }
 
     public function testGetSynopsis()
@@ -233,7 +230,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command);
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasArgument('bar'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
@@ -255,7 +251,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command, false);
         $this->assertTrue($command->getDefinition()->hasOption('bar'), '->mergeApplicationDefinition(false) merges the application and the command options');
         $this->assertFalse($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition(false) does not merge the application arguments');
@@ -412,6 +407,75 @@ class CommandTest extends TestCase
 
         $this->assertEquals('interact called'.\PHP_EOL.'not bound'.\PHP_EOL, $tester->getDisplay());
     }
+
+    public function testCommandAttribute()
+    {
+        $this->assertSame('|foo|f', Php8Command::getDefaultName());
+        $this->assertSame('desc', Php8Command::getDefaultDescription());
+
+        $command = new Php8Command();
+
+        $this->assertSame('foo', $command->getName());
+        $this->assertSame('desc', $command->getDescription());
+        $this->assertTrue($command->isHidden());
+        $this->assertSame(['f'], $command->getAliases());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDefaultNameProperty()
+    {
+        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultName" for setting a command name is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
+
+        $this->assertSame('my:command', MyCommand::getDefaultName());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDefaultDescriptionProperty()
+    {
+        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultDescription" for setting a command description is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
+
+        $this->assertSame('This is a command I wrote all by myself', MyCommand::getDefaultDescription());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testStaticDefaultProperties()
+    {
+        $command = new MyCommand();
+
+        $this->assertSame('my:command', $command->getName());
+        $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
+    }
+
+    public function testAttributeOverridesProperty()
+    {
+        $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
+        $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
+
+        $command = new MyAnnotatedCommand();
+
+        $this->assertSame('my:command', $command->getName());
+        $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
+    }
+
+    public function testDefaultCommand()
+    {
+        $apl = new Application();
+        $apl->setDefaultCommand(Php8Command::getDefaultName());
+        $property = new \ReflectionProperty($apl, 'defaultCommand');
+
+        $this->assertEquals('foo', $property->getValue($apl));
+
+        $apl->setDefaultCommand(Php8Command2::getDefaultName());
+        $property = new \ReflectionProperty($apl, 'defaultCommand');
+
+        $this->assertEquals('foo2', $property->getValue($apl));
+    }
 }
 
 // In order to get an unbound closure, we should create it outside a class
@@ -421,4 +485,41 @@ function createClosure()
     return function (InputInterface $input, OutputInterface $output) {
         $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
     };
+}
+
+#[AsCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'])]
+class Php8Command extends Command
+{
+}
+
+#[AsCommand(name: 'foo2', description: 'desc2', hidden: true)]
+class Php8Command2 extends Command
+{
+}
+
+class MyCommand extends Command
+{
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultName = 'my:command';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultDescription = 'This is a command I wrote all by myself';
+}
+
+#[AsCommand(name: 'my:command', description: 'This is a command I wrote all by myself')]
+class MyAnnotatedCommand extends Command
+{
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultName = 'i-shall-be-ignored';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultDescription = 'This description should be ignored.';
 }

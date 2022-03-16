@@ -266,7 +266,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
             $this->buildViolation('Constraint Message')
                 ->setParameter('{{ value }}', $dirtyValueAsString)
                 ->setParameter('{{ compared_value }}', 'null')
-                ->setParameter('{{ compared_value_type }}', 'NULL')
+                ->setParameter('{{ compared_value_type }}', 'null')
                 ->setParameter('{{ compared_value_path }}', 'value')
                 ->setCode($this->getErrorCode())
                 ->assertRaised();

@@ -27,13 +27,14 @@ class HiddenType extends AbstractType
             // Pass errors to the parent
             'error_bubbling' => true,
             'compound' => false,
+            'invalid_message' => 'The hidden field is invalid.',
         ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'hidden';
     }

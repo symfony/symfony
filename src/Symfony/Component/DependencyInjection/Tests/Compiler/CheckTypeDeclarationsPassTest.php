@@ -73,7 +73,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsWhenPassingNullToRequiredArgument()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct()" accepts "stdClass", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct()" accepts "stdClass", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -251,7 +251,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingNullToOptionalThatDoesNotAcceptNull()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct()" accepts "int", "NULL" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarOptionalArgumentNotNull::__construct()" accepts "int", "null" passed.');
 
         $container = new ContainerBuilder();
 
@@ -294,7 +294,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessFailsOnPassingScalarTypeToConstructorTypedWithClass()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct()" accepts "stdClass", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\Bar::__construct()" accepts "stdClass", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -382,7 +382,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessSuccessWhenPassingIntegerToArrayTypedParameter()
     {
         $this->expectException(InvalidParameterTypeException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray()" accepts "array", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray()" accepts "array", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -404,9 +404,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 7.2
-     */
     public function testProcessSuccessWhenPassingDefinitionForObjectType()
     {
         $container = new ContainerBuilder();
@@ -606,7 +603,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
     public function testProcessThrowsOnIterableTypeWhenScalarPassed()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable()" accepts "iterable", "integer" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "bar_call": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\BarMethodCall::setIterable()" accepts "iterable", "int" passed.');
 
         $container = new ContainerBuilder();
 
@@ -733,7 +730,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foobar', Deprecated::class)
-            ->setDeprecated(true)
+            ->setDeprecated('foo/bar', '1.2.3', '')
         ;
 
         (new CheckTypeDeclarationsPass(true))->process($container);
@@ -823,9 +820,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -839,9 +833,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -854,9 +845,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithFalse()
     {
         $container = new ContainerBuilder();
@@ -870,9 +858,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -887,9 +872,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -903,9 +885,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -921,9 +900,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithTrue()
     {
         $container = new ContainerBuilder();
@@ -934,14 +910,11 @@ class CheckTypeDeclarationsPassTest extends TestCase
             ->setArguments([true]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor::create()" accepts "array|false", "boolean" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor::create()" accepts "array|false", "bool" passed.');
 
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReferencePassesMixed()
     {
         $container = new ContainerBuilder();
@@ -956,9 +929,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -972,9 +942,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();

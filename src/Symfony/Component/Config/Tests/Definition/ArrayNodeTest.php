@@ -68,11 +68,9 @@ class ArrayNodeTest extends TestCase
     }
 
     /**
-     * @param array|\Exception $expected
-     *
      * @dataProvider ignoreAndRemoveMatrixProvider
      */
-    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, $expected, string $message = '')
+    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, array|\Exception $expected, string $message = '')
     {
         if ($expected instanceof \Exception) {
             $this->expectException(\get_class($expected));
@@ -92,7 +90,6 @@ class ArrayNodeTest extends TestCase
         $node = new ArrayNode('foo');
 
         $r = new \ReflectionMethod($node, 'preNormalize');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($node, $denormalized));
     }
@@ -134,7 +131,6 @@ class ArrayNodeTest extends TestCase
         $rootNode->addChild($fiveNode);
         $rootNode->addChild(new ScalarNode('string_key'));
         $r = new \ReflectionMethod($rootNode, 'normalizeValue');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($rootNode, $denormalized));
     }
@@ -181,7 +177,6 @@ class ArrayNodeTest extends TestCase
         $node->addChild($scalar2);
 
         $r = new \ReflectionMethod($node, 'normalizeValue');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($node, $prenormalized));
     }
@@ -230,10 +225,13 @@ class ArrayNodeTest extends TestCase
     public function testSetDeprecated()
     {
         $childNode = new ArrayNode('foo');
-        $childNode->setDeprecated('"%node%" is deprecated');
+        $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
 
         $this->assertTrue($childNode->isDeprecated());
-        $this->assertSame('"foo" is deprecated', $childNode->getDeprecationMessage($childNode->getName(), $childNode->getPath()));
+        $deprecation = $childNode->getDeprecation($childNode->getName(), $childNode->getPath());
+        $this->assertSame('"foo" is deprecated', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
@@ -248,14 +246,19 @@ class ArrayNodeTest extends TestCase
         };
 
         $prevErrorHandler = set_error_handler($deprecationHandler);
-        $node->finalize([]);
-        restore_error_handler();
-
+        try {
+            $node->finalize([]);
+        } finally {
+            restore_error_handler();
+        }
         $this->assertFalse($deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
 
         $prevErrorHandler = set_error_handler($deprecationHandler);
-        $node->finalize(['foo' => []]);
-        restore_error_handler();
+        try {
+            $node->finalize(['foo' => []]);
+        } finally {
+            restore_error_handler();
+        }
         $this->assertTrue($deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 
@@ -272,7 +275,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(false);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $r->invoke($node, ...$prenormalizeds);
     }
@@ -290,7 +292,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(true);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $r->invoke($node, ...$prenormalizeds);
     }
@@ -306,7 +307,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(true, false);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $this->assertEquals($merged, $r->invoke($node, ...$prenormalizeds));
     }

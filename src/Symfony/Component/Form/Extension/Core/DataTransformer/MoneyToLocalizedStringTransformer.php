@@ -21,11 +21,11 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
-    private $divisor;
+    private int $divisor;
 
-    public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = self::ROUND_HALF_UP, ?int $divisor = 1)
+    public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, ?int $divisor = 1, string $locale = null)
     {
-        parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode);
+        parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode, $locale);
 
         $this->divisor = $divisor ?? 1;
     }
@@ -35,12 +35,10 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @param int|float|null $value Normalized number
      *
-     * @return string Localized money string
-     *
      * @throws TransformationFailedException if the given value is not numeric or
-     *                                       if the value can not be transformed
+     *                                       if the value cannot be transformed
      */
-    public function transform($value)
+    public function transform(mixed $value): string
     {
         if (null !== $value && 1 !== $this->divisor) {
             if (!is_numeric($value)) {
@@ -57,12 +55,10 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @param string $value Localized money string
      *
-     * @return int|float|null Normalized number
-     *
      * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): int|float|null
     {
         $value = parent::reverseTransform($value);
         if (null !== $value && 1 !== $this->divisor) {

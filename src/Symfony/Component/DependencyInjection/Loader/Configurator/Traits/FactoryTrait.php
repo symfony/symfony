@@ -19,16 +19,14 @@ trait FactoryTrait
     /**
      * Sets a factory.
      *
-     * @param string|array|ReferenceConfigurator $factory A PHP callable reference
-     *
      * @return $this
      */
-    final public function factory($factory): self
+    final public function factory(string|array|ReferenceConfigurator $factory): static
     {
         if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);
 
-            throw new InvalidArgumentException(sprintf('Invalid factory "%s": the "service:method" notation is not available when using PHP-based DI configuration. Use "[ref(\'%s\'), \'%s\']" instead.', $factory, $factoryParts[0], $factoryParts[1]));
+            throw new InvalidArgumentException(sprintf('Invalid factory "%s": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'%s\'), \'%s\']" instead.', $factory, $factoryParts[0], $factoryParts[1]));
         }
 
         $this->definition->setFactory(static::processValue($factory, true));

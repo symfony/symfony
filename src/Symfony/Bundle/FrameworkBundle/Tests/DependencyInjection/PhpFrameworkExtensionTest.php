@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
@@ -83,111 +85,49 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.
-     */
-    public function testWorkflowDeprecateWorkflowSingleState()
+    public function testRateLimiterWithLockFactory()
     {
-        $this->createContainerFromClosure(function ($container) {
-            $container->loadFromExtension('framework', [
-                'workflows' => [
-                    'article' => [
-                        'type' => 'workflow',
-                        'marking_store' => [
-                            'type' => 'single_state',
-                        ],
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                            'c',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b'],
-                            ],
-                        ],
+        try {
+            $this->createContainerFromClosure(function (ContainerBuilder $container) {
+                $container->loadFromExtension('framework', [
+                    'lock' => false,
+                    'rate_limiter' => [
+                        'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
                     ],
+                ]);
+            });
+
+            $this->fail('No LogicException thrown');
+        } catch (LogicException $e) {
+            $this->assertEquals('Rate limiter "with_lock" requires the Lock component to be installed and configured.', $e->getMessage());
+        }
+
+        $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'lock' => true,
+                'rate_limiter' => [
+                    'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
                 ],
             ]);
         });
+
+        $withLock = $container->getDefinition('limiter.with_lock');
+        $this->assertEquals('lock.factory', (string) $withLock->getArgument(2));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWorkflowValidationMultipleState()
+    public function testRateLimiterLockFactory()
     {
-        $this->createContainerFromClosure(function ($container) {
+        $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'workflows' => [
-                    'article' => [
-                        'type' => 'workflow',
-                        'marking_store' => [
-                            'type' => 'multiple_state',
-                        ],
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                            'c',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b', 'c'],
-                            ],
-                        ],
-                    ],
+                'rate_limiter' => [
+                    'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => null],
                 ],
             ]);
         });
 
-        // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
-        $this->addToAssertionCount(1);
-    }
+        $this->expectException(OutOfBoundsException::class);
+        $this->expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
 
-    /**
-     * @group legacy
-     */
-    public function testWorkflowValidationSingleState()
-    {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The marking store of workflow "article" can not store many places. But the transition "a_to_b" has too many output (2). Only one is accepted.');
-        $this->createContainerFromClosure(function ($container) {
-            $container->loadFromExtension('framework', [
-                'workflows' => [
-                    'article' => [
-                        'type' => 'workflow',
-                        'marking_store' => [
-                            'type' => 'single_state',
-                        ],
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                            'c',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b', 'c'],
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
-        });
-
-        // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
-        $this->addToAssertionCount(1);
+        $container->getDefinition('limiter.without_lock')->getArgument(2);
     }
 }

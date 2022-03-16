@@ -19,21 +19,25 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Caches the choice lists created by the decorated factory.
  *
+ * To cache a list based on its options, arguments must be decorated
+ * by a {@see Cache\AbstractStaticOption} implementation.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Jules Pietri <jules@heahprod.com>
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
-    private $decoratedFactory;
+    private ChoiceListFactoryInterface $decoratedFactory;
 
     /**
      * @var ChoiceListInterface[]
      */
-    private $lists = [];
+    private array $lists = [];
 
     /**
      * @var ChoiceListView[]
      */
-    private $views = [];
+    private array $views = [];
 
     /**
      * Generates a SHA-256 hash for the given value.
@@ -41,13 +45,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      * Optionally, a namespace string can be passed. Calling this method will
      * the same values, but different namespaces, will return different hashes.
      *
-     * @param mixed $value The value to hash
-     *
      * @return string The SHA-256 hash
      *
      * @internal
      */
-    public static function generateHash($value, string $namespace = ''): string
+    public static function generateHash(mixed $value, string $namespace = ''): string
     {
         if (\is_object($value)) {
             $value = spl_object_hash($value);
@@ -69,10 +71,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
 
     /**
      * Returns the decorated factory.
-     *
-     * @return ChoiceListFactoryInterface The decorated factory
      */
-    public function getDecoratedFactory()
+    public function getDecoratedFactory(): ChoiceListFactoryInterface
     {
         return $this->decoratedFactory;
     }
@@ -80,19 +80,34 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createListFromChoices($choices, $value = null)
+    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
 
-        // The value is not validated on purpose. The decorated factory may
-        // decide which values to accept and which not.
+        $cache = true;
+        // Only cache per value and filter when needed. The value is not validated on purpose.
+        // The decorated factory may decide which values to accept and which not.
+        if ($value instanceof Cache\ChoiceValue) {
+            $value = $value->getOption();
+        } elseif ($value) {
+            $cache = false;
+        }
+        if ($filter instanceof Cache\ChoiceFilter) {
+            $filter = $filter->getOption();
+        } elseif ($filter) {
+            $cache = false;
+        }
 
-        $hash = self::generateHash([$choices, $value], 'fromChoices');
+        if (!$cache) {
+            return $this->decoratedFactory->createListFromChoices($choices, $value, $filter);
+        }
+
+        $hash = self::generateHash([$choices, $value, $filter], 'fromChoices');
 
         if (!isset($this->lists[$hash])) {
-            $this->lists[$hash] = $this->decoratedFactory->createListFromChoices($choices, $value);
+            $this->lists[$hash] = $this->decoratedFactory->createListFromChoices($choices, $value, $filter);
         }
 
         return $this->lists[$hash];
@@ -101,12 +116,36 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
-        $hash = self::generateHash([$loader, $value], 'fromLoader');
+        $cache = true;
+
+        if ($loader instanceof Cache\ChoiceLoader) {
+            $loader = $loader->getOption();
+        } else {
+            $cache = false;
+        }
+
+        if ($value instanceof Cache\ChoiceValue) {
+            $value = $value->getOption();
+        } elseif ($value) {
+            $cache = false;
+        }
+
+        if ($filter instanceof Cache\ChoiceFilter) {
+            $filter = $filter->getOption();
+        } elseif ($filter) {
+            $cache = false;
+        }
+
+        if (!$cache) {
+            return $this->decoratedFactory->createListFromLoader($loader, $value, $filter);
+        }
+
+        $hash = self::generateHash([$loader, $value, $filter], 'fromLoader');
 
         if (!isset($this->lists[$hash])) {
-            $this->lists[$hash] = $this->decoratedFactory->createListFromLoader($loader, $value);
+            $this->lists[$hash] = $this->decoratedFactory->createListFromLoader($loader, $value, $filter);
         }
 
         return $this->lists[$hash];
@@ -115,11 +154,59 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
     {
-        // The input is not validated on purpose. This way, the decorated
-        // factory may decide which input to accept and which not.
-        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr]);
+        $cache = true;
+
+        if ($preferredChoices instanceof Cache\PreferredChoice) {
+            $preferredChoices = $preferredChoices->getOption();
+        } elseif ($preferredChoices) {
+            $cache = false;
+        }
+
+        if ($label instanceof Cache\ChoiceLabel) {
+            $label = $label->getOption();
+        } elseif (null !== $label) {
+            $cache = false;
+        }
+
+        if ($index instanceof Cache\ChoiceFieldName) {
+            $index = $index->getOption();
+        } elseif ($index) {
+            $cache = false;
+        }
+
+        if ($groupBy instanceof Cache\GroupBy) {
+            $groupBy = $groupBy->getOption();
+        } elseif ($groupBy) {
+            $cache = false;
+        }
+
+        if ($attr instanceof Cache\ChoiceAttr) {
+            $attr = $attr->getOption();
+        } elseif ($attr) {
+            $cache = false;
+        }
+
+        if ($labelTranslationParameters instanceof Cache\ChoiceTranslationParameters) {
+            $labelTranslationParameters = $labelTranslationParameters->getOption();
+        } elseif ([] !== $labelTranslationParameters) {
+            $cache = false;
+        }
+
+        if (!$cache) {
+            return $this->decoratedFactory->createView(
+                $list,
+                $preferredChoices,
+                $label,
+                $index,
+                $groupBy,
+                $attr,
+                $labelTranslationParameters
+            );
+        }
+
+        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr, $labelTranslationParameters]);
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(
@@ -128,7 +215,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
                 $label,
                 $index,
                 $groupBy,
-                $attr
+                $attr,
+                $labelTranslationParameters
             );
         }
 
@@ -139,5 +227,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     {
         $this->lists = [];
         $this->views = [];
+        Cache\AbstractStaticOption::reset();
     }
 }

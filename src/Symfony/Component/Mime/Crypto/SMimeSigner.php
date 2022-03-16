@@ -19,10 +19,10 @@ use Symfony\Component\Mime\Message;
  */
 final class SMimeSigner extends SMime
 {
-    private $signCertificate;
-    private $signPrivateKey;
-    private $signOptions;
-    private $extraCerts;
+    private string $signCertificate;
+    private string|array $signPrivateKey;
+    private int $signOptions;
+    private ?string $extraCerts;
 
     /**
      * @param string      $certificate          The path of the file containing the signing certificate (in PEM format)

@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Mailer\Transport\Smtp;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\AuthenticatorInterface;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Sends Emails over SMTP with ESMTP support.
@@ -26,9 +26,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class EsmtpTransport extends SmtpTransport
 {
-    private $authenticators = [];
-    private $username = '';
-    private $password = '';
+    private array $authenticators = [];
+    private string $username = '';
+    private string $password = '';
 
     public function __construct(string $host = 'localhost', int $port = 0, bool $tls = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -63,7 +63,10 @@ class EsmtpTransport extends SmtpTransport
         $stream->setPort($port);
     }
 
-    public function setUsername(string $username): self
+    /**
+     * @return $this
+     */
+    public function setUsername(string $username): static
     {
         $this->username = $username;
 
@@ -75,7 +78,10 @@ class EsmtpTransport extends SmtpTransport
         return $this->username;
     }
 
-    public function setPassword(string $password): self
+    /**
+     * @return $this
+     */
+    public function setPassword(string $password): static
     {
         $this->password = $password;
 
@@ -178,7 +184,7 @@ class EsmtpTransport extends SmtpTransport
         }
 
         if (!$authNames) {
-            throw new TransportException('Failed to find an authenticator supported by the SMTP server.');
+            throw new TransportException(sprintf('Failed to find an authenticator supported by the SMTP server, which currently supports: "%s".', implode('", "', $modes)));
         }
 
         $message = sprintf('Failed to authenticate on SMTP server with username "%s" using the following authenticators: "%s".', $this->username, implode('", "', $authNames));

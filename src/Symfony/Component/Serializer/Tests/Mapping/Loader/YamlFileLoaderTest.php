@@ -18,9 +18,11 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
-use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -28,6 +30,8 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class YamlFileLoaderTest extends TestCase
 {
+    use ContextMappingTestTrait;
+
     /**
      * @var YamlFileLoader
      */
@@ -40,7 +44,7 @@ class YamlFileLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->loader = new YamlFileLoader(__DIR__.'/../../Fixtures/serialization.yml');
-        $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+        $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy');
     }
 
     public function testInterface()
@@ -75,7 +79,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testMaxDepth()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy');
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy');
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -85,7 +89,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testSerializedName()
     {
-        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy');
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy');
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
@@ -106,5 +110,28 @@ class YamlFileLoaderTest extends TestCase
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 
         $this->assertEquals($expected, $classMetadata);
+    }
+
+    public function testLoadIgnore()
+    {
+        $classMetadata = new ClassMetadata(IgnoreDummy::class);
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
+        $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+    }
+
+    public function testLoadInvalidIgnore()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('The "ignore" value must be a boolean');
+
+        (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-ignore.yml'))->loadClassMetadata(new ClassMetadata(IgnoreDummy::class));
+    }
+
+    protected function getLoaderForContextMapping(): LoaderInterface
+    {
+        return $this->loader;
     }
 }

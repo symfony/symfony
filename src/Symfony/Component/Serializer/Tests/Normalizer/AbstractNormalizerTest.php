@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableOptionalConstructorArgumentDummy;
@@ -74,6 +75,9 @@ class AbstractNormalizerTest extends TestCase
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['other']], true);
         $this->assertEquals(['a3', 'a4'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], true);
+        $this->assertEquals(['a1', 'a2', 'a3', 'a4'], $result);
     }
 
     public function testGetAllowedAttributesAsObjects()
@@ -106,6 +110,9 @@ class AbstractNormalizerTest extends TestCase
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['other']], false);
         $this->assertEquals([$a3, $a4], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], false);
+        $this->assertEquals([$a1, $a2, $a3, $a4], $result);
     }
 
     public function testObjectWithStaticConstructor()
@@ -193,5 +200,21 @@ class AbstractNormalizerTest extends TestCase
         yield [new PropertyNormalizer(null, null, $extractor)];
         yield [new ObjectNormalizer()];
         yield [new ObjectNormalizer(null, null, null, $extractor)];
+    }
+
+    public function testIgnore()
+    {
+        $classMetadata = new ClassMetadata(IgnoreDummy::class);
+        $attributeMetadata = new AttributeMetadata('ignored1');
+        $attributeMetadata->setIgnore(true);
+        $classMetadata->addAttributeMetadata($attributeMetadata);
+        $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
+
+        $dummy = new IgnoreDummy();
+        $dummy->ignored1 = 'hello';
+
+        $normalizer = new PropertyNormalizer($this->classMetadata);
+
+        $this->assertSame([], $normalizer->normalize($dummy));
     }
 }

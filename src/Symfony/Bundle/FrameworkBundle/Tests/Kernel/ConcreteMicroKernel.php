@@ -17,12 +17,11 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 {
@@ -33,7 +32,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     public function onKernelException(ExceptionEvent $event)
     {
         if ($event->getThrowable() instanceof Danger) {
-            $event->setResponse(Response::create('It\'s dangerous to go alone. Take this ⚔'));
+            $event->setResponse(new Response('It\'s dangerous to go alone. Take this ⚔'));
         }
     }
 
@@ -74,25 +73,18 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
 
-    public function __destruct()
+    protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        if ($this->cacheDir) {
-            $fs = new Filesystem();
-            $fs->remove($this->cacheDir);
-        }
+        $routes->add('halloween', '/')->controller('kernel::halloweenAction');
+        $routes->add('danger', '/danger')->controller('kernel::dangerousAction');
     }
 
-    protected function configureRoutes(RouteCollectionBuilder $routes)
-    {
-        $routes->add('/', 'kernel::halloweenAction');
-        $routes->add('/danger', 'kernel::dangerousAction');
-    }
-
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', [
             'secret' => '$ecret',
+            'router' => ['utf8' => true],
         ]);
 
         $c->setParameter('halloween', 'Have a great day!');

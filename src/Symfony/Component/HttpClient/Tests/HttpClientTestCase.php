@@ -11,14 +11,29 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
+use Symfony\Component\HttpClient\Response\StreamWrapper;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
+
+
+/*
+Tests for HTTP2 Push need a recent version of both PHP and curl. This docker command should run them:
+docker run -it --rm -v $(pwd):/app -v /path/to/vulcain:/usr/local/bin/vulcain -w /app php:7.3-alpine ./phpunit src/Symfony/Component/HttpClient --filter Push
+The vulcain binary can be found at https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz - see https://github.com/dunglas/vulcain for source
+*/
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
+    private static $vulcainStarted = false;
+
     public function testTimeoutOnDestruct()
     {
         if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {
@@ -118,31 +133,212 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertTrue(feof($stream));
     }
 
-    public function testTimeoutIsNotAFatalError()
+    public function testResponseStreamRewind()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:8057/timeout-body', [
-            'timeout' => 0.25,
-        ]);
-        $this->assertSame(200, $response->getStatusCode());
+        $response = $client->request('GET', 'http://localhost:8057/103');
 
-        try {
-            $response->getContent();
-            $this->fail(TransportException::class.' expected');
-        } catch (TransportException $e) {
+        $stream = $response->toStream();
+
+        $this->assertSame('Here the body', stream_get_contents($stream));
+        rewind($stream);
+        $this->assertSame('Here the body', stream_get_contents($stream));
+    }
+
+    public function testStreamWrapperStreamRewind()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/103');
+
+        $stream = StreamWrapper::createResource($response);
+
+        $this->assertSame('Here the body', stream_get_contents($stream));
+        rewind($stream);
+        $this->assertSame('Here the body', stream_get_contents($stream));
+    }
+
+    public function testStreamWrapperWithClientStreamRewind()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/103');
+
+        $stream = StreamWrapper::createResource($response, $client);
+
+        $this->assertSame('Here the body', stream_get_contents($stream));
+        rewind($stream);
+        $this->assertSame('Here the body', stream_get_contents($stream));
+    }
+
+    public function testHttp2PushVulcain()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        self::startVulcain($client);
+        $logger = new TestLogger();
+        $client->setLogger($logger);
+
+        $responseAsArray = $client->request('GET', 'https://127.0.0.1:3000/json', [
+            'headers' => [
+                'Preload' => '/documents/*/id',
+            ],
+        ])->toArray();
+
+        foreach ($responseAsArray['documents'] as $document) {
+            $client->request('GET', 'https://127.0.0.1:3000'.$document['id'])->toArray();
         }
 
-        for ($i = 0; $i < 10; ++$i) {
-            try {
-                $this->assertSame('<1><2>', $response->getContent());
+        $client->reset();
+
+        $expected = [
+            'Request: "GET https://127.0.0.1:3000/json"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/1"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/2"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/3"',
+            'Response: "200 https://127.0.0.1:3000/json"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/1"',
+            'Response: "200 https://127.0.0.1:3000/json/1"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/2"',
+            'Response: "200 https://127.0.0.1:3000/json/2"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/3"',
+            'Response: "200 https://127.0.0.1:3000/json/3"',
+        ];
+        $this->assertSame($expected, $logger->logs);
+    }
+
+    public function testPause()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $time = microtime(true);
+        $response->getInfo('pause_handler')(0.5);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue(0.5 <= microtime(true) - $time);
+
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $time = microtime(true);
+        $response->getInfo('pause_handler')(1);
+
+        foreach ($client->stream($response, 0.5) as $chunk) {
+            $this->assertTrue($chunk->isTimeout());
+            $response->cancel();
+        }
+        $response = null;
+        $this->assertTrue(1.0 > microtime(true) - $time);
+        $this->assertTrue(0.5 <= microtime(true) - $time);
+    }
+
+    public function testPauseReplace()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $time = microtime(true);
+        $response->getInfo('pause_handler')(10);
+        $response->getInfo('pause_handler')(0.5);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertGreaterThanOrEqual(0.5, microtime(true) - $time);
+        $this->assertLessThanOrEqual(5, microtime(true) - $time);
+    }
+
+    public function testPauseDuringBody()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-body');
+
+        $time = microtime(true);
+        $this->assertSame(200, $response->getStatusCode());
+        $response->getInfo('pause_handler')(1);
+        $response->getContent();
+        $this->assertGreaterThanOrEqual(1, microtime(true) - $time);
+    }
+
+    public function testHttp2PushVulcainWithUnusedResponse()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        self::startVulcain($client);
+        $logger = new TestLogger();
+        $client->setLogger($logger);
+
+        $responseAsArray = $client->request('GET', 'https://127.0.0.1:3000/json', [
+            'headers' => [
+                'Preload' => '/documents/*/id',
+            ],
+        ])->toArray();
+
+        $i = 0;
+        foreach ($responseAsArray['documents'] as $document) {
+            $client->request('GET', 'https://127.0.0.1:3000'.$document['id'])->toArray();
+            if (++$i >= 2) {
                 break;
-            } catch (TransportException $e) {
             }
         }
 
-        if (10 === $i) {
-            throw $e;
+        $client->reset();
+
+        $expected = [
+            'Request: "GET https://127.0.0.1:3000/json"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/1"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/2"',
+            'Queueing pushed response: "https://127.0.0.1:3000/json/3"',
+            'Response: "200 https://127.0.0.1:3000/json"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/1"',
+            'Response: "200 https://127.0.0.1:3000/json/1"',
+            'Accepting pushed response: "GET https://127.0.0.1:3000/json/2"',
+            'Response: "200 https://127.0.0.1:3000/json/2"',
+            'Unused pushed response: "https://127.0.0.1:3000/json/3"',
+        ];
+        $this->assertSame($expected, $logger->logs);
+    }
+
+    public function testDnsFailure()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://bad.host.test/');
+
+        $this->expectException(TransportException::class);
+        $response->getStatusCode();
+    }
+
+    private static function startVulcain(HttpClientInterface $client)
+    {
+        if (self::$vulcainStarted) {
+            return;
         }
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            throw new SkippedTestSuiteError('Testing with the "vulcain" is not supported on Windows.');
+        }
+
+        if (['application/json'] !== $client->request('GET', 'http://127.0.0.1:8057/json')->getHeaders()['content-type']) {
+            throw new SkippedTestSuiteError('symfony/http-client-contracts >= 2.0.1 required');
+        }
+
+        $process = new Process(['vulcain'], null, [
+            'DEBUG' => 1,
+            'UPSTREAM' => 'http://127.0.0.1:8057',
+            'ADDR' => ':3000',
+            'KEY_FILE' => __DIR__.'/Fixtures/tls/server.key',
+            'CERT_FILE' => __DIR__.'/Fixtures/tls/server.crt',
+        ]);
+        $process->start();
+
+        register_shutdown_function($process->stop(...));
+        sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
+
+        if (!$process->isRunning()) {
+            if ('\\' !== \DIRECTORY_SEPARATOR && 127 === $process->getExitCode()) {
+                throw new SkippedTestSuiteError('vulcain binary is missing');
+            }
+
+            if ('\\' !== \DIRECTORY_SEPARATOR && 126 === $process->getExitCode()) {
+                throw new SkippedTestSuiteError('vulcain binary is not executable');
+            }
+
+            throw new SkippedTestSuiteError((new ProcessFailedException($process))->getMessage());
+        }
+
+        self::$vulcainStarted = true;
     }
 
     public function testHandleIsRemovedOnException()
@@ -159,7 +355,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             unset($e);
 
             $r = new \ReflectionProperty($client, 'multi');
-            $r->setAccessible(true);
             /** @var ClientState $clientState */
             $clientState = $r->getValue($client);
 
@@ -212,5 +407,41 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * @dataProvider getRedirectWithAuthTests
+     */
+    public function testRedirectWithAuth(string $url, bool $redirectWithAuth)
+    {
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'cookie' => 'foo=bar',
+                ],
+            ]);
+            $body = $response->toArray();
+        } finally {
+            $p->stop();
+        }
+
+        if ($redirectWithAuth) {
+            $this->assertArrayHasKey('HTTP_COOKIE', $body);
+        } else {
+            $this->assertArrayNotHasKey('HTTP_COOKIE', $body);
+        }
+    }
+
+    public function getRedirectWithAuthTests()
+    {
+        return [
+            'same host and port' => ['url' => 'http://localhost:8057/302', 'redirectWithAuth' => true],
+            'other port' => ['url' => 'http://localhost:8067/302', 'redirectWithAuth' => false],
+            'other host' => ['url' => 'http://127.0.0.1:8057/302', 'redirectWithAuth' => false],
+        ];
     }
 }

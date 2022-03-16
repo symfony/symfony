@@ -32,10 +32,10 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  */
 class MultiplierRetryStrategy implements RetryStrategyInterface
 {
-    private $maxRetries;
-    private $delayMilliseconds;
-    private $multiplier;
-    private $maxDelayMilliseconds;
+    private int $maxRetries;
+    private int $delayMilliseconds;
+    private float $multiplier;
+    private int $maxDelayMilliseconds;
 
     /**
      * @param int   $maxRetries           The maximum number of times to retry
@@ -48,29 +48,35 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         $this->maxRetries = $maxRetries;
 
         if ($delayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" passed.', $delayMilliseconds));
+            throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
         }
         $this->delayMilliseconds = $delayMilliseconds;
 
         if ($multiplier < 1) {
-            throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" passed.', $multiplier));
+            throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
         }
         $this->multiplier = $multiplier;
 
         if ($maxDelayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" passed.', $maxDelayMilliseconds));
+            throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
         }
         $this->maxDelayMilliseconds = $maxDelayMilliseconds;
     }
 
-    public function isRetryable(Envelope $message): bool
+    /**
+     * @param \Throwable|null $throwable The cause of the failed handling
+     */
+    public function isRetryable(Envelope $message, \Throwable $throwable = null): bool
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
         return $retries < $this->maxRetries;
     }
 
-    public function getWaitingTime(Envelope $message): int
+    /**
+     * @param \Throwable|null $throwable The cause of the failed handling
+     */
+    public function getWaitingTime(Envelope $message, \Throwable $throwable = null): int
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 

@@ -4,7 +4,7 @@
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                     xsi:schemaLocation="http://symfony.com/schema/dic/serializer-mapping https://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd">
 
-    <class name="Symfony\Component\Serializer\Tests\Fixtures\GroupDummy">
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy">
         <attribute name="foo">
             <group>group1</group>
             <group>group2</group>
@@ -15,23 +15,83 @@
         </attribute>
     </class>
 
-    <class name="Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy">
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy">
         <attribute name="foo" max-depth="2" />
         <attribute name="bar" max-depth="3" />
     </class>
 
-    <class name="Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy">
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy">
         <attribute name="foo" serialized-name="baz" />
         <attribute name="bar" serialized-name="qux" />
     </class>
 
-    <class name="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy">
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy">
         <discriminator-map type-property="type">
-            <mapping type="first" class="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild" />
-            <mapping type="second" class="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild" />
+            <mapping type="first" class="Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild" />
+            <mapping type="second" class="Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild" />
         </discriminator-map>
 
         <attribute name="foo" />
+    </class>
+
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy">
+        <attribute name="ignored1" ignore="true" />
+        <attribute name="ignored2" ignore="true" />
+    </class>
+
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent">
+        <attribute name="parentProperty">
+            <normalization_context>
+                <entry name="prop">dummy_parent_value</entry>
+            </normalization_context>
+        </attribute>
+        <attribute name="overriddenParentProperty">
+            <normalization_context>
+                <entry name="prop">dummy_parent_value</entry>
+            </normalization_context>
+        </attribute>
+    </class>
+
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy">
+        <attribute name="foo">
+            <context>
+                <entry name="foo">value</entry>
+                <entry name="bar">value</entry>
+                <entry name="nested">
+                    <entry name="nested_key">nested_value</entry>
+                </entry>
+                <entry name="array">
+                    <entry>first</entry>
+                    <entry>second</entry>
+                </entry>
+            </context>
+            <context>
+                <group>a</group>
+                <entry name="bar">value_for_group_a</entry>
+            </context>
+        </attribute>
+        <attribute name="bar">
+            <normalization_context>
+                <group>a</group>
+                <group>b</group>
+                <entry name="format">d/m/Y</entry>
+            </normalization_context>
+            <denormalization_context>
+                <group>a</group>
+                <group>b</group>
+                <entry name="format">m-d-Y H:i</entry>
+            </denormalization_context>
+        </attribute>
+        <attribute name="overriddenParentProperty">
+            <normalization_context>
+                <entry name="prop">dummy_value</entry>
+            </normalization_context>
+        </attribute>
+        <attribute name="methodWithContext">
+            <context>
+                <entry name="method">method_with_context</entry>
+            </context>
+        </attribute>
     </class>
 
 </serializer>

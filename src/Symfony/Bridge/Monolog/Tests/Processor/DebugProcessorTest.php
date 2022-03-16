@@ -43,6 +43,30 @@ class DebugProcessorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider providerDatetimeRfc3339FormatTests
+     */
+    public function testDatetimeRfc3339Format(array $record, $expectedTimestamp)
+    {
+        $processor = new DebugProcessor();
+        $processor($record);
+
+        $records = $processor->getLogs();
+        self::assertCount(1, $records);
+        self::assertSame($expectedTimestamp, $records[0]['timestamp_rfc3339']);
+    }
+
+    public function providerDatetimeRfc3339FormatTests(): array
+    {
+        $record = $this->getRecord();
+
+        return [
+            [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), '2019-01-01T00:01:00.000+00:00'],
+            [array_merge($record, ['datetime' => '2019-01-01T00:01:00+00:00']), '2019-01-01T00:01:00.000+00:00'],
+            [array_merge($record, ['datetime' => 'foo']), false],
+        ];
+    }
+
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();
@@ -87,16 +111,16 @@ class DebugProcessorTest extends TestCase
         $this->assertSame(0, $processor->countErrors(new Request()));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Bridge\Monolog\Processor\DebugProcessor::getLogs()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     * @expectedDeprecation The "Symfony\Bridge\Monolog\Processor\DebugProcessor::countErrors()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassWithoutArgument()
+    public function testInheritedClassCallGetLogsWithoutArgument()
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
-        $debugProcessorChild->getLogs();
-        $debugProcessorChild->countErrors();
+        $this->assertSame([], $debugProcessorChild->getLogs());
+    }
+
+    public function testInheritedClassCallCountErrorsWithoutArgument()
+    {
+        $debugProcessorChild = new ClassThatInheritDebugProcessor();
+        $this->assertEquals(0, $debugProcessorChild->countErrors());
     }
 
     private function getRecord($level = Logger::WARNING, $message = 'test'): array

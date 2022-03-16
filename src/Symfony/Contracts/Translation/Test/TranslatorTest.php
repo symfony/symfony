@@ -43,10 +43,7 @@ class TranslatorTest extends TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
             use TranslatorTrait;
@@ -74,6 +71,8 @@ class TranslatorTest extends TestCase
     }
 
     /**
+     * @requires extension intl
+     *
      * @dataProvider getTransChoiceTests
      */
     public function testTransChoiceWithDefaultLocale($expected, $id, $number)
@@ -165,11 +164,11 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider getChooseTests
      */
-    public function testChoose($expected, $id, $number)
+    public function testChoose($expected, $id, $number, $locale = null)
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
+        $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number], null, $locale));
     }
 
     public function testReturnMessageIfExactlyOneStandardRuleIsGiven()
@@ -278,6 +277,18 @@ class TranslatorTest extends TestCase
             ['', '|', 1],
             // Empty plural set (3 plural forms) from a .PO file
             ['', '||', 1],
+
+            // Floating values
+            ['1.5 liters', '%count% liter|%count% liters', 1.5],
+            ['1.5 litre', '%count% litre|%count% litres', 1.5, 'fr'],
+
+            // Negative values
+            ['-1 degree', '%count% degree|%count% degrees', -1],
+            ['-1 degré', '%count% degré|%count% degrés', -1],
+            ['-1.5 degrees', '%count% degree|%count% degrees', -1.5],
+            ['-1.5 degré', '%count% degré|%count% degrés', -1.5, 'fr'],
+            ['-2 degrees', '%count% degree|%count% degrees', -2],
+            ['-2 degrés', '%count% degré|%count% degrés', -2],
         ];
     }
 
@@ -303,10 +314,8 @@ class TranslatorTest extends TestCase
      * This array should contain all currently known langcodes.
      *
      * As it is impossible to have this ever complete we should try as hard as possible to have it almost complete.
-     *
-     * @return array
      */
-    public function successLangcodes()
+    public function successLangcodes(): array
     {
         return [
             ['1', ['ay', 'bo', 'cgg', 'dz', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky']],
@@ -325,7 +334,7 @@ class TranslatorTest extends TestCase
      *
      * @return array with nplural together with langcodes
      */
-    public function failingLangcodes()
+    public function failingLangcodes(): array
     {
         return [
             ['1', ['fa']],
@@ -339,11 +348,10 @@ class TranslatorTest extends TestCase
     /**
      * We validate only on the plural coverage. Thus the real rules is not tested.
      *
-     * @param string $nplural       Plural expected
-     * @param array  $matrix        Containing langcodes and their plural index values
-     * @param bool   $expectSuccess
+     * @param string $nplural Plural expected
+     * @param array  $matrix  Containing langcodes and their plural index values
      */
-    protected function validateMatrix($nplural, $matrix, $expectSuccess = true)
+    protected function validateMatrix(string $nplural, array $matrix, bool $expectSuccess = true)
     {
         foreach ($matrix as $langCode => $data) {
             $indexes = array_flip($data);

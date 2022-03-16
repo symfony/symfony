@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 
@@ -26,70 +28,74 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public const SESSION_NAMESPACE = '_csrf';
 
-    private $session;
-    private $namespace;
+    private RequestStack $requestStack;
+    private string $namespace;
 
     /**
-     * Initializes the storage with a Session object and a session namespace.
+     * Initializes the storage with a RequestStack object and a session namespace.
      *
-     * @param string $namespace The namespace under which the token is stored in the session
+     * @param string $namespace The namespace under which the token is stored in the requestStack
      */
-    public function __construct(SessionInterface $session, string $namespace = self::SESSION_NAMESPACE)
+    public function __construct(RequestStack $requestStack, string $namespace = self::SESSION_NAMESPACE)
     {
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->namespace = $namespace;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId)
+    public function getToken(string $tokenId): string
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        if (!$this->session->has($this->namespace.'/'.$tokenId)) {
+        if (!$session->has($this->namespace.'/'.$tokenId)) {
             throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
         }
 
-        return (string) $this->session->get($this->namespace.'/'.$tokenId);
+        return (string) $session->get($this->namespace.'/'.$tokenId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setToken($tokenId, $token)
+    public function setToken(string $tokenId, string $token)
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        $this->session->set($this->namespace.'/'.$tokenId, (string) $token);
+        $session->set($this->namespace.'/'.$tokenId, $token);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasToken($tokenId)
+    public function hasToken(string $tokenId): bool
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        return $this->session->has($this->namespace.'/'.$tokenId);
+        return $session->has($this->namespace.'/'.$tokenId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId)
+    public function removeToken(string $tokenId): ?string
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        return $this->session->remove($this->namespace.'/'.$tokenId);
+        return $session->remove($this->namespace.'/'.$tokenId);
     }
 
     /**
@@ -97,10 +103,19 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public function clear()
     {
-        foreach (array_keys($this->session->all()) as $key) {
+        $session = $this->getSession();
+        foreach (array_keys($session->all()) as $key) {
             if (str_starts_with($key, $this->namespace.'/')) {
-                $this->session->remove($key);
+                $session->remove($key);
             }
         }
+    }
+
+    /**
+     * @throws SessionNotFoundException
+     */
+    private function getSession(): SessionInterface
+    {
+        return $this->requestStack->getSession();
     }
 }

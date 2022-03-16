@@ -13,12 +13,18 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
+use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
+use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
@@ -26,9 +32,9 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
 {
-    private const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
-    private const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
-    private const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
+    private const CLASSNAME = Entity::class;
+    private const PARENTCLASS = EntityParent::class;
+    private const PROVIDERCLASS = GroupSequenceProviderEntity::class;
     private const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
 
     protected $metadata;
@@ -329,23 +335,39 @@ class ClassMetadataTest extends TestCase
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
+
+    public function testCascadeConstraint()
+    {
+        $metadata = new ClassMetadata(CascadingEntity::class);
+
+        $metadata->addConstraint(new Cascade());
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(4, $metadata->properties);
+        $this->assertSame([
+            'requiredChild',
+            'optionalChild',
+            'staticChild',
+            'children',
+        ], $metadata->getConstrainedProperties());
+    }
 }
 
 class ClassCompositeConstraint extends Composite
 {
     public $nested;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return $this->getCompositeOption();
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'nested';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT];
     }

@@ -1,0 +1,14 @@
+<?php
+
+return [
+    'Names' => [
+        'be' => 'kviterussisk',
+        'be_BY' => 'kviterussisk (Kviterussland)',
+        'gv' => 'manx',
+        'kl' => 'grønlandsk [kalaallisut]',
+        'mg' => 'madagassisk',
+        'ne' => 'nepalsk',
+        'rw' => 'kinjarwanda',
+        'sc' => 'sardinsk',
+    ],
+];

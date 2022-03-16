@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
  */
 class RuntimeInstantiator implements InstantiatorInterface
 {
-    private $factory;
+    private LazyLoadingValueHolderFactory $factory;
 
     public function __construct()
     {
@@ -38,7 +38,7 @@ class RuntimeInstantiator implements InstantiatorInterface
     /**
      * {@inheritdoc}
      */
-    public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
+    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object
     {
         return $this->factory->createProxy(
             $this->factory->getGenerator()->getProxifiedClass($definition),

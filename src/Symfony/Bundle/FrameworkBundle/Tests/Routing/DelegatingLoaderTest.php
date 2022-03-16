@@ -3,7 +3,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -14,15 +13,10 @@ use Symfony\Component\Routing\RouteCompiler;
 
 class DelegatingLoaderTest extends TestCase
 {
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a "Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser" instance as first argument to "Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader::__construct()" is deprecated since Symfony 4.4, pass a "Symfony\Component\Config\Loader\LoaderResolverInterface" instance instead.
-     */
     public function testConstructorApi()
     {
-        $controllerNameParser = $this->createMock(ControllerNameParser::class);
-        new DelegatingLoader($controllerNameParser, new LoaderResolver());
-        $this->assertTrue(true, '__construct() takes a ControllerNameParser and LoaderResolverInterface respectively as its first and second argument.');
+        new DelegatingLoader(new LoaderResolver());
+        $this->assertTrue(true, '__construct() takes a LoaderResolverInterface as its first argument.');
     }
 
     public function testLoadDefaultOptions()
@@ -37,13 +31,13 @@ class DelegatingLoaderTest extends TestCase
 
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('/', [], [], ['utf8' => false]));
-        $routeCollection->add('bar', new Route('/', [], [], ['foo' => 123]));
+        $routeCollection->add('bar', new Route('/', [], ['_locale' => 'de'], ['foo' => 123]));
 
         $loader->expects($this->once())
             ->method('load')
             ->willReturn($routeCollection);
 
-        $delegatingLoader = new DelegatingLoader($loaderResolver, ['utf8' => true]);
+        $delegatingLoader = new DelegatingLoader($loaderResolver, ['utf8' => true], ['_locale' => 'fr|en']);
 
         $loadedRouteCollection = $delegatingLoader->load('foo');
         $this->assertCount(2, $loadedRouteCollection);
@@ -53,6 +47,7 @@ class DelegatingLoaderTest extends TestCase
             'utf8' => false,
         ];
         $this->assertSame($expected, $routeCollection->get('foo')->getOptions());
+        $this->assertSame(['_locale' => 'fr|en'], $routeCollection->get('foo')->getRequirements());
 
         $expected = [
             'compiler_class' => RouteCompiler::class,
@@ -60,43 +55,6 @@ class DelegatingLoaderTest extends TestCase
             'utf8' => true,
         ];
         $this->assertSame($expected, $routeCollection->get('bar')->getOptions());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Referencing controllers with foo:bar:baz is deprecated since Symfony 4.1, use "some_parsed::controller" instead.
-     */
-    public function testLoad()
-    {
-        $controllerNameParser = $this->createMock(ControllerNameParser::class);
-        $controllerNameParser->expects($this->once())
-            ->method('parse')
-            ->with('foo:bar:baz')
-            ->willReturn('some_parsed::controller');
-
-        $loaderResolver = $this->createMock(LoaderResolverInterface::class);
-
-        $loader = $this->createMock(LoaderInterface::class);
-
-        $loaderResolver->expects($this->once())
-            ->method('resolve')
-            ->willReturn($loader);
-
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('foo', new Route('/', ['_controller' => 'foo:bar:baz']));
-        $routeCollection->add('bar', new Route('/', ['_controller' => 'foo::baz']));
-        $routeCollection->add('baz', new Route('/', ['_controller' => 'foo:baz']));
-
-        $loader->expects($this->once())
-            ->method('load')
-            ->willReturn($routeCollection);
-
-        $delegatingLoader = new DelegatingLoader($controllerNameParser, $loaderResolver);
-
-        $loadedRouteCollection = $delegatingLoader->load('foo');
-        $this->assertCount(3, $loadedRouteCollection);
-        $this->assertSame('some_parsed::controller', $routeCollection->get('foo')->getDefault('_controller'));
-        $this->assertSame('foo::baz', $routeCollection->get('bar')->getDefault('_controller'));
-        $this->assertSame('foo:baz', $routeCollection->get('baz')->getDefault('_controller'));
+        $this->assertSame(['_locale' => 'de'], $routeCollection->get('bar')->getRequirements());
     }
 }

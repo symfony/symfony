@@ -173,31 +173,16 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveFailed(UploadedFile $file)
     {
-        switch ($file->getError()) {
-            case \UPLOAD_ERR_INI_SIZE:
-                $exceptionClass = IniSizeFileException::class;
-                break;
-            case \UPLOAD_ERR_FORM_SIZE:
-                $exceptionClass = FormSizeFileException::class;
-                break;
-            case \UPLOAD_ERR_PARTIAL:
-                $exceptionClass = PartialFileException::class;
-                break;
-            case \UPLOAD_ERR_NO_FILE:
-                $exceptionClass = NoFileException::class;
-                break;
-            case \UPLOAD_ERR_CANT_WRITE:
-                $exceptionClass = CannotWriteFileException::class;
-                break;
-            case \UPLOAD_ERR_NO_TMP_DIR:
-                $exceptionClass = NoTmpDirFileException::class;
-                break;
-            case \UPLOAD_ERR_EXTENSION:
-                $exceptionClass = ExtensionFileException::class;
-                break;
-            default:
-                $exceptionClass = FileException::class;
-        }
+        $exceptionClass = match ($file->getError()) {
+            \UPLOAD_ERR_INI_SIZE => IniSizeFileException::class,
+            \UPLOAD_ERR_FORM_SIZE => FormSizeFileException::class,
+            \UPLOAD_ERR_PARTIAL => PartialFileException::class,
+            \UPLOAD_ERR_NO_FILE => NoFileException::class,
+            \UPLOAD_ERR_CANT_WRITE => CannotWriteFileException::class,
+            \UPLOAD_ERR_NO_TMP_DIR => NoTmpDirFileException::class,
+            \UPLOAD_ERR_EXTENSION => ExtensionFileException::class,
+            default => FileException::class,
+        };
 
         $this->expectException($exceptionClass);
 
@@ -258,40 +243,6 @@ class UploadedFileTest extends TestCase
         );
 
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
-     */
-    public function testConstructDeprecatedSize()
-    {
-        $file = new UploadedFile(
-            __DIR__.'/Fixtures/test.gif',
-            'original.gif',
-            'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
-            \UPLOAD_ERR_OK,
-            false
-        );
-
-        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
-     */
-    public function testConstructDeprecatedSizeWhenPassingOnlyThe4Needed()
-    {
-        $file = new UploadedFile(
-            __DIR__.'/Fixtures/test.gif',
-            'original.gif',
-            'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif')
-        );
-
-        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
     }
 
     public function testGetExtension()

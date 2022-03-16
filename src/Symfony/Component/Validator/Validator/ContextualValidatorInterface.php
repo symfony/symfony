@@ -28,11 +28,9 @@ interface ContextualValidatorInterface
      * If called multiple times, the path will always be reset to the context's
      * original path with the given path appended to it.
      *
-     * @param string $path The path to append
-     *
      * @return $this
      */
-    public function atPath($path);
+    public function atPath(string $path): static;
 
     /**
      * Validates a value against a constraint or a list of constraints.
@@ -41,24 +39,23 @@ interface ContextualValidatorInterface
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
      * @param mixed                                                 $value       The value to validate
-     * @param Constraint|Constraint[]                               $constraints The constraint(s) to validate against
+     * @param Constraint|Constraint[]|null                          $constraints The constraint(s) to validate against
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups      The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this
      */
-    public function validate($value, $constraints = null, $groups = null);
+    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): static;
 
     /**
      * Validates a property of an object against the constraints specified
      * for this property.
      *
-     * @param object                                                $object       The object
      * @param string                                                $propertyName The name of the validated property
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups       The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this
      */
-    public function validateProperty($object, $propertyName, $groups = null);
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): static;
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -71,13 +68,11 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null);
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): static;
 
     /**
      * Returns the violations that have been generated so far in the context
      * of the validator.
-     *
-     * @return ConstraintViolationListInterface The constraint violations
      */
-    public function getViolations();
+    public function getViolations(): ConstraintViolationListInterface;
 }

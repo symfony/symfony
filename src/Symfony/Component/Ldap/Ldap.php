@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
+use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 
@@ -21,11 +22,7 @@ use Symfony\Component\Ldap\Exception\DriverNotFoundException;
  */
 final class Ldap implements LdapInterface
 {
-    private $adapter;
-
-    private const ADAPTER_MAP = [
-        'ext_ldap' => 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter',
-    ];
+    private AdapterInterface $adapter;
 
     public function __construct(AdapterInterface $adapter)
     {
@@ -35,7 +32,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function bind($dn = null, $password = null)
+    public function bind(string $dn = null, string $password = null)
     {
         $this->adapter->getConnection()->bind($dn, $password);
     }
@@ -43,7 +40,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function query($dn, $query, array $options = []): QueryInterface
+    public function query(string $dn, string $query, array $options = []): QueryInterface
     {
         return $this->adapter->createQuery($dn, $query, $options);
     }
@@ -59,7 +56,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function escape($subject, $ignore = '', $flags = 0): string
+    public function escape(string $subject, string $ignore = '', int $flags = 0): string
     {
         return $this->adapter->escape($subject, $ignore, $flags);
     }
@@ -69,17 +66,13 @@ final class Ldap implements LdapInterface
      *
      * @param string $adapter The adapter name
      * @param array  $config  The adapter's configuration
-     *
-     * @return static
      */
-    public static function create($adapter, array $config = []): self
+    public static function create(string $adapter, array $config = []): static
     {
-        if (!isset(self::ADAPTER_MAP[$adapter])) {
-            throw new DriverNotFoundException(sprintf('Adapter "%s" not found. You should use one of: "%s".', $adapter, implode('", "', self::ADAPTER_MAP)));
+        if ('ext_ldap' !== $adapter) {
+            throw new DriverNotFoundException(sprintf('Adapter "%s" not found. Only "ext_ldap" is supported at the moment.', $adapter));
         }
 
-        $class = self::ADAPTER_MAP[$adapter];
-
-        return new self(new $class($config));
+        return new self(new Adapter($config));
     }
 }

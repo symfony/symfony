@@ -31,7 +31,7 @@ class_exists(ResponseHeaderBag::class);
  */
 final class HttpClientKernel implements HttpKernelInterface
 {
-    private $client;
+    private HttpClientInterface $client;
 
     public function __construct(HttpClientInterface $client = null)
     {
@@ -42,7 +42,7 @@ final class HttpClientKernel implements HttpKernelInterface
         $this->client = $client ?? HttpClient::create();
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         $headers = $this->getHeaders($request);
         $body = '';

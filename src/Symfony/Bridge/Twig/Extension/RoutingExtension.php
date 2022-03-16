@@ -22,12 +22,10 @@ use Twig\TwigFunction;
  * Provides integration of the Routing component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
-class RoutingExtension extends AbstractExtension
+final class RoutingExtension extends AbstractExtension
 {
-    private $generator;
+    private UrlGeneratorInterface $generator;
 
     public function __construct(UrlGeneratorInterface $generator)
     {
@@ -36,37 +34,21 @@ class RoutingExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
-            new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
+            new TwigFunction('url', $this->getUrl(...), ['is_safe_callback' => $this->isUrlGenerationSafe(...)]),
+            new TwigFunction('path', $this->getPath(...), ['is_safe_callback' => $this->isUrlGenerationSafe(...)]),
         ];
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $relative
-     *
-     * @return string
-     */
-    public function getPath($name, $parameters = [], $relative = false)
+    public function getPath(string $name, array $parameters = [], bool $relative = false): string
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $schemeRelative
-     *
-     * @return string
-     */
-    public function getUrl($name, $parameters = [], $schemeRelative = false)
+    public function getUrl(string $name, array $parameters = [], bool $schemeRelative = false): string
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
     }
@@ -92,8 +74,6 @@ class RoutingExtension extends AbstractExtension
      * @param Node $argsNode The arguments of the path/url function
      *
      * @return array An array with the contexts the URL is safe
-     *
-     * @final
      */
     public function isUrlGenerationSafe(Node $argsNode): array
     {
@@ -109,13 +89,5 @@ class RoutingExtension extends AbstractExtension
         }
 
         return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'routing';
     }
 }

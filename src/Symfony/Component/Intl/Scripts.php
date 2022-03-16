@@ -51,7 +51,7 @@ final class Scripts extends ResourceBundle
     /**
      * @return string[]
      */
-    public static function getNames($displayLocale = null): array
+    public static function getNames(string $displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }

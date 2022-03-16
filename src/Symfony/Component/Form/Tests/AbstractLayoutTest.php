@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
@@ -1525,29 +1526,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
-    {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', [
-            'input' => 'string',
-            'date_widget' => 'choice',
-            'time_widget' => 'choice',
-            'widget' => 'single_text',
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
-        ]);
-
-        $this->assertWidgetMatchesXpath($form->createView(), [],
-'/input
-    [@type="datetime-local"]
-    [@name="name"]
-    [@value="2011-02-03T04:05:06"]
-'
-        );
-    }
-
     public function testDateChoice()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', date('Y').'-02-03', [
@@ -1950,7 +1928,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testPercent()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
@@ -1966,7 +1944,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]
@@ -1981,7 +1959,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]
@@ -2687,6 +2665,36 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             '/*
     [@id="name_help"]
     [.="[trans]for company ACME Ltd.[/trans]"]
+'
+        );
+    }
+
+    public function testLabelWithTranslatableMessage()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => new TranslatableMessage('foo'),
+        ]);
+        $html = $this->renderLabel($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/label
+    [@for="name"]
+    [.="[trans]foo[/trans]"]
+'
+        );
+    }
+
+    public function testHelpWithTranslatableMessage()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => new TranslatableMessage('foo'),
+        ]);
+        $html = $this->renderHelp($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/*
+    [@id="name_help"]
+    [.="[trans]foo[/trans]"]
 '
         );
     }

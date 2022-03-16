@@ -13,13 +13,12 @@ namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type as DBALType;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Tools\Setup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
-use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy210;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEnum;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
@@ -32,7 +31,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractorTest extends TestCase
 {
-    private function createExtractor(bool $legacy = false)
+    private function createExtractor()
     {
         $config = Setup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'], true);
         $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);
@@ -42,20 +41,10 @@ class DoctrineExtractorTest extends TestCase
             $entityManager->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('custom_foo', 'foo');
         }
 
-        return new DoctrineExtractor($legacy ? $entityManager->getMetadataFactory() : $entityManager);
+        return new DoctrineExtractor($entityManager);
     }
 
     public function testGetProperties()
-    {
-        $this->doTestGetProperties(false);
-    }
-
-    public function testLegacyGetProperties()
-    {
-        $this->doTestGetProperties(true);
-    }
-
-    private function doTestGetProperties(bool $legacy)
     {
         // Fields
         $expected = [
@@ -72,11 +61,8 @@ class DoctrineExtractorTest extends TestCase
             'binary',
             'customFoo',
             'bigint',
+            'json',
         ];
-
-        if (class_exists(Types::class)) {
-            $expected[] = 'json';
-        }
 
         // Associations
         $expected = array_merge($expected, [
@@ -94,21 +80,11 @@ class DoctrineExtractorTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $this->createExtractor($legacy)->getProperties(!class_exists(Types::class) ? 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy' : DoctrineDummy210::class)
+            $this->createExtractor()->getProperties(DoctrineDummy::class)
         );
     }
 
     public function testTestGetPropertiesWithEmbedded()
-    {
-        $this->doTestGetPropertiesWithEmbedded(false);
-    }
-
-    public function testLegacyTestGetPropertiesWithEmbedded()
-    {
-        $this->doTestGetPropertiesWithEmbedded(true);
-    }
-
-    private function doTestGetPropertiesWithEmbedded(bool $legacy)
     {
         if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
@@ -119,7 +95,7 @@ class DoctrineExtractorTest extends TestCase
                 'id',
                 'embedded',
             ],
-            $this->createExtractor($legacy)->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
+            $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
         );
     }
 
@@ -128,33 +104,10 @@ class DoctrineExtractorTest extends TestCase
      */
     public function testExtract($property, array $type = null)
     {
-        $this->doTestExtract(false, $property, $type);
-    }
-
-    /**
-     * @dataProvider typesProvider
-     */
-    public function testLegacyExtract($property, array $type = null)
-    {
-        $this->doTestExtract(true, $property, $type);
-    }
-
-    private function doTestExtract(bool $legacy, $property, array $type = null)
-    {
-        $this->assertEquals($type, $this->createExtractor($legacy)->getTypes(!class_exists(Types::class) ? 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy' : DoctrineDummy210::class, $property, []));
+        $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
     }
 
     public function testExtractWithEmbedded()
-    {
-        $this->doTestExtractWithEmbedded(false);
-    }
-
-    public function testLegacyExtractWithEmbedded()
-    {
-        $this->doTestExtractWithEmbedded(true);
-    }
-
-    private function doTestExtractWithEmbedded(bool $legacy)
     {
         if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
@@ -166,7 +119,7 @@ class DoctrineExtractorTest extends TestCase
             'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable'
         )];
 
-        $actualTypes = $this->createExtractor($legacy)->getTypes(
+        $actualTypes = $this->createExtractor()->getTypes(
             'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded',
             'embedded',
             []
@@ -175,9 +128,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {
@@ -273,41 +223,17 @@ class DoctrineExtractorTest extends TestCase
             ['json', null],
         ];
 
-        if (class_exists(Types::class)) {
-            $provider[] = ['json', null];
-        }
-
         return $provider;
     }
 
     public function testGetPropertiesCatchException()
     {
-        $this->doTestGetPropertiesCatchException(false);
-    }
-
-    public function testLegacyGetPropertiesCatchException()
-    {
-        $this->doTestGetPropertiesCatchException(true);
-    }
-
-    private function doTestGetPropertiesCatchException(bool $legacy)
-    {
-        $this->assertNull($this->createExtractor($legacy)->getProperties('Not\Exist'));
+        $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
     public function testGetTypesCatchException()
     {
-        return $this->doTestGetTypesCatchException(false);
-    }
-
-    public function testLegacyGetTypesCatchException()
-    {
-        return $this->doTestGetTypesCatchException(true);
-    }
-
-    private function doTestGetTypesCatchException(bool $legacy)
-    {
-        $this->assertNull($this->createExtractor($legacy)->getTypes('Not\Exist', 'baz'));
+        $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
     }
 
     public function testGeneratedValueNotWritable()

@@ -16,8 +16,8 @@ namespace Symfony\Component\Messenger;
  */
 class TraceableMessageBus implements MessageBusInterface
 {
-    private $decoratedBus;
-    private $dispatchedMessages = [];
+    private MessageBusInterface $decoratedBus;
+    private array $dispatchedMessages = [];
 
     public function __construct(MessageBusInterface $decoratedBus)
     {
@@ -27,7 +27,7 @@ class TraceableMessageBus implements MessageBusInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message, array $stamps = []): Envelope
+    public function dispatch(object $message, array $stamps = []): Envelope
     {
         $envelope = Envelope::wrap($message, $stamps);
         $context = [

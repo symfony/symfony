@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -26,7 +27,7 @@ class NoTemplatingEntryTest extends TestCase
         $kernel->boot();
 
         $container = $kernel->getContainer();
-        $content = $container->get('twig')->render('index.html.twig');
+        $content = $container->get('twig.alias')->render('index.html.twig');
         $this->assertStringContainsString('{ a: b }', $content);
     }
 
@@ -60,17 +61,16 @@ class NoTemplatingEntryKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(function ($container) {
+        $loader->load(function (ContainerBuilder $container) {
             $container
                 ->loadFromExtension('framework', [
                     'secret' => '$ecret',
                     'form' => ['enabled' => false],
                 ])
                 ->loadFromExtension('twig', [
-                    'strict_variables' => false, // to be removed in 5.0 relying on default
-                    'exception_controller' => null, // to be removed in 5.0
                     'default_path' => __DIR__.'/templates',
                 ])
+                ->setAlias('twig.alias', 'twig')->setPublic(true)
             ;
         });
     }

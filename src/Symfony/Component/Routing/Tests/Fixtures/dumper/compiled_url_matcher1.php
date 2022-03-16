@@ -22,8 +22,8 @@ return [
         '/c2/route3' => [[['_route' => 'route3'], 'b.example.com', null, null, false, false, null]],
         '/route5' => [[['_route' => 'route5'], 'c.example.com', null, null, false, false, null]],
         '/route6' => [[['_route' => 'route6'], null, null, null, false, false, null]],
-        '/route11' => [[['_route' => 'route11'], '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null, false, false, null]],
-        '/route12' => [[['_route' => 'route12', 'var1' => 'val'], '#^(?P<var1>[^\\.]++)\\.example\\.com$#sDi', null, null, false, false, null]],
+        '/route11' => [[['_route' => 'route11'], '{^(?P<var1>[^\\.]++)\\.example\\.com$}sDi', null, null, false, false, null]],
+        '/route12' => [[['_route' => 'route12', 'var1' => 'val'], '{^(?P<var1>[^\\.]++)\\.example\\.com$}sDi', null, null, false, false, null]],
         '/route17' => [[['_route' => 'route17'], null, null, null, false, false, null]],
     ],
     [ // $regexpList

@@ -18,10 +18,6 @@ session_setflash:
     path:     /session_setflash/{message}
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::setFlashAction }
 
-injected_flashbag_session_setflash:
-    path:     injected_flashbag/session_setflash/{message}
-    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\InjectedFlashbagSessionController::setFlashAction}
-
 session_showflash:
     path:     /session_showflash
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::showFlashAction }
@@ -53,6 +49,10 @@ fragment_inlined:
     path:     /fragment_inlined
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController::inlinedAction }
 
+fragment_uri:
+    path:     /fragment_uri
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController::fragmentUriAction }
+
 array_controller:
     path:     /array_controller
     defaults: { _controller: [ArrayController, someAction] }
@@ -60,3 +60,7 @@ array_controller:
 send_email:
     path:     /send_email
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::indexAction }
+
+uid:
+    resource: "../../Controller/UidController.php"
+    type: "annotation"

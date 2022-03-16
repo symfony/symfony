@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
@@ -28,13 +27,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class InlineFragmentRenderer extends RoutableFragmentRenderer
 {
-    private $kernel;
-    private $dispatcher;
+    private HttpKernelInterface $kernel;
+    private ?EventDispatcherInterface $dispatcher;
 
     public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
     {
         $this->kernel = $kernel;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -44,7 +43,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
      *
      *  * alt: an alternative URI to render in case of an error
      */
-    public function render($uri, Request $request, array $options = [])
+    public function render(string|ControllerReference $uri, Request $request, array $options = []): Response
     {
         $reference = null;
         if ($uri instanceof ControllerReference) {
@@ -106,7 +105,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
     }
 
-    protected function createSubRequest($uri, Request $request)
+    protected function createSubRequest(string $uri, Request $request)
     {
         $cookies = $request->cookies->all();
         $server = $request->server->all();
@@ -139,7 +138,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'inline';
     }

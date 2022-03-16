@@ -15,13 +15,15 @@ namespace Symfony\Component\Finder\Iterator;
  * FileTypeFilterIterator only keeps files, directories, or both.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @extends \FilterIterator<string, \SplFileInfo>
  */
 class FileTypeFilterIterator extends \FilterIterator
 {
     public const ONLY_FILES = 1;
     public const ONLY_DIRECTORIES = 2;
 
-    private $mode;
+    private int $mode;
 
     /**
      * @param \Iterator $iterator The Iterator to filter
@@ -36,11 +38,8 @@ class FileTypeFilterIterator extends \FilterIterator
 
     /**
      * Filters the iterator values.
-     *
-     * @return bool true if the value should be kept, false otherwise
      */
-    #[\ReturnTypeWillChange]
-    public function accept()
+    public function accept(): bool
     {
         $fileinfo = $this->current();
         if (self::ONLY_DIRECTORIES === (self::ONLY_DIRECTORIES & $this->mode) && $fileinfo->isFile()) {

@@ -40,22 +40,8 @@ class JsonDecode implements DecoderInterface
         self::RECURSION_DEPTH => 512,
     ];
 
-    /**
-     * Constructs a new JsonDecode instance.
-     *
-     * @param array $defaultContext
-     */
-    public function __construct($defaultContext = [], int $depth = 512)
+    public function __construct(array $defaultContext = [])
     {
-        if (!\is_array($defaultContext)) {
-            @trigger_error(sprintf('Using constructor parameters that are not a default context is deprecated since Symfony 4.2, use the "%s" and "%s" keys of the context instead.', self::ASSOCIATIVE, self::RECURSION_DEPTH), \E_USER_DEPRECATED);
-
-            $defaultContext = [
-                self::ASSOCIATIVE => (bool) $defaultContext,
-                self::RECURSION_DEPTH => $depth,
-            ];
-        }
-
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
@@ -80,13 +66,11 @@ class JsonDecode implements DecoderInterface
      * json_decode_options: integer
      *      Specifies additional options as per documentation for json_decode
      *
-     * @return mixed
-     *
      * @throws NotEncodableValueException
      *
      * @see https://php.net/json_decode
      */
-    public function decode($data, $format, array $context = [])
+    public function decode(string $data, string $format, array $context = []): mixed
     {
         $associative = $context[self::ASSOCIATIVE] ?? $this->defaultContext[self::ASSOCIATIVE];
         $recursionDepth = $context[self::RECURSION_DEPTH] ?? $this->defaultContext[self::RECURSION_DEPTH];
@@ -98,7 +82,7 @@ class JsonDecode implements DecoderInterface
             throw new NotEncodableValueException($e->getMessage(), 0, $e);
         }
 
-        if (\PHP_VERSION_ID >= 70300 && (\JSON_THROW_ON_ERROR & $options)) {
+        if (\JSON_THROW_ON_ERROR & $options) {
             return $decodedData;
         }
 
@@ -111,8 +95,10 @@ class JsonDecode implements DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding(string $format /*, array $context = [] */): bool
     {
         return JsonEncoder::FORMAT === $format;
     }

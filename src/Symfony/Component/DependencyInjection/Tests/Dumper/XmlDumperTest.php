@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -23,6 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 
 class XmlDumperTest extends TestCase
 {
@@ -82,8 +84,6 @@ class XmlDumperTest extends TestCase
         </service>
       </argument>
     </service>
-    <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
   </services>
 </container>
 ', $dumper->dump());
@@ -101,8 +101,6 @@ class XmlDumperTest extends TestCase
       <tag name=\"foo&quot;bar\bar\" foo=\"foo&quot;barřž€\"/>
       <argument>foo&lt;&gt;&amp;bar</argument>
     </service>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
 ", $dumper->dump());
@@ -127,8 +125,6 @@ class XmlDumperTest extends TestCase
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container15.php'],
@@ -137,8 +133,6 @@ class XmlDumperTest extends TestCase
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\"/>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container16.php'],
@@ -147,8 +141,6 @@ class XmlDumperTest extends TestCase
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"decorator\" decorates=\"decorated\" decoration-on-invalid=\"null\" decoration-inner-name=\"decorated.inner\" decoration-priority=\"1\"/>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container34.php'],
@@ -245,9 +237,6 @@ class XmlDumperTest extends TestCase
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_abstract.xml'), $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();
@@ -263,5 +252,16 @@ class XmlDumperTest extends TestCase
         $dumper = new XmlDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_enumeration.xml'), $dumper->dump());
+    }
+
+    public function testDumpServiceWithAbstractArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
+            ->setArgument('$bar', 'test');
+
+        $dumper = new XmlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_abstract_argument.xml', $dumper->dump());
     }
 }

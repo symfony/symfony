@@ -17,6 +17,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -57,7 +59,6 @@ class MandrillApiTransportTest extends TestCase
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('message', $payload);
@@ -119,5 +120,42 @@ class MandrillApiTransportTest extends TestCase
         $this->expectException(HttpTransportException::class);
         $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
+    }
+
+    public function testTagAndMetadataHeaders()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TagHeader('password-reset'));
+        $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
+        $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MandrillApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('message', $payload);
+        $this->assertArrayNotHasKey('headers', $payload['message']);
+        $this->assertArrayHasKey('tags', $payload['message']);
+        $this->assertSame(['password-reset'], $payload['message']['tags']);
+        $this->assertArrayHasKey('metadata', $payload['message']);
+        $this->assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['message']['metadata']);
+    }
+
+    public function testCanHaveMultipleTags()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TagHeader('password-reset,user'));
+        $email->getHeaders()->add(new TagHeader('another'));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MandrillApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('message', $payload);
+        $this->assertArrayNotHasKey('headers', $payload['message']);
+        $this->assertArrayHasKey('tags', $payload['message']);
+        $this->assertSame(['password-reset', 'user', 'another'], $payload['message']['tags']);
     }
 }

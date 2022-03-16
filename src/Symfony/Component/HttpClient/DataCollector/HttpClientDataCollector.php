@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\VarDumper\Caster\ImgStub;
 
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
@@ -25,7 +26,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
     /**
      * @var TraceableHttpClient[]
      */
-    private $clients = [];
+    private array $clients = [];
 
     public function registerClient(string $name, TraceableHttpClient $client)
     {
@@ -34,10 +35,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
     /**
      * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->reset();
 
@@ -99,6 +98,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         $errorCount = 0;
         $baseInfo = [
             'response_headers' => 1,
+            'retry_count' => 1,
             'redirect_count' => 1,
             'redirect_url' => 1,
             'user_data' => 1,
@@ -130,13 +130,94 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
                 }
             }
 
+            if (\is_string($content = $trace['content'])) {
+                $contentType = 'application/octet-stream';
+
+                foreach ($info['response_headers'] ?? [] as $h) {
+                    if (0 === stripos($h, 'content-type: ')) {
+                        $contentType = substr($h, \strlen('content-type: '));
+                        break;
+                    }
+                }
+
+                if (str_starts_with($contentType, 'image/') && class_exists(ImgStub::class)) {
+                    $content = new ImgStub($content, $contentType, '');
+                } else {
+                    $content = [$content];
+                }
+
+                $content = ['response_content' => $content];
+            } elseif (\is_array($content)) {
+                $content = ['response_json' => $content];
+            } else {
+                $content = [];
+            }
+
+            if (isset($info['retry_count'])) {
+                $content['retries'] = $info['previous_info'];
+                unset($info['previous_info']);
+            }
+
             $debugInfo = array_diff_key($info, $baseInfo);
-            $info = array_diff_key($info, $debugInfo) + ['debug_info' => $debugInfo];
+            $info = ['info' => $debugInfo] + array_diff_key($info, $debugInfo) + $content;
             unset($traces[$i]['info']); // break PHP reference used by TraceableHttpClient
             $traces[$i]['info'] = $this->cloneVar($info);
             $traces[$i]['options'] = $this->cloneVar($trace['options']);
+            $traces[$i]['curlCommand'] = $this->getCurlCommand($trace);
         }
 
         return [$errorCount, $traces];
+    }
+
+    private function getCurlCommand(array $trace): ?string
+    {
+        $debug = explode("\n", $trace['info']['debug']);
+        $url = $trace['url'];
+        $command = ['curl', '--compressed'];
+
+        $dataArg = [];
+
+        if ($json = $trace['options']['json'] ?? null) {
+            $dataArg[] = '--data '.escapeshellarg(json_encode($json, \JSON_PRETTY_PRINT));
+        } elseif ($body = $trace['options']['body'] ?? null) {
+            if (\is_string($body)) {
+                $dataArg[] = '--data '.escapeshellarg($body);
+            } elseif (\is_array($body)) {
+                foreach ($body as $key => $value) {
+                    $dataArg[] = '--data '.escapeshellarg("$key=$value");
+                }
+            } else {
+                return null;
+            }
+        }
+
+        $dataArg = empty($dataArg) ? null : implode(' ', $dataArg);
+
+        foreach ($debug as $line) {
+            $line = substr($line, 0, -1);
+
+            if (str_starts_with('< ', $line)) {
+                // End of the request, beginning of the response. Stop parsing.
+                break;
+            }
+
+            if ('' === $line || preg_match('/^[*<]|(Host: )/', $line)) {
+                continue;
+            }
+
+            if (preg_match('/^> ([A-Z]+)/', $line, $match)) {
+                $command[] = sprintf('--request %s', $match[1]);
+                $command[] = sprintf('--url %s', escapeshellarg($url));
+                continue;
+            }
+
+            $command[] = '--header '.escapeshellarg($line);
+        }
+
+        if (null !== $dataArg) {
+            $command[] = $dataArg;
+        }
+
+        return implode(" \\\n  ", $command);
     }
 }

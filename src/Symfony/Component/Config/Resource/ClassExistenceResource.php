@@ -19,16 +19,16 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface
 {
-    private $resource;
-    private $exists;
+    private string $resource;
+    private ?array $exists = null;
 
-    private static $autoloadLevel = 0;
-    private static $autoloadedClass;
-    private static $existsCache = [];
+    private static int $autoloadLevel = 0;
+    private static ?string $autoloadedClass = null;
+    private static array $existsCache = [];
 
     /**
      * @param string    $resource The fully-qualified class name
@@ -42,15 +42,12 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
         }
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }
 
-    /**
-     * @return string The file path to the resource
-     */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }
@@ -60,7 +57,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      *
      * @throws \ReflectionException when a parent class/interface/trait is not found
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp): bool
     {
         $loaded = class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
 
@@ -146,7 +143,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      *
      * @internal
      */
-    public static function throwOnRequiredClass($class, \Exception $previous = null)
+    public static function throwOnRequiredClass(string $class, \Exception $previous = null)
     {
         // If the passed class is the resource being checked, we shouldn't throw.
         if (null === $previous && self::$autoloadedClass === $class) {
@@ -187,7 +184,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             'args' => [$class],
         ];
 
-        if (\PHP_VERSION_ID >= 80000 && isset($trace[1])) {
+        if (isset($trace[1])) {
             $callerFrame = $trace[1];
             $i = 2;
         } elseif (false !== $i = array_search($autoloadFrame, $trace, true)) {
@@ -224,7 +221,6 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             foreach ($props as $p => $v) {
                 if (null !== $v) {
                     $r = new \ReflectionProperty(\Exception::class, $p);
-                    $r->setAccessible(true);
                     $r->setValue($e, $v);
                 }
             }

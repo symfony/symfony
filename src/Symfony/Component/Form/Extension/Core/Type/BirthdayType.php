@@ -21,7 +21,10 @@ class BirthdayType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('years', range((int) date('Y') - 120, date('Y')));
+        $resolver->setDefaults([
+            'years' => range((int) date('Y') - 120, date('Y')),
+            'invalid_message' => 'Please enter a valid birthdate.',
+        ]);
 
         $resolver->setAllowedTypes('years', 'array');
     }
@@ -29,7 +32,7 @@ class BirthdayType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return DateType::class;
     }
@@ -37,7 +40,7 @@ class BirthdayType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'birthday';
     }

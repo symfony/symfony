@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Ip extends Constraint
 {
     public const V4 = '4';
@@ -47,7 +48,7 @@ class Ip extends Constraint
 
     public const INVALID_IP_ERROR = 'b1b427ae-9f6f-41b0-aa9b-84511fbb3c5b';
 
-    protected static $versions = [
+    protected const VERSIONS = [
         self::V4,
         self::V6,
         self::ALL,
@@ -65,9 +66,19 @@ class Ip extends Constraint
         self::ALL_ONLY_PUBLIC,
     ];
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_IP_ERROR => 'INVALID_IP_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const VERSIONS instead
+     */
+    protected static $versions = self::VERSIONS;
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $version = self::V4;
 
@@ -78,16 +89,26 @@ class Ip extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
+    public function __construct(
+        array $options = null,
+        string $version = null,
+        string $message = null,
+        callable $normalizer = null,
+        array $groups = null,
+        mixed $payload = null
+    ) {
+        parent::__construct($options, $groups, $payload);
+
+        $this->version = $version ?? $this->version;
+        $this->message = $message ?? $this->message;
+        $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (!\in_array($this->version, self::$versions)) {
             throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s".', implode('", "', self::$versions)));
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', \is_object($this->normalizer) ? \get_class($this->normalizer) : \gettype($this->normalizer)));
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 }

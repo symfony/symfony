@@ -41,10 +41,15 @@ class ConsoleFormatter implements FormatterInterface
         Logger::EMERGENCY => 'fg=white;bg=red',
     ];
 
-    private $options;
-    private $cloner;
+    private array $options;
+    private VarCloner $cloner;
+
+    /**
+     * @var resource|null
+     */
     private $outputBuffer;
-    private $dumper;
+
+    private CliDumper $dumper;
 
     /**
      * Available options:
@@ -67,14 +72,14 @@ class ConsoleFormatter implements FormatterInterface
         if (class_exists(VarCloner::class)) {
             $this->cloner = new VarCloner();
             $this->cloner->addCasters([
-                '*' => [$this, 'castObject'],
+                '*' => $this->castObject(...),
             ]);
 
             $this->outputBuffer = fopen('php://memory', 'r+');
             if ($this->options['multiline']) {
                 $output = $this->outputBuffer;
             } else {
-                $output = [$this, 'echoLine'];
+                $output = $this->echoLine(...);
             }
 
             $this->dumper = new CliDumper($output, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
@@ -83,10 +88,8 @@ class ConsoleFormatter implements FormatterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function formatBatch(array $records)
+    public function formatBatch(array $records): mixed
     {
         foreach ($records as $key => $record) {
             $records[$key] = $this->format($record);
@@ -97,10 +100,8 @@ class ConsoleFormatter implements FormatterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function format(array $record)
+    public function format(array $record): mixed
     {
         $record = $this->replacePlaceHolder($record);
 
@@ -145,7 +146,7 @@ class ConsoleFormatter implements FormatterInterface
     /**
      * @internal
      */
-    public function castObject($v, array $a, Stub $s, bool $isNested): array
+    public function castObject(mixed $v, array $a, Stub $s, bool $isNested): array
     {
         if ($this->options['multiline']) {
             return $a;
@@ -182,9 +183,9 @@ class ConsoleFormatter implements FormatterInterface
         return $record;
     }
 
-    private function dumpData($data, bool $colors = null): string
+    private function dumpData(mixed $data, bool $colors = null): string
     {
-        if (null === $this->dumper) {
+        if (!isset($this->dumper)) {
             return '';
         }
 

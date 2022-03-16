@@ -37,7 +37,29 @@
         <xsd:element name="services" type="services" />
         <xsd:group ref="foreign" />
       </xsd:sequence>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="when" type="when" />
+      </xsd:sequence>
     </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="when">
+    <xsd:sequence>
+      <xsd:group ref="foreign" />
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="imports" type="imports" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="parameters" type="parameters" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="services" type="services" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+    </xsd:sequence>
+    <xsd:attribute name="env" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:group name="foreign">
@@ -57,6 +79,7 @@
       <xsd:element name="prototype" type="prototype" minOccurs="0" />
       <xsd:element name="defaults" type="defaults" minOccurs="0" maxOccurs="1" />
       <xsd:element name="instanceof" type="instanceof" minOccurs="0" />
+      <xsd:element name="stack" type="stack" minOccurs="0" />
     </xsd:choice>
   </xsd:complexType>
 
@@ -113,7 +136,7 @@
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="deprecated" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
@@ -157,7 +180,7 @@
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="deprecated" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
@@ -176,9 +199,30 @@
     <xsd:attribute name="autoconfigure" type="boolean" />
   </xsd:complexType>
 
+  <xsd:complexType name="stack">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="service" type="service" minOccurs="1" />
+      <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
+    </xsd:choice>
+    <xsd:attribute name="id" type="xsd:string" use="required" />
+    <xsd:attribute name="public" type="boolean" />
+  </xsd:complexType>
+
   <xsd:complexType name="tag">
-    <xsd:attribute name="name" type="xsd:string" use="required" />
-    <xsd:anyAttribute namespace="##any" processContents="lax" />
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:anyAttribute namespace="##any" processContents="lax" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="deprecated">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="package" type="xsd:string" use="required" />
+        <xsd:attribute name="version" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
 
   <xsd:complexType name="parameters">
@@ -260,6 +304,7 @@
 
   <xsd:simpleType name="argument_type">
     <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="abstract" />
       <xsd:enumeration value="collection" />
       <xsd:enumeration value="service" />
       <xsd:enumeration value="expression" />

@@ -20,7 +20,7 @@ class EnvelopeNormalizer implements NormalizerInterface
 {
     private $serializer;
 
-    public function normalize($envelope, $format = null, array $context = [])
+    public function normalize($envelope, string $format = null, array $context = []): array
     {
         $xmlContent = $this->serializer->serialize($envelope->message, 'xml');
 
@@ -31,12 +31,12 @@ class EnvelopeNormalizer implements NormalizerInterface
         ];
     }
 
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof EnvelopeObject;
     }
 
-    public function setSerializer($serializer)
+    public function setSerializer($serializer): void
     {
         $this->serializer = $serializer;
     }

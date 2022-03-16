@@ -22,33 +22,23 @@ class IntlCallbackChoiceLoader extends CallbackChoiceLoader
     /**
      * {@inheritdoc}
      */
-    public function loadChoicesForValues(array $values, $value = null)
+    public function loadChoicesForValues(array $values, callable $value = null): array
     {
-        // Optimize
-        $values = array_filter($values);
-        if (empty($values)) {
-            return [];
-        }
-
-        return $this->loadChoiceList($value)->getChoicesForValues($values);
+        return parent::loadChoicesForValues(array_filter($values), $value);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function loadValuesForChoices(array $choices, $value = null)
+    public function loadValuesForChoices(array $choices, callable $value = null): array
     {
-        // Optimize
         $choices = array_filter($choices);
-        if (empty($choices)) {
-            return [];
-        }
 
         // If no callable is set, choices are the same as values
         if (null === $value) {
             return $choices;
         }
 
-        return $this->loadChoiceList($value)->getValuesForChoices($choices);
+        return parent::loadValuesForChoices($choices, $value);
     }
 }

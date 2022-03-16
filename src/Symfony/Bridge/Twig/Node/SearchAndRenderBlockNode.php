@@ -18,15 +18,10 @@ use Twig\Node\Expression\FunctionExpression;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class SearchAndRenderBlockNode extends FunctionExpression
+final class SearchAndRenderBlockNode extends FunctionExpression
 {
-    /**
-     * @return void
-     */
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->addDebugInfo($this);
         $compiler->raw('$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(');

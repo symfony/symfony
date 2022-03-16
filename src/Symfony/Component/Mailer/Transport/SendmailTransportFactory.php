@@ -21,7 +21,7 @@ final class SendmailTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         if ('sendmail+smtp' === $dsn->getScheme() || 'sendmail' === $dsn->getScheme()) {
-            return new SendmailTransport(null, $this->dispatcher, $this->logger);
+            return new SendmailTransport($dsn->getOption('command'), $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'sendmail', $this->getSupportedSchemes());

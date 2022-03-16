@@ -15,6 +15,8 @@ use Fake\ImportedAndFake;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AttributeController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
@@ -107,7 +109,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testNamedClosure()
     {
-        $arguments = $this->factory->createArgumentMetadata(\Closure::fromCallable([$this, 'signature1']));
+        $arguments = $this->factory->createArgumentMetadata($this->signature1(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, false, null),
@@ -125,6 +127,30 @@ class ArgumentMetadataFactoryTest extends TestCase
             new ArgumentMetadata('bar', \stdClass::class, false, false, null, true),
             new ArgumentMetadata('baz', 'string', false, true, 'value', true),
             new ArgumentMetadata('last', 'string', false, true, '', false),
+        ], $arguments);
+    }
+
+    public function testAttributeSignature()
+    {
+        $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'action']);
+
+        $this->assertEquals([
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
+        ], $arguments);
+    }
+
+    public function testMultipleAttributes()
+    {
+        $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg']);
+        $this->assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
+    }
+
+    public function testIssue41478()
+    {
+        $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'issue41478']);
+        $this->assertEquals([
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
+            new ArgumentMetadata('bat', 'string', false, false, null, false, []),
         ], $arguments);
     }
 

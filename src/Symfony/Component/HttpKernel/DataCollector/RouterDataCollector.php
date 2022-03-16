@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class RouterDataCollector extends DataCollector
 {
     /**
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage<Request, callable>
      */
     protected $controllers;
 
@@ -34,11 +34,9 @@ class RouterDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      *
-     * @param \Throwable|null $exception
-     *
-     * @final since Symfony 4.4
+     * @final
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         if ($response instanceof RedirectResponse) {
             $this->data['redirect'] = true;
@@ -63,17 +61,15 @@ class RouterDataCollector extends DataCollector
         ];
     }
 
-    protected function guessRoute(Request $request, $controller)
+    protected function guessRoute(Request $request, string|object|array $controller)
     {
         return 'n/a';
     }
 
     /**
      * Remembers the controller associated to each request.
-     *
-     * @final since Symfony 4.3
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event)
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }
@@ -81,23 +77,17 @@ class RouterDataCollector extends DataCollector
     /**
      * @return bool Whether this request will result in a redirect
      */
-    public function getRedirect()
+    public function getRedirect(): bool
     {
         return $this->data['redirect'];
     }
 
-    /**
-     * @return string|null The target URL
-     */
-    public function getTargetUrl()
+    public function getTargetUrl(): ?string
     {
         return $this->data['url'];
     }
 
-    /**
-     * @return string|null The target route
-     */
-    public function getTargetRoute()
+    public function getTargetRoute(): ?string
     {
         return $this->data['route'];
     }
@@ -105,7 +95,7 @@ class RouterDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'router';
     }

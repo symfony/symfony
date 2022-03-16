@@ -86,6 +86,13 @@ class FileTest extends TestCase
         @unlink($targetPath);
     }
 
+    public function testGetContent()
+    {
+        $file = new File(__FILE__);
+
+        $this->assertStringEqualsFile(__FILE__, $file->getContent());
+    }
+
     public function getFilenameFixtures()
     {
         return [

@@ -1116,6 +1116,21 @@ class SimpleFormTest extends AbstractFormTest
         $form->setData('foo');
     }
 
+    public function testIsEmptyCallback()
+    {
+        $config = new FormConfigBuilder('foo', null, $this->dispatcher);
+
+        $config->setIsEmptyCallback(function ($modelData): bool { return 'ccc' === $modelData; });
+        $form = new Form($config);
+        $form->setData('ccc');
+        $this->assertTrue($form->isEmpty());
+
+        $config->setIsEmptyCallback(function (): bool { return false; });
+        $form = new Form($config);
+        $form->setData(null);
+        $this->assertFalse($form->isEmpty());
+    }
+
     protected function createForm(): FormInterface
     {
         return $this->getBuilder()->getForm();

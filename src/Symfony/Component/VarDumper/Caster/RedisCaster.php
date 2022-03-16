@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class RedisCaster
 {
@@ -46,7 +46,7 @@ class RedisCaster
         \RedisCluster::FAILOVER_DISTRIBUTE_SLAVES => 'DISTRIBUTE_SLAVES',
     ];
 
-    public static function castRedis(\Redis $c, array $a, Stub $stub, $isNested)
+    public static function castRedis(\Redis $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
@@ -72,7 +72,7 @@ class RedisCaster
         ];
     }
 
-    public static function castRedisArray(\RedisArray $c, array $a, Stub $stub, $isNested)
+    public static function castRedisArray(\RedisArray $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
@@ -84,7 +84,7 @@ class RedisCaster
         ];
     }
 
-    public static function castRedisCluster(\RedisCluster $c, array $a, Stub $stub, $isNested)
+    public static function castRedisCluster(\RedisCluster $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
         $failover = $c->getOption(\RedisCluster::OPT_SLAVE_FAILOVER);
@@ -102,10 +102,7 @@ class RedisCaster
         return $a;
     }
 
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster $redis
-     */
-    private static function getRedisOptions($redis, array $options = []): EnumStub
+    private static function getRedisOptions(\Redis|\RedisArray|\RedisCluster $redis, array $options = []): EnumStub
     {
         $serializer = $redis->getOption(\Redis::OPT_SERIALIZER);
         if (\is_array($serializer)) {

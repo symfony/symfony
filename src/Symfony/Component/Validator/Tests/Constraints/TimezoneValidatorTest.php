@@ -180,6 +180,18 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Etc/UTC', \DateTimeZone::EUROPE];
     }
 
+    public function testInvalidGroupedTimezoneNamed()
+    {
+        $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: 'myMessage');
+
+        $this->validator->validate('Europe/Berlin', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"Europe/Berlin"')
+            ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_ZONE_ERROR)
+            ->assertRaised();
+    }
+
     /**
      * @dataProvider getValidGroupedTimezonesByCountry
      */

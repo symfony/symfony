@@ -1,0 +1,33 @@
+{
+    "name": "symfony/rate-limiter",
+    "type": "library",
+    "description": "Provides a Token Bucket implementation to rate limit input and output in your application",
+    "keywords": ["limiter", "rate-limiter"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wouter de Jong",
+            "email": "wouter@wouterj.nl"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/lock": "^5.4|^6.0",
+        "symfony/options-resolver": "^5.4|^6.0"
+    },
+    "require-dev": {
+        "psr/cache": "^1.0|^2.0|^3.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\RateLimiter\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

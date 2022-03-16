@@ -9,7 +9,7 @@ services:
         public: true
         file: file.php
         lazy: true
-        arguments: [!service { class: Class1, public: false }]
+        arguments: [!service { class: Class1 }]
     bar:
         alias: foo
         public: true

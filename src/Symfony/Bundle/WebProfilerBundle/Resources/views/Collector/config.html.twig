@@ -64,7 +64,13 @@
 
             <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
                 <b>PHP Extensions</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'gray' }}">xdebug {{ collector.hasxdebug ? '✓' : '✗' }}</span>
+                {% if collector.hasXdebugInfo %}
+                    <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()">
+                {% endif %}
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasXdebug ? 'green' : 'gray' }}">Xdebug {{ collector.hasXdebug ? '✓' : '✗' }}</span>
+                {% if collector.hasXdebugInfo %}
+                    </a>
+                {% endif %}
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasapcu ? 'green' : 'gray' }}">APCu {{ collector.hasapcu ? '✓' : '✗' }}</span>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.haszendopcache ? 'green' : 'red' }}">OPcache {{ collector.haszendopcache ? '✓' : '✗' }}</span>
             </div>

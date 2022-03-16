@@ -74,29 +74,6 @@ class TimezoneTypeTest extends BaseTypeTest
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation The option "regions" is deprecated since Symfony 4.2.
-     */
-    public function testFilterByRegions()
-    {
-        $choices = $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE])
-            ->createView()->vars['choices'];
-
-        $this->assertContainsEquals(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Europe / Amsterdam'), $choices);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The option "regions" is deprecated since Symfony 4.2.
-     */
-    public function testFilterByRegionsWithIntl()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "regions" option can only be used if the "intl" option is set to false.');
-        $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE, 'intl' => true]);
-    }
-
-    /**
      * @requires extension intl
      */
     public function testIntlTimeZoneInput()

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -400,17 +400,17 @@ class CompoundFormTest extends AbstractFormTest
     {
         $form = $this->getBuilder()
             ->setCompound(true)
-            // We test using PropertyPathMapper on purpose. The traversal logic
+            // We test using DataMapper on purpose. The traversal logic
             // is currently contained in InheritDataAwareIterator, but even
             // if that changes, this test should still function.
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->getForm();
 
         $childToBeRemoved = $this->createForm('removed', false);
         $childToBeAdded = $this->createForm('added', false);
         $child = $this->getBuilder('child', new EventDispatcher())
             ->setCompound(true)
-            ->setDataMapper(new PropertyPathMapper())
+            ->setDataMapper(new DataMapper())
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($form, $childToBeAdded) {
                 $form->remove('removed');
                 $form->add($childToBeAdded);
@@ -455,7 +455,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testSetDataDoesNotMapViewDataToChildrenWithLockedSetData()
     {
-        $mapper = new PropertyPathMapper();
+        $mapper = new DataMapper();
         $viewData = [
             'firstName' => 'Fabien',
             'lastName' => 'Pot',

@@ -16,12 +16,10 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class CsrfRuntime
+final class CsrfRuntime
 {
-    private $csrfTokenManager;
+    private CsrfTokenManagerInterface $csrfTokenManager;
 
     public function __construct(CsrfTokenManagerInterface $csrfTokenManager)
     {

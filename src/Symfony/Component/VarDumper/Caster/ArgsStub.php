@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ArgsStub extends EnumStub
 {
-    private static $parameters = [];
+    private static array $parameters = [];
 
     public function __construct(array $args, string $function, ?string $class)
     {

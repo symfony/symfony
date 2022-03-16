@@ -20,18 +20,18 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 final class Envelope
 {
-    private $stamps = [];
-    private $message;
+    /**
+     * @var array<string, list<StampInterface>>
+     */
+    private array $stamps = [];
+    private object $message;
 
     /**
-     * @param object           $message
+     * @param object|Envelope  $message
      * @param StampInterface[] $stamps
      */
-    public function __construct($message, array $stamps = [])
+    public function __construct(object $message, array $stamps = [])
     {
-        if (!\is_object($message)) {
-            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object but got "%s".', __METHOD__, \gettype($message)));
-        }
         $this->message = $message;
 
         foreach ($stamps as $stamp) {
@@ -42,10 +42,9 @@ final class Envelope
     /**
      * Makes sure the message is in an Envelope and adds the given stamps.
      *
-     * @param object|Envelope  $message
      * @param StampInterface[] $stamps
      */
-    public static function wrap($message, array $stamps = []): self
+    public static function wrap(object $message, array $stamps = []): self
     {
         $envelope = $message instanceof self ? $message : new self($message);
 
@@ -53,9 +52,9 @@ final class Envelope
     }
 
     /**
-     * @return static A new Envelope instance with additional stamp
+     * Adds one or more stamps.
      */
-    public function with(StampInterface ...$stamps): self
+    public function with(StampInterface ...$stamps): static
     {
         $cloned = clone $this;
 
@@ -67,9 +66,9 @@ final class Envelope
     }
 
     /**
-     * @return static A new Envelope instance without any stamps of the given class
+     * Removes all stamps of the given class.
      */
-    public function withoutAll(string $stampFqcn): self
+    public function withoutAll(string $stampFqcn): static
     {
         $cloned = clone $this;
 
@@ -94,6 +93,13 @@ final class Envelope
         return $cloned;
     }
 
+    /**
+     * @template TStamp of StampInterface
+     *
+     * @param class-string<TStamp> $stampFqcn
+     *
+     * @return TStamp|null
+     */
     public function last(string $stampFqcn): ?StampInterface
     {
         return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;
@@ -111,10 +117,7 @@ final class Envelope
         return $this->stamps;
     }
 
-    /**
-     * @return object The original message contained in the envelope
-     */
-    public function getMessage()
+    public function getMessage(): object
     {
         return $this->message;
     }

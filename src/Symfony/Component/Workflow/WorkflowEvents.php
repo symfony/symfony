@@ -11,6 +11,14 @@
 
 namespace Symfony\Component\Workflow;
 
+use Symfony\Component\Workflow\Event\AnnounceEvent;
+use Symfony\Component\Workflow\Event\CompletedEvent;
+use Symfony\Component\Workflow\Event\EnteredEvent;
+use Symfony\Component\Workflow\Event\EnterEvent;
+use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Event\LeaveEvent;
+use Symfony\Component\Workflow\Event\TransitionEvent;
+
 /**
  * To learn more about how workflow events work, check the documentation
  * entry at {@link https://symfony.com/doc/current/workflow/usage.html#using-events}.
@@ -23,14 +31,14 @@ final class WorkflowEvents
     public const GUARD = 'workflow.guard';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\AnnounceEvent")
+     * @Event("Symfony\Component\Workflow\Event\LeaveEvent")
      */
-    public const ANNOUNCE = 'workflow.announce';
+    public const LEAVE = 'workflow.leave';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\CompletedEvent")
+     * @Event("Symfony\Component\Workflow\Event\TransitionEvent")
      */
-    public const COMPLETED = 'workflow.completed';
+    public const TRANSITION = 'workflow.transition';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\EnterEvent")
@@ -43,14 +51,29 @@ final class WorkflowEvents
     public const ENTERED = 'workflow.entered';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\LeaveEvent")
+     * @Event("Symfony\Component\Workflow\Event\CompletedEvent")
      */
-    public const LEAVE = 'workflow.leave';
+    public const COMPLETED = 'workflow.completed';
 
     /**
-     * @Event("Symfony\Component\Workflow\Event\TransitionEvent")
+     * @Event("Symfony\Component\Workflow\Event\AnnounceEvent")
      */
-    public const TRANSITION = 'workflow.transition';
+    public const ANNOUNCE = 'workflow.announce';
+
+    /**
+     * Event aliases.
+     *
+     * These aliases can be consumed by RegisterListenersPass.
+     */
+    public const ALIASES = [
+        GuardEvent::class => self::GUARD,
+        LeaveEvent::class => self::LEAVE,
+        TransitionEvent::class => self::TRANSITION,
+        EnterEvent::class => self::ENTER,
+        EnteredEvent::class => self::ENTERED,
+        CompletedEvent::class => self::COMPLETED,
+        AnnounceEvent::class => self::ANNOUNCE,
+    ];
 
     private function __construct()
     {

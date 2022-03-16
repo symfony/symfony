@@ -33,7 +33,7 @@ class RedisArrayStoreTest extends AbstractRedisStoreTest
         }
     }
 
-    protected function getRedisConnection()
+    protected function getRedisConnection(): \RedisArray
     {
         $redis = new \RedisArray([getenv('REDIS_HOST')]);
 

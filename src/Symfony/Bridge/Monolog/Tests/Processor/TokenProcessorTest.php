@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\TokenProcessor;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 /**
  * Tests the TokenProcessor.
@@ -25,7 +26,11 @@ class TokenProcessorTest extends TestCase
 {
     public function testProcessor()
     {
-        $token = new UsernamePasswordToken('user', 'password', 'provider', ['ROLE_USER']);
+        if (!method_exists(UsernamePasswordToken::class, 'getUserIdentifier')) {
+            $this->markTestSkipped('This test requires symfony/security-core 5.3+');
+        }
+
+        $token = new UsernamePasswordToken(new InMemoryUser('user', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
@@ -34,8 +39,7 @@ class TokenProcessorTest extends TestCase
         $record = $processor($record);
 
         $this->assertArrayHasKey('token', $record['extra']);
-        $this->assertEquals($token->getUsername(), $record['extra']['token']['username']);
-        $this->assertEquals($token->isAuthenticated(), $record['extra']['token']['authenticated']);
+        $this->assertEquals($token->getUserIdentifier(), $record['extra']['token']['user_identifier']);
         $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
     }
 }

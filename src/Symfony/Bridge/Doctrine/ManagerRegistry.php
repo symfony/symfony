@@ -30,20 +30,16 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
 
     /**
      * {@inheritdoc}
-     *
-     * @return object
      */
-    protected function getService($name)
+    protected function getService($name): object
     {
         return $this->container->get($name);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    protected function resetService($name)
+    protected function resetService($name): void
     {
         if (!$this->container->initialized($name)) {
             return;
@@ -55,17 +51,13 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
         }
         $manager->setProxyInitializer(\Closure::bind(
             function (&$wrappedInstance, LazyLoadingInterface $manager) use ($name) {
-                if (isset($this->normalizedIds[$normalizedId = strtolower($name)])) { // BC with DI v3.4
-                    $name = $this->normalizedIds[$normalizedId];
-                }
                 if (isset($this->aliases[$name])) {
                     $name = $this->aliases[$name];
                 }
                 if (isset($this->fileMap[$name])) {
                     $wrappedInstance = $this->load($this->fileMap[$name], false);
                 } else {
-                    $method = $this->methodMap[$name] ?? 'get'.strtr($name, $this->underscoreMap).'Service'; // BC with DI v3.4
-                    $wrappedInstance = $this->{$method}(false);
+                    $wrappedInstance = $this->{$this->methodMap[$name]}(false);
                 }
 
                 $manager->setProxyInitializer(null);

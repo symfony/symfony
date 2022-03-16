@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -38,7 +39,7 @@ class GuardListenerTest extends TestCase
             ],
         ];
         $expressionLanguage = new ExpressionLanguage();
-        $token = new UsernamePasswordToken('username', 'credentials', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'credentials', ['ROLE_USER']), 'provider', ['ROLE_USER']);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
         $this->authenticationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -136,7 +137,7 @@ class GuardListenerTest extends TestCase
     private function createEvent(Transition $transition = null)
     {
         $subject = new Subject();
-        $transition = $transition ?? new Transition('name', 'from', 'to');
+        $transition ??= new Transition('name', 'from', 'to');
 
         $workflow = $this->createMock(WorkflowInterface::class);
 

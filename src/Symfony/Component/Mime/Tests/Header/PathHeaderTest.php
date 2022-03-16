@@ -13,7 +13,6 @@ namespace Symfony\Component\Mime\Tests\Header;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Exception\AddressEncoderException;
 use Symfony\Component\Mime\Header\PathHeader;
 
 class PathHeaderTest extends TestCase
@@ -50,11 +49,10 @@ class PathHeaderTest extends TestCase
         $this->assertEquals('<chris@xn--swftmailer-78a.org>', $header->getBodyAsString());
     }
 
-    public function testAddressMustBeEncodable()
+    public function testAddressMustBeEncodableWithUtf8CharsInLocalPart()
     {
-        $this->expectException(AddressEncoderException::class);
         $header = new PathHeader('Return-Path', new Address('chrïs@swiftmailer.org'));
-        $header->getBodyAsString();
+        $this->assertSame('<chrïs@swiftmailer.org>', $header->getBodyAsString());
     }
 
     public function testSetBody()

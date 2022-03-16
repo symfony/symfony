@@ -1,6 +1,95 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `PropertyPathMaper`
+ * Remove `Symfony\Component\Form\Extension\Validator\Util\ServerParams`
+ * Remove `FormPass` configuration
+ * Remove the `NumberToLocalizedStringTransformer::ROUND_*` constants, use `\NumberFormatter::ROUND_*` instead
+ * The `rounding_mode` option of the `PercentType` defaults to `\NumberFormatter::ROUND_HALFUP`
+ * The rounding mode argument of the constructor of `PercentToLocalizedStringTransformer` defaults to `\NumberFormatter::ROUND_HALFUP`
+ * Add `FormConfigInterface::getIsEmptyCallback()` and `FormConfigBuilderInterface::setIsEmptyCallback()`
+ * Change `$forms` parameter type of the `DataMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$forms` parameter type of the `DataMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+
+5.4
+---
+
+ * Deprecate calling `FormErrorIterator::children()` if the current element is not iterable.
+ * Allow to pass `TranslatableMessage` objects to the `help` option
+ * Add the `EnumType`
+
+5.3
+---
+
+ * Changed `$forms` parameter type of the `DataMapperInterface::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$forms` parameter type of the `DataMapperInterface::mapFormsToData()` method from `iterable` to `\Traversable`.
+ * Deprecated passing an array as the second argument of the `DataMapper::mapDataToForms()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the first argument of the `DataMapper::mapFormsToData()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the second argument of the `CheckboxListMapper::mapDataToForms()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the first argument of the `CheckboxListMapper::mapFormsToData()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the second argument of the `RadioListMapper::mapDataToForms()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the first argument of the `RadioListMapper::mapFormsToData()` method, pass `\Traversable` instead.
+ * Added a `choice_translation_parameters` option to `ChoiceType`
+ * Add `UuidType` and `UlidType`
+ * Dependency on `symfony/intl` was removed. Install `symfony/intl` if you are using `LocaleType`, `CountryType`, `CurrencyType`, `LanguageType` or `TimezoneType`.
+ * Add `priority` option to `BaseType` and sorting view fields
+
+5.2.0
+-----
+
+ * Added support for using the `{{ label }}` placeholder in constraint messages, which is replaced in the `ViolationMapper` by the corresponding field form label.
+ * Added `DataMapper`, `ChainAccessor`, `PropertyPathAccessor` and `CallbackAccessor` with new callable `getter` and `setter` options for each form type
+ * Deprecated `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`
+ * Added an `html5` option to `MoneyType` and `PercentType`, to use `<input type="number" />`
+
+5.1.0
+-----
+
+ * Deprecated not configuring the `rounding_mode` option of the `PercentType`. It will default to `\NumberFormatter::ROUND_HALFUP` in Symfony 6.
+ * Deprecated not passing a rounding mode to the constructor of `PercentToLocalizedStringTransformer`. It will default to `\NumberFormatter::ROUND_HALFUP` in Symfony 6.
+ * Added `collection_entry` block prefix to `CollectionType` entries
+ * Added a `choice_filter` option to `ChoiceType`
+ * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.
+ * Added a `ChoiceList` facade to leverage explicit choice list caching based on options
+ * Added an `AbstractChoiceLoader` to simplify implementations and handle global optimizations
+ * The `view_timezone` option defaults to the `model_timezone` if no `reference_date` is configured.
+ * Implementing the `FormConfigInterface` without implementing the `getIsEmptyCallback()` method
+   is deprecated. The method will be added to the interface in 6.0.
+ * Implementing the `FormConfigBuilderInterface` without implementing the `setIsEmptyCallback()` method
+   is deprecated. The method will be added to the interface in 6.0.
+ * Added a `rounding_mode` option for the PercentType and correctly round the value when submitted
+ * Deprecated `Symfony\Component\Form\Extension\Validator\Util\ServerParams` in favor of its parent class `Symfony\Component\Form\Util\ServerParams`
+ * Added the `html5` option to the `ColorType` to validate the input
+ * Deprecated `NumberToLocalizedStringTransformer::ROUND_*` constants, use `\NumberFormatter::ROUND_*` instead
+
+5.0.0
+-----
+
+ * Removed support for using different values for the "model_timezone" and "view_timezone" options of the `TimeType`
+   without configuring a reference date.
+ * Removed the `scale` option of the `IntegerType`.
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is not supported anymore.
+ * The `format` option of `DateType` and `DateTimeType` cannot be used when the `html5` option is enabled.
+ * Using names for buttons that do not start with a letter, a digit, or an underscore throw an exception
+ * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons throw an exception.
+ * removed the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
+ * removed `getExtendedType()` method of the `FormTypeExtensionInterface`
+ * added static `getExtendedTypes()` method to the `FormTypeExtensionInterface`
+ * calling to `FormRenderer::searchAndRenderBlock()` method for fields which were already rendered throw a `BadMethodCallException`
+ * removed the `regions` option of the `TimezoneType`
+ * removed the `$scale` argument of the `IntegerToLocalizedStringTransformer`
+ * removed `TemplatingExtension` and `TemplatingRendererEngine` classes, use Twig instead
+ * passing a null message when instantiating a `Symfony\Component\Form\FormError` is not allowed
+ * removed support for using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+
 4.4.0
 -----
 

@@ -20,13 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CachePoolClearerPass implements CompilerPassInterface
 {
-    private $cachePoolClearerTag;
-
-    public function __construct(string $cachePoolClearerTag = 'cache.pool.clearer')
-    {
-        $this->cachePoolClearerTag = $cachePoolClearerTag;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -34,7 +27,7 @@ class CachePoolClearerPass implements CompilerPassInterface
     {
         $container->getParameterBag()->remove('cache.prefix.seed');
 
-        foreach ($container->findTaggedServiceIds($this->cachePoolClearerTag) as $id => $attr) {
+        foreach ($container->findTaggedServiceIds('cache.pool.clearer') as $id => $attr) {
             $clearer = $container->getDefinition($id);
             $pools = [];
             foreach ($clearer->getArgument(0) as $name => $ref) {

@@ -16,9 +16,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -38,36 +38,30 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class RouterListener implements EventSubscriberInterface
 {
-    private $matcher;
-    private $context;
-    private $logger;
-    private $requestStack;
-    private $projectDir;
-    private $debug;
+    private RequestMatcherInterface|UrlMatcherInterface $matcher;
+    private RequestContext $context;
+    private ?LoggerInterface $logger;
+    private RequestStack $requestStack;
+    private ?string $projectDir;
+    private bool $debug;
 
     /**
-     * @param UrlMatcherInterface|RequestMatcherInterface $matcher    The Url or Request matcher
-     * @param RequestContext|null                         $context    The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
-     * @param string                                      $projectDir
+     * @param RequestContext|null $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null, string $projectDir = null, bool $debug = true)
+    public function __construct(UrlMatcherInterface|RequestMatcherInterface $matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null, string $projectDir = null, bool $debug = true)
     {
-        if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
-            throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
-        }
-
         if (null === $context && !$matcher instanceof RequestContextAwareInterface) {
             throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
         }
 
         $this->matcher = $matcher;
-        $this->context = $context ?: $matcher->getContext();
+        $this->context = $context ?? $matcher->getContext();
         $this->requestStack = $requestStack;
         $this->logger = $logger;
         $this->projectDir = $projectDir;
@@ -94,7 +88,7 @@ class RouterListener implements EventSubscriberInterface
         $this->setCurrentRequest($this->requestStack->getParentRequest());
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -114,20 +108,18 @@ class RouterListener implements EventSubscriberInterface
                 $parameters = $this->matcher->match($request->getPathInfo());
             }
 
-            if (null !== $this->logger) {
-                $this->logger->info('Matched route "{route}".', [
-                    'route' => $parameters['_route'] ?? 'n/a',
-                    'route_parameters' => $parameters,
-                    'request_uri' => $request->getUri(),
-                    'method' => $request->getMethod(),
-                ]);
-            }
+            $this->logger?->info('Matched route "{route}".', [
+                'route' => $parameters['_route'] ?? 'n/a',
+                'route_parameters' => $parameters,
+                'request_uri' => $request->getUri(),
+                'method' => $request->getMethod(),
+            ]);
 
             $request->attributes->add($parameters);
             unset($parameters['_route'], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
-            $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
+            $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getUriForPath($request->getPathInfo()));
 
             if ($referer = $request->headers->get('referer')) {
                 $message .= sprintf(' (from "%s")', $referer);
@@ -135,13 +127,13 @@ class RouterListener implements EventSubscriberInterface
 
             throw new NotFoundHttpException($message, $e);
         } catch (MethodNotAllowedException $e) {
-            $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), implode(', ', $e->getAllowedMethods()));
+            $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getUriForPath($request->getPathInfo()), implode(', ', $e->getAllowedMethods()));
 
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
         if (!$this->debug || !($e = $event->getThrowable()) instanceof NotFoundHttpException) {
             return;
@@ -152,7 +144,7 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [['onKernelRequest', 32]],

@@ -25,7 +25,6 @@ class FileLocatorTest extends TestCase
         $loader = new FileLocator([]);
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('isAbsolutePath');
-        $m->setAccessible(true);
 
         $this->assertTrue($m->invoke($loader, $path), '->isAbsolutePath() returns true for an absolute path');
     }
@@ -110,6 +109,6 @@ class FileLocatorTest extends TestCase
         $this->expectExceptionMessage('An empty file name is not valid to be located.');
         $loader = new FileLocator([__DIR__.'/Fixtures']);
 
-        $loader->locate(null, __DIR__);
+        $loader->locate('', __DIR__);
     }
 }

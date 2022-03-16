@@ -16,6 +16,8 @@ namespace Symfony\Component\PropertyAccess;
  * information about the current element.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @extends \ArrayIterator<int, string>
  */
 class PropertyPathIterator extends \ArrayIterator implements PropertyPathIteratorInterface
 {
@@ -31,7 +33,7 @@ class PropertyPathIterator extends \ArrayIterator implements PropertyPathIterato
     /**
      * {@inheritdoc}
      */
-    public function isIndex()
+    public function isIndex(): bool
     {
         return $this->path->isIndex($this->key());
     }
@@ -39,7 +41,7 @@ class PropertyPathIterator extends \ArrayIterator implements PropertyPathIterato
     /**
      * {@inheritdoc}
      */
-    public function isProperty()
+    public function isProperty(): bool
     {
         return $this->path->isProperty($this->key());
     }

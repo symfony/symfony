@@ -11,9 +11,10 @@ services:
     foo:
         class: Bar\FooClass
         tags:
-            - { name: foo, foo: foo }
-            - { name: foo, bar: bar, baz: baz }
-            - { name: nullable, bar: bar, baz: ~ }
+            - foo: { foo: foo }
+            - foo: { bar: bar, baz: baz }
+            - foo: { name: bar, baz: baz }
+            - nullable: { bar: bar, baz: ~ }
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:
@@ -57,7 +58,6 @@ services:
 
     inlined:
         class: Bar
-        public: false
         properties: { pub: pub }
         calls:
             - [setBaz, ['@baz']]
@@ -74,7 +74,6 @@ services:
         public: true
     configurator_service:
         class: ConfClass
-        public: false
         calls:
             - [setFoo, ['@baz']]
 
@@ -84,7 +83,6 @@ services:
         public: true
     configurator_service_simple:
         class: ConfClass
-        public: false
         arguments: ['bar']
     configured_service_simple:
         class: stdClass
@@ -104,11 +102,13 @@ services:
         public: true
     deprecated_service:
         class: stdClass
-        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
+        deprecated:
+            message: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
+            package: vendor/package
+            version: 1.1
         public: true
     new_factory:
         class: FactoryClass
-        public: false
         properties: { foo: bar }
     factory_service:
         class: Bar
@@ -125,8 +125,10 @@ services:
         public: true
     factory_simple:
         class: SimpleFactoryClass
-        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
-        public: false
+        deprecated:
+            message: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
+            package: vendor/package
+            version: 1.1
         arguments: ['foo']
     factory_service_simple:
         class: Bar
@@ -153,19 +155,12 @@ services:
     tagged_iterator_foo:
         class: Bar
         tags:
-            - { name: foo }
-        public: false
+            - foo
     tagged_iterator:
         class: Bar
         arguments:
             - !tagged_iterator foo
         public: true
-    Psr\Container\ContainerInterface:
-        alias: service_container
-        public: false
-    Symfony\Component\DependencyInjection\ContainerInterface:
-        alias: service_container
-        public: false
     alias_for_foo:
         alias: 'foo'
         public: true
@@ -178,3 +173,9 @@ services:
         public: true
     errored_definition:
         class: stdClass
+    preload_sidekick:
+        class: stdClass
+        tags:
+            - container.preload: { class: 'Some\Sidekick1' }
+            - container.preload: { class: 'Some\Sidekick2' }
+        public: true

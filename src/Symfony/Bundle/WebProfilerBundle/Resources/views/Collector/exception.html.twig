@@ -3,7 +3,7 @@
 {% block head %}
     {% if collector.hasexception %}
         <style>
-            {{ render(path('_profiler_exception_css', { token: token })) }}
+            {{ render(controller('web_profiler.controller.exception_panel::stylesheet', { token: token })) }}
             {{ include('@WebProfiler/Collector/exception.css.twig') }}
         </style>
     {% endif %}
@@ -31,7 +31,7 @@
         </div>
     {% else %}
         <div class="sf-reset">
-            {{ render(path('_profiler_exception', { token: token })) }}
+            {{ render(controller('web_profiler.controller.exception_panel::body', { token: token })) }}
         </div>
     {% endif %}
 {% endblock %}

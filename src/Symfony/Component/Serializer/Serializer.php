@@ -17,9 +17,11 @@ use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
 use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
@@ -47,6 +49,19 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {
     /**
+     * Flag to control whether an empty array should be transformed to an
+     * object (in JSON: {}) or to a list (in JSON: []).
+     */
+    public const EMPTY_ARRAY_AS_OBJECT = 'empty_array_as_object';
+
+    private const SCALAR_TYPES = [
+        'int' => true,
+        'bool' => true,
+        'float' => true,
+        'string' => true,
+    ];
+
+    /**
      * @var Encoder\ChainEncoder
      */
     protected $encoder;
@@ -56,12 +71,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     protected $decoder;
 
-    /**
-     * @internal since Symfony 4.1
-     */
-    protected $normalizers = [];
-
-    private $cachedNormalizers;
+    private $normalizers = [];
     private $denormalizerCache = [];
     private $normalizerCache = [];
 
@@ -85,8 +95,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($normalizer instanceof NormalizerInterface || $normalizer instanceof DenormalizerInterface)) {
-                @trigger_error(sprintf('Passing normalizers ("%s") which do not implement either "%s" or "%s" has been deprecated since Symfony 4.2.', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class), \E_USER_DEPRECATED);
-                // throw new \InvalidArgumentException(sprintf('The class "%s" does not implement "%s" or "%s".', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
             }
         }
         $this->normalizers = $normalizers;
@@ -105,8 +114,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($encoder instanceof EncoderInterface || $encoder instanceof DecoderInterface)) {
-                @trigger_error(sprintf('Passing encoders ("%s") which do not implement either "%s" or "%s" has been deprecated since Symfony 4.2.', \get_class($encoder), EncoderInterface::class, DecoderInterface::class), \E_USER_DEPRECATED);
-                // throw new \InvalidArgumentException(sprintf('The class "%s" does not implement "%s" or "%s".', \get_class($normalizer), EncoderInterface::class, DecoderInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($encoder), EncoderInterface::class, DecoderInterface::class));
             }
         }
         $this->encoder = new ChainEncoder($realEncoders);
@@ -116,7 +124,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function serialize($data, $format, array $context = []): string
+    final public function serialize(mixed $data, string $format, array $context = []): string
     {
         if (!$this->supportsEncoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Serialization for the format "%s" is not supported.', $format));
@@ -132,7 +140,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function deserialize($data, $type, $format, array $context = [])
+    final public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
         if (!$this->supportsDecoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Deserialization for the format "%s" is not supported.', $format));
@@ -146,7 +154,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = null, array $context = [])
+    public function normalize(mixed $data, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
@@ -157,9 +165,13 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $data;
         }
 
+        if (\is_array($data) && !$data && ($context[self::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
+            return new \ArrayObject();
+        }
+
         if (is_iterable($data)) {
-            if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) === true && $data instanceof \Countable && 0 === $data->count()) {
-                return $data;
+            if ($data instanceof \Countable && ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && !\count($data)) {
+                return new \ArrayObject();
             }
 
             $normalized = [];
@@ -175,10 +187,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            throw new NotNormalizableValueException(sprintf('Could not normalize object of type "%s", no supporting normalizer found.', \get_class($data)));
+            throw new NotNormalizableValueException(sprintf('Could not normalize object of type "%s", no supporting normalizer found.', get_debug_type($data)));
         }
 
-        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('%s resource', get_resource_type($data))));
+        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('"%s" resource', get_resource_type($data))));
     }
 
     /**
@@ -186,23 +198,50 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
+        if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS], $context['not_normalizable_value_exceptions'])) {
+            throw new LogicException('Passing a value for "not_normalizable_value_exceptions" context key is not allowed.');
+        }
+
+        $normalizer = $this->getDenormalizer($data, $type, $format, $context);
+
+        // Check for a denormalizer first, e.g. the data is wrapped
+        if (!$normalizer && isset(self::SCALAR_TYPES[$type])) {
+            if (!('is_'.$type)($data)) {
+                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)), $data, [$type], $context['deserialization_path'] ?? null, true);
+            }
+
+            return $data;
+        }
+
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
 
-        if ($normalizer = $this->getDenormalizer($data, $type, $format, $context)) {
-            return $normalizer->denormalize($data, $type, $format, $context);
+        if (!$normalizer) {
+            throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
         }
 
-        throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
+        if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])) {
+            unset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]);
+            $context['not_normalizable_value_exceptions'] = [];
+            $errors = &$context['not_normalizable_value_exceptions'];
+            $denormalized = $normalizer->denormalize($data, $type, $format, $context);
+            if ($errors) {
+                throw new PartialDenormalizationException($denormalized, $errors);
+            }
+
+            return $denormalized;
+        }
+
+        return $normalizer->denormalize($data, $type, $format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return null !== $this->getNormalizer($data, $format, $context);
     }
@@ -210,9 +249,9 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
-        return null !== $this->getDenormalizer($data, $type, $format, $context);
+        return isset(self::SCALAR_TYPES[$type]) || null !== $this->getDenormalizer($data, $type, $format, $context);
     }
 
     /**
@@ -222,12 +261,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @param string $format  Format name, present to give the option to normalizers to act differently based on formats
      * @param array  $context Options available to the normalizer
      */
-    private function getNormalizer($data, ?string $format, array $context): ?NormalizerInterface
+    private function getNormalizer(mixed $data, ?string $format, array $context): ?NormalizerInterface
     {
-        if ($this->cachedNormalizers !== $this->normalizers) {
-            $this->cachedNormalizers = $this->normalizers;
-            $this->denormalizerCache = $this->normalizerCache = [];
-        }
         $type = \is_object($data) ? \get_class($data) : 'native-'.\gettype($data);
 
         if (!isset($this->normalizerCache[$format][$type])) {
@@ -265,12 +300,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @param string $format  Format name, present to give the option to normalizers to act differently based on formats
      * @param array  $context Options available to the denormalizer
      */
-    private function getDenormalizer($data, string $class, ?string $format, array $context): ?DenormalizerInterface
+    private function getDenormalizer(mixed $data, string $class, ?string $format, array $context): ?DenormalizerInterface
     {
-        if ($this->cachedNormalizers !== $this->normalizers) {
-            $this->cachedNormalizers = $this->normalizers;
-            $this->denormalizerCache = $this->normalizerCache = [];
-        }
         if (!isset($this->denormalizerCache[$format][$class])) {
             $this->denormalizerCache[$format][$class] = [];
 
@@ -301,7 +332,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function encode($data, $format, array $context = [])
+    final public function encode(mixed $data, string $format, array $context = []): string
     {
         return $this->encoder->encode($data, $format, $context);
     }
@@ -309,7 +340,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function decode($data, $format, array $context = [])
+    final public function decode(string $data, string $format, array $context = []): mixed
     {
         return $this->decoder->decode($data, $format, $context);
     }
@@ -317,7 +348,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format, array $context = [])
+    public function supportsEncoding(string $format, array $context = []): bool
     {
         return $this->encoder->supportsEncoding($format, $context);
     }
@@ -325,7 +356,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format, array $context = [])
+    public function supportsDecoding(string $format, array $context = []): bool
     {
         return $this->decoder->supportsDecoding($format, $context);
     }

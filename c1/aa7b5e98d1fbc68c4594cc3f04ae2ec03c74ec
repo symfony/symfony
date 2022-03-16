@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-01-05T12:59:20Z
+
+no change to the testsuite ? this looks suspicious to me
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-01-05T13:01:29Z
+
+I'll fix the tests if this is acceptable. Sorry but don't want to waste time on that if it's going to be closed due to being seen as BC break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-01-09T11:00:53Z
+
+That works for me! Please, go ahead with the tests :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-02-25T07:49:46Z
+
+@Seldaek Any news?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-16T16:09:39Z
+
+Sorry, got lost in the inbox.. Rebased and fixed TableTest now.

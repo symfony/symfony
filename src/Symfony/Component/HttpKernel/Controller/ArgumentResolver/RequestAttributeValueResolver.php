@@ -43,7 +43,7 @@ final class RequestAttributeValueResolver implements ArgumentValueResolverInterf
 
         // at this point we have a typehint which is either a scalar, a class or an intersection type (which must be a class too)
         // if the type is not a scalar type and the value is not an object we should skip here and let other value resolvers do their job
-        if (!in_array($type, ['string', 'int', 'float', 'bool'], true) && gettype($request->attributes->get($argument->getName())) !== 'object') {
+        if (!\in_array($type, ['string', 'int', 'float', 'bool'], true) && 'object' !== \gettype($request->attributes->get($argument->getName()))) {
             return false;
         }
 

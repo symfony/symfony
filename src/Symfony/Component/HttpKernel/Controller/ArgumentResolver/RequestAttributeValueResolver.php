@@ -27,7 +27,27 @@ final class RequestAttributeValueResolver implements ArgumentValueResolverInterf
      */
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        return !$argument->isVariadic() && $request->attributes->has($argument->getName());
+        if ($argument->isVariadic()) {
+            return false;
+        }
+
+        if (!$request->attributes->has($argument->getName())) {
+            return false;
+        }
+
+        $type = $argument->getType();
+        // for union types or no type we assume it is supported to keep things simple
+        if (null === $type || str_contains($type, '|')) {
+            return true;
+        }
+
+        // at this point we have a typehint which is either a scalar, a class or an intersection type (which must be a class too)
+        // if the type is not a scalar type and the value is not an object we should skip here and let other value resolvers do their job
+        if (!in_array($type, ['string', 'int', 'float', 'bool'], true) && gettype($request->attributes->get($argument->getName())) !== 'object') {
+            return false;
+        }
+
+        return true;
     }
 
     /**

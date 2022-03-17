@@ -128,7 +128,7 @@ class UserValueResolverTest extends TestCase
 
         $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessageMatches('/^The logged-in user is an instance of "Mock_UserInterface[^"]+" and an user of type "Symfony\\\\Component\\\\Security\\\\Core\\\\User\\\\InMemoryUser" is expected.$/');
+        $this->expectExceptionMessageMatches('/^The logged-in user is an instance of "Mock_UserInterface[^"]+" but a user of type "Symfony\\\\Component\\\\Security\\\\Core\\\\User\\\\InMemoryUser" is expected.$/');
         iterator_to_array($resolver->resolve(Request::create('/'), $metadata));
     }
 

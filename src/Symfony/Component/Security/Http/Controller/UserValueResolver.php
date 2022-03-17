@@ -61,7 +61,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
         } elseif (null === $argument->getType() || $user instanceof ($argument->getType())) {
             yield $user;
         } else {
-            throw new AccessDeniedException(sprintf('The logged-in user is an instance of "%s" and an user of type "%s" is expected.', $user::class, $argument->getType()));
+            throw new AccessDeniedException(sprintf('The logged-in user is an instance of "%s" but a user of type "%s" is expected.', $user::class, $argument->getType()));
         }
     }
 }

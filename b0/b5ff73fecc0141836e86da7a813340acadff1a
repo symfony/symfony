@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2022-03-16T11:20:19Z
+
+Well if think removing a 500 could easily be considered an non-breaking change.
+
+We could even go further and throw an access denied exception if the current user class doesn't extends the argument type. This would allow to do thing like limiting access to admin by sub-classing the user class for example.
+
+This is actually one of the solution I proposed to fix https://github.com/sensiolabs/SensioFrameworkExtraBundle/issues/574 so I'm in favor of doing this change.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-16T11:39:39Z
+
+This would fix https://github.com/symfony/symfony/issues/45257.
+
+While I agree that the current error is bad from a DX pov, I'm wondering if we want the argument resolver to know about authorization. I mean, as you said, it's mostly a developer error.
+
+Assuming we go this way, wouldn't the access denied error be cryptic as well in case you just forgot to make that parameter nullable? Maybe that could be fixed by a meaningful exception message?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-16T12:22:48Z
+
+Yeah I was not sure about adding a message to the exception, I guess by default it is hidden from users so it is only for devs right? If so I'll add a message to try and clarify why the AccessDenied occurred. But IMO while it may confuse some, it is still clearer than this autowiring exception which requires you to know quite a bit about symfony internals to make sense of it.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-16T12:29:33Z
+
+@chalasr so do you see this as bugfix too? Should I rebase to 4.4 and try to add some tests?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-16T13:01:33Z
+
+> I guess by default it is hidden from users so it is only for devs right?
+
+Yes, all good.
+
+Honestly I tend to think this is more a feature as it was not intended to work like this originally, but I agree the current error is really problematic and we should fix it.
+Please go ahead with the rebase and the tests, switching back to 6.1 should not be hard for us if others disagree with merging this as a bugfix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-16T13:08:07Z
+
+I understand the discussion, but per our merging strategy, this is new behavior and as such, it should be merged on 6.1.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-16T15:21:59Z
+
+OK updated to add tests, and also include the idea by @jvasseur above:
+
+> We could even go further and throw an access denied exception if the current user class doesn't extends the argument type. This would allow to do thing like limiting access to admin by sub-classing the user class for example.
+
+So now it yields $user or null depending if the $user is instanceof param type (or null for nullable params), and otherwise it throws AccessDenied always.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-16T16:34:21Z
+
+Looks good. Should we handle the `User $user = new User()` case somehow?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-16T20:15:38Z
+
+@chalasr yes that sounds sensible, although a bit of a weird case it's better if this doesn't end up throwing AccessDenied so I added a test & fix for that case 👍🏻

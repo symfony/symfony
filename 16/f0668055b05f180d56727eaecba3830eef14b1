@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2022-01-07T23:20:56Z
+
+I haven't looked at the code yet, but I really like the idea. See also these 2 comments on the original PR: https://github.com/symfony/symfony/pull/42251 Being able to predict whether an option has a value or not and maybe even dumping the static values to the completion file (e.g. for apps like Composer) are 2 other very interesting advantages of this approach.
+
+From https://github.com/posener/complete , mentioned in the comments I referenced above, I especially like the Predict enum:
+
+```
+ 			"name":      predict.Set{"foo", "bar", "foo bar"},
+ 			"something": predict.Something,
+ 			"nothing":   predict.Nothing,
+```
+
+Set: values are static, can be dumped (or described)
+Something: We'll have to invoke the `_complete` command for this
+Nothing: Skip completion, this option has no value (or value is not autocompletable).
+
+We can even extend this with e.g. Files, to enable the great file completion system of shell completion.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-01-10T20:49:17Z
+
+After you comment @wouterj, I think we can use a union type that covers each cases.
+
+- `true`: calling `complete`.
+- `false`: disable completion
+- `\Closure`: call it
+- `iterable`: get fixed values from the iterable
+- `null`: not defined, will call `complete` by default. Setting `null` should be deprecated and become `false` by default in `7.0`.
+
+We must stay open to file completion once we'd have managed to get it work #43607.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-02-15T18:33:35Z
+
+Thank you for all your time for this review. We have something very clear now.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-03-16T18:45:36Z
+
+@chalasr @wouterj ready for a new review. Description updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-17T16:27:14Z
+
+What about this todo?
+>  Add info to descriptor
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-03-17T16:43:51Z
+
+> What about this todo?
+> > Add info to descriptor
+
+Could be part of an other PR.

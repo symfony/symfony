@@ -101,7 +101,10 @@ class ArgumentMetadata
     }
 
     /**
-     * @return object[]
+     * @param class-string          $name
+     * @param self::IS_INSTANCEOF|0 $flags
+     *
+     * @return array<object>
      */
     public function getAttributes(string $name = null, int $flags = 0): array
     {
@@ -109,6 +112,19 @@ class ArgumentMetadata
             return $this->attributes;
         }
 
+        return $this->getAttributesOfType($name, $flags);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T>       $name
+     * @param self::IS_INSTANCEOF|0 $flags
+     *
+     * @return array<T>
+     */
+    public function getAttributesOfType(string $name, int $flags = 0): array
+    {
         $attributes = [];
         if ($flags & self::IS_INSTANCEOF) {
             foreach ($this->attributes as $attribute) {

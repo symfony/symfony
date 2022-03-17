@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-20T15:25:31Z
+
+That reminds me https://github.com/symfony/symfony/pull/40783, we should not forget about it :angel:
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-01-20T15:26:39Z
+
+Well, do I *need* it? No, I worked around it already with an instanceof check to calm PHPStan down..
+
+I just assumed this was going to be a simple tweak that could be done as bugfix, but then I noticed the API is kinda bad and thus the types are too broad and yeah.. the usual rabbit hole :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-01-20T16:13:03Z
+
+Okay, let's target 6.1 then. You never know who's parsing those docblocks these days. 🙈
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-01-20T20:37:48Z
+
+I'm fine rebasing this for 6.1, but the question remains what the better API is.. do others care about fixing the API and deprecating things one way or the other? Or is it just me? :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-01-27T18:01:37Z
+
+try https://psalm.dev/r/eb6309306d
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-27T18:09:00Z
+
+This syntax for conditional types works in psalm, but is not supported in phpstan or in PHPStorm (without the psalm plugin) or other IDEs. So this makes it unacceptable to be used in the Symfony phpdoc.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-01-27T18:12:03Z
+
+https://github.com/phpstan/phpstan/issues/3853 we wait
+
+personally, psalm is like a god to me ;);)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-21T15:39:41Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-16T16:02:12Z
+
+Ok rebased. Added a second method to have cleaner return types. I guess one could add a deprecation warning if you pass `$name` to `getAttributes()` but I'm not sure if it's worth bothering people with this.

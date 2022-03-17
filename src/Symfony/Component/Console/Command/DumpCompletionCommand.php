@@ -12,8 +12,6 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,12 +37,7 @@ final class DumpCompletionCommand extends Command
      */
     protected static $defaultDescription = 'Dump the shell completion script';
 
-    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
-    {
-        if ($input->mustSuggestArgumentValuesFor('shell')) {
-            $suggestions->suggestValues($this->getSupportedShells());
-        }
-    }
+    private array $supportedShells;
 
     protected function configure()
     {
@@ -82,7 +75,7 @@ Add this to the end of your shell configuration file (e.g. <info>"~/.bashrc"</>)
     <info>eval "$(${fullCommand} completion bash)"</>
 EOH
             )
-            ->addArgument('shell', InputArgument::OPTIONAL, 'The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given')
+            ->addArgument('shell', InputArgument::OPTIONAL, 'The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given', null, $this->getSupportedShells(...))
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Tail the completion debug log')
         ;
     }
@@ -135,7 +128,7 @@ EOH
      */
     private function getSupportedShells(): array
     {
-        return array_map(function ($f) {
+        return $this->supportedShells ??= array_map(function ($f) {
             return pathinfo($f, \PATHINFO_EXTENSION);
         }, glob(__DIR__.'/../Resources/completion.*'));
     }

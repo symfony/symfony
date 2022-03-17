@@ -51,7 +51,7 @@ class SendersLocator implements SendersLocatorInterface
                 $typeSenderAliases[] = $senderAlias;
             }
 
-            if (\PHP_VERSION_ID >= 80000 && empty($typeSenderAliases)) {
+            if (empty($typeSenderAliases)) {
                 $typeSenderAliases = $this->getSendersFromAttributes($type);
             }
 

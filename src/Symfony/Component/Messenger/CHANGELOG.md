@@ -6,7 +6,7 @@ CHANGELOG
 
  * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs.
  * Automatically resolve handled message type when method different from `__invoke` is used as handler.
- * Add `Senders` attribute to configure message to sender mapping
+ * Add `Transport` attribute to configure message to sender mapping
 
 6.0
 ---

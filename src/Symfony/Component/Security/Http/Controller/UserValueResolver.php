@@ -37,7 +37,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
     {
         // with the attribute, the type can be any UserInterface implementation
         // otherwise, the type must be UserInterface
-        if (UserInterface::class !== $argument->getType() && !$argument->getAttributes(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
+        if (UserInterface::class !== $argument->getType() && !$argument->getAttributesOfType(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
             return false;
         }
 

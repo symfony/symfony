@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-16T08:07:29Z
+
+Hey!
+
+I think @PhilETaylor has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-03-17T18:46:40Z
+
+> I think @PhilETaylor has recently worked with this code. Maybe they can help review this?
+
+Sorry, nothing to add here. My changes were in HtmlRenderer to render a custom template 2 years ago https://github.com/symfony/symfony/commit/6e1d16b44d0a50cca45fc115a0da18cb24256fc6 and not related to framework.ide :) :) Although I use the framework.ide links daily so happy to test this PR.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-17T06:46:01Z
+
+Can you rebase to get rid of the merge commit?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-17T12:44:11Z
+
+@raziel057 Rebase done. For next times, please check https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request :)

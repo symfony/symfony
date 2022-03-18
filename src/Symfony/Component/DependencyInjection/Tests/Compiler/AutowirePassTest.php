@@ -1141,11 +1141,15 @@ class AutowirePassTest extends TestCase
 
         $definition = $container->getDefinition(AutowireAttribute::class);
 
-        $this->assertCount(4, $definition->getArguments());
+        $this->assertCount(8, $definition->getArguments());
         $this->assertEquals(new Reference('some.id'), $definition->getArgument(0));
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(1));
         $this->assertSame('%some.parameter%/bar', $definition->getArgument(2));
-        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(3));
+        $this->assertEquals(new Reference('some.id'), $definition->getArgument(3));
+        $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(4));
+        $this->assertSame('bar', $definition->getArgument(5));
+        $this->assertSame('@bar', $definition->getArgument(6));
+        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(7));
 
         $container->compile();
 
@@ -1154,6 +1158,10 @@ class AutowirePassTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $service->service);
         $this->assertSame('foo', $service->expression);
         $this->assertSame('foo/bar', $service->value);
+        $this->assertInstanceOf(\stdClass::class, $service->serviceAsValue);
+        $this->assertSame('foo', $service->expressionAsValue);
+        $this->assertSame('bar', $service->rawValue);
+        $this->assertSame('@bar', $service->escapedRawValue);
         $this->assertNull($service->invalid);
     }
 }

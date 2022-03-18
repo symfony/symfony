@@ -28,17 +28,25 @@ class Autowire
     /**
      * Use only ONE of the following.
      *
+     * @param string|null $value      Parameter value (ie "%kernel.project_dir%/some/path")
      * @param string|null $service    Service ID (ie "some.service")
      * @param string|null $expression Expression (ie 'service("some.service").someMethod()')
-     * @param string|null $value      Parameter value (ie "%kernel.project_dir%/some/path")
      */
     public function __construct(
+        ?string $value = null,
         ?string $service = null,
         ?string $expression = null,
-        ?string $value = null
     ) {
         if (!($service xor $expression xor null !== $value)) {
             throw new LogicException('#[Autowire] attribute must declare exactly one of $service, $expression, or $value.');
+        }
+
+        if (null !== $value && str_starts_with($value, '@')) {
+            match (true) {
+                str_starts_with($value, '@@') => $value = substr($value, 1),
+                str_starts_with($value, '@=') => $expression = substr($value, 2),
+                default => $service = substr($value, 1),
+            };
         }
 
         $this->value = match (true) {

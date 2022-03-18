@@ -37,6 +37,14 @@ class AutowireAttribute
         public string $expression,
         #[Autowire(value: '%some.parameter%/bar')]
         public string $value,
+        #[Autowire('@some.id')]
+        public \stdClass $serviceAsValue,
+        #[Autowire("@=parameter('some.parameter')")]
+        public string $expressionAsValue,
+        #[Autowire('bar')]
+        public string $rawValue,
+        #[Autowire('@@bar')]
+        public string $escapedRawValue,
         #[Autowire(service: 'invalid.id')]
         public ?\stdClass $invalid = null,
     ) {

@@ -87,7 +87,7 @@ class SendmailTransport extends AbstractTransport
 
         $command = $this->command;
 
-        if (!empty($recipients = $message->getEnvelope()->getRecipients())) {
+        if ($recipients = $message->getEnvelope()->getRecipients()) {
             $command = str_replace(' -t', '', $command);
         }
 

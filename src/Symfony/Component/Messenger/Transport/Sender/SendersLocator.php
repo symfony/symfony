@@ -85,7 +85,7 @@ class SendersLocator implements SendersLocatorInterface
             return [];
         }
 
-        $attributes = $reflectionClass->getAttributes(Transport::class);
+        $attributes = $reflectionClass->getAttributes(Transport::class, \ReflectionAttribute::IS_INSTANCEOF);
 
         return array_map(function (\ReflectionAttribute $attribute): string {
             /** @var Transport $attributeInstance */

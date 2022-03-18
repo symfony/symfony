@@ -5,7 +5,7 @@ namespace Symfony\Component\Messenger\Tests\Fixtures;
 use Symfony\Component\Messenger\Attribute\Transport;
 
 #[Transport('message_attribute_sender')]
-#[Transport('message_attribute_sender_2')]
+#[CustomTransport]
 class DummyMessageWithAttribute implements DummyMessageInterface
 {
     private $message;
@@ -18,5 +18,14 @@ class DummyMessageWithAttribute implements DummyMessageInterface
     public function getMessage(): string
     {
         return $this->message;
+    }
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class CustomTransport extends Transport
+{
+    public function __construct()
+    {
+        parent::__construct('message_attribute_sender_2');
     }
 }

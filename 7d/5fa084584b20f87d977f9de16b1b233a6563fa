@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-03-18T12:38:58Z
+
+still not fixed...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-18T14:13:02Z
+
+Happens since https://github.com/vimeo/psalm/pull/7727
+Issue tracked at https://github.com/vimeo/psalm/issues/7733

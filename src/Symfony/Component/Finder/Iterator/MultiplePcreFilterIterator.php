@@ -27,9 +27,9 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
     protected $noMatchRegexps = [];
 
     /**
-     * @param \Iterator $iterator        The Iterator to filter
-     * @param string[]  $matchPatterns   An array of patterns that need to match
-     * @param string[]  $noMatchPatterns An array of patterns that need to not match
+     * @param \Iterator<TKey, TValue> $iterator        The Iterator to filter
+     * @param string[]                $matchPatterns   An array of patterns that need to match
+     * @param string[]                $noMatchPatterns An array of patterns that need to not match
      */
     public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
     {

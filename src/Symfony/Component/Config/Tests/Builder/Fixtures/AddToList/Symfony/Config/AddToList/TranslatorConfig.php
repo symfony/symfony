@@ -2,6 +2,7 @@
 
 namespace Symfony\Config\AddToList;
 
+require_once __DIR__.\DIRECTORY_SEPARATOR.'Translator'.\DIRECTORY_SEPARATOR.'BooksConfig.php';
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -14,6 +15,7 @@ class TranslatorConfig
 {
     private $fallbacks;
     private $sources;
+    private $books;
     
     /**
      * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
@@ -37,6 +39,21 @@ class TranslatorConfig
         return $this;
     }
     
+    /**
+     * looks for translation in old fashion way
+     * @deprecated The child node "books" at path "translator" is deprecated.
+    */
+    public function books(array $value = []): \Symfony\Config\AddToList\Translator\BooksConfig
+    {
+        if (null === $this->books) {
+            $this->books = new \Symfony\Config\AddToList\Translator\BooksConfig($value);
+        } elseif ([] !== $value) {
+            throw new InvalidConfigurationException('The node created by "books()" has already been initialized. You cannot pass values the second time you call books().');
+        }
+    
+        return $this->books;
+    }
+    
     public function __construct(array $value = [])
     {
     
@@ -48,6 +65,11 @@ class TranslatorConfig
         if (isset($value['sources'])) {
             $this->sources = $value['sources'];
             unset($value['sources']);
+        }
+    
+        if (isset($value['books'])) {
+            $this->books = new \Symfony\Config\AddToList\Translator\BooksConfig($value['books']);
+            unset($value['books']);
         }
     
         if ([] !== $value) {
@@ -63,6 +85,9 @@ class TranslatorConfig
         }
         if (null !== $this->sources) {
             $output['sources'] = $this->sources;
+        }
+        if (null !== $this->books) {
+            $output['books'] = $this->books->toArray();
         }
     
         return $output;

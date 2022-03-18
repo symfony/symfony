@@ -23,7 +23,7 @@
         "symfony/polyfill-php80": "^1.16",
         "symfony/routing": "^4.3|^5.0",
         "symfony/twig-bundle": "^4.2|^5.0",
-        "twig/twig": "^1.43|^2.13|^3.0.4"
+        "twig/twig": "^1.43|^2.14.11|^3.3.8"
     },
     "require-dev": {
         "symfony/browser-kit": "^4.3|^5.0",

@@ -42,7 +42,7 @@
         "symfony/translation": "^4.2|^5.0",
         "symfony/translation-contracts": "^1.1|^2",
         "psr/cache": "^1.0|^2.0|^3.0",
-        "twig/twig": "^1.43|^2.13|^3.0.4"
+        "twig/twig": "^1.43|^2.14.11|^3.3.8"
     },
     "provide": {
         "psr/log-implementation": "1.0|2.0"
@@ -53,7 +53,7 @@
         "symfony/console": ">=5",
         "symfony/dependency-injection": "<4.3",
         "symfony/translation": "<4.2",
-        "twig/twig": "<1.43|<2.13,>=2"
+        "twig/twig": "<1.43|<2.14.11,>=2"
     },
     "suggest": {
         "symfony/browser-kit": "",

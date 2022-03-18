@@ -22,7 +22,7 @@
         "symfony/http-kernel": "^4.4",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-php80": "^1.16",
-        "twig/twig": "^1.43|^2.14|^3.3.8"
+        "twig/twig": "^1.43|^2.14.11|^3.3.8"
     },
     "require-dev": {
         "symfony/asset": "^3.4|^4.0|^5.0",

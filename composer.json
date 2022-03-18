@@ -37,7 +37,7 @@
         "friendsofphp/proxy-manager-lts": "^1.0.2",
         "doctrine/event-manager": "~1.0",
         "doctrine/persistence": "^1.3|^2",
-        "twig/twig": "^1.43|^2.13|^3.0.4",
+        "twig/twig": "^1.43|^2.14.11|^3.3.8",
         "psr/cache": "^1.0|^2.0",
         "psr/container": "^1.0",
         "psr/link": "^1.0",

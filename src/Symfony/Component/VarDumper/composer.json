@@ -25,7 +25,7 @@
         "ext-iconv": "*",
         "symfony/console": "^3.4|^4.0|^5.0",
         "symfony/process": "^4.4|^5.0",
-        "twig/twig": "^1.43|^2.13|^3.0.4"
+        "twig/twig": "^1.43|^2.14.11|^3.3.8"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",

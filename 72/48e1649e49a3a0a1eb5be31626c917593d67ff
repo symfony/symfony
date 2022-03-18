@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-07T08:20:49Z
+
+> What about calling Yaml::parse() before calling YamlFileLoader::resolveServices()?
+
+I'm withdrawing this comment, bad idea :)
+
+Another idea, using named arguments:
+
+- `#[Autowire(service: MailerConfiguration::class)`
+- `#[Autowire(expr: 'service("App\Mail\MailerConfiguration").getMailerMethod()')`
+- `#[Autowire(value: '%kernel.project_dir%'/var/foo')`
+
+I think that's my preference: no custom yaml-like strings and more explicit than standalone attributes.
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-03-07T13:06:53Z
+
+I've made this change and also added the _raw_ `parameter` argument (updated PR description).
+
+What about controller action arguments? Separate PR?
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-03-07T16:38:35Z
+
+> Here are some minor comments. I like it. How about you? Let's close the two previous ones?
+
+Made these changes. I am happy with it as well - let's close them!
+
+Few questions:
+1. Should I change the service Reference behaviour for nullable parameters?
+2. For controller arguments: are only service's allowed? No expressions/parameters?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-07T16:54:32Z
+
+> Should I change the service Reference behaviour for nullable parameters?
+
+That'd make sense yes
+
+> For controller arguments: are only service's allowed? No expressions/parameters?
+
+expressions/parameters should be allowed. There is a hack using 'current' as factory right now, you'll see it in the pass.
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-03-07T18:14:29Z
+
+Ok, I have the controller argument support working but implementation might need some work.

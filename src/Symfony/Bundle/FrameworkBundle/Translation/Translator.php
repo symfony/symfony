@@ -33,6 +33,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         'resource_files' => [],
         'scanned_directories' => [],
         'cache_vary' => [],
+        'fallback_on_blank_string' => false,
     ];
 
     /**
@@ -91,7 +92,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         $this->resourceFiles = $this->options['resource_files'];
         $this->scannedDirectories = $this->options['scanned_directories'];
 
-        parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], $this->options['cache_vary']);
+        parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], $this->options['cache_vary'], $this->options['fallback_on_blank_string']);
     }
 
     /**

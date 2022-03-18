@@ -179,6 +179,20 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
+    public function testFallbackOnBlankString()
+    {
+        $translator = new Translator('en', null, null, false, [], true);
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => ''], 'en');
+        $translator->addResource('array', ['foo' => 'bar'], 'fr');
+
+        // force catalogue loading
+        $translator->trans('foo');
+
+        $translator->setFallbackLocales(['fr']);
+        $this->assertEquals('bar', $translator->trans('foo'));
+    }
+
     /**
      * @dataProvider getInvalidLocalesTests
      */

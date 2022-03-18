@@ -795,6 +795,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->defaultValue([])
                         ->end()
+                        ->booleanNode('fallback_on_blank_string')->defaultValue(false)->end()
                         ->booleanNode('logging')->defaultValue(false)->end()
                         ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->scalarNode('cache_dir')->defaultValue('%kernel.cache_dir%/translations')->end()

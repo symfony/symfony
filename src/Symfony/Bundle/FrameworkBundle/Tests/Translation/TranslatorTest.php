@@ -393,6 +393,24 @@ class TranslatorTest extends TestCase
         $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
     }
 
+    public function testFallbackOnBlankString()
+    {
+        $loader = new YamlFileLoader();
+        $resourceFiles = [
+            'en' => [
+                __DIR__.'/../Fixtures/Resources/translations3/messages.en.yml',
+            ],
+            'fr' => [
+                __DIR__.'/../Fixtures/Resources/translations3/messages.en.yml',
+            ],
+        ];
+
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles, 'fallback_on_blank_string' => true], 'yml');
+        $translator->setLocale('fr');
+        $translator->setFallbackLocales(['en']);
+        $this->assertEquals('bar', $translator->trans('foo'));
+    }
+
     private function createTranslator($loader, $options, $translatorClass = Translator::class, $loaderFomat = 'loader', $defaultLocale = 'en', array $enabledLocales = [])
     {
         if (null === $defaultLocale) {

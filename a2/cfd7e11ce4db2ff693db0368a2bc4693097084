@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-11T21:44:02Z
+
+The test failure looks realted:
+
+```
+There was 1 failure:
+
+1) Symfony\Component\PropertyInfo\Tests\Extractor\PhpDocExtractorTest::testUnknownPseudoType
+null does not match expected type "array".
+
+/home/runner/work/symfony/symfony/src/Symfony/Component/PropertyInfo/Tests/Extractor/PhpDocExtractorTest.php:356
+```

@@ -65,6 +65,10 @@ class PhpExecutableFinderTest extends TestCase
 
     public function testFindWithExecutableDirectory()
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Directories are not executable on Windows');
+        }
+
         $originalPhpBinary = getenv('PHP_BINARY');
 
         try {

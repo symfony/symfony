@@ -101,6 +101,6 @@ final class Rate
 
     public function __toString(): string
     {
-        return $this->refillTime->format('P%y%m%dDT%HH%iM%sS').'-'.$this->refillAmount;
+        return $this->refillTime->format('P%yY%mM%dDT%HH%iM%sS').'-'.$this->refillAmount;
     }
 }

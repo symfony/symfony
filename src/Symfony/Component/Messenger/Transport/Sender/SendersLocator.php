@@ -51,7 +51,7 @@ class SendersLocator implements SendersLocatorInterface
                 $typeSenderAliases[] = $senderAlias;
             }
 
-            if (empty($typeSenderAliases)) {
+            if (!$typeSenderAliases) {
                 $typeSenderAliases = $this->getSendersFromAttributes($type);
             }
 

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 // Auto-adapt to PHPUnit 8 that added a `void` return-type to the setUp/tearDown methods
 
-if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \ReflectionMethod(TestCase::class, 'tearDown'))->hasReturnType()) {
+if ((new \ReflectionMethod(TestCase::class, 'tearDown'))->hasReturnType()) {
     /**
      * @internal
      */

@@ -54,7 +54,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         $envelope = $message->getEnvelope();
 
         $request = [
-            'FromEmailAddress' => $envelope->getSender()->toString(),
+            'FromEmailAddress' => $this->stringifyAddress($envelope->getSender()),
             'Destination' => [
                 'ToAddresses' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
             ],
@@ -121,15 +121,20 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
     protected function stringifyAddresses(array $addresses): array
     {
         return array_map(function (Address $a) {
-            // AWS does not support UTF-8 address
-            if (preg_match('~[\x00-\x08\x10-\x19\x7F-\xFF\r\n]~', $name = $a->getName())) {
-                return sprintf('=?UTF-8?B?%s?= <%s>',
-                    base64_encode($name),
-                    $a->getEncodedAddress()
-                );
-            }
-
-            return $a->toString();
+            return $this->stringifyAddress($a);
         }, $addresses);
+    }
+
+    protected function stringifyAddress(Address $a): string
+    {
+        // AWS does not support UTF-8 address
+        if (preg_match('~[\x00-\x08\x10-\x19\x7F-\xFF\r\n]~', $name = $a->getName())) {
+            return sprintf('=?UTF-8?B?%s?= <%s>',
+                base64_encode($name),
+                $a->getEncodedAddress()
+            );
+        }
+
+        return $a->toString();
     }
 }

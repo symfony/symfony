@@ -83,7 +83,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
             $this->assertSame('Hello!', $content['Content']['Simple']['Subject']['Data']);
             $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $content['Destination']['ToAddresses'][0]);
             $this->assertSame('=?UTF-8?B?SsOpcsOpbXk=?= <jeremy@derusse.com>', $content['Destination']['CcAddresses'][0]);
-            $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['FromEmailAddress']);
+            $this->assertSame('=?UTF-8?B?RmFiacOpbg==?= <fabpot@symfony.com>', $content['FromEmailAddress']);
             $this->assertSame('Hello There!', $content['Content']['Simple']['Body']['Text']['Data']);
             $this->assertSame('<b>Hello There!</b>', $content['Content']['Simple']['Body']['Html']['Data']);
             $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $content['ReplyToAddresses']);
@@ -105,7 +105,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->cc(new Address('jeremy@derusse.com', 'Jérémy'))
-            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->from(new Address('fabpot@symfony.com', 'Fabién'))
             ->text('Hello There!')
             ->html('<b>Hello There!</b>')
             ->replyTo(new Address('replyto-1@example.com'), new Address('replyto-2@example.com'))

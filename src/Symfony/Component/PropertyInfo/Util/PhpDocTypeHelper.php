@@ -187,6 +187,6 @@ final class PhpDocTypeHelper
             return ['object', $docType];
         }
 
-        return ['object', substr($docType, 1)]; // substr to strip the namespace's `\`-prefix
+        return ['object', ltrim($docType, '\\')];
     }
 }

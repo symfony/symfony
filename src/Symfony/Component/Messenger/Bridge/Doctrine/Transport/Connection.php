@@ -16,7 +16,7 @@ use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -413,7 +413,7 @@ class Connection implements ResetInterface
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
         // No indices on queue_name and available_at on MySQL to prevent deadlock issues when running multiple consumers.
-        if (!$this->driverConnection->getDatabasePlatform() instanceof MySqlPlatform) {
+        if (!$this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
             $table->addIndex(['queue_name']);
             $table->addIndex(['available_at']);
         }

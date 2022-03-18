@@ -20,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           extensions: "json,couchbase,memcached,mongodb,redis,xsl,ldap,dom"
           ini-values: "memory_limit=-1"
           coverage: none
@@ -39,18 +39,13 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
-          composer require --no-update psalm/phar phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
-
-          echo "::group::composer update"
-          composer update --no-progress --ansi
-          git checkout composer.json
-          echo "::endgroup::"
-
-          ./vendor/bin/psalm.phar --version
+          composer require --no-progress --ansi psalm/phar phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
 
       - name: Generate Psalm baseline
         run: |
+          git checkout composer.json
           git checkout -m ${{ github.base_ref }}
+
           ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
           git checkout -m FETCH_HEAD
 

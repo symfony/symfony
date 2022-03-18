@@ -91,6 +91,11 @@ class SendmailTransport extends AbstractTransport
         $this->getLogger()->debug(sprintf('Email transport "%s" starting', __CLASS__));
 
         $command = $this->command;
+
+        if ($recipients = $message->getEnvelope()->getRecipients()) {
+            $command = str_replace(' -t', '', $command);
+        }
+
         if (!str_contains($command, ' -f')) {
             $command .= ' -f'.escapeshellarg($message->getEnvelope()->getSender()->getEncodedAddress());
         }
@@ -99,6 +104,10 @@ class SendmailTransport extends AbstractTransport
 
         if (!str_contains($command, ' -i') && !str_contains($command, ' -oi')) {
             $chunks = AbstractStream::replace("\n.", "\n..", $chunks);
+        }
+
+        foreach ($recipients as $recipient) {
+            $command .= ' '.escapeshellarg($recipient->getEncodedAddress());
         }
 
         $this->stream->setCommand($command);

@@ -81,7 +81,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
                 }
             } else {
                 if (!is_file($this->manifestPath)) {
-                    throw new RuntimeException(sprintf('Asset manifest file "%s" does not exist.', $this->manifestPath));
+                    throw new RuntimeException(sprintf('Asset manifest file "%s" does not exist. Did you forget to build the assets with npm or yarn?', $this->manifestPath));
                 }
 
                 try {

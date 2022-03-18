@@ -239,11 +239,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function getAttributeDenormalizationContext(string $class, string $attribute, array $context): array
     {
+        $context['deserialization_path'] = ($context['deserialization_path'] ?? false) ? $context['deserialization_path'].'.'.$attribute : $attribute;
+
         if (null === $metadata = $this->getAttributeMetadata($class, $attribute)) {
             return $context;
         }
-
-        $context['deserialization_path'] = ($context['deserialization_path'] ?? false) ? $context['deserialization_path'].'.'.$attribute : $attribute;
 
         return array_merge($context, $metadata->getDenormalizationContextForGroups($this->getGroups($context)));
     }

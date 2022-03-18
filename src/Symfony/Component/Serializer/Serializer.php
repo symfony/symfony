@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\CacheableSupport;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
@@ -247,19 +248,24 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     private function getNormalizer(mixed $data, ?string $format, array $context): ?NormalizerInterface
     {
         $type = \is_object($data) ? $data::class : 'native-'.\gettype($data);
-
+        $minCached = CacheableSupport::SupportAlways;
+        $minUncached = CacheableSupport::SupportNever;
         if (!isset($this->normalizerCache[$format][$type])) {
+            $minCached = CacheableSupport::Support;
+            $minUncached = CacheableSupport::SupportNot;
             $this->normalizerCache[$format][$type] = [];
-
             foreach ($this->normalizers as $k => $normalizer) {
                 if (!$normalizer instanceof NormalizerInterface) {
                     continue;
                 }
 
-                if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
-                    $this->normalizerCache[$format][$type][$k] = false;
-                } elseif ($normalizer->supportsNormalization($data, $format, $context)) {
-                    $this->normalizerCache[$format][$type][$k] = true;
+                $support = $this->supportsNormalizationWrapper($normalizer, $data, $format, $context);
+                if (CacheableSupport::SupportNever === $support) {
+                    continue;
+                }
+
+                $this->normalizerCache[$format][$type][$k] = $support;
+                if (CacheableSupport::SupportAlways === $support) {
                     break;
                 }
             }
@@ -267,12 +273,29 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
         foreach ($this->normalizerCache[$format][$type] as $k => $cached) {
             $normalizer = $this->normalizers[$k];
-            if ($cached || $normalizer->supportsNormalization($data, $format, $context)) {
+            if ($cached->value >= $minCached->value || ($cached->value > $minUncached->value && $this->supportsNormalizationWrapper($normalizer, $data, $format, $context)->value > CacheableSupport::SupportNot->value)) {
                 return $normalizer;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Backwards-Compatibility layer for CacheableSupportsMethodInterface -> CacheableSupport.
+     */
+    private function supportsNormalizationWrapper(NormalizerInterface $normalizer, mixed $data, ?string $format, array $context): CacheableSupport
+    {
+        $value = $normalizer->supportsNormalization($data, $format, $context);
+        if (\is_bool($value)) {
+            trigger_deprecation('symfony/serializer', '6.2', 'Returning boolean from "%s::%s" is deprecated, return "%s" instead.', NormalizerInterface::class, 'supports()', CacheableSupport::class);
+        }
+
+        return match ($value) {
+            true => $normalizer instanceof CacheableSupportsMethodInterface && $normalizer->hasCacheableSupportsMethod() ? CacheableSupport::SupportAlways : CacheableSupport::Support,
+            false => $normalizer instanceof CacheableSupportsMethodInterface && $normalizer->hasCacheableSupportsMethod() ? CacheableSupport::SupportNever : CacheableSupport::SupportNot,
+            default => $value
+        };
     }
 
     /**
@@ -285,7 +308,11 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     private function getDenormalizer(mixed $data, string $class, ?string $format, array $context): ?DenormalizerInterface
     {
+        $minCached = CacheableSupport::SupportAlways;
+        $minUncached = CacheableSupport::SupportNever;
         if (!isset($this->denormalizerCache[$format][$class])) {
+            $minCached = CacheableSupport::Support;
+            $minUncached = CacheableSupport::SupportNot;
             $this->denormalizerCache[$format][$class] = [];
 
             foreach ($this->normalizers as $k => $normalizer) {
@@ -293,10 +320,13 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                     continue;
                 }
 
-                if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
-                    $this->denormalizerCache[$format][$class][$k] = false;
-                } elseif ($normalizer->supportsDenormalization(null, $class, $format, $context)) {
-                    $this->denormalizerCache[$format][$class][$k] = true;
+                $support = $this->supportsDenormalizationWrapper($normalizer, $data, $class, $format, $context);
+                if (CacheableSupport::SupportNever === $support) {
+                    continue;
+                }
+
+                $this->denormalizerCache[$format][$class][$k] = $support;
+                if (CacheableSupport::SupportAlways === $support) {
                     break;
                 }
             }
@@ -304,12 +334,29 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
         foreach ($this->denormalizerCache[$format][$class] as $k => $cached) {
             $normalizer = $this->normalizers[$k];
-            if ($cached || $normalizer->supportsDenormalization($data, $class, $format, $context)) {
+            if ($cached->value >= $minCached->value || ($cached->value > $minUncached->value && $this->supportsDenormalizationWrapper($normalizer, $data, $class, $format, $context)->value > CacheableSupport::SupportNot->value)) {
                 return $normalizer;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Backwards-Compatibility layer for CacheableSupportsMethodInterface -> CacheableSupport.
+     */
+    private function supportsDenormalizationWrapper(DenormalizerInterface $normalizer, mixed $data, string $class, ?string $format, array $context): CacheableSupport
+    {
+        $value = $normalizer->supportsDenormalization($data, $class, $format, $context);
+        if (\is_bool($value)) {
+            trigger_deprecation('symfony/serializer', '6.2', 'Returning boolean from "%s::%s" is deprecated, return "%s" instead.', DenormalizerInterface::class, 'supports()', CacheableSupport::class);
+        }
+
+        return match ($value) {
+            true => $normalizer instanceof CacheableSupportsMethodInterface && $normalizer->hasCacheableSupportsMethod() ? CacheableSupport::SupportAlways : CacheableSupport::Support,
+            false => $normalizer instanceof CacheableSupportsMethodInterface && $normalizer->hasCacheableSupportsMethod() ? CacheableSupport::SupportNever : CacheableSupport::SupportNot,
+            default => $value
+        };
     }
 
     final public function encode(mixed $data, string $format, array $context = []): string

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+* Cache normalizer selection based on format and type
+* Deprecate `Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface`, use `Symfony\Component\Serializer\Normalizer\CacheableSupport` instead
+
 6.2
 ---
 

@@ -34,8 +34,6 @@ interface DenormalizerInterface
      * @param string $format  Format the given data was extracted from
      * @param array  $context Options available to the denormalizer
      *
-     * @return mixed
-     *
      * @throws BadMethodCallException   Occurs when the normalizer is not called in an expected context
      * @throws InvalidArgumentException Occurs when the arguments are not coherent or not supported
      * @throws UnexpectedValueException Occurs when the item cannot be hydrated with the given data
@@ -49,12 +47,11 @@ interface DenormalizerInterface
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.
      *
-     * @param mixed  $data    Data to denormalize from
-     * @param string $type    The class to which the data should be denormalized
-     * @param string $format  The format being deserialized from
-     * @param array  $context Options available to the denormalizer
+     * @param mixed  $data   Data to denormalize from
+     * @param string $type   The class to which the data should be denormalized
+     * @param string $format The format being deserialized from
      *
-     * @return bool
+     * @return CacheableSupport|bool returning a boolean is deprecated
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
 }

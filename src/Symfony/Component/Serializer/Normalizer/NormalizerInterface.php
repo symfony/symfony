@@ -41,11 +41,10 @@ interface NormalizerInterface
     /**
      * Checks whether the given class is supported for normalization by this normalizer.
      *
-     * @param mixed  $data    Data to normalize
-     * @param string $format  The format being (de-)serialized from or into
-     * @param array  $context Context options for the normalizer
+     * @param mixed  $data   Data to normalize
+     * @param string $format The format being (de-)serialized from or into
      *
-     * @return bool
+     * @return CacheableSupport|bool returning a boolean is deprecated
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
 }

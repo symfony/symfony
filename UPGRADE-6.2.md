@@ -102,6 +102,7 @@ Serializer
  * Deprecate calling `AttributeMetadata::setSerializedName()`, `ClassMetadata::setClassDiscriminatorMapping()` without arguments
  * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
  * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
+ * Deprecate `Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface`, use `Symfony\Component\Serializer\Normalizer\CacheableSupport` instead
 
 Translation
 -----------

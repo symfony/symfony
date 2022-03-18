@@ -37,6 +37,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
+use Symfony\Component\Serializer\Normalizer\CacheableSupport;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -1246,6 +1247,29 @@ class SerializerTest extends TestCase
             [null],
             [new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))],
         ];
+    }
+
+    public function testCacheableNormalizer()
+    {
+        $normalizer = $this->createMock(NormalizerInterface::class);
+        $serializer = new Serializer([$normalizer], []);
+
+        $normalizer
+            ->expects($this->exactly(3))
+            ->method('supportsNormalization')
+            ->willReturnCallback(function ($data, $format, array $context = []): CacheableSupport {
+                if (!$data instanceof Bar) {
+                    return CacheableSupport::SupportNever;
+                }
+
+                return ($context['TEST_CONTEXT'] ?? false) ? CacheableSupport::Support : CacheableSupport::SupportNot;
+            });
+
+        $this->assertTrue($serializer->supportsNormalization(new Bar(''), 'json', ['TEST_CONTEXT' => true]));
+        $this->assertFalse($serializer->supportsNormalization(new Bar(''), 'json'));
+        $this->assertFalse($serializer->supportsNormalization(new \stdClass(), 'json', ['TEST_CONTEXT' => true]));
+        $this->assertFalse($serializer->supportsNormalization(new \stdClass(), 'json', ['TEST_CONTEXT' => true]));
+        $this->assertFalse($serializer->supportsNormalization(new \stdClass(), 'json', ['TEST_CONTEXT' => true]));
     }
 }
 

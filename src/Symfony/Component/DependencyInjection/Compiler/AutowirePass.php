@@ -14,14 +14,17 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
@@ -254,6 +257,18 @@ class AutowirePass extends AbstractRecursivePass
                     if (TaggedLocator::class === $attribute->getName()) {
                         $attribute = $attribute->newInstance();
                         $arguments[$index] = new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, true, $attribute->defaultPriorityMethod, (array) $attribute->exclude));
+                        break;
+                    }
+
+                    if (Autowire::class === $attribute->getName()) {
+                        $value = $attribute->newInstance()->value;
+
+                        if ($value instanceof Reference && $parameter->allowsNull()) {
+                            $value = new Reference($value, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+                        }
+
+                        $arguments[$index] = $value;
+
                         break;
                     }
                 }

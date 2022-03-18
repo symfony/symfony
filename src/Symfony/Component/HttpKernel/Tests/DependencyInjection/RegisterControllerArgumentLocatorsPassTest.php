@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -441,6 +442,36 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         ];
         $this->assertEquals($expected, $locator->getArgument(0));
     }
+
+    public function testAutowireAttribute()
+    {
+        if (!class_exists(Autowire::class)) {
+            $this->markTestSkipped('#[Autowire] attribute not available.');
+        }
+
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('some.id', \stdClass::class);
+        $container->setParameter('some.parameter', 'foo');
+
+        $container->register('foo', WithAutowireAttribute::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $locator = $container->get($locatorId)->get('foo::fooAction');
+
+        $this->assertInstanceOf(\stdClass::class, $locator->get('service1'));
+        $this->assertSame('foo/bar', $locator->get('value'));
+        $this->assertSame('foo', $locator->get('expression'));
+        $this->assertFalse($locator->has('service2'));
+    }
 }
 
 class RegisterTestController
@@ -518,6 +549,21 @@ class WithTarget
         #[Target('image.storage')]
         ControllerDummy $service1,
         ControllerDummy $service2
+    ) {
+    }
+}
+
+class WithAutowireAttribute
+{
+    public function fooAction(
+        #[Autowire(service: 'some.id')]
+        \stdClass $service1,
+        #[Autowire(value: '%some.parameter%/bar')]
+        string $value,
+        #[Autowire(expression: "parameter('some.parameter')")]
+        string $expression,
+        #[Autowire(service: 'invalid.id')]
+        \stdClass $service2 = null,
     ) {
     }
 }

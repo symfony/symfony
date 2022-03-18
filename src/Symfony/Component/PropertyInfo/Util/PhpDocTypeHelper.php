@@ -164,6 +164,6 @@ final class PhpDocTypeHelper
             return ['object', $docType];
         }
 
-        return ['object', substr($docType, 1)];
+        return ['object', ltrim($docType, '\\')];
     }
 }

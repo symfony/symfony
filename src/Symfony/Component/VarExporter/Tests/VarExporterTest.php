@@ -132,9 +132,9 @@ class VarExporterTest extends TestCase
         yield ['datetime', [
             \DateTime::createFromFormat('U', 0),
             \DateTimeImmutable::createFromFormat('U', 0),
-            new \DateTimeZone('Europe/Paris'),
-            new \DateInterval('P7D'),
-            new \DatePeriod('R4/2012-07-01T00:00:00Z/P7D'),
+            $tz = new \DateTimeZone('Europe/Paris'),
+            $interval = ($start = new \DateTime('2009-10-11', $tz))->diff(new \DateTime('2009-10-18', $tz)),
+            new \DatePeriod($start, $interval, 4),
         ]];
 
         $value = \PHP_VERSION_ID >= 70406 ? new ArrayObject() : new \ArrayObject();

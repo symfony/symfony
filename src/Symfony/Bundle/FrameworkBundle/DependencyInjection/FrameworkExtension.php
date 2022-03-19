@@ -1056,6 +1056,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.router_debug');
             $container->removeDefinition('console.command.router_match');
             $container->removeDefinition('messenger.middleware.router_context');
+            $container->removeDefinition('translation.locale_aware_request_context');
 
             return;
         }

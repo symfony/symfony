@@ -8,12 +8,13 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class TranslatorConfig 
 {
     private $fallbacks;
     private $sources;
+    private $_usedProperties = [];
     
     /**
      * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
@@ -21,6 +22,7 @@ class TranslatorConfig
      */
     public function fallbacks($value): self
     {
+        $this->_usedProperties['fallbacks'] = true;
         $this->fallbacks = $value;
     
         return $this;
@@ -32,6 +34,7 @@ class TranslatorConfig
      */
     public function source(string $source_class, $value): self
     {
+        $this->_usedProperties['sources'] = true;
         $this->sources[$source_class] = $value;
     
         return $this;
@@ -40,12 +43,14 @@ class TranslatorConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['fallbacks'])) {
+        if (array_key_exists('fallbacks', $value)) {
+            $this->_usedProperties['fallbacks'] = true;
             $this->fallbacks = $value['fallbacks'];
             unset($value['fallbacks']);
         }
     
-        if (isset($value['sources'])) {
+        if (array_key_exists('sources', $value)) {
+            $this->_usedProperties['sources'] = true;
             $this->sources = $value['sources'];
             unset($value['sources']);
         }
@@ -58,10 +63,10 @@ class TranslatorConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->fallbacks) {
+        if (isset($this->_usedProperties['fallbacks'])) {
             $output['fallbacks'] = $this->fallbacks;
         }
-        if (null !== $this->sources) {
+        if (isset($this->_usedProperties['sources'])) {
             $output['sources'] = $this->sources;
         }
     

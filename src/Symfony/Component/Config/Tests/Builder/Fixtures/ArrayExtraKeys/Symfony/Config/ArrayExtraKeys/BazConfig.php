@@ -7,7 +7,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class BazConfig 
 {
@@ -33,11 +33,7 @@ class BazConfig
      */
     public function set(string $key, $value): self
     {
-        if (null === $value) {
-            unset($this->_extraKeys[$key]);
-        } else {
-            $this->_extraKeys[$key] = $value;
-        }
+        $this->_extraKeys[$key] = $value;
     
         return $this;
     }

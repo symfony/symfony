@@ -20,6 +20,7 @@ return [
             'corge' => 'bar2_corge',
             'grault' => 'bar2_grault',
             'extra1' => 'bar2_extra1',
+            'extra4' => null,
             'extra2' => 'bar2_extra2',
             'extra3' => 'bar2_extra3',
         ],

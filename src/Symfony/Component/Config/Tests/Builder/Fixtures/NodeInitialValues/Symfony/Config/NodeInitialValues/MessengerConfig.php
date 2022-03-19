@@ -8,15 +8,18 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class MessengerConfig 
 {
     private $transports;
+    private $_usedProperties = [];
     
     public function transports(string $name, array $value = []): \Symfony\Config\NodeInitialValues\Messenger\TransportsConfig
     {
         if (!isset($this->transports[$name])) {
+            $this->_usedProperties['transports'] = true;
+    
             return $this->transports[$name] = new \Symfony\Config\NodeInitialValues\Messenger\TransportsConfig($value);
         }
         if ([] === $value) {
@@ -29,7 +32,8 @@ class MessengerConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['transports'])) {
+        if (array_key_exists('transports', $value)) {
+            $this->_usedProperties['transports'] = true;
             $this->transports = array_map(function ($v) { return new \Symfony\Config\NodeInitialValues\Messenger\TransportsConfig($v); }, $value['transports']);
             unset($value['transports']);
         }
@@ -42,7 +46,7 @@ class MessengerConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->transports) {
+        if (isset($this->_usedProperties['transports'])) {
             $output['transports'] = array_map(function ($v) { return $v->toArray(); }, $this->transports);
         }
     

@@ -8,4 +8,5 @@ return static function (PrimitiveTypesConfig $config) {
     $config->floatNode(47.11);
     $config->integerNode(1337);
     $config->scalarNode('foobar');
+    $config->scalarNodeWithDefault(null);
 };

@@ -34,11 +34,12 @@ class GetAttrNode extends Node
 
     public function compile(Compiler $compiler)
     {
+        $nullSafe = $this->nodes['attribute'] instanceof ConstantNode && $this->nodes['attribute']->isNullSafe;
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
                 $compiler
                     ->compile($this->nodes['node'])
-                    ->raw('->')
+                    ->raw($nullSafe ? '?->' : '->')
                     ->raw($this->nodes['attribute']->attributes['value'])
                 ;
                 break;
@@ -46,7 +47,7 @@ class GetAttrNode extends Node
             case self::METHOD_CALL:
                 $compiler
                     ->compile($this->nodes['node'])
-                    ->raw('->')
+                    ->raw($nullSafe ? '?->' : '->')
                     ->raw($this->nodes['attribute']->attributes['value'])
                     ->raw('(')
                     ->compile($this->nodes['arguments'])
@@ -69,6 +70,9 @@ class GetAttrNode extends Node
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
+                if (null === $obj && $this->nodes['attribute']->isNullSafe) {
+                    return null;
+                }
                 if (!\is_object($obj)) {
                     throw new \RuntimeException(sprintf('Unable to get property "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
@@ -79,6 +83,9 @@ class GetAttrNode extends Node
 
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
+                if (null === $obj && $this->nodes['attribute']->isNullSafe) {
+                    return null;
+                }
                 if (!\is_object($obj)) {
                     throw new \RuntimeException(sprintf('Unable to call method "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }

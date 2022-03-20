@@ -73,6 +73,10 @@ class Lexer
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
                 $cursor += \strlen($match[0]);
+            } elseif ('?' === $expression[$cursor] && '.' === ($expression[$cursor + 1] ?? '')) {
+                // null-safe
+                $tokens[] = new Token(Token::PUNCTUATION_TYPE, '?.', ++$cursor);
+                ++$cursor;
             } elseif (str_contains('.,?:', $expression[$cursor])) {
                 // punctuation
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);

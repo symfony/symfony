@@ -21,7 +21,8 @@
         "symfony/options-resolver": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/security-core": "^5.4|^6.0"
+        "symfony/security-core": "^5.4|^6.0",
+        "symfony/security-http": "^5.4|^6.0"
     },
     "conflict": {
         "symfony/options-resolver": "<5.4",

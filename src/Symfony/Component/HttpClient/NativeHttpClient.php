@@ -376,7 +376,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         if (0 < $maxRedirects = $options['max_redirects']) {
             $redirectHeaders = ['host' => $host];
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
-                return 0 !== stripos($h, 'Host:');
+                return 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:');
             });
 
             if (isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {

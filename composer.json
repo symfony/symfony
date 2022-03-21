@@ -175,6 +175,9 @@
         "files": [
             "src/Symfony/Component/String/Resources/functions.php"
         ],
+        "classmap": [
+            "src/Symfony/Component/Cache/Traits/ValueWrapper.php"
+        ],
         "exclude-from-classmap": [
             "**/Tests/"
         ]

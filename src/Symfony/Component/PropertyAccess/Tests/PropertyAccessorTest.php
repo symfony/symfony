@@ -730,8 +730,7 @@ class PropertyAccessorTest extends TestCase
 
     private function generateAnonymousClass($value)
     {
-        return new class($value)
-        {
+        return new class($value) {
             private $foo;
 
             public function __construct($foo)
@@ -907,9 +906,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testSetValueWrongTypeShouldThrowWrappedException()
     {
         $object = new TestClassTypedProperty();

@@ -690,6 +690,8 @@ class Request
 
     /**
      * Gets the Session.
+     *
+     * @throws SessionNotFoundException When session is not set properly
      */
     public function getSession(): SessionInterface
     {

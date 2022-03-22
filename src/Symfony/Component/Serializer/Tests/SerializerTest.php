@@ -1076,6 +1076,42 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
+    public function testUnionTypeDeserializable()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [
+                new DateTimeNormalizer(),
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $actual = $serializer->deserialize('{ "changed": null }', DummyUnionType::class, 'json', [
+                DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::ISO8601,
+            ]);
+
+            $this->assertEquals((new DummyUnionType())->setChanged(null), $actual, 'Union type denormalization first case failed.');
+
+            $actual = $serializer->deserialize('{ "changed": "2022-03-22T16:15:05+0000" }', DummyUnionType::class, 'json', [
+                DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::ISO8601,
+            ]);
+
+            $expectedDateTime = \DateTime::createFromFormat(\DateTimeInterface::ISO8601, '2022-03-22T16:15:05+0000');
+            $this->assertEquals((new DummyUnionType())->setChanged($expectedDateTime), $actual, 'Union type denormalization second case failed.');
+
+            $actual = $serializer->deserialize('{ "changed": false }', DummyUnionType::class, 'json', [
+                DateTimeNormalizer::FORMAT_KEY => \DateTimeInterface::ISO8601,
+            ]);
+
+            $this->assertEquals(new DummyUnionType(), $actual, 'Union type denormalization third case failed.');
+        } catch (\Throwable $th) {
+            $this->fail();
+        }
+    }
+
     public function provideCollectDenormalizationErrors()
     {
         return [
@@ -1180,6 +1216,18 @@ class DummyList extends \ArrayObject
     public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->list);
+    }
+}
+
+class DummyUnionType
+{
+    public null|bool|\DateTime $changed = false;
+
+    public function setChanged(\DateTime|bool|null $changed): self
+    {
+        $this->changed = $changed;
+
+        return $this;
     }
 }
 

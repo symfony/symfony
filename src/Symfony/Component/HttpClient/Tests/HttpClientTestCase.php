@@ -205,9 +205,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
     public function testNullBody()
     {
-        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $client = $this->getHttpClient(__FUNCTION__);
 
-        $httpClient->request('POST', 'http://localhost:8057/post', [
+        $client->request('POST', 'http://localhost:8057/post', [
             'body' => null,
         ]);
 

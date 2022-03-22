@@ -8,13 +8,14 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class TransportsConfig 
 {
     private $dsn;
     private $serializer;
     private $options;
+    private $_usedProperties = [];
     
     /**
      * @default null
@@ -23,6 +24,7 @@ class TransportsConfig
      */
     public function dsn($value): self
     {
+        $this->_usedProperties['dsn'] = true;
         $this->dsn = $value;
     
         return $this;
@@ -35,6 +37,7 @@ class TransportsConfig
      */
     public function serializer($value): self
     {
+        $this->_usedProperties['serializer'] = true;
         $this->serializer = $value;
     
         return $this;
@@ -46,6 +49,7 @@ class TransportsConfig
      */
     public function options($value): self
     {
+        $this->_usedProperties['options'] = true;
         $this->options = $value;
     
         return $this;
@@ -54,17 +58,20 @@ class TransportsConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['dsn'])) {
+        if (array_key_exists('dsn', $value)) {
+            $this->_usedProperties['dsn'] = true;
             $this->dsn = $value['dsn'];
             unset($value['dsn']);
         }
     
-        if (isset($value['serializer'])) {
+        if (array_key_exists('serializer', $value)) {
+            $this->_usedProperties['serializer'] = true;
             $this->serializer = $value['serializer'];
             unset($value['serializer']);
         }
     
-        if (isset($value['options'])) {
+        if (array_key_exists('options', $value)) {
+            $this->_usedProperties['options'] = true;
             $this->options = $value['options'];
             unset($value['options']);
         }
@@ -77,13 +84,13 @@ class TransportsConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->dsn) {
+        if (isset($this->_usedProperties['dsn'])) {
             $output['dsn'] = $this->dsn;
         }
-        if (null !== $this->serializer) {
+        if (isset($this->_usedProperties['serializer'])) {
             $output['serializer'] = $this->serializer;
         }
-        if (null !== $this->options) {
+        if (isset($this->_usedProperties['options'])) {
             $output['options'] = $this->options;
         }
     

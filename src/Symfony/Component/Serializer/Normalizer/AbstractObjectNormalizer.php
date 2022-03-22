@@ -404,6 +404,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $expectedTypes = [];
+        $singleType = count($types) === 1;
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return null;
@@ -455,29 +456,35 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $expectedTypes[Type::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
 
-            if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
-                if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer.', $attribute, $class));
+            try {
+                if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
+                    if (!$this->serializer instanceof DenormalizerInterface) {
+                        throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer.', $attribute, $class));
+                    }
+
+                    $childContext = $this->createChildContext($context, $attribute, $format);
+                    if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
+                        return $this->serializer->denormalize($data, $class, $format, $childContext);
+                    }
                 }
 
-                $childContext = $this->createChildContext($context, $attribute, $format);
-                if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
-                    return $this->serializer->denormalize($data, $class, $format, $childContext);
+                // JSON only has a Number type corresponding to both int and float PHP types.
+                // PHP's json_encode, JavaScript's JSON.stringify, Go's json.Marshal as well as most other JSON encoders convert
+                // floating-point numbers like 12.0 to 12 (the decimal part is dropped when possible).
+                // PHP's json_decode automatically converts Numbers without a decimal part to integers.
+                // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
+                // a float is expected.
+                if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && null !== $format && str_contains($format, JsonEncoder::FORMAT)) {
+                    return (float) $data;
                 }
-            }
 
-            // JSON only has a Number type corresponding to both int and float PHP types.
-            // PHP's json_encode, JavaScript's JSON.stringify, Go's json.Marshal as well as most other JSON encoders convert
-            // floating-point numbers like 12.0 to 12 (the decimal part is dropped when possible).
-            // PHP's json_decode automatically converts Numbers without a decimal part to integers.
-            // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
-            // a float is expected.
-            if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && null !== $format && str_contains($format, JsonEncoder::FORMAT)) {
-                return (float) $data;
-            }
-
-            if (('is_'.$builtinType)($data)) {
-                return $data;
+                if (('is_'.$builtinType)($data)) {
+                    return $data;
+                }
+            } catch (NotNormalizableValueException|LogicException $exception) {
+                if($singleType) {
+                    throw $exception;
+                }
             }
         }
 

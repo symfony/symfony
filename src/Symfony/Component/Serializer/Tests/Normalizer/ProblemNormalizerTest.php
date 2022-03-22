@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 
 class ProblemNormalizerTest extends TestCase
@@ -44,5 +45,34 @@ class ProblemNormalizerTest extends TestCase
         ];
 
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable(new \RuntimeException('Error'))));
+    }
+
+    public function testNormalizeErrorServerWithDebug()
+    {
+        $expected = [
+            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => 'An error occurred',
+            'status' => 500,
+            'detail' => 'Sensitive error',
+            'class' => 'RuntimeException',
+        ];
+
+        $normalizer = new ProblemNormalizer(true);
+        $actual = $normalizer->normalize(FlattenException::createFromThrowable(new \RuntimeException('Sensitive error')));
+        unset($actual['trace']);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testNormalizeErrorClientWithDetail()
+    {
+        $expected = [
+            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => 'An error occurred',
+            'status' => 400,
+            'detail' => 'Bad request message',
+        ];
+
+        $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable(new BadRequestHttpException('Bad request message'))));
     }
 }

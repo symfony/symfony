@@ -54,7 +54,7 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
             'type' => $context['type'],
             'title' => $context['title'],
             'status' => $context['status'] ?? $object->getStatusCode(),
-            'detail' => $debug ? $object->getMessage() : $object->getStatusText(),
+            'detail' => $debug || $object->getStatusCode() < 500 ? $object->getMessage() : $object->getStatusText(),
         ];
         if ($debug) {
             $data['class'] = $object->getClass();

@@ -73,7 +73,7 @@ class ScopingHttpClientTest extends TestCase
 
         $response = $client->request('GET', 'http://example.com/foo-bar', ['json' => ['url' => 'http://example.com']]);
         $requestOptions = $response->getRequestOptions();
-        $this->assertSame('Content-Type: application/json', $requestOptions['headers'][1]);
+        $this->assertSame('Content-Type: application/json', $requestOptions['headers'][3]);
         $requestJson = json_decode($requestOptions['body'], true);
         $this->assertSame('http://example.com', $requestJson['url']);
         $this->assertSame('X-FooBar: '.$defaultOptions['.*/foo-bar']['headers']['X-FooBar'], $requestOptions['headers'][0]);

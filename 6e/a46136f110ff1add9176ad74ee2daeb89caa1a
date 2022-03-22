@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-15T13:24:43Z
+
+I'm not sure if this is an issue we should "solve" in the Symfony codebase. In your setup, the `DoctrineProvider` class cannot be used and if you would try to use it, you'd get a runtime error telling you why the class cannot be used (because the `CacheProvider` is missing). That piece of information would be lost with your change applied.
+
+My question is: Why can't this be solved on Psalm's side?
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2022-03-15T14:25:06Z
+
+> My question is: Why can't this be solved on Psalm's side?
+
+I don't know if it is or not, see the original issue: https://github.com/vimeo/psalm/issues/7680
+
+There isn't an actual feature to avoid loading a class, and the simple loading makes Psalm die with a fatal error.
+OTOH, having this class around creates a possible weak spot, so I like this solution because it makes impossible to even read that class as existent, since it would be broken.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-18T16:02:08Z
+
+Can you please fix the CS issue and rebase?

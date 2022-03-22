@@ -7,12 +7,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class BarConfig 
 {
     private $corge;
     private $grault;
+    private $_usedProperties = [];
     private $_extraKeys;
     
     /**
@@ -22,6 +23,7 @@ class BarConfig
      */
     public function corge($value): static
     {
+        $this->_usedProperties['corge'] = true;
         $this->corge = $value;
     
         return $this;
@@ -34,6 +36,7 @@ class BarConfig
      */
     public function grault($value): static
     {
+        $this->_usedProperties['grault'] = true;
         $this->grault = $value;
     
         return $this;
@@ -42,12 +45,14 @@ class BarConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['corge'])) {
+        if (array_key_exists('corge', $value)) {
+            $this->_usedProperties['corge'] = true;
             $this->corge = $value['corge'];
             unset($value['corge']);
         }
     
-        if (isset($value['grault'])) {
+        if (array_key_exists('grault', $value)) {
+            $this->_usedProperties['grault'] = true;
             $this->grault = $value['grault'];
             unset($value['grault']);
         }
@@ -59,10 +64,10 @@ class BarConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->corge) {
+        if (isset($this->_usedProperties['corge'])) {
             $output['corge'] = $this->corge;
         }
-        if (null !== $this->grault) {
+        if (isset($this->_usedProperties['grault'])) {
             $output['grault'] = $this->grault;
         }
     
@@ -76,11 +81,7 @@ class BarConfig
      */
     public function set(string $key, mixed $value): static
     {
-        if (null === $value) {
-            unset($this->_extraKeys[$key]);
-        } else {
-            $this->_extraKeys[$key] = $value;
-        }
+        $this->_extraKeys[$key] = $value;
     
         return $this;
     }

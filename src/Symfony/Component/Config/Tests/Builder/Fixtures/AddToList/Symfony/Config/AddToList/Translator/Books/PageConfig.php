@@ -8,12 +8,13 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class PageConfig 
 {
     private $number;
     private $content;
+    private $_usedProperties = [];
     
     /**
      * @default null
@@ -22,6 +23,7 @@ class PageConfig
      */
     public function number($value): static
     {
+        $this->_usedProperties['number'] = true;
         $this->number = $value;
     
         return $this;
@@ -34,6 +36,7 @@ class PageConfig
      */
     public function content($value): static
     {
+        $this->_usedProperties['content'] = true;
         $this->content = $value;
     
         return $this;
@@ -42,12 +45,14 @@ class PageConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['number'])) {
+        if (array_key_exists('number', $value)) {
+            $this->_usedProperties['number'] = true;
             $this->number = $value['number'];
             unset($value['number']);
         }
     
-        if (isset($value['content'])) {
+        if (array_key_exists('content', $value)) {
+            $this->_usedProperties['content'] = true;
             $this->content = $value['content'];
             unset($value['content']);
         }
@@ -60,10 +65,10 @@ class PageConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->number) {
+        if (isset($this->_usedProperties['number'])) {
             $output['number'] = $this->number;
         }
-        if (null !== $this->content) {
+        if (isset($this->_usedProperties['content'])) {
             $output['content'] = $this->content;
         }
     

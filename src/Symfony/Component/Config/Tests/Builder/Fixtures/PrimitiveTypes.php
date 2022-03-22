@@ -18,6 +18,7 @@ class PrimitiveTypes implements ConfigurationInterface
                 ->floatNode('float_node')->end()
                 ->integerNode('integer_node')->end()
                 ->scalarNode('scalar_node')->end()
+                ->scalarNode('scalar_node_with_default')->defaultTrue()->end()
             ->end()
         ;
 

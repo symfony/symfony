@@ -9,16 +9,19 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class MessengerConfig 
 {
     private $routing;
     private $receiving;
+    private $_usedProperties = [];
     
     public function routing(string $message_class, array $value = []): \Symfony\Config\AddToList\Messenger\RoutingConfig
     {
         if (!isset($this->routing[$message_class])) {
+            $this->_usedProperties['routing'] = true;
+    
             return $this->routing[$message_class] = new \Symfony\Config\AddToList\Messenger\RoutingConfig($value);
         }
         if ([] === $value) {
@@ -30,18 +33,22 @@ class MessengerConfig
     
     public function receiving(array $value = []): \Symfony\Config\AddToList\Messenger\ReceivingConfig
     {
+        $this->_usedProperties['receiving'] = true;
+    
         return $this->receiving[] = new \Symfony\Config\AddToList\Messenger\ReceivingConfig($value);
     }
     
     public function __construct(array $value = [])
     {
     
-        if (isset($value['routing'])) {
+        if (array_key_exists('routing', $value)) {
+            $this->_usedProperties['routing'] = true;
             $this->routing = array_map(function ($v) { return new \Symfony\Config\AddToList\Messenger\RoutingConfig($v); }, $value['routing']);
             unset($value['routing']);
         }
     
-        if (isset($value['receiving'])) {
+        if (array_key_exists('receiving', $value)) {
+            $this->_usedProperties['receiving'] = true;
             $this->receiving = array_map(function ($v) { return new \Symfony\Config\AddToList\Messenger\ReceivingConfig($v); }, $value['receiving']);
             unset($value['receiving']);
         }
@@ -54,10 +61,10 @@ class MessengerConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->routing) {
+        if (isset($this->_usedProperties['routing'])) {
             $output['routing'] = array_map(function ($v) { return $v->toArray(); }, $this->routing);
         }
-        if (null !== $this->receiving) {
+        if (isset($this->_usedProperties['receiving'])) {
             $output['receiving'] = array_map(function ($v) { return $v->toArray(); }, $this->receiving);
         }
     

@@ -24,6 +24,7 @@ use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ * @group integration
  */
 class CombinedStoreTest extends AbstractStoreTest
 {
@@ -43,7 +44,8 @@ class CombinedStoreTest extends AbstractStoreTest
      */
     public function getStore(): PersistingStoreInterface
     {
-        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
+        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]));
+
         try {
             $redis->connect();
         } catch (\Exception $e) {

@@ -8,11 +8,12 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class RoutingConfig 
 {
     private $senders;
+    private $_usedProperties = [];
     
     /**
      * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
@@ -21,6 +22,7 @@ class RoutingConfig
      */
     public function senders(ParamConfigurator|array $value): static
     {
+        $this->_usedProperties['senders'] = true;
         $this->senders = $value;
     
         return $this;
@@ -29,7 +31,8 @@ class RoutingConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['senders'])) {
+        if (array_key_exists('senders', $value)) {
+            $this->_usedProperties['senders'] = true;
             $this->senders = $value['senders'];
             unset($value['senders']);
         }
@@ -42,7 +45,7 @@ class RoutingConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->senders) {
+        if (isset($this->_usedProperties['senders'])) {
             $output['senders'] = $this->senders;
         }
     

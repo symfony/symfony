@@ -32,6 +32,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
  */
 class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 {
+    /**
+     * @var ClassBuilder[]
+     */
     private array $classes = [];
     private string $outputDir;
 
@@ -88,6 +91,9 @@ public function NAME(): string
         foreach ($this->classes as $class) {
             $this->buildConstructor($class);
             $this->buildToArray($class);
+            if ($class->getProperties()) {
+                $class->addProperty('_usedProperties', null, '[]');
+            }
             $this->buildSetExtraKey($class);
 
             file_put_contents($this->getFullPath($class), $class->build());
@@ -138,6 +144,7 @@ public function NAME(): string
 COMMENTpublic function NAME(array $value = []): CLASS
 {
     if (null === $this->PROPERTY) {
+        $this->_usedProperties[\'PROPERTY\'] = true;
         $this->PROPERTY = new CLASS($value);
     } elseif ([] !== $value) {
         throw new InvalidConfigurationException(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\');
@@ -164,6 +171,7 @@ COMMENT *
  */
 public function NAME(mixed $valueDEFAULT): static
 {
+    $this->_usedProperties[\'PROPERTY\'] = true;
     $this->PROPERTY = $value;
 
     return $this;
@@ -191,6 +199,7 @@ public function NAME(mixed $valueDEFAULT): static
  */
 public function NAME(ParamConfigurator|array $value): static
 {
+    $this->_usedProperties[\'PROPERTY\'] = true;
     $this->PROPERTY = $value;
 
     return $this;
@@ -204,6 +213,7 @@ public function NAME(ParamConfigurator|array $value): static
  */
 public function NAME(string $VAR, TYPE $VALUE): static
 {
+    $this->_usedProperties[\'PROPERTY\'] = true;
     $this->PROPERTY[$VAR] = $VALUE;
 
     return $this;
@@ -231,6 +241,8 @@ public function NAME(string $VAR, TYPE $VALUE): static
             $body = '
 COMMENTpublic function NAME(array $value = []): CLASS
 {
+    $this->_usedProperties[\'PROPERTY\'] = true;
+
     return $this->PROPERTY[] = new CLASS($value);
 }';
             $class->addMethod($methodName, $body, ['COMMENT' => $comment, 'PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn()]);
@@ -239,9 +251,11 @@ COMMENTpublic function NAME(array $value = []): CLASS
 COMMENTpublic function NAME(string $VAR, array $VALUE = []): CLASS
 {
     if (!isset($this->PROPERTY[$VAR])) {
-        return $this->PROPERTY[$VAR] = new CLASS($value);
+        $this->_usedProperties[\'PROPERTY\'] = true;
+
+        return $this->PROPERTY[$VAR] = new CLASS($VALUE);
     }
-    if ([] === $value) {
+    if ([] === $VALUE) {
         return $this->PROPERTY[$VAR];
     }
 
@@ -266,6 +280,7 @@ COMMENT * @return $this
  */
 public function NAME($value): static
 {
+    $this->_usedProperties[\'PROPERTY\'] = true;
     $this->PROPERTY = $value;
 
     return $this;
@@ -385,7 +400,7 @@ public function NAME($value): static
             }
 
             $body .= strtr('
-    if (null !== $this->PROPERTY) {
+    if (isset($this->_usedProperties[\'PROPERTY\'])) {
         $output[\'ORG_NAME\'] = '.$code.';
     }', ['PROPERTY' => $p->getName(), 'ORG_NAME' => $p->getOriginalName()]);
         }
@@ -415,7 +430,8 @@ public function NAME(): array
             }
 
             $body .= strtr('
-    if (isset($value[\'ORG_NAME\'])) {
+    if (array_key_exists(\'ORG_NAME\', $value)) {
+        $this->_usedProperties[\'PROPERTY\'] = true;
         $this->PROPERTY = '.$code.';
         unset($value[\'ORG_NAME\']);
     }
@@ -460,11 +476,7 @@ public function __construct(array $value = [])
  */
 public function NAME(string $key, mixed $value): static
 {
-    if (null === $value) {
-        unset($this->_extraKeys[$key]);
-    } else {
-        $this->_extraKeys[$key] = $value;
-    }
+    $this->_extraKeys[$key] = $value;
 
     return $this;
 }');

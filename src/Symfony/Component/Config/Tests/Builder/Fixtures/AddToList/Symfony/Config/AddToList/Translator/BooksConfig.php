@@ -8,11 +8,12 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class BooksConfig 
 {
     private $page;
+    private $_usedProperties = [];
     
     /**
      * @example "page 1"
@@ -20,13 +21,16 @@ class BooksConfig
     */
     public function page(array $value = []): \Symfony\Config\AddToList\Translator\Books\PageConfig
     {
+        $this->_usedProperties['page'] = true;
+    
         return $this->page[] = new \Symfony\Config\AddToList\Translator\Books\PageConfig($value);
     }
     
     public function __construct(array $value = [])
     {
     
-        if (isset($value['page'])) {
+        if (array_key_exists('page', $value)) {
+            $this->_usedProperties['page'] = true;
             $this->page = array_map(function ($v) { return new \Symfony\Config\AddToList\Translator\Books\PageConfig($v); }, $value['page']);
             unset($value['page']);
         }
@@ -39,7 +43,7 @@ class BooksConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->page) {
+        if (isset($this->_usedProperties['page'])) {
             $output['page'] = array_map(function ($v) { return $v->toArray(); }, $this->page);
         }
     

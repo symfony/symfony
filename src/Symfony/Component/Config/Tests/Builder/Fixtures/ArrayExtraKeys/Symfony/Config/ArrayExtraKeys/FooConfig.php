@@ -7,12 +7,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class FooConfig 
 {
     private $baz;
     private $qux;
+    private $_usedProperties = [];
     private $_extraKeys;
     
     /**
@@ -22,6 +23,7 @@ class FooConfig
      */
     public function baz($value): static
     {
+        $this->_usedProperties['baz'] = true;
         $this->baz = $value;
     
         return $this;
@@ -34,6 +36,7 @@ class FooConfig
      */
     public function qux($value): static
     {
+        $this->_usedProperties['qux'] = true;
         $this->qux = $value;
     
         return $this;
@@ -42,12 +45,14 @@ class FooConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['baz'])) {
+        if (array_key_exists('baz', $value)) {
+            $this->_usedProperties['baz'] = true;
             $this->baz = $value['baz'];
             unset($value['baz']);
         }
     
-        if (isset($value['qux'])) {
+        if (array_key_exists('qux', $value)) {
+            $this->_usedProperties['qux'] = true;
             $this->qux = $value['qux'];
             unset($value['qux']);
         }
@@ -59,10 +64,10 @@ class FooConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->baz) {
+        if (isset($this->_usedProperties['baz'])) {
             $output['baz'] = $this->baz;
         }
-        if (null !== $this->qux) {
+        if (isset($this->_usedProperties['qux'])) {
             $output['qux'] = $this->qux;
         }
     
@@ -76,11 +81,7 @@ class FooConfig
      */
     public function set(string $key, mixed $value): static
     {
-        if (null === $value) {
-            unset($this->_extraKeys[$key]);
-        } else {
-            $this->_extraKeys[$key] = $value;
-        }
+        $this->_extraKeys[$key] = $value;
     
         return $this;
     }

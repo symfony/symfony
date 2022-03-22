@@ -455,4 +455,22 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'other host' => ['url' => 'http://127.0.0.1:8057/302', 'redirectWithAuth' => false],
         ];
     }
+
+    public function testDefaultContentType()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = $client->withOptions(['headers' => ['Content-Type: application/json']]);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => ['abc' => 'def'],
+        ]);
+
+        $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => '{"abc": "def"}',
+        ]);
+
+        $this->assertSame(['abc' => 'def', 'content-type' => 'application/json', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+    }
 }

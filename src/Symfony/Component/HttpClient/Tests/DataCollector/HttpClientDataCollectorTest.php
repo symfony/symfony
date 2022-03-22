@@ -252,8 +252,8 @@ class HttpClientDataCollectorTest extends TestCase
   --request POST \\
   --url %1$shttp://localhost:8057/json%1$s \\
   --header %1$sAccept: */*%1$s \\
-  --header %1$sContent-Length: 32%1$s \\
   --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
+  --header %1$sContent-Length: 32%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient/Native%1$s \\
   --data %1$sfoo=fooval%1$s --data %1$sbar=barval%1$s --data %1$sbaz=bazval%1$s',

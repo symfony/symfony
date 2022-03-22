@@ -205,7 +205,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $options['headers'][] = 'Accept-Encoding: gzip'; // Expose only one encoding, some servers mess up when more are provided
         }
 
+        $hasContentLength = isset($options['normalized_headers']['content-length'][0]);
+
         foreach ($options['headers'] as $header) {
+            if ($hasContentLength && 0 === stripos($header, 'Content-Length:')) {
+                continue; // Let curl handle Content-Length headers
+            }
             if (':' === $header[-2] && \strlen($header) - 2 === strpos($header, ': ')) {
                 // curl requires a special syntax to send empty headers
                 $curlopts[\CURLOPT_HTTPHEADER][] = substr_replace($header, ';', -2);
@@ -232,7 +237,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 };
             }
 
-            if (isset($options['normalized_headers']['content-length'][0])) {
+            if ($hasContentLength) {
                 $curlopts[\CURLOPT_INFILESIZE] = substr($options['normalized_headers']['content-length'][0], \strlen('Content-Length: '));
             } elseif (!isset($options['normalized_headers']['transfer-encoding'])) {
                 $curlopts[\CURLOPT_HTTPHEADER][] = 'Transfer-Encoding: chunked'; // Enable chunked request bodies

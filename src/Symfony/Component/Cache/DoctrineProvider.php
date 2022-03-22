@@ -15,6 +15,10 @@ use Doctrine\Common\Cache\CacheProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
+if (!class_exists(CacheProvider::class)) {
+    return;
+}
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *

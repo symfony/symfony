@@ -88,12 +88,12 @@ trait HttpClientTrait
             unset($options['json']);
 
             if (!isset($options['normalized_headers']['content-type'])) {
-                $options['normalized_headers']['content-type'] = [$options['headers'][] = 'Content-Type: application/json'];
+                $options['normalized_headers']['content-type'] = ['Content-Type: application/json'];
             }
         }
 
         if (!isset($options['normalized_headers']['accept'])) {
-            $options['normalized_headers']['accept'] = [$options['headers'][] = 'Accept: */*'];
+            $options['normalized_headers']['accept'] = ['Accept: */*'];
         }
 
         if (isset($options['body'])) {
@@ -104,7 +104,6 @@ trait HttpClientTrait
                 && ('' !== $h || ('' !== $options['body'] && !isset($options['normalized_headers']['transfer-encoding'])))
             ) {
                 $options['normalized_headers']['content-length'] = [substr_replace($h ?: 'Content-Length: ', \strlen($options['body']), 16)];
-                $options['headers'] = array_merge(...array_values($options['normalized_headers']));
             }
         }
 
@@ -146,11 +145,11 @@ trait HttpClientTrait
         if (null !== $url) {
             // Merge auth with headers
             if (($options['auth_basic'] ?? false) && !($options['normalized_headers']['authorization'] ?? false)) {
-                $options['normalized_headers']['authorization'] = [$options['headers'][] = 'Authorization: Basic '.base64_encode($options['auth_basic'])];
+                $options['normalized_headers']['authorization'] = ['Authorization: Basic '.base64_encode($options['auth_basic'])];
             }
             // Merge bearer with headers
             if (($options['auth_bearer'] ?? false) && !($options['normalized_headers']['authorization'] ?? false)) {
-                $options['normalized_headers']['authorization'] = [$options['headers'][] = 'Authorization: Bearer '.$options['auth_bearer']];
+                $options['normalized_headers']['authorization'] = ['Authorization: Bearer '.$options['auth_bearer']];
             }
 
             unset($options['auth_basic'], $options['auth_bearer']);
@@ -172,6 +171,14 @@ trait HttpClientTrait
         }
 
         $options['max_duration'] = isset($options['max_duration']) ? (float) $options['max_duration'] : 0;
+
+        if (isset($options['normalized_headers']['content-length']) && $contentType = $options['normalized_headers']['content-type'] ?? null) {
+            // Move Content-Type after Content-Length, see https://bugs.php.net/44603
+            unset($options['normalized_headers']['content-type']);
+            $options['normalized_headers']['content-type'] = $contentType;
+        }
+
+        $options['headers'] = array_merge(...array_values($options['normalized_headers']));
 
         return [$url, $options];
     }

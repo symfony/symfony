@@ -171,13 +171,6 @@ trait HttpClientTrait
         }
 
         $options['max_duration'] = isset($options['max_duration']) ? (float) $options['max_duration'] : 0;
-
-        if (isset($options['normalized_headers']['content-length']) && $contentType = $options['normalized_headers']['content-type'] ?? null) {
-            // Move Content-Type after Content-Length, see https://bugs.php.net/44603
-            unset($options['normalized_headers']['content-type']);
-            $options['normalized_headers']['content-type'] = $contentType;
-        }
-
         $options['headers'] = array_merge(...array_values($options['normalized_headers']));
 
         return [$url, $options];

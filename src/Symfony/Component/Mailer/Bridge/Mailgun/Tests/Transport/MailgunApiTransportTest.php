@@ -65,8 +65,8 @@ class MailgunApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
-        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+        $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
+        $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
     }
 
     public function testSend()

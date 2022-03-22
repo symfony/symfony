@@ -121,7 +121,7 @@ class SendgridApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['headers'][$name] = $header->getBodyAsString();
+            $payload['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $payload;

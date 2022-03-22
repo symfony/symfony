@@ -14,6 +14,7 @@ namespace Symfony\Component\Dotenv\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Dotenv\Dotenv;
@@ -46,11 +47,22 @@ final class DebugCommand extends Command
 
         parent::__construct();
     }
+    
+        protected function configure()
+    {
+        $this
+            ->setDescription(self::$defaultDescription)
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format')
+             ->setHelp(<<<EOF
+  <info>php %command.full_name% </info>
+  <info>php %command.full_name%  --format=json</info>
+EOF
+            );
+    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $io->title('Dotenv Variables & Files');
 
         if (!\array_key_exists('SYMFONY_DOTENV_VARS', $_SERVER)) {
             $io->error('Dotenv component is not initialized.');
@@ -62,6 +74,13 @@ final class DebugCommand extends Command
         $availableFiles = array_filter($envFiles, function (string $file) {
             return is_file($this->getFilePath($file));
         });
+        
+        if ($input->getOption('format') == "json") {
+            $io->writeln(json_encode($this->getVariablesasArray($availableFiles), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+            return 0;
+        }
+
+        $io->title('Dotenv Variables & Files');
 
         if (\in_array('.env.local.php', $availableFiles, true)) {
             $io->warning('Due to existing dump file (.env.local.php) all other dotenv files are skipped.');
@@ -108,6 +127,20 @@ final class DebugCommand extends Command
             }
 
             $output[] = $varDetails;
+        }
+
+        return $output;
+    }
+    
+    private function getVariablesasArray(array $envFiles): array
+    {
+        $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
+        sort($vars);
+
+        $output = [];
+        foreach ($vars as $var) {
+            $realValue = $_SERVER[$var];
+            $output[$var] = $realValue;
         }
 
         return $output;

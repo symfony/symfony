@@ -203,6 +203,17 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ])->getStatusCode());
     }
 
+    public function testRedirectAfterPost()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/302/relative', [
+            'body' => 'abc',
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testNullBody()
     {
         $client = $this->getHttpClient(__FUNCTION__);

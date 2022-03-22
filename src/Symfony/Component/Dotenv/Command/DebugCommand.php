@@ -47,8 +47,8 @@ final class DebugCommand extends Command
 
         parent::__construct();
     }
-    
-        protected function configure()
+
+    protected function configure()
     {
         $this
             ->setDescription(self::$defaultDescription)
@@ -74,9 +74,10 @@ EOF
         $availableFiles = array_filter($envFiles, function (string $file) {
             return is_file($this->getFilePath($file));
         });
-        
-        if ($input->getOption('format') == "json") {
+
+        if ('json' == $input->getOption('format')) {
             $io->writeln(json_encode($this->getVariablesasArray($availableFiles), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+
             return 0;
         }
 
@@ -131,7 +132,7 @@ EOF
 
         return $output;
     }
-    
+
     private function getVariablesasArray(array $envFiles): array
     {
         $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');

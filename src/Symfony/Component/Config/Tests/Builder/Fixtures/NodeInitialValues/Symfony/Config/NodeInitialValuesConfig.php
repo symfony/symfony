@@ -9,16 +9,18 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuilderInterface
 {
     private $someCleverName;
     private $messenger;
+    private $_usedProperties = [];
     
     public function someCleverName(array $value = []): \Symfony\Config\NodeInitialValues\SomeCleverNameConfig
     {
         if (null === $this->someCleverName) {
+            $this->_usedProperties['someCleverName'] = true;
             $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value);
         } elseif ([] !== $value) {
             throw new InvalidConfigurationException('The node created by "someCleverName()" has already been initialized. You cannot pass values the second time you call someCleverName().');
@@ -30,6 +32,7 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
     public function messenger(array $value = []): \Symfony\Config\NodeInitialValues\MessengerConfig
     {
         if (null === $this->messenger) {
+            $this->_usedProperties['messenger'] = true;
             $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($value);
         } elseif ([] !== $value) {
             throw new InvalidConfigurationException('The node created by "messenger()" has already been initialized. You cannot pass values the second time you call messenger().');
@@ -46,12 +49,14 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
     public function __construct(array $value = [])
     {
     
-        if (isset($value['some_clever_name'])) {
+        if (array_key_exists('some_clever_name', $value)) {
+            $this->_usedProperties['someCleverName'] = true;
             $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value['some_clever_name']);
             unset($value['some_clever_name']);
         }
     
-        if (isset($value['messenger'])) {
+        if (array_key_exists('messenger', $value)) {
+            $this->_usedProperties['messenger'] = true;
             $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($value['messenger']);
             unset($value['messenger']);
         }
@@ -64,10 +69,10 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->someCleverName) {
+        if (isset($this->_usedProperties['someCleverName'])) {
             $output['some_clever_name'] = $this->someCleverName->toArray();
         }
-        if (null !== $this->messenger) {
+        if (isset($this->_usedProperties['messenger'])) {
             $output['messenger'] = $this->messenger->toArray();
         }
     

@@ -9,16 +9,18 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilderInterface
 {
     private $translator;
     private $messenger;
+    private $_usedProperties = [];
     
     public function translator(array $value = []): \Symfony\Config\AddToList\TranslatorConfig
     {
         if (null === $this->translator) {
+            $this->_usedProperties['translator'] = true;
             $this->translator = new \Symfony\Config\AddToList\TranslatorConfig($value);
         } elseif ([] !== $value) {
             throw new InvalidConfigurationException('The node created by "translator()" has already been initialized. You cannot pass values the second time you call translator().');
@@ -30,6 +32,7 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
     public function messenger(array $value = []): \Symfony\Config\AddToList\MessengerConfig
     {
         if (null === $this->messenger) {
+            $this->_usedProperties['messenger'] = true;
             $this->messenger = new \Symfony\Config\AddToList\MessengerConfig($value);
         } elseif ([] !== $value) {
             throw new InvalidConfigurationException('The node created by "messenger()" has already been initialized. You cannot pass values the second time you call messenger().');
@@ -46,12 +49,14 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
     public function __construct(array $value = [])
     {
     
-        if (isset($value['translator'])) {
+        if (array_key_exists('translator', $value)) {
+            $this->_usedProperties['translator'] = true;
             $this->translator = new \Symfony\Config\AddToList\TranslatorConfig($value['translator']);
             unset($value['translator']);
         }
     
-        if (isset($value['messenger'])) {
+        if (array_key_exists('messenger', $value)) {
+            $this->_usedProperties['messenger'] = true;
             $this->messenger = new \Symfony\Config\AddToList\MessengerConfig($value['messenger']);
             unset($value['messenger']);
         }
@@ -64,10 +69,10 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->translator) {
+        if (isset($this->_usedProperties['translator'])) {
             $output['translator'] = $this->translator->toArray();
         }
-        if (null !== $this->messenger) {
+        if (isset($this->_usedProperties['messenger'])) {
             $output['messenger'] = $this->messenger->toArray();
         }
     

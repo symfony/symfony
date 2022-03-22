@@ -8,11 +8,12 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuilderInterface
 {
     private $anyValue;
+    private $_usedProperties = [];
     
     /**
      * @default null
@@ -22,6 +23,7 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
      */
     public function anyValue(mixed $value): static
     {
+        $this->_usedProperties['anyValue'] = true;
         $this->anyValue = $value;
     
         return $this;
@@ -35,7 +37,8 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     public function __construct(array $value = [])
     {
     
-        if (isset($value['any_value'])) {
+        if (array_key_exists('any_value', $value)) {
+            $this->_usedProperties['anyValue'] = true;
             $this->anyValue = $value['any_value'];
             unset($value['any_value']);
         }
@@ -48,7 +51,7 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->anyValue) {
+        if (isset($this->_usedProperties['anyValue'])) {
             $output['any_value'] = $this->anyValue;
         }
     

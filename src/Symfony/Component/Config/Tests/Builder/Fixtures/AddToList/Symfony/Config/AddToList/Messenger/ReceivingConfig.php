@@ -8,12 +8,13 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class ReceivingConfig 
 {
     private $priority;
     private $color;
+    private $_usedProperties = [];
     
     /**
      * @default null
@@ -22,6 +23,7 @@ class ReceivingConfig
      */
     public function priority($value): static
     {
+        $this->_usedProperties['priority'] = true;
         $this->priority = $value;
     
         return $this;
@@ -34,6 +36,7 @@ class ReceivingConfig
      */
     public function color($value): static
     {
+        $this->_usedProperties['color'] = true;
         $this->color = $value;
     
         return $this;
@@ -42,12 +45,14 @@ class ReceivingConfig
     public function __construct(array $value = [])
     {
     
-        if (isset($value['priority'])) {
+        if (array_key_exists('priority', $value)) {
+            $this->_usedProperties['priority'] = true;
             $this->priority = $value['priority'];
             unset($value['priority']);
         }
     
-        if (isset($value['color'])) {
+        if (array_key_exists('color', $value)) {
+            $this->_usedProperties['color'] = true;
             $this->color = $value['color'];
             unset($value['color']);
         }
@@ -60,10 +65,10 @@ class ReceivingConfig
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->priority) {
+        if (isset($this->_usedProperties['priority'])) {
             $output['priority'] = $this->priority;
         }
-        if (null !== $this->color) {
+        if (isset($this->_usedProperties['color'])) {
             $output['color'] = $this->color;
         }
     

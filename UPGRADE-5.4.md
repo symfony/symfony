@@ -52,6 +52,11 @@ HttpFoundation
  * Mark `Request::get()` internal, use explicit input sources instead
  * Deprecate `upload_progress.*` and `url_rewriter.tags` session options
 
+Ldap
+----
+
+ * Deprecate `LdapAuthenticator::createAuthenticatedToken()`, use `LdapAuthenticator::createToken()` instead
+
 Lock
 ----
 

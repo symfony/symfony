@@ -97,6 +97,10 @@ trait HttpClientTrait
         }
 
         if (isset($options['body'])) {
+            if (\is_array($options['body'])) {
+                $options['normalized_headers']['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
+            }
+
             $options['body'] = self::normalizeBody($options['body']);
 
             if (\is_string($options['body'])

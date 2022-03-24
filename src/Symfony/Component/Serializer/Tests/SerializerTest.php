@@ -1193,7 +1193,7 @@ class DummyUnionType
      *
      * @return $this
      */
-    public function setChanged($changed): self
+    public function setChanged($changed): static
     {
         $this->changed = $changed;
 

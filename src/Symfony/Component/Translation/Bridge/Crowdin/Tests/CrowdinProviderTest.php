@@ -217,7 +217,10 @@ XLIFF;
         $provider->write($translatorBag);
     }
 
-    public function testCompleteWriteProcessAddFileAndUploadTranslations()
+    /**
+     * @dataProvider getResponsesForProcessAddFileAndUploadTranslations
+     */
+    public function testCompleteWriteProcessAddFileAndUploadTranslations(TranslatorBag $translatorBag, string $expectedLocale, string $expectedMessagesTranslationsContent)
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
@@ -232,24 +235,6 @@ XLIFF;
       <trans-unit id="ypeBEso" resname="a">
         <source>a</source>
         <target>trans_en_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-
-XLIFF;
-
-        $expectedMessagesTranslationsContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="ypeBEso" resname="a">
-        <source>a</source>
-        <target>trans_fr_a</target>
       </trans-unit>
     </body>
   </file>
@@ -296,22 +281,14 @@ XLIFF;
 
                 return new MockResponse(json_encode(['data' => ['id' => 19]]), ['http_code' => 201]);
             },
-            'UploadTranslations' => function (string $method, string $url, array $options = []): ResponseInterface {
+            'UploadTranslations' => function (string $method, string $url, array $options = []) use ($expectedLocale): ResponseInterface {
                 $this->assertSame('POST', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/fr', $url);
+                $this->assertSame(sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', $expectedLocale), $url);
                 $this->assertSame('{"storageId":19,"fileId":12}', $options['body']);
 
                 return new MockResponse();
             },
         ];
-
-        $translatorBag = new TranslatorBag();
-        $translatorBag->addCatalogue(new MessageCatalogue('en', [
-            'messages' => ['a' => 'trans_en_a'],
-        ]));
-        $translatorBag->addCatalogue(new MessageCatalogue('fr', [
-            'messages' => ['a' => 'trans_fr_a'],
-        ]));
 
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
@@ -321,10 +298,69 @@ XLIFF;
         $provider->write($translatorBag);
     }
 
+    public function getResponsesForProcessAddFileAndUploadTranslations(): \Generator
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $translatorBagFr = new TranslatorBag();
+        $translatorBagFr->addCatalogue($arrayLoader->load([
+            'a' => 'trans_en_a',
+        ], 'en'));
+        $translatorBagFr->addCatalogue($arrayLoader->load([
+            'a' => 'trans_fr_a',
+        ], 'fr'));
+
+        yield [$translatorBagFr, 'fr', <<<'XLIFF'
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="ypeBEso" resname="a">
+        <source>a</source>
+        <target>trans_fr_a</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+
+XLIFF
+        ];
+
+        $translatorBagEnGb = new TranslatorBag();
+        $translatorBagEnGb->addCatalogue($arrayLoader->load([
+            'a' => 'trans_en_a',
+        ], 'en'));
+        $translatorBagEnGb->addCatalogue($arrayLoader->load([
+            'a' => 'trans_en_gb_a',
+        ], 'en_GB'));
+
+        yield [$translatorBagEnGb, 'en-GB', <<<'XLIFF'
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="en-GB" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="ypeBEso" resname="a">
+        <source>a</source>
+        <target>trans_en_gb_a</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+
+XLIFF
+        ];
+    }
+
     /**
      * @dataProvider getResponsesForOneLocaleAndOneDomain
      */
-    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
+    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag, string $expectedTargetLanguageId)
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -340,10 +376,10 @@ XLIFF;
                     ],
                 ]));
             },
-            'exportProjectTranslations' => function (string $method, string $url, array $options = []): ResponseInterface {
+            'exportProjectTranslations' => function (string $method, string $url, array $options = []) use ($expectedTargetLanguageId): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/exports', $url);
-                $this->assertSame('{"targetLanguageId":"fr","fileIds":[12]}', $options['body']);
+                $this->assertSame(sprintf('{"targetLanguageId":"%s","fileIds":[12]}', $expectedTargetLanguageId), $options['body']);
 
                 return new MockResponse(json_encode(['data' => ['url' => 'https://file.url']]));
             },
@@ -401,7 +437,37 @@ XLIFF;
 </xliff>
 XLIFF
             ,
-            $expectedTranslatorBagFr,
+            $expectedTranslatorBagFr, 'fr',
+        ];
+
+        $expectedTranslatorBagEnUs = new TranslatorBag();
+        $expectedTranslatorBagEnUs->addCatalogue($arrayLoader->load([
+            'index.hello' => 'Hello',
+            'index.greetings' => 'Welcome, {firstname}!',
+        ], 'en_GB'));
+
+        yield ['en_GB', 'messages', <<<'XLIFF'
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="en_GB" datatype="database" tool-id="crowdin">
+    <header>
+      <tool tool-id="crowdin" tool-name="Crowdin" tool-version="1.0.25 20201211-1" tool-company="Crowdin"/>
+    </header>
+    <body>
+      <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+        <source>index.hello</source>
+        <target state="translated">Hello</target>
+      </trans-unit>
+      <trans-unit id="crowdin:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="crowdin:format=icu">
+        <source>index.greetings</source>
+        <target state="translated">Welcome, {firstname}!</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+XLIFF
+            ,
+            $expectedTranslatorBagEnUs, 'en-GB',
         ];
     }
 

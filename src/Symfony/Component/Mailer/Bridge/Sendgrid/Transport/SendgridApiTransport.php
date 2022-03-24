@@ -133,7 +133,7 @@ class SendgridApiTransport extends AbstractApiTransport
             } elseif ($header instanceof MetadataHeader) {
                 $customArguments[$header->getKey()] = $header->getValue();
             } else {
-                $payload['headers'][$name] = $header->getBodyAsString();
+                $payload['headers'][$header->getName()] = $header->getBodyAsString();
             }
         }
 

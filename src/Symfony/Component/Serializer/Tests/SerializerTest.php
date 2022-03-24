@@ -718,6 +718,38 @@ class SerializerTest extends TestCase
         $this->assertSame(42, $serializer->deserialize('{"wrapper": 42}', 'int', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[wrapper]']));
     }
 
+    public function testUnionTypeDeserializable()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [
+                new DateTimeNormalizer(),
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        $actual = $serializer->deserialize('{ "changed": null }', DummyUnionType::class, 'json', [
+            DateTimeNormalizer::FORMAT_KEY => \DateTime::ISO8601,
+        ]);
+
+        $this->assertEquals((new DummyUnionType())->setChanged(null), $actual, 'Union type denormalization first case failed.');
+
+        $actual = $serializer->deserialize('{ "changed": "2022-03-22T16:15:05+0000" }', DummyUnionType::class, 'json', [
+            DateTimeNormalizer::FORMAT_KEY => \DateTime::ISO8601,
+        ]);
+
+        $expectedDateTime = \DateTime::createFromFormat(\DateTime::ISO8601, '2022-03-22T16:15:05+0000');
+        $this->assertEquals((new DummyUnionType())->setChanged($expectedDateTime), $actual, 'Union type denormalization second case failed.');
+
+        $actual = $serializer->deserialize('{ "changed": false }', DummyUnionType::class, 'json', [
+            DateTimeNormalizer::FORMAT_KEY => \DateTime::ISO8601,
+        ]);
+
+        $this->assertEquals(new DummyUnionType(), $actual, 'Union type denormalization third case failed.');
+    }
+
     private function serializerWithClassDiscriminator()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -1152,6 +1184,26 @@ class Bar
     public function __construct($value)
     {
         $this->value = $value;
+    }
+}
+
+class DummyUnionType
+{
+    /**
+     * @var \DateTime|bool|null
+     */
+    public $changed = false;
+
+    /**
+     * @param \DateTime|bool|null
+     *
+     * @return $this
+     */
+    public function setChanged($changed): self
+    {
+        $this->changed = $changed;
+
+        return $this;
     }
 }
 

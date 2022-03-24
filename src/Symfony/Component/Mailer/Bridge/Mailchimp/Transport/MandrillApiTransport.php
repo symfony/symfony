@@ -138,7 +138,7 @@ class MandrillApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['message']['headers'][$name] = $header->getBodyAsString();
+            $payload['message']['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $payload;

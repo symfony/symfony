@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-18T08:11:28Z
+
+@tijsverkoyen Can you have a look at the broken tests?
+
+---------------------------------------------------------------------------
+
+by tijsverkoyen at 2022-03-18T10:15:15Z
+
+@fabpot I will, but I really am struggling. I can't find any references to the old `p`-tag.
+
+If I understand the [output](https://github.com/symfony/symfony/runs/5597950142?check_suite_focus=true#step:8:7521) of the test correctly it should be fixed in `/home/runner/work/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/form/Tests/AbstractLayoutTest.php:435`. Which is in the vendor-folder, as it is installed through composer.
+It seems like an older version is installed as the file has been fixed: https://github.com/symfony/symfony/pull/45771/files#diff-4125508802c9ee9145cb3e5f9c6742dad7c084623d03442c38b7cba10b8c8f09L435
+
+```1) Symfony\Bridge\Twig\Tests\Extension\FormExtensionDivLayoutTest::testHelp
+Failed asserting that
+
+/div
+    [@id="name_help"]
+    [@class="help-text"]
+    [.="[trans]Help text test![/trans]"]
+
+matches exactly once. Matches 0 times in
+
+<p id="name_help" class="help-text">[trans]Help text test![/trans]</p>
+
+/home/runner/work/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/form/Tests/AbstractLayoutTest.php:94
+/home/runner/work/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/form/Tests/AbstractLayoutTest.php:435
+```

@@ -1426,6 +1426,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('reset_on_message')
                             ->defaultTrue()
                             ->info('Reset container services after each message.')
+                            ->setDeprecated('symfony/framework-bundle', '6.1', 'Option "%node%" at "%path%" is deprecated. It does nothing and will be removed in version 7.0.')
                             ->validate()
                                 ->ifTrue(static fn ($v) => true !== $v)
                                 ->thenInvalid('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.')

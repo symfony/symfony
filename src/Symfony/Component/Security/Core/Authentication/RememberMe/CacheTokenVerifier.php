@@ -45,11 +45,11 @@ class CacheTokenVerifier implements TokenVerifierInterface
         }
 
         $cacheKey = $this->getCacheKey($token);
-        if (!$this->cache->hasItem($cacheKey)) {
+        $item = $this->cache->getItem($cacheKey);
+        if (!$item->isHit()) {
             return false;
         }
 
-        $item = $this->cache->getItem($cacheKey);
         $outdatedToken = $item->get();
 
         return hash_equals($outdatedToken, $tokenValue);

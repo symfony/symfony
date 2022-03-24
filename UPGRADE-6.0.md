@@ -146,6 +146,11 @@ Inflector
 
  * The component has been removed, use `EnglishInflector` from the String component instead.
 
+Ldap
+----
+
+ * Remove `LdapAuthenticator::createAuthenticatedToken()`, use `LdapAuthenticator::createToken()` instead
+
 Lock
 ----
 

@@ -137,9 +137,9 @@ class MailgunApiTransport extends AbstractApiTransport
             // Check if it is a valid prefix or header name according to Mailgun API
             $prefix = substr($name, 0, 2);
             if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
-                $headerName = $name;
+                $headerName = $header->getName();
             } else {
-                $headerName = 'h:'.$name;
+                $headerName = 'h:'.$header->getName();
             }
 
             $payload[$headerName] = $header->getBodyAsString();

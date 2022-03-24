@@ -41,14 +41,6 @@ final class InputBag extends ParameterBag
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function all(string $key = null): array
-    {
-        return parent::all($key);
-    }
-
-    /**
      * Replaces the current input values by a new set.
      */
     public function replace(array $inputs = [])

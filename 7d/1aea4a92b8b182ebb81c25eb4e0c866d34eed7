@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-22T15:17:33Z
+
+Hey!
+
+I think @karlshea has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-03-22T19:13:13Z
+
+Hmm, I'm wondering how this slipped through the testsuite. Are we missing a compatibility test check here?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-22T19:15:31Z
+
+The LdapAuthenticator is not tested at all.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-23T13:03:51Z
+
+~GH is having issues closing PRs :grimacing:~

@@ -76,8 +76,8 @@ class MailgunApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
-        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+        $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
+        $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
 
         $this->assertArrayHasKey('h:foo', $payload);
         $this->assertEquals('foo-value', $payload['h:foo']);
@@ -224,10 +224,10 @@ class MailgunApiTransportTest extends TestCase
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
-        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
-        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
-        $this->assertArrayHasKey('h:custom-header', $payload);
-        $this->assertEquals('value', $payload['h:custom-header']);
+        $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
+        $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
+        $this->assertArrayHasKey('h:Custom-Header', $payload);
+        $this->assertEquals('value', $payload['h:Custom-Header']);
         $this->assertArrayHasKey('o:tag', $payload);
         $this->assertSame('password-reset', $payload['o:tag']);
         $this->assertArrayHasKey('v:Color', $payload);

@@ -161,7 +161,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
                 continue;
             }
-            $headersAndTags['headers'][$name] = $header->getBodyAsString();
+            $headersAndTags['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $headersAndTags;

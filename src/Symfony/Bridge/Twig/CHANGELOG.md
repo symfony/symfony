@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Wrap help messages on form elements in `div` instead of `p`
+
 5.4
 ---
 

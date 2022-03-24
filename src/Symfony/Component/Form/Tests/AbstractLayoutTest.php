@@ -432,7 +432,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-'/p
+'/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help text test![/trans]"]

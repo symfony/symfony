@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
@@ -47,14 +48,13 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('argument_resolver.backed_enum_resolver', BackedEnumValueResolver::class)
-            ->tag('controller.argument_value_resolver', [
-                'priority' => 105, // prior to the RequestAttributeValueResolver
-            ])
+            ->tag('controller.argument_value_resolver', ['priority' => 100])
 
         ->set('argument_resolver.uid', UidValueResolver::class)
-            ->tag('controller.argument_value_resolver', [
-                'priority' => 100, // same priority than RequestAttributeValueResolver, but registered before
-            ])
+            ->tag('controller.argument_value_resolver', ['priority' => 100])
+
+        ->set('argument_resolver.datetime', DateTimeValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 100])
 
         ->set('argument_resolver.request_attribute', RequestAttributeValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => 100])

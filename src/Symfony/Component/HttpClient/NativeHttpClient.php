@@ -81,9 +81,11 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             }
         }
 
+        $sendContentLength = !\is_string($options['body']) || 'POST' === $method;
+
         $options['body'] = self::getBodyAsString($options['body']);
 
-        if ('' === $options['body'] && 'POST' === $method && !isset($options['normalized_headers']['content-length'])) {
+        if ('' === $options['body'] && $sendContentLength && !isset($options['normalized_headers']['content-length'])) {
             $options['headers'][] = 'Content-Length: 0';
         }
         if (('' !== $options['body'] || 'POST' === $method) && !isset($options['normalized_headers']['content-type'])) {

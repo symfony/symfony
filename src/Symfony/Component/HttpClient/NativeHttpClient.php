@@ -85,6 +85,11 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $options['body'] = self::getBodyAsString($options['body']);
 
+        if (isset($options['normalized_headers']['transfer-encoding'])) {
+            unset($options['normalized_headers']['transfer-encoding']);
+            $options['headers'] = array_merge(...array_values($options['normalized_headers']));
+            $options['body'] = self::dechunk($options['body']);
+        }
         if ('' === $options['body'] && $hasBody && !$hasContentLength) {
             $options['headers'][] = 'Content-Length: 0';
         }

@@ -16,6 +16,7 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
@@ -325,6 +326,121 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]');
+    }
+
+    public function testSortedChoicesWithoutTranslation()
+    {
+        $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
+            'choices' => ['Choice&B' => '&b', 'Choice&A' => '&a'],
+            'choice_translation_domain' => false,
+            'sorted_choices' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/select
+    [@name="name"]
+    [
+        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=2]
+'
+        );
+    }
+
+    public function testSortedChoiceWithPlaceholderWithoutTranslation()
+    {
+        $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
+            'choices' => ['Choice&B' => '&b', 'Choice&A' => '&a'],
+            'translation_domain' => false,
+            'placeholder' => 'Placeholder&Not&Translated',
+            'sorted_choices' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/select
+    [@name="name"]
+    [
+        ./option[@value=""][not(@selected)][not(@disabled)][.="Placeholder&Not&Translated"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=3]
+'
+        );
+    }
+
+    public function testSortedChoiceAttributes()
+    {
+        $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
+            'choices' => ['Choice&B' => '&b', 'Choice&A' => '&a'],
+            'sorted_choices' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/select
+    [@name="name"]
+    [
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
+    ]
+    [count(./option)=2]
+'
+        );
+    }
+
+    public function testSortedChoiceWithPlaceholder()
+    {
+        $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
+            'choices' => ['Choice&B' => '&b', 'Choice&A' => '&a'],
+            'placeholder' => 'Placeholder',
+            'sorted_choices' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/select
+    [@name="name"]
+    [
+        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Placeholder[/trans]"]
+        /following-sibling::option[@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
+    ]
+    [count(./option)=3]
+'
+        );
+    }
+
+    public function testSortedChoiceGrouped()
+    {
+        $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
+            'choices' => [
+                'Group&2' => ['Choice&C' => '&c'],
+                'Group&1' => ['Choice&B' => '&b', 'Choice&A' => '&a'],
+            ],
+            'sorted_choices' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/select
+    [@name="name"]
+    [
+        ./optgroup[position() = 1][@label="[trans]Group&2[/trans]"]
+        [
+            ./option[@value="&c"][not(@selected)][.="[trans]Choice&C[/trans]"]
+        ]
+        [count(./option)=1]
+    ]
+    [
+        ./optgroup[position() = 2][@label="[trans]Group&1[/trans]"]
+        [
+            ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+            /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ]
+        [count(./option)=2]
+    ]
+    [count(./optgroup)=2]
+'
+        );
     }
 
     protected function renderForm(FormView $view, array $vars = [])

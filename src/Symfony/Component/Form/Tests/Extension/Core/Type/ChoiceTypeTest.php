@@ -2247,4 +2247,40 @@ class ChoiceTypeTest extends BaseTypeTest
             new ChoiceView('c', 'c', 'Kris'),
         ], $form->createView()->vars['choices']);
     }
+
+    public function testSortedChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'sorted_choices' => true,
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+            new ChoiceView('d', 'd', 'Jon'),
+            new ChoiceView('e', 'e', 'Roman'),
+        ], $form->createView()->vars['choices']);
+        $this->assertTrue($form->createView()->vars['sorted_choices']);
+    }
+
+    public function testSortedChoiceLoader()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_loader' => new CallbackChoiceLoader(function () {
+                return $this->choices;
+            }),
+            'sorted_choices' => true,
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+            new ChoiceView('d', 'd', 'Jon'),
+            new ChoiceView('e', 'e', 'Roman'),
+        ], $form->createView()->vars['choices']);
+        $this->assertTrue($form->createView()->vars['sorted_choices']);
+    }
 }

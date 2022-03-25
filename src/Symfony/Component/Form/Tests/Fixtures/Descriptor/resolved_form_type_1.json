@@ -16,7 +16,8 @@
             "group_by",
             "multiple",
             "placeholder",
-            "preferred_choices"
+            "preferred_choices",
+            "sorted_choices"
         ],
         "overridden": {
             "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [

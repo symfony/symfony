@@ -78,6 +78,10 @@
 {%- endblock choice_widget_collapsed -%}
 
 {%- block choice_widget_options -%}
+    {%- if sorted_choices is same as (true) and options|first is not iterable -%}
+        {% set options = options|sort((a, b) => (choice_translation_domain is same as(false) ? a.label : a.label|trans(a.labelTranslationParameters, choice_translation_domain)) <=> (choice_translation_domain is same as(false) ? b.label : b.label|trans(b.labelTranslationParameters, choice_translation_domain))) %}
+    {%- endif -%}
+
     {% for group_label, choice in options %}
         {%- if choice is iterable -%}
             <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">

@@ -275,6 +275,9 @@ class ChoiceType extends AbstractType
             // POST request.
             $view->vars['full_name'] .= '[]';
         }
+
+        // Add sorted_choices key
+        $view->vars['sorted_choices'] = $options['sorted_choices'];
     }
 
     /**
@@ -353,6 +356,7 @@ class ChoiceType extends AbstractType
             'multiple' => false,
             'expanded' => false,
             'choices' => [],
+            'sorted_choices' => null,
             'choice_filter' => null,
             'choice_loader' => null,
             'choice_label' => null,
@@ -377,7 +381,6 @@ class ChoiceType extends AbstractType
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
-
         $resolver->setAllowedTypes('choices', ['null', 'array', \Traversable::class]);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
         $resolver->setAllowedTypes('choice_loader', ['null', ChoiceLoaderInterface::class, ChoiceLoader::class]);
@@ -389,6 +392,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
         $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
+        $resolver->setAllowedTypes('sorted_choices', ['null', 'bool']);
     }
 
     /**

@@ -34,6 +34,7 @@
         "symfony/http-kernel": "^5.0|^6.0",
         "symfony/messenger": "^4.4|^5.0|^6.0",
         "symfony/doctrine-messenger": "^5.1|^6.0",
+        "symfony/phpunit-bridge": "^4.4|^5.4|^6.0",
         "symfony/property-access": "^4.4|^5.0|^6.0",
         "symfony/property-info": "^5.0|^6.0",
         "symfony/proxy-manager-bridge": "^4.4|^5.0|^6.0",

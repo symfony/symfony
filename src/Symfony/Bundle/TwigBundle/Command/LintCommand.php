@@ -49,7 +49,7 @@ EOF
         if (str_starts_with($filename, '@')) {
             $dir = $this->getApplication()->getKernel()->locateResource($filename);
 
-            return Finder::create()->files()->in($dir)->name('*.twig');
+            return Finder::create()->files()->in($dir)->name($this->namePatterns);
         }
 
         return parent::findFiles($filename);

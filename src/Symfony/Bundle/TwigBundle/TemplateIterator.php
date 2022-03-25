@@ -29,16 +29,19 @@ class TemplateIterator implements \IteratorAggregate
     private \Traversable $templates;
     private array $paths;
     private ?string $defaultPath;
+    private array $namePatterns;
 
     /**
-     * @param array       $paths       Additional Twig paths to warm
-     * @param string|null $defaultPath The directory where global templates can be stored
+     * @param array       $paths        Additional Twig paths to warm
+     * @param string|null $defaultPath  The directory where global templates can be stored
+     * @param string[]    $namePatterns Pattern of file names
      */
-    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null)
+    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null, array $namePatterns = [])
     {
         $this->kernel = $kernel;
         $this->paths = $paths;
         $this->defaultPath = $defaultPath;
+        $this->namePatterns = $namePatterns;
     }
 
     public function getIterator(): \Traversable
@@ -82,7 +85,7 @@ class TemplateIterator implements \IteratorAggregate
         }
 
         $templates = [];
-        foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs) as $file) {
+        foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs)->name($this->namePatterns) as $file) {
             $templates[] = (null !== $namespace ? '@'.$namespace.'/' : '').str_replace('\\', '/', $file->getRelativePathname());
         }
 

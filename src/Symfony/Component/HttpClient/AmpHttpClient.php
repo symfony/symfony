@@ -92,7 +92,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
             }
         }
 
-        if ('' !== $options['body'] && !isset($options['normalized_headers']['content-type'])) {
+        if (('' !== $options['body'] || 'POST' === $method) && !isset($options['normalized_headers']['content-type'])) {
             $options['headers'][] = 'Content-Type: application/x-www-form-urlencoded';
         }
 

@@ -82,7 +82,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $options['body'] = self::getBodyAsString($options['body']);
 
-        if ('' !== $options['body'] && 'POST' === $method && !isset($options['normalized_headers']['content-type'])) {
+        if ('' !== $options['body'] && !isset($options['normalized_headers']['content-type'])) {
             $options['headers'][] = 'Content-Type: application/x-www-form-urlencoded';
         }
 

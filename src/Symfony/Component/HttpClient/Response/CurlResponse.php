@@ -409,6 +409,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 } elseif (303 === $info['http_code'] || ('POST' === $info['http_method'] && \in_array($info['http_code'], [301, 302], true))) {
                     $info['http_method'] = 'HEAD' === $info['http_method'] ? 'HEAD' : 'GET';
                     curl_setopt($ch, \CURLOPT_POSTFIELDS, '');
+                    curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, $info['http_method']);
                 }
             }
 

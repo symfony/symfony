@@ -246,7 +246,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         } elseif ('' !== $body || 'POST' === $method || $hasContentLength) {
             $curlopts[\CURLOPT_POSTFIELDS] = $body;
 
-            if ('' === $body && !isset($options['normalized_headers']['content-type'])) {
+            if ('' === $body && 'POST' !== $method && !isset($options['normalized_headers']['content-type'])) {
                 $curlopts[\CURLOPT_HTTPHEADER][] = 'Content-Type:';
             }
         }

@@ -214,6 +214,18 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    public function testEmptyPut()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('PUT', 'http://localhost:8057/post', [
+            'headers' => ['Content-Length' => '0'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
+    }
+
     public function testNullBody()
     {
         $client = $this->getHttpClient(__FUNCTION__);

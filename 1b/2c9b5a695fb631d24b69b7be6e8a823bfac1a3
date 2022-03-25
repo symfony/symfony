@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by l-vo at 2022-02-20T14:58:50Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by l-vo at 2022-02-20T21:05:30Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-21T10:50:06Z
+
+Hey!
+
+I think @lucasaba has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2022-02-24T10:21:10Z
+
+@nicolas-grekas @fabpot given that this PR is about moving away from a deprecated DBAL API for the collector of the Symfony webprofiler, I suggest merging that into 5.4 rather than 6.1, so that the Symfony LTS does not use the deprecated API for years for the debug features.
+
+---------------------------------------------------------------------------
+
+by l-vo at 2022-02-28T20:43:55Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-07T19:25:51Z
+
+> given that this PR is about moving away from a deprecated DBAL API for the collector of the Symfony webprofiler, I suggest merging that into 5.4 rather than 6.1, so that the Symfony LTS does not use the deprecated API for years for the debug features.
+
+Sounds reasonable. Let's do that.
+
+@l-vo Can you please rebase your PR on the 5.4 branch and make sure your new code is compatible with PHP 7.3?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2022-03-13T16:27:11Z
+
+@derrabus @stof target branch changed to 5.4. Should I do another PR to 6.1 after merge to restore modern additions brought by php >=8 ?
+
+---------------------------------------------------------------------------
+
+by l-vo at 2022-03-13T16:27:31Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-22T14:03:49Z
+
+> Should I do another PR to 6.1 after merge to restore modern additions brought by php >=8 ?
+
+If we don't do this already while merging up, please create that PR.

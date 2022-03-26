@@ -20,6 +20,25 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DateTimeValueResolverTest extends TestCase
 {
+    private $defaultTimezone;
+
+    protected function setUp(): void
+    {
+        $this->defaultTimezone = date_default_timezone_get();
+    }
+
+    protected function tearDown(): void
+    {
+        date_default_timezone_set($this->defaultTimezone);
+    }
+
+    public function getTimeZones()
+    {
+        yield ['UTC'];
+        yield ['Etc/GMT+9'];
+        yield ['Etc/GMT-14'];
+    }
+
     public function testSupports()
     {
         $resolver = new DateTimeValueResolver();
@@ -37,12 +56,16 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertFalse($resolver->supports($request, $argument));
     }
 
-    public function testFullDate()
+    /**
+     * @dataProvider getTimeZones
+     */
+    public function testFullDate(string $timezone)
     {
+        date_default_timezone_set($timezone);
         $resolver = new DateTimeValueResolver();
 
         $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
-        $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00']);
+        $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00+0000']);
 
         /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
@@ -53,8 +76,12 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2012-07-21', $results[0]->format('Y-m-d'));
     }
 
-    public function testUnixTimestamp()
+    /**
+     * @dataProvider getTimeZones
+     */
+    public function testUnixTimestamp(string $timezone)
     {
+        date_default_timezone_set($timezone);
         $resolver = new DateTimeValueResolver();
 
         $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
@@ -86,6 +113,7 @@ class DateTimeValueResolverTest extends TestCase
 
     public function testCustomClass()
     {
+        date_default_timezone_set('UTC');
         $resolver = new DateTimeValueResolver();
 
         $argument = new ArgumentMetadata('dummy', FooDateTime::class, false, false, null);
@@ -100,12 +128,16 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2016-09-08', $results[0]->format('Y-m-d'));
     }
 
-    public function testDateTimeImmutable()
+    /**
+     * @dataProvider getTimeZones
+     */
+    public function testDateTimeImmutable(string $timezone)
     {
+        date_default_timezone_set($timezone);
         $resolver = new DateTimeValueResolver();
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
-        $request = self::requestWithAttributes(['dummy' => '2016-09-08 00:00:00']);
+        $request = self::requestWithAttributes(['dummy' => '2016-09-08 00:00:00+0000']);
 
         /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);

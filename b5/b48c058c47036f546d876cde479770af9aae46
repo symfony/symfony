@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-01T21:42:12Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mjpvandenberg at 2022-02-02T07:52:28Z
+
+The low-deps tests for FrameworkBundle are failing because _current_ 6.1 branch of Messenger does not allow the `AsMessageHandler` attribute on methods. Should I remove the change in the FrameworkBundle and save that for a later PR?
+
+(The Psalm and Fabbot failures are not related to the changes in this PR.)
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-02T17:44:08Z
+
+Hey!
+
+I think @alirezamirsepassi has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T16:12:51Z
+
+> The low-deps tests for FrameworkBundle are failing because _current_ 6.1 branch of Messenger does not allow the `AsMessageHandler` attribute on methods. Should I remove the change in the FrameworkBundle and save that for a later PR?
+>
+> (The Psalm and Fabbot failures are not related to the changes in this PR.)
+
+I've fixed the deps issue to fix the tests.

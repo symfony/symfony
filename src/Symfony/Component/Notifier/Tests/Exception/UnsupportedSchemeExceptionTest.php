@@ -41,6 +41,7 @@ use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
@@ -96,6 +97,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             OneSignalTransportFactory::class => false,
             OvhCloudTransportFactory::class => false,
             RocketChatTransportFactory::class => false,
+            SendberryTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
             SinchTransportFactory::class => false,
             SlackTransportFactory::class => false,

@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Exception;
 /**
  * @author Ben Roberts <ben@headsnet.com>
  */
-class FlashMessageMappingException extends LogicException
+class FlashMessageImportanceMapperException extends LogicException
 {
     public function __construct(string $importance, string $mappingClass)
     {

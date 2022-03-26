@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Notifier\FlashMessage;
 
-use Symfony\Component\Notifier\Exception\FlashMessageMappingException;
+use Symfony\Component\Notifier\Exception\FlashMessageImportanceMapperException;
 
 /**
  * @author Ben Roberts <ben@headsnet.com>
@@ -21,7 +21,7 @@ abstract class AbstractFlashMessageImportanceMapper
     public function flashMessageTypeFromImportance(string $importance): string
     {
         if (!\array_key_exists($importance, static::IMPORTANCE_MAP)) {
-            throw new FlashMessageMappingException($importance, static::class);
+            throw new FlashMessageImportanceMapperException($importance, static::class);
         }
 
         return static::IMPORTANCE_MAP[$importance];

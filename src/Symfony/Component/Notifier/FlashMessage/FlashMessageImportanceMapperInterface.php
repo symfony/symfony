@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Notifier\FlashMessage;
 
-use Symfony\Component\Notifier\Exception\FlashMessageMappingException;
+use Symfony\Component\Notifier\Exception\FlashMessageImportanceMapperException;
 
 /**
  * @author Ben Roberts <ben@headsnet.com>
@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Exception\FlashMessageMappingException;
 interface FlashMessageImportanceMapperInterface
 {
     /**
-     * @throws FlashMessageMappingException
+     * @throws FlashMessageImportanceMapperException
      */
     public function flashMessageTypeFromImportance(string $importance): string;
 }

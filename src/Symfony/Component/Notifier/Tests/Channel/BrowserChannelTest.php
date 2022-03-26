@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Notifier\Channel\BrowserChannel;
-use Symfony\Component\Notifier\Exception\FlashMessageMappingException;
+use Symfony\Component\Notifier\Exception\FlashMessageImportanceMapperException;
 use Symfony\Component\Notifier\FlashMessage\BootstrapFlashMessageImportanceMapper;
 use Symfony\Component\Notifier\FlashMessage\DefaultFlashMessageImportanceMapper;
 use Symfony\Component\Notifier\FlashMessage\FlashMessageImportanceMapperInterface;
@@ -58,7 +58,7 @@ class BrowserChannelTest extends TestCase
         $notification->importance('unknown-importance-string');
         $recipient = new Recipient('hello@example.com');
 
-        $this->expectException(FlashMessageMappingException::class);
+        $this->expectException(FlashMessageImportanceMapperException::class);
 
         $browserChannel->notify($notification, $recipient);
     }

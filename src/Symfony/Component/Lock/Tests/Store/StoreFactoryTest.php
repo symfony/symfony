@@ -63,6 +63,7 @@ class StoreFactoryTest extends TestCase
         if (class_exists(\Zookeeper::class)) {
             yield [$this->createMock(\Zookeeper::class), ZookeeperStore::class];
             yield ['zookeeper://localhost:2181', ZookeeperStore::class];
+            yield ['zookeeper://localhost01,localhost02:2181', ZookeeperStore::class];
         }
         if (\extension_loaded('sysvsem')) {
             yield ['semaphore', SemaphoreStore::class];

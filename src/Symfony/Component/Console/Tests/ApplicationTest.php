@@ -1175,6 +1175,25 @@ class ApplicationTest extends TestCase
         $this->assertTrue($passedRightValue, '-> exit code 1 was passed in the console.terminate event');
     }
 
+    /**
+     * @testWith [-1]
+     *           [-32000]
+     */
+    public function testRunReturnsExitCodeOneForNegativeExceptionCode($exceptionCode)
+    {
+        $exception = new \Exception('', $exceptionCode);
+
+        $application = $this->getMockBuilder(Application::class)->setMethods(['doRun'])->getMock();
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+            ->method('doRun')
+            ->willThrowException($exception);
+
+        $exitCode = $application->run(new ArrayInput([]), new NullOutput());
+
+        $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is '.$exceptionCode);
+    }
+
     public function testAddingOptionWithDuplicateShortcut()
     {
         $this->expectException(\LogicException::class);

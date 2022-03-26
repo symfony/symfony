@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2022-02-23T13:37:58Z
+
+That's an interesting way to do it without having to change the typing of `Definition`.
+
+I think this could still introduce subtle BC breaks since the PHPDoc of `getFactory` says:
+> The PHP function or an array containing a class/Reference and a method to call
+
+people could expect to get a function name when the value is a string and probably doesn't bother doing additional checks before passing it to something like the `ReflectionFunction` constructor. But this is mostly theoretical, not sure if it would cause real BC breaks.
+
+BTW good jobs adding support for passing arguments to the expression, I didn't bother doing it because the gain wasn't important but it's nice to have expressions be more in line with other types of factories.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-01T08:30:16Z
+
+> people could expect to get a function name when the value is a string and probably doesn't bother doing additional checks before passing it to something like the ReflectionFunction constructor. But this is mostly theoretical, not sure if it would cause real BC breaks.
+
+I agree about that, especially the last sentence :)

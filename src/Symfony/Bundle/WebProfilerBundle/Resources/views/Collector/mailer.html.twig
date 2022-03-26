@@ -5,7 +5,7 @@
 
     {% if events.messages|length %}
         {% set icon %}
-            {% include('@WebProfiler/Icon/mailer.svg') %}
+            {{ source('@WebProfiler/Icon/mailer.svg') }}
             <span class="sf-toolbar-value">{{ events.messages|length }}</span>
         {% endset %}
 
@@ -65,7 +65,7 @@
     {% set events = collector.events %}
 
     <span class="label {{ events.messages is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/mailer.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/mailer.svg') }}</span>
 
         <strong>E-mails</strong>
         {% if events.messages|length > 0 %}

@@ -24,8 +24,8 @@
     {% set icon %}
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
         {% if collector.route %}
-            {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
-            {% if collector.forwardtoken %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
+            {% if collector.redirect %}{{ source('@WebProfiler/Icon/redirect.svg') }}{% endif %}
+            {% if collector.forwardtoken %}{{ source('@WebProfiler/Icon/forward.svg') }}{% endif %}
             <span class="sf-toolbar-label">{{ 'GET' != collector.method ? collector.method }} @</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}
@@ -99,7 +99,7 @@
 
 {% block menu %}
     <span class="label">
-        <span class="icon">{{ include('@WebProfiler/Icon/request.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/request.svg') }}</span>
         <strong>Request / Response</strong>
     </span>
 {% endblock %}
@@ -265,7 +265,7 @@
                     </div>
 
                     <div class="metric">
-                        <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.statelesscheck ? 'yes' : 'no') ~ '.svg') }}</span>
+                        <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.statelesscheck ? 'yes' : 'no') ~ '.svg') }}</span>
                         <span class="label">Stateless check enabled</span>
                     </div>
                 </div>

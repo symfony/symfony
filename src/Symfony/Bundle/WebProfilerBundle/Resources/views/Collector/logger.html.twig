@@ -6,7 +6,7 @@
     {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
         {% set icon %}
             {% set status_color = collector.counterrors ? 'red' : collector.countwarnings ? 'yellow' : 'none' %}
-            {{ include('@WebProfiler/Icon/logger.svg') }}
+            {{ source('@WebProfiler/Icon/logger.svg') }}
             <span class="sf-toolbar-value">{{ collector.counterrors ?: (collector.countdeprecations + collector.countwarnings) }}</span>
         {% endset %}
 
@@ -33,7 +33,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.counterrors ? 'error' : collector.countwarnings ? 'warning' : 'none' }} {{ collector.logs is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/logger.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/logger.svg') }}</span>
         <strong>Logs</strong>
         {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
             <span class="count">
@@ -83,7 +83,7 @@
 
             <details id="log-filter-priority" class="log-filter">
                 <summary>
-                    <span class="icon">{{ include('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
                     Level (<span class="filter-active-num">{{ filters.priority|length - 1 }}</span>)
                 </summary>
 
@@ -104,7 +104,7 @@
 
             <details id="log-filter-channel" class="log-filter">
                 <summary>
-                    <span class="icon">{{ include('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
                     Channel (<span class="filter-active-num">{{ filters.channel|length - 1 }}</span>)
                 </summary>
 

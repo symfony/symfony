@@ -1,0 +1,30 @@
+{
+    "name": "symfony/sendberry-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Sendberry Notifier Bridge",
+    "keywords": ["sms", "sendberry", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vasilij Duško",
+            "email": "vasilij@prado.lt"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.0.2",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sendberry\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

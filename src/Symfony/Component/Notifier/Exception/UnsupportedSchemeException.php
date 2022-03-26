@@ -136,6 +136,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
             'package' => 'symfony/rocket-chat-notifier',
         ],
+        'sendberry' => [
+            'class' => Bridge\Sendberry\SendberryTransportFactory::class,
+            'package' => 'symfony/sendberry-notifier',
+        ],
         'sendinblue' => [
             'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,
             'package' => 'symfony/sendinblue-notifier',

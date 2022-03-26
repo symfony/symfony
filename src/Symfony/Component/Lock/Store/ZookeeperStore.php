@@ -53,7 +53,7 @@ class ZookeeperStore implements PersistingStoreInterface
             }
         }
 
-        return new \Zookeeper(implode($hosts, ','));
+        return new \Zookeeper(implode(',', $hosts));
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer;
+use Symfony\Bundle\FrameworkBundle\Translation\LocaleAwareRequestContext;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Translation\Dumper\CsvFileDumper;
 use Symfony\Component\Translation\Dumper\IcuResFileDumper;
@@ -39,6 +40,7 @@ use Symfony\Component\Translation\Loader\PoFileLoader;
 use Symfony\Component\Translation\Loader\QtFileLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
@@ -163,4 +165,21 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.service_subscriber', ['id' => 'translator'])
             ->tag('kernel.cache_warmer')
     ;
+
+    if (class_exists(LocaleSwitcher::class)) {
+        $container->services()
+            ->set('translation.locale_switcher', LocaleSwitcher::class)
+            ->args([
+                param('kernel.default_locale'),
+                abstract_arg('LocaleAware services'),
+            ])
+            ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
+
+            ->set('translation.locale_aware_request_context', LocaleAwareRequestContext::class)
+            ->args([
+                service('router.request_context'),
+                param('kernel.default_locale'),
+            ])
+        ;
+    }
 };

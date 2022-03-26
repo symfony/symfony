@@ -1723,6 +1723,25 @@ class ContainerBuilderTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testExpressionInFactory()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperty('bar', new Reference('bar'))
+        ;
+        $container
+            ->register('bar', 'string')
+            ->setFactory('@=arg(0) + args.get(0) + args.count()')
+            ->addArgument(123)
+        ;
+
+        $container->compile();
+
+        $this->assertSame(247, $container->get('foo')->bar);
+    }
+
     public function testFindTags()
     {
         $container = new ContainerBuilder();

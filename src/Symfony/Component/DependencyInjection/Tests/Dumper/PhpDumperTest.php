@@ -1510,6 +1510,30 @@ PHP
 
         $this->addToAssertionCount(1);
     }
+
+    public function testExpressionInFactory()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperty('bar', new Reference('bar'))
+        ;
+        $container
+            ->register('bar', 'string')
+            ->setFactory('@=arg(0) + args.get(0) + args.count()')
+            ->addArgument(123)
+        ;
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Expression_In_Factory']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Expression_In_Factory();
+
+        $this->assertSame(247, $container->get('foo')->bar);
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

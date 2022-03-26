@@ -28,7 +28,7 @@
         "symfony/config": "^5.4|^6.0",
         "symfony/console": "^5.4|^6.0",
         "symfony/css-selector": "^5.4|^6.0",
-        "symfony/dependency-injection": "^5.4|^6.0",
+        "symfony/dependency-injection": "^6.1",
         "symfony/dom-crawler": "^5.4|^6.0",
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",

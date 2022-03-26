@@ -358,6 +358,44 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('public, s-maxage=20', $cacheControl);
     }
 
+    public function testSetStaleIfError()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-if-error=86400', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidate()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-while-revalidate=300', $cacheControl);
+    }
+
+    public function testSetStaleIfErrorWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-if-error=86400, private', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidateWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-while-revalidate=300, private', $cacheControl);
+    }
+
     public function testIsPrivate()
     {
         $response = new Response();

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add stale while revalidate and stale if error cache header
+
 6.0
 ---
 

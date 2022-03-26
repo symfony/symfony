@@ -46,6 +46,26 @@
                             </span>
                         </div>
 
+                        {% if collector.supportsRoleHierarchy %}
+                            <div class="sf-toolbar-info-piece">
+                                <b>Inherited Roles</b>
+                                <span>
+                                    {% if collector.inheritedRoles is empty %}
+                                        none
+                                    {% else %}
+                                        {% set remainingRoles = collector.inheritedRoles|slice(1) %}
+                                        {{ collector.inheritedRoles|first }}
+                                        {% if remainingRoles is not empty %}
+                                            +
+                                            <abbr title="{{ remainingRoles|join(', ') }}">
+                                                {{ remainingRoles|length }} more
+                                            </abbr>
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
+
                         <div class="sf-toolbar-info-piece">
                             <b>Token class</b>
                             <span>{{ collector.tokenClass|abbr_class }}</span>

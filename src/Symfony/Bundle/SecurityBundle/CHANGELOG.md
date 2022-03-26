@@ -3,7 +3,9 @@ CHANGELOG
 
 6.1
 ---
-* The `security.access_control` now accepts a `RequestMatcherInterface` under the `request_matcher` option as scope configuration
+
+ * The `security.access_control` now accepts a `RequestMatcherInterface` under the `request_matcher` option as scope configuration
+ * Display the inherited roles of the logged-in user in the Web Debug Toolbar
 
 6.0
 ---

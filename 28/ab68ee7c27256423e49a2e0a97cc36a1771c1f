@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-18T13:38:56Z
+
+Hey!
+
+I think @jschaedl has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-21T16:46:26Z
+
+Can you please add a test case to cover this?
+Also, what is the likelihood of breaking something?
+
+---------------------------------------------------------------------------
+
+by benr77 at 2022-02-21T17:23:36Z
+
+> Also, what is the likelihood of breaking something?
+
+Currently a Flash message with type "notification" is created. After this PR, the type would be either "urgent", "high", "medium" or "low".
+
+Worst case scenario is that the styling of the flash message is missing, because the class name is changed (the type is normally used to define the alert styling via CSS).
+
+I'm not sure if this is an acceptable trade-off? But for me at least, having the Browser Channel only be able to create flash messages of a single type is quite limiting.
+
+I will add a test once we decide if this is worth pursuing or not.
+Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-21T17:25:49Z
+
+Would using `'notification '.$importance` work around the issue?
+
+---------------------------------------------------------------------------
+
+by benr77 at 2022-02-21T17:29:27Z
+
+Yes, great idea - then the CSS class is still there for legacy implementations, and the user can take advantage of the new feature should they want to. I'll update the PR and add the tests ASAP.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2022-02-21T18:26:20Z
+
+I've seen cases where only one type of flash mesages where retrieved to show on a page, in that case this would means this changes will make the flash message never show up which could be an annoying BC break.
+
+---------------------------------------------------------------------------
+
+by benr77 at 2022-02-22T07:43:52Z
+
+> I've seen cases where only one type of flash messages where retrieved to show on a page, in that case this would means this changes will make the flash message never show up which could be an annoying BC break.
+
+Sure, I can understand that, but it's definitely an edge case, and also if someone did implement this, for this change to have an effect they would also have to be generating the flash messages via the Notifier component, which I _guess_ is not that many, seeing as most will likely still be dispatching flash messages from controller actions.
+
+The current state of the PR is that notifications now have a "type" of e.g. `notification urgent` and using this multi-word string for the "type" does feel a little weird, even though it does nicely solve the problem of changes CSS classes which may be depended on.
+
+Is there any way we can keep both behaviours for now? Maybe with some service configuration?
+
+Or we could bump this forward until we can define it as a BC break?
+
+---------------------------------------------------------------------------
+
+by benr77 at 2022-03-13T11:59:20Z
+
+Instead, can we inject an `ImportanceMapperInterface` to `BrowserChannel`, and then provide a default implementation which simply maps _all_ of the importance levels to the string "notification". This default mapper is then used to replicate exactly the current behaviour.
+
+Users who want to change this mapping can then implement their own, and simply override the service configuration to inject theirs instead of the default.
+
+This would allow the existing behaviour to be preserved, whilst also providing a flexible override for users who need it.
+
+If people think this is a better approach, please let me know and I'll create a PR (should this be a separate PR or should I update this one?).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-13T12:09:17Z
+
+As explained, this is indeed a BC break. So, your interface approach is a nice way to solve the issue IMHO. You can update the code in this PR as it cannot be merged as is anyway.
+
+---------------------------------------------------------------------------
+
+by benr77 at 2022-03-15T07:22:03Z
+
+I have implemented the mapper as suggested. Nothing too controversial I hope, except that I've also included an additional implementation of the mapper for the Bootstrap CSS framework.
+
+We could provide implementations for the same CSS frameworks that are supported by the Form component Twig themes. Let me know if this should be a separate PR or to simply remove it, or of course to add the other implementations.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-18T07:24:49Z
+
+Can you have a look at the tests as some look broken because of the changes implemented in this PR (see Tests (8.1, low-deps) )?
+
+---------------------------------------------------------------------------
+
+by benr77 at 2022-03-18T07:40:31Z
+
+> Can you have a look at the tests as some look broken because of the changes implemented in this PR (see Tests (8.1, low-deps) )?
+
+I see errors such as
+
+```
+PHPUnit\Framework\MockObject\UnknownTypeException: Class or interface
+"Symfony\Component\HttpFoundation\Session\Session" does not exist
+```
+
+These are because I am mocking the session with `$session = $this->createMock(Session::class);` - is this not the right way to do it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T10:55:36Z
+
+> > Can you have a look at the tests as some look broken because of the changes implemented in this PR (see Tests (8.1, low-deps) )?
+>
+> I see errors such as
+>
+> ```
+> PHPUnit\Framework\MockObject\UnknownTypeException: Class or interface
+> "Symfony\Component\HttpFoundation\Session\Session" does not exist
+> ```
+>
+> These are because I am mocking the session with `$session = $this->createMock(Session::class);` - is this not the right way to do it?
+
+I've just fixed it by adding the missing dep in composer.json.

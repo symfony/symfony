@@ -32,6 +32,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Discord\DiscordTransportFactory::class,
             'package' => 'symfony/discord-notifier',
         ],
+        'engagespot' => [
+            'class' => Bridge\Engagespot\EngagespotTransportFactory::class,
+            'package' => 'symfony/engagespot-notifier',
+        ],
         'esendex' => [
             'class' => Bridge\Esendex\EsendexTransportFactory::class,
             'package' => 'symfony/esendex-notifier',

@@ -15,6 +15,7 @@ use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
+use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -71,6 +72,7 @@ final class Transport
         AmazonSnsTransportFactory::class,
         ClickatellTransportFactory::class,
         DiscordTransportFactory::class,
+        EngagespotTransportFactory::class,
         EsendexTransportFactory::class,
         ExpoTransportFactory::class,
         FirebaseTransportFactory::class,

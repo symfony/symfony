@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by StaffNowa at 2022-01-27T08:07:32Z
+
+> Some comments, thanks for your contribution.
+>
+> Please add a docs and recipes PR +1
+
+Thanks for your time. I updated my code and prepared recipes and docs.
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2022-01-27T19:08:28Z
+
+@welcoMattic you are right. We do not need to validate "from" at all. They validate ourselves. We catch this with
+
+```
+if (isset($responseArr['status']) && 'ok' !== $responseArr['status']) {
+    throw new TransportException(sprintf("Unable to send the SMS. \n%s\n", implode("\n", $responseArr['message'])), $response);
+}
+```
+
+![image](https://user-images.githubusercontent.com/2715254/151427143-56d380f5-0f48-4c67-acb3-c41bc23cf5e4.png)
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2022-02-21T17:06:00Z
+
+@nicolas-grekas thanks. Made small changes
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2022-02-21T18:01:39Z
+
+> Do you know anyone at Sendberry that you [back the bridge](https://symfony.com/blog/calling-saas-providers-to-back-their-symfony-bridge)? Would you like to reach them about that?
+
+I am just found them on the internet. I can try to send the link to your blog post :)
+Found in my Facebook 2021-08-30, I tried to contact "Sendberry - Mobile Marketing," but response nothing.

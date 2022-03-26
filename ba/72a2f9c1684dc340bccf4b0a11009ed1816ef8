@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by jmsche at 2021-11-26T10:10:46Z
+
+AppVeyor failure seems unrelated
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-27T05:42:16Z
+
+Hey!
+
+I think @NicoHaase has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jmsche at 2022-03-10T14:00:34Z
+
+Just managed to rebase the 6.1 branch on my fork, so I hope this PR can get to 6.1?

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ossinkine at 2022-03-25T12:59:49Z
+
+@gndk You are right, `en` locale is valid and already works with Crowdin. But `en_US` is also valid and does not work with Crowdin. This PR fixes it.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-25T15:22:24Z
+
+Hey!
+
+I think @rvanlaak has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot

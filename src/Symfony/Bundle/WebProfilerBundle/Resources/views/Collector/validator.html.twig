@@ -4,7 +4,7 @@
     {% if collector.violationsCount > 0 or collector.calls|length %}
         {% set status_color = collector.violationsCount ? 'red' %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/validator.svg') }}
+            {{ source('@WebProfiler/Icon/validator.svg') }}
             <span class="sf-toolbar-value">
                 {{ collector.violationsCount ?: collector.calls|length }}
             </span>
@@ -27,7 +27,7 @@
 
 {% block menu %}
     <span class="label {{- collector.violationsCount ? ' label-status-error' }} {{ collector.calls is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/validator.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/validator.svg') }}</span>
         <strong>Validator</strong>
         {% if collector.violationsCount > 0 %}
             <span class="count">

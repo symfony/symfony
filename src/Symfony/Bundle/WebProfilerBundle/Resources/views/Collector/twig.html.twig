@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% set time = collector.templatecount ? '%0.0f'|format(collector.time) : 'n/a' %}
     {% set icon %}
-        {{ include('@WebProfiler/Icon/twig.svg') }}
+        {{ source('@WebProfiler/Icon/twig.svg') }}
         <span class="sf-toolbar-value">{{ time }}</span>
         <span class="sf-toolbar-label">ms</span>
     {% endset %}
@@ -32,7 +32,7 @@
 
 {% block menu %}
     <span class="label {{ 0 == collector.templateCount ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/twig.svg') }}</span>
         <strong>Twig</strong>
     </span>
 {% endblock %}
@@ -88,7 +88,7 @@
                     {%- set file = collector.templatePaths[template]|default(false) -%}
                     {%- set link = file ? file|file_link(1) : false -%}
                     <td>
-                        <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                        <span class="sf-icon icon-twig">{{ source('@WebProfiler/Icon/twig.svg') }}</span>
                         {% if link %}
                             <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
                             <div>

@@ -370,7 +370,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
-        if (!empty($extraAttributes)) {
+        if ($extraAttributes) {
             throw new ExtraAttributesException($extraAttributes);
         }
 
@@ -405,6 +405,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $expectedTypes = [];
         $isUnionType = \count($types) > 1;
+        $extraAttributesException = null;
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return null;
@@ -494,7 +495,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if (!$isUnionType) {
                     throw $e;
                 }
+            } catch (ExtraAttributesException $e) {
+                if (!$isUnionType) {
+                    throw $e;
+                }
+
+                if (!$extraAttributesException) {
+                    $extraAttributesException = $e;
+                }
             }
+        }
+
+        if ($extraAttributesException) {
+            throw $extraAttributesException;
         }
 
         if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {

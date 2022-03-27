@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\EventListener\UserProviderListener;
 
@@ -65,6 +66,15 @@ class UserBadge implements BadgeInterface
             }
 
             $this->user = ($this->userLoader)($this->userIdentifier);
+
+            // No user has been found via the $this->userLoader callback
+            if (null === $this->user) {
+                $exception = new UserNotFoundException();
+                $exception->setUserIdentifier($this->userIdentifier);
+
+                throw $exception;
+            }
+
             if (!$this->user instanceof UserInterface) {
                 throw new AuthenticationServiceException(sprintf('The user provider must return a UserInterface object, "%s" given.', get_debug_type($this->user)));
             }

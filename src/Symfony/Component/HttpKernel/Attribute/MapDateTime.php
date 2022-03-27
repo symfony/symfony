@@ -18,7 +18,8 @@ namespace Symfony\Component\HttpKernel\Attribute;
 class MapDateTime
 {
     public function __construct(
-        public readonly ?string $format = null
+        public readonly ?string $format = null,
+        public readonly ?string $timezone = null,
     ) {
     }
 }

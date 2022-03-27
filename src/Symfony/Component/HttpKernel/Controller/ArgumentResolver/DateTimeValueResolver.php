@@ -48,30 +48,42 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
 
         $class = \DateTimeInterface::class === $argument->getType() ? \DateTimeImmutable::class : $argument->getType();
         $format = null;
+        $timezone = null;
 
         if ($attributes = $argument->getAttributes(MapDateTime::class, ArgumentMetadata::IS_INSTANCEOF)) {
             $attribute = $attributes[0];
             $format = $attribute->format;
+            $timezone = $attribute->timezone;
         }
 
         $date = false;
+        $defaultTimezone = date_default_timezone_get();
+        if ('default' === $timezone) {
+            $timezone = $defaultTimezone;
+        } elseif ($timezone) {
+            date_default_timezone_set($timezone);
+        }
 
-        if (null !== $format) {
-            $date = $class::createFromFormat($format, $value);
+        try {
+            if (null !== $format) {
+                $date = $class::createFromFormat($format, $value);
 
-            if ($class::getLastErrors()['warning_count']) {
-                $date = false;
+                if ($class::getLastErrors()['warning_count']) {
+                    $date = false;
+                }
+            } elseif (false !== filter_var($value, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
+                $date = new $class('@'.$value);
+            } elseif (false !== $timestamp = strtotime($value)) {
+                $date = new $class('@'.$timestamp);
             }
-        } elseif (false !== filter_var($value, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
-            $date = new $class('@'.$value);
-        } elseif (false !== $timestamp = strtotime($value))  {
-            $date = new $class('@'.$timestamp);
+        } finally {
+            date_default_timezone_set($defaultTimezone);
         }
 
         if (!$date) {
             throw new NotFoundHttpException(sprintf('Invalid date given for parameter "%s".', $argument->getName()));
         }
 
-        yield $date;
+        yield $timezone ? $date->setTimezone(new \DateTimeZone($timezone)) : $date;
     }
 }

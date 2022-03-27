@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-17T20:15:05Z
+
+Hey!
+
+I think @IonBazan has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-21T15:12:46Z
+
+Can you please add a test case, and rebase + target 5.4 also?
+
+---------------------------------------------------------------------------
+
+by kaznovac at 2022-02-23T13:31:21Z
+
+don't have time to thoroughly check the pr and how does the `UserNotFoundException` propagate, pay attention not to reintroduce the [user enumeration](https://github.com/symfony/symfony/security/advisories/GHSA-3r3h-g39f-v648)
+also take in consideration the `hideUserNotFoundExceptions` parameter
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T15:58:35Z
+
+@wouterj Can you have a look at this PR?

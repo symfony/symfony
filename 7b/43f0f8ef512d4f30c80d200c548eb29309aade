@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-26T01:02:46Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by acoulton at 2022-03-26T01:15:46Z
+
+It looks like appveyor failed on a network issue - I'm not sure how to make that retry - and the coding standards report is for existing content in the testcase that is not modified here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T07:26:31Z
+
+As there is a potential behavior change (even if theoretical only), I would do the change on 6.1 instead and add a note in the CHANGELOG file to document the change.
+
+---------------------------------------------------------------------------
+
+by acoulton at 2022-03-26T08:33:34Z
+
+@fabpot the only issue with targeting 6.1 is we're currently still tied to 4.4 due to third-party dependencies.
+
+As it stands our CI occasionally false-positives when in fact the process has crashed. We've now had two branches (that we know of) where code has been merged with failing tests that have not shown up till a later run. And more times it has occurred during work on a branch. Essentially we can't trust our green tick now, and have to check the output of every build. There may well be other users who have cron/CI/etc processes that are failing undetected.
+
+That feels like quite a significant bug. It is definitely higher impact than the possibility someone starts to see failures due to an unexpected but still nonzero exit code.
+
+So it should really be fixed in the first supported version IMO.
+
+If you're not happy to change all negative values in 4.4 then I think at least we should change anything `< -255`. Values lower than that are very clearly not valid exit codes, so changing them seems reasonable even in the older versions.
+
+Then I could do a separate PR for 6.1 to apply this broader change to get rid of all negative values, which I think is best long-term.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by acoulton at 2022-03-26T08:36:33Z
+
+PS thank you for the quick weekend review!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T10:59:07Z
+
+As you said, someone might rely on the current behavior. From my past experience, whenever we said that it was ok to merge something because there is 0 chance someone would have used the bad behavior, we had to revert because someone somewhere did rely on the behavior.
+
+So, we have decided quite a while ago to not play this game anymore and always only merge bug fixes.
+
+I know that this is frustrating, but we want to be on the safe side and try to minimize BC breaks as much as possible.
+
+I hope you will understand our position.
+
+---------------------------------------------------------------------------
+
+by acoulton at 2022-03-26T11:16:02Z
+
+@fabpot ok fair enough for the general negative number case.
+
+But surely nobody can be relying on `throw new Exception ('not really', -256)` (or -512 etc), allowing that to bubble out of their app and expecting that to terminate the app with an exit code of zero?
+
+That is 100% a bug IMO - and a nasty one - and I can't see any valid reason not to fix it.
+
+If you wanted to limit the behaviour change to the bare minimum then I suppose the fix could only change the specific -256,-512,... values that result in a zero. But that is very inconsistent with how you handle positive numbers >= 256.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T11:19:30Z
+
+I must admit that you have a point here :)
+
+Can you fix the CS issue so that I can merge it in 4.4.
+
+---------------------------------------------------------------------------
+
+by acoulton at 2022-03-26T14:25:38Z
+
+@fabpot thanks very much. Of course, I'll sort that when I'm back at my machine later on.
+
+---------------------------------------------------------------------------
+
+by kaznovac at 2022-03-26T20:24:27Z
+
+Negative error codes have unspecified (implementation/environment specific - in most cases it's modulo 256) behavior, only codes 0-255 are defined.
+
+https://tldp.org/LDP/abs/html/exitcodes.html
+
+So this is rather a bug fix rather than a BC.
+
+---------------------------------------------------------------------------
+
+by acoulton at 2022-03-26T22:35:42Z
+
+@fabpot thanks for spotting the CS issue I've corrected that now.

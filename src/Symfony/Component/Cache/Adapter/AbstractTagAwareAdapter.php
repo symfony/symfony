@@ -56,7 +56,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 $item->isHit = $isHit;
                 // Extract value, tags and meta data from the cache value
                 $item->value = $value['value'];
-                $item->metadata[CacheItem::METADATA_TAGS] = $value['tags'] ?? [];
+                $item->metadata[CacheItem::METADATA_TAGS] = isset($value['tags']) ? array_combine($value['tags'], $value['tags']) : [];
                 if (isset($value['meta'])) {
                     // For compactness these values are packed, & expiry is offset to reduce size
                     $v = unpack('Ve/Nc', $value['meta']);
@@ -95,18 +95,19 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
 
                     if ($metadata) {
                         // For compactness, expiry and creation duration are packed, using magic numbers as separators
-                        $value['meta'] = pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME]);
+                        $value['meta'] = pack('VN', (int) (0.1 + $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET), $metadata[CacheItem::METADATA_CTIME]);
                     }
 
                     // Extract tag changes, these should be removed from values in doSave()
                     $value['tag-operations'] = ['add' => [], 'remove' => []];
                     $oldTags = $item->metadata[CacheItem::METADATA_TAGS] ?? [];
-                    foreach (array_diff($value['tags'], $oldTags) as $addedTag) {
+                    foreach (array_diff_key($value['tags'], $oldTags) as $addedTag) {
                         $value['tag-operations']['add'][] = $getId($tagPrefix.$addedTag);
                     }
-                    foreach (array_diff($oldTags, $value['tags']) as $removedTag) {
+                    foreach (array_diff_key($oldTags, $value['tags']) as $removedTag) {
                         $value['tag-operations']['remove'][] = $getId($tagPrefix.$removedTag);
                     }
+                    $value['tags'] = array_keys($value['tags']);
 
                     $byLifetime[$ttl][$getId($key)] = $value;
                     $item->metadata = $item->newMetadata;

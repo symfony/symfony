@@ -48,6 +48,9 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },
+        "classmap": [
+            "Traits/ValueWrapper.php"
+        ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

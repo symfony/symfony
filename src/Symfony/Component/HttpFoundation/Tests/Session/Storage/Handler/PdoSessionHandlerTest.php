@@ -345,6 +345,21 @@ class PdoSessionHandlerTest extends TestCase
         yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
     }
 
+    public function testTtl()
+    {
+        foreach ([60, fn () => 60] as $ttl) {
+            $pdo = $this->getMemorySqlitePdo();
+            $storage = new PdoSessionHandler($pdo, ['ttl' => $ttl]);
+
+            $storage->open('', 'sid');
+            $storage->read('id');
+            $storage->write('id', 'data');
+            $storage->close();
+
+            $this->assertEqualsWithDelta(time() + 60, $pdo->query('SELECT sess_lifetime FROM sessions')->fetchColumn(), 5);
+        }
+    }
+
     /**
      * @return resource
      */

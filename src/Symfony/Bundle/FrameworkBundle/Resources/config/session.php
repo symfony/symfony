@@ -77,7 +77,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('session.abstract_handler', AbstractSessionHandler::class)
             ->factory([SessionHandlerFactory::class, 'createHandler'])
-            ->args([abstract_arg('A string or a connection object')])
+            ->args([abstract_arg('A string or a connection object'), []])
 
         ->set('session_listener', SessionListener::class)
             ->args([

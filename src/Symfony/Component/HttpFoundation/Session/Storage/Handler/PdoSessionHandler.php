@@ -80,6 +80,11 @@ class PdoSessionHandler extends AbstractSessionHandler
     private string $timeCol = 'sess_time';
 
     /**
+     * Time to live in seconds.
+     */
+    private int|\Closure|null $ttl;
+
+    /**
      * Username when lazy-connect.
      */
     private string $username = '';
@@ -137,6 +142,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *  * lock_mode: The strategy for locking, see constants [default: LOCK_TRANSACTIONAL]
+     *  * ttl: The time to live in seconds.
      *
      * @param \PDO|string|null $pdoOrDsn A \PDO instance or DSN string or URL string or null
      *
@@ -166,6 +172,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         $this->password = $options['db_password'] ?? $this->password;
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
         $this->lockMode = $options['lock_mode'] ?? $this->lockMode;
+        $this->ttl = $options['ttl'] ?? null;
     }
 
     /**
@@ -275,7 +282,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      */
     protected function doWrite(string $sessionId, string $data): bool
     {
-        $maxlifetime = (int) ini_get('session.gc_maxlifetime');
+        $maxlifetime = (int) (($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? ini_get('session.gc_maxlifetime'));
 
         try {
             // We use a single MERGE SQL query when supported by the database.
@@ -318,7 +325,7 @@ class PdoSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp(string $sessionId, string $data): bool
     {
-        $expiry = time() + (int) ini_get('session.gc_maxlifetime');
+        $expiry = time() + (int) (($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? ini_get('session.gc_maxlifetime'));
 
         try {
             $updateStmt = $this->pdo->prepare(

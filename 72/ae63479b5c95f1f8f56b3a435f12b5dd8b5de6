@@ -1,0 +1,486 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-09-12T21:58:26Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-13T07:30:43Z
+
+Hi, thanks for the PR, it's an impressive amount of work!
+
+> Current implementations of TagAwareAdapters either do not support them explicitly or fail to guarantee tag-based invalidation of linked items
+
+While it may not be explicit, I feel like `TagAwareAdapter` already provides what you describe here about OCC (and that's not by mistake ;)). I'd like to understand what the new ephemeral adapters provide that `TagAwareAdapter` doesn't? If they provide an incremental improvement, then can't we bring that improvement to `TagAwareAdapter`?
+
+> one more thing in this PR is RetryProxyAdapter
+
+Can you please split this proposal in a separate PR so that we can consider it separately? Note that I still need to understand when this is an appropriate strategy, vs recomputing or locking. I'm also wondering how this works when the cache is cold? (but let's discuss that in the new PR)
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-09-13T17:03:22Z
+
+Thank you for your feedback @nicolas-grekas!
+
+> > Current implementations of TagAwareAdapters either do not support them explicitly or fail to guarantee tag-based invalidation of linked items
+>
+> While it may not be explicit, I feel like `TagAwareAdapter` already provides what you describe here about OCC (and that's not by mistake ;)). I'd like to understand what the new ephemeral adapters provide that `TagAwareAdapter` doesn't? If they provide an incremental improvement, then can't we bring that improvement to `TagAwareAdapter`?
+>
+A few years ago I arrived at the conclusion that `TagAwareAdapter` is not safe with LRU caches, and a few weeks ago I  decided to fix that but arrived at another conclusion that it's not feasible, at least from my point of view. I'll recheck current `TagAwareAdapter` and be back with detailed information.
+
+The main purpose of this family of adapters is to make tag-based invalidation reliable for LRU-like caches. OCC is just a possible positive side-effect.
+
+> > one more thing in this PR is RetryProxyAdapter
+>
+> Can you please split this proposal in a separate PR so that we can consider it separately? Note that I still need to understand when this is an appropriate strategy, vs recomputing or locking. I'm also wondering how this works when the cache is cold? (but let's discuss that in the new PR)
+
+I'll cherry-pick related to RetryProxyAdapter commits into a new branch.  Should I also remove them from the current branch and leave the rest in current PR, or I need to cherry-pick the rest and open new PR for Ephemeral Adapters? Which option is the best?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-13T17:07:36Z
+
+> I arrived at the conclusion that TagAwareAdapter is not safe with LRU caches
+
+Currently, `TagAwareAdapter` stores tags and items under two separate keys. This means LRU can decide to evict the tags but not the item. That's maybe what you found? But since both keys are always accessed together, they should have the same LRU stats. Let me know if there is anything else.
+
+>  Should I also remove them from the current branch and leave the rest in current PR
+
+Yes please. Let's keep only ephemeral-related stuff in this very PR.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-10-13T13:40:56Z
+
+I am back :) Have made some fixes and improvements.
+>
+> Currently, `TagAwareAdapter` stores tags and items under two separate keys. This means LRU can decide to evict the tags but not the item. That's maybe what you found? But since both keys are always accessed together, they should have the same LRU stats. Let me know if there is anything else.
+>
+Of course, this solution attracted my attention. I can say that although TagAwareAdapter handles the absence of item tags gracefully (it requires both keys), different situations when data may become outdated are possible. For example, Redis may reject writes when it fails to reclaim enough memory (is out of memory), thus _updating relatively big item value may be rejected while item tags are sucessfully updated_ (ironically, instances with 'noeviction' policy are most obviously affected by this scenario). Theoretically, two concurrent processes may overwrite one of the each other's keys.
+
+With regard to LRU scores and evictions, absolutely in most cases Redis will evict these keys separately just because of its probabilistic LRU algorithm https://redis.io/topics/lru-cache, and sometimes instead of evicting one item of bigger size Redis will have to evict more items (many smaller item tags). Memcached, in its turn, uses separate queues for items of different sizes so again these keys most likely will be evicted separately https://memcached.org/blog/modern-lru/. I'd say that because of their splitted nature, items have more than one reason to become corrupted.
+
+With sharded db, you may also be concerned with the fact that the ratio of survived items when one of shards goes down declines from (N-1)/N to ((N-1)/N)^2 since item's value and their tags are stored randomly on different shards.
+
+But my main concern is the versioning algorithm, it may be affected by evictions and OOM state.
+
+https://github.com/symfony/symfony/blob/1b7526ec6c90d36e4c6d803d5fa802b8fee6bbdc/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php#L420 _When tag's version_ (another key, not from the pair mentioned above) _is evicted, it's being "reset" to 0_. You may lose invalidation which occured before eviction if previous item's tag version was 0 and item had not been updated (recomputed and saved) by the time of tag eviction. Or, item's tag version may be non-0 but something near to, then it's possible to lose invalidation(s) which occur(s) after eviction. In such situations, item's value remains valid while should be deemed invalidated.
+
+Versions are incremented, and increment operation is not atomic. Setting aside theoretical debates about atomicity, let's focus on implementation details specific to Memcached and Redis.
+https://github.com/symfony/symfony/blob/1b7526ec6c90d36e4c6d803d5fa802b8fee6bbdc/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php#L422
+_When memory limit is reached, Redis and Memcached evict other key(s) on SET even if specified key already exists_. In Memcached, it very likely will be another tag since they all are in a one queue for smallest items. In Redis, as we already know, SET (and other memory consuming commands) may be rejected resulting in not updating a value and responding with `-OOM command not allowed when used memory > 'maxmemory'.` That is, _tag invalidation may be lost_.
+
+In EphemeralTagAwareAdapter, tag invalidation is DELetion of a tag. Redis doesn't reject DEL command so you'll never lose invalidation because of OOM state. After eviction or invalidation (which have the same effect), tag version is set to a new random number from fairly wide range (presisely 2^64 even for 32-bit platforms) which will be used for tagging items till the next invalidation or eviction.
+
+-----
+**In relation to OCC**, there was one intresting bug/feature of TagAwareAdapter which was corrected by update https://github.com/symfony/symfony/pull/43302 (no 100% guarantee, though).
+
+The order of operations on items and tags is different for adapters with single pool and with two separate pools for items and tags because they use different deferred queues which are implicitly flushed at different points. In most cases this difference doesn't affect data validity much but with single pool item value is saved to cache before current tag version is even loaded from cache, hence item may be saved with outdated data and then new just updated tag version will be attached.
+
+Why did I say that this feature doesn't affect data validity much? Because data validity is already affected by the fact that tag versions are loaded after data was computed and passed to `save()`. It's pretty obvious fact for all PSR-6 adapters wich accept only pre-computed data while that data may become outdated during its computation.
+
+So achieving OCC with tags is possible only if it's allowed to pass a callback instead of a pre-computed value. Allowing this for `save()` method probably violates PSR-6 restrictions while improvement of Contracts' `get()` seems feasable.
+
+https://github.com/symfony/symfony/pull/42997/files#diff-3b97d36771c557028a9b6d24c305832ab72f78ac62c8951cf508bcaa0e0fc857R69
+
+https://github.com/symfony/symfony/pull/42997/files#diff-9645113276660ed0fb1f3f55acb5fe71a88d270d63c2b2eca120f867c28de07fR56
+
+**== Appendix ==**
+
+Examples of Redis commands for computing and saving new tagged item with `get()` method followed by tag invalidation and  then recomputing item's value on the next `get()`. You may notice the lag between first MGET and SET operations due to computation of value.
+
+TagAwareAdapter, 1 pool (wrong order):
+```
+1633079229.164564 [0 127.0.0.1:49430] "MGET" "TagAwarePool:\x00tags\x00foo" "TagAwarePool:foo"
+1633079229.279636 [0 127.0.0.1:49430] "SET" "TagAwarePool:foo" "\x00\x00\x00\x02\x00"
+1633079229.279838 [0 127.0.0.1:49430] "MGET" "TagAwarePool:tag1\x00tags\x00"
+1633079229.280168 [0 127.0.0.1:49430] "SET" "TagAwarePool:\x00tags\x00foo" "\x00\x00\x00\x02\x14\x01\x11\x04tag1\x06\x00"
+. . .
+1633079233.324239 [0 127.0.0.1:49430] "MGET" "TagAwarePool:tag1\x00tags\x00"
+1633079233.324899 [0 127.0.0.1:49430] "SET" "TagAwarePool:tag1\x00tags\x00" "\x00\x00\x00\x02\x06\x01"
+. . .
+1633079237.011041 [0 127.0.0.1:49430] "MGET" "TagAwarePool:\x00tags\x00foo" "TagAwarePool:foo"
+1633079237.011697 [0 127.0.0.1:49430] "MGET" "TagAwarePool:tag1\x00tags\x00"
+1633079237.125972 [0 127.0.0.1:49430] "SET" "TagAwarePool:foo" "\x00\x00\x00\x02\x00"
+1633079237.126200 [0 127.0.0.1:49430] "MGET" "TagAwarePool:tag1\x00tags\x00"
+1633079237.126624 [0 127.0.0.1:49430] "SET" "TagAwarePool:\x00tags\x00foo" "\x00\x00\x00\x02\x14\x01\x11\x04tag1\x06\x01"
+```
+TagAwareAdapter, 2 pools (right order):
+```
+1633081096.268363 [0 127.0.0.1:57272] "MGET" "TagAwarePool:\x00tags\x00foo" "TagAwarePool:foo"
+1633081096.382170 [0 127.0.0.1:57274] "MGET" "TagAwareTags:tag1\x00tags\x00"
+1633081096.383040 [0 127.0.0.1:57272] "SET" "TagAwarePool:foo" "\x00\x00\x00\x02\x00"
+1633081096.383062 [0 127.0.0.1:57272] "SET" "TagAwarePool:\x00tags\x00foo" "\x00\x00\x00\x02\x14\x01\x11\x04tag1\x06\a"
+. . .
+1633081101.967450 [0 127.0.0.1:57274] "MGET" "TagAwareTags:tag1\x00tags\x00"
+1633081101.968720 [0 127.0.0.1:57274] "SET" "TagAwareTags:tag1\x00tags\x00" "\x00\x00\x00\x02\x06\b"
+. . .
+1633081104.507026 [0 127.0.0.1:57272] "MGET" "TagAwarePool:\x00tags\x00foo" "TagAwarePool:foo"
+1633081104.507781 [0 127.0.0.1:57274] "MGET" "TagAwareTags:tag1\x00tags\x00"
+1633081104.620087 [0 127.0.0.1:57274] "MGET" "TagAwareTags:tag1\x00tags\x00"
+1633081104.620870 [0 127.0.0.1:57272] "SET" "TagAwarePool:foo" "\x00\x00\x00\x02\x00"
+1633081104.620892 [0 127.0.0.1:57272] "SET" "TagAwarePool:\x00tags\x00foo" "\x00\x00\x00\x02\x14\x01\x11\x04tag1\x06\b"
+```
+
+---
+EphemeralTagAwareAdapter without OCC, 1 pool:
+```
+1633438756.945548 [0 127.0.0.1:43578] "MGET" "EphemeralPool:$foo"
+1633438757.059431 [0 127.0.0.1:43578] "MGET" "EphemeralPool:#tag1"
+1633438757.059906 [0 127.0.0.1:43578] "SET" "EphemeralPool:#tag1" "\x00\x00\x00\x02\x11\tV\bL\xca\xbdo\xf0\xd5\xa8"
+1633438757.060436 [0 127.0.0.1:43578] "SET" "EphemeralPool:$foo" "\x00\x00\x00\x02\x14\x02\x11\x01$\x06\x00\x11\x01#\x14\x01\x11\x04tag1\x11\tV\bL\xca\xbdo\xf0\xd5\xa8"
+. . .
+1633438760.593541 [0 127.0.0.1:43578] "UNLINK" "EphemeralPool:#tag1"
+. . .
+1633438763.509929 [0 127.0.0.1:43578] "MGET" "EphemeralPool:$foo"
+1633438763.510409 [0 127.0.0.1:43578] "MGET" "EphemeralPool:#tag1"
+1633438763.510951 [0 127.0.0.1:43578] "SET" "EphemeralPool:#tag1" "\x00\x00\x00\x02\x11\t4\xe1\xbb\xa6\xbbo\xf0\xd5\xa8"
+1633438763.625100 [0 127.0.0.1:43578] "SET" "EphemeralPool:$foo" "\x00\x00\x00\x02\x14\x02\x11\x01$\x06\x00\x11\x01#\x14\x01\x11\x04tag1\x11\t4\xe1\xbb\xa6\xbbo\xf0\xd5\xa8"
+```
+
+EphemeralTagAwareAdapter with OCC, 1 pool:
+```
+1633439000.313231 [0 127.0.0.1:43588] "MGET" "EphemeralPool:$foo"
+1633439000.313981 [0 127.0.0.1:43588] "MGET" "EphemeralPool:#tag1"
+1633439000.314627 [0 127.0.0.1:43588] "SET" "EphemeralPool:#tag1" "\x00\x00\x00\x02\x11\t\x0e{\xaa\x05K\xbe\xdegu"
+1633439000.428288 [0 127.0.0.1:43588] "SET" "EphemeralPool:$foo" "\x00\x00\x00\x02\x14\x02\x11\x01$\x06\x00\x11\x01#\x14\x01\x11\x04tag1\x11\t\x0e{\xaa\x05K\xbe\xdegu"
+. . .
+1633439004.192115 [0 127.0.0.1:43588] "UNLINK" "EphemeralPool:#tag1"
+. . .
+1633439007.144599 [0 127.0.0.1:43588] "MGET" "EphemeralPool:$foo"
+1633439007.145116 [0 127.0.0.1:43588] "MGET" "EphemeralPool:#tag1"
+1633439007.145622 [0 127.0.0.1:43588] "SET" "EphemeralPool:#tag1" "\x00\x00\x00\x02\x11\t1\xc4\xfb\x90\xea\xbe\xdegu"
+1633439007.260152 [0 127.0.0.1:43588] "SET" "EphemeralPool:$foo" "\x00\x00\x00\x02\x14\x02\x11\x01$\x06\x00\x11\x01#\x14\x01\x11\x04tag1\x11\t1\xc4\xfb\x90\xea\xbe\xdegu"
+```
+
+EphemeralTagAwareAdapter with OCC, 2 pools:
+```
+1633439207.980599 [0 127.0.0.1:43596] "MGET" "EphemeralPool:$foo"
+1633439207.981096 [0 127.0.0.1:43598] "MGET" "EphemeralTags:#tag1"
+1633439207.981430 [0 127.0.0.1:43598] "SET" "EphemeralTags:#tag1" "\x00\x00\x00\x02\x11\tw;\xee^\x15`#r\xbc"
+1633439208.101122 [0 127.0.0.1:43596] "SET" "EphemeralPool:$foo" "\x00\x00\x00\x02\x14\x02\x11\x01$\x06\x00\x11\x01#\x14\x01\x11\x04tag1\x11\tw;\xee^\x15`#r\xbc"
+. . .
+1633439215.342044 [0 127.0.0.1:43598] "UNLINK" "EphemeralTags:#tag1"
+. . .
+1633439219.108947 [0 127.0.0.1:43596] "MGET" "EphemeralPool:$foo"
+1633439219.109352 [0 127.0.0.1:43598] "MGET" "EphemeralTags:#tag1"
+1633439219.109975 [0 127.0.0.1:43598] "SET" "EphemeralTags:#tag1" "\x00\x00\x00\x02\x11\t\x0bM\x9d4\xbf`#r\xbc"
+1633439219.225135 [0 127.0.0.1:43596] "SET" "EphemeralPool:$foo" "\x00\x00\x00\x02\x14\x02\x11\x01$\x06\x00\x11\x01#\x14\x01\x11\x04tag1\x11\t\x0bM\x9d4\xbf`#r\xbc"
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-18T17:32:30Z
+
+Thanks for the extensive details, that's super interesting!
+
+About split keys for value & tags, let's merge them. We don't guarantee that cached values will survive a minor upgrade so it's fine to break that. We just need to be sure that we gracefully discard old data.
+
+About versioning, good points also! We have #43301 on the topic but you go further. I like deleting for invalidating.
+
+I would really really prefer not adding a new adapter to the component. `TagAwareAdapter` should be the only ephemeral adapter.
+
+Would you agree with sending PRs that incrementally converge to implementing your proposals into `TagAwareAdapter`? Eg by reviewing #43301 then contributing a PR on top, and by sending another PR for merging keys for value+tags, and another for the ordering issue if there is something to do there?
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-10-20T09:42:46Z
+
+@nicolas-grekas If all features of `EphemeralTagAwareAdapter` are desirable and we can discard cached items on upgrade, wouldn't it be easier to replace `TagAwareAdapter` with `EphemeralTagAwareAdapter` (keeping the old name) rather than fixing it? The only thing to add in this case is `$knownTagVersionsTtl` parameter - I can do this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-20T13:27:42Z
+
+Yes, I'd be fine renaming your `EphemeralTagAwareAdapter` to `TagAwareAdapter`, with graceful discarding of old data id that's not already the case.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-10-20T14:06:09Z
+
+> Yes, I'd be fine renaming your `EphemeralTagAwareAdapter` to `TagAwareAdapter`, with graceful discarding of old data id that's not already the case.
+
+`EphemeralTagAwareAdapter` uses own prefixes for keys so it will totally ignore old data. The only issue I see is that old tags are stored with no expiration and have to be cleared manually (this may be tricky). Do you anticipate any other problems?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-20T14:07:45Z
+
+As long as the code remain backward compatible, it should be fine :)
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-10-25T05:40:37Z
+
+As a proof of concept I made `TagAwareAdapter` descendant of `EphemeralTagAwareAdapter`. It looks very nice now but there are particular concerns:
+1) Change of invalidation algorithm makes it impossible to use different versions of `TagAwareAdapter` concurrently including period of rolling updates. Because of different prefixes they are two different caches, and while they do not interfere each other, invalidations which come from instances with different versions of adapter will be mutually ignored. Even if we would upgrade `TagAwareAdapter` incrementally and preserve old prefixes for tags, invalidations from instances with updated adapter (tag deletions) will most likely be ignored by instances with old adapters https://github.com/symfony/symfony/pull/43301
+2) Implicit commit on tag invalidations is not in effect anymore. This behavior is very specific to `TagAvareAdapter` and I think users should be warned about this change.
+https://github.com/symfony/symfony/commit/0e8d14defdf69b5769a875e831108e8f1817d403#diff-62a9d545beee431f11c3e05ba5d991976e559f7f95238382a26ded599a95fab6R51
+3) Private method `getTagVersions` is replaced with inherited protected one, and there is other new protected methods.
+https://github.com/symfony/symfony/blob/0e8d14defdf69b5769a875e831108e8f1817d403/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php
+
+Which of these points are real BC breaks? Are there other barriers?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-03T10:45:16Z
+
+> Implicit commit on tag invalidations is not in effect anymore
+
+I don't get why `EphemeralTagAwareAdapter` shouldn't commit deferred items on tag invalidation. Is it needed for this PR or is it because you think it's more appropriate for some reason? (which one?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-03T11:08:32Z
+
+Sorry for the sparse messages, I'm still digesting your proposal, looking for a way to make things as simple as possible.
+For versions, I'm sold we should delete when invalidating (but I'm still wondering why we should skip committing). This raises the question of fetching the latest version, and generating a random one on a miss. To make this performant, instead of adding a dedicated Redis adapter, I'm wondering if we shouldn't add an optional interface that `RedisAdapter` would implement, and that would return the versions of a list of tags, potentially generating it on the go: `$adapter->getTagVersions($tags)`.
+About storing items and tags under separate keys, I'm wondering if can't keep it as is, but we would always store the tags even when they are empty. That way, we would return a miss when the item is fetched but not its tags (because eviction.)
+Wouldn't that solve all the issues you spotted? What did I miss if not?
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-11-04T13:59:43Z
+
+> I thought we could drop `EphemeralTagAwareAdapter` and keep only `TagAwareAdapter`. Can't we?
+
+We can but I hadn't decided what is better: to replace the body of `TagAwareAdapter` with the content of `EphemeralTagAwareAdapter` or to meld `EphemeralTagAwareAdapter` into the abstract class. I tend to think that melding into the abstract class is preferable because of the peculiarity of `TagAwareAdapter::invalidateTags()`, and I'm still uncertain if its cache of known tag versions is good for `RedisEphemeralTagAwareAdapter` though it seems to work well. In its turn, fleshing the abstract class out with implementation details effectively means that we'll drop `AbstractEphemeralTagAwareAdapter` but even this way, I'd like to test some ideas on optimization and simplifying caching of known tag versions before moving forward.
+
+> > Implicit commit on tag invalidations is not in effect anymore
+>
+> I don't get why `EphemeralTagAwareAdapter` shouldn't commit deferred items on tag invalidation. Is it needed for this PR or is it because you think it's more appropriate for some reason? (which one?)
+
+I have the opposite question - why adapter should commit deferred items when it is asked to invalidate some tags? Implicit behavior makes results less predictable and less manageable (like here https://github.com/symfony/symfony/pull/43302). Probably there were reasons for that but now I see no reason for persisting items implicitly. There is a pair of `saveDeferred()` and `commit()`, and if someone used to rely on implicit commits, a smart destructor is still in place.
+
+> For versions, I'm sold we should delete when invalidating (but I'm still wondering why we should skip committing). This raises the question of fetching the latest version, and generating a random one on a miss. To make this performant, instead of adding a dedicated Redis adapter, I'm wondering if we shouldn't add an optional interface that `RedisAdapter` would implement, and that would return the versions of a list of tags, potentially generating it on the go: `$adapter->getTagVersions($tags)`.
+
+Sorry, I don’t get the idea of the (public?) interface. Could you explain in more detail?
+
+Btw, I had an implementation of the adapter for Memcached on my to-do list but I paused it after the `MemcachedTrait` was removed. The idea is the same: to use plain strings instead of marshalled values and to leverage atomic operations for tags creation.
+
+> About storing items and tags under separate keys, I'm wondering if can't keep it as is, but we would always store the tags even when they are empty. That way, we would return a miss when the item is fetched but not its tags (because eviction.) Wouldn't that solve all the issues you spotted? What did I miss if not?
+
+Currently, `TagAwareAdapter` stores an item's tag versions even when they are empty; and an item is discarded if its tags are evicted, even when they were empty. The potential problem here is that they can be updated partially, only tag versions but not an item itself. And the practical issue is that the eviction rate and the resulting item invalidation rate are higher than when they are stored as a single piece of data.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-04T16:04:23Z
+
+dropping `AbstractEphemeralTagAwareAdapter` would be nice :)
+
+> why adapter should commit deferred items when it is asked to invalidate some tags?
+
+Should a deferred and tagged item be removed when one of its tags is invalidated? By committing, we answer yes to this question. I'm fine reconsidering if needed. Reducing the number of roundtrips to the backend could help decide if we're looking for technical reasons.
+
+> I don’t get the idea of the (public?) interface
+
+What does `RedisEphemeralTagAwareAdapter` bring compared to using the generic implem? Can't we instead create an API (not an internal one, but one specific to the component) that would allow reusing most of the generic code and plug in an enhanced implemen for adapters that implement this optional API? That's the questions I'm considering. My current understanding is that an API that allows invalidating/(re)generating/fetching the version of a tag could be enough. Am I wrong? What else does `RedisEphemeralTagAwareAdapter` provide? (I must admit I didn't look carefully enough at it).
+
+> an item is discarded if its tags are evicted
+
+Good news, I forgot about that :)
+But you're right about the higher eviction rate. We need to pack tags+values.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-11-04T18:36:54Z
+
+> dropping `AbstractEphemeralTagAwareAdapter` would be nice :)
+>
+> > why adapter should commit deferred items when it is asked to invalidate some tags?
+>
+> Should a deferred and tagged item be removed when one of its tags is invalidated? By committing, we answer yes to this question. I'm fine reconsidering if needed. Reducing the number of roundtrips to the backend could help decide if we're looking for technical reasons.
+
+By keeping them in a deferred queue and not committing them _before_ tag invalidation we explicitly say "yes" to all deferred items. They may be safely committed right after tag invalidation or later, on shutdown, doesn't matter when.
+>
+> > I don’t get the idea of the (public?) interface
+>
+> What does `RedisEphemeralTagAwareAdapter` bring compared to using the generic implem? Can't we instead create an API (not an internal one, but one specific to the component) that would allow reusing most of the generic code and plug in an enhanced implemen for adapters that implement this optional API? That's the questions I'm considering. My current understanding is that an API that allows invalidating/(re)generating/fetching the version of a tag could be enough. Am I wrong? What else does `RedisEphemeralTagAwareAdapter` provide? (I must admit I didn't look carefully enough at it).
+>
+It brings performance by leveraging atomic operations and the use of light unencoded strings for tags. Additionally, `RedisEphemeralTagAwareAdapter` allows tags to be ephemeral and keeps them by refreshing their TTLs from time to time. The main difference is in `retrieveTagVersions()`: the design was to allow implementations with different types of tags - strings, numbers, etc.
+
+So, you're correct. Having `retrieveTagVersions()` + `invalidateTags()` is enough for getting a new breed of adapter. Perhaps having only the first one is also enough since tags may be merely deleted but adapters use deferred queues and tend to do extra work, sometimes implicitly, so it's better to have both of them.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-11-05T10:45:10Z
+
+@nicolas-grekas Regarding possible API, I think that `invalidateTags()` should be included because deletion is not the only possible way to invalidate tags. Deletion is the best for storages of limited size which can reject writes and is good as a general algorithm but it may be not optimal. For ex., I believe that for most SQL DBs updating existing tags will be more performant than deletion+creation. It's only a hypothesis, though.
+A hybrid algorithm is also possible.
+I could try this approach but I need help. Where to place and how to name the interface? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-11T18:23:42Z
+
+We might be able to go with:
+
+```php
+interface TagVersionsStorageInterface
+{
+    public function retrieveTagVersions(array $tags, bool $invalidate = false): array;
+}
+```
+
+I'm also wondering if we couldn't to the same for packing items+tags: have an extra interface to allow doing so with compatible pool adapters, with a fallback on the current strategy, which is simple and effective for simpler pools.
+
+Let's do this in 2 PRs if you agree. First `TagVersionsStorageInterface`, later on that other idea if confirmed.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-11-12T05:46:11Z
+
+@nicolas-grekas What's the purpose of the second argument `bool $invalidate = false`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-12T07:43:36Z
+
+> What's the purpose of the second argument bool $invalidate = false?
+
+This would be useful if invalidating were meant as "update the version of the tag". This was the case when invalidation meant also commit. But you're right, that's not needed if we split both operations.
+
+We might then go with `retrieveTagVersions(array $tags): array;` and `invalidateTags(array $tags): bool;` I suppose.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2022-03-14T14:40:48Z
+
+@nicolas-grekas I implemented `TagVersionsStorageInterface` for RedisAdapter but finally rejected this idea because it requires access to `AbstractAdapter::getId()` in child classes.
+https://github.com/symfony/symfony/commit/7a5c89a95e3b78cb5c0d7934e55bb3d1cdc98e6b#diff-3ec12dd91e2011324dd067b4cdf5be4988befa442562e401677a0b57f9121f87R66
+https://github.com/symfony/symfony/commit/7a5c89a95e3b78cb5c0d7934e55bb3d1cdc98e6b#diff-c7103c3d4c70ac6eb872f7121d25ee0950d816fd029f5e0cc586a0ea5c4473a0R365
+
+I left only general algorithm for dealing with tags and put all the stuff in a one file, as you wished.
+So now the main difference between current implementation and upgraded TagAwareAdater is that the last one stores cache items and their tag versions as a single piece of data. But there are a few other small improvements such as more compact packing of metadata, expiration time instead of creation time for knownTagVersions, pruning of expired knownTagVersions, prefix for item keys, and inlined `getItem()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-23T18:58:32Z
+
+I'm proposing https://github.com/sbelyshkin/symfony/pull/1 on top of your work. I added notes there.
+
+Here's a quick summary:
+- instead of using a key with a special array, I propose to introduce a DTO. I named it `Ͼ` (in the root namespace) for shortness, since this impacts the storage needs.
+- compatibility with previously populated pools is preserved
+- the `knownTagVersions` cache is now limited to 1000 items with an LRU-based implementation
+- no tags are created anymore when only fetching them for comparison
+
+> more compact packing of metadata
+> prefix for item keys
+
+Somehow reverted by my DTO proposal, which would allow - in another iteration - to use HSET for Redis, thus consuming even less storage.
+
+> expiration time instead of creation time for knownTagVersions
+
+Reverted, because I don't get what this provides. What did I miss?
+
+> pruning of expired knownTagVersions
+
+Replaced by LRU-based pruning, which is simpler and should be as effective.
+
+> inlined getItem()
+
+Reverted also, this won't make a difference in practice, better keep the code simple.
+
+Let me know if I missed anything!
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2022-03-24T05:43:03Z
+
+Thanks a lot @nicolas-grekas ! I need some time to review all changes you've proposed.
+Right now I have a few questions and answers for you.
+> * compatibility with previously populated pools is preserved
+
+How is this achieved?
+
+> > more compact packing of metadata
+> > prefix for item keys
+>
+> Somehow reverted by my DTO proposal, which would allow - in another iteration - to use HSET for Redis, thus consuming even less storage.
+
+In what way and where do you plan to use HSET?
+
+> > expiration time instead of creation time for knownTagVersions
+>
+> Reverted, because I don't get what this provides. What did I miss?
+
+This was a tiny optimization for computing expiration only once and not every time you retrieve a known tag from internal cache. Really tiny :)
+
+> > pruning of expired knownTagVersions
+>
+> Replaced by LRU-based pruning, which is simpler and should be as effective.
+
+I'll check that.
+
+>
+> > inlined getItem()
+>
+> Reverted also, this won't make a difference in practice, better keep the code simple.
+>
+It was another optimization. The only reason for this is better performance when retrieving small items (a few KBs). The degree of increase depends on the ratio of CPU/IO time for whole operation and can be as high as 20% for TAA+FileSystemAdapter on local FS and as high as 10% for TAA+RedisAdapter with local instance of Redis. But for big items (100KBs and more) or for slow IO, the increase is not so impressive.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-24T09:14:58Z
+
+> compatibility with previously populated pools is preserved
+
+by 1. fetching old-style tags while fetching items and 2. have metadata[tags] set to an array when retrieving newly persisted items (vs unset for older ones)
+
+> In what way and where do you plan to use HSET?
+
+metadata is about expiry, ctime and tags. I think we could drop expiry and replace it by a call to `EXPIRETIME`, then we can put ctime+item+tags in one HSET, with special keys for ctime+item to not messup with tags that would also be in the hash.
+
+> The only reason for this is better performance when retrieving small items (a few KBs).
+
+Thanks for the details, I didn't bench in such details. I still would like to not duplicate the logic so what I did instead is removing the generator. getItems now returns a simple array. The generator was not useful anyway since we buffer all items internally. This should reclaim some perf.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-24T09:20:46Z
+
+> When versions of non-existing tags are requested for item commits or for validation of retrieved items, adapter creates tags and assigns a new random version to them.
+
+Note that this is not true anymore: we don't persist the tags when retrieving items. Does it make sense? I'd like to have your thoughts about that.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2022-03-24T15:56:37Z
+
+> > When versions of non-existing tags are requested for item commits or for validation of retrieved items, adapter creates tags and assigns a new random version to them.
+>
+> Note that this is not true anymore: we don't persist the tags when retrieving items.
+
+Thank you for bringing this to my attention. Very likely this solution will increase the number of overwrites of tags and hence item computations. I experimented around this earlier and now need to dive into new code and benchmark it again. I'll do it on this weekend.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-28T10:02:02Z
+
+ctime is now packed as a 14-bits floating point number. This leave 2 bits free: one is used to tell if tags are set or not, the other could be used for future needs.
+
+I'm going to merge this PR because I think it's ready. If any changes should be made, a follow up PR is very welcome @sbelyshkin

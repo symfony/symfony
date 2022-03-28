@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -46,8 +47,12 @@ class BinaryNode extends Node
         $operator = $this->attributes['operator'];
 
         if ('matches' == $operator) {
+            if ($this->nodes['right'] instanceof ConstantNode) {
+                $this->evaluateMatches($this->nodes['right']->evaluate([], []), '');
+            }
+
             $compiler
-                ->raw('preg_match(')
+                ->raw('(static function ($regexp, $str) { set_error_handler(function ($t, $m) use ($regexp, $str) { throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12)); }); try { return preg_match($regexp, $str); } finally { restore_error_handler(); } })(')
                 ->compile($this->nodes['right'])
                 ->raw(', ')
                 ->compile($this->nodes['left'])
@@ -159,12 +164,24 @@ class BinaryNode extends Node
 
                 return $left % $right;
             case 'matches':
-                return preg_match($right, $left);
+                return $this->evaluateMatches($right, $left);
         }
     }
 
     public function toArray()
     {
         return ['(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')'];
+    }
+
+    private function evaluateMatches(string $regexp, string $str): int
+    {
+        set_error_handler(function ($t, $m) use ($regexp) {
+            throw new SyntaxError(sprintf('Regexp "%s" passed to "matches" is not valid', $regexp).substr($m, 12));
+        });
+        try {
+            return preg_match($regexp, $str);
+        } finally {
+            restore_error_handler();
+        }
     }
 }

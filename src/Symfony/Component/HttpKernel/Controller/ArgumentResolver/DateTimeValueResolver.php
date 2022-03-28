@@ -62,10 +62,15 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
             if ($class::getLastErrors()['warning_count']) {
                 $date = false;
             }
-        } elseif (false !== filter_var($value, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
-            $date = new $class('@'.$value);
-        } elseif (false !== $timestamp = strtotime($value))  {
-            $date = new $class('@'.$timestamp);
+        } else {
+            if (false !== filter_var($value, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
+                $value = '@'.$value;
+            }
+            try {
+                $date = new $class($value);
+            } catch (\Exception $e) {
+                $date = false;
+            }
         }
 
         if (!$date) {

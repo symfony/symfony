@@ -1,0 +1,209 @@
+---------------------------------------------------------------------------
+
+by Jayfrown at 2022-01-03T16:54:26Z
+
+@wouterj FWIW, I have the following docker-compose setup for a local LDAP:
+
+<details>
+<summary>docker-compose.yml:</summary>
+
+```yaml
+services:
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    restart: unless-stopped
+    environment:
+      LDAP_LOG_LEVEL: "256"
+      LDAP_ORGANISATION: ${LDAP_ORGANISATION:-Example Inc.}
+      LDAP_DOMAIN: ${LDAP_DOMAIN:-example.org}
+      LDAP_BASE_DN: ${LDAP_BASE_DN:-"dc=example,dc=org"}
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:-config}
+      LDAP_RFC2307BIS_SCHEMA: "false"
+      LDAP_BACKEND: "mdb"
+      LDAP_TLS: "true"
+      LDAP_TLS_CRT_FILENAME: "ldap.crt"
+      LDAP_TLS_KEY_FILENAME: "ldap.key"
+      LDAP_TLS_DH_PARAM_FILENAME: "dhparam.pem"
+      LDAP_TLS_CA_CRT_FILENAME: "ca.crt"
+      LDAP_TLS_ENFORCE: "false"
+      LDAP_TLS_CIPHER_SUITE: "SECURE256:-VERS-SSL3.0"
+      LDAP_TLS_VERIFY_CLIENT: "demand"
+      LDAP_REPLICATION: "false"
+      KEEP_EXISTING_CONFIG: "false"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+      LDAP_SSL_HELPER_PREFIX: "ldap"
+    tty: true
+    stdin_open: true
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+      - ldap_certs:/container/service/slapd/assets/certs/
+    ports:
+      - "389:389"
+      - "636:636"
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - "8080:80"
+    depends_on:
+      - openldap
+
+volumes:
+  ldap_data:
+  ldap_config:
+  ldap_certs:
+```
+</details>
+
+And the following configuration in Symfony:
+
+<details>
+<summary>services.yaml:</summary>
+
+```yaml
+    Symfony\Component\Ldap\Ldap:
+        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+        tags: ['ldap']
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        arguments:
+            - host: '%env(resolve:LDAP_HOST)%'
+              port: '%env(resolve:LDAP_PORT)%'
+              encryption: '%env(resolve:LDAP_ENCRYPTION)%'
+              options:
+                  protocol_version: 3
+                  referrals: false
+```
+</details>
+
+<details>
+<summary>security.yaml:</summary>
+
+```yaml
+    providers:
+        app_ldap:
+            ldap:
+                service: Symfony\Component\Ldap\Ldap
+                base_dn: '%env(resolve:LDAP_BASE_DN)%'
+                search_dn: '%env(resolve:LDAP_SEARCH_DN)%'
+                search_password: '%env(resolve:LDAP_SEARCH_PASSWORD)%'
+                default_roles: ROLE_USER
+                uid_key: uid
+
+    firewalls:
+        main:
+            provider: app_ldap
+```
+</details>
+
+<details>
+<summary>.env:</summary>
+
+```
+LDAP_HOST="openldap"
+LDAP_PORT="389"
+LDAP_ENCRYPTION="none"
+LDAP_SEARCH_DN="cn=admin,dc=example,dc=org"
+LDAP_SEARCH_PASSWORD="admin"
+LDAP_BASE_DN="ou=Users,dc=example,dc=org"
+```
+</details>
+
+You'd have to create the rest of the schema by hand, if needed I can try to provide an LDIF.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-04T12:39:04Z
+
+Hey!
+
+I think @karlshea has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Jayfrown at 2022-03-22T18:35:30Z
+
+@wouterj if there's anything I can do to make reviewing easier, let me know
+
+---------------------------------------------------------------------------
+
+by stof at 2022-03-22T18:44:31Z
+
+CheckLdapCredentialsListener has 2 modes. Your PR description lets me think that you tested only one of them.
+
+---------------------------------------------------------------------------
+
+by Jayfrown at 2022-03-22T19:09:49Z
+
+> CheckLdapCredentialsListener has 2 modes. Your PR description lets me think that you tested only one of them.
+
+@stof Thanks. It is very possible I might have missed something, as I'm not familiar with the two modes you mention. Could you expand on this or send some documentation my way?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-03-22T19:13:42Z
+
+I'm not familiar with the ldap part either. But for those 2 modes, see the if/else inside the try/catch you changed
+
+---------------------------------------------------------------------------
+
+by Jayfrown at 2022-03-22T21:05:46Z
+
+@stof Thanks. If I understand correctly the difference is when [`query_string`](https://symfony.com/doc/current/security/ldap.html#query-string) is set, which, according to the documentation:
+
+> makes the user provider search for a user and then use the found DN for the bind process
+
+Basically allowing the LDAP component to search for a given user in multiple OUs instead of simply interpolating the username into the `dn_string`.
+
+<details>
+<summary>Expand default behavior</summary>
+
+- Interpolate the user-provided username in the `dn_string`, eg. `uid={username},dc=example,dc=com` becomes `uid=jayfrown,dc=example,dc=com`
+- Use the user-provided password to bind as the interpolated `dn_string`
+  - If the bind is successful, the credentials are accepted and log-in continues
+  - If the bind is not successful, the credentials are rejected and log-in is prohibited
+</details>
+
+<details>
+<summary>Expand query_string behavior</summary>
+
+- Interpolate the user-provided username in the `query_string`, eg. `(&(uid={username}))` becomes `(&(uid=jayfrown))`
+- Bind with the configured search credentials
+- Perform an LDAP search inside the `dn_string` using the `query_string`, eg. if `dn_string` is `dc=example,dc=com`, this can return `uid=jayfrown,dc=companyA,dc=example,dc=com` or `uid=jayfrown,dc=companyB,dc=example,dc=com`, etc.
+  - If the search does not yield exactly one result, throw a `BadCredentialsException` indicating that the user-provided username is invalid
+  - If the search yields exactly one result, use the user-provided password to bind as the found DN
+      - If the bind is successful, the credentials are accepted and log-in continues
+      - If the bind is not successful, the credentials are rejected and log-in is prohibited
+</details>
+
+Having said all that, my changes should not impact either scenario apart from what I've already described. However, when I have some more time I will set up a configuration using `query_string` and test with that as well.
+
+---------------------------------------------------------------------------
+
+by Jayfrown at 2022-03-23T02:12:57Z
+
+I made an [example application](https://github.com/Jayfrown/symfony-ldap-example/) to make it easier to test and verify behavior. The repository includes a docker-compose configuration that spins up an OpenLDAP container, seeds it with some users, and exposes the ports such that the local application can communicate with it.
+
+There are a couple of branches to test all permutations (with/without `query_string` as well as with/without this PR applied)
+
+- The [`master` branch](https://github.com/Jayfrown/symfony-ldap-example/tree/master) uses the normal configuration, without this PR applied
+- The [`query_string` branch](https://github.com/Jayfrown/symfony-ldap-example/tree/query_string) uses the [`query_string` configuration](https://symfony.com/doc/current/security/ldap.html#query-string) without this PR applied
+- The [`44898` branch](https://github.com/Jayfrown/symfony-ldap-example/tree/44898) uses the normal configuration, with this PR applied
+- The [`44898_query_string` branch](https://github.com/Jayfrown/symfony-ldap-example/tree/44898_query_string) uses the [`query_string` configuration](https://symfony.com/doc/current/security/ldap.html#query-string), with this PR applied
+
+Branches with this PR applied require [`Jayfrown/ldap dev-ldap-server-unavailable`](https://github.com/Jayfrown/ldap/tree/ldap-server-unavailable) which is a clone of the `symfony/ldap` repository which includes the work in this PR.
+
+Note that after switching to/from branches with this PR applied it is necessary to run `composer install`.
+
+----
+
+@stof I've tested the same scenarios as mentioned in the OP with the `query_string` configuration and the behavior remains the same.

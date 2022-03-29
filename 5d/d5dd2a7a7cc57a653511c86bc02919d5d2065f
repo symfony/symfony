@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-01-12T15:35:13Z
+
+> I see __sleep is implemented but that does not seem to help here, not sure what the purpose is/was.
+
+I think the purpose was precisely to reduce the storage size
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-01-12T15:46:41Z
+
+It does not seem to have any effect though, so I think it was mostly there to exclude the `cached` property: https://3v4l.org/nHuAQ
+
+FYI here is the full output with igbinary:
+
+```
+string 'O:3:"Noo":2:{s:6:"�*�bar";s:7:"sdfpods";s:7:"�*�bloo";s:8:"blkdsjds";}' (length=70)
+string 'O:3:"Foo":2:{s:6:"�*�bar";s:7:"sdfpods";s:7:"�*�bloo";s:8:"blkdsjds";}' (length=70)
+string 'O:3:"Bar":2:{i:0;s:7:"sdfpods";i:1;s:8:"blkdsjds";}' (length=51)
+string '���STXETBETXNooDC4STXDC1ACK�*�barDC1BELsdfpodsDC1BEL�*�blooDC1BSblkdsjds' (length=47)
+string '���STXETBETXFooDC4STXDC1ACK�*�barDC1BELsdfpodsDC1BEL�*�blooDC1BSblkdsjds' (length=47)
+string '���STXETBETXBarDC4STXACK�DC1BELsdfpodsACKSOHDC1BSblkdsjds' (length=34)
+```
+
+You can see it is quite a bit shorter with __serialize, but it's much more with the RateLimiter classes because somehow the serialized output includes the property names with full class name every time, it's extremely wasteful:
+
+One example from my prod redis server: `\x00\x00\x00\x02\x172Symfony\\Component\\RateLimiter\\Policy\\SlidingWindow\x14\x05\x116\x00Symfony\\Component\\RateLimiter\\Policy\\SlidingWindow\x00id\x11\x1clogin_per_ip-000.000.214.194\x11<\x00Symfony\\Component\\RateLimiter\\Policy\\SlidingWindow\x00hitCount\x06\x01\x11E\x00Symfony\\Component\\RateLimiter\\Policy\\SlidingWindow\x00intervalInSeconds\x06<\x11I\x00Symfony\\Component\\RateLimiter\\Policy\\SlidingWindow\x00hitCountForLastWindow\x06\x00\x11?\x00Symfony\\Component\\RateLimiter\\Policy\\SlidingWindow\x00windowEndAt\na\xde\xc1\xfa`
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-01-12T15:48:33Z
+
+In any case, I think we need @wouterj or @Nyholm to shine some light on this :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-02-04T22:49:25Z
+
+Oh no, you are very correct. This is indeed a bug. I’m not sure about your solution. I think there is a good reason why we didn’t set a new expectation time, Ie we don’t want to move the window. (Yes, it is “sliding” but we need a clear start and end of each window which is defined by the cache item)
+
+I need to give this a second look asap to confirm. (I’m currently traveling and my computer broke down)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-01T14:57:42Z
+
+@Nyholm ping here? I'd be happy to get this resolved at some point, as our redis keeps filling up right now :)
+
+Thanks to the bug right now, the cache item doesn't expire ever if you hit more than once.
+
+So either the way I see it, either:
+- you hit once, then it disappears after 2x $intervalsInSeconds (SlidingWindow's interval), then you come back and you hit and it's a fresh SlidingWindow
+- you hit it twice, then if you hit a third time it is reloaded from cache, you are still in the active window and so things work using that existing one
+- you hit it twice, so it stays in the cache, but you hit a third time after the sliding window expired, then I assume createFromPreviousWindow is called to create a new one, which is correct behavior too, but if it was cleared from the cache because you come later than 2x $intervalsInSeconds it would simply create a blank one and that'd be correct too.
+
+So the fix seems correct to me (it would only change the last bit of the last bullet point above), but maybe I misunderstood something of course.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-03-16T15:41:57Z
+
+Rebased/retargetted to 5.4 as 5.3 is now EOL
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-03-17T13:03:48Z
+
+Please let me delay this week too. I have an open source session planned on Sunday. If I fail to come back then just ignore me.
+
+Sorry for being unavailable.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T11:12:49Z
+
+Any news here?

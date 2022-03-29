@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
 use Symfony\Component\Ldap\Security\LdapBadge;
@@ -133,7 +133,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->expectExceptionMessage('The presented password is invalid.');
 
         $this->ldap->method('escape')->willReturnArgument(0);
-        $this->ldap->expects($this->any())->method('bind')->willThrowException(new ConnectionException());
+        $this->ldap->expects($this->any())->method('bind')->willThrowException(new InvalidCredentialsException());
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent());

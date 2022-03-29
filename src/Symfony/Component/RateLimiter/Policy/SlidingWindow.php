@@ -114,6 +114,18 @@ final class SlidingWindow implements LimiterStateInterface
 
     public function __unserialize(array $data): void
     {
+        // BC layer for old objects serialized via __sleep
+        if (5 === \count($data)) {
+            $data = array_values($data);
+            $this->id = $data[0];
+            $this->hitCount = $data[1];
+            $this->intervalInSeconds = $data[2];
+            $this->hitCountForLastWindow = $data[3];
+            $this->windowEndAt = $data[4];
+
+            return;
+        }
+
         $pack = key($data);
         $this->windowEndAt = $data[$pack];
         ['a' => $this->hitCount, 'b' => $this->hitCountForLastWindow, 'c' => $this->intervalInSeconds] = unpack('Na/Nb/Nc', $pack);

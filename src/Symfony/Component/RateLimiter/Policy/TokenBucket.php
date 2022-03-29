@@ -98,6 +98,18 @@ final class TokenBucket implements LimiterStateInterface
 
     public function __unserialize(array $data): void
     {
+        // BC layer for old objects serialized via __sleep
+        if (5 === \count($data)) {
+            $data = array_values($data);
+            $this->id = $data[0];
+            $this->tokens = $data[1];
+            $this->timer = $data[2];
+            $this->burstSize = $data[3];
+            $this->rate = Rate::fromString($data[4]);
+
+            return;
+        }
+
         [$this->tokens, $this->timer] = array_values($data);
         [$pack, $rate] = array_keys($data);
         $this->rate = Rate::fromString($rate);

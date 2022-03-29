@@ -43,11 +43,6 @@ final class SlidingWindow implements LimiterStateInterface
      */
     private $windowEndAt;
 
-    /**
-     * @var bool true if this window has been cached
-     */
-    private $cached = true;
-
     public function __construct(string $id, int $intervalInSeconds)
     {
         if ($intervalInSeconds < 1) {
@@ -56,7 +51,6 @@ final class SlidingWindow implements LimiterStateInterface
         $this->id = $id;
         $this->intervalInSeconds = $intervalInSeconds;
         $this->windowEndAt = microtime(true) + $intervalInSeconds;
-        $this->cached = false;
     }
 
     public static function createFromPreviousWindow(self $window, int $intervalInSeconds): self
@@ -72,31 +66,17 @@ final class SlidingWindow implements LimiterStateInterface
         return $new;
     }
 
-    /**
-     * @internal
-     */
-    public function __sleep(): array
-    {
-        // $cached is not serialized, it should only be set
-        // upon first creation of the window.
-        return ['id', 'hitCount', 'intervalInSeconds', 'hitCountForLastWindow', 'windowEndAt'];
-    }
-
     public function getId(): string
     {
         return $this->id;
     }
 
     /**
-     * Store for the rest of this time frame and next.
+     * Returns the remaining of this timeframe and the next one.
      */
-    public function getExpirationTime(): ?int
+    public function getExpirationTime(): int
     {
-        if ($this->cached) {
-            return null;
-        }
-
-        return 2 * $this->intervalInSeconds;
+        return $this->windowEndAt + $this->intervalInSeconds - microtime(true);
     }
 
     public function isExpired(): bool
@@ -123,5 +103,20 @@ final class SlidingWindow implements LimiterStateInterface
     public function getRetryAfter(): \DateTimeImmutable
     {
         return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $this->windowEndAt));
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            pack('NNN', $this->hitCount, $this->hitCountForLastWindow, $this->intervalInSeconds).$this->id => $this->windowEndAt,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $pack = key($data);
+        $this->windowEndAt = $data[$pack];
+        ['a' => $this->hitCount, 'b' => $this->hitCountForLastWindow, 'c' => $this->intervalInSeconds] = unpack('Na/Nb/Nc', $pack);
+        $this->id = substr($pack, 12);
     }
 }

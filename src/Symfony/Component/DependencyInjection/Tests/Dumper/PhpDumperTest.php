@@ -1534,6 +1534,20 @@ PHP
 
         $this->assertSame(247, $container->get('foo')->bar);
     }
+
+    public function testClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('closure', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([new Reference('bar')]);
+        $container->register('bar', 'stdClass');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/closure.php', $dumper->dump());
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

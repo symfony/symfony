@@ -1,0 +1,10 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    closure_property:
+        class: stdClass
+        public: true
+        properties: { foo: !service { class: Closure, arguments: [!service { class: stdClass }], factory: [Closure, fromCallable] } }

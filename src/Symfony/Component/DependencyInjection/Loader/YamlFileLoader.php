@@ -804,6 +804,14 @@ class YamlFileLoader extends FileLoader
     {
         if ($value instanceof TaggedValue) {
             $argument = $value->getValue();
+
+            if ('closure' === $value->getTag()) {
+                $argument = $this->resolveServices($argument, $file, $isParameter);
+
+                return (new Definition('Closure'))
+                    ->setFactory(['Closure', 'fromCallable'])
+                    ->addArgument($argument);
+            }
             if ('iterator' === $value->getTag()) {
                 if (!\is_array($argument)) {
                     throw new InvalidArgumentException(sprintf('"!iterator" tag only accepts sequences in "%s".', $file));

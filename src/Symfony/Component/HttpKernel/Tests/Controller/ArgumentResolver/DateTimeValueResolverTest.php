@@ -65,7 +65,7 @@ class DateTimeValueResolverTest extends TestCase
         $resolver = new DateTimeValueResolver();
 
         $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
-        $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00+0000']);
+        $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00']);
 
         /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
@@ -73,7 +73,8 @@ class DateTimeValueResolverTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(\DateTime::class, $results[0]);
-        $this->assertEquals('2012-07-21', $results[0]->format('Y-m-d'));
+        $this->assertSame($timezone, $results[0]->getTimezone()->getName(), 'Default timezone');
+        $this->assertEquals('2012-07-21 00:00:00', $results[0]->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -93,7 +94,8 @@ class DateTimeValueResolverTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(\DateTime::class, $results[0]);
-        $this->assertEquals('2001-05-11', $results[0]->format('Y-m-d'));
+        $this->assertSame('+00:00', $results[0]->getTimezone()->getName(), 'Timestamps are UTC');
+        $this->assertEquals('2001-05-11 00:42:00', $results[0]->format('Y-m-d H:i:s'));
     }
 
     public function testNullableWithEmptyAttribute()
@@ -125,7 +127,7 @@ class DateTimeValueResolverTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(FooDateTime::class, $results[0]);
-        $this->assertEquals('2016-09-08', $results[0]->format('Y-m-d'));
+        $this->assertEquals('2016-09-08 00:00:00+00:00', $results[0]->format('Y-m-d H:i:sP'));
     }
 
     /**
@@ -137,7 +139,7 @@ class DateTimeValueResolverTest extends TestCase
         $resolver = new DateTimeValueResolver();
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
-        $request = self::requestWithAttributes(['dummy' => '2016-09-08 00:00:00+0000']);
+        $request = self::requestWithAttributes(['dummy' => '2016-09-08 00:00:00 +05:00']);
 
         /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
@@ -145,7 +147,31 @@ class DateTimeValueResolverTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(\DateTimeImmutable::class, $results[0]);
-        $this->assertEquals('2016-09-08', $results[0]->format('Y-m-d'));
+        $this->assertSame('+05:00', $results[0]->getTimezone()->getName(), 'Input timezone');
+        $this->assertEquals('2016-09-08 00:00:00', $results[0]->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @dataProvider getTimeZones
+     */
+    public function testWithFormat(string $timezone)
+    {
+        date_default_timezone_set($timezone);
+        $resolver = new DateTimeValueResolver();
+
+        $argument = new ArgumentMetadata('dummy', \DateTimeInterface::class, false, false, null, false, [
+            MapDateTime::class => new MapDateTime('m-d-y H:i:s'),
+        ]);
+        $request = self::requestWithAttributes(['dummy' => '09-08-16 12:34:56']);
+
+        /** @var \Generator $results */
+        $results = $resolver->resolve($request, $argument);
+        $results = iterator_to_array($results);
+
+        $this->assertCount(1, $results);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $results[0]);
+        $this->assertSame($timezone, $results[0]->getTimezone()->getName(), 'Default timezone');
+        $this->assertEquals('2016-09-08 12:34:56', $results[0]->format('Y-m-d H:i:s'));
     }
 
     public function provideInvalidDates()
@@ -153,7 +179,7 @@ class DateTimeValueResolverTest extends TestCase
         return [
             'invalid date' => [
                 new ArgumentMetadata('dummy', \DateTime::class, false, false, null),
-                self::requestWithAttributes(['dummy' => 'Invalid DateTime Format'])
+                self::requestWithAttributes(['dummy' => 'Invalid DateTime Format']),
             ],
             'invalid format' => [
                 new ArgumentMetadata('dummy', \DateTime::class, false, false, null, false, [new MapDateTime(format: 'd.m.Y')]),

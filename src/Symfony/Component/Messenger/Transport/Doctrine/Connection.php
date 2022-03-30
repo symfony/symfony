@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
@@ -157,6 +158,14 @@ class Connection
 
     public function get(): ?array
     {
+        if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+            try {
+                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31']);
+            } catch (DriverException $e) {
+                // Ignore the exception
+            }
+        }
+
         get:
         $this->driverConnection->beginTransaction();
         try {
@@ -224,6 +233,10 @@ class Connection
     public function ack(string $id): bool
     {
         try {
+            if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31'], ['id' => $id]) > 0;
+            }
+
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException|Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -233,6 +246,10 @@ class Connection
     public function reject(string $id): bool
     {
         try {
+            if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31'], ['id' => $id]) > 0;
+            }
+
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException|Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -388,6 +405,7 @@ class Connection
         $table->addColumn('headers', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
         $table->addColumn('queue_name', self::$useDeprecatedConstants ? Type::STRING : Types::STRING)
+            ->setLength(190) // MySQL 5.6 only supports 191 characters on an indexed column in utf8mb4 mode
             ->setNotnull(true);
         $table->addColumn('created_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
@@ -396,11 +414,8 @@ class Connection
         $table->addColumn('delivered_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
-        // No indices on queue_name and available_at on MySQL to prevent deadlock issues when running multiple consumers.
-        if (!$this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
-            $table->addIndex(['queue_name']);
-            $table->addIndex(['available_at']);
-        }
+        $table->addIndex(['queue_name']);
+        $table->addIndex(['available_at']);
         $table->addIndex(['delivered_at']);
 
         return $schema;

@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-10-25T17:15:33Z
+
+I like this goal :) did you see #42754 also? I believe we can get rid of a lot of boilerplate generally, making everything first-class.
+
+I tend to find the wiring as done in https://github.com/symfony/symfony/discussions/43080 rather elegant, eg. no need for a new `MicroBundleInterface` IMHO.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-10-25T17:46:02Z
+
+> I like this goal :) did you see #42754 also? I believe we can get rid of a lot of boilerplate generally, making everything first-class.
+
+Hi @ro0NL I did, at first glance it makes sense, let me think a bit more about it.
+
+> I tend to find the wiring as done in #43080 rather elegant, eg. no need for a new MicroBundleInterface IMHO.
+
+Yep, I didn't want to add a new interface, but it should be simpler than working around the extension interface yourself. Also, because I needed a chance to instantiate the `ContainerConfigurator`. From the DX point of view, it's faster and intuitive.
+
+An alternative I was thinking about is creating a new `ExtensionBundle` or `MicroBundle` subclass of `Bundle`, so we could get rid of this new interface and the required trait as well.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-25T17:48:07Z
+
+Quick note (that doesn't invalidate any of this PR - I like the way this PR heads into): while these are based on "convention", they are all configured within the `Bundle` and `XxxExtension` classes themselves. I.e. you can customize both configuration and extension class name(space), see e.g. the SecurityBundle of Symfony (which uses `MainConfiguration`).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-10-25T17:59:19Z
+
+> From the DX point of view, it's faster and intuitive.
+
+Perhaps just a MicroBundleTrait is sufficient ... to shortcut as done in https://github.com/symfony/symfony/discussions/43080
+
+But i'd consider this a final step :)
+
+I mean, why aim for "bundle extends extension", rather than composition (using anon. classes)?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-10-25T19:01:27Z
+
+I updated the implementation to remove the Interface dependency, so it's only about using the `MicroBundleTrait`. It feels better now :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-10-26T05:03:56Z
+
+* I updated the proposal, now it's specific to `MicroBundleTrait` only
+* Basic tests added
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-11-24T05:33:49Z
+
+Update:
+ * Added a new `DefinitionConfigurator` helper to define TreeBuilder config and import definition from files. It's a combination of `TreeBuilder` + `DefinitionFileLoader`, and it's passed now as argument to `MicroBundle::configuration()` method.
+
+Pending:
+* Waiting for 6.1 branch to rebase and fix component dependencies.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-11-29T19:51:06Z
+
+> Waiting for 6.1 branch to rebase and fix component dependencies.
+
+It's done.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-01-09T05:49:28Z
+
+After reading this issue https://github.com/symfony/symfony/issues/44904 I added one improvement more to the list. When you want to change the extension alias e.g. from `acme_foo` to `foo`:
+
+**Before:** You have to set the `Bundle::$name` property to `FooBundle` (note you must keep the camelCase convention) just to change the extension alias, other alternatives require more work.
+
+**After:** You have to set the `MicroBundle::$extensionAlias` property to the desired value e.g. `foo` and your bundle name will remain the same.
+
+This avoids confusion on some commands like `config:dump-references`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-03-02T17:07:50Z
+
+FYI: This new feature is already available for Symfony 5.4 in this separate package https://github.com/yceruto/micro-symfony. Also, with `MicroExtension` class for bundle-less approach.
+
+I will update this proposal to include `MicroExtension` too.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-03-04T18:48:24Z
+
+Thanks @nicolas-grekas for your review.
+
+> I will update this proposal to include MicroExtension too.
+
+I'm not completely sure about `MicroExtension` yet, so this is ready on my side.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-03-11T23:59:44Z
+
+I confirmed the usefulness of `MicroExtension` class with other developers, it's especially useful for those applications applying the bundle-less approach. They still need to define an extension to create the app configuration (probably more than one definition in big projects), so here we go with the same benefits as `MicroBundle`.
+
+Update!
+ * Added `MicroExtension` class
+ * <del>Deprecated `ConfigurableExtension` class in favor of `MicroExtension`</del>
+ * Refactoring solution to avoid code duplication
+
+This is ready for review again.

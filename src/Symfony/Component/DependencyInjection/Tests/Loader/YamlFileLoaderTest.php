@@ -1088,4 +1088,14 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
+
+    public function testClosure()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('closure.yml');
+
+        $definition = $container->getDefinition('closure_property')->getProperties()['foo'];
+        $this->assertEquals((new Definition('Closure'))->setFactory(['Closure', 'fromCallable'])->addArgument(new Reference('bar')), $definition);
+    }
 }

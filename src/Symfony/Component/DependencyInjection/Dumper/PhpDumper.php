@@ -1132,6 +1132,15 @@ EOTXT
         if (null !== $definition->getFactory()) {
             $callable = $definition->getFactory();
 
+            if (['Closure', 'fromCallable'] === $callable && [0] === array_keys($definition->getArguments())) {
+                $callable = $definition->getArgument(0);
+                $arguments = ['...'];
+
+                if ($callable instanceof Reference || $callable instanceof Definition) {
+                    $callable = [$callable, '__invoke'];
+                }
+            }
+
             if (\is_array($callable)) {
                 if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $callable[1])) {
                     throw new RuntimeException(sprintf('Cannot dump definition because of invalid factory method (%s).', $callable[1] ?: 'n/a'));
@@ -1159,7 +1168,7 @@ EOTXT
                 return $return.sprintf("[%s, '%s'](%s)", $class, $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
             }
 
-            if (str_starts_with($callable, '@=')) {
+            if (\is_string($callable) && str_starts_with($callable, '@=')) {
                 return $return.sprintf('(($args = %s) ? (%s) : null)',
                     $this->dumpValue(new ServiceLocatorArgument($definition->getArguments())),
                     $this->getExpressionLanguage()->compile(substr($callable, 2), ['this' => 'container', 'args' => 'args'])

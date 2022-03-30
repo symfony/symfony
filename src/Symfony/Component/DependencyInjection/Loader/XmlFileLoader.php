@@ -495,7 +495,7 @@ class XmlFileLoader extends FileLoader
                 $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
             }
 
-            switch ($arg->getAttribute('type')) {
+            switch ($type = $arg->getAttribute('type')) {
                 case 'service':
                     if ('' === $arg->getAttribute('id')) {
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service" has no or empty "id" attribute in "%s".', $name, $file));
@@ -517,13 +517,19 @@ class XmlFileLoader extends FileLoader
                     $arg = $this->getArgumentsAsPhp($arg, $name, $file);
                     $arguments[$key] = new IteratorArgument($arg);
                     break;
+                case 'closure':
                 case 'service_closure':
                     if ('' !== $arg->getAttribute('id')) {
                         $arg = new Reference($arg->getAttribute('id'), $invalidBehavior);
                     } else {
                         $arg = $this->getArgumentsAsPhp($arg, $name, $file);
                     }
-                    $arguments[$key] = new ServiceClosureArgument($arg);
+                    $arguments[$key] = match ($type) {
+                        'service_closure' => new ServiceClosureArgument($arg),
+                        'closure' => (new Definition('Closure'))
+                            ->setFactory(['Closure', 'fromCallable'])
+                            ->addArgument($arg),
+                    };
                     break;
                 case 'service_locator':
                     $arg = $this->getArgumentsAsPhp($arg, $name, $file);
@@ -532,7 +538,6 @@ class XmlFileLoader extends FileLoader
                 case 'tagged':
                 case 'tagged_iterator':
                 case 'tagged_locator':
-                    $type = $arg->getAttribute('type');
                     $forLocator = 'tagged_locator' === $type;
 
                     if (!$arg->getAttribute('tag')) {

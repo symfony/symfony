@@ -183,3 +183,13 @@ function service_closure(string $serviceId): ClosureReferenceConfigurator
 {
     return new ClosureReferenceConfigurator($serviceId);
 }
+
+/**
+ * Creates a closure.
+ */
+function closure(string|array|ReferenceConfigurator|Expression $callable): InlineServiceConfigurator
+{
+    return (new InlineServiceConfigurator(new Definition('Closure')))
+        ->factory(['Closure', 'fromCallable'])
+        ->args([$callable]);
+}

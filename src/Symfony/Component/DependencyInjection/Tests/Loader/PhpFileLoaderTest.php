@@ -98,6 +98,7 @@ class PhpFileLoaderTest extends TestCase
         yield ['remove'];
         yield ['config_builder'];
         yield ['expression_factory'];
+        yield ['closure'];
     }
 
     public function testAutoConfigureAndChildDefinition()

@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 interface ConfigurableExtensionInterface extends ConfigurableInterface
 {
     /**
-     * Allow an extension to prepend the extension configurations.
+     * Allows an extension to prepend the extension configurations.
      */
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void;
 

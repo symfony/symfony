@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -67,15 +66,18 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $pool->save($item);
         $this->assertTrue($pool->getItem('foo')->isHit());
-        $this->assertTrue($pool->getItem('foo')->isHit());
 
-        sleep(20);
+        $tagsPool->deleteItem('baz'.TagAwareAdapter::TAGS_PREFIX); // tag invalidation
 
-        $this->assertTrue($pool->getItem('foo')->isHit());
+        $this->assertTrue($pool->getItem('foo')->isHit()); // known tag version is used
 
-        sleep(5);
+        sleep(10);
 
-        $this->assertTrue($pool->getItem('foo')->isHit());
+        $this->assertTrue($pool->getItem('foo')->isHit()); // known tag version is still used
+
+        sleep(1);
+
+        $this->assertFalse($pool->getItem('foo')->isHit()); // known tag version has expired
     }
 
     public function testInvalidateTagsWithArrayAdapter()

@@ -39,7 +39,6 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     use LoggerAwareTrait;
 
     public const TAGS_PREFIX = "\0tags\0";
-    private const MAX_NUMBER_OF_KNOWN_TAG_VERSIONS = 1000;
 
     private array $deferred = [];
     private AdapterInterface $pool;
@@ -79,8 +78,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         );
         self::$setTagVersions ??= \Closure::bind(
             static function (array $items, array $tagVersions) {
-                $now = null;
-                foreach ($items as $key => $item) {
+                foreach ($items as $item) {
                     $item->newMetadata[CacheItem::METADATA_TAGS] = array_intersect_key($tagVersions, $item->newMetadata[CacheItem::METADATA_TAGS] ?? []);
                 }
             },
@@ -343,14 +341,16 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     private function getTagVersions(array $tagsByKey, bool $persistTags): array
     {
         $tagVersions = [];
-        $fetchTagVersions = false;
+        $fetchTagVersions = $persistTags;
 
         foreach ($tagsByKey as $tags) {
             $tagVersions += $tags;
-
+            if ($fetchTagVersions) {
+                continue;
+            }
             foreach ($tags as $tag => $version) {
                 if ($tagVersions[$tag] !== $version) {
-                    unset($this->knownTagVersions[$tag]);
+                    $fetchTagVersions = true;
                 }
             }
         }
@@ -364,13 +364,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         foreach ($tagVersions as $tag => $version) {
             $tags[$tag.static::TAGS_PREFIX] = $tag;
             $knownTagVersion = $this->knownTagVersions[$tag] ?? [0, null];
-            if ($fetchTagVersions || $knownTagVersion[1] !== $version || $now - $knownTagVersion[0] >= $this->knownTagVersionsTtl) {
-                // reuse previously fetched tag versions up to the ttl
+            if ($fetchTagVersions || $now > $knownTagVersion[0] || $knownTagVersion[1] !== $version) {
+                // reuse previously fetched tag versions until the expiration
                 $fetchTagVersions = true;
-            }
-            unset($this->knownTagVersions[$tag]); // For LRU tracking
-            if ([0, null] !== $knownTagVersion) {
-                $this->knownTagVersions[$tag] = $knownTagVersion;
             }
         }
 
@@ -380,20 +376,24 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
         $newTags = [];
         $newVersion = null;
+        $expiration = $now + $this->knownTagVersionsTtl;
         foreach ($this->tags->getItems(array_keys($tags)) as $tag => $version) {
-            if (!$version->isHit()) {
+            unset($this->knownTagVersions[$tag = $tags[$tag]]); // update FIFO
+            if (null !== $tagVersions[$tag] = $version->get()) {
+                $this->knownTagVersions[$tag] = [$expiration, $tagVersions[$tag]];
+            } elseif ($persistTags) {
                 $newTags[$tag] = $version->set($newVersion ??= random_bytes(6));
+                $tagVersions[$tag] = $newVersion;
+                $this->knownTagVersions[$tag] = [$expiration, $newVersion];
             }
-            $tagVersions[$tag = $tags[$tag]] = $version->get();
-            $this->knownTagVersions[$tag] = [$now, $tagVersions[$tag]];
         }
 
-        if ($newTags && $persistTags) {
+        if ($newTags) {
             (self::$saveTags)($this->tags, $newTags);
         }
 
-        if (\count($this->knownTagVersions) > $maxTags = max(self::MAX_NUMBER_OF_KNOWN_TAG_VERSIONS, \count($newTags) << 1)) {
-            array_splice($this->knownTagVersions, 0, $maxTags >> 1);
+        while ($now > ($this->knownTagVersions[$tag = array_key_first($this->knownTagVersions)][0] ?? \INF)) {
+            unset($this->knownTagVersions[$tag]);
         }
 
         return $tagVersions;

@@ -11,6 +11,7 @@ CHANGELOG
  * Allow using expressions as service factories
  * Add argument type `closure` to help passing closures to services
  * Deprecate `ReferenceSetArgumentTrait`
+ * Add `AbstractExtension` class for DI configuration/definition on a single file
 
 6.0
 ---

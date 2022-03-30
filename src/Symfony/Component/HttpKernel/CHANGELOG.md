@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate StreamedResponseListener, it's not needed anymore
  * Add `Profiler::isEnabled()` so collaborating collector services may elect to omit themselves.
  * Add the `UidValueResolver` argument value resolver
+ * Add `AbstractBundle` class for DI configuration/definition on a single file
 
 6.0
 ---

@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Stamp\ViaSenderStamp;
 
 /**
  * Maps a message to a list of senders.
@@ -41,20 +42,35 @@ class SendersLocator implements SendersLocatorInterface
      */
     public function getSenders(Envelope $envelope): iterable
     {
+        if (\count($envelope->all(ViaSenderStamp::class)) > 0) {
+            $viaSenderStamp = $envelope->last(ViaSenderStamp::class);
+
+            foreach ($viaSenderStamp->getSenders() as $senderAlias) {
+                yield from $this->getSenderFromAlias($senderAlias);
+            }
+
+            return;
+        }
+
         $seen = [];
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
             foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
                 if (!\in_array($senderAlias, $seen, true)) {
-                    if (!$this->sendersLocator->has($senderAlias)) {
-                        throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
-                    }
-
                     $seen[] = $senderAlias;
-                    $sender = $this->sendersLocator->get($senderAlias);
-                    yield $senderAlias => $sender;
+
+                    yield from $this->getSenderFromAlias($senderAlias);
                 }
             }
         }
+    }
+
+    private function getSenderFromAlias(string $senderAlias): iterable
+    {
+        if (!$this->sendersLocator->has($senderAlias)) {
+            throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
+        }
+
+        yield $senderAlias => $this->sendersLocator->get($senderAlias);
     }
 }

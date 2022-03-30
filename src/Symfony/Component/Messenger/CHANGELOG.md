@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add new `messenger:stats` command that return a list of transports with their "to be processed" message count
+ * Add `ViaSenderStamp` to change the transport while dispatching a message
 
 6.1
 ---

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Sender;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\ViaSenderStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -32,6 +33,22 @@ class SendersLocatorTest extends TestCase
         ], $sendersLocator);
 
         $this->assertSame(['my_sender' => $sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
+        $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
+    }
+
+    public function testItReturnsTheSenderBasedOnViaSenderStamp()
+    {
+        $mySender = $this->createMock(SenderInterface::class);
+        $otherSender = $this->createMock(SenderInterface::class);
+        $sendersLocator = $this->createContainer([
+            'my_sender' => $mySender,
+            'other_sender' => $otherSender,
+        ]);
+        $locator = new SendersLocator([
+            DummyMessage::class => ['my_sender'],
+        ], $sendersLocator);
+
+        $this->assertSame(['other_sender' => $otherSender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a'), [new ViaSenderStamp(['other_sender'])]))));
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 

@@ -134,7 +134,7 @@ class MemcachedSessionHandlerTest extends TestCase
         return [
             [['prefix' => 'session'], true],
             [['expiretime' => 100], true],
-            [['prefix' => 'session', 'expiretime' => 200], true],
+            [['prefix' => 'session', 'ttl' => 200], true],
             [['expiretime' => 100, 'foo' => 'bar'], false],
         ];
     }

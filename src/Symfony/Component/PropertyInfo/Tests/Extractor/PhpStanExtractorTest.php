@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
@@ -20,6 +21,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type;
+
+require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
 
 /**
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
@@ -31,9 +34,15 @@ class PhpStanExtractorTest extends TestCase
      */
     private $extractor;
 
+    /**
+     * @var PhpDocExtractor
+     */
+    private $phpDocExtractor;
+
     protected function setUp(): void
     {
         $this->extractor = new PhpStanExtractor();
+        $this->phpDocExtractor = new PhpDocExtractor();
     }
 
     /**
@@ -415,6 +424,15 @@ class PhpStanExtractorTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')],
             $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy')
         );
+    }
+
+    public function testDummyNamespaceWithProperty()
+    {
+        $phpStanTypes = $this->extractor->getTypes(\B\Dummy::class, 'property');
+        $phpDocTypes = $this->phpDocExtractor->getTypes(\B\Dummy::class, 'property');
+
+        $this->assertEquals('A\Property', $phpStanTypes[0]->getClassName());
+        $this->assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
     }
 }
 

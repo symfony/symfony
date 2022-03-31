@@ -45,7 +45,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     /** @var NameScopeFactory */
     private $nameScopeFactory;
 
-    /** @var array<string, array{PhpDocNode|null, int|null, string|null}> */
+    /** @var array<string, array{PhpDocNode|null, int|null, string|null, string|null}> */
     private $docBlocks = [];
     private $phpStanTypeHelper;
     private $mutatorPrefixes;
@@ -72,8 +72,8 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         /** @var PhpDocNode|null $docNode */
-        [$docNode, $source, $prefix] = $this->getDocBlock($class, $property);
-        $nameScope = $this->nameScopeFactory->create($class);
+        [$docNode, $source, $prefix, $declaringClass] = $this->getDocBlock($class, $property);
+        $nameScope = $this->nameScopeFactory->create($class, $declaringClass);
         if (null === $docNode) {
             return null;
         }
@@ -184,7 +184,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     }
 
     /**
-     * @return array{PhpDocNode|null, int|null, string|null}
+     * @return array{PhpDocNode|null, int|null, string|null, string|null}
      */
     private function getDocBlock(string $class, string $property): array
     {
@@ -196,20 +196,23 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
         $ucFirstProperty = ucfirst($property);
 
-        if ($docBlock = $this->getDocBlockFromProperty($class, $property)) {
-            $data = [$docBlock, self::PROPERTY, null];
-        } elseif ([$docBlock] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
-            $data = [$docBlock, self::ACCESSOR, null];
-        } elseif ([$docBlock, $prefix] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)) {
-            $data = [$docBlock, self::MUTATOR, $prefix];
+        if ([$docBlock, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
+            $data = [$docBlock, self::PROPERTY, null, $declaringClass];
+        } elseif ([$docBlock, $_, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
+            $data = [$docBlock, self::ACCESSOR, null, $declaringClass];
+        } elseif ([$docBlock, $prefix, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)) {
+            $data = [$docBlock, self::MUTATOR, $prefix, $declaringClass];
         } else {
-            $data = [null, null, null];
+            $data = [null, null, null, null];
         }
 
         return $this->docBlocks[$propertyHash] = $data;
     }
 
-    private function getDocBlockFromProperty(string $class, string $property): ?PhpDocNode
+    /**
+     * @return array{PhpDocNode, string}|null
+     */
+    private function getDocBlockFromProperty(string $class, string $property): ?array
     {
         // Use a ReflectionProperty instead of $class to get the parent class if applicable
         try {
@@ -226,11 +229,11 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $phpDocNode = $this->phpDocParser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
 
-        return $phpDocNode;
+        return [$phpDocNode, $reflectionProperty->class];
     }
 
     /**
-     * @return array{PhpDocNode, string}|null
+     * @return array{PhpDocNode, string, string}|null
      */
     private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
     {
@@ -269,6 +272,6 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $phpDocNode = $this->phpDocParser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
 
-        return [$phpDocNode, $prefix];
+        return [$phpDocNode, $prefix, $reflectionMethod->class];
     }
 }

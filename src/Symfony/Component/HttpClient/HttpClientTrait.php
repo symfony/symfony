@@ -105,8 +105,13 @@ trait HttpClientTrait
 
             if (\is_string($options['body'])
                 && (string) \strlen($options['body']) !== substr($h = $options['normalized_headers']['content-length'][0] ?? '', 16)
-                && ('' !== $h || ('' !== $options['body'] && !isset($options['normalized_headers']['transfer-encoding'])))
+                && ('' !== $h || '' !== $options['body'])
             ) {
+                if (isset($options['normalized_headers']['transfer-encoding'])) {
+                    unset($options['normalized_headers']['transfer-encoding']);
+                    $options['body'] = self::dechunk($options['body']);
+                }
+
                 $options['normalized_headers']['content-length'] = [substr_replace($h ?: 'Content-Length: ', \strlen($options['body']), 16)];
             }
         }
@@ -364,6 +369,22 @@ trait HttpClientTrait
 
         if (!\is_array(@stream_get_meta_data($body))) {
             throw new InvalidArgumentException(sprintf('Option "body" must be string, stream resource, iterable or callable, "%s" given.', get_debug_type($body)));
+        }
+
+        return $body;
+    }
+
+    private static function dechunk(string $body): string
+    {
+        $h = fopen('php://temp', 'w+');
+        stream_filter_append($h, 'dechunk', \STREAM_FILTER_WRITE);
+        fwrite($h, $body);
+        $body = stream_get_contents($h, -1, 0);
+        rewind($h);
+        ftruncate($h, 0);
+
+        if (fwrite($h, '-') && '' !== stream_get_contents($h, -1, 0)) {
+            throw new TransportException('Request body has broken chunked encoding.');
         }
 
         return $body;

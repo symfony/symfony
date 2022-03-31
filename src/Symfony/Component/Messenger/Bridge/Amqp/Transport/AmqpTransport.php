@@ -101,7 +101,3 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
         return $this->sender ??= new AmqpSender($this->connection, $this->serializer);
     }
 }
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport::class, false)) {
-    class_alias(AmqpTransport::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport::class);
-}

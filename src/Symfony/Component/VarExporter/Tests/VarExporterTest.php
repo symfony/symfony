@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\FooReadonly;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooSerializable;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\VarExporter\Tests\Fixtures\MySerializable;
@@ -233,6 +234,7 @@ class VarExporterTest extends TestCase
         yield ['php74-serializable', new Php74Serializable()];
 
         yield ['unit-enum', [FooUnitEnum::Bar], true];
+        yield ['readonly', new FooReadonly('k', 'v')];
     }
 
     public function testUnicodeDirectionality()

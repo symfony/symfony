@@ -28,4 +28,14 @@
             <directory>./vendor</directory>
         </exclude>
     </coverage>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
+            <arguments>
+                <array>
+                    <element key="time-sensitive"><string>Symfony\Bridge\Doctrine\Middleware\Debug</string></element>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>
 </phpunit>

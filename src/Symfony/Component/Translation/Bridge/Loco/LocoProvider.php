@@ -243,6 +243,7 @@ final class LocoProvider implements ProviderInterface
         foreach ($translations as $id => $message) {
             $responses[$id] = $this->client->request('POST', sprintf('translations/%s/%s', rawurlencode($id), rawurlencode($locale)), [
                 'body' => $message,
+                'headers' => ['Content-Type' => 'text/plain'],
             ]);
         }
 

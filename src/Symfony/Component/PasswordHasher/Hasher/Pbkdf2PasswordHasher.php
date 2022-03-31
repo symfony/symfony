@@ -52,7 +52,7 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
 
         try {
             $this->encodedLength = \strlen($this->hash('', 'salt'));
-        } catch (\LogicException $e) {
+        } catch (\LogicException) {
             // ignore unsupported algorithm
         }
 

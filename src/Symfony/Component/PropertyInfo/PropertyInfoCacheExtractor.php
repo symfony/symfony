@@ -95,7 +95,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     {
         try {
             $serializedArguments = serialize($arguments);
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // If arguments are not serializable, skip the cache
             return $this->propertyInfoExtractor->{$method}(...$arguments);
         }

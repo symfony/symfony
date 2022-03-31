@@ -64,7 +64,7 @@ class YunpianTransport extends AbstractTransport
 
         try {
             $data = $response->toArray(false);
-        } catch (ExceptionInterface $exception) {
+        } catch (ExceptionInterface) {
             throw new TransportException('Unable to send the SMS.', $response);
         }
 

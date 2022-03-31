@@ -81,7 +81,7 @@ class FileLinkFormatter
     {
         try {
             return $router->generate($routeName).$queryString;
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return null;
         }
     }

@@ -104,7 +104,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
     {
         try {
             $this->classReflector ??= new \ReflectionClass($this->className);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             // the class does not exist anymore
             return false;
         }

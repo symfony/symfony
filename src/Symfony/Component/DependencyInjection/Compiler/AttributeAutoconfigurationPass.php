@@ -55,7 +55,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 
             try {
                 $attributeReflector = new \ReflectionClass($attributeName);
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 continue;
             }
 
@@ -103,7 +103,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         if ($this->parameterAttributeConfigurators) {
             try {
                 $constructorReflector = $this->getConstructor($value, false);
-            } catch (RuntimeException $e) {
+            } catch (RuntimeException) {
                 $constructorReflector = null;
             }
 

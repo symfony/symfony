@@ -105,10 +105,10 @@ final class EsendexTransport extends AbstractTransport
 
                 $message .= sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
             }
-        } catch (HttpClientTransportException $e) {
+        } catch (HttpClientTransportException) {
             // Catching this exception is useful to keep compatibility, with symfony/http-client < 4.4.10
             // See https://github.com/symfony/symfony/pull/37065
-        } catch (JsonException $e) {
+        } catch (JsonException) {
         }
 
         throw new TransportException($message, $response);

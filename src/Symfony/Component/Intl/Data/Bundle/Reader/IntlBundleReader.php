@@ -33,7 +33,7 @@ class IntlBundleReader implements BundleReaderInterface
         try {
             // Never enable fallback. We want to know if a bundle cannot be found
             $bundle = new \ResourceBundle($locale, $path, false);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $bundle = null;
         }
 

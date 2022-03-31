@@ -176,9 +176,9 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         foreach ($this->registry->getManagers() as $name => $em) {
             try {
                 return $this->cache[$class] = [$em->getClassMetadata($class), $name];
-            } catch (MappingException $e) {
+            } catch (MappingException) {
                 // not an entity or mapped super class
-            } catch (LegacyMappingException $e) {
+            } catch (LegacyMappingException) {
                 // not an entity or mapped super class, using Doctrine ORM 2.2
             }
         }

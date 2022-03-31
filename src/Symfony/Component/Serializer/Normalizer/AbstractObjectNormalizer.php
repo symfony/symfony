@@ -381,7 +381,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
                 try {
                     $attributeContext[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
-                } catch (NoSuchPropertyException $e) {
+                } catch (NoSuchPropertyException) {
                 }
             }
 
@@ -722,7 +722,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 'context' => $context,
                 'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // The context cannot be serialized, skip the cache
             return false;
         }

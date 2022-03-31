@@ -190,7 +190,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
             } elseif ($this->appendOnly) {
                 $value = new LazyValue($file);
             }
-        } catch (\ErrorException $e) {
+        } catch (\ErrorException) {
             return false;
         } finally {
             restore_error_handler();

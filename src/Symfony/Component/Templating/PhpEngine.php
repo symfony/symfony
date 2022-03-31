@@ -100,7 +100,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         try {
             $this->load($name);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
 

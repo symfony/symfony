@@ -159,7 +159,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
 
                 try {
                     yield $id => '' === $meta ? [] : $this->marshaller->unmarshall($meta);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     yield $id => [];
                 }
             }

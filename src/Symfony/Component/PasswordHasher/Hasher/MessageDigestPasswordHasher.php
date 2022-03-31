@@ -41,7 +41,7 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
 
         try {
             $this->hashLength = \strlen($this->hash('', 'salt'));
-        } catch (\LogicException $e) {
+        } catch (\LogicException) {
             // ignore algorithm not supported
         }
 

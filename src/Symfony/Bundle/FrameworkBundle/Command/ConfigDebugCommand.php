@@ -195,7 +195,7 @@ EOF
                 $config = $this->getConfig($this->findExtension($name), $this->compileContainer());
                 $paths = array_keys(self::buildPathsCompletion($config));
                 $suggestions->suggestValues($paths);
-            } catch (LogicException $e) {
+            } catch (LogicException) {
             }
         }
     }

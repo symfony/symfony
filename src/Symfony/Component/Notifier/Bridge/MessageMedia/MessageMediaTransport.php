@@ -98,7 +98,7 @@ final class MessageMediaTransport extends AbstractTransport
             $error = $response->toArray(false);
 
             $errorMessage = $error['details'][0] ?? ($error['message'] ?? 'Unknown reason');
-        } catch (DecodingExceptionInterface|TransportExceptionInterface $e) {
+        } catch (DecodingExceptionInterface|TransportExceptionInterface) {
             $errorMessage = 'Unknown reason';
         }
 

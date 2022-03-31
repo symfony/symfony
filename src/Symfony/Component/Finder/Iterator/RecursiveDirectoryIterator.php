@@ -82,7 +82,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             parent::getChildren();
 
             return true;
-        } catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException) {
             // If directory is unreadable and finder is set to ignore it, skip children
             return false;
         }

@@ -629,7 +629,7 @@ class ErrorHandler
                 self::$exitCode = 255;
                 $handler->handleException($fatalError);
             }
-        } catch (FatalError $e) {
+        } catch (FatalError) {
             // Ignore this re-throw
         }
 

@@ -146,7 +146,7 @@ class ProfilerController
         $url = null;
         try {
             $url = $this->generator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // the profiler is not enabled
         }
 

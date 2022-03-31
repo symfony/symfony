@@ -186,7 +186,7 @@ EOF
                     $codePaths[] = $this->defaultViewsPath;
                 }
                 $currentName = $foundBundle->getName();
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // such a bundle does not exist, so treat the argument as path
                 $path = $input->getArgument('bundle');
 

@@ -43,7 +43,7 @@ class LanguageType extends AbstractType
                             try {
                                 $languageCode = $useAlpha3Codes ? Languages::getAlpha3Code($alpha2Code) : $alpha2Code;
                                 $languagesList[$languageCode] = Languages::getName($alpha2Code, $alpha2Code);
-                            } catch (MissingResourceException $e) {
+                            } catch (MissingResourceException) {
                                 // ignore errors like "Couldn't read the indices for the locale 'meta'"
                             }
                         }

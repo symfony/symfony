@@ -154,7 +154,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -217,7 +217,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         // Use a ReflectionProperty instead of $class to get the parent class if applicable
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -255,7 +255,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
                 ) {
                     break;
                 }
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 // Try the next prefix if the method doesn't exist
             }
         }

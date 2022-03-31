@@ -83,7 +83,7 @@ class ReflectionCaster
         // Cannot create ReflectionGenerator based on a terminated Generator
         try {
             $reflectionGenerator = new \ReflectionGenerator($c);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $a[Caster::PREFIX_VIRTUAL.'closed'] = true;
 
             return $a;
@@ -298,7 +298,7 @@ class ReflectionCaster
                 if (null === $v) {
                     unset($a[$prefix.'allowsNull']);
                 }
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
             }
         }
 

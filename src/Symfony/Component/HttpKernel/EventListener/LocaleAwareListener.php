@@ -69,7 +69,7 @@ class LocaleAwareListener implements EventSubscriberInterface
         foreach ($this->localeAwareServices as $service) {
             try {
                 $service->setLocale($locale);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 $service->setLocale($defaultLocale);
             }
         }

@@ -46,7 +46,7 @@ final class SecurityExtension extends AbstractExtension
 
         try {
             return $this->securityChecker->isGranted($role, $object);
-        } catch (AuthenticationCredentialsNotFoundException $e) {
+        } catch (AuthenticationCredentialsNotFoundException) {
             return false;
         }
     }

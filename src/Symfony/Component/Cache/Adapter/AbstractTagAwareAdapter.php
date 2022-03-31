@@ -253,7 +253,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                     $tagData[$this->getId(self::TAGS_PREFIX.$tag)][] = $id;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $ok = false;
         }
 
@@ -261,7 +261,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
             if ((!$tagData || $this->doDeleteTagRelations($tagData)) && $ok) {
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         // When bulk-delete failed, retry each item individually

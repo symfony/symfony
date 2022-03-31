@@ -147,7 +147,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);
-        } catch (NoSuchPropertyException $exception) {
+        } catch (NoSuchPropertyException) {
             // Properties not found are ignored
         }
     }

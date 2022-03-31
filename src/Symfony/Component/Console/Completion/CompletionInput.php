@@ -183,7 +183,7 @@ final class CompletionInput extends ArgvInput
     {
         try {
             return parent::parseToken($token, $parseOptions);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             // suppress errors, completed input is almost never valid
         }
 

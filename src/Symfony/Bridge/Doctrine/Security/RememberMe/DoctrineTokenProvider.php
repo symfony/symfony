@@ -163,7 +163,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         // we also accept it as a valid value.
         try {
             $tmpToken = $this->loadTokenBySeries($tmpSeries);
-        } catch (TokenNotFoundException $e) {
+        } catch (TokenNotFoundException) {
             return false;
         }
 

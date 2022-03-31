@@ -76,7 +76,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
                 } else {
                     $this->collection->addResource(new FileExistenceResource($containerFile));
                 }
-            } catch (ParameterNotFoundException $exception) {
+            } catch (ParameterNotFoundException) {
             }
         }
 

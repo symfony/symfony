@@ -35,7 +35,7 @@ class TraceableUrlMatcher extends UrlMatcher
 
         try {
             $this->match($pathinfo);
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
         }
 
         return $this->traces;

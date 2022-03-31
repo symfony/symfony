@@ -166,7 +166,7 @@ class Filesystem
                     if (file_exists($tmpName)) {
                         try {
                             self::doRemove([$tmpName], true);
-                        } catch (IOException $e) {
+                        } catch (IOException) {
                         }
                     }
 

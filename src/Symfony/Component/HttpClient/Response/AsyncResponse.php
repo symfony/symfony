@@ -168,7 +168,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
             }
 
             $this->passthru = null;
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             // ignore any errors when canceling
         }
     }
@@ -193,7 +193,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                 foreach (self::passthru($this->client, $this, new LastChunk()) as $chunk) {
                     // no-op
                 }
-            } catch (ExceptionInterface $e) {
+            } catch (ExceptionInterface) {
                 // ignore any errors when destructing
             }
         }

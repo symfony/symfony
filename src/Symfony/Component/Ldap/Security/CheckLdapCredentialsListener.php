@@ -77,7 +77,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
                 if ('' !== $ldapBadge->getSearchDn() && '' !== $ldapBadge->getSearchPassword()) {
                     try {
                         $ldap->bind($ldapBadge->getSearchDn(), $ldapBadge->getSearchPassword());
-                    } catch (InvalidCredentialsException $e) {
+                    } catch (InvalidCredentialsException) {
                         throw new InvalidSearchCredentialsException();
                     }
                 } else {
@@ -97,7 +97,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
             }
 
             $ldap->bind($dn, $presentedPassword);
-        } catch (InvalidCredentialsException $e) {
+        } catch (InvalidCredentialsException) {
             throw new BadCredentialsException('The presented password is invalid.');
         }
 

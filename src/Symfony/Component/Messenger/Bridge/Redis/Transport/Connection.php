@@ -511,7 +511,7 @@ class Connection
         if ($unlink) {
             try {
                 $unlink = false !== $this->connection->unlink($this->stream, $this->queue);
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 $unlink = false;
             }
         }

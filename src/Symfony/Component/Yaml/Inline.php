@@ -370,7 +370,7 @@ class Inline
                         try {
                             $pos = 0;
                             $value = self::parseMapping('{'.$value.'}', $flags, $pos, $references);
-                        } catch (\InvalidArgumentException $e) {
+                        } catch (\InvalidArgumentException) {
                             // no, it's not
                         }
                     }
@@ -675,7 +675,7 @@ class Inline
                             if (false !== $scalar = $time->getTimestamp()) {
                                 return $scalar;
                             }
-                        } catch (\ValueError $e) {
+                        } catch (\ValueError) {
                             // no-op
                         }
 

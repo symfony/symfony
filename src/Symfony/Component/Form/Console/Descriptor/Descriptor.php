@@ -135,7 +135,7 @@ abstract class Descriptor implements DescriptorInterface
         foreach ($map as $key => $method) {
             try {
                 $definition[$key] = $introspector->{$method}($option);
-            } catch (NoConfigurationException $e) {
+            } catch (NoConfigurationException) {
                 // noop
             }
         }

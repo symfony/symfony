@@ -28,8 +28,9 @@ class SlidingWindowTest extends TestCase
         $this->assertSame(2 * 10, $window->getExpirationTime());
 
         $data = serialize($window);
+        sleep(10);
         $cachedWindow = unserialize($data);
-        $this->assertNull($cachedWindow->getExpirationTime());
+        $this->assertSame(10, $cachedWindow->getExpirationTime());
 
         $new = SlidingWindow::createFromPreviousWindow($cachedWindow, 15);
         $this->assertSame(2 * 15, $new->getExpirationTime());

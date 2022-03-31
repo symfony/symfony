@@ -49,7 +49,7 @@ install:
     - echo extension=php_sodium.dll >> php.ini-max
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
-    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/2.0.0/composer.phar)
+    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/2.2.10/composer.phar)
     - php composer.phar self-update --2
     - copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
     - git config --global user.email ""

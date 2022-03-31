@@ -74,13 +74,14 @@
                     <element key="time-sensitive">
                         <array>
                             <element key="0"><string>Cache\IntegrationTests</string></element>
-                            <element key="1"><string>Symfony\Component\Cache</string></element>
-                            <element key="2"><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
-                            <element key="3"><string>Symfony\Component\Cache\Tests\Traits</string></element>
-                            <element key="4"><string>Symfony\Component\Cache\Traits</string></element>
-                            <element key="5"><string>Symfony\Component\Console</string></element>
-                            <element key="6"><string>Symfony\Component\HttpFoundation</string></element>
-                            <element key="7"><string>Symfony\Component\Uid</string></element>
+                            <element key="1"><string>Symfony\Bridge\Doctrine\Middleware\Debug</string></element>
+                            <element key="2"><string>Symfony\Component\Cache</string></element>
+                            <element key="3"><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
+                            <element key="4"><string>Symfony\Component\Cache\Tests\Traits</string></element>
+                            <element key="5"><string>Symfony\Component\Cache\Traits</string></element>
+                            <element key="6"><string>Symfony\Component\Console</string></element>
+                            <element key="7"><string>Symfony\Component\HttpFoundation</string></element>
+                            <element key="8"><string>Symfony\Component\Uid</string></element>
                         </array>
                     </element>
                 </array>

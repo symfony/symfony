@@ -278,7 +278,7 @@ final class CrowdinProvider implements ProviderInterface
          * @see https://support.crowdin.com/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin API)
          * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.translations.postOnLanguage (Crowdin Enterprise API)
          */
-        return $this->client->request('POST', 'translations/'.$locale, [
+        return $this->client->request('POST', 'translations/'.str_replace('_', '-', $locale), [
             'json' => [
                 'storageId' => $storageId,
                 'fileId' => $fileId,
@@ -294,7 +294,7 @@ final class CrowdinProvider implements ProviderInterface
          */
         return $this->client->request('POST', 'translations/exports', [
             'json' => [
-                'targetLanguageId' => $languageId,
+                'targetLanguageId' => str_replace('_', '-', $languageId),
                 'fileIds' => [$fileId],
             ],
         ]);

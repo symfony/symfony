@@ -42,6 +42,12 @@ class DivisibleByValidator extends AbstractComparisonValidator
         if (!$remainder = fmod($value1, $value2)) {
             return true;
         }
+        if (\is_float($value2) && \INF !== $value2) {
+            $quotient = $value1 / $value2;
+            $rounded = round($quotient);
+
+            return sprintf('%.12e', $quotient) === sprintf('%.12e', $rounded);
+        }
 
         return sprintf('%.12e', $value2) === sprintf('%.12e', $remainder);
     }

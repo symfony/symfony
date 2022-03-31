@@ -1,2 +1,6 @@
 imports:
     - { resource: "../config/default.yml" }
+
+framework:
+    uid:
+        enabled: false

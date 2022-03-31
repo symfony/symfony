@@ -559,7 +559,3 @@ class Connection
         return (null !== $amqpStamp ? $amqpStamp->getRoutingKey() : null) ?? $this->getDefaultPublishRoutingKey();
     }
 }
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\Connection::class, false)) {
-    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\AmqpExt\Connection::class);
-}

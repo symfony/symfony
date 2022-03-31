@@ -31,10 +31,11 @@ class ConnectionTest extends TestCase
     public function testFromDsn()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue'], [
+            new Connection([
+                'stream' => 'queue',
                 'host' => 'localhost',
                 'port' => 6379,
-            ], [], $this->createMock(\Redis::class)),
+            ], $this->createMock(\Redis::class)),
             Connection::fromDsn('redis://localhost/queue?', [], $this->createMock(\Redis::class))
         );
     }
@@ -42,10 +43,11 @@ class ConnectionTest extends TestCase
     public function testFromDsnOnUnixSocket()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue'], [
+            new Connection([
+                'stream' => 'queue',
                 'host' => '/var/run/redis/redis.sock',
                 'port' => 0,
-            ], [], $redis = $this->createMock(\Redis::class)),
+            ], $redis = $this->createMock(\Redis::class)),
             Connection::fromDsn('redis:///var/run/redis/redis.sock', ['stream' => 'queue'], $redis)
         );
     }
@@ -80,10 +82,12 @@ class ConnectionTest extends TestCase
     public function testFromDsnWithQueryOptions()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1'], [
+            new Connection([
+                'stream' => 'queue',
+                'group' => 'group1',
+                'consumer' => 'consumer1',
                 'host' => 'localhost',
                 'port' => 6379,
-            ], [
                 'serializer' => 2,
             ], $this->createMock(\Redis::class)),
             Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2', [], $this->createMock(\Redis::class))
@@ -106,7 +110,7 @@ class ConnectionTest extends TestCase
     public function testRedisClusterInstanceIsSupported()
     {
         $redis = $this->createMock(\RedisCluster::class);
-        $this->assertInstanceOf(Connection::class, new Connection([], [], [], $redis));
+        $this->assertInstanceOf(Connection::class, new Connection([], $redis));
     }
 
     public function testKeepGettingPendingMessages()

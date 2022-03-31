@@ -443,7 +443,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Reads the a property from an object.
+     * Reads the value of a property from an object.
      *
      * @throws NoSuchPropertyException If $ignoreInvalidProperty is false and the property does not exist or is not public
      */

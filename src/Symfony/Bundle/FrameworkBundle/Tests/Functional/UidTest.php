@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV4;
@@ -42,10 +41,6 @@ class UidTest extends AbstractWebTestCase
 
     public function testArgumentValueResolverEnabled()
     {
-        if (!class_exists(UidValueResolver::class)) {
-            $this->markTestSkipped('Needs symfony/http-kernel >= 6.1');
-        }
-
         $client = $this->createClient(['test_case' => 'Uid', 'root_config' => 'config_enabled.yml']);
 
         // Any format

@@ -33,3 +33,7 @@ class RedisTransportFactory implements TransportFactoryInterface
         return 0 === strpos($dsn, 'redis://') || 0 === strpos($dsn, 'rediss://');
     }
 }
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class, false)) {
+    class_alias(RedisTransportFactory::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class);
+}

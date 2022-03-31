@@ -30,3 +30,7 @@ class RedisReceivedStamp implements NonSendableStampInterface
         return $this->id;
     }
 }
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisReceivedStamp::class, false)) {
+    class_alias(RedisReceivedStamp::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisReceivedStamp::class);
+}

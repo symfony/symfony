@@ -32,3 +32,7 @@ class AmqpTransportFactory implements TransportFactoryInterface
         return 0 === strpos($dsn, 'amqp://') || 0 === strpos($dsn, 'amqps://');
     }
 }
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class, false)) {
+    class_alias(AmqpTransportFactory::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class);
+}

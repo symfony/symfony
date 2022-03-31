@@ -101,8 +101,8 @@
             {%- endif -%}
         {%- endif -%}
         <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
-            {{- widget|raw }}
-            {%- if label is not same as(false) -%}
+            {#- if statement must be kept on the same line, to force the space between widget and label -#}
+            {{- widget|raw }} {% if label is not same as(false) -%}
                 {%- if translation_domain is same as(false) -%}
                     {%- if label_html is same as(false) -%}
                         {{ label -}}

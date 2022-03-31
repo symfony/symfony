@@ -57,7 +57,3 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         return 0 === strpos($dsn, 'doctrine://');
     }
 }
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory::class, false)) {
-    class_alias(DoctrineTransportFactory::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory::class);
-}

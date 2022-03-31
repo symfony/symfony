@@ -30,7 +30,3 @@ class DoctrineReceivedStamp implements NonSendableStampInterface
         return $this->id;
     }
 }
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceivedStamp::class, false)) {
-    class_alias(DoctrineReceivedStamp::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceivedStamp::class);
-}

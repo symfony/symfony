@@ -48,3 +48,7 @@ class RedisSender implements SenderInterface
         return $envelope->with(new TransportMessageIdStamp($id));
     }
 }
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisSender::class, false)) {
+    class_alias(RedisSender::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisSender::class);
+}

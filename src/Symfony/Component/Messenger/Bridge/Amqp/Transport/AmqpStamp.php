@@ -88,3 +88,7 @@ final class AmqpStamp implements NonSendableStampInterface
         );
     }
 }
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp::class, false)) {
+    class_alias(AmqpStamp::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp::class);
+}

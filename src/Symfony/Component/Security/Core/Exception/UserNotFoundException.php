@@ -71,3 +71,7 @@ class UserNotFoundException extends AuthenticationException
         parent::__unserialize($parentData);
     }
 }
+
+if (!class_exists(UsernameNotFoundException::class, false)) {
+    class_alias(UserNotFoundException::class, UsernameNotFoundException::class);
+}

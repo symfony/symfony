@@ -108,3 +108,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         return $this->decisionLog;
     }
 }
+
+if (!class_exists(DebugAccessDecisionManager::class, false)) {
+    class_alias(TraceableAccessDecisionManager::class, DebugAccessDecisionManager::class);
+}

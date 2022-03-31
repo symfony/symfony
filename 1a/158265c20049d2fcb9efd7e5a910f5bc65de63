@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-28T15:41:29Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-29T11:44:29Z
+
+Hey!
+
+I think @l-vo has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-29T14:00:45Z
+
+cc @greg0ire
+
+---------------------------------------------------------------------------
+
+by mondrake at 2022-01-29T16:03:39Z
+
+> Please add tests.
+
+I am not familiar with Symfony's test suite. I'll try to have a look, in the meantime any pointer appreciated.
+
+---------------------------------------------------------------------------
+
+by mondrake at 2022-01-29T16:37:51Z
+
+@greg0ire I have added a couple of tests.
+
+---------------------------------------------------------------------------
+
+by mondrake at 2022-01-29T17:54:21Z
+
+@greg0ire I think the test coverage is now complete
+
+---------------------------------------------------------------------------
+
+by mondrake at 2022-01-29T21:08:59Z
+
+Added an integration test.

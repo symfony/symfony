@@ -34,7 +34,7 @@ class RedisExtIntegrationTest extends TestCase
 
         try {
             $this->redis = new \Redis();
-            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
         } catch (\Exception $e) {
@@ -142,7 +142,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testConnectionBelowRedeliverTimeout()
     {
         // lower redeliver timeout and claim interval
-        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')], $this->redis);
 
         $connection->cleanup();
         $connection->setup();
@@ -170,7 +170,8 @@ class RedisExtIntegrationTest extends TestCase
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(
             getenv('MESSENGER_REDIS_DSN'),
-            ['redeliver_timeout' => 0, 'claim_interval' => 500],
+            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')],
+
             $this->redis
         );
 
@@ -212,6 +213,25 @@ class RedisExtIntegrationTest extends TestCase
             ]),
         ], $message['data']);
         $connection->ack($message['id']);
+    }
+
+    public function testLazySentinel()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'),
+            ['lazy' => true,
+             'delete_after_ack' => true,
+             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER'), ], $this->redis);
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame([
+            'message' => json_encode([
+                'body' => '1',
+                'headers' => [],
+            ]),
+        ], $message['data']);
+        $connection->reject($message['id']);
+        $connection->cleanup();
     }
 
     public function testLazyCluster()
@@ -273,7 +293,7 @@ class RedisExtIntegrationTest extends TestCase
         }, $hosts);
         $dsn = implode(',', $dsn);
 
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn));
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')]));
     }
 
     public function testJsonError()
@@ -292,7 +312,7 @@ class RedisExtIntegrationTest extends TestCase
     {
         $redis = new \Redis();
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['sentinel_master' => null], $redis);
 
         $this->assertNull($connection->get()); // no message, should return null immediately
         $connection->add('1', []);
@@ -304,7 +324,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testGetAfterReject()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
 
         $connection->add('1', []);
         $connection->add('2', []);
@@ -312,7 +332,8 @@ class RedisExtIntegrationTest extends TestCase
         $failing = $connection->get();
         $connection->reject($failing['id']);
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', []);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null]);
+
         $this->assertNotNull($connection->get());
 
         $redis->del('messenger-rejectthenget');

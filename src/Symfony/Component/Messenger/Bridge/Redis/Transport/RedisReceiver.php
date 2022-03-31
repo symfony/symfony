@@ -96,7 +96,3 @@ class RedisReceiver implements ReceiverInterface
         return $redisReceivedStamp;
     }
 }
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisReceiver::class, false)) {
-    class_alias(RedisReceiver::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisReceiver::class);
-}

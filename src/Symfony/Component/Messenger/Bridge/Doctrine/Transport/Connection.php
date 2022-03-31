@@ -469,7 +469,3 @@ class Connection implements ResetInterface
             : $this->driverConnection->getSchemaManager();
     }
 }
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\Connection::class, false)) {
-    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);
-}

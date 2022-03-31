@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.1",
         "ext-amqp": "*",
-        "symfony/messenger": "^5.4|^6.0"
+        "symfony/messenger": "^6.1"
     },
     "require-dev": {
         "symfony/event-dispatcher": "^5.4|^6.0",

@@ -136,6 +136,9 @@ class DeprecationErrorHandler
         if ($deprecation->isMuted()) {
             return null;
         }
+        if ($this->getConfiguration()->isIgnoredDeprecation($deprecation)) {
+            return null;
+        }
         if ($this->getConfiguration()->isBaselineDeprecation($deprecation)) {
             return null;
         }

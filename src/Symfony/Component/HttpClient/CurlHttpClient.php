@@ -202,9 +202,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
         $hasContentLength = isset($options['normalized_headers']['content-length'][0]);
 
-        foreach ($options['headers'] as $header) {
+        foreach ($options['headers'] as $i => $header) {
             if ($hasContentLength && 0 === stripos($header, 'Content-Length:')) {
-                continue; // Let curl handle Content-Length headers
+                // Let curl handle Content-Length headers
+                unset($options['headers'][$i]);
+                continue;
             }
             if (':' === $header[-2] && \strlen($header) - 2 === strpos($header, ': ')) {
                 // curl requires a special syntax to send empty headers

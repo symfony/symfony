@@ -388,6 +388,18 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $body);
     }
 
+    public function testDropContentRelatedHeadersWhenFollowingRequestIsUsingGet()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/302', [
+            'body' => 'foo',
+            'headers' => ['Content-Length: 3'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testNegativeTimeout()
     {
         $client = $this->getHttpClient(__FUNCTION__);

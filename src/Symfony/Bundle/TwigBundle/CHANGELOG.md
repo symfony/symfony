@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add option `twig.file_name_pattern` to restrict which files are compiled by cache warmer and linter.
+
 6.0
 ---
 

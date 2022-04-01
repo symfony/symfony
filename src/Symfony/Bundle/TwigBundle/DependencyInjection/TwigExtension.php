@@ -97,6 +97,9 @@ class TwigExtension extends Extension
         // paths are modified in ExtensionPass if forms are enabled
         $container->getDefinition('twig.template_iterator')->replaceArgument(1, $config['paths']);
 
+        $container->getDefinition('twig.template_iterator')->replaceArgument(3, $config['file_name_pattern']);
+        $container->getDefinition('twig.command.lint')->replaceArgument(1, $config['file_name_pattern'] ?: ['*.twig']);
+
         foreach ($this->getBundleTemplatePaths($container, $config) as $name => $paths) {
             $namespace = $this->normalizeBundleName($name);
             foreach ($paths as $path) {

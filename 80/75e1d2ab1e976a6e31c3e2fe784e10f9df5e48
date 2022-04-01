@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T07:27:39Z
+
+I'm not sure about this change, but this can only be merged in 6.1 anyway as this is a behavior change and not a bug fix (we always consider performance improvements as a new feature).
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-03-26T11:07:38Z
+
+Ok for 6.1.
+
+The question to answer before merging this PR is: is it expected to have twig templates that does not have the `.twig` extension?
+
+---
+
+The alternative in my code is to decorate the iterator and filter each template name.
+```php
+class TemplateIterator implements \IteratorAggregate
+{
+    public function __construct(private iterable $iterator) {}
+    public function getIterator(): \Generator
+    {
+        foreach ($this->iterator as $filename) {
+            if (str_ends_with($filename, '.twig')) {
+                yield $filename;
+            }
+        }
+    }
+}
+```
+
+And use a compiler pass to inject the decorator in the cache warmer.
+```php
+class TemplateIteratorPass implements CompilerPassInterface
+{
+    public function process(ContainerBuilder $container)
+    {
+        $warmer = $container->getDefinition('twig.template_cache_warmer');
+        $iterator = $container->register(TemplateIterator::class, TemplateIterator::class)->addArgument($warmer->getArgument(1));
+        $warmer->setArgument(1, $iterator);
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T11:20:49Z
+
+> Ok for 6.1.
+>
+> The question to answer before merging this PR is: is it expected to have twig templates that does not have the `.twig` extension?
+>
+
+I think that this is indeed a great question. And the answer is: you can have templates with another extension. It's probably not widespread but nothing forbids it.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-03-26T19:59:06Z
+
+I added an option to the `TwigBundle`, ~the plan is to change its default value in 7.0~:
+
+```yaml
+twig:
+    file_name_pattern: "*.twig"
+```
+
+~The majority of projects having only `*.twig` files in the template directories, they will not have the deprecation notice and not need to update their configuration.~
+
+~For projects that mix file extensions (like mine), the deprecation notice will be triggered and it will be easy to solve by adding the config.~
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-03-26T21:03:00Z
+
+Unfortunately, the deprecation is not reported in logs when running `bin/console cache:warmup`. And there is very few chances the cache is warmed in tests. I've removed the deprecation to simply add the option. Updating the default value in 7.0 could be part of an other PR.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-03-26T21:37:20Z
+
+> > Ok for 6.1.
+> > The question to answer before merging this PR is: is it expected to have twig templates that does not have the `.twig` extension?
+>
+> I think that this is indeed a great question. And the answer is: you can have templates with another extension. It's probably not widespread but nothing forbids it.
+
+In Symfony WebProfilerBundle itself, all svg are included as templates with `include` tag.
+https://github.com/symfony/symfony/blob/24304ad77874f03f9971fd9e29c0ef0776b0f5b9/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/header.html.twig#L3
+
+https://github.com/symfony/symfony/blob/24304ad77874f03f9971fd9e29c0ef0776b0f5b9/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/time.html.twig#L150
+
+Zurb templates uses the `source()` function correctly.
+https://github.com/symfony/symfony/blob/24304ad77874f03f9971fd9e29c0ef0776b0f5b9/src/Symfony/Bridge/Twig/Resources/views/Email/zurb_2/notification/body.html.twig#L6-L7
+
+See https://github.com/symfony/symfony/pull/45858
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-03-27T11:11:26Z
+
+For the record and to not miss something in previous discussions:
+ * https://github.com/symfony/symfony/issues/28282
+ * https://github.com/symfony/symfony/pull/34321
+ * https://github.com/symfony/symfony/issues/34142
+ * https://github.com/symfony/symfony/pull/34416
+ * https://github.com/symfony/symfony/issues/41950
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-03-27T16:10:50Z
+
+Thanks @yceruto. This proves this issue is common. Your PR was almost the same, with excluded directories in addition.
+
+@fabpot [presented the argument](https://github.com/symfony/symfony/pull/34416#issuecomment-554723176) that `templates` directory is for templates only, but experience shows that grouping files by their type is not optimal for maintenance. A twig loader namespace can target a directory with several `templates` directories.

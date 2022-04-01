@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
+/**
+ * @requires extension intl
+ */
 class LocaleSwitcherTest extends TestCase
 {
     private string $intlLocale;

@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Add `TraceableSerializer`, `TraceableNormalizer`, `TraceableEncoder` and `SerializerDataCollector` to integrate with the web profiler
  * Add the ability to create contexts using context builders
  * Set `Context` annotation as not final
  * Deprecate `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead

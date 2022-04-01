@@ -18,6 +18,7 @@ use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -181,6 +182,18 @@ class Connection implements ResetInterface
                     sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
                     $sql
                 );
+            }
+
+            // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
+            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+                $sql = str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql);
+
+                $wrappedQuery = $this->driverConnection->createQueryBuilder()
+                    ->select('w.*')
+                    ->from($this->configuration['table_name'], 'w')
+                    ->where('w.id IN('.$sql.')');
+
+                $sql = $wrappedQuery->getSQL();
             }
 
             // use SELECT ... FOR UPDATE to lock table

@@ -32,6 +32,9 @@ class BinaryNode extends Node
         '..' => 'range',
         'in' => 'in_array',
         'not in' => '!in_array',
+        'contains' => 'str_contains',
+        'starts with' => 'str_starts_with',
+        'ends with' => 'str_ends_with',
     ];
 
     public function __construct(string $operator, Node $left, Node $right)

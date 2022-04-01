@@ -2,10 +2,6 @@ build: false
 clone_depth: 2
 clone_folder: c:\projects\symfony
 
-cache:
-    - composer.phar
-    - .phpunit -> phpunit
-
 init:
     - SET PATH=c:\php;%PATH%
     - SET COMPOSER_NO_INTERACTION=1
@@ -48,9 +44,8 @@ install:
     - echo extension=php_sodium.dll >> php.ini-max
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
-    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/2.2.10/composer.phar)
-    - php composer.phar self-update --2
-    - copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
+    - appveyor DownloadFile https://getcomposer.org/download/latest-stable/composer.phar
+    - mkdir %APPDATA%\Composer && copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
     - git config --global user.email ""
     - git config --global user.name "Symfony"
     - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -o '[0-9][0-9]*\.[0-9]'"`) DO (SET SYMFONY_VERSION=%%F)

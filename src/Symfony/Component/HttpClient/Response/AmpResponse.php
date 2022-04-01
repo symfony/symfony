@@ -313,7 +313,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 $location = $urlResolver::parseUrl($location);
                 $location = $urlResolver::resolveUrl($location, $previousUrl);
                 $info['redirect_url'] = implode('', $location);
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 return $response;
             }
 
@@ -327,7 +327,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 // Discard body of redirects
                 while (null !== yield $response->getBody()->read()) {
                 }
-            } catch (HttpException|StreamException $e) {
+            } catch (HttpException|StreamException) {
                 // Ignore streaming errors on previous responses
             }
 

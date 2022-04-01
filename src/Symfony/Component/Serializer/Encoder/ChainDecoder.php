@@ -47,7 +47,7 @@ class ChainDecoder implements ContextAwareDecoderInterface
     {
         try {
             $this->getDecoder($format, $context);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             return false;
         }
 

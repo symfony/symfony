@@ -281,7 +281,7 @@ class Container implements ContainerInterface, ResetInterface
                 if ($service instanceof ResetInterface) {
                     $service->reset();
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 continue;
             }
         }

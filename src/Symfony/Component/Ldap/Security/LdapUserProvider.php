@@ -76,7 +76,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     {
         try {
             $this->ldap->bind($this->searchDn, $this->searchPassword);
-        } catch (InvalidCredentialsException $e) {
+        } catch (InvalidCredentialsException) {
             throw new InvalidSearchCredentialsException();
         }
 
@@ -107,7 +107,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             if (null !== $this->uidKey) {
                 $identifier = $this->getAttributeValue($entry, $this->uidKey);
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
         }
 
         return $this->loadUser($identifier, $entry);
@@ -144,7 +144,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             $user->getEntry()->setAttribute($this->passwordAttribute, [$newHashedPassword]);
             $this->ldap->getEntryManager()->update($user->getEntry());
             $user->setPassword($newHashedPassword);
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             // ignore failed password upgrades
         }
     }

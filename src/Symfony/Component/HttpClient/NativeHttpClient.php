@@ -367,7 +367,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             try {
                 $url = self::parseUrl($location);
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 $info['redirect_url'] = null;
 
                 return null;

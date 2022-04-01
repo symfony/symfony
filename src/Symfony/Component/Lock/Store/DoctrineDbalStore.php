@@ -89,7 +89,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
                 ParameterType::STRING,
                 ParameterType::STRING,
             ]);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
             if (!$this->conn->isTransactionActive() || $this->platformSupportsTableCreationInTransaction()) {
                 $this->createTable();
             }
@@ -102,10 +102,10 @@ class DoctrineDbalStore implements PersistingStoreInterface
                     ParameterType::STRING,
                     ParameterType::STRING,
                 ]);
-            } catch (DBALException $e) {
+            } catch (DBALException) {
                 $this->putOffExpiration($key, $this->initialTtl);
             }
-        } catch (DBALException $e) {
+        } catch (DBALException) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }

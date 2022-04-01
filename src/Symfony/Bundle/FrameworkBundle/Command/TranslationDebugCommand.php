@@ -153,7 +153,7 @@ EOF
                 if ($this->defaultViewsPath) {
                     $codePaths[] = $this->defaultViewsPath;
                 }
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // such a bundle does not exist, so treat the argument as path
                 $path = $input->getArgument('bundle');
 

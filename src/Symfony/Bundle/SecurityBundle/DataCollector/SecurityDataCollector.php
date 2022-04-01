@@ -111,7 +111,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $logoutUrl = null;
             try {
                 $logoutUrl = $this->logoutUrlGenerator?->getLogoutPath();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // fail silently when the logout URL cannot be generated
             }
 

@@ -68,7 +68,7 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
             }
             try {
                 $date = new $class($value);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $date = false;
             }
         }

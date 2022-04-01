@@ -132,7 +132,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $this->conn->executeStatement($deleteSql, $params, $paramTypes);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
         }
 
         return true;
@@ -209,7 +209,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $this->conn->executeStatement($sql);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
         }
 
         return true;
@@ -223,7 +223,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN (?)";
         try {
             $this->conn->executeStatement($sql, [array_values($ids)], [Connection::PARAM_STR_ARRAY]);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
         }
 
         return true;
@@ -274,7 +274,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $lifetime = $lifetime ?: null;
         try {
             $stmt = $this->conn->prepare($sql);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
             if (!$this->conn->isTransactionActive() || \in_array($platformName, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                 $this->createTable();
             }
@@ -312,7 +312,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         foreach ($values as $id => $data) {
             try {
                 $rowCount = $stmt->executeStatement();
-            } catch (TableNotFoundException $e) {
+            } catch (TableNotFoundException) {
                 if (!$this->conn->isTransactionActive() || \in_array($platformName, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                     $this->createTable();
                 }
@@ -321,7 +321,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $platformName && 0 === $rowCount) {
                 try {
                     $insertStmt->executeStatement();
-                } catch (DBALException $e) {
+                } catch (DBALException) {
                     // A concurrent write won, let it be
                 }
             }

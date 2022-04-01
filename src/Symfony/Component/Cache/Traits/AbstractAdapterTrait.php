@@ -170,7 +170,7 @@ trait AbstractAdapterTrait
             if ($this->doDelete($ids)) {
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         $ok = true;

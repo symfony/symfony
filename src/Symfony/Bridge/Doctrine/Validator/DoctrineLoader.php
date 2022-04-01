@@ -50,7 +50,7 @@ final class DoctrineLoader implements LoaderInterface
         $className = $metadata->getClassName();
         try {
             $doctrineMetadata = $this->entityManager->getClassMetadata($className);
-        } catch (MappingException|OrmMappingException $exception) {
+        } catch (MappingException|OrmMappingException) {
             return false;
         }
 

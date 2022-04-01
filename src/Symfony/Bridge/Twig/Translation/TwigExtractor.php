@@ -53,7 +53,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         foreach ($this->extractFiles($resource) as $file) {
             try {
                 $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
-            } catch (Error $e) {
+            } catch (Error) {
                 // ignore errors, these should be fixed by using the linter
             }
         }

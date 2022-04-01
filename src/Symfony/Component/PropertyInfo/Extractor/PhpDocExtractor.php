@@ -203,7 +203,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
         $reflectionConstructor = $reflectionClass->getConstructor();
@@ -215,7 +215,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->contextFactory->createFromReflector($reflectionConstructor));
 
             return $this->filterDocBlockParams($docBlock, $property);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return null;
         }
     }
@@ -243,7 +243,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             $reflectionProperty = null;
         }
 
@@ -278,7 +278,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         // Use a ReflectionProperty instead of $class to get the parent class if applicable
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -292,7 +292,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflector));
-        } catch (\InvalidArgumentException|\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException) {
             return null;
         }
     }
@@ -320,7 +320,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                 ) {
                     break;
                 }
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 // Try the next prefix if the method doesn't exist
             }
         }
@@ -339,7 +339,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return [$this->docBlockFactory->create($reflectionMethod, $this->createFromReflector($reflector)), $prefix];
-        } catch (\InvalidArgumentException|\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException) {
             return null;
         }
     }

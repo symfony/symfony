@@ -39,7 +39,7 @@ class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
 
         try {
             $connection->executeQuery($connection->getDatabasePlatform()->getDummySelectSQL());
-        } catch (DBALException $e) {
+        } catch (DBALException) {
             $connection->close();
             $connection->connect();
         }

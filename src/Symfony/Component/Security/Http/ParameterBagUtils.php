@@ -48,7 +48,7 @@ final class ParameterBagUtils
 
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));
-        } catch (AccessException $e) {
+        } catch (AccessException) {
             return null;
         }
     }
@@ -76,7 +76,7 @@ final class ParameterBagUtils
 
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));
-        } catch (AccessException $e) {
+        } catch (AccessException) {
             return null;
         }
     }

@@ -337,7 +337,7 @@ class ExceptionCaster
                     $stub->attr['file'] = $f;
                     $stub->attr['line'] = $caller->getStartLine();
                 }
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 // ignore fake class/function
             }
 

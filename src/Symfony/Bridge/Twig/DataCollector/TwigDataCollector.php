@@ -71,7 +71,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
             if ($profile->isTemplate()) {
                 try {
                     $template = $this->twig->load($name = $profile->getName());
-                } catch (LoaderError $e) {
+                } catch (LoaderError) {
                     $template = null;
                 }
 

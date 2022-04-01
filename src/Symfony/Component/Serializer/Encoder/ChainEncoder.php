@@ -47,7 +47,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
     {
         try {
             $this->getEncoder($format, $context);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             return false;
         }
 

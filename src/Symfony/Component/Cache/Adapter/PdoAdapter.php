@@ -135,7 +135,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $delete = $connection->prepare($deleteSql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return true;
         }
         $delete->bindValue(':time', time(), \PDO::PARAM_INT);
@@ -145,7 +145,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
         try {
             return $delete->execute();
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return true;
         }
     }
@@ -232,7 +232,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $conn->exec($sql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
         }
 
         return true;
@@ -248,7 +248,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         try {
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute(array_values($ids));
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
         }
 
         return true;
@@ -301,7 +301,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $lifetime = $lifetime ?: null;
         try {
             $stmt = $conn->prepare($sql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                 $this->createTable();
             }
@@ -336,7 +336,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         foreach ($values as $id => $data) {
             try {
                 $stmt->execute();
-            } catch (\PDOException $e) {
+            } catch (\PDOException) {
                 if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                     $this->createTable();
                 }
@@ -345,7 +345,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $driver && !$stmt->rowCount()) {
                 try {
                     $insertStmt->execute();
-                } catch (\PDOException $e) {
+                } catch (\PDOException) {
                     // A concurrent write won, let it be
                 }
             }

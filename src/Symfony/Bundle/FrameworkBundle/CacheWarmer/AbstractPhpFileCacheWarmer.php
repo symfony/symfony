@@ -78,7 +78,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     {
         try {
             ClassExistenceResource::throwOnRequiredClass($class, $exception);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
         }
     }
 

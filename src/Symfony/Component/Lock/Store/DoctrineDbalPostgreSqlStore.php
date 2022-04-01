@@ -141,7 +141,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             // If lock acquired = there is no other ReadLock
             $store->save($key);
             $this->unlockShared($key);
-        } catch (LockConflictedException $e) {
+        } catch (LockConflictedException) {
             // an other key exists in this ReadLock
         }
 

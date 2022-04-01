@@ -114,7 +114,7 @@ class EsmtpTransport extends SmtpTransport
     {
         try {
             $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
             return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
         }
 
@@ -135,7 +135,7 @@ class EsmtpTransport extends SmtpTransport
             try {
                 $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
                 $this->capabilities = $this->parseCapabilities($response);
-            } catch (TransportExceptionInterface $e) {
+            } catch (TransportExceptionInterface) {
                 return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
             }
         }
@@ -184,7 +184,7 @@ class EsmtpTransport extends SmtpTransport
             } catch (TransportExceptionInterface $e) {
                 try {
                     $this->executeCommand("RSET\r\n", [250]);
-                } catch (TransportExceptionInterface $_) {
+                } catch (TransportExceptionInterface) {
                     // ignore this exception as it probably means that the server error was final
                 }
 

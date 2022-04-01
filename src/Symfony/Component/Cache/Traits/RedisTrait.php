@@ -465,7 +465,7 @@ trait RedisTrait
             if ($unlink) {
                 try {
                     $unlink = false !== $this->redis->unlink($ids);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                     $unlink = false;
                 }
             }

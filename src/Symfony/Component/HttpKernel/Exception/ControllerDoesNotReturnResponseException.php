@@ -49,7 +49,7 @@ class ControllerDoesNotReturnResponseException extends \LogicException
                     'file' => $r->getFileName(),
                     'line' => $r->getEndLine(),
                 ];
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 return null;
             }
         }
@@ -68,7 +68,7 @@ class ControllerDoesNotReturnResponseException extends \LogicException
 
             try {
                 $line = $r->getMethod('__invoke')->getEndLine();
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 $line = $r->getEndLine();
             }
 

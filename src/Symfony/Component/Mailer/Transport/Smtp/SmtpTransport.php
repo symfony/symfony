@@ -138,7 +138,7 @@ class SmtpTransport extends AbstractTransport
             if ($this->started) {
                 try {
                     $this->executeCommand("RSET\r\n", [250]);
-                } catch (TransportExceptionInterface $_) {
+                } catch (TransportExceptionInterface) {
                     // ignore this exception as it probably means that the server error was final
                 }
             }
@@ -276,7 +276,7 @@ class SmtpTransport extends AbstractTransport
 
         try {
             $this->executeCommand("QUIT\r\n", [221]);
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
         } finally {
             $this->stream->terminate();
             $this->started = false;
@@ -292,7 +292,7 @@ class SmtpTransport extends AbstractTransport
 
         try {
             $this->executeCommand("NOOP\r\n", [250]);
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
             $this->stop();
         }
     }

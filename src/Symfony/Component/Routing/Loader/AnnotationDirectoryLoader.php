@@ -79,7 +79,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
 
         try {
             return is_dir($this->locator->locate($resource));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
     }

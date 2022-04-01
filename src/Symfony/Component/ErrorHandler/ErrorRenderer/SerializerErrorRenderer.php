@@ -68,7 +68,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
                 'debug' => $debug,
             ]))
             ->setHeaders($flattenException->getHeaders() + $headers);
-        } catch (NotEncodableValueException $e) {
+        } catch (NotEncodableValueException) {
             return $this->fallbackErrorRenderer->render($exception);
         }
     }

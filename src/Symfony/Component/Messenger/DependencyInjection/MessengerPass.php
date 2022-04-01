@@ -205,7 +205,7 @@ class MessengerPass implements CompilerPassInterface
 
         try {
             $method = $handlerClass->getMethod($methodName);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             throw new RuntimeException(sprintf('Invalid handler service "%s": class "%s" must have an "%s()" method.', $serviceId, $handlerClass->getName(), $methodName));
         }
 
@@ -301,7 +301,7 @@ class MessengerPass implements CompilerPassInterface
             $consumeCommandDefinition->replaceArgument(4, array_values($receiverNames));
             try {
                 $consumeCommandDefinition->replaceArgument(6, $busIds);
-            } catch (OutOfBoundsException $e) {
+            } catch (OutOfBoundsException) {
                 // ignore to preserve compatibility with symfony/framework-bundle < 5.4
             }
         }

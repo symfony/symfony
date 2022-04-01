@@ -700,7 +700,7 @@ class Response
     {
         try {
             return $this->headers->getDate('Expires');
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             // according to RFC 2616 invalid date formats (e.g. "0" and "-1") must be treated as in the past
             return \DateTime::createFromFormat('U', time() - 172800);
         }

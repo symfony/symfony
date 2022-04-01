@@ -50,7 +50,7 @@ class ClassStub extends ConstStub
             if (\is_array($r)) {
                 try {
                     $r = new \ReflectionMethod($r[0], $r[1]);
-                } catch (\ReflectionException $e) {
+                } catch (\ReflectionException) {
                     $r = new \ReflectionClass($r[0]);
                 }
             }
@@ -71,7 +71,7 @@ class ClassStub extends ConstStub
                     $this->value .= $s;
                 }
             }
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return;
         } finally {
             if (0 < $i = strrpos($this->value, '\\')) {

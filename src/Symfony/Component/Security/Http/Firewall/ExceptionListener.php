@@ -204,7 +204,7 @@ class ExceptionListener
 
         try {
             $response = $this->authenticationEntryPoint->start($request, $authException);
-        } catch (NotAnEntryPointException $e) {
+        } catch (NotAnEntryPointException) {
             $this->throwUnauthorizedException($authException);
         }
 

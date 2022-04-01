@@ -213,7 +213,7 @@ class TextDescriptor extends Descriptor
 
         try {
             $r = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return '';
         }
 

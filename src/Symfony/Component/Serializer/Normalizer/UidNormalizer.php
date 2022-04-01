@@ -83,7 +83,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
             }
 
             return $type::fromString($data);
-        } catch (\InvalidArgumentException|\TypeError $exception) {
+        } catch (\InvalidArgumentException|\TypeError) {
             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The data is not a valid "%s" string representation.', $type), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         } catch (\Error $e) { // @deprecated remove this catch block in 7.0
             if (str_starts_with($e->getMessage(), 'Cannot instantiate abstract class')) {

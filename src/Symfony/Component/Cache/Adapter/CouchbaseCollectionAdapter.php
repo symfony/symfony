@@ -140,7 +140,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         foreach ($ids as $id) {
             try {
                 $resultCouchbase = $this->connection->get($id);
-            } catch (DocumentNotFoundException $exception) {
+            } catch (DocumentNotFoundException) {
                 continue;
             }
 
@@ -181,7 +181,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
                 if (null === $result->mutationToken()) {
                     $idsErrors[] = $id;
                 }
-            } catch (DocumentNotFoundException $exception) {
+            } catch (DocumentNotFoundException) {
             }
         }
 
@@ -204,7 +204,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         foreach ($values as $key => $value) {
             try {
                 $this->connection->upsert($key, $value, $upsertOptions);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 $ko[$key] = '';
             }
         }

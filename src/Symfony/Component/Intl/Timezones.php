@@ -35,12 +35,12 @@ final class Timezones extends ResourceBundle
             self::readEntry(['Names', $timezone]);
 
             return true;
-        } catch (MissingResourceException $e) {
+        } catch (MissingResourceException) {
             try {
                 new \DateTimeZone($timezone);
 
                 return true;
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return false;
             }
         }

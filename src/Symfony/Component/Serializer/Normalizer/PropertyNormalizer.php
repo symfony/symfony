@@ -93,7 +93,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             if ($reflectionProperty->isStatic()) {
                 return false;
             }
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return false;
         }
 
@@ -128,7 +128,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -157,7 +157,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return;
         }
 

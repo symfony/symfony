@@ -184,7 +184,7 @@ final class CompleteCommand extends Command
 
         try {
             $completionInput->bind($this->getApplication()->getDefinition());
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
         }
 
         return $completionInput;
@@ -199,7 +199,7 @@ final class CompleteCommand extends Command
             }
 
             return $this->getApplication()->find($inputName);
-        } catch (CommandNotFoundException $e) {
+        } catch (CommandNotFoundException) {
         }
 
         return null;

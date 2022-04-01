@@ -463,7 +463,7 @@ final class Dotenv
 
             try {
                 $process->mustRun();
-            } catch (ProcessException $e) {
+            } catch (ProcessException) {
                 throw $this->createFormatException(sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
             }
 

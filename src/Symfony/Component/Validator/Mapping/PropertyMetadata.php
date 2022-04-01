@@ -62,7 +62,7 @@ class PropertyMetadata extends MemberMetadata
 
             try {
                 return $reflProperty->getValue($object);
-            } catch (\Error $e) {
+            } catch (\Error) {
                 return null;
             }
         }

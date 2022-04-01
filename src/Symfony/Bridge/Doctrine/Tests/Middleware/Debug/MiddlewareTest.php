@@ -11,6 +11,7 @@ use Doctrine\DBAL\Result;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Bridge\Doctrine\Middleware\Debug\Middleware;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -29,6 +30,8 @@ class MiddlewareTest extends TestCase
         if (!interface_exists(MiddlewareInterface::class)) {
             $this->markTestSkipped(sprintf('%s needed to run this test', MiddlewareInterface::class));
         }
+
+        ClockMock::withClockMock(false);
     }
 
     private function init(bool $withStopwatch = true): void

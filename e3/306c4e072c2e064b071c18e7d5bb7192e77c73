@@ -1,0 +1,193 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-12-03T17:03:34Z
+
+Turning a method into a protected API is a new feature, and increases the maintenance work as it becomes part of the BC surface. Thus, inheritance-based extension points are the most costly ones in term of BC (because they are the harder ones in term of writing BC layers). We won't accept turning private methods into protected ones just because someone asks for that without justification.
+
+Please describe your use case so that we can decide what is the right extension point for that.
+
+---------------------------------------------------------------------------
+
+by ampaze at 2021-12-03T17:33:27Z
+
+The use case is to signal the SMTP server to use the [XVERP](http://www.postfix.org/VERP_README.html#smtp) and [DSN](http://www.postfix.org/DSN_README.html) service extensions. (See the example commands I posted)
+
+This PR is a good way to make a real **E**SMTPTransport possible, that is one that actually supports arbitrary service extensions. The current implementation is unfortunately completely sealed off and has no way to do this.
+
+----
+Just a thought:
+I understand that you want to avoid work, but constantly leaving no way to inherit a class creates more work for everyone else having to either copy (multiple) files and keeping them in sync or spending time to find some other workaround :confused:
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-03T18:03:46Z
+
+> Just a thought:
+> I understand that you want to avoid work, but constantly leaving no way to inherit a class creates more work for everyone else having to either copy (multiple) files and keeping them in sync or spending time to find some other workaround
+
+@ampaze no. It means people wanting to implement things that are not already possible with our API need to discuss with us so that we add the right _maintainable_ extension point. And it also encourages to use the available extension points rather than hacking things through inheritance (and as said before, inheritance is the hardest thing in term of writing BC layers).
+
+And the goal is not to avoid work. It is to allow us to work on Symfony while provide BC guarantees to our users. If we put everything protected, we would not be able to provide the Symfony BC promise at all. Look at what Symfony contributors are allowed to do as changes (which is just a consequence of what is a BC break): https://symfony.com/doc/current/contributing/code/bc.html#changing-classes. And now, imagine the impact for us if all private APIs were protected. There's no way we could maintain Symfony like that.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-03T18:37:52Z
+
+Regarding support for custom (as-in not part of the Symfony codebase) extensions for ESMTP, I'm quite sure you are the first one to request it since the release of the `symfony/mailer` component (in May 2019).
+
+@fabpot looking at the Swiftmailer codebase, I see that it had support for custom `EsmtpHandler` extension points. Do you think it makes sense to implement an equivalent feature in symfony/mailer ?
+
+---------------------------------------------------------------------------
+
+by ampaze at 2021-12-06T11:04:11Z
+
+@stof Thanks for the detailed response, of course I don't have to maintain Symfony (and you are doing a good job with that) so my viewpoint is in terms of the stuff I need to get done. Sometimes this might be uncommon use cases, and if you decide that it's not worth having in Symfony, I am stuck.
+
+----
+
+Indeed I am coming from `Swiftmailer` and trying to switch to `symfony/mailer`.
+
+---------------------------------------------------------------------------
+
+by ampaze at 2021-12-15T10:19:57Z
+
+Any news on this?
+
+---------------------------------------------------------------------------
+
+by SwenVanZanten at 2022-01-03T16:26:11Z
+
+I'm also looking for a feature to extend the `RCPT TO:` and the `MAIL FROM:` smtp commands at this point. I'm coming from Swiftmailer where this was possible by using the `Swift_Transport_EsmtpHandler` interface. Just using the following methods `getMailParams`, `getRcptParams`. It also provided a way to check if a feature was supported after the `EHLO` command response. In this case I'm trying to implement the DSN functions.
+
+So far the best workaround I found is to make my own transport and extend Symfony EsmtpTransport. Than override the `executeCommand` method change the command's that I need changed and pass that thru the parent `executeCommand`. Very ugly imo, but it works so far. For now I only have to figure out a way to collect the available features after the EHLO command.
+
+---------------------------------------------------------------------------
+
+by SwenVanZanten at 2022-01-04T08:57:48Z
+
+So far the best solution to my problem is the following:
+
+```php
+class MyEsmtpTransport extends EsmtpTransport
+{
+    public function executeCommand(string $command, array $codes): string
+    {
+        // change the commands you want to change here
+
+        $response = parent::executeCommand($command, $codes);
+
+        // check the response for capabilities here
+
+        return $response;
+    }
+}
+```
+
+Of course this is far from ideal but the alternative would be to copy a whole lot of the original component. A proper way of supporting DSN would be highly appreciated if I might say so 😆
+
+---------------------------------------------------------------------------
+
+by ampaze at 2022-01-04T09:35:01Z
+
+Good to know I am not the only one using ESMPT for something more than the most basic stuff.
+
+@stof @fabpot can you comment on this issue?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-01-04T19:43:01Z
+
+This change is certainly no bugfix, so it won't be merged into 4.4. We can consider it for 6.1 as a feature, but we should have tests covering the change then.
+
+---------------------------------------------------------------------------
+
+by ampaze at 2022-01-05T09:35:01Z
+
+> This change is certainly no bugfix, so it won't be merged into 4.4. We can consider it for 6.1 as a feature, but we should have tests covering the change then.
+
+This is not a feature (or a bugfix), it just makes it possible to replace Swiftmailer, which was deprecated without having the functionality available in the new Mailer component.
+
+Also, I am not sure what exactly do you want to test? The only changes are the visibility / accessability of properties or methods.
+
+For me personally, it is not important for this to be merged in 4.4, we are using 5.4 / 6 anyway.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-01-05T15:10:02Z
+
+> Also, I am not sure what exactly do you want to test? The only changes are the visibility / accessability of properties or methods.
+
+By changing the visibility, you create an extension point. Downstream projects may call and/or override the methods you have made protected. The consequence is we cannot delete, rename or change the behavior of those methods in later releases without breaking code that relies on them.
+
+You probably have a certain use-case in mind for this change. You want to extend a class and either call or override a currently private method. The task is simply to write a test that would break when your own code would break as well.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-07T18:24:54Z
+
+I'm still not convinced extending EsmtpTransport is the right way to provide such extension points (inheritance-based extension points are basically impossible to refactor later as it is very hard to implement BC layer for them and such BC layers often end up being partial only due to that). Even Swiftmailer (which was abusing inheritance a lot) was not relying on inheritance to expose those features.
+To me, the proper solution would instead be to design proper composition-based extension points. But as I have no experience with ESMTP, I'm not sure how they should look like.
+
+---------------------------------------------------------------------------
+
+by SwenVanZanten at 2022-01-07T21:46:52Z
+
+> I'm still not convinced extending EsmtpTransport is the right way to provide such extension points (inheritance-based extension points are basically impossible to refactor later as it is very hard to implement BC layer for them and such BC layers often end up being partial only due to that). Even Swiftmailer (which was abusing inheritance a lot) was not relying on inheritance to expose those features.
+>
+> To me, the proper solution would instead be to design proper composition-based extension points. But as I have no experience with ESMTP, I'm not sure how they should look like.
+
+I have to agree with this, I don't think this is the correct approach. I liked the interface solution from swift mailer a lot more. The inheritance approach isn't really future proof imho
+
+---------------------------------------------------------------------------
+
+by ampaze at 2022-01-10T08:24:20Z
+
+I think it is a bit strange, that in the current code, the one method that **EsmtpTransport** needs to override from **SmtpTransport** is `protected`, and the others are `private`. Concidence?
+
+https://github.com/symfony/symfony/blob/6b9fafb2c0ef84bfa7d17b3b37737c5da710bd0e/src/Symfony/Component/Mailer/Transport/Smtp/SmtpTransport.php#L228-L241
+
+Why is the `doHeloCommand` extension point ok, and the others are not?
+
+----
+
+Two other suggestions:
+
+```php
+private function doMailFromCommand(string $address): void
+{
+    $params = $this->getMailFromParameters($this->capabilities, $address);
+    $this->executeCommand(trim(sprintf("MAIL FROM:<%s>\r\n %s", $address, $params)), [250]);
+}
+```
+
+But this would require ```$this->capabilities``` and ```getMailFromParameters``` to be available in SmtpTransport, which is not really correct.
+
+So I prefer this one:
+
+```php
+protected function getMailFromCommand(string $address): string
+{
+    return sprintf("MAIL FROM:<%s>", $address);
+}
+
+private function doMailFromCommand(string $address): void
+{
+    $this->executeCommand($this->getMailFromCommand($address). "\r\n", [250]);
+}
+```
+
+---------------------------------------------------------------------------
+
+by ampaze at 2022-01-25T11:03:21Z
+
+Sorry to keep bothering you with this, but it has been another two weeks with no progress.
+
+Can someone in charge please take another look at the problem and the proposed solution? If it is not viable because of maintenance concerns, what is an alternative? This feature is needed.
+
+---------------------------------------------------------------------------
+
+by ampaze at 2022-03-31T07:19:42Z
+
+@nicolas-grekas
+
+Thanks.

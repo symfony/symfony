@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-01T07:22:22Z
+
+I don't think so because some static code analysis is needed to detect those cases.
+
+New occurrences will probably happen because of old habits but that's ok I guess. We can just try to do our best in reviews and clean them once in a while.

@@ -98,7 +98,10 @@ class TwigExtension extends Extension
         $container->getDefinition('twig.template_iterator')->replaceArgument(1, $config['paths']);
 
         $container->getDefinition('twig.template_iterator')->replaceArgument(3, $config['file_name_pattern']);
-        $container->getDefinition('twig.command.lint')->replaceArgument(1, $config['file_name_pattern'] ?: ['*.twig']);
+
+        if ($container->hasDefinition('twig.command.lint')) {
+            $container->getDefinition('twig.command.lint')->replaceArgument(1, $config['file_name_pattern'] ?: ['*.twig']);
+        }
 
         foreach ($this->getBundleTemplatePaths($container, $config) as $name => $paths) {
             $namespace = $this->normalizeBundleName($name);

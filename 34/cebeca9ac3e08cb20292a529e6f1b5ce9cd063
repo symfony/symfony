@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-28T20:44:46Z
+
+If I'm not wrong, it's already possible to write constraints with required args, but then they can only be loaded via annotations, and not via yaml/xml, isn't it?
+
+Relying on `getNumberOfRequiredParameters` feels fragile. I think this won't work as nicely as we'd like in practice. Can't we think of another check to replace the call? Eg add `AbstractConstraint` and use an `instanceof` check against it?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-03-29T03:42:33Z
+
+> If I'm not wrong, it's already possible to write constraints with required args, but then they can only be loaded via annotations, and not via yaml/xml, isn't it?
+
+yes
+
+> Relying on `getNumberOfRequiredParameters` feels fragile. I think this won't work as nicely as we'd like in practice. Can't we think of another check to replace the call? Eg add `AbstractConstraint` and use an `instanceof` check against it?
+
+And what that `AbstractConstraint` would give us, except an empty marker? `Constraint` is already abstract :) From my side I don't see what wouldn't work because it's now just determining if the constructor requires something that are mandatory and properly instantiating it instead of making the old assumption that we are instantiating it with single argument.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-29T07:10:15Z
+
+> And what that AbstractConstraint would give us, except an empty marker?
+
+Exactly that: a marker to express that some constraints opt-in to get their arguments by a named constructor.
+
+> From my side I don't see what wouldn't work because it's now just determining if the constructor requires something that are mandatory and properly instantiating it instead of making the old assumption that we are instantiating it with single argument.
+
+The next logical step would be to allow constructing constraints using named arguments, even if no arguments are required.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-03-29T07:14:24Z
+
+> Exactly that: a marker to express that some constraints opt-in to get their arguments by a named constructor.
+
+Maybe then an attribute could be used for this? because if I'd extend an existing constraint it wouldn't work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-29T07:18:08Z
+
+That'd work for me also!
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-03-29T07:26:49Z
+
+> That'd work for me also!
+
+Thank you, updated.

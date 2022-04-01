@@ -43,7 +43,7 @@ install:
     - echo extension=php_curl.dll >> php.ini-max
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
-    - appveyor DownloadFile https://github.com/composer/composer/releases/download/2.2.10/composer.phar
+    - appveyor DownloadFile https://getcomposer.org/download/latest-2.2.x/composer.phar
     - mkdir %APPDATA%\Composer && copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
     - git config --global user.email ""
     - git config --global user.name "Symfony"

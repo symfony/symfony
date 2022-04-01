@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -102,6 +103,7 @@ class Worker
         }
 
         $this->dispatchEvent(new WorkerStoppedEvent($this));
+        $this->resetReceiverConnections();
     }
 
     private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName): void
@@ -153,6 +155,15 @@ class Worker
     public function stop(): void
     {
         $this->shouldStop = true;
+    }
+
+    private function resetReceiverConnections(): void
+    {
+        foreach ($this->receivers as $transportName => $receiver) {
+            if ($receiver instanceof ResetInterface) {
+                $receiver->reset();
+            }
+        }
     }
 
     private function dispatchEvent($event)

@@ -199,24 +199,34 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         foreach ($config['access_control'] as $access) {
             if (isset($access['request_matcher'])) {
-                if ($access['path'] || $access['host'] || $access['port'] || $access['ips'] || $access['methods']) {
+                if ($access['path'] || $access['host'] || $access['port'] || $access['ips'] || $access['methods'] || $access['attributes'] || $access['route']) {
                     throw new InvalidConfigurationException('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
                 }
                 $matcher = new Reference($access['request_matcher']);
             } else {
+                $attributes = $access['attributes'];
+
+                if ($access['route']) {
+                    if (\array_key_exists('_route', $attributes)) {
+                        throw new InvalidConfigurationException('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
+                    }
+                    $attributes['_route'] = $access['route'];
+                }
+
                 $matcher = $this->createRequestMatcher(
                     $container,
                     $access['path'],
                     $access['host'],
                     $access['port'],
                     $access['methods'],
-                    $access['ips']
+                    $access['ips'],
+                    $attributes
                 );
             }
 
-            $attributes = $access['roles'];
+            $roles = $access['roles'];
             if ($access['allow_if']) {
-                $attributes[] = $this->createExpression($container, $access['allow_if']);
+                $roles[] = $this->createExpression($container, $access['allow_if']);
             }
 
             $emptyAccess = 0 === \count(array_filter($access));
@@ -226,7 +236,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
 
             $container->getDefinition('security.access_map')
-                      ->addMethodCall('add', [$matcher, $attributes, $access['requires_channel']]);
+                      ->addMethodCall('add', [$matcher, $roles, $access['requires_channel']]);
         }
 
         // allow cache warm-up for expressions

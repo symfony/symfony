@@ -323,6 +323,105 @@ class SecurityExtensionTest extends TestCase
         yield 'Invalid configuration with port' => [['port' => 80]];
         yield 'Invalid configuration with methods' => [['methods' => ['POST']]];
         yield 'Invalid configuration with ips' => [['ips' => ['0.0.0.0']]];
+        yield 'Invalid configuration with attributes' => [['attributes' => ['_route' => 'foo_route']]];
+        yield 'Invalid configuration with route' => [['route' => 'foo_route']];
+    }
+
+    public function testRegisterAccessControlWithSpecifiedAttributes()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['attributes' => ['_route' => 'foo_route']],
+            ],
+        ]);
+
+        $container->compile();
+
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $requestMatcherId = (string) $args[0];
+
+        $requestMatcherDefinition = $container->getDefinition($requestMatcherId);
+        $requestMatcherConstructorArguments = $requestMatcherDefinition->getArguments();
+        $this->assertArrayHasKey(4, $requestMatcherConstructorArguments);
+        $attributes = $requestMatcherConstructorArguments[4];
+        $this->assertArrayHasKey('_route', $attributes);
+        $this->assertSame('foo_route', $attributes['_route']);
+    }
+
+    public function testRegisterAccessControlWithSpecifiedRoute()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['route' => 'foo_route'],
+            ],
+        ]);
+
+        $container->compile();
+
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $requestMatcherId = (string) $args[0];
+
+        $requestMatcherDefinition = $container->getDefinition($requestMatcherId);
+        $requestMatcherConstructorArguments = $requestMatcherDefinition->getArguments();
+        $this->assertArrayHasKey(4, $requestMatcherConstructorArguments);
+        $attributes = $requestMatcherConstructorArguments[4];
+        $this->assertArrayHasKey('_route', $attributes);
+        $this->assertSame('foo_route', $attributes['_route']);
+    }
+
+    public function testRegisterAccessControlWithSpecifiedAttributesThrowsException()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['route' => 'anything', 'attributes' => ['_route' => 'foo_route']],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
+
+        $container->compile();
     }
 
     public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()

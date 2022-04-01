@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `start()` and `stop()` methods public on `SmtpTransport`
+ * Improve extensibility of `EsmtpTransport`
 
 6.0
 ---

@@ -172,8 +172,6 @@ class SmtpTransport extends AbstractTransport
      * @param int[] $codes
      *
      * @throws TransportException when an invalid response if received
-     *
-     * @internal
      */
     public function executeCommand(string $command, array $codes): string
     {
@@ -225,6 +223,10 @@ class SmtpTransport extends AbstractTransport
         }
     }
 
+    /**
+     * @internal since version 6.1, to be made private in 7.0
+     * @final since version 6.1, to be made private in 7.0
+     */
     protected function doHeloCommand(): void
     {
         $this->executeCommand(sprintf("HELO %s\r\n", $this->domain), [250]);

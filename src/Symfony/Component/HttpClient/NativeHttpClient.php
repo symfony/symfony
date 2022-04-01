@@ -430,9 +430,12 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 if ('POST' === $options['method'] || 303 === $info['http_code']) {
                     $info['http_method'] = $options['method'] = 'HEAD' === $options['method'] ? 'HEAD' : 'GET';
                     $options['content'] = '';
-                    $options['header'] = array_filter($options['header'], static function ($h) {
+                    $filterContentHeaders = static function ($h) {
                         return 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:');
-                    });
+                    };
+                    $options['header'] = array_filter($options['header'], $filterContentHeaders);
+                    $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
+                    $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
 
                     stream_context_set_option($context, ['http' => $options]);
                 }

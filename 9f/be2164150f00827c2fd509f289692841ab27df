@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by julienfalque at 2021-10-12T12:07:57Z
+
+I think this PR is ready but I'd like to have more feedback on the open discussions before addressing them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-25T15:40:56Z
+
+I think I agree with this comment:
+https://github.com/symfony/symfony/pull/43239#discussion_r720685015
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-25T15:42:21Z
+
+Could you please send a PR that only fixes the infinite loop before this one is finished?
+Tests on appveyor are failing since a month and it'd be great making them green asap.
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2021-10-25T21:33:43Z
+
+See #43704. Test failures seem unrelated (this time). Sorry for the trouble :(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-26T07:59:21Z
+
+Thanks, rebase unlocked for this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-12T09:31:49Z
+
+(don't forget to remove the draft status when you're ready)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T11:50:37Z
+
+What's the status of this PR? Is it ready to be merged?
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2022-03-26T11:56:44Z
+
+As I remember the test failure looked unrelated to changes here so yes, it is ready to be merged. I'm going to rebase it to make sure all tests pass.

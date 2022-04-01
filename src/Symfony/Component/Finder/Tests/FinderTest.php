@@ -433,18 +433,60 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 ->ignoreVCSIgnored(true)
         );
 
-        copy(__DIR__.'/Fixtures/gitignore/search_root/b.txt', __DIR__.'/Fixtures/gitignore/search_root/a.txt');
-        copy(__DIR__.'/Fixtures/gitignore/search_root/b.txt', __DIR__.'/Fixtures/gitignore/search_root/c.txt');
-        copy(__DIR__.'/Fixtures/gitignore/search_root/dir/a.txt', __DIR__.'/Fixtures/gitignore/search_root/dir/b.txt');
-        copy(__DIR__.'/Fixtures/gitignore/search_root/dir/a.txt', __DIR__.'/Fixtures/gitignore/search_root/dir/c.txt');
+        $this->assertIterator(self::toAbsolute([
+            'gitignore/search_root/b.txt',
+            'gitignore/search_root/dir',
+            'gitignore/search_root/dir/a.txt',
+        ]), $finder->in(self::toAbsolute('gitignore/search_root'))->getIterator());
+    }
 
-        $this->assertIterator($this->toAbsoluteFixtures([
+    public function testIgnoreVCSIgnoredUpToFirstGitRepositoryRoot()
+    {
+        $finder = $this->buildFinder();
+        $this->assertSame(
+            $finder,
+            $finder
+                ->ignoreVCS(true)
+                ->ignoreDotFiles(true)
+                ->ignoreVCSIgnored(true)
+        );
+
+        $this->assertIterator(self::toAbsolute([
+            'gitignore/git_root/search_root/b.txt',
+            'gitignore/git_root/search_root/c.txt',
+            'gitignore/git_root/search_root/dir',
+            'gitignore/git_root/search_root/dir/a.txt',
+            'gitignore/git_root/search_root/dir/c.txt',
+        ]), $finder->in(self::toAbsolute('gitignore/git_root/search_root'))->getIterator());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testIgnoreVCSIgnoredWithOpenBasedir()
+    {
+        if (ini_get('open_basedir')) {
+            $this->markTestSkipped('Cannot test when open_basedir is set');
+        }
+
+        $finder = $this->buildFinder();
+        $this->assertSame(
+            $finder,
+            $finder
+                ->ignoreVCS(true)
+                ->ignoreDotFiles(true)
+                ->ignoreVCSIgnored(true)
+        );
+
+        $this->iniSet('open_basedir', \dirname(__DIR__, 5).\PATH_SEPARATOR.self::toAbsolute('gitignore/search_root'));
+
+        $this->assertIterator(self::toAbsolute([
             'gitignore/search_root/b.txt',
             'gitignore/search_root/c.txt',
             'gitignore/search_root/dir',
             'gitignore/search_root/dir/a.txt',
             'gitignore/search_root/dir/c.txt',
-        ]), $finder->in(__DIR__.'/Fixtures/gitignore/search_root')->getIterator());
+        ]), $finder->in(self::toAbsolute('gitignore/search_root'))->getIterator());
     }
 
     public function testIgnoreVCSCanBeDisabledAfterFirstIteration()
@@ -1462,6 +1504,15 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     protected function buildFinder()
     {
-        return Finder::create();
+        return Finder::create()->exclude('gitignore');
+    }
+
+    protected function iniSet(string $varName, string $newValue): void
+    {
+        if ('open_basedir' === $varName && $deprecationsFile = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
+            $newValue .= \PATH_SEPARATOR.$deprecationsFile;
+        }
+
+        parent::iniSet('open_basedir', $newValue);
     }
 }

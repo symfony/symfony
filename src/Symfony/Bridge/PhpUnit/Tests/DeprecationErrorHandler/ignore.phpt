@@ -4,6 +4,9 @@ Test DeprecationErrorHandler with an ignoreFile
 <?php
 $filename = tempnam(sys_get_temp_dir(), 'sf-');
 $ignorePatterns = [
+  '# A comment line and, below, an empty comment line and an empty line that should be interpreted as a comment.',
+  '#',
+  '',
   '/^ignored .* deprecation/',
 ];
 file_put_contents($filename, implode("\n", $ignorePatterns));

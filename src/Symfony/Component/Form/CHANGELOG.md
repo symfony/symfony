@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add a `prototype_options` option to `CollectionType`
+
 6.0
 ---
 

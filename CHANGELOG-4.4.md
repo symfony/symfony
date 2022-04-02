@@ -7,6 +7,31 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.40 (2022-04-02)
+
+ * bug #45910 [Messenger] reset connection on worker shutdown (SanderHagen)
+ * bug #45909 [Form][TwigBundle] reset Twig form theme resources between requests (xabbuh)
+ * bug #45906 [HttpClient] on redirections don't send content related request headers (xabbuh)
+ * bug #45714 [Messenger] Fix cannot select FOR UPDATE from view on Oracle (rjd22)
+ * bug #45888 [Messenger] Add mysql indexes back and work around deadlocks using soft-delete (nicolas-grekas)
+ * bug #45891 [HttpClient] Fix exporting objects with readonly properties (nicolas-grekas)
+ * bug #45875 [ExpressionLanguage] Fix matches when the regexp is not valid (fabpot)
+ * bug #45870 [Validator] Fix File constraint invalid max size exception message (fancyweb)
+ * bug #45851 [Console] Fix exit status on uncaught exception with negative code (acoulton)
+ * bug #45838 [Serializer] Fix denormalizing union types (T-bond)
+ * bug #45816 [Mailer] Preserve case of headers (nicolas-grekas)
+ * bug #45814 [HttpClient] Let curl handle Content-Length headers (nicolas-grekas)
+ * bug #45813 [HttpClient] Move Content-Type after Content-Length (nicolas-grekas)
+ * bug #45737 [Lock] SemaphoreStore catching exception from sem_get (Triplkrypl)
+ * bug #45690 [Mailer] Use recipients in sendmail transport (HypeMC)
+ * bug #45720 [PropertyInfo] strip only leading `\` when unknown docType (EmilMassey)
+ * bug #44915 [Console] Fix compact table style to avoid outputting a leading space (Seldaek)
+ * bug #45676 [Process] Don't return executable directories in PhpExecutableFinder (fancyweb)
+ * bug #45702 [Form] Fix the usage of the Valid constraints in array-based forms (stof)
+ * bug #45677 [DependencyInjection] fix `ServiceSubscriberTrait` bug where parent has `__call()` (kbond)
+ * bug #45678 [HttpClient] Fix reading proxy settings from dotenv when curl is used (nicolas-grekas)
+ * bug #45671 [FrameworkBundle] Ensure container is reset between tests (nicolas-grekas)
+
 * 4.4.39 (2022-03-05)
 
  * bug #45631 [HttpFoundation] Fix PHP 8.1 deprecation in `Response::isNotModified` (HypeMC)

@@ -136,6 +136,18 @@ class ParserTest extends TestCase
                 new Node\BinaryNode('matches', new Node\ConstantNode('foo'), new Node\ConstantNode('/foo/')),
                 '"foo" matches "/foo/"',
             ],
+            [
+                new Node\BinaryNode('starts with', new Node\ConstantNode('foo'), new Node\ConstantNode('f')),
+                '"foo" starts with "f"',
+            ],
+            [
+                new Node\BinaryNode('ends with', new Node\ConstantNode('foo'), new Node\ConstantNode('f')),
+                '"foo" ends with "f"',
+            ],
+            [
+                new Node\BinaryNode('contains', new Node\ConstantNode('foo'), new Node\ConstantNode('f')),
+                '"foo" contains "f"',
+            ],
 
             // chained calls
             [

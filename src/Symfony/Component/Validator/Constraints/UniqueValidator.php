@@ -43,11 +43,8 @@ class UniqueValidator extends ConstraintValidator
         $collectionElements = [];
         $normalizer = $this->getNormalizer($constraint);
         foreach ($value as $element) {
-            if (!empty($fields)) {
-                $element = $this->reduceElementKeys($fields, $element);
-                if (empty($element)) {
-                    continue;
-                }
+            if ($fields && !$element = $this->reduceElementKeys($fields, $element)) {
+                continue;
             }
 
             $element = $normalizer($element);

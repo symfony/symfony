@@ -224,7 +224,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
     public function testCollectionFieldsAreOptional()
     {
-        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique('id'));
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: 'id'));
 
         $this->assertNoViolation();
     }
@@ -237,15 +237,15 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf('Expected argument of type "string", "%s" given', $type));
 
-        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique([$field]));
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: [$field]));
     }
 
-    public function getInvalidFieldNames(): \Generator
+    public function getInvalidFieldNames(): array
     {
         return [
-            yield ['stdClass', new \stdClass()],
-            yield ['int', 2],
-            yield ['bool', false],
+            ['stdClass', new \stdClass()],
+            ['int', 2],
+            ['bool', false],
         ];
     }
 
@@ -254,9 +254,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCollectionValues(array $value, array $fields)
     {
-        $this->validator->validate($value, new Unique($fields, [
+        $this->validator->validate($value, new Unique([
             'message' => 'myMessage',
-        ]));
+        ], fields: $fields));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
@@ -264,17 +264,17 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidCollectionValues(): \Generator
+    public function getInvalidCollectionValues(): array
     {
         return [
-            yield 'unique string' => [[['lang' => 'eng', 'translation' => 'hi'], ['lang' => 'eng', 'translation' => 'hello'],
+            'unique string' => [[['lang' => 'eng', 'translation' => 'hi'], ['lang' => 'eng', 'translation' => 'hello'],
             ], ['lang']],
-            yield 'unique floats' => [[
+            'unique floats' => [[
                 ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
                 ['latitude' => 52.520008, 'longitude' => 13.404954],
                 ['latitude' => 51.509865, 'longitude' => -0.118092],
             ], ['latitude', 'longitude']],
-            yield 'unique int' => [[
+            'unique int' => [[
                 ['id' => 1, 'email' => 'bar@email.com'], ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id']],
         ];

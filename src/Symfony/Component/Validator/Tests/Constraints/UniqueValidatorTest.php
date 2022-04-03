@@ -267,7 +267,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public function getInvalidCollectionValues(): array
     {
         return [
-            'unique string' => [[['lang' => 'eng', 'translation' => 'hi'], ['lang' => 'eng', 'translation' => 'hello'],
+            'unique string' => [[
+                ['lang' => 'eng', 'translation' => 'hi'],
+                ['lang' => 'eng', 'translation' => 'hello'],
             ], ['lang']],
             'unique floats' => [[
                 ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
@@ -275,7 +277,8 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['latitude' => 51.509865, 'longitude' => -0.118092],
             ], ['latitude', 'longitude']],
             'unique int' => [[
-                ['id' => 1, 'email' => 'bar@email.com'], ['id' => 1, 'email' => 'foo@email.com'],
+                ['id' => 1, 'email' => 'bar@email.com'],
+                ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id']],
         ];
     }

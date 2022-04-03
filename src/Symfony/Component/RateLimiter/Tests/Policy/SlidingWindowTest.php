@@ -34,6 +34,9 @@ class SlidingWindowTest extends TestCase
 
         $new = SlidingWindow::createFromPreviousWindow($cachedWindow, 15);
         $this->assertSame(2 * 15, $new->getExpirationTime());
+
+        usleep(10.1);
+        $this->assertIsInt($new->getExpirationTime());
     }
 
     public function testInvalidInterval()

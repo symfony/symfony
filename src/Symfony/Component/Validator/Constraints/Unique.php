@@ -52,29 +52,14 @@ class Unique extends Constraint
         mixed $payload = null,
         array|string $fields = null,
     ) {
-        if (\is_array($fields) && \is_string(key($fields))) {
-            $options = array_merge($fields, $options);
-        } elseif (null !== $fields) {
-            $options['fields'] = $fields;
-        }
-
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->fields = $fields ?? $this->fields;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
-    }
-
-    public function getOptions(): array
-    {
-        return ['fields'];
-    }
-
-    public function getDefaultOption(): string
-    {
-        return 'fields';
     }
 }

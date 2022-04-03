@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-02T16:15:04Z
+
+Hey!
+
+I think @HeahDude has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2022-03-14T09:18:10Z
+
+Hello @xabbuh, do you think there is any chance that this gets merged? I would like to close it if there is no chance. Thanks for any answer.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-03-18T10:28:01Z
+
+@michaelKaefer This sounds reasonable to me.
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2022-03-18T14:36:26Z
+
+@xabbuh Do you mean the PR sounds reasonable or closing the PR sounds reasonable?
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2022-03-28T20:45:12Z
+
+@xabbuh @yceruto Thank you, I added the allowed type definition and created  a PR for the docs: https://github.com/symfony/symfony-docs/pull/16664.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-29T07:16:13Z
+
+Can you please add a test case, and also a line in the changelog of the component?
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2022-04-02T18:31:56Z
+
+@nicolas-grekas Sorry, I forgot that, I added both now.

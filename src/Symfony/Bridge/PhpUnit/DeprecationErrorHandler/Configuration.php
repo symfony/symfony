@@ -310,7 +310,7 @@ class Configuration
         }
 
         $normalizedConfiguration += [
-            'max' => [],
+            'max' => ['total' => 0],
             'disabled' => false,
             'verbose' => true,
             'quiet' => [],
@@ -336,7 +336,7 @@ class Configuration
         }
 
         return new self(
-            $normalizedConfiguration['max'] ?? [],
+            $normalizedConfiguration['max'],
             '',
             $verboseOutput,
             $normalizedConfiguration['ignoreFile'],

@@ -125,7 +125,7 @@ class Configuration
             });
             try {
                 foreach (file($ignoreFile) as $line => $pattern) {
-                    if ('#' !== trim($line)[0] ?? '#') {
+                    if ('#' !== (trim($pattern)[0] ?? '#')) {
                         preg_match($pattern, '');
                         $this->ignoreDeprecationPatterns[] = $pattern;
                     }

@@ -118,7 +118,7 @@ $PHPUNIT_REMOVE_RETURN_TYPEHINT = filter_var($getEnvVar('SYMFONY_PHPUNIT_REMOVE_
 $COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json';
 
 $root = __DIR__;
-while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/DeprecationErrorHandler.php')) {
+while (!file_exists($root.'/'.$COMPOSER_JSON) || !file_exists($root.'/DeprecationErrorHandler.php')) {
     if ($root === dirname($root)) {
         break;
     }

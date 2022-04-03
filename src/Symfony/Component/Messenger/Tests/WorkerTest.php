@@ -40,6 +40,7 @@ use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @group time-sensitive
@@ -96,6 +97,19 @@ class WorkerTest extends TestCase
 
         $this->assertSame(1, $receiver->getRejectCount());
         $this->assertSame(0, $receiver->getAcknowledgeCount());
+    }
+
+    public function testWorkerResetsConnectionIfReceiverIsResettable()
+    {
+        $resettableReceiver = new ResettableDummyReceiver([]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $dispatcher = new EventDispatcher();
+
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker->stop();
+        $worker->run();
+        $this->assertTrue($resettableReceiver->hasBeenReset());
     }
 
     public function testWorkerDoesNotSendNullMessagesToTheBus()
@@ -536,5 +550,20 @@ class DummyBatchHandler implements BatchHandlerInterface
         foreach ($jobs as [$job, $ack]) {
             $ack->ack($job);
         }
+    }
+}
+
+class ResettableDummyReceiver extends DummyReceiver implements ResetInterface
+{
+    private $hasBeenReset = false;
+
+    public function reset()
+    {
+        $this->hasBeenReset = true;
+    }
+
+    public function hasBeenReset(): bool
+    {
+        return $this->hasBeenReset;
     }
 }

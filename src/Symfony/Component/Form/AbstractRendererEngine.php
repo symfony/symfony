@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * Default implementation of {@link FormRendererEngineInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractRendererEngine implements FormRendererEngineInterface
+abstract class AbstractRendererEngine implements FormRendererEngineInterface, ResetInterface
 {
     /**
      * The variable in {@link FormView} used as cache key.
@@ -192,5 +194,13 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
         $this->resourceHierarchyLevels[$cacheKey][$blockName] = false;
 
         return false;
+    }
+
+    public function reset(): void
+    {
+        $this->themes = [];
+        $this->useDefaultThemes = [];
+        $this->resources = [];
+        $this->resourceHierarchyLevels = [];
     }
 }

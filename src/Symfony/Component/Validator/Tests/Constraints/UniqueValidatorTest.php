@@ -154,15 +154,15 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getCallback()
+    public function getCallback(): array
     {
         return [
-            yield 'static function' => [static function (\stdClass $object) {
+            'static function' => [static function (\stdClass $object) {
                 return [$object->name, $object->email];
             }],
-            yield 'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\CallableClass::execute'],
-            yield 'callable with static notation' => [[CallableClass::class, 'execute']],
-            yield 'callable with object' => [[new CallableClass(), 'execute']],
+            'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\CallableClass::execute'],
+            'callable with static notation' => [[CallableClass::class, 'execute']],
+            'callable with object' => [[new CallableClass(), 'execute']],
         ];
     }
 

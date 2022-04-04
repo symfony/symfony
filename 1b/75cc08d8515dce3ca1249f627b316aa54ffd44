@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-20T14:51:23Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mytuny at 2022-03-20T14:57:00Z
+
+I start working on this PR before the 6.1 release, therefore, this work is based on branch 5.4 instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-20T15:01:39Z
+
+Right, please rebase to target ~5.4~6.1 as that's the branch where new features are merged.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-20T16:13:51Z
+
+@nicolas-grekas wanted to say 6.1, not 5.4, for the branch :)
+
+---------------------------------------------------------------------------
+
+by mytuny at 2022-03-20T21:56:27Z
+
+I just rebased to 6.1, however, this seem to pollute the PR commits history :/ + had to resolve few conflits.
+Don't you think that is better to re-open a clean PR based on 6.1 branch ?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-03-21T11:47:41Z
+
+@mytuny this polluted it, because you were still targetting the 5.4 branch in the PR. I edited the PR to change the target branch to 6.1, which fixed it.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-03-21T11:49:43Z
+
+also, it looks like you merged your rebased branch with the upstream branch instead of forcing the push, thus duplicating the commits in the history. See https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request
+
+---------------------------------------------------------------------------
+
+by mytuny at 2022-03-21T11:49:51Z
+
+> @mytuny this polluted it, because you were still targetting the 5.4 branch in the PR. I edited the PR to change the target branch to 6.1, which fixed it.
+
+Brilliant! Many thanks 👏
+
+---------------------------------------------------------------------------
+
+by mytuny at 2022-03-21T14:40:40Z
+
+> also, it looks like you merged your rebased branch with the upstream branch instead of forcing the push, thus duplicating the commits in the history. See https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request
+
+Although I followed exactly the steps mentioned there, a conflit-resolving commits that I've added during the rebase of 6.1 has introduced that duplication. The conflits occured with files that have been changed both in 6.1 and in my PR as well comparing to 5.4, namely the CHANGELOG file and the ConstantNode.php file. That's why I asked if it is better to re-submit a PR based on 6.1 right from the start 🤔
+
+---------------------------------------------------------------------------
+
+by stof at 2022-03-21T14:46:04Z
+
+@mytuny the process I linked to is using a force push, precisely to **avoid** doing a merge of the remote branch after the rebase.
+You should not have the commit `Merge remote-tracking branch 'origin/feature_expressionlanguage_nulls` at all in your branch.
+
+---------------------------------------------------------------------------
+
+by mytuny at 2022-03-21T14:47:51Z
+
+>
+
+Yess, exactly :( any suggestions ?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-03-21T14:55:10Z
+
+@mytuny use `git reset --hard bffdcd22cabac5e105697b44e8e34c080dbe5f39` to reset your branch to the commit before the bad merge, and then actually follow the end of the process as documented
+
+---------------------------------------------------------------------------
+
+by mytuny at 2022-03-21T15:30:03Z
+
+@stof All right! the hard reset does the trick.
+This time I forced the push and we seem to have a cleaner commits history by now...
+Thank you :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-04T13:18:26Z
+
+Note that the nullsafe operator only guards against `null`. It does not guard against undefined properties/keys.

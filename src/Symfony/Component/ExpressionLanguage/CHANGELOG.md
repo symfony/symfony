@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for null-safe syntax when parsing object's methods and properties
+ * Add new operators: `contains`, `starts with` and `ends with`
  * Support lexing numbers with the numeric literal separator `_`
  * Support lexing decimals with no leading zero
 

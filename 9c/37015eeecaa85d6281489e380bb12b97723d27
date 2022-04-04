@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-04-04T18:13:25Z
+
+The attribute is used by child class `Symfony\Bundle\TwigBundle\Command\LintCommand`. Psalm spotted the issue.
+
+Is there any alternative? Adding a protected `getNamePattern`? Auto-append the `Finder` instance returned by `findFiles`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-04T18:25:02Z
+
+Understood, thanks. Fixed.

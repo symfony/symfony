@@ -39,16 +39,13 @@ use Twig\Source;
 #[AsCommand(name: 'lint:twig', description: 'Lint a Twig template and outputs encountered errors')]
 class LintCommand extends Command
 {
-    protected string|array $namePatterns;
-    private Environment $twig;
     private string $format;
 
-    public function __construct(Environment $twig, string|array $namePatterns = ['*.twig'])
-    {
+    public function __construct(
+        private Environment $twig,
+        private array $namePatterns = ['*.twig'],
+    ) {
         parent::__construct();
-
-        $this->twig = $twig;
-        $this->namePatterns = $namePatterns;
     }
 
     protected function configure()

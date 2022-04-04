@@ -75,7 +75,7 @@ EOF
         });
 
         if ('json' == $input->getOption('format')) {
-            $io->writeln(json_encode($this->getVariablesasArray($availableFiles), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+            $io->writeln(json_encode($this->getVariablesasArray($availableFiles), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR));
 
             return 0;
         }

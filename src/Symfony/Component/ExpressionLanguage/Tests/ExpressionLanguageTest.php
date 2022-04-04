@@ -237,12 +237,41 @@ class ExpressionLanguageTest extends TestCase
         $registerCallback($el);
     }
 
-    public function testCallBadCallable()
+    /**
+     * @dataProvider provideNullSafe
+     */
+    public function testNullSafeEvaluate($expression, $foo)
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
-        $el = new ExpressionLanguage();
-        $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertNull($expressionLanguage->evaluate($expression, ['foo' => $foo]));
+    }
+
+    /**
+     * @dataProvider provideNullSafe
+     */
+    public function testNullsafeCompile($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertNull(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))));
+    }
+
+    public function provideNullsafe()
+    {
+        $foo = new class() extends \stdClass {
+            public function bar()
+            {
+                return null;
+            }
+        };
+
+        yield ['foo?.bar', null];
+        yield ['foo?.bar()', null];
+        yield ['foo.bar?.baz', (object) ['bar' => null]];
+        yield ['foo.bar?.baz()', (object) ['bar' => null]];
+        yield ['foo["bar"]?.baz', ['bar' => null]];
+        yield ['foo["bar"]?.baz()', ['bar' => null]];
+        yield ['foo.bar()?.baz', $foo];
+        yield ['foo.bar()?.baz()', $foo];
     }
 
     /**

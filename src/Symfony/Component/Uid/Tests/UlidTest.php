@@ -52,6 +52,12 @@ class UlidTest extends TestCase
         $this->assertTrue($ulid->equals(Ulid::fromString(hex2bin('7fffffffffffffffffffffffffffffff'))));
     }
 
+    public function testHexString()
+    {
+        $ulid = Ulid::fromString('1BVXue8CnY8ogucrHX3TeF');
+        $this->assertSame('0x0177058f4dacd0b2a990a49af02bc008', $ulid->toHexString());
+    }
+
     public function testFromUuid()
     {
         $uuid = new UuidV4();

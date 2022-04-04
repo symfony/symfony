@@ -116,6 +116,13 @@ class UuidTest extends TestCase
         $this->assertSame(self::A_UUID_V4, (string) $uuid);
     }
 
+    public function testHexString()
+    {
+        $uuid = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame('0xd6b3345b29054048a83cb5988e765d98', $uuid->toHexString());
+    }
+
     public function testFromUlid()
     {
         $ulid = new Ulid();

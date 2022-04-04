@@ -128,6 +128,14 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
+     * Returns the identifier as a prefixed hexadecimal case insensitive string.
+     */
+    public function toHex(): string
+    {
+        return '0x'.bin2hex($this->toBinary());
+    }
+
+    /**
      * Returns whether the argument is an AbstractUid and contains the same value as the current instance.
      */
     public function equals(mixed $other): bool

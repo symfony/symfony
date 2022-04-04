@@ -38,6 +38,7 @@ final class InspectUuidCommandTest extends TestCase
   toRfc4122 (canonical)   00000000-0000-0000-0000-000000000000  
   toBase58                1111111111111111111111                
   toBase32                00000000000000000000000000            
+  toHex                   0x00000000000000000000000000000000    
  ----------------------- -------------------------------------- 
 
 
@@ -58,6 +59,7 @@ EOF
   toRfc4122 (canonical)   461cc9b9-2397-0dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6dw4oVPm5uT17um                
   toBase32                263K4VJ8WQ1PX93T9KNX667XZC            
+  toHex                   0x461cc9b923970dba91e933af4c63f7ec    
  ----------------------- -------------------------------------- 
 
 
@@ -73,6 +75,7 @@ EOF
   toRfc4122 (canonical)   461cc9b9-2397-2dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6fjLfNnvSAHMV7Z                
   toBase32                263K4VJ8WQ5PX93T9KNX667XZC            
+  toHex                   0x461cc9b923972dba91e933af4c63f7ec    
  ----------------------- -------------------------------------- 
 
 
@@ -88,6 +91,7 @@ EOF
   toRfc4122 (canonical)   461cc9b9-2397-7dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6kE2K6HpooNEQ83                
   toBase32                263K4VJ8WQFPX93T9KNX667XZC            
+  toHex                   0x461cc9b923977dba91e933af4c63f7ec    
  ----------------------- -------------------------------------- 
 
 
@@ -103,6 +107,7 @@ EOF
   toRfc4122 (canonical)   461cc9b9-2397-cdba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6pihxonjBST7K8X                
   toBase32                263K4VJ8WQSPX93T9KNX667XZC            
+  toHex                   0x461cc9b92397cdba91e933af4c63f7ec    
  ----------------------- -------------------------------------- 
 
 
@@ -123,6 +128,7 @@ EOF
   toRfc4122 (canonical)   4c8e3a2a-5993-11eb-a861-2bf05af69e52  
   toBase58                ATJGVdrgFqvc6thDFXv1Qu                
   toBase32                2CHRX2MPCK27NTGR9BY1DFD7JJ            
+  toHex                   0x4c8e3a2a599311eba8612bf05af69e52    
  ----------------------- -------------------------------------- 
   Time                    2021-01-18 13:44:34.438609 UTC        
  ----------------------- -------------------------------------- 
@@ -145,6 +151,7 @@ EOF
   toRfc4122 (canonical)   d108a1a0-957e-3c77-b110-d3f912374439  
   toBase58                Sp7q16VVeC7zPsMPVEToq2                
   toBase32                6H12GT15BY7HVV246KZ493EH1S            
+  toHex                   0xd108a1a0957e3c77b110d3f912374439    
  ----------------------- -------------------------------------- 
 
 
@@ -165,6 +172,7 @@ EOF
   toRfc4122 (canonical)   705c6eab-a535-4f49-bd51-436d0e81206a  
   toBase58                EsjuVs1nd42xt7jSB8hNQH                
   toBase32                3GBHQAQ99N9X4VTMA3DM78283A            
+  toHex                   0x705c6eaba5354f49bd51436d0e81206a    
  ----------------------- -------------------------------------- 
 
 
@@ -185,6 +193,7 @@ EOF
   toRfc4122 (canonical)   4ec6c3ad-de94-5f75-b5f0-ad56661a30c4  
   toBase58                AjCoyQeK6TtFemqYWV5uKZ                
   toBase32                2ERV1TVQMMBXTVBW5DASK1MC64            
+  toHex                   0x4ec6c3adde945f75b5f0ad56661a30c4    
  ----------------------- -------------------------------------- 
 
 
@@ -205,6 +214,7 @@ EOF
   toRfc4122 (canonical)   1eb59937-b0a7-6288-a861-db3dc2d8d4db  
   toBase58                4nwhs6vwvNU2AbcCSD1XP8                
   toBase32                0YPPCKFC57CA4AGREV7Q1DHN6V            
+  toHex                   0x1eb59937b0a76288a861db3dc2d8d4db    
  ----------------------- -------------------------------------- 
   Time                    2021-01-18 13:45:52.427892 UTC        
  ----------------------- -------------------------------------- 

@@ -63,6 +63,7 @@ EOF
             ['toBase32 (canonical)', (string) $ulid],
             ['toBase58', $ulid->toBase58()],
             ['toRfc4122', $ulid->toRfc4122()],
+            ['toHex', $ulid->toHex()],
             new TableSeparator(),
             ['Time', ($ulid->getDateTime())->format('Y-m-d H:i:s.v \U\T\C')],
         ]);

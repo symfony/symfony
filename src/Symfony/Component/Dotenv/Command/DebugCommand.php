@@ -51,7 +51,6 @@ final class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format')
              ->setHelp(<<<EOF
   <info>php %command.full_name% </info>

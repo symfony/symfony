@@ -84,7 +84,7 @@ EOF
             $route = $routes->get($name);
             $matchingRoutes = $this->findRouteNameContaining($name, $routes);
 
-            if (!$input->isInteractive() && !$route && count($matchingRoutes) > 1) {
+            if (!$input->isInteractive() && !$route && \count($matchingRoutes) > 1) {
                 $foundRoutes = $this->findRouteContaining($name, $routes);
                 $helper->describe($io, $foundRoutes, [
                     'format' => $input->getOption('format'),

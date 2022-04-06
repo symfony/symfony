@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Authentication;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -64,7 +65,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $this->tokenStorage = $tokenStorage;
         $this->eventDispatcher = $eventDispatcher;
         $this->firewallName = $firewallName;
-        $this->logger = $logger;
+        $this->logger = is_null($logger) ? new NullLogger() : $logger;
         $this->eraseCredentials = $eraseCredentials;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
         $this->requiredBadges = $requiredBadges;
@@ -89,31 +90,25 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
     public function supports(Request $request): ?bool
     {
-        if (null !== $this->logger) {
-            $context = ['firewall_name' => $this->firewallName];
+        $context = ['firewall_name' => $this->firewallName];
 
-            if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
-                $context['authenticators'] = \count($this->authenticators);
-            }
-
-            $this->logger->debug('Checking for authenticator support.', $context);
+        if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
+            $context['authenticators'] = \count($this->authenticators);
         }
+
+        $this->logger->debug('Checking for authenticator support.', $context);
 
         $authenticators = [];
         $skippedAuthenticators = [];
         $lazy = true;
         foreach ($this->authenticators as $authenticator) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
-            }
+            $this->logger->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
 
             if (false !== $supports = $authenticator->supports($request)) {
                 $authenticators[] = $authenticator;
                 $lazy = $lazy && null === $supports;
             } else {
-                if (null !== $this->logger) {
-                    $this->logger->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
-                }
+                $this->logger->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
                 $skippedAuthenticators[] = $authenticator;
             }
         }
@@ -151,18 +146,14 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             // eagerly (before token storage is initialized), whereas authenticate() is called
             // lazily (after initialization).
             if (false === $authenticator->supports($request)) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('Skipping the "{authenticator}" authenticator as it did not support the request.', ['authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
-                }
+                $this->logger->debug('Skipping the "{authenticator}" authenticator as it did not support the request.', ['authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
 
                 continue;
             }
 
             $response = $this->executeAuthenticator($authenticator, $request);
             if (null !== $response) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('The "{authenticator}" authenticator set the response. Any later authenticator will not be called', ['authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
-                }
+                $this->logger->debug('The "{authenticator}" authenticator set the response. Any later authenticator will not be called', ['authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
 
                 return $response;
             }
@@ -210,9 +201,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
             $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
 
-            if (null !== $this->logger) {
-                $this->logger->info('Authenticator successful!', ['token' => $authenticatedToken, 'authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
-            }
+            $this->logger->info('Authenticator successful!', ['token' => $authenticatedToken, 'authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
             $response = $this->handleAuthenticationFailure($e, $request, $authenticator, $passport);
@@ -229,9 +218,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             return $response;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Authenticator set no success response: request continues.', ['authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
-        }
+        $this->logger->debug('Authenticator set no success response: request continues.', ['authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
 
         return null;
     }
@@ -262,9 +249,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
      */
     private function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator, ?PassportInterface $passport): ?Response
     {
-        if (null !== $this->logger) {
-            $this->logger->info('Authenticator failed.', ['exception' => $authenticationException, 'authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
-        }
+        $this->logger->info('Authenticator failed.', ['exception' => $authenticationException, 'authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
 
         // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
         // to prevent user enumeration via response content comparison
@@ -273,7 +258,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         }
 
         $response = $authenticator->onAuthenticationFailure($request, $authenticationException);
-        if (null !== $response && null !== $this->logger) {
+        if (null !== $response) {
             $this->logger->debug('The "{authenticator}" authenticator set the failure response.', ['authenticator' => \get_class($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)]);
         }
 

@@ -65,7 +65,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $this->tokenStorage = $tokenStorage;
         $this->eventDispatcher = $eventDispatcher;
         $this->firewallName = $firewallName;
-        $this->logger = is_null($logger) ? new NullLogger() : $logger;
+        $this->logger = null === $logger ? new NullLogger() : $logger;
         $this->eraseCredentials = $eraseCredentials;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
         $this->requiredBadges = $requiredBadges;

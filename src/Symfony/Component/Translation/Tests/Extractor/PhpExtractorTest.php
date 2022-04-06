@@ -64,6 +64,9 @@ EOF;
                 'typecast' => 'prefixtypecast',
                 'msg1' => 'prefixmsg1',
                 'msg2' => 'prefixmsg2',
+                'variable-assignation-inlined-in-trans-method-call1' => 'prefixvariable-assignation-inlined-in-trans-method-call1',
+                'variable-assignation-inlined-in-trans-method-call2' => 'prefixvariable-assignation-inlined-in-trans-method-call2',
+                'variable-assignation-inlined-in-trans-method-call3' => 'prefixvariable-assignation-inlined-in-trans-method-call3',
             ],
         ];
         $actualCatalogue = $catalogue->all();

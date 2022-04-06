@@ -157,7 +157,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
-            if ('.' === $t) {
+            if ('.' === $t || '=' === $t) {
                 // Concatenate with next token
                 continue;
             }
@@ -196,6 +196,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     $docPart = '';
                     break;
                 case \T_WHITESPACE:
+                case \T_VARIABLE:
                     break;
                 default:
                     break 2;

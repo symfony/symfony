@@ -57,3 +57,6 @@ EOF
 <?php echo $view['translator']->transChoice('msg2', ceil(4.5), [], 'not_messages'); ?>
 
 <?php echo $view['translator']->trans('default domain', [], null); ?>
+<?php echo $view['translator']->trans($key = 'variable-assignation-inlined-in-trans-method-call1', $parameters = [], $domain = 'not_messages'); ?>
+<?php echo $view['translator']->trans('variable-assignation-inlined-in-trans-method-call2', $parameters = [], $domain = 'not_messages'); ?>
+<?php echo $view['translator']->trans('variable-assignation-inlined-in-trans-method-call3', [], $domain = 'not_messages'); ?>

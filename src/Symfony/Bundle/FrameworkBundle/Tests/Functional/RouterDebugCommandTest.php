@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use function PHPUnit\Framework\assertSame;
 
 /**
  * @group functional

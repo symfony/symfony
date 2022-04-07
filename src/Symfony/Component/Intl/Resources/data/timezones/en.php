@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'Turkey Time (Istanbul)',
         'Europe/Jersey' => 'Greenwich Mean Time (Jersey)',
         'Europe/Kaliningrad' => 'Eastern European Time (Kaliningrad)',
-        'Europe/Kiev' => 'Eastern European Time (Kiev)',
+        'Europe/Kiev' => 'Eastern European Time (Kyiv)',
         'Europe/Kirov' => 'Russia Time (Kirov)',
         'Europe/Lisbon' => 'Western European Time (Lisbon)',
         'Europe/Ljubljana' => 'Central European Time (Ljubljana)',

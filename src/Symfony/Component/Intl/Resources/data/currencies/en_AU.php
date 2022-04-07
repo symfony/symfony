@@ -110,6 +110,10 @@ return [
             0 => 'COP',
             1 => 'Colombian Peso',
         ],
+        'CUP' => [
+            0 => 'CUP',
+            1 => 'Cuban Peso',
+        ],
         'CVE' => [
             0 => 'CVE',
             1 => 'Cape Verdean Escudo',

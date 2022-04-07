@@ -105,6 +105,7 @@ return [
         'en_MS' => 'lingɛlɛ́sa (Mɔsera)',
         'en_MT' => 'lingɛlɛ́sa (Malitɛ)',
         'en_MU' => 'lingɛlɛ́sa (Morisɛ)',
+        'en_MV' => 'lingɛlɛ́sa (Madívɛ)',
         'en_MW' => 'lingɛlɛ́sa (Malawi)',
         'en_MY' => 'lingɛlɛ́sa (Malezi)',
         'en_NA' => 'lingɛlɛ́sa (Namibi)',

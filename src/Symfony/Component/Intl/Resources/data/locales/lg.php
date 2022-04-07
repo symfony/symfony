@@ -104,6 +104,7 @@ return [
         'en_MS' => 'Lungereza (Monteseraati)',
         'en_MT' => 'Lungereza (Malita)',
         'en_MU' => 'Lungereza (Mawulisyasi)',
+        'en_MV' => 'Lungereza (Bizinga by’eMalidive)',
         'en_MW' => 'Lungereza (Malawi)',
         'en_MY' => 'Lungereza (Malezya)',
         'en_NA' => 'Lungereza (Namibiya)',

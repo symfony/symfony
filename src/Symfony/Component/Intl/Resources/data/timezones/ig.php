@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'Oge Turkey (Istanbul)',
         'Europe/Jersey' => 'Oge Mpaghara Greemwich Mean (Jersey)',
         'Europe/Kaliningrad' => 'Oge Mpaghara Ọwụwa Anyanwụ Europe (Kaliningrad)',
-        'Europe/Kiev' => 'Oge Mpaghara Ọwụwa Anyanwụ Europe (Kiev)',
+        'Europe/Kiev' => 'Oge Mpaghara Ọwụwa Anyanwụ Europe (Kyiv)',
         'Europe/Kirov' => 'Oge Rụssịa (Kirov)',
         'Europe/Lisbon' => 'Oge Mpaghara Ọdịda Anyanwụ Europe (Lisbon)',
         'Europe/Ljubljana' => 'Oge Mpaghara Etiti Europe (Ljubljana)',

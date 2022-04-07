@@ -341,7 +341,7 @@ return [
         'Europe/Istanbul' => 'Istanbul (Durka áigi)',
         'Europe/Jersey' => 'Jersey (Greenwich gaskka áigi)',
         'Europe/Kaliningrad' => 'Kaliningrad (nuorti-Eurohpá áigi)',
-        'Europe/Kiev' => 'Kiev (nuorti-Eurohpá áigi)',
+        'Europe/Kiev' => 'Kyiv (nuorti-Eurohpá áigi)',
         'Europe/Kirov' => 'Kirov (Ruošša áigi)',
         'Europe/Lisbon' => 'Lisbon (oarje-Eurohpá áigi)',
         'Europe/Ljubljana' => 'Ljubljana (gaska-Eurohpá áigi)',

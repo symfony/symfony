@@ -104,6 +104,7 @@ return [
         'en_MS' => 'Engeleere (Monseraat)',
         'en_MT' => 'Engeleere (Malte)',
         'en_MU' => 'Engeleere (Moriis)',
+        'en_MV' => 'Engeleere (Maldiiwe)',
         'en_MW' => 'Engeleere (Malaawi)',
         'en_MY' => 'Engeleere (Malesii)',
         'en_NA' => 'Engeleere (Namibii)',

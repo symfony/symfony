@@ -798,7 +798,7 @@
         ],
         "PHP": [
             "₱",
-            "Philippine Piso"
+            "Philippine Peso"
         ],
         "PKR": [
             "PKR",
@@ -895,6 +895,10 @@
         "SKK": [
             "SKK",
             "Slovak Koruna"
+        ],
+        "SLE": [
+            "SLE",
+            "Sierra Leonean New Leone"
         ],
         "SLL": [
             "SLL",
@@ -1043,6 +1047,10 @@
         "VEB": [
             "VEB",
             "Venezuelan Bolívar (1871–2008)"
+        ],
+        "VED": [
+            "VED",
+            "Bolívar Soberano"
         ],
         "VEF": [
             "VEF",

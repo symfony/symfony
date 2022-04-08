@@ -89,6 +89,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
+                new InputOption('blank', null, InputOption::VALUE_NONE, 'Extract new-found messages as blank strings'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
@@ -99,7 +100,7 @@ of a given bundle or the default translations directory. It can display them or 
 the new ones into the translation files.
 
 When new translation strings are found it can automatically add a prefix to the translation
-message.
+message. Alternatively, it can also extract new-found messages as blank strings.
 
 Example running against a Bundle (AcmeBundle)
 
@@ -120,6 +121,10 @@ You can dump a tree-like structure using the yaml format with <comment>--as-tree
 
     <info>php %command.full_name% --force --format=yaml --as-tree=3 en AcmeBundle</info>
     <info>php %command.full_name% --force --format=yaml --sort=asc --as-tree=3 fr</info>
+
+You can extract new-found messages as blank strings with the <comment>--blank</> flag:
+
+    <info>php %command.full_name% --force --blank en</info>
 
 EOF
             )
@@ -144,6 +149,12 @@ EOF
         // check presence of force or dump-message
         if (true !== $input->getOption('force') && true !== $input->getOption('dump-messages')) {
             $errorIo->error('You must choose one of --force or --dump-messages');
+
+            return 1;
+        }
+
+        if (!method_exists($this->extractor, 'blank') && true === $input->getOption('blank')) {
+            $errorIo->error('The --blank option is not supported by this extractor. It is available in symfony/translation 6.1 and symfony/twig-bridge 6.1.');
 
             return 1;
         }
@@ -203,7 +214,7 @@ EOF
         $io->comment(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
         $io->comment('Parsing templates...');
-        $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $input->getOption('prefix'));
+        $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $input->getOption('prefix'), $input->getOption('blank'));
 
         $io->comment('Loading translation files...');
         $currentCatalogue = $this->loadCurrentMessages($input->getArgument('locale'), $transPaths);
@@ -339,7 +350,7 @@ EOF
         }
 
         if ($input->mustSuggestOptionValuesFor('domain') && $locale = $input->getArgument('locale')) {
-            $extractedCatalogue = $this->extractMessages($locale, $this->getRootCodePaths($kernel), $input->getOption('prefix'));
+            $extractedCatalogue = $this->extractMessages($locale, $this->getRootCodePaths($kernel), $input->getOption('prefix'), $input->getOption('blank'));
 
             $currentCatalogue = $this->loadCurrentMessages($locale, $this->getRootTransPaths());
 
@@ -391,10 +402,13 @@ EOF
         return $filteredCatalogue;
     }
 
-    private function extractMessages(string $locale, array $transPaths, string $prefix): MessageCatalogue
+    private function extractMessages(string $locale, array $transPaths, string $prefix, bool $blank): MessageCatalogue
     {
         $extractedCatalogue = new MessageCatalogue($locale);
         $this->extractor->setPrefix($prefix);
+        if (method_exists($this->extractor, 'blank')) {
+            $this->extractor->blank($blank);
+        }
         foreach ($transPaths as $path) {
             if (is_dir($path) || is_file($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);

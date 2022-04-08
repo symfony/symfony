@@ -6,6 +6,7 @@ CHANGELOG
 
  * Parameters implementing `TranslatableInterface` are processed
  * Add the file extension to the `XliffFileDumper` constructor
+ * Add virtual method `blank()` to `ExtractorInterface`, which allows to extract blank strings instead of a prefixed copy of the translation key and implement it in the `PhpExtractor` and `ChainExtractor`
 
 5.4
 ---

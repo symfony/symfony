@@ -37,10 +37,36 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpBlankMessagesAndCleanWithDeprecatedCommandName()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpBlankMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
         $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
@@ -53,10 +79,36 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpBlankMessagesAsTreeAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--as-tree' => 1, '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpSortedMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'asc']);
+        $this->assertMatchesRegularExpression("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpSortedBlankMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '', 'test' => '', 'bar' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'asc', '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
         $this->assertMatchesRegularExpression("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
         $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
@@ -69,6 +121,19 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpReverseSortedBlankMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '', 'test' => '', 'bar' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'desc', '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
+        $this->assertMatchesRegularExpression("/\*test\*foo\*bar/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpSortWithoutValueAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
@@ -77,10 +142,35 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpSortWithoutValueAndCleanBlank()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '', 'test' => '', 'bar' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort', '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
+        $this->assertMatchesRegularExpression("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpWrongSortAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'test']);
+        $this->assertMatchesRegularExpression('/\[ERROR\] Wrong sort order/', $tester->getDisplay());
+    }
+
+    public function testDumpWrongSortAndCleanBlank()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '', 'test' => '', 'bar' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'test', '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
         $this->assertMatchesRegularExpression('/\[ERROR\] Wrong sort order/', $tester->getDisplay());
     }
 
@@ -97,10 +187,42 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpBlankMessagesAndCleanInRootDirectory()
+    {
+        $this->fs->remove($this->translationDir);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->fs->mkdir($this->translationDir.'/translations');
+        $this->fs->mkdir($this->translationDir.'/templates');
+
+        $tester = $this->createCommandTester(['messages' => ['foo' => '']], [], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--dump-messages' => true, '--clean' => true, '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpTwoMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
+        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/bar/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/2 messages were successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpTwoBlankMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '', 'bar' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
         $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
         $this->assertMatchesRegularExpression('/bar/', $tester->getDisplay());
         $this->assertMatchesRegularExpression('/2 messages were successfully extracted/', $tester->getDisplay());
@@ -114,10 +236,35 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpBlankMessagesForSpecificDomain()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => ''], 'mydomain' => ['bar' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--domain' => 'mydomain', '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
+        $this->assertMatchesRegularExpression('/bar/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
+    }
+
     public function testWriteMessages()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--force' => true]);
+        $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
+    }
+
+    public function testWriteBlankMessages()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--force' => true, '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
@@ -130,6 +277,23 @@ class TranslationUpdateCommandTest extends TestCase
 
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--force' => true]);
+        $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
+    }
+
+    public function testWriteBlankMessagesInRootDirectory()
+    {
+        $this->fs->remove($this->translationDir);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->fs->mkdir($this->translationDir.'/translations');
+        $this->fs->mkdir($this->translationDir.'/templates');
+
+        $tester = $this->createCommandTester(['messages' => ['foo' => '']]);
+        $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--force' => true, '--blank' => true]);
+        if (!method_exists($tester, 'blank')) {
+            $this->assertMatchesRegularExpression('/The --blank option is not supported by this extractor./', $tester->getDisplay());
+
+            return;
+        }
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 

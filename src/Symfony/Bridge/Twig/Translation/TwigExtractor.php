@@ -38,6 +38,11 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
      */
     private string $prefix = '';
 
+    /**
+     * Extract new-found messages as blank strings.
+     */
+    private bool $blank = false;
+
     private Environment $twig;
 
     public function __construct(Environment $twig)
@@ -67,6 +72,14 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         $this->prefix = $prefix;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function blank(bool $blank): void
+    {
+        $this->blank = $blank;
+    }
+
     protected function extractTemplate(string $template, MessageCatalogue $catalogue)
     {
         $visitor = $this->twig->getExtension(TranslationExtension::class)->getTranslationNodeVisitor();
@@ -75,7 +88,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         $this->twig->parse($this->twig->tokenize(new Source($template, '')));
 
         foreach ($visitor->getMessages() as $message) {
-            $catalogue->set(trim($message[0]), $this->prefix.trim($message[0]), $message[1] ?: $this->defaultDomain);
+            $catalogue->set(trim($message[0]), $this->blank ? '' : $this->prefix.trim($message[0]), $message[1] ?: $this->defaultDomain);
         }
 
         $visitor->disable();

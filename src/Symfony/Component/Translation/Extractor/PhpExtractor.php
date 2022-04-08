@@ -31,6 +31,11 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     private string $prefix = '';
 
     /**
+     * Extract new-found messages as blank strings.
+     */
+    private bool $blank = false;
+
+    /**
      * The sequence that captures translation messages.
      */
     protected $sequences = [
@@ -147,6 +152,14 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function blank(bool $blank): void
+    {
+        $this->blank = $blank;
     }
 
     /**
@@ -295,7 +308,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                 }
 
                 if ($message) {
-                    $catalog->set($message, $this->prefix.$message, $domain);
+                    $catalog->set($message, $this->blank ? '' : $this->prefix.$message, $domain);
                     $metadata = $catalog->getMetadata($message, $domain) ?? [];
                     $normalizedFilename = preg_replace('{[\\\\/]+}', '/', $filename);
                     $metadata['sources'][] = $normalizedFilename.':'.$tokens[$key][2];

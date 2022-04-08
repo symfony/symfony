@@ -47,6 +47,7 @@ class Choice extends Constraint
     public $multipleMessage = 'One or more of the given values is invalid.';
     public $minMessage = 'You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.';
     public $maxMessage = 'You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.';
+    public bool $match = true;
 
     /**
      * {@inheritdoc}
@@ -69,7 +70,8 @@ class Choice extends Constraint
         string $minMessage = null,
         string $maxMessage = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
+        bool $match = null,
     ) {
         if (\is_array($options) && $options && array_is_list($options)) {
             $choices ??= $options;
@@ -90,5 +92,6 @@ class Choice extends Constraint
         $this->multipleMessage = $multipleMessage ?? $this->multipleMessage;
         $this->minMessage = $minMessage ?? $this->minMessage;
         $this->maxMessage = $maxMessage ?? $this->maxMessage;
+        $this->match = $match ?? $this->match;
     }
 }

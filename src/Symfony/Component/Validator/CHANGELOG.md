@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
  * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
  * Allow creating constraints with required arguments
+ * Add the `match` option to the `Choice` constraint
 
 6.0
 ---

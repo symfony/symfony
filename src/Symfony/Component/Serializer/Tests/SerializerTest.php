@@ -51,6 +51,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
+use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
@@ -570,6 +571,19 @@ class SerializerTest extends TestCase
         ]);
 
         $this->assertEquals(new DummyUnionType(), $actual, 'Union type denormalization third case failed.');
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testFalseBuiltInTypes()
+    {
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)], ['json' => new JsonEncoder()]);
+
+        $actual = $serializer->deserialize('{"false":false}', FalseBuiltInDummy::class, 'json');
+
+        $this->assertEquals(new FalseBuiltInDummy(), $actual);
     }
 
     private function serializerWithClassDiscriminator()

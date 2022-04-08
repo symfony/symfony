@@ -104,6 +104,7 @@ return [
         'en_MS' => 'Borɔfo (Mantserat)',
         'en_MT' => 'Borɔfo (Mɔlta)',
         'en_MU' => 'Borɔfo (Mɔrehyeɔs)',
+        'en_MV' => 'Borɔfo (Maldives)',
         'en_MW' => 'Borɔfo (Malawi)',
         'en_MY' => 'Borɔfo (Malehyia)',
         'en_NA' => 'Borɔfo (Namibia)',

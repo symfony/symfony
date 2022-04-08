@@ -197,7 +197,7 @@ return [
         'Europe/Isle_of_Man' => 'Waktu Greenwich (Isle of Man)',
         'Europe/Jersey' => 'Waktu Greenwich (Jersey)',
         'Europe/Kaliningrad' => 'Waktu Éropa Timur (Kaliningrad)',
-        'Europe/Kiev' => 'Waktu Éropa Timur (Kiev)',
+        'Europe/Kiev' => 'Waktu Éropa Timur (Kyiv)',
         'Europe/Kirov' => 'Rusia (Kirov)',
         'Europe/Lisbon' => 'Waktu Éropa Barat (Lisbon)',
         'Europe/Ljubljana' => 'Waktu Éropa Tengah (Ljubljana)',

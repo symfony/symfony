@@ -104,6 +104,7 @@ return [
         'en_MS' => 'Icongereza (Monteserati)',
         'en_MT' => 'Icongereza (Malita)',
         'en_MU' => 'Icongereza (Izinga rya Morise)',
+        'en_MV' => 'Icongereza (Moludave)',
         'en_MW' => 'Icongereza (Malawi)',
         'en_MY' => 'Icongereza (Maleziya)',
         'en_NA' => 'Icongereza (Namibiya)',

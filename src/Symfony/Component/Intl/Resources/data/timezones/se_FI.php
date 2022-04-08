@@ -314,7 +314,7 @@ return [
         'Europe/Isle_of_Man' => 'Mansuolu (Greenwicha áigi)',
         'Europe/Jersey' => 'Jersey (Greenwicha áigi)',
         'Europe/Kaliningrad' => 'Kaliningrad (Nuorta-Eurohpa áigi)',
-        'Europe/Kiev' => 'Kiev (Nuorta-Eurohpa áigi)',
+        'Europe/Kiev' => 'Kyiv (Nuorta-Eurohpa áigi)',
         'Europe/Lisbon' => 'Lisboa (Oarje-Eurohpá áigi)',
         'Europe/Ljubljana' => 'Ljubljana (Gaska-Eurohpá áigi)',
         'Europe/London' => 'London (Greenwicha áigi)',

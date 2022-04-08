@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support of no-capture regex modifier `/n` in MultiplePcreFilterIterator (available from PHP 8.2)
+
 6.0
 ---
 

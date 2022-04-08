@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-04-07T09:50:04Z
+
+Do we need a separate PR for 5.4 ? Isn't the merge-up of the 5.4 PR enough?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-04-07T10:00:06Z
+
+> Do we need a separate PR for 5.4 ? Isn't the merge-up of the 5.4 PR enough?
+
+in 4.4 data are dumped in JSON format. We switched to PHP format in 5.x.

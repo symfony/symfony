@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+* Add `no_stop_clause` option to the DSN that allows removing "STOP clause" at the end of the message for non-commercial use
+
 5.3
 ---
 

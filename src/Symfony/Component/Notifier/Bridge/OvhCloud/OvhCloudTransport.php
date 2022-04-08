@@ -33,6 +33,7 @@ final class OvhCloudTransport extends AbstractTransport
     private string $consumerKey;
     private string $serviceName;
     private ?string $sender = null;
+    private bool $noStopClause = false;
 
     public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -47,10 +48,20 @@ final class OvhCloudTransport extends AbstractTransport
     public function __toString(): string
     {
         if (null !== $this->sender) {
-            return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s&sender=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName, $this->sender);
+            return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s&sender=%s&no_stop_clause=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName, $this->sender, (int) $this->noStopClause);
         }
 
-        return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName);
+        return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s&no_stop_clause=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName, (int) $this->noStopClause);
+    }
+
+    /**
+     * @return $this
+     */
+    public function setNoStopClause(bool $noStopClause): static
+    {
+        $this->noStopClause = $noStopClause;
+
+        return $this;
     }
 
     /**
@@ -82,7 +93,7 @@ final class OvhCloudTransport extends AbstractTransport
             'coding' => '8bit',
             'message' => $message->getSubject(),
             'receivers' => [$message->getPhone()],
-            'noStopClause' => false,
+            'noStopClause' => $this->noStopClause,
             'priority' => 'medium',
         ];
 

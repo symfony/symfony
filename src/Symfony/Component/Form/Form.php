@@ -704,7 +704,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
         return FormUtil::isEmpty($this->modelData) ||
             // arrays, countables
-            ((\is_array($this->modelData) || $this->modelData instanceof \Countable) && 0 === \count($this->modelData)) ||
+            (is_countable($this->modelData) && 0 === \count($this->modelData)) ||
             // traversables that are not countable
             ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }

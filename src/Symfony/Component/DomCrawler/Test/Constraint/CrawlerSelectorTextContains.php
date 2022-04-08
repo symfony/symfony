@@ -56,7 +56,7 @@ final class CrawlerSelectorTextContains extends Constraint
         $this->hasNode = true;
         $this->nodeText = $crawler->text(null, true);
 
-        return false !== mb_strpos($this->nodeText, $this->expectedText);
+        return str_contains($this->nodeText, $this->expectedText);
     }
 
     /**

@@ -558,7 +558,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
      */
     public function trimPrefix($prefix): static
     {
-        if (\is_array($prefix) || $prefix instanceof \Traversable) {
+        if (is_iterable($prefix)) {
             foreach ($prefix as $s) {
                 $t = $this->trimPrefix($s);
 
@@ -592,7 +592,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
      */
     public function trimSuffix($suffix): static
     {
-        if (\is_array($suffix) || $suffix instanceof \Traversable) {
+        if (is_iterable($suffix)) {
             foreach ($suffix as $s) {
                 $t = $this->trimSuffix($s);
 

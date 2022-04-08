@@ -65,6 +65,9 @@ final class Notifier implements NotifierInterface
         return $this->adminRecipients;
     }
 
+    /**
+     * @return iterable<ChannelInterface, string|null>
+     */
     private function getChannels(Notification $notification, RecipientInterface $recipient): iterable
     {
         $channels = $notification->getChannels($recipient);

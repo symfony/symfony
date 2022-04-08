@@ -44,12 +44,18 @@ class Notification
     private string $exceptionAsString = '';
     private string $importance = self::IMPORTANCE_HIGH;
 
+    /**
+     * @param list<string> $channels
+     */
     public function __construct(string $subject = '', array $channels = [])
     {
         $this->subject = $subject;
         $this->channels = $channels;
     }
 
+    /**
+     * @param list<string> $channels
+     */
     public static function fromThrowable(\Throwable $exception, array $channels = []): self
     {
         $parts = explode('\\', \get_class($exception));
@@ -147,6 +153,8 @@ class Notification
     }
 
     /**
+     * @param list<string> $channels
+     *
      * @return $this
      */
     public function channels(array $channels): static
@@ -156,6 +164,9 @@ class Notification
         return $this;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getChannels(RecipientInterface $recipient): array
     {
         return $this->channels;

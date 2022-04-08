@@ -18,6 +18,7 @@ use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -396,6 +397,11 @@ class ConnectionTest extends TestCase
         yield 'SQL Server' => [
             new SQLServer2012Platform(),
             'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+        ];
+
+        yield 'Oracle' => [
+            new OraclePlatform(),
+            'SELECT w.* FROM messenger_messages w WHERE w.id IN(SELECT a.id FROM (SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE',
         ];
     }
 

@@ -55,7 +55,7 @@ class Process implements \IteratorAggregate
     private $hasCallback = false;
     private $commandline;
     private $cwd;
-    private $env;
+    private $env = [];
     private $input;
     private $starttime;
     private $lastOutputTime;

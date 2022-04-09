@@ -91,7 +91,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         if (null !== $this->logger) {
             $context = ['firewall_name' => $this->firewallName];
 
-            if ($this->authenticators instanceof \Countable || \is_array($this->authenticators)) {
+            if (is_countable($this->authenticators)) {
                 $context['authenticators'] = \count($this->authenticators);
             }
 

@@ -223,6 +223,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     private function getCurrentTimestampStatement(): string
     {
         $platform = $this->conn->getDatabasePlatform();
+
         return match (true) {
             $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform,
             $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform => 'UNIX_TIMESTAMP()',

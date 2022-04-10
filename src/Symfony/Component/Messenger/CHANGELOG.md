@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Add SerializerDecorator that will remove non-sendable stamps and then call the decorated serializer.
  * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs.
  * Automatically resolve handled message type when method different from `__invoke` is used as handler.
  * Allow `#[AsMessageHandler]` attribute on methods.

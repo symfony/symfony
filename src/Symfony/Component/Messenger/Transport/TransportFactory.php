@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerDecorator;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -33,7 +34,7 @@ class TransportFactory implements TransportFactoryInterface
     {
         foreach ($this->factories as $factory) {
             if ($factory->supports($dsn, $options)) {
-                return $factory->createTransport($dsn, $options, $serializer);
+                return $factory->createTransport($dsn, $options, new SerializerDecorator($serializer));
             }
         }
 

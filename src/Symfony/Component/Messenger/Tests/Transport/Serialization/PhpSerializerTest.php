@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
-use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
@@ -77,18 +76,6 @@ class PhpSerializerTest extends TestCase
         ]);
     }
 
-    public function testEncodedSkipsNonEncodeableStamps()
-    {
-        $serializer = new PhpSerializer();
-
-        $envelope = new Envelope(new DummyMessage('Hello'), [
-            new DummyPhpSerializerNonSendableStamp(),
-        ]);
-
-        $encoded = $serializer->encode($envelope);
-        $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
-    }
-
     public function testNonUtf8IsBase64Encoded()
     {
         $serializer = new PhpSerializer();
@@ -99,8 +86,4 @@ class PhpSerializerTest extends TestCase
         $this->assertTrue((bool) preg_match('//u', $encoded['body']), 'Encodes non-UTF8 payloads');
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
-}
-
-class DummyPhpSerializerNonSendableStamp implements NonSendableStampInterface
-{
 }

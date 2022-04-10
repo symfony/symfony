@@ -32,13 +32,13 @@ class MysqlStoreTest extends AbstractStoreTest
         return new MysqlStore($this->getPdo());
     }
 
-    public function testDriverRequirement(): void
+    public function testDriverRequirement()
     {
         $this->expectException(InvalidArgumentException::class);
         new MysqlStore(new \PDO('sqlite::memory:'));
     }
 
-    public function testExceptionModeRequirement(): void
+    public function testExceptionModeRequirement()
     {
         $this->expectException(InvalidArgumentException::class);
         $pdo = $this->getPdo();
@@ -46,7 +46,7 @@ class MysqlStoreTest extends AbstractStoreTest
         new MysqlStore($pdo);
     }
 
-    public function testSelfConflictException(): void
+    public function testSelfConflictException()
     {
         $store = $this->getStore();
         $store->save(new Key('foo'));
@@ -59,7 +59,7 @@ class MysqlStoreTest extends AbstractStoreTest
         }
     }
 
-    public function testOtherConflictException(): void
+    public function testOtherConflictException()
     {
         $storeA = $this->getStore();
         $storeA->save(new Key('foo'));

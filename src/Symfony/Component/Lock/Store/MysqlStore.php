@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Lock\Store;
 
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -61,7 +70,7 @@ class MysqlStore implements PersistingStoreInterface
             throw new LockConflictedException('Lock already acquired by this connection.');
         }
 
-        throw new LockAcquiringException('Failed to acquire lock due to mysql error');
+        throw new LockAcquiringException('Failed to acquire lock due to mysql error.');
     }
 
     public function putOffExpiration(Key $key, float $ttl): void

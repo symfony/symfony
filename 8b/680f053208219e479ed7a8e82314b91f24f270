@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-04-08T04:59:12Z
+
+That's a new feature, and as such, it should target 6.1 (we merged the same for Mailer as a new feature as well).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-04-08T08:46:21Z
+
+> That's a new feature, and as such, it should target 6.1 (we merged the same for Mailer as a new feature as well).
+
+All right. That makes it a lot easier. 😅

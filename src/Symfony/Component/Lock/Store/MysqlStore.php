@@ -48,20 +48,19 @@ class MysqlStore implements PersistingStoreInterface
 
     public function save(Key $key): void
     {
-        $stateKey = $this->getStateKey($key);
-        if ($key->hasState($stateKey)) {
+        if ($this->exists($key)) {
             return;
         }
 
         $name = self::getLockName($key);
-        $stmt = $this->conn->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), -1, GET_LOCK(:name, 0))');
+        $stmt = $this->getConnection()->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), -1, GET_LOCK(:name, 0))');
         $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetchColumn();
 
         // lock acquired
         if (1 === $result) {
-            $key->setState($stateKey, $name);
+            $key->setState($this->getStateKey($key), $name);
 
             return;
         }
@@ -84,7 +83,7 @@ class MysqlStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
-        $stmt = $this->conn->prepare('DO RELEASE_LOCK(:name)');
+        $stmt = $this->getConnection()->prepare('DO RELEASE_LOCK(:name)');
         $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
         $stmt->execute();
 
@@ -93,7 +92,23 @@ class MysqlStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
-        return $key->hasState($this->getStateKey($key));
+        $stateKey = $this->getStateKey($key);
+        if (!$key->hasState($stateKey)) {
+            return false;
+        }
+
+        $stmt = $this->getConnection()->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), 1, 0)');
+        $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetchColumn();
+
+        if (1 === $result) {
+            return true;
+        }
+
+        $key->removeState($stateKey);
+
+        return false;
     }
 
     private function getConnection(): \PDO

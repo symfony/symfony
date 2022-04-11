@@ -1,4 +1,5 @@
 framework:
+    http_method_override: false
     secret: test
     router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
     test: ~

@@ -51,6 +51,7 @@ class WebProfilerBundleKernel extends Kernel
     protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
     {
         $containerBuilder->loadFromExtension('framework', [
+            'http_method_override' => false,
             'secret' => 'foo-secret',
             'profiler' => ['only_exceptions' => false],
             'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],

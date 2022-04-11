@@ -18,6 +18,7 @@ services:
               provider: cache.test_redis_connection
 
 framework:
+    http_method_override: false
     cache:
         pools:
             cache.pool1:

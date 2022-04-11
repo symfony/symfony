@@ -76,12 +76,23 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->validate()
+                ->always(function ($v) {
+                    if (!isset($v['http_method_override'])) {
+                        trigger_deprecation('symfony/framework-bundle', '6.1', 'Not setting the "framework.http_method_override" config option is deprecated. It will default to "false" in 7.0.');
+
+                        $v['http_method_override'] = true;
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->fixXmlConfig('enabled_locale')
             ->children()
                 ->scalarNode('secret')->end()
-                ->scalarNode('http_method_override')
+                ->booleanNode('http_method_override')
                     ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
-                    ->defaultTrue()
+                    ->treatNullLike(false)
                 ->end()
                 ->scalarNode('trust_x_sendfile_type_header')
                     ->info('Set true to enable support for xsendfile in binary file responses.')

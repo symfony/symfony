@@ -1,4 +1,5 @@
 framework:
+    http_method_override: false
     php_errors:
         log:
             !php/const \E_NOTICE: !php/const Psr\Log\LogLevel::ERROR

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
@@ -23,7 +24,6 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SendMessageMiddlewareTest extends MiddlewareTestCase
 {

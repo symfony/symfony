@@ -35,6 +35,7 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<5.4",
+        "symfony/event-dispatcher-contracts": "<2",
         "symfony/framework-bundle": "<5.4",
         "symfony/http-kernel": "<5.4",
         "symfony/serializer": "<5.4"

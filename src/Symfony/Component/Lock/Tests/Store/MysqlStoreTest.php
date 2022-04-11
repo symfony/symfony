@@ -12,8 +12,8 @@ class MysqlStoreTest extends AbstractStoreTest
 {
     protected function getEnv(): array
     {
-        if (!$host = getenv('MYSQL_HOST')) {
-            $this->markTestSkipped('Missing MYSQL_HOST env variable');
+        if (!$dsn = getenv('MYSQL_DSN')) {
+            $this->markTestSkipped('Missing MYSQL_DSN env variable');
         }
 
         if (!$user = getenv('MYSQL_USERNAME')) {
@@ -24,14 +24,14 @@ class MysqlStoreTest extends AbstractStoreTest
             $this->markTestSkipped('Missing MYSQL_PASSWORD env variable');
         }
 
-        return [$host, $user, $pass];
+        return [$dsn, $user, $pass];
     }
 
     protected function getPdo(): \PDO
     {
-        [$host, $user, $pass] = $this->getEnv();
+        [$dsn, $user, $pass] = $this->getEnv();
 
-        return new \PDO('mysql:host='.$host, $user, $pass);
+        return new \PDO($dsn, $user, $pass);
     }
 
     protected function getStore(): PersistingStoreInterface

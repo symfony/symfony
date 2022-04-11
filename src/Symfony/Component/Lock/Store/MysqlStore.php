@@ -23,19 +23,25 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class MysqlStore implements PersistingStoreInterface
 {
-    private \PDO $conn;
+    private ?\PDO $conn;
 
-    public function __construct(\PDO $conn)
+    private ?string $dsn;
+
+    private array $options;
+
+    public function __construct(\PDO|string $connOrDsn, array $options = [])
     {
-        if ('mysql' !== $driver = $conn->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-            throw new InvalidArgumentException(sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
+        if ($connOrDsn instanceof \PDO) {
+            $this->conn = $connOrDsn;
+            $this->assertMysqlDriver();
+            if (\PDO::ERRMODE_EXCEPTION !== $this->conn->getAttribute(\PDO::ATTR_ERRMODE)) {
+                throw new InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION)).', __METHOD__));
+            }
+        } else {
+            $this->dsn = $connOrDsn;
         }
 
-        if (\PDO::ERRMODE_EXCEPTION !== $conn->getAttribute(\PDO::ATTR_ERRMODE)) {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION)).', __METHOD__));
-        }
-
-        $this->conn = $conn;
+        $this->options = $options;
     }
 
     public function save(Key $key): void
@@ -44,11 +50,9 @@ class MysqlStore implements PersistingStoreInterface
             return;
         }
 
-        // todo ? check that mysql > 5.7.3
-
         // mysql limits lock name length to 64 chars
         $name = (string) $key;
-        $name = \strlen($name) > 64 ? hash('sha256', $name) : $name;
+        $name = \strlen($name) > 64 ? hash('xxh128', $name) : $name;
 
         $stmt = $this->conn->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), -1, GET_LOCK(:name, 0))');
         $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
@@ -102,5 +106,28 @@ class MysqlStore implements PersistingStoreInterface
         $stmt->execute();
 
         return 1 === $stmt->fetchColumn();
+    }
+
+    private function getConnection(): \PDO
+    {
+        if (!$this->conn) {
+            $this->conn = new \PDO(
+                $this->dsn,
+                $this->options['db_username'] ?? null,
+                $this->options['db_password'] ?? null,
+                $this->options['db_connection_options'] ?? null
+            );
+            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->assertMysqlDriver();
+        }
+
+        return $this->conn;
+    }
+
+    private function assertMysqlDriver(): void
+    {
+        if ('mysql' !== $driver = $this->conn->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+            throw new InvalidArgumentException(sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
+        }
     }
 }

@@ -10,7 +10,7 @@ use Symfony\Component\Lock\Store\MysqlStore;
 
 class MysqlStoreTest extends AbstractStoreTest
 {
-    protected function getPdo(): \PDO
+    protected function getEnv(): array
     {
         if (!$host = getenv('MYSQL_HOST')) {
             $this->markTestSkipped('Missing MYSQL_HOST env variable');
@@ -23,6 +23,13 @@ class MysqlStoreTest extends AbstractStoreTest
         if (!$pass = getenv('MYSQL_PASSWORD')) {
             $this->markTestSkipped('Missing MYSQL_PASSWORD env variable');
         }
+
+        return [$host, $user, $pass];
+    }
+
+    protected function getPdo(): \PDO
+    {
+        [$host, $user, $pass] = $this->getEnv();
 
         return new \PDO('mysql:host='.$host, $user, $pass);
     }
@@ -72,5 +79,13 @@ class MysqlStoreTest extends AbstractStoreTest
         } catch (LockConflictedException $e) {
             $this->assertStringContainsString('acquired by other', $e->getMessage());
         }
+    }
+
+    public function testDsnConstructor()
+    {
+        $this->expectNotToPerformAssertions();
+
+        [$host, $user, $pass] = $this->getEnv();
+        new MysqlStore("mysql:$host", ['db_username' => $user, 'db_password' => $pass]);
     }
 }

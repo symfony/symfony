@@ -29,6 +29,9 @@ class MysqlStore implements PersistingStoreInterface
 
     private array $options;
 
+    /** @var bool[] */
+    private static array $locksAcquired = [];
+
     public function __construct(\PDO|string $connOrDsn, array $options = [])
     {
         if ($connOrDsn instanceof \PDO) {
@@ -46,22 +49,20 @@ class MysqlStore implements PersistingStoreInterface
 
     public function save(Key $key): void
     {
-        if ($key->hasState(__CLASS__)) {
+        $id = $this->getLockId($key);
+
+        if (self::$locksAcquired[$id] ?? false) {
             return;
         }
 
-        // mysql limits lock name length to 64 chars
-        $name = (string) $key;
-        $name = \strlen($name) > 64 ? hash('xxh128', $name) : $name;
-
         $stmt = $this->conn->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), -1, GET_LOCK(:name, 0))');
-        $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
+        $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetchColumn();
 
         // lock acquired
         if (1 === $result) {
-            $key->setState(__CLASS__, $name);
+            self::$locksAcquired[$id] = true;
 
             return;
         }
@@ -84,28 +85,16 @@ class MysqlStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
-        if (!$key->hasState(__CLASS__)) {
-            return;
-        }
-
         $stmt = $this->conn->prepare('DO RELEASE_LOCK(:name)');
-        $stmt->bindValue(':name', $key->getState(__CLASS__), \PDO::PARAM_STR);
+        $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
         $stmt->execute();
 
-        $key->removeState(__CLASS__);
+        unset(self::$locksAcquired[$this->getLockId($key)]);
     }
 
     public function exists(Key $key): bool
     {
-        if (!$key->hasState(__CLASS__)) {
-            return false;
-        }
-
-        $stmt = $this->conn->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), 1, 0)');
-        $stmt->bindValue(':name', $key->getState(__CLASS__), \PDO::PARAM_STR);
-        $stmt->execute();
-
-        return 1 === $stmt->fetchColumn();
+        return self::$locksAcquired[$this->getLockId($key)] ?? false;
     }
 
     private function getConnection(): \PDO
@@ -129,5 +118,18 @@ class MysqlStore implements PersistingStoreInterface
         if ('mysql' !== $driver = $this->conn->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
             throw new InvalidArgumentException(sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
         }
+    }
+
+    private function getLockId(Key $key): string
+    {
+        return spl_object_id($this->getConnection()).'_'.spl_object_id($key);
+    }
+
+    private static function getLockName(Key $key): string
+    {
+        // mysql limits lock name length to 64 chars
+        $name = (string) $key;
+
+        return \strlen($name) > 64 ? hash('xxh128', $name) : $name;
     }
 }

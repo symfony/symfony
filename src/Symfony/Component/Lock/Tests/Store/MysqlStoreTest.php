@@ -53,19 +53,6 @@ class MysqlStoreTest extends AbstractStoreTest
         new MysqlStore($pdo);
     }
 
-    public function testSelfConflictException()
-    {
-        $store = $this->getStore();
-        $store->save(new Key('foo'));
-
-        try {
-            $store->save(new Key('foo'));
-            $this->fail('Expected exception: '.LockConflictedException::class);
-        } catch (LockConflictedException $e) {
-            $this->assertStringContainsString('acquired by this', $e->getMessage());
-        }
-    }
-
     public function testOtherConflictException()
     {
         $storeA = $this->getStore();

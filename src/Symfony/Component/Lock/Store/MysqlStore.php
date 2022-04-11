@@ -23,11 +23,13 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class MysqlStore implements PersistingStoreInterface
 {
-    private ?\PDO $conn;
+    private ?\PDO $conn = null;
 
     private ?string $dsn;
 
     private array $options;
+
+    private ?int $connectionId = null;
 
     /** @var bool[] */
     private static array $locksAcquired = [];
@@ -122,7 +124,11 @@ class MysqlStore implements PersistingStoreInterface
 
     private function getLockId(Key $key): string
     {
-        return spl_object_id($this->getConnection()).'_'.spl_object_id($key);
+        if (!$this->connectionId) {
+            $this->connectionId = $this->getConnection()->query('SELECT CONNECTION_ID()')->fetchColumn();
+        }
+
+        return $this->connectionId.'_'.spl_object_id($key);
     }
 
     private static function getLockName(Key $key): string

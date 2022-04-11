@@ -73,6 +73,7 @@ class MysqlStoreTest extends AbstractStoreTest
         $this->expectNotToPerformAssertions();
 
         [$host, $user, $pass] = $this->getEnv();
-        new MysqlStore("mysql:$host", ['db_username' => $user, 'db_password' => $pass]);
+        $store = new MysqlStore("mysql:$host", ['db_username' => $user, 'db_password' => $pass]);
+        $store->save(new Key('foo'));
     }
 }

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-04T10:24:00Z
+
+Thanks. Can you please rebase to target 4.4? We'd better merge the test cases there since the code is almost the same there.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-04-04T21:34:39Z
+
+It's rebased !
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-07T23:13:30Z
+
+Could you try to force-push again? For some reason, the CI checks didn't run after the rebase.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-04-08T13:11:00Z
+
+@chalasr CI is now triggered and green

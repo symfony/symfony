@@ -30,7 +30,7 @@ class LengthValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Length::class);
         }
 
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return;
         }
 

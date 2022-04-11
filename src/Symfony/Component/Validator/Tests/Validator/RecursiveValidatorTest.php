@@ -2202,10 +2202,9 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity, null, ['one', 'two']);
 
-        $this->assertCount(3, $violations);
+        $this->assertCount(2, $violations);
         $this->assertInstanceOf(NotBlank::class, $violations->get(0)->getConstraint());
         $this->assertInstanceOf(Length::class, $violations->get(1)->getConstraint());
-        $this->assertInstanceOf(Length::class, $violations->get(2)->getConstraint());
     }
 
     public function testRequiredConstraintIsIgnored()

@@ -30,20 +30,11 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsInvalid()
+    public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Length([
-            'value' => $limit = 6,
-            'exactMessage' => 'myMessage',
-        ]));
+        $this->validator->validate('', new Length(['value' => 6]));
 
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '""')
-            ->setParameter('{{ limit }}', $limit)
-            ->setInvalidValue('')
-            ->setPlural($limit)
-            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
-            ->assertRaised();
+        $this->assertNoViolation();
     }
 
     public function testExpectsStringCompatibleType()

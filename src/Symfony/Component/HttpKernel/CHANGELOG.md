@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add constructor argument `bool $catchThrowable` to `HttpKernel`
+ * Add `ControllerEvent::getAttributes()` to handle attributes on controllers
 
 6.1
 ---

@@ -154,23 +154,23 @@ class ArgumentMetadataFactoryTest extends TestCase
         ], $arguments);
     }
 
-    private function signature1(self $foo, array $bar, callable $baz)
+    public function signature1(self $foo, array $bar, callable $baz)
     {
     }
 
-    private function signature2(self $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null)
+    public function signature2(self $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null)
     {
     }
 
-    private function signature3(FakeClassThatDoesNotExist $bar, ImportedAndFake $baz)
+    public function signature3(FakeClassThatDoesNotExist $bar, ImportedAndFake $baz)
     {
     }
 
-    private function signature4($foo = 'default', $bar = 500, $baz = [])
+    public function signature4($foo = 'default', $bar = 500, $baz = [])
     {
     }
 
-    private function signature5(array $foo = null, $bar = null)
+    public function signature5(array $foo = null, $bar = null)
     {
     }
 }

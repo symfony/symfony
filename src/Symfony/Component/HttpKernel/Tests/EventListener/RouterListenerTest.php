@@ -173,7 +173,7 @@ class RouterListenerTest extends TestCase
             return new Response('Exception handled', 400);
         }));
 
-        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver(), true);
 
         $request = Request::create('http://localhost/');
         $request->headers->set('host', '###');
@@ -195,7 +195,7 @@ class RouterListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
 
-        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver(), true);
 
         $request = Request::create('http://localhost/');
         $response = $kernel->handle($request);

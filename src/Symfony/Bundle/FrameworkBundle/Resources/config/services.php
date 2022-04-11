@@ -85,6 +85,7 @@ return static function (ContainerConfigurator $container) {
                 service('controller_resolver'),
                 service('request_stack'),
                 service('argument_resolver'),
+                false,
             ])
             ->tag('container.hot_path')
             ->tag('container.preload', ['class' => HttpKernelRunner::class])

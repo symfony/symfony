@@ -86,6 +86,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
             'http_method_override' => false,
             'secret' => '$ecret',
             'router' => ['utf8' => true],
+            'catch_all_throwables' => true,
         ]);
 
         $c->setParameter('halloween', 'Have a great day!');

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add constructor argument `bool $catchThrowable` to `HttpKernel`
+
 6.1
 ---
 

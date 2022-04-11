@@ -53,19 +53,50 @@ class MysqlStoreTest extends AbstractStoreTest
         new MysqlStore($pdo);
     }
 
-    public function testOtherConflictException()
+    public function testOtherConnConflictException()
     {
         $storeA = $this->getStore();
-        $storeA->save(new Key('foo'));
-
         $storeB = $this->getStore();
 
+        $key = new Key('foo');
+        $storeA->save($key);
+
+        $this->assertFalse($storeB->exists($key));
+
         try {
-            $storeB->save(new Key('foo'));
+            $storeB->save($key);
             $this->fail('Expected exception: '.LockConflictedException::class);
         } catch (LockConflictedException $e) {
             $this->assertStringContainsString('acquired by other', $e->getMessage());
         }
+    }
+
+    public function testExistsOnKeyClone()
+    {
+        $store = $this->getStore();
+
+        $key = new Key('foo');
+        $store->save($key);
+
+        $this->assertTrue($store->exists($key));
+        $this->assertTrue($store->exists(clone $key));
+    }
+
+    public function testStoresAreStateless()
+    {
+        $pdo = $this->getPdo();
+
+        $storeA = new MysqlStore($pdo);
+        $storeB = new MysqlStore($pdo);
+        $key = new Key('foo');
+
+        $storeA->save($key);
+        $this->assertTrue($storeA->exists($key));
+        $this->assertTrue($storeB->exists($key));
+
+        $storeB->delete($key);
+        $this->assertFalse($storeB->exists($key));
+        $this->assertFalse($storeA->exists($key));
     }
 
     public function testDsnConstructor()

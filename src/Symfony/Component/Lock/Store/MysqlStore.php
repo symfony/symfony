@@ -31,9 +31,6 @@ class MysqlStore implements PersistingStoreInterface
 
     private int $connectionId;
 
-    /** @var bool[] */
-    private static array $locksAcquired = [];
-
     public function __construct(\PDO|string $connOrDsn, array $options = [])
     {
         if ($connOrDsn instanceof \PDO) {
@@ -51,20 +48,20 @@ class MysqlStore implements PersistingStoreInterface
 
     public function save(Key $key): void
     {
-        $id = $this->getLockId($key);
-
-        if (self::$locksAcquired[$id] ?? false) {
+        $stateKey = $this->getStateKey($key);
+        if ($key->hasState($stateKey)) {
             return;
         }
 
+        $name = self::getLockName($key);
         $stmt = $this->conn->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), -1, GET_LOCK(:name, 0))');
-        $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
+        $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetchColumn();
 
         // lock acquired
         if (1 === $result) {
-            self::$locksAcquired[$id] = true;
+            $key->setState($stateKey, $name);
 
             return;
         }
@@ -91,12 +88,12 @@ class MysqlStore implements PersistingStoreInterface
         $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
         $stmt->execute();
 
-        unset(self::$locksAcquired[$this->getLockId($key)]);
+        $key->removeState($this->getStateKey($key));
     }
 
     public function exists(Key $key): bool
     {
-        return self::$locksAcquired[$this->getLockId($key)] ?? false;
+        return $key->hasState($this->getStateKey($key));
     }
 
     private function getConnection(): \PDO
@@ -122,13 +119,13 @@ class MysqlStore implements PersistingStoreInterface
         }
     }
 
-    private function getLockId(Key $key): string
+    private function getStateKey(Key $key): string
     {
         if (!isset($this->connectionId)) {
             $this->connectionId = $this->getConnection()->query('SELECT CONNECTION_ID()')->fetchColumn();
         }
 
-        return $this->connectionId.'_'.spl_object_id($key);
+        return __CLASS__.'_'.$this->connectionId;
     }
 
     private static function getLockName(Key $key): string

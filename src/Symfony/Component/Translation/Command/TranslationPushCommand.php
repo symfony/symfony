@@ -22,7 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
-use Symfony\Component\Translation\TranslatorBag;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -133,7 +132,7 @@ EOF
         $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
 
         if (!$domains) {
-            $domains = $this->getDomainsFromTranslatorBag($localTranslations);
+            $domains = $provider->getDomains();
         }
 
         if (!$deleteMissing && $force) {
@@ -167,16 +166,5 @@ EOF
         $io->success(sprintf('%s local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', $force ? 'All' : 'New', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
         return 0;
-    }
-
-    private function getDomainsFromTranslatorBag(TranslatorBag $translatorBag): array
-    {
-        $domains = [];
-
-        foreach ($translatorBag->getCatalogues() as $catalogue) {
-            $domains += $catalogue->getDomains();
-        }
-
-        return array_unique($domains);
     }
 }

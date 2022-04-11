@@ -18,6 +18,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  * New found messages are injected to the catalogue using the prefix.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @method void blank(bool $blank) Extract new-found messages as blank strings.
  */
 interface ExtractorInterface
 {

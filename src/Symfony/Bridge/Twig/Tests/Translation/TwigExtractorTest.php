@@ -53,6 +53,38 @@ class TwigExtractorTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider getExtractData
+     */
+    public function testExtractBlank($template, $messages)
+    {
+        $loader = $this->createMock(LoaderInterface::class);
+        $twig = new Environment($loader, [
+            'strict_variables' => true,
+            'debug' => true,
+            'cache' => false,
+            'autoescape' => false,
+        ]);
+        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
+
+        $extractor = new TwigExtractor($twig);
+        $extractor->setPrefix('prefix');
+        $extractor->blank(true);
+        $catalogue = new MessageCatalogue('en');
+
+        $m = new \ReflectionMethod($extractor, 'extractTemplate');
+        $m->invoke($extractor, $template, $catalogue);
+
+        if (0 === \count($messages)) {
+            $this->assertSame($catalogue->all(), $messages);
+        }
+
+        foreach ($messages as $key => $domain) {
+            $this->assertTrue($catalogue->has($key, $domain));
+            $this->assertEquals('', $catalogue->get($key, $domain));
+        }
+    }
+
     public function getExtractData()
     {
         return [

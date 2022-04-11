@@ -9,6 +9,7 @@ CHANGELOG
  * Add `cache:pool:invalidate-tags` command
  * Add `xliff` support in addition to `xlf` for `XliffFileDumper`
  * Deprecate the `reset_on_message` config option. It can be set to `true` only and does nothing now
+ * Add `--blank` option to the `translation:extract` command, which extracts blank strings instead of a prefixed copy of the translation key
 
 6.0
 ---

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Wrap help messages on form elements in `div` instead of `p`
+ * Implement new virtual method `blank()` of the `ExtractorInterface`, which allows to extract blank strings instead of a prefixed copy of the translation key, in the `TwigExtractor`
 
 5.4
 ---

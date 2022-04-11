@@ -30,8 +30,8 @@ trait HandleTrait
      * This behavior is useful for both synchronous command & query buses,
      * the last one usually returning the handler result.
      *
-     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
-     * @param StampInterface[] $stamps Stamps to be set on the Envelope which are used to control middlewares behaviors
+     * @param object|Envelope  $message The message or the message pre-wrapped in an envelope
+     * @param StampInterface[] $stamps  Stamps to be set on the Envelope which are used to control middlewares behaviors
      */
     private function handle(object $message, array $stamps = []): mixed
     {
@@ -52,7 +52,7 @@ trait HandleTrait
                 return sprintf('"%s"', $stamp->getHandlerName());
             }, $handledStamps));
 
-            throw new LogicException(sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s::%s()", got %d: %s.', get_debug_type($envelope->getMessage()), static::class, __FUNCTION__, \count($handledStamps), $handlers));
+            throw new LogicException(sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s::%s()", got %d: "%s".', get_debug_type($envelope->getMessage()), static::class, __FUNCTION__, \count($handledStamps), $handlers));
         }
 
         return $handledStamps[0]->getResult();

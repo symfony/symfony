@@ -8,6 +8,7 @@ CHANGELOG
  * Allow using UTF-8 parameter names
  * Support the `attribute` type (alias of `annotation`) in annotation loaders
  * Already encoded slashes are not decoded nor double-encoded anymore when generating URLs (query parameters)
+ * Add `EnumRequirement` to help generate route requirements from a `\BackedEnum`
 
 5.3
 ---

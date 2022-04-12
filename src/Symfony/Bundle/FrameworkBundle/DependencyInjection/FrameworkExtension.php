@@ -715,9 +715,9 @@ class FrameworkExtension extends Extension
 
         if ($httpMethodOverride) {
             $container->getDefinition('http_cache')
-                  ->addArgument((new Definition('void'))
-                      ->setFactory([Request::class, 'enableHttpMethodParameterOverride'])
-                  );
+                ->addArgument((new Definition('void'))
+                    ->setFactory([Request::class, 'enableHttpMethodParameterOverride'])
+                );
         }
     }
 
@@ -1927,6 +1927,8 @@ class FrameworkExtension extends Extension
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }
+
+        $container->getDefinition('stop_worker_on_sigterm_signal_listener')->setArgument('$signals', $config['stop_signals']);
 
         $defaultMiddleware = [
             'before' => [

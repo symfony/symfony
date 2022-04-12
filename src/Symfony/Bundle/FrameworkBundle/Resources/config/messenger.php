@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
@@ -192,8 +193,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
-        ->set('messenger.listener.stop_worker_on_sigterm_signal_listener', StopWorkerOnSigtermSignalListener::class)
+        ->set('messenger.listener.stop_worker_on_signal_listener', StopWorkerOnSignalListener::class)
             ->args([
+                abstract_arg('signals'),
                 service('logger')->ignoreOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')

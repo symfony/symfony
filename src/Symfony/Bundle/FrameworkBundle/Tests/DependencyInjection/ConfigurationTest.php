@@ -265,6 +265,106 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    public function testMessengerWithoutPcntl()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [
+            'framework' => [
+                'messenger' => [
+                ],
+            ],
+        ]);
+
+        self::assertEquals([\SIGTERM], $config['framework']['messenger']['stop_signals']);
+    }
+
+    public function testMessengerWithPcntlWithoutExplicitlyConfigured()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You must install pcntl extension in order to use stop_signals.');
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, [
+            'framework' => [
+                'messenger' => [
+                    'stop_signals' => \SIGTERM
+                ],
+            ],
+        ]);
+    }
+
+    public function testMessengerWithoutPcntlWithoutStopSignals()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, [
+            'framework' => [
+                'messenger' => [
+                ],
+            ],
+        ]);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testMessengerWithInvalidSignal()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid signal passed to stop_signals');
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, [
+            'framework' => [
+                'messenger' => [
+                    'stop_signals' => \SIG_IGN
+                ],
+            ],
+        ]);
+    }
+
+    public function testMessengerWithMultipleStopSignals()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [
+            'framework' => [
+                'messenger' => [
+                    'stop_signals' => [\SIGTERM, \SIGQUIT]
+                ],
+            ],
+        ]);
+
+        static::assertEquals(
+            [\SIGTERM, \SIGQUIT],
+            $config['messenger']['stop_signals']
+        );
+    }
+
+    public function testMessengerWithStringStopSignal()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [
+            'framework' => [
+                'messenger' => [
+                    'stop_signals' => ['SIGTERM', 'SIGQUIT']
+                ],
+            ],
+        ]);
+
+        static::assertEquals(
+            [\SIGTERM, \SIGQUIT],
+            $config['messenger']['stop_signals']
+        );
+    }
+
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';

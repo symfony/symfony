@@ -14,10 +14,12 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 use AsyncAws\Ses\Input\SendEmailRequest;
 use AsyncAws\Ses\ValueObject\Content;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MessageConverter;
 
 /**
@@ -53,7 +55,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         $envelope = $message->getEnvelope();
 
         $request = [
-            'FromEmailAddress' => $this->stringifyAddress($envelope->getSender()),
+            'FromEmailAddress' => $this->stringifyAddress(self::getSenderFromHeaders($email->getHeaders())),
             'Destination' => [
                 'ToAddresses' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
             ],
@@ -129,5 +131,20 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         }
 
         return $a->toString();
+    }
+
+    private static function getSenderFromHeaders(Headers $headers): Address
+    {
+        if ($sender = $headers->get('Sender')) {
+            return $sender->getAddress();
+        }
+        if ($from = $headers->get('From')) {
+            return $from->getAddresses()[0];
+        }
+        if ($return = $headers->get('Return-Path')) {
+            return $return->getAddress();
+        }
+
+        throw new LogicException('Unable to determine the sender of the message.');
     }
 }

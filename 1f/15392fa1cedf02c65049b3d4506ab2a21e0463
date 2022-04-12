@@ -1,0 +1,155 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-12T00:04:56Z
+
+Hey!
+
+I think @alexander-schranz has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2022-02-14T05:42:05Z
+
+@alexander-schranz I have a multi tenanted application which I'm sharing sessions across multiple domains.
+
+A user will login to domain1.com and manage content. Within that same area, they can switch to another site (e.g. domain2.com). When the user switches, we sign a URL and send the original session id to domain2.com.
+
+When the user lands on domain2.com, we are calling $session->setId('original-session-id').
+
+The above works fine at the moment.
+
+The issue arises when the user already has an active session on domain2.com.
+
+e.g. they have logged into domain2.com. The open a new tab and visit domain1.com and login. Now, if they switch from domain1.com to domain2.com, the user lands on the signed URL but we can't use the session ID because the cookie is taking preference.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-02-14T09:40:14Z
+
+@trsteel88 The `$session->setId('original-session-id');` should still work in your case as it is called after your the cookie session id was set and so would overwrite the cookie session id. But maybe we have problems with subrequest here are you losing your set session id inside a subrequest? Can you give the following a try:
+
+```php
+            $request->setSessionFactory(function () use (&$sess, $request) {
+                if (!$sess) {
+                    $sess = $this->getSession();
+
+                    /*
+                     * For supporting sessions in php runtime with runners like roadrunner or swoole, the session
+                     * cookie needs to be read from the cookie bag and set on the session storage.
+                     *
+                     * Do not set it when a native php session is active.
+                     */
+                    if ($sess && !$sess->isStarted() && \PHP_SESSION_ACTIVE !== session_status()) {
+                        $sessionId = $sess->getId() ? $sess->getId() : $request->cookies->get($sess->getName(), '');
+                        $sess->setId($sessionId);
+                    }
+                }
+
+                return $sess;
+            });
+```
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2022-02-14T10:31:59Z
+
+The session is not active when I'm calling it. I'm overriding the NativeSessionFactory and have an event that is fired when the createStorage is called.
+
+This allows me to then listen to that event elsewhere.
+
+In my case, the session has not started yet and that's why the interfering code is overriding my value.
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2022-02-14T10:37:21Z
+
+> @trsteel88 The `$session->setId('original-session-id');` should still work in your case as it is called after your the cookie session id was set and so would overwrite the cookie session id. But maybe we have problems with subrequest here are you losing your set session id inside a subrequest? Can you give the following a try:
+>
+> ```
+>             $request->setSessionFactory(function () use (&$sess, $request) {
+>                 if (!$sess) {
+>                     $sess = $this->getSession();
+>
+>                     /*
+>                      * For supporting sessions in php runtime with runners like roadrunner or swoole, the session
+>                      * cookie needs to be read from the cookie bag and set on the session storage.
+>                      *
+>                      * Do not set it when a native php session is active.
+>                      */
+>                     if ($sess && !$sess->isStarted() && \PHP_SESSION_ACTIVE !== session_status()) {
+>                         $sessionId = $sess->getId() ? $sess->getId() : $request->cookies->get($sess->getName(), '');
+>                         $sess->setId($sessionId);
+>                     }
+>                 }
+>
+>                 return $sess;
+>             });
+> ```
+
+This works. I'll update the PR.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-02-14T21:51:21Z
+
+Okay some tests are now failing. I need also check what effect this change will have on swoole and roadrunner applications. The `Surrogate` test sounds we maybe run into problems with `ESI` or subrequests with this change, or that maybe the test is wrong. Not sure if I will have time before end of the week to have a look at it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T17:06:39Z
+
+@alexander-schranz Do you think you will have time to have a look at this one soon?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-04-01T17:17:56Z
+
+@fabpot I will try to have a look at it tomorrow.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-04-06T23:48:44Z
+
+Update here tested roadrunner and swoole and the change seems not have any effects on them.
+
+The following patch should fix the tests, I have no permissons to push it:
+
+```patch
+commit 625f2b7e31fa242b515aa0cea13574a68f1d07a5
+Author: Alexander Schranz <alexander@sulu.io>
+Date:   Thu Apr 7 01:47:40 2022 +0200
+
+    Fix surrogate test cases for session listener
+
+diff --git a/src/Symfony/Component/HttpKernel/Tests/EventListener/SessionListenerTest.php b/src/Symfony/Component/HttpKernel/Tests/EventListener/SessionListenerTest.php
+index 3bf31bfe68..f0609316b4 100644
+--- a/src/Symfony/Component/HttpKernel/Tests/EventListener/SessionListenerTest.php
++++ b/src/Symfony/Component/HttpKernel/Tests/EventListener/SessionListenerTest.php
+@@ -522,7 +522,7 @@ class SessionListenerTest extends TestCase
+     public function testSurrogateMainRequestIsPublic()
+     {
+         $session = $this->createMock(Session::class);
+-        $session->expects($this->exactly(2))->method('getName')->willReturn('PHPSESSID');
++        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
+         $session->expects($this->exactly(4))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1, 1, 1));
+
+         $container = new Container();
+@@ -562,7 +562,7 @@ class SessionListenerTest extends TestCase
+     public function testGetSessionIsCalledOnce()
+     {
+         $session = $this->createMock(Session::class);
+-        $session->expects($this->exactly(2))->method('getName')->willReturn('PHPSESSID');
++        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
+         $sessionStorage = $this->createMock(NativeSessionStorage::class);
+         $kernel = $this->createMock(KernelInterface::class);
+```
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2022-04-10T11:25:15Z
+
+Updated @alexander-schranz

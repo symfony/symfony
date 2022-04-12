@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by bastnic at 2022-01-20T14:25:10Z
+
+To add some context: I've a problem somewhere in my stack that truncate my big json response (2.5mo).
+
+I expected Symfony to add the header `Content-Length` that would help but it seems not. Anybody knows a good reason not to ?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-20T14:33:59Z
+
+This `prepare` method is called on the kernel.response event at priority 0, while the WebProfilerBundle will inject the toolbar later. So this would then report the *wrong* content-length header, which seems worse to me. Maybe `Response::setContent` should update the `Content-Length` header if it is present.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-20T14:41:55Z
+
+And very early versions of Symfony used to put that header, which has been removed to fix an issue with gzip: https://github.com/symfony/symfony/issues/1846
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-20T14:55:01Z
+
+Thanks for link @stof, PR updated to update the header in `setContent()` instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-20T15:03:19Z
+
+Given the potential impact (the old ticket also mentions that adding the `Content-Length` prevents Apache to use chunked transfer encoding), should this be merged as a bugfix or a new feature ?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-20T15:04:27Z
+
+Also, the PR description looks wrong. It is not fixing the bug from 2011 (which was already fixed by removing the content-length header at that time)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-20T15:12:54Z
+
+OK to target 6.1
+PR updated. Setting the header in `setContent()` breaks HttpCache.
+Now doing it in `send()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-11T15:02:43Z
+
+Review welcome @symfony/mergers

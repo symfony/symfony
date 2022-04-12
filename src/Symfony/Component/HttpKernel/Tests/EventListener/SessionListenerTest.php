@@ -599,14 +599,9 @@ class SessionListenerTest extends TestCase
     public function testGetSessionIsCalledOnce()
     {
         $session = $this->createMock(Session::class);
-<<<<<<< HEAD
-        $session->expects($this->exactly(2))->method('getName')->willReturn('PHPSESSID');
+        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
         $sessionFactory = $this->createMock(SessionFactory::class);
         $sessionFactory->expects($this->once())->method('createSession')->willReturn($session);
-=======
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $sessionStorage = $this->createMock(NativeSessionStorage::class);
->>>>>>> 5.4
         $kernel = $this->createMock(KernelInterface::class);
 
         $requestStack = new RequestStack();

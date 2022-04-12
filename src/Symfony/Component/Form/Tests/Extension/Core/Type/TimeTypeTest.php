@@ -991,6 +991,27 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertSame($input, $form->getViewData());
     }
 
+    public function testArrayTimeWithReferenceDoesUseReferenceDateOnModelTransform()
+    {
+        $input = [
+            'hour' => '21',
+            'minute' => '45',
+        ];
+
+        $form = $this->factory->create(static::TESTED_TYPE, $input, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'reference_date' => new \DateTimeImmutable('01-05-2021 12:34:56', new \DateTimeZone('UTC')),
+            'input' => 'array',
+        ]);
+
+        $this->assertSame($input, $form->getData());
+        $this->assertEquals([
+            'hour' => '23',
+            'minute' => '45',
+        ], $form->getViewData());
+    }
+
     /**
      * @dataProvider provideEmptyData
      */

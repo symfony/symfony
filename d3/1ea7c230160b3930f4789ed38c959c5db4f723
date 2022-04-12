@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-11-21T09:45:00Z
+
+I'm not sure how HtmlSanitizer vs. DomCrawler correlates :thinking: nevertheless i think this makes the implementation more robust :+1:
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-11-21T11:02:34Z
+
+@ro0NL they correlate because the current implementation is basically an opt-in based on the mere presence of the parser. Having html-sanitizer as a component requiring the parser would opt-in people unexpectedly. This pr solves this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-11T15:08:30Z
+
+Can you target 6.1 now that exists?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T11:46:32Z
+
+@tgalopin Can you rebase this PR on 6.1? Is it ready to be merged then?

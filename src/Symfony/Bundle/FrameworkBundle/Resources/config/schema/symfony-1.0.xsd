@@ -42,6 +42,7 @@
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
+        <xsd:attribute name="trust-x-sendfile-type-header" type="xsd:boolean" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />

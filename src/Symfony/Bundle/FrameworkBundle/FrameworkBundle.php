@@ -45,6 +45,7 @@ use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
@@ -94,6 +95,10 @@ class FrameworkBundle extends Bundle
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
+        }
+
+        if ($this->container->getParameter('kernel.trust_x_sendfile_type_header')) {
+            BinaryFileResponse::trustXSendfileTypeHeader();
         }
     }
 

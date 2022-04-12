@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Translation\Provider\FilteringProvider;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\TranslatorBag;
@@ -133,7 +134,13 @@ EOF
         $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
 
         if (!$domains) {
-            $domains = $this->getDomainsFromTranslatorBag($localTranslations);
+            if ($provider instanceof FilteringProvider) {
+                $domains = $provider->getDomains();
+            }
+
+            if (!$domains) {
+                $domains = $this->getDomainsFromTranslatorBag($localTranslations);
+            }
         }
 
         if (!$deleteMissing && $force) {

@@ -217,6 +217,40 @@ class SessionListenerTest extends TestCase
     /**
      * @runInSeparateProcess
      */
+    public function testNewSessionIdIsNotOverwritten()
+    {
+        $newSessionId = $this->createValidSessionId();
+
+        $this->assertNotEmpty($newSessionId);
+
+        $request = new Request();
+        $request->cookies->set('PHPSESSID', 'OLD-SESSION-ID');
+
+        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $session = $request->getSession();
+        $this->assertSame($newSessionId, $session->getId());
+        $session->set('hello', 'world');
+
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+        $this->assertSame($newSessionId, $session->getId());
+
+        $cookies = $response->headers->getCookies();
+
+        $this->assertCount(1, $cookies);
+        $sessionCookie = $cookies[0];
+
+        $this->assertSame('PHPSESSID', $sessionCookie->getName());
+        $this->assertSame($newSessionId, $sessionCookie->getValue());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testSessionCookieClearedWhenInvalidated()
     {
         $sessionId = $this->createValidSessionId();
@@ -500,7 +534,7 @@ class SessionListenerTest extends TestCase
     public function testSurrogateMainRequestIsPublic()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getName')->willReturn('PHPSESSID');
+        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
         $session->expects($this->exactly(4))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1, 1, 1));
 
         $container = new Container();
@@ -540,7 +574,7 @@ class SessionListenerTest extends TestCase
     public function testGetSessionIsCalledOnce()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getName')->willReturn('PHPSESSID');
+        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
         $sessionStorage = $this->createMock(NativeSessionStorage::class);
         $kernel = $this->createMock(KernelInterface::class);
 

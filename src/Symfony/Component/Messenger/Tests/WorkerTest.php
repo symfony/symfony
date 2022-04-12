@@ -175,6 +175,25 @@ class WorkerTest extends TestCase
         $worker->run();
     }
 
+    public function testWorkerWithoutDispatcher()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $worker = new Worker([$receiver], $bus);
+
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(static function () use ($worker, $envelope) {
+                $worker->stop();
+
+                return $envelope;
+            });
+
+        $worker->run();
+    }
+
     public function testWorkerDispatchesEventsOnError()
     {
         $envelope = new Envelope(new DummyMessage('Hello'));

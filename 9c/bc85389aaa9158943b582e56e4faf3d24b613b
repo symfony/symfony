@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-22T13:22:26Z
+
+Hey!
+
+I think @usu has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-03-22T13:36:17Z
+
+Note: the alternative mentioned on Slack was to use a PHP 8 attribute to configure the `\BackedEnum` argument resolver instead, but perhaps not the best idea, since it'll be slightly less performant and wouldn't allow multiple routes with different requirements on contrary of this suggestion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-22T13:43:58Z
+
+If we really want to support subsets, we should give the subset of "what".
+Wouldn't this be a cleaner signature?
+`BackedEnumRequirement(class-string<T> $enum, ...BackedEnum<T> $cases)`
+
+Honestly, I find this quite ugly... but :shrug:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-28T09:14:23Z
+
+What about renaming BackedEnumRequirement to EnumRequirement? I feel like adding "Backed" doesn't provide anything.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-03-31T12:24:22Z
+
+`\UnitEnum` enums are not supported. `EnumRequirement` could imply the class supports both `\BackedEnum` and `\UnitEnum`.
+
+I'll change the signature to `BackedEnumRequirement(class-string<T> $enum, ...BackedEnum<T> $cases)` and throw if a $case is not part of $enum.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-31T12:34:21Z
+
+> EnumRequirement could imply the class supports both \BackedEnum and \UnitEnum
+
+It cannot since it will throw once ppl give it a try - and it's a logical error to expect that a pure enum could work as a part of matching a URL, so ppl that could have this expectation are wrong anyway. "BackedEnum" just adds to the ugliness of using enums to me...

@@ -110,7 +110,7 @@ final class CacheItem implements ItemInterface
         if (!$this->isTaggable) {
             throw new LogicException(sprintf('Cache item "%s" comes from a non tag-aware pool: you cannot tag it.', $this->key));
         }
-        if (!is_iterable($tags)) {
+        if (!\is_array($tags) && !$tags instanceof \Traversable) { // don't use is_iterable(), it's slow
             $tags = [$tags];
         }
         foreach ($tags as $tag) {

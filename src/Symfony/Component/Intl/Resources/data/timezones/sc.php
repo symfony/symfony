@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'Ora Turchia (Ìstanbul)',
         'Europe/Jersey' => 'Ora de su meridianu de Greenwich (Jersey)',
         'Europe/Kaliningrad' => 'Ora de s’Europa orientale (Kaliningrad)',
-        'Europe/Kiev' => 'Ora de s’Europa orientale (Kiev)',
+        'Europe/Kiev' => 'Ora de s’Europa orientale (Kyiv)',
         'Europe/Kirov' => 'Ora Rùssia (Kirov)',
         'Europe/Lisbon' => 'Ora de s’Europa otzidentale (Lisbona)',
         'Europe/Ljubljana' => 'Ora de s’Europa tzentrale (Ljubljana)',

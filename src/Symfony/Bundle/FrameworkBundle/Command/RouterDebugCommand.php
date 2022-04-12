@@ -91,7 +91,21 @@ EOF
         }
 
         if ($name) {
-            if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {
+            $route = $routes->get($name);
+            $matchingRoutes = $this->findRouteNameContaining($name, $routes);
+
+            if (!$input->isInteractive() && !$route && \count($matchingRoutes) > 1) {
+                $helper->describe($io, $this->findRouteContaining($name, $routes), [
+                    'format' => $input->getOption('format'),
+                    'raw_text' => $input->getOption('raw'),
+                    'show_controllers' => $input->getOption('show-controllers'),
+                    'output' => $io,
+                ]);
+
+                return 0;
+            }
+
+            if (!$route && $matchingRoutes) {
                 $default = 1 === \count($matchingRoutes) ? $matchingRoutes[0] : null;
                 $name = $io->choice('Select one of the matching routes', $matchingRoutes, $default);
                 $route = $routes->get($name);
@@ -145,5 +159,17 @@ EOF
             $helper = new DescriptorHelper();
             $suggestions->suggestValues($helper->getFormats());
         }
+    }
+
+    private function findRouteContaining(string $name, RouteCollection $routes): RouteCollection
+    {
+        $foundRoutes = new RouteCollection();
+        foreach ($routes as $routeName => $route) {
+            if (false !== stripos($routeName, $name)) {
+                $foundRoutes->add($routeName, $route);
+            }
+        }
+
+        return $foundRoutes;
     }
 }

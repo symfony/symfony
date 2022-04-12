@@ -107,7 +107,7 @@ trait HttpClientTrait
                 && (string) \strlen($options['body']) !== substr($h = $options['normalized_headers']['content-length'][0] ?? '', 16)
                 && ('' !== $h || '' !== $options['body'])
             ) {
-                if (isset($options['normalized_headers']['transfer-encoding'])) {
+                if ('chunked' === substr($options['normalized_headers']['transfer-encoding'][0] ?? '', \strlen('Transfer-Encoding: '))) {
                     unset($options['normalized_headers']['transfer-encoding']);
                     $options['body'] = self::dechunk($options['body']);
                 }

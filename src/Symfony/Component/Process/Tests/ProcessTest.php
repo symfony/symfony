@@ -1503,8 +1503,11 @@ class ProcessTest extends TestCase
 
     public function testEnvArgument()
     {
-        $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $cmd = '\\' === \DIRECTORY_SEPARATOR ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
+        $p = Process::fromShellCommandline($cmd);
+        $this->assertSame([], $p->getEnv());
+
+        $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $p = Process::fromShellCommandline($cmd, null, $env);
         $p->run(null, ['BAR' => 'baR', 'BAZ' => 'baZ']);
 

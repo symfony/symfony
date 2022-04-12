@@ -103,6 +103,7 @@ return [
         'en_MS' => 'Chirungu (Montserrat)',
         'en_MT' => 'Chirungu (Malta)',
         'en_MU' => 'Chirungu (Mauritius)',
+        'en_MV' => 'Chirungu (Maldives)',
         'en_MW' => 'Chirungu (Malawi)',
         'en_MY' => 'Chirungu (Malaysia)',
         'en_NA' => 'Chirungu (Namibia)',

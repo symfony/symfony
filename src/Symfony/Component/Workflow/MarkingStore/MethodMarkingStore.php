@@ -54,7 +54,15 @@ final class MethodMarkingStore implements MarkingStoreInterface
             throw new LogicException(sprintf('The method "%s::%s()" does not exist.', \get_class($subject), $method));
         }
 
-        $marking = $subject->{$method}();
+        $marking = null;
+        try {
+            $marking = $subject->{$method}();
+        } catch (\Error $e) {
+            $unInitializedPropertyMassage = sprintf('Typed property %s::$%s must not be accessed before initialization', get_debug_type($subject), $this->property);
+            if ($e->getMessage() !== $unInitializedPropertyMassage) {
+                throw $e;
+            }
+        }
 
         if (null === $marking) {
             return new Marking();

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-26T12:48:59Z
+
+Hey!
+
+I think @rvanlaak has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T11:03:24Z
+
+@welcoMattic Do you have time to answer Nicolas's question? Is it ready to be merged then?
+
+---------------------------------------------------------------------------
+
+by ossinkine at 2022-04-02T16:40:35Z
+
+Thank you for MR! I suggest to merge it to 5.4 but not to 6.1 because actually this can be considered as a fix for more obvious behavior. I've also been surprised when discovered the domains are got not from config.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-04-06T19:05:08Z
+
+@fabpot I fixed @nicolas-grekas comment, it's ready to merge now, sorry for the delay
+
+@ossinkine we must consider it as a feature, because nothing is properly broken here
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-04-12T14:39:12Z
+
+According to discussion with @nicolas-grekas, this PR is a bugfix. It's rebased on 5.4

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-04-30T10:08:45Z
+
+Can you add a test case that would fail without this patch?
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2021-04-30T10:17:22Z
+
+> Can you add a test case that would fail without this patch?
+
+Let me see if I can make a good one
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2021-04-30T11:25:58Z
+
+hmmm, maybe it's more of an issue of if should be a valid setting for that input anyways (maybe help me out with thinking here).
+Does the timezone need to be applied to an array field that only stores hours and minutes in the first place? The more I think about it the answer is: probably not.
+Cause tbh it's a bit of strange and undefined behaviour which probably also relates to the other thing I ran into:
+https://github.com/symfony/symfony/pull/41000
+
+Maybe it would me more sense to disable the model and view timezone options for the array input all together and throw a logic exception when you try it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-05-17T14:16:25Z
+
+Does this apply to 4.4 too?
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2021-05-17T14:18:50Z
+
+Yes, this changed line is present in 4.4 as well

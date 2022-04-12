@@ -28,6 +28,8 @@ final class LockRegistry
 {
     private static $openedFiles = [];
     private static $lockedFiles;
+    private static $signalingException;
+    private static $signalingCallback;
 
     /**
      * The number of items in this list controls the max number of concurrent processes.
@@ -92,6 +94,9 @@ final class LockRegistry
             return $callback($item, $save);
         }
 
+        self::$signalingException ?? self::$signalingException = unserialize("O:9:\"Exception\":1:{s:16:\"\0Exception\0trace\";a:0:{}}");
+        self::$signalingCallback ?? self::$signalingCallback = function () { throw self::$signalingException; };
+
         while (true) {
             try {
                 // race to get the lock in non-blocking mode
@@ -121,18 +126,15 @@ final class LockRegistry
                 flock($lock, \LOCK_UN);
                 unset(self::$lockedFiles[$key]);
             }
-            static $signalingException, $signalingCallback;
-            $signalingException = $signalingException ?? unserialize("O:9:\"Exception\":1:{s:16:\"\0Exception\0trace\";a:0:{}}");
-            $signalingCallback = $signalingCallback ?? function () use ($signalingException) { throw $signalingException; };
 
             try {
-                $value = $pool->get($item->getKey(), $signalingCallback, 0);
+                $value = $pool->get($item->getKey(), self::$signalingCallback, 0);
                 $logger && $logger->info('Item "{key}" retrieved after lock was released', ['key' => $item->getKey()]);
                 $save = false;
 
                 return $value;
             } catch (\Exception $e) {
-                if ($signalingException !== $e) {
+                if (self::$signalingException !== $e) {
                     throw $e;
                 }
                 $logger && $logger->info('Item "{key}" not found while lock was released, now retrying', ['key' => $item->getKey()]);

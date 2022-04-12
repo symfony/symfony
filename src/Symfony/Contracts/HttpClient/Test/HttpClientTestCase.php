@@ -331,11 +331,16 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame('', $response->getContent(false));
     }
 
-    public function testRedirects()
+    /**
+     * @testWith [[]]
+     *           [["Content-Length: 7"]]
+     */
+    public function testRedirects(array $headers = [])
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('POST', 'http://localhost:8057/301', [
             'auth_basic' => 'foo:bar',
+            'headers' => $headers,
             'body' => function () {
                 yield 'foo=bar';
             },

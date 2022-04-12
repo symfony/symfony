@@ -196,7 +196,7 @@ return [
         'Europe/Isle_of_Man' => 'Wā Toharite Greenwich (Isle of Man)',
         'Europe/Jersey' => 'Wā Toharite Greenwich (Jersey)',
         'Europe/Kaliningrad' => 'Wā Uropi Rāwhiti (Kaliningrad)',
-        'Europe/Kiev' => 'Wā Uropi Rāwhiti (Kiev)',
+        'Europe/Kiev' => 'Wā Uropi Rāwhiti (Kyiv)',
         'Europe/Kirov' => 'Rūhia (Kirov)',
         'Europe/Lisbon' => 'Wā Uropi Uru (Lisbon)',
         'Europe/Ljubljana' => 'Wā Uropi Waenga (Ljubljana)',

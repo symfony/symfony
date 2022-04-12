@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the symfony/symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *

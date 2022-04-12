@@ -344,7 +344,7 @@ return [
         'Europe/Istanbul' => 'تۈركىيە ۋاقتى (Istanbul)',
         'Europe/Jersey' => 'گىرىنۋىچ ۋاقتى (Jersey)',
         'Europe/Kaliningrad' => 'شەرقىي ياۋروپا ۋاقتى (Kaliningrad)',
-        'Europe/Kiev' => 'شەرقىي ياۋروپا ۋاقتى (Kiev)',
+        'Europe/Kiev' => 'شەرقىي ياۋروپا ۋاقتى (Kyiv)',
         'Europe/Kirov' => 'رۇسىيە ۋاقتى (Kirov)',
         'Europe/Lisbon' => 'غەربىي ياۋروپا ۋاقتى (Lisbon)',
         'Europe/Ljubljana' => 'ئوتتۇرا ياۋروپا ۋاقتى (Ljubljana)',

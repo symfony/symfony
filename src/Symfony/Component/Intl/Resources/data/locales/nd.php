@@ -104,6 +104,7 @@ return [
         'en_MS' => 'isi-Ngisi (Montserrat)',
         'en_MT' => 'isi-Ngisi (Malta)',
         'en_MU' => 'isi-Ngisi (Mauritius)',
+        'en_MV' => 'isi-Ngisi (Maldives)',
         'en_MW' => 'isi-Ngisi (Malawi)',
         'en_MY' => 'isi-Ngisi (Malezhiya)',
         'en_NA' => 'isi-Ngisi (Namibhiya)',

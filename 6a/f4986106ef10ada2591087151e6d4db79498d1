@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-04-11T10:12:36Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-04-11T10:12:39Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-04-11T10:30:12Z
+
+This should be on 4.4 instead.
+
+---------------------------------------------------------------------------
+
+by tpetry at 2022-04-11T10:31:45Z
+
+Ok, I'll rebase it onto 4.4 😉
+
+---------------------------------------------------------------------------
+
+by tpetry at 2022-04-11T10:44:42Z
+
+@fabpot Can you re-run the workflows? I missed changing the new base branch information in the Github Pull Request setting.
+
+---------------------------------------------------------------------------
+
+by AndreasSchantl at 2022-04-11T11:52:59Z
+
+This is great! I am having the issue with Laravel 9 not setting the Return Path on the sent email correctly. It's always the sender email.
+
+Thanks for the PR!

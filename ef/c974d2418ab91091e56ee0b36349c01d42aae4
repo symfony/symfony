@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-04-12T14:44:46Z
+
+The difference is probably because `\is_array` is a compiler-optimized function (and `instanceof` is a dedicated opcode) while `is_iterable` is not compiler-optimized.

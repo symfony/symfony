@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Doctrine\Tests\Middleware\Debug;
 
 use Doctrine\DBAL\Configuration;
@@ -62,12 +71,12 @@ EOT
     {
         return [
             'executeStatement' => [
-                static function(object $target, ...$args) {
+                static function (object $target, ...$args) {
                     return $target->executeStatement(...$args);
                 },
             ],
             'executeQuery' => [
-                static function(object $target, ...$args): Result {
+                static function (object $target, ...$args): Result {
                     return $target->executeQuery(...$args);
                 },
             ],
@@ -148,13 +157,13 @@ EOT
     {
         return [
             'commit' => [
-                static function(Connection $conn): bool {
+                static function (Connection $conn): bool {
                     return $conn->commit();
                 },
                 '"COMMIT"',
             ],
             'rollback' => [
-                static function(Connection $conn): bool {
+                static function (Connection $conn): bool {
                     return $conn->rollBack();
                 },
                 '"ROLLBACK"',
@@ -198,18 +207,18 @@ EOT
     {
         return [
             'commit and exec' => [
-                static function(Connection $conn, string $sql) {
+                static function (Connection $conn, string $sql) {
                     return $conn->executeStatement($sql);
                 },
-                static function(Connection $conn): bool {
+                static function (Connection $conn): bool {
                     return $conn->commit();
                 },
             ],
             'rollback and query' => [
-                static function(Connection $conn, string $sql): Result {
+                static function (Connection $conn, string $sql): Result {
                     return $conn->executeQuery($sql);
                 },
-                static function(Connection $conn): bool {
+                static function (Connection $conn): bool {
                     return $conn->rollBack();
                 },
             ],

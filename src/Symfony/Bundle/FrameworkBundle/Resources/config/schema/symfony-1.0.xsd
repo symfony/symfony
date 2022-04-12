@@ -31,6 +31,7 @@
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
             <xsd:element name="exceptions" type="exceptions" minOccurs="0" maxOccurs="1" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="semaphore" type="semaphore" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
@@ -475,6 +476,21 @@
     </xsd:complexType>
 
     <xsd:complexType name="lock_resource">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="name" type="xsd:string" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="semaphore">
+        <xsd:sequence>
+            <xsd:element name="resource" type="semaphore_resource" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="semaphore_resource">
         <xsd:simpleContent>
             <xsd:extension base="xsd:string">
                 <xsd:attribute name="name" type="xsd:string" />

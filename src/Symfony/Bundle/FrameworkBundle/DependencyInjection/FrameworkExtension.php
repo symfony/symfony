@@ -185,6 +185,10 @@ use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Semaphore\PersistingStoreInterface as SemaphoreStoreInterface;
+use Symfony\Component\Semaphore\Semaphore;
+use Symfony\Component\Semaphore\SemaphoreFactory;
+use Symfony\Component\Semaphore\Store\StoreFactory as SemaphoreStoreFactory;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -402,6 +406,10 @@ class FrameworkExtension extends Extension
 
         if (self::$lockConfigEnabled = $this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['semaphore'])) {
+            $this->registerSemaphoreConfiguration($config['semaphore'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['rate_limiter'])) {
@@ -1892,6 +1900,39 @@ class FrameworkExtension extends Extension
                 $container->setAlias(LockFactory::class, new Alias('lock.factory', false));
             } else {
                 $container->registerAliasForArgument('lock.'.$resourceName.'.factory', LockFactory::class, $resourceName.'.lock.factory');
+            }
+        }
+    }
+
+    private function registerSemaphoreConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        $loader->load('semaphore.php');
+
+        foreach ($config['resources'] as $resourceName => $resourceStore) {
+            $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+            $storeDefinition = new Definition(SemaphoreStoreInterface::class);
+            $storeDefinition->setFactory([SemaphoreStoreFactory::class, 'createStore']);
+            $storeDefinition->setArguments([$resourceStore]);
+
+            $container->setDefinition($storeDefinitionId = '.semaphore.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
+
+            // Generate factories for each resource
+            $factoryDefinition = new ChildDefinition('semaphore.factory.abstract');
+            $factoryDefinition->replaceArgument(0, new Reference($storeDefinitionId));
+            $container->setDefinition('semaphore.'.$resourceName.'.factory', $factoryDefinition);
+
+            // Generate services for semaphore instances
+            $semaphoreDefinition = new Definition(Semaphore::class);
+            $semaphoreDefinition->setPublic(false);
+            $semaphoreDefinition->setFactory([new Reference('semaphore.'.$resourceName.'.factory'), 'createSemaphore']);
+            $semaphoreDefinition->setArguments([$resourceName]);
+
+            // provide alias for default resource
+            if ('default' === $resourceName) {
+                $container->setAlias('semaphore.factory', new Alias('semaphore.'.$resourceName.'.factory', false));
+                $container->setAlias(SemaphoreFactory::class, new Alias('semaphore.factory', false));
+            } else {
+                $container->registerAliasForArgument('semaphore.'.$resourceName.'.factory', SemaphoreFactory::class, $resourceName.'.semaphore.factory');
             }
         }
     }

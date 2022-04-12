@@ -265,6 +265,57 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideValidSemaphoreConfigurationTests
+     */
+    public function testValidSemaphoreConfiguration($semaphoreConfig, $processedConfig)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'semaphore' => $semaphoreConfig,
+            ],
+        ]);
+
+        $this->assertArrayHasKey('semaphore', $config);
+
+        $this->assertEquals($processedConfig, $config['semaphore']);
+    }
+
+    public function provideValidSemaphoreConfigurationTests()
+    {
+        yield [null, ['enabled' => true, 'resources' => []]];
+
+        yield ['redis://default', ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['default' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['enabled' => false, 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['enabled' => false, 'default' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['resources' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['resources' => ['default' => 'redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['enabled' => false, 'resources' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['enabled' => false, 'resources' => ['default' => 'redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+
+        // xml
+
+        yield [['resource' => ['redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default']]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default'], ['name' => 'bar', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default', 'bar' => 'redis://default']]];
+
+        yield [['enabled' => false, 'resource' => ['redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['foo' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://foo'], ['name' => 'bar', 'value' => 'redis://bar']]], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+    }
+
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
@@ -523,6 +574,11 @@ class ConfigurationTest extends TestCase
                     'default' => [
                         class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock',
                     ],
+                ],
+            ],
+            'semaphore' => [
+                'enabled' => !class_exists(FullStack::class),
+                'resources' => [
                 ],
             ],
             'messenger' => [

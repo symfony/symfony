@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Add support for configuring semaphores
  * Environment variable `SYMFONY_IDE` is read by default when `framework.ide` config is not set.
  * Load PHP configuration files by default in the `MicroKernelTrait`
  * Add `cache:pool:invalidate-tags` command

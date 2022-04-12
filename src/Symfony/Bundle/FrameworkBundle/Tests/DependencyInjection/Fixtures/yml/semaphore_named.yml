@@ -1,0 +1,7 @@
+parameters:
+    env(REDIS_DSN): redis://paas.com
+
+framework:
+    semaphore:
+        foo: redis://paas.com
+        qux: "%env(REDIS_DSN)%"

@@ -74,6 +74,7 @@ class FlexStyleMicroKernel extends Kernel
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $routes->add('halloween', '/')->controller([$this, 'halloweenAction']);
+        $routes->add('halloween2', '/h')->controller($this->halloweenAction(...));
     }
 
     protected function configureContainer(ContainerConfigurator $c): void

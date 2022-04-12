@@ -89,6 +89,11 @@ class MicroKernelTraitTest extends TestCase
         $response = $kernel->handle($request);
 
         $this->assertEquals('Have a great day!', $response->getContent());
+
+        $request = Request::create('/h');
+        $response = $kernel->handle($request);
+
+        $this->assertEquals('Have a great day!', $response->getContent());
     }
 
     public function testSecretLoadedFromExtension()

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 
-class DateTimeToArrayTransformerTest extends TestCase
+class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 {
     public function testTransform()
     {
@@ -534,5 +534,10 @@ class DateTimeToArrayTransformerTest extends TestCase
             'minute' => '5',
             'second' => '',
         ]);
+    }
+
+    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    {
+        return new DateTimeToArrayTransformer($inputTimezone, $outputTimezone);
     }
 }

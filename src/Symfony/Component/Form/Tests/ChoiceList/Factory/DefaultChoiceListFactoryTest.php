@@ -16,10 +16,10 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
@@ -194,7 +194,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoader()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $list = $this->factory->createListFromLoader($loader);
 
@@ -203,7 +203,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithValues()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $value = function () {};
         $list = $this->factory->createListFromLoader($loader, $value);

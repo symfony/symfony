@@ -11,23 +11,31 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class LocaleSwitcher implements LocaleAwareInterface
+class LocaleSwitcher implements LocaleAwareInterface
 {
+    private string $defaultLocale;
+
     /**
      * @param LocaleAwareInterface[] $localeAwareServices
      */
-    public function __construct(private string $locale, private iterable $localeAwareServices)
-    {
+    public function __construct(
+        private string $locale,
+        private iterable $localeAwareServices,
+        private ?RequestContext $requestContext = null,
+    ) {
+        $this->defaultLocale = $locale;
     }
 
     public function setLocale(string $locale): void
     {
         \Locale::setDefault($this->locale = $locale);
+        $this->requestContext?->setParameter('_locale', $locale);
 
         foreach ($this->localeAwareServices as $service) {
             $service->setLocale($locale);
@@ -42,17 +50,26 @@ final class LocaleSwitcher implements LocaleAwareInterface
     /**
      * Switch to a new locale, execute a callback, then switch back to the original.
      *
-     * @param callable():void $callback
+     * @template T
+     *
+     * @param callable():T $callback
+     *
+     * @return T
      */
-    public function runWithLocale(string $locale, callable $callback): void
+    public function runWithLocale(string $locale, callable $callback): mixed
     {
         $original = $this->getLocale();
         $this->setLocale($locale);
 
         try {
-            $callback();
+            return $callback();
         } finally {
             $this->setLocale($original);
         }
+    }
+
+    public function reset(): void
+    {
+        $this->setLocale($this->defaultLocale);
     }
 }

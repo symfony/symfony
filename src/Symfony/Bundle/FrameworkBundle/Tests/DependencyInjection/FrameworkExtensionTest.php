@@ -31,7 +31,6 @@ use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -2019,15 +2018,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->has('translation.locale_switcher'));
-        $this->assertTrue($container->has('translation.locale_aware_request_context'));
 
         $switcherDef = $container->getDefinition('translation.locale_switcher');
-        $localeAwareRequestContextDef = $container->getDefinition('translation.locale_aware_request_context');
 
         $this->assertSame('%kernel.default_locale%', $switcherDef->getArgument(0));
-        $this->assertInstanceOf(AbstractArgument::class, $switcherDef->getArgument(1));
-        $this->assertEquals(new Reference('router.request_context'), $localeAwareRequestContextDef->getArgument(0));
-        $this->assertSame('%kernel.default_locale%', $localeAwareRequestContextDef->getArgument(1));
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $switcherDef->getArgument(1));
+        $this->assertSame('kernel.locale_aware', $switcherDef->getArgument(1)->getTag());
+        $this->assertEquals(new Reference('router.request_context', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $switcherDef->getArgument(2));
     }
 
     protected function createContainer(array $data = [])

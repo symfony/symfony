@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCa
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigureLocaleSwitcherPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
@@ -164,7 +163,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new RemoveUnusedSessionMarshallingHandlerPass());
-        $container->addCompilerPass(new ConfigureLocaleSwitcherPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);

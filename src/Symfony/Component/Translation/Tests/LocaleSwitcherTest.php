@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -74,6 +75,24 @@ class LocaleSwitcherTest extends TestCase
         $this->assertSame('en', \Locale::getDefault());
         $this->assertSame('en', $service->getLocale());
         $this->assertSame('en', $switcher->getLocale());
+    }
+
+    public function testWithRequestContext()
+    {
+        $context = new RequestContext();
+        $service = new LocaleSwitcher('en', [], $context);
+
+        $this->assertSame('en', $service->getLocale());
+
+        $service->setLocale('fr');
+
+        $this->assertSame('fr', $service->getLocale());
+        $this->assertSame('fr', $context->getParameter('_locale'));
+
+        $service->reset();
+
+        $this->assertSame('en', $service->getLocale());
+        $this->assertSame('en', $context->getParameter('_locale'));
     }
 }
 

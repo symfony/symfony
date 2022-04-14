@@ -1,0 +1,168 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-01T21:38:59Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-02T10:52:36Z
+
+On second though, we might want to go a bit further: with the current approach, referenced services are going to be instantiated all the time, while they might be needed only on very specific routes.
+What about providing a service locator instead, after making EL able to deal with them?
+
+---------------------------------------------------------------------------
+
+by chapterjason at 2021-12-02T17:36:26Z
+
+What if two services are registered with the same name? This could cause some confusing issues, every service will override the one registered before.
+
+If docs will be added: prefix the service names in third party bundles.
+
+---------------------------------------------------------------------------
+
+by renanbr at 2021-12-02T19:41:25Z
+
+@nicolas-grekas
+
+> On second though, we might want to go a bit further: with the current approach, referenced services are going to be instantiated all the time, while they might be needed only on very specific routes.
+What about providing a service locator instead, after making EL able to deal with them?
+
+Instantiating services all the time is indeed not good. Based on your feedback I was wondering if we could inject a function that relies on a service locator instead of injecting variables
+
+```
+#[Route('/page', condition: "service('myService').myMethod()")]
+```
+
+Pros:
+
+- No changes in `UrlMatcher` (we can use the already available function provider feature)
+- We'll create services only when requested
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-03T17:41:47Z
+
+I like it @renanbr!
+
+---------------------------------------------------------------------------
+
+by renanbr at 2021-12-03T19:53:42Z
+
+Status: Since eafc9c5749ac2063e5d9c3689a19202b12cbc6d1, the FrameworkBundle wraps tagged services into a `ServiceLocator`, then passes it to the routing component, which unpacks services in the matcher when necessary.
+
+I'm satisfied with this ☝🏼 solution.
+
+My next shot will be implementing `service('name')` as described in https://github.com/symfony/symfony/pull/44405#issuecomment-984944188
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2022-03-09T18:13:40Z
+
+Why not using the `ExpressionFunctionProviderInterface` extension point instead of creating a new way of extending the expression language ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-17T16:55:39Z
+
+> Why not using the ExpressionFunctionProviderInterface extension point instead of creating a new way of extending the expression language ?
+
+For convenience I think. What would be the DX of your proposal?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-02T13:58:32Z
+
+@renanbr up to finish this PR?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-04-03T08:09:06Z
+
+> > Why not using the ExpressionFunctionProviderInterface extension point instead of creating a new way of extending the expression language ?
+>
+> For convenience I think. What would be the DX of your proposal?
+
+Late it the discussion. A new function `service()` would provide access to the container.
+```php
+class DefaultController
+{
+    #[Route('/page', condition: 'service('foo').bar()')]
+    public function page(): Response { ... }
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-03T08:29:31Z
+
+> A new function service() would provide access to the container.
+
+The one true container you mean? I guess that's no-go since that'd require services to be made public. The benefit of this proposal is that it allows labeling which services need to be made available for the routing layer.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-04-03T10:11:46Z
+
+Maybe a service locator, feed with regular tagged services.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-03T10:13:51Z
+
+That's exactly what this PR does IIUC :)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-04-03T10:53:12Z
+
+Indeed. Then the description needs to be updated.
+
+---------------------------------------------------------------------------
+
+by renanbr at 2022-04-05T06:54:44Z
+
+> @renanbr up to finish this PR?
+
+I'll work on this week and the next week.
+
+thanks for the review btw
+
+---------------------------------------------------------------------------
+
+by renanbr at 2022-04-05T18:02:34Z
+
+Update, despite the CI:
+
+- The current code is working (against a local application, no tests yet 😬)
+- Routing Variable concept removed
+- Routing Service concept kept
+- Name is optional as it fallbacks to the service-id (confirmed)
+    - https://github.com/symfony/symfony/pull/44405#discussion_r822794408
+- PR's description is updated
+
+in other words, it's ready for a new review round
+
+---------------------------------------------------------------------------
+
+by renanbr at 2022-04-12T19:55:16Z
+
+updated,
+latest changes
+
+- rename tag to `routing.condition_service`;
+- rename tag identifier to `alias`;
+- rename class attribute to `AsRoutingConditionService`;
+- move class attribute under FrameworkBundle;
+- rename expression language function to `container.get_routing_condition_service`;
+- add tests

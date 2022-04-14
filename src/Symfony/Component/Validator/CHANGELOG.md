@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Add the `fields` option to the `Unique` constraint, to define which collection keys should be checked for uniqueness
  * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
  * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
  * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`

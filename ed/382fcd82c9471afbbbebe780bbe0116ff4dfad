@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-04-14T10:16:39Z
+
+well, we have a stateful place storing the locale anyway (`\Locale::getDefault()` in ext-intl). So we'll never eliminate the state entirely.
+And we do have the LocaleAware contract, while adding a dependency on the LocaleSwitcher requires depending on the translation component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-14T10:19:07Z
+
+> adding a dependency on the LocaleSwitcher requires depending on the translation component.
+
+LocaleSwitcher should be autowired as LocaleAwareInterface!
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-04-14T12:54:31Z
+
+> This is an edgy feature btw to me because it builds on mutable services.
+
+Doesn't every `LocaleAwareInterface` service, by definition, carry mutable state?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-14T13:16:23Z
+
+> Doesn't every LocaleAwareInterface service, by definition, carry mutable state?
+
+yes, that's what I meant by "*builds on* mutable services" ;)

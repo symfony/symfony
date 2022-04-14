@@ -205,6 +205,7 @@ use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
@@ -1082,7 +1083,6 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.router_debug');
             $container->removeDefinition('console.command.router_match');
             $container->removeDefinition('messenger.middleware.router_context');
-            $container->removeDefinition('translation.locale_aware_request_context');
 
             return;
         }
@@ -1295,6 +1295,11 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('translation.php');
+
+        if (!ContainerBuilder::willBeAvailable('symfony/translation', LocaleSwitcher::class, ['symfony/framework-bundle'])) {
+            $container->removeDefinition('translation.locale_switcher');
+        }
+
         $loader->load('translation_providers.php');
 
         // Use the "real" translator instead of the identity default

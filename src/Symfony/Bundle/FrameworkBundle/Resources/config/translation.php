@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer;
-use Symfony\Bundle\FrameworkBundle\Translation\LocaleAwareRequestContext;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Translation\Dumper\CsvFileDumper;
 use Symfony\Component\Translation\Dumper\IcuResFileDumper;
@@ -46,6 +45,7 @@ use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -164,22 +164,15 @@ return static function (ContainerConfigurator $container) {
             ->args([service(ContainerInterface::class)])
             ->tag('container.service_subscriber', ['id' => 'translator'])
             ->tag('kernel.cache_warmer')
+
+        ->set('translation.locale_switcher', LocaleSwitcher::class)
+            ->args([
+                param('kernel.default_locale'),
+                tagged_iterator('kernel.locale_aware'),
+                service('router.request_context')->ignoreOnInvalid(),
+            ])
+            ->tag('kernel.reset', ['method' => 'reset'])
+        ->alias(LocaleAwareInterface::class, 'translation.locale_switcher')
+        ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
     ;
-
-    if (class_exists(LocaleSwitcher::class)) {
-        $container->services()
-            ->set('translation.locale_switcher', LocaleSwitcher::class)
-            ->args([
-                param('kernel.default_locale'),
-                abstract_arg('LocaleAware services'),
-            ])
-            ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
-
-            ->set('translation.locale_aware_request_context', LocaleAwareRequestContext::class)
-            ->args([
-                service('router.request_context'),
-                param('kernel.default_locale'),
-            ])
-        ;
-    }
 };

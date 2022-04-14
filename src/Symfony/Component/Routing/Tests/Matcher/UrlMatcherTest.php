@@ -474,6 +474,37 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['bar' => 'bar', '_route' => 'foo'], $matcher->match('/foo/bar'));
     }
 
+    public function testRouteParametersCondition()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo');
+        $route->setCondition("params['_route'] matches '/^s[a-z]+$/'");
+        $coll->add('static', $route);
+        $route = new Route('/bar');
+        $route->setHost('en.example.com');
+        $route->setCondition("params['_route'] matches '/^s[a-z\-]+$/'");
+        $coll->add('static-with-host', $route);
+        $route = new Route('/foo/{id}');
+        $route->setCondition("params['id'] < 100");
+        $coll->add('dynamic1', $route);
+        $route = new Route('/foo/{id}');
+        $route->setCondition("params['id'] > 100 and params['id'] < 1000");
+        $coll->add('dynamic2', $route);
+        $route = new Route('/bar/{id}/');
+        $route->setCondition("params['id'] < 100");
+        $coll->add('dynamic-with-slash', $route);
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('/sub/front.php', 'GET', 'en.example.com'));
+
+        $this->assertEquals(['_route' => 'static'], $matcher->match('/foo'));
+        $this->assertEquals(['_route' => 'static-with-host'], $matcher->match('/bar'));
+        $this->assertEquals(['_route' => 'dynamic1', 'id' => '10'], $matcher->match('/foo/10'));
+        $this->assertEquals(['_route' => 'dynamic2', 'id' => '200'], $matcher->match('/foo/200'));
+        $this->assertEquals(['_route' => 'dynamic-with-slash', 'id' => '10'], $matcher->match('/bar/10/'));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo/3000');
+    }
+
     public function testDecodeOnce()
     {
         $coll = new RouteCollection();

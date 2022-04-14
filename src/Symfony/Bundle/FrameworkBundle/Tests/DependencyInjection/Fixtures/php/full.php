@@ -81,51 +81,6 @@ $container->loadFromExtension('framework', [
         ],
     ],
     'html_sanitizer' => [
-        'default' => 'my.sanitizer',
-        'sanitizers' => [
-            'my.sanitizer' => [
-                'allow_safe_elements' => true,
-                'allow_all_static_elements' => true,
-                'allow_elements' => [
-                    'custom-tag-1' => ['data-attr-1'],
-                    'custom-tag-2' => [],
-                    'custom-tag-3' => '*',
-                ],
-                'block_elements' => [
-                    'custom-tag-4',
-                ],
-                'drop_elements' => [
-                    'custom-tag-5',
-                ],
-                'allow_attributes' => [
-                    'data-attr-2' => ['custom-tag-6'],
-                    'data-attr-3' => [],
-                    'data-attr-4' => '*',
-                ],
-                'drop_attributes' => [
-                    'data-attr-5' => ['custom-tag-6'],
-                    'data-attr-6' => [],
-                    'data-attr-7' => '*',
-                ],
-                'force_attributes' => [
-                    'custom-tag-7' => [
-                        'data-attr-8' => 'value',
-                    ],
-                ],
-                'force_https_urls' => true,
-                'allowed_link_schemes' => ['http', 'https', 'mailto'],
-                'allowed_link_hosts' => ['symfony.com'],
-                'allow_relative_links' => true,
-                'allowed_media_schemes' => ['http', 'https', 'data'],
-                'allowed_media_hosts' => ['symfony.com'],
-                'allow_relative_medias' => true,
-                'with_attribute_sanitizers' => [
-                    'App\\Sanitizer\\CustomAttributeSanitizer',
-                ],
-                'without_attribute_sanitizers' => [
-                    'App\\Sanitizer\\OtherCustomAttributeSanitizer',
-                ],
-            ],
-        ],
+        'enabled' => true,
     ],
 ]);

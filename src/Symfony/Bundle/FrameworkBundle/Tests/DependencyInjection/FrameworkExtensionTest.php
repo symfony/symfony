@@ -2030,33 +2030,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('router.request_context', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $switcherDef->getArgument(2));
     }
 
-    public function testHtmlSanitizerDefault()
+    public function testHtmlSanitizer()
     {
-        $container = $this->createContainerFromFile('html_sanitizer_default');
-
-        // html_sanitizer service
-        $this->assertTrue($container->hasDefinition('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
-        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer')->getClass());
-        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer')->getArguments());
-        $this->assertSame('html_sanitizer.config', (string) $args[0]);
-
-        // html_sanitizer.config service
-        $this->assertTrue($container->hasDefinition('html_sanitizer.config'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
-        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config')->getClass());
-        $this->assertCount(1, $calls = $container->getDefinition('html_sanitizer.config')->getMethodCalls());
-        $this->assertSame(['allowSafeElements', []], $calls[0]);
-
-        // Default alias
-        $this->assertSame(
-            'html_sanitizer',
-            (string) $container->getAlias(HtmlSanitizerInterface::class),
-            '->registerHtmlSanitizerConfiguration() creates appropriate default alias'
-        );
-    }
-
-    public function testHtmlSanitizerFull()
-    {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('html_sanitizer');
 
         // html_sanitizer service
         $this->assertTrue($container->hasDefinition('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
@@ -2084,18 +2060,18 @@ abstract class FrameworkExtensionTest extends TestCase
             [
                 ['allowSafeElements', [], true],
                 ['allowAllStaticElements', [], true],
-                ['allowElement', ['custom-tag-1', ['data-attr-1']], true],
-                ['allowElement', ['custom-tag-2', []], true],
-                ['allowElement', ['custom-tag-3', '*'], true],
-                ['blockElement', ['custom-tag-4'], true],
-                ['dropElement', ['custom-tag-5'], true],
-                ['allowAttribute', ['data-attr-2', ['custom-tag-6']], true],
-                ['allowAttribute', ['data-attr-3', []], true],
-                ['allowAttribute', ['data-attr-4', '*'], true],
-                ['dropAttribute', ['data-attr-5', ['custom-tag-6']], true],
-                ['dropAttribute', ['data-attr-6', []], true],
-                ['dropAttribute', ['data-attr-7', '*'], true],
-                ['forceAttribute', ['custom-tag-7', 'data-attr-8', 'value'], true],
+                ['allowElement', ['iframe', 'src'], true],
+                ['allowElement', ['custom-tag', ['data-attr', 'data-attr-1']], true],
+                ['allowElement', ['custom-tag-2', '*'], true],
+                ['blockElement', ['section'], true],
+                ['dropElement', ['video'], true],
+                ['allowAttribute', ['src', $this instanceof XmlFrameworkExtensionTest ? 'iframe' : ['iframe']], true],
+                ['allowAttribute', ['data-attr', '*'], true],
+                ['dropAttribute', ['data-attr', $this instanceof XmlFrameworkExtensionTest ? 'custom-tag' : ['custom-tag']], true],
+                ['dropAttribute', ['data-attr-1', []], true],
+                ['dropAttribute', ['data-attr-2', '*'], true],
+                ['forceAttribute', ['a', 'rel', 'noopener noreferrer'], true],
+                ['forceAttribute', ['h1', 'class', 'bp4-heading'], true],
                 ['forceHttpsUrls', [true], true],
                 ['allowLinkSchemes', [['http', 'https', 'mailto']], true],
                 ['allowLinkHosts', [['symfony.com']], true],
@@ -2121,18 +2097,11 @@ abstract class FrameworkExtensionTest extends TestCase
         );
 
         // Named alias
-        $this->assertSame(
-            'html_sanitizer.sanitizer.my.sanitizer',
-            (string) $container->getAlias(HtmlSanitizerInterface::class.' $mySanitizer'),
-            '->registerHtmlSanitizerConfiguration() creates appropriate named alias'
-        );
+        $this->assertSame('html_sanitizer.sanitizer.my.sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class.' $mySanitizer'), '->registerHtmlSanitizerConfiguration() creates appropriate named alias');
+        $this->assertSame('html_sanitizer.sanitizer.all.sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class.' $allSanitizer'), '->registerHtmlSanitizerConfiguration() creates appropriate named alias');
 
         // Default alias
-        $this->assertSame(
-            'html_sanitizer.sanitizer.my.sanitizer',
-            (string) $container->getAlias(HtmlSanitizerInterface::class),
-            '->registerHtmlSanitizerConfiguration() creates appropriate default alias'
-        );
+        $this->assertSame('html_sanitizer.sanitizer.my.sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class), '->registerHtmlSanitizerConfiguration() creates appropriate default alias');
     }
 
     protected function createContainer(array $data = [])

@@ -831,41 +831,20 @@
 
     <xsd:complexType name="sanitizer">
         <xsd:sequence>
-            <xsd:element name="allow-element" type="allow-element" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
+            <xsd:element name="allow-element" type="element-option" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="block-element" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
             <xsd:element name="drop-element" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
-            <xsd:element name="allow-attribute" type="allow-attribute" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
-            <xsd:element name="drop-attribute" type="drop-attribute" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
+            <xsd:element name="allow-attribute" type="attribute-option" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="drop-attribute" type="attribute-option" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="force-attribute" type="force-attribute" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
             <xsd:element name="allowed-link-scheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
             <xsd:element name="allowed-link-host" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
             <xsd:element name="allowed-media-scheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
             <xsd:element name="allowed-media-host" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
             <xsd:element name="with-attribute-sanitizer" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-        <xsd:sequence>
             <xsd:element name="without-attribute-sanitizer" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="allow-safe-elements" type="xsd:boolean" />
         <xsd:attribute name="allow-all-static-elements" type="xsd:boolean" />
         <xsd:attribute name="force-https-urls" type="xsd:boolean" />
@@ -873,10 +852,32 @@
         <xsd:attribute name="allow-relative-medias" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:complexType name="allow-element">
+    <xsd:complexType name="element-option">
         <xsd:sequence>
             <xsd:element name="attribute" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
-        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="attribute-option">
+        <xsd:sequence>
+            <xsd:element name="element" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="force-attribute">
+        <xsd:sequence>
+            <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:simpleContent>
+                        <xsd:extension base="xsd:string">
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:extension>
+                    </xsd:simpleContent>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 </xsd:schema>

@@ -5,14 +5,14 @@ CHANGELOG
 ---
 
  * Add support for configuring semaphores
- * Environment variable `SYMFONY_IDE` is read by default when `framework.ide` config is not set.
+ * Environment variable `SYMFONY_IDE` is read by default when `framework.ide` config is not set
  * Load PHP configuration files by default in the `MicroKernelTrait`
  * Add `cache:pool:invalidate-tags` command
  * Add `xliff` support in addition to `xlf` for `XliffFileDumper`
  * Deprecate the `reset_on_message` config option. It can be set to `true` only and does nothing now
  * Add `trust_x_sendfile_type_header` option
  * Add support for first-class callable route controller in `MicroKernelTrait`
- * Add tag `routing.condition_service` to autoconfigure routing condition services.
+ * Add tag `routing.condition_service` to autoconfigure routing condition services
 
 6.0
 ---

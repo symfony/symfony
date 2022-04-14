@@ -37,10 +37,10 @@ final class EnumRequirement implements \Stringable
             }
         }
 
-        $this->values = array_unique(array_map(
+        $this->values = array_map(
             static fn (\BackedEnum $e): string => $e->value,
             $cases ?: $enum::cases(),
-        ));
+        );
     }
 
     public function __toString(): string

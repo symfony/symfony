@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-06T11:00:11Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-07T07:02:00Z
+
+Hey!
+
+I think @lmasforne has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-08-09T12:33:44Z
+
+@wkania I just wanted to thank you for your great pull request description: you explained things well and showed some code examples, making the review much easier. Thanks!
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-03-31T08:46:45Z
+
+Would be very useful if this could work also with collection of DTOs, so I could provide property path where to look.
+
+---------------------------------------------------------------------------
+
+by wkania at 2022-04-03T13:16:45Z
+
+> Would be very useful if this could work also with collection of DTOs, so I could provide property path where to look.
+
+You should check the [normalizer](https://symfony.com/doc/current/reference/constraints/Unique.html#normalizer) option.
+Example [here](https://github.com/symfony/symfony/blob/6.1/src/Symfony/Component/Validator/Tests/Constraints/UniqueValidatorTest.php#L159).

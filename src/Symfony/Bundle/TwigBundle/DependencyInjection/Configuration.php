@@ -127,7 +127,10 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->variableNode('autoescape')->defaultValue('name')->end()
+                ->variableNode('autoescape')
+                    ->defaultValue('name')
+                    ->setDeprecated('symfony/twig-bundle', '6.1', 'Option "%node%" at "%path%" is deprecated, use autoescape_service[_method] instead.')
+                ->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig\Template')->cannotBeEmpty()->end()

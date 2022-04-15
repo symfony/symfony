@@ -61,7 +61,7 @@ class UserBadge implements BadgeInterface
      */
     public function getUser(): UserInterface
     {
-        if (null !== $this->user) {
+        if (isset($this->user)) {
             return $this->user;
         }
 

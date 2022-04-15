@@ -184,7 +184,7 @@ class PropertyNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    public function testConstructorDenormalizeWithInvalidArgument()
+    public function testConstructorDenormalizeWithInvalidArguments()
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar'],
@@ -194,7 +194,10 @@ class PropertyNormalizerTest extends TestCase
         );
         $this->assertSame('foo', $obj->getFoo());
         $this->assertSame('bar', $obj->getBar());
+    }
 
+    public function testThatExceptionIsThrownWithInvalidArgumentsWithDefaulltConfiguration()
+    {
         $this->expectException(\LogicException::class);
         $this->expectErrorMessage(sprintf('Argument "%s" is not acceptable as first argument of "%s"', 'foo', PropertyConstructorWithValidationDummy::class));
         $this->normalizer->denormalize(

@@ -95,7 +95,6 @@
         "symfony/security-bundle": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
-        "symfony/security-guard": "self.version",
         "symfony/security-http": "self.version",
         "symfony/semaphore": "self.version",
         "symfony/serializer": "self.version",

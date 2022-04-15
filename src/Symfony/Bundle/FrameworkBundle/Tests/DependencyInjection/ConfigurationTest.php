@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
@@ -638,6 +639,11 @@ class ConfigurationTest extends TestCase
                 'default_uuid_version' => 6,
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
+            ],
+            'html_sanitizer' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
+                'default' => null,
+                'sanitizers' => [],
             ],
             'exceptions' => [],
         ];

@@ -27,7 +27,6 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AutoMappingTrait;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
@@ -38,13 +37,6 @@ use Symfony\Component\Validator\Validation;
  */
 class DoctrineLoaderTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!trait_exists(AutoMappingTrait::class)) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.4+');
-        }
-    }
-
     public function testLoadClassMetadata()
     {
         $validator = Validation::createValidatorBuilder()

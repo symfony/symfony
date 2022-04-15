@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
-use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
@@ -137,10 +136,6 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
     {
-        if (!class_exists(Collection::class)) {
-            $this->markTestSkipped('Collections are not implemented in current phpdocumentor/type-resolver version');
-        }
-
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }
 

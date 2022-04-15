@@ -26,10 +26,6 @@ class TokenProcessorTest extends TestCase
 {
     public function testProcessor()
     {
-        if (!method_exists(UsernamePasswordToken::class, 'getUserIdentifier')) {
-            $this->markTestSkipped('This test requires symfony/security-core 5.3+');
-        }
-
         $token = new UsernamePasswordToken(new InMemoryUser('user', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);

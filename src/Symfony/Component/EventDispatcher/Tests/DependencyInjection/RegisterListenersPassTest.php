@@ -249,10 +249,6 @@ class RegisterListenersPassTest extends TestCase
 
     public function testTaggedInvokableEventListener()
     {
-        if (!class_exists(AttributeAutoconfigurationPass::class)) {
-            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
-        }
-
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute): void {
             $definition->addTag('kernel.event_listener', get_object_vars($attribute));
@@ -280,10 +276,6 @@ class RegisterListenersPassTest extends TestCase
 
     public function testTaggedMultiEventListener()
     {
-        if (!class_exists(AttributeAutoconfigurationPass::class)) {
-            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
-        }
-
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(AsEventListener::class,
             static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {

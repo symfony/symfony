@@ -61,29 +61,29 @@ class UserBadge implements BadgeInterface
      */
     public function getUser(): UserInterface
     {
-        if (!isset($this->user)) {
-            if (null === $this->userLoader) {
-                throw new \LogicException(sprintf('No user loader is configured, did you forget to register the "%s" listener?', UserProviderListener::class));
-            }
-
-            $user = ($this->userLoader)($this->userIdentifier);
-
-            // No user has been found via the $this->userLoader callback
-            if (null === $user) {
-                $exception = new UserNotFoundException();
-                $exception->setUserIdentifier($this->userIdentifier);
-
-                throw $exception;
-            }
-
-            if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException(sprintf('The user provider must return a UserInterface object, "%s" given.', get_debug_type($this->user)));
-            }
-
-            $this->user = $user;
+        if (null !== $this->user) {
+            return $this->user;
         }
 
-        return $this->user;
+        if (null === $this->userLoader) {
+            throw new \LogicException(sprintf('No user loader is configured, did you forget to register the "%s" listener?', UserProviderListener::class));
+        }
+
+        $user = ($this->userLoader)($this->userIdentifier);
+
+        // No user has been found via the $this->userLoader callback
+        if (null === $user) {
+            $exception = new UserNotFoundException();
+            $exception->setUserIdentifier($this->userIdentifier);
+
+            throw $exception;
+        }
+
+        if (!$user instanceof UserInterface) {
+            throw new AuthenticationServiceException(sprintf('The user provider must return a UserInterface object, "%s" given.', get_debug_type($user)));
+        }
+
+        return $this->user = $user;
     }
 
     public function getUserLoader(): ?callable

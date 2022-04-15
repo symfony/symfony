@@ -67,10 +67,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormBuilderInterface');
         }
 
-        if (null !== $type && !\is_string($type)) {
-            throw new UnexpectedTypeException($type, 'string or null');
-        }
-
         // Add to "children" to maintain order
         $this->children[$child] = null;
         $this->unresolvedChildren[$child] = [$type, $options];

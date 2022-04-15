@@ -79,10 +79,6 @@ class AbstractControllerTest extends TestCase
 
     public function testGetParameter()
     {
-        if (!class_exists(ContainerBag::class)) {
-            $this->markTestSkipped('ContainerBag class does not exist');
-        }
-
         $container = new Container(new FrozenParameterBag(['foo' => 'bar']));
         $container->set('parameter_bag', new ContainerBag($container));
 

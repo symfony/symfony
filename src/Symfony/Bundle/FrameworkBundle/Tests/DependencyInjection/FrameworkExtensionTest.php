@@ -71,7 +71,6 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
-use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow;
@@ -1298,10 +1297,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testValidationAutoMapping()
     {
-        if (!class_exists(PropertyInfoLoader::class)) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
-        }
-
         $container = $this->createContainerFromFile('validation_auto_mapping');
         $parameter = [
             'App\\' => ['services' => ['foo', 'bar']],

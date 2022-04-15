@@ -2734,6 +2734,10 @@ class FrameworkExtension extends Extension
                 $def->addMethodCall('withoutAttributeSanitizer', [new Reference($serviceName)], true);
             }
 
+            if ($sanitizerConfig['max_input_length']) {
+                $def->addMethodCall('withMaxInputLength', [$sanitizerConfig['max_input_length']], true);
+            }
+
             // Create the sanitizer and link its config
             $sanitizerId = 'html_sanitizer.sanitizer.'.$sanitizerName;
             $container->register($sanitizerId, HtmlSanitizer::class)->addArgument(new Reference($configId));

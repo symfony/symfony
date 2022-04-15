@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-28T16:41:29Z
+
+Remember to add `symfony/html-sanitizer` to the `require-dev` section of FrameworkBundle's composer.json.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T11:14:11Z
+
+@tgalopin Would be great (required?) if you can finish this PR before te 6.1 deadline which is happening soon now :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-04-14T19:43:10Z
+
+I've pushed a commit finalizing the tests and XML support. This PR should be ready to merge

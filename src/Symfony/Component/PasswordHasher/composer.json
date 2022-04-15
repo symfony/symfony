@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "symfony/security-core": "^5.4|^6.0",
-        "symfony/console": "^5"
+        "symfony/console": "^5.4|^6.0"
     },
     "conflict": {
         "symfony/security-core": "<5.4"

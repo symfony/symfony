@@ -32,6 +32,7 @@ final class SmsapiTransport extends AbstractTransport
     private string $authToken;
     private string $from;
     private bool $fast = false;
+    private bool $test = false;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -47,6 +48,16 @@ final class SmsapiTransport extends AbstractTransport
     public function setFast(bool $fast): static
     {
         $this->fast = $fast;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTest(bool $test): static
+    {
+        $this->test = $test;
 
         return $this;
     }
@@ -75,9 +86,9 @@ final class SmsapiTransport extends AbstractTransport
                 'to' => $message->getPhone(),
                 'message' => $message->getSubject(),
                 'fast' => $this->fast,
-                'encoding' => 'utf-8',
                 'format' => 'json',
                 'encoding' => 'utf-8',
+                'test' => $this->test,
             ],
         ]);
 

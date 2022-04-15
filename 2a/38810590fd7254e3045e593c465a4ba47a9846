@@ -1,0 +1,122 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-23T15:51:51Z
+
+This is an alternative to #26529 and it fixes #26524
+With attributes being mainstream, this is a very workable solution!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-02-23T16:59:23Z
+
+Now i'm wondering ... when by default (any format allowed) can we me make the canonical format also the canonical URL at HTTP level? https://developers.google.com/search/docs/advanced/crawling/consolidate-duplicate-urls
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-28T10:14:15Z
+
+I like the idea.
+
+Do we envision adding more "simple" requirements there? Like for integers, emails, ... My question is about what we want to have in this Requirement class.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-28T10:15:39Z
+
+Also some date formats would be nice as they're common in URLs.
+
+---------------------------------------------------------------------------
+
+by tarlepp at 2022-04-01T17:13:09Z
+
+I think that
+```
+#[Route(path: '/users/{id}', requirements: ['id' => Requirement::UUID])]
+```
+is not enough, I think that there should be also patterns for specific versions of UUID and not just generic one.
+
+---------------------------------------------------------------------------
+
+by jmsche at 2022-04-01T17:56:52Z
+
+What about a slug pattern?
+
+---------------------------------------------------------------------------
+
+by pbowyer at 2022-04-01T19:02:25Z
+
+To complement the slug pattern, there's `<<id>>-<<slug for seo only>>` and `<<slug for seo only>>-<<id>>` which are both popular. I use the latter, as does Medium and other big sites. Example:
+```
+https://timjwise.medium.com/will-smith-chris-rock-and-what-youre-missing-about-that-slap-3ad83f924c82
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-04-12T06:07:54Z
+
+I'd rather wait for more requirements to be implemented. As is, this is of limited value. Announcing a well-thought feature is better IMHO.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-12T10:11:32Z
+
+I moved the enum to the `Requirement` namespace since `EnumRequirement` was merged :smiley:
+
+> Do we envision adding more "simple" requirements there? Like for integers, emails
+
+Not sure adding simple cases like `DIGIT = '\d+'` bring value?
+For emails, we would reuse the 2 patterns from the Validator component?
+
+> Also some date formats would be nice as they're common in URLs.
+
+Y-m-d and H:i:s?
+
+> I think that there should be also patterns for specific versions of UUID
+
+We can add several regexes but can we fully validate all versions just with a regex? I'm not sure, @nicolas-grekas?
+
+> What about a slug pattern?
+
+Slugs can be very different depending on the application IMHO but we can add one very generic case like [a-zA-Z0-9-]+ but does it really bring value?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-12T13:13:34Z
+
+It should be possible to validate the version of a UUID using a regexp yes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-12T13:14:53Z
+
+See https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex which gives a stricter regexp even for generic UUIDs.
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-04-13T12:55:24Z
+
+> At some few scenarios, I've used .* if I wanted to catch everything including slashes (/). Ie "redirect to legacy app controller".
+
+Agree, I use this quite a lot but as `.+` - not sure if `.*` is the better choice. Having this as a Requirement would remove that dilemma :)
+
+Lots of questions on [stackoverflow](https://www.google.com/search?q=symfony+route+catch+all+site:stackoverflow.com&sxsrf=APq-WBvyBgrf0O_71XvLfmRqCS9NQShEmw:1649854679830&sa=X&ved=2ahUKEwiI9vzQi5H3AhVVHc0KHWkiDWsQrQIoBHoECA0QBQ&biw=1853&bih=948&dpr=1) about this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-04-14T15:39:45Z
+
+Tests looks broken
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-14T16:10:55Z
+
+> Tests looks broken
+
+I'll add some tests for every regex, do you think we have reached the first iteration of the set that will be merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-04-14T16:19:56Z
+
+Looks like a good first set.

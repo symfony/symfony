@@ -128,6 +128,7 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
             $tokenVerifier = $this->createTokenVerifier($container, $firewallName, $config['token_verifier'] ?? null);
             $container->setDefinition($rememberMeHandlerId, new ChildDefinition('security.authenticator.persistent_remember_me_handler'))
                 ->replaceArgument(0, new Reference($tokenProviderId))
+                ->replaceArgument(1, $config['secret'])
                 ->replaceArgument(2, new Reference($userProviderId))
                 ->replaceArgument(4, $config)
                 ->replaceArgument(6, $tokenVerifier)
@@ -136,6 +137,7 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
             $signatureHasherId = 'security.authenticator.remember_me_signature_hasher.'.$firewallName;
             $container->setDefinition($signatureHasherId, new ChildDefinition('security.authenticator.remember_me_signature_hasher'))
                 ->replaceArgument(1, $config['signature_properties'])
+                ->replaceArgument(2, $config['secret'])
             ;
 
             $container->setDefinition($rememberMeHandlerId, new ChildDefinition('security.authenticator.signature_remember_me_handler'))
@@ -205,7 +207,10 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         ;
 
         $builder
-            ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()
+            ->scalarNode('secret')
+                ->cannotBeEmpty()
+                ->defaultValue('%kernel.secret%')
+            ->end()
             ->scalarNode('service')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()

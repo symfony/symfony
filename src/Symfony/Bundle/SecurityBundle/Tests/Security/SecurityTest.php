@@ -13,8 +13,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\Security;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -80,6 +83,32 @@ class SecurityTest extends TestCase
 
         $security = new Security($container);
         $this->assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
+    }
+
+    /**
+     * @dataProvider getFirewallConfigTests
+     */
+    public function testGetFirewallConfig(Request $request, ?FirewallConfig $expectedFirewallConfig)
+    {
+        $firewallMap = $this->createMock(FirewallMap::class);
+
+        $firewallMap->expects($this->once())
+            ->method('getFirewallConfig')
+            ->with($request)
+            ->willReturn($expectedFirewallConfig);
+
+        $container = $this->createContainer('security.firewall.map', $firewallMap);
+
+        $security = new \Symfony\Component\Security\Core\Security($container);
+        $this->assertSame($expectedFirewallConfig, $security->getFirewallConfig($request));
+    }
+
+    public function getFirewallConfigTests()
+    {
+        $request = new Request();
+
+        yield [$request, null];
+        yield [$request, new FirewallConfig('main', 'acme_user_checker')];
     }
 
     private function createContainer(string $serviceId, object $serviceObject): ContainerInterface

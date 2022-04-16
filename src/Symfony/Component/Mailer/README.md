@@ -13,6 +13,7 @@ $ composer require symfony/mailer
 ```php
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 
 $transport = Transport::fromDsn('smtp://localhost');
 $mailer = new Mailer($transport);

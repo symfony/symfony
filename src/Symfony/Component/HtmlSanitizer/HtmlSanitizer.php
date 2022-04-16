@@ -25,7 +25,6 @@ use Symfony\Component\HtmlSanitizer\Visitor\DomVisitor;
 final class HtmlSanitizer implements HtmlSanitizerInterface
 {
     private HtmlSanitizerConfig $config;
-    private int $maxInputLength;
     private ParserInterface $parser;
 
     /**
@@ -33,10 +32,9 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
      */
     private array $domVisitors = [];
 
-    public function __construct(HtmlSanitizerConfig $config, int $maxInputLength = 20000, ParserInterface $parser = null)
+    public function __construct(HtmlSanitizerConfig $config, ParserInterface $parser = null)
     {
         $this->config = $config;
-        $this->maxInputLength = $maxInputLength;
         $this->parser = $parser ?? new MastermindsParser();
     }
 
@@ -64,8 +62,8 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
         $this->domVisitors[$context] ??= $this->createDomVisitorForContext($context);
 
         // Prevent DOS attack induced by extremely long HTML strings
-        if (\strlen($input) > $this->maxInputLength) {
-            $input = substr($input, 0, $this->maxInputLength);
+        if (\strlen($input) > $this->config->getMaxInputLength()) {
+            $input = substr($input, 0, $this->config->getMaxInputLength());
         }
 
         // Only operate on valid UTF-8 strings. This is necessary to prevent cross

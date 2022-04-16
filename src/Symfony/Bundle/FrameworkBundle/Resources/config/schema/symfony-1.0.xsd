@@ -850,6 +850,7 @@
         <xsd:attribute name="force-https-urls" type="xsd:boolean" />
         <xsd:attribute name="allow-relative-links" type="xsd:boolean" />
         <xsd:attribute name="allow-relative-medias" type="xsd:boolean" />
+        <xsd:attribute name="max-input-length" type="xsd:positiveInteger" />
     </xsd:complexType>
 
     <xsd:complexType name="element-option">

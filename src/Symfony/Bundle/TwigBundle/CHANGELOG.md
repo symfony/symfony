@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add option `twig.file_name_pattern` to restrict which files are compiled by cache warmer and linter
+ * Deprecate option `twig.autoescape`, use `twig.autoescape_service[_method]` instead
 
 6.0
 ---

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\NativeRequestHandler;
 
@@ -67,13 +67,11 @@ class FormConfigTest extends TestCase
      */
     public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-
         if (null !== $expectedException) {
             $this->expectException($expectedException);
         }
 
-        $formConfigBuilder = new FormConfigBuilder($name, null, $dispatcher);
+        $formConfigBuilder = new FormConfigBuilder($name, null, new EventDispatcher());
 
         $this->assertSame((string) $name, $formConfigBuilder->getName());
     }
@@ -135,8 +133,6 @@ class FormConfigTest extends TestCase
 
     private function getConfigBuilder($name = 'name')
     {
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        return new FormConfigBuilder($name, null, $dispatcher);
+        return new FormConfigBuilder($name, null, new EventDispatcher());
     }
 }

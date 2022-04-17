@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 
-class DateTimeToStringTransformerTest extends TestCase
+class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
 {
     public function dataProvider(): array
     {
@@ -169,5 +169,10 @@ class DateTimeToStringTransformerTest extends TestCase
         $this->expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-04-31');
+    }
+
+    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    {
+        return new DateTimeToStringTransformer($inputTimezone, $outputTimezone);
     }
 }

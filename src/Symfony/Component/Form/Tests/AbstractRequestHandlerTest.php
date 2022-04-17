@@ -18,9 +18,10 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\RequestHandlerInterface;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
@@ -417,7 +418,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected function createBuilder($name, $compound = false, array $options = [])
     {
-        $builder = new FormBuilder($name, null, new EventDispatcher(), $this->createMock(FormFactoryInterface::class), $options);
+        $builder = new FormBuilder($name, null, new EventDispatcher(), new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory())), $options);
         $builder->setCompound($compound);
 
         if ($compound) {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\ChoiceList;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 
@@ -23,82 +24,67 @@ class LazyChoiceListTest extends TestCase
     public function testGetChoiceLoadersLoadsLoadedListOnFirstCall()
     {
         $choices = ['RESULT'];
-        $calls = 0;
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices, &$calls) {
-            ++$calls;
-
+        $list = new LazyChoiceList($choiceLoader = new UsageTrackingChoiceLoader($choices), function ($choice) use ($choices) {
             return array_search($choice, $choices);
         });
 
         $this->assertSame(['RESULT'], $list->getChoices());
         $this->assertSame(['RESULT'], $list->getChoices());
-        $this->assertSame(1, $calls);
+        $this->assertSame(1, $choiceLoader->loadChoiceListCalls);
     }
 
     public function testGetValuesLoadsLoadedListOnFirstCall()
     {
-        $calls = 0;
-        $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), function ($choice) use (&$calls) {
-            ++$calls;
-
+        $list = new LazyChoiceList($choiceLoader = new UsageTrackingChoiceLoader(['RESULT']), function ($choice) {
             return $choice;
         });
 
         $this->assertSame(['RESULT'], $list->getValues());
         $this->assertSame(['RESULT'], $list->getValues());
-        $this->assertSame(1, $calls);
+        $this->assertSame(1, $choiceLoader->loadChoiceListCalls);
     }
 
     public function testGetStructuredValuesLoadsLoadedListOnFirstCall()
     {
-        $calls = 0;
-        $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), function ($choice) use (&$calls) {
-            ++$calls;
-
+        $list = new LazyChoiceList($choiceLoader = new UsageTrackingChoiceLoader(['RESULT']), function ($choice) {
             return $choice;
         });
 
         $this->assertSame(['RESULT'], $list->getStructuredValues());
         $this->assertSame(['RESULT'], $list->getStructuredValues());
-        $this->assertSame(1, $calls);
+        $this->assertSame(2, $choiceLoader->loadChoiceListCalls);
     }
 
     public function testGetOriginalKeysLoadsLoadedListOnFirstCall()
     {
-        $calls = 0;
         $choices = [
             'a' => 'foo',
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use (&$calls) {
-            ++$calls;
-
+        $list = new LazyChoiceList($choiceLoader = new UsageTrackingChoiceLoader($choices), function ($choice) {
             return $choice;
         });
 
         $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
         $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
-        $this->assertSame(3, $calls);
+        $this->assertSame(2, $choiceLoader->loadChoiceListCalls);
     }
 
     public function testGetChoicesForValuesForwardsCallIfListNotLoaded()
     {
-        $calls = 0;
         $choices = [
             'a' => 'foo',
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices, &$calls) {
-            ++$calls;
-
+        $list = new LazyChoiceList($choiceLoader = new UsageTrackingChoiceLoader($choices), function ($choice) use ($choices) {
             return array_search($choice, $choices);
         });
 
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
-        $this->assertSame(3, $calls);
+        $this->assertSame(2, $choiceLoader->loadChoiceListCalls);
     }
 
     public function testGetChoicesForValuesUsesLoadedList()
@@ -108,7 +94,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices) {
+        $list = new LazyChoiceList($choiceLoader = new UsageTrackingChoiceLoader($choices), function ($choice) use ($choices) {
             return array_search($choice, $choices);
         });
 
@@ -117,6 +103,7 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
+        $this->assertSame(1, $choiceLoader->loadChoiceListCalls);
     }
 
     public function testGetValuesForChoicesUsesLoadedList()
@@ -126,7 +113,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices) {
+        $list = new LazyChoiceList($choiceLoader = new UsageTrackingChoiceLoader($choices), function ($choice) use ($choices) {
             return array_search($choice, $choices);
         });
 
@@ -135,5 +122,18 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['a', 'b'], $list->getValuesForChoices(['foo', 'bar']));
         $this->assertSame(['a', 'b'], $list->getValuesForChoices(['foo', 'bar']));
+        $this->assertSame(1, $choiceLoader->loadChoiceListCalls);
+    }
+}
+
+class UsageTrackingChoiceLoader extends ArrayChoiceLoader
+{
+    public $loadChoiceListCalls = 0;
+
+    public function loadChoiceList($value = null): ChoiceListInterface
+    {
+        ++$this->loadChoiceListCalls;
+
+        return parent::loadChoiceList($value);
     }
 }

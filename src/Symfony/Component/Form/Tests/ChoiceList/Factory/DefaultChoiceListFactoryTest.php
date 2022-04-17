@@ -21,6 +21,7 @@ use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class DefaultChoiceListFactoryTest extends TestCase
@@ -254,7 +255,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoader()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $list = $this->factory->createListFromLoader($loader);
 
@@ -263,7 +264,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithValues()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $value = function () {};
         $list = $this->factory->createListFromLoader($loader, $value);

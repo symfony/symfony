@@ -468,6 +468,46 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals([['firewall' => 'default']], $handler->getTag('security.remember_me_handler'));
     }
 
+    public function testSecretRememberMeHasher()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['secret' => 'very'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_signature_hasher.default');
+        $this->assertSame('very', $handler->getArgument(2));
+    }
+
+    public function testSecretRememberMeHandler()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['secret' => 'very', 'token_provider' => 'token_provider_id'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
+        $this->assertSame('very', $handler->getArgument(1));
+    }
+
     public function sessionConfigurationProvider()
     {
         return [

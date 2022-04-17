@@ -14,13 +14,12 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryBuilder;
-use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
+use Symfony\Component\Form\Tests\Fixtures\NullFormTypeGuesser;
 
 class FormFactoryBuilderTest extends TestCase
 {
     private $registry;
-    private $guesser;
     private $type;
 
     protected function setUp(): void
@@ -28,7 +27,6 @@ class FormFactoryBuilderTest extends TestCase
         $factory = new \ReflectionClass(FormFactory::class);
         $this->registry = $factory->getProperty('registry');
 
-        $this->guesser = $this->createMock(FormTypeGuesserInterface::class);
         $this->type = new FooType();
     }
 
@@ -49,7 +47,7 @@ class FormFactoryBuilderTest extends TestCase
     public function testAddTypeGuesser()
     {
         $factoryBuilder = new FormFactoryBuilder();
-        $factoryBuilder->addTypeGuesser($this->guesser);
+        $factoryBuilder->addTypeGuesser(new NullFormTypeGuesser());
 
         $factory = $factoryBuilder->getFormFactory();
         $registry = $this->registry->getValue($factory);

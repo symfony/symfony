@@ -11,19 +11,23 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormType;
-use Symfony\Component\Form\Test\FormBuilderInterface;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
+use Symfony\Component\Form\Tests\Fixtures\ConfigurableFormType;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -32,23 +36,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormTypeTest extends TestCase
 {
+    private $calls;
+
     /**
-     * @var MockObject&FormTypeInterface
+     * @var FormTypeInterface
      */
     private $parentType;
 
     /**
-     * @var MockObject&FormTypeInterface
+     * @var FormTypeInterface
      */
     private $type;
 
     /**
-     * @var MockObject&FormTypeExtensionInterface
+     * @var FormTypeExtensionInterface
      */
     private $extension1;
 
     /**
-     * @var MockObject&FormTypeExtensionInterface
+     * @var FormTypeExtensionInterface
      */
     private $extension2;
 
@@ -62,51 +68,27 @@ class ResolvedFormTypeTest extends TestCase
      */
     private $resolvedType;
 
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
     protected function setUp(): void
     {
-        $this->parentType = $this->getMockFormType();
-        $this->type = $this->getMockFormType();
-        $this->extension1 = $this->getMockFormTypeExtension();
-        $this->extension2 = $this->getMockFormTypeExtension();
+        $this->calls = [];
+        $this->parentType = new UsageTrackingParentFormType($this->calls);
+        $this->type = new UsageTrackingFormType($this->calls);
+        $this->extension1 = new UsageTrackingFormTypeExtension($this->calls, ['c' => 'c_default']);
+        $this->extension2 = new UsageTrackingFormTypeExtension($this->calls, ['d' => 'd_default']);
         $this->parentResolvedType = new ResolvedFormType($this->parentType);
         $this->resolvedType = new ResolvedFormType($this->type, [$this->extension1, $this->extension2], $this->parentResolvedType);
+        $this->formFactory = new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory()));
     }
 
     public function testGetOptionsResolver()
     {
-        $i = 0;
-
-        $assertIndexAndAddOption = function ($index, $option, $default) use (&$i) {
-            return function (OptionsResolver $resolver) use (&$i, $index, $option, $default) {
-                $this->assertEquals($index, $i, 'Executed at index '.$index);
-
-                ++$i;
-
-                $resolver->setDefaults([$option => $default]);
-            };
-        };
-
-        // First the default options are generated for the super type
-        $this->parentType->expects($this->once())
-            ->method('configureOptions')
-            ->willReturnCallback($assertIndexAndAddOption(0, 'a', 'a_default'));
-
-        // The form type itself
-        $this->type->expects($this->once())
-            ->method('configureOptions')
-            ->willReturnCallback($assertIndexAndAddOption(1, 'b', 'b_default'));
-
-        // And its extensions
-        $this->extension1->expects($this->once())
-            ->method('configureOptions')
-            ->willReturnCallback($assertIndexAndAddOption(2, 'c', 'c_default'));
-
-        $this->extension2->expects($this->once())
-            ->method('configureOptions')
-            ->willReturnCallback($assertIndexAndAddOption(3, 'd', 'd_default'));
-
-        $givenOptions = ['a' => 'a_custom', 'c' => 'c_custom'];
-        $resolvedOptions = ['a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default'];
+        $givenOptions = ['a' => 'a_custom', 'c' => 'c_custom', 'foo' => 'bar'];
+        $resolvedOptions = ['a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default', 'foo' => 'bar'];
 
         $resolver = $this->resolvedType->getOptionsResolver();
 
@@ -115,26 +97,10 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testCreateBuilder()
     {
-        $givenOptions = ['a' => 'a_custom', 'c' => 'c_custom'];
-        $resolvedOptions = ['a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default'];
-        $optionsResolver = $this->createMock(OptionsResolver::class);
+        $givenOptions = ['a' => 'a_custom', 'c' => 'c_custom', 'foo' => 'bar'];
+        $resolvedOptions = ['b' => 'b_default', 'd' => 'd_default', 'a' => 'a_custom', 'c' => 'c_custom', 'foo' => 'bar'];
 
-        $this->resolvedType = $this->getMockBuilder(ResolvedFormType::class)
-            ->setConstructorArgs([$this->type, [$this->extension1, $this->extension2], $this->parentResolvedType])
-            ->setMethods(['getOptionsResolver'])
-            ->getMock();
-
-        $this->resolvedType->expects($this->once())
-            ->method('getOptionsResolver')
-            ->willReturn($optionsResolver);
-
-        $optionsResolver->expects($this->once())
-            ->method('resolve')
-            ->with($givenOptions)
-            ->willReturn($resolvedOptions);
-
-        $factory = $this->getMockFormFactory();
-        $builder = $this->resolvedType->createBuilder($factory, 'name', $givenOptions);
+        $builder = $this->resolvedType->createBuilder($this->formFactory, 'name', $givenOptions);
 
         $this->assertSame($this->resolvedType, $builder->getType());
         $this->assertSame($resolvedOptions, $builder->getOptions());
@@ -143,26 +109,19 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testCreateBuilderWithDataClassOption()
     {
-        $givenOptions = ['data_class' => 'Foo'];
-        $resolvedOptions = ['data_class' => \stdClass::class];
-        $optionsResolver = $this->createMock(OptionsResolver::class);
+        $resolvedOptions = [
+            'a' => 'a_default',
+            'b' => 'b_default',
+            'c' => 'c_default',
+            'd' => 'd_default',
+            'data_class' => \stdClass::class,
+            'foo' => 'bar',
+        ];
 
-        $this->resolvedType = $this->getMockBuilder(ResolvedFormType::class)
-            ->setConstructorArgs([$this->type, [$this->extension1, $this->extension2], $this->parentResolvedType])
-            ->setMethods(['getOptionsResolver'])
-            ->getMock();
-
-        $this->resolvedType->expects($this->once())
-            ->method('getOptionsResolver')
-            ->willReturn($optionsResolver);
-
-        $optionsResolver->expects($this->once())
-            ->method('resolve')
-            ->with($givenOptions)
-            ->willReturn($resolvedOptions);
-
-        $factory = $this->getMockFormFactory();
-        $builder = $this->resolvedType->createBuilder($factory, 'name', $givenOptions);
+        $builder = $this->resolvedType->createBuilder($this->formFactory, 'name', [
+            'data_class' => \stdClass::class,
+            'foo' => 'bar',
+        ]);
 
         $this->assertSame($this->resolvedType, $builder->getType());
         $this->assertSame($resolvedOptions, $builder->getOptions());
@@ -172,74 +131,21 @@ class ResolvedFormTypeTest extends TestCase
     public function testFailsCreateBuilderOnInvalidFormOptionsResolution()
     {
         $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage('An error has occurred resolving the options of the form "Symfony\Component\Form\Extension\Core\Type\HiddenType": The required option "foo" is missing.');
-        $optionsResolver = (new OptionsResolver())
-            ->setRequired('foo')
-        ;
-        $this->resolvedType = $this->getMockBuilder(ResolvedFormType::class)
-            ->setConstructorArgs([$this->type, [$this->extension1, $this->extension2], $this->parentResolvedType])
-            ->setMethods(['getOptionsResolver', 'getInnerType'])
-            ->getMock()
-        ;
-        $this->resolvedType->expects($this->once())
-            ->method('getOptionsResolver')
-            ->willReturn($optionsResolver)
-        ;
-        $this->resolvedType->expects($this->once())
-            ->method('getInnerType')
-            ->willReturn(new HiddenType())
-        ;
-        $factory = $this->getMockFormFactory();
+        $this->expectExceptionMessage(sprintf('An error has occurred resolving the options of the form "%s": The required option "foo" is missing.', UsageTrackingFormType::class));
 
-        $this->resolvedType->createBuilder($factory, 'name');
+        $this->resolvedType->createBuilder($this->formFactory, 'name');
     }
 
     public function testBuildForm()
     {
-        $i = 0;
+        $this->resolvedType->buildForm(new FormBuilder(null, null, new EventDispatcher(), $this->formFactory), []);
 
-        $assertIndex = function ($index) use (&$i) {
-            return function () use (&$i, $index) {
-                $this->assertEquals($index, $i, 'Executed at index '.$index);
-
-                ++$i;
-            };
-        };
-
-        $options = ['a' => 'Foo', 'b' => 'Bar'];
-        $builder = $this->createMock(FormBuilderInterface::class);
-
-        // First the form is built for the super type
-        $this->parentType->expects($this->once())
-            ->method('buildForm')
-            ->with($builder, $options)
-            ->willReturnCallback($assertIndex(0));
-
-        // Then the type itself
-        $this->type->expects($this->once())
-            ->method('buildForm')
-            ->with($builder, $options)
-            ->willReturnCallback($assertIndex(1));
-
-        // Then its extensions
-        $this->extension1->expects($this->once())
-            ->method('buildForm')
-            ->with($builder, $options)
-            ->willReturnCallback($assertIndex(2));
-
-        $this->extension2->expects($this->once())
-            ->method('buildForm')
-            ->with($builder, $options)
-            ->willReturnCallback($assertIndex(3));
-
-        $this->resolvedType->buildForm($builder, $options);
+        $this->assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['buildForm']);
     }
 
     public function testCreateView()
     {
-        $form = $this->bootstrapForm();
-
-        $view = $this->resolvedType->createView($form);
+        $view = $this->resolvedType->createView($this->formFactory->create());
 
         $this->assertInstanceOf(FormView::class, $view);
         $this->assertNull($view->parent);
@@ -247,10 +153,9 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testCreateViewWithParent()
     {
-        $form = $this->bootstrapForm();
-        $parentView = $this->createMock(FormView::class);
+        $parentView = new FormView();
 
-        $view = $this->resolvedType->createView($form, $parentView);
+        $view = $this->resolvedType->createView($this->formFactory->create(), $parentView);
 
         $this->assertInstanceOf(FormView::class, $view);
         $this->assertSame($parentView, $view->parent);
@@ -258,97 +163,23 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testBuildView()
     {
-        $options = ['a' => '1', 'b' => '2'];
-        $form = $this->bootstrapForm();
-        $view = $this->createMock(FormView::class);
+        $this->resolvedType->buildView(new FormView(), $this->formFactory->create(), []);
 
-        $i = 0;
-
-        $assertIndex = function ($index) use (&$i) {
-            return function () use (&$i, $index) {
-                $this->assertEquals($index, $i, 'Executed at index '.$index);
-
-                ++$i;
-            };
-        };
-
-        // First the super type
-        $this->parentType->expects($this->once())
-            ->method('buildView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(0));
-
-        // Then the type itself
-        $this->type->expects($this->once())
-            ->method('buildView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(1));
-
-        // Then its extensions
-        $this->extension1->expects($this->once())
-            ->method('buildView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(2));
-
-        $this->extension2->expects($this->once())
-            ->method('buildView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(3));
-
-        $this->resolvedType->buildView($view, $form, $options);
+        $this->assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['buildView']);
     }
 
     public function testFinishView()
     {
-        $options = ['a' => '1', 'b' => '2'];
-        $form = $this->bootstrapForm();
-        $view = $this->createMock(FormView::class);
+        $this->resolvedType->finishView(new FormView(), $this->formFactory->create(), []);
 
-        $i = 0;
-
-        $assertIndex = function ($index) use (&$i) {
-            return function () use (&$i, $index) {
-                $this->assertEquals($index, $i, 'Executed at index '.$index);
-
-                ++$i;
-            };
-        };
-
-        // First the super type
-        $this->parentType->expects($this->once())
-            ->method('finishView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(0));
-
-        // Then the type itself
-        $this->type->expects($this->once())
-            ->method('finishView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(1));
-
-        // Then its extensions
-        $this->extension1->expects($this->once())
-            ->method('finishView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(2));
-
-        $this->extension2->expects($this->once())
-            ->method('finishView')
-            ->with($view, $form, $options)
-            ->willReturnCallback($assertIndex(3));
-
-        $this->resolvedType->finishView($view, $form, $options);
+        $this->assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['finishView']);
     }
 
     public function testGetBlockPrefix()
     {
-        $this->type->expects($this->once())
-            ->method('getBlockPrefix')
-            ->willReturn('my_prefix');
+        $resolvedType = new ResolvedFormType(new ConfigurableFormType());
 
-        $resolvedType = new ResolvedFormType($this->type);
-
-        $this->assertSame('my_prefix', $resolvedType->getBlockPrefix());
+        $this->assertSame('configurable_form_prefix', $resolvedType->getBlockPrefix());
     }
 
     /**
@@ -372,28 +203,84 @@ class ResolvedFormTypeTest extends TestCase
             [Fixtures\FBooType::class, 'f_boo'],
         ];
     }
+}
 
-    private function getMockFormType($typeClass = AbstractType::class): MockObject&FormTypeInterface
+class UsageTrackingFormType extends AbstractType
+{
+    use UsageTrackingTrait;
+
+    public function __construct(array &$calls)
     {
-        return $this->getMockBuilder($typeClass)->setMethods(['getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
+        $this->calls = &$calls;
     }
 
-    private function getMockFormTypeExtension(): MockObject&FormTypeExtensionInterface
+    public function getParent(): string
     {
-        return $this->getMockBuilder(AbstractTypeExtension::class)->setMethods(['getExtendedTypes', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
+        return UsageTrackingParentFormType::class;
     }
 
-    private function getMockFormFactory(): MockObject&FormFactoryInterface
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        return $this->createMock(FormFactoryInterface::class);
+        $resolver->setDefault('b', 'b_default');
+        $resolver->setDefined('data_class');
+        $resolver->setRequired('foo');
+    }
+}
+
+class UsageTrackingParentFormType extends AbstractType
+{
+    use UsageTrackingTrait;
+
+    public function __construct(array &$calls)
+    {
+        $this->calls = &$calls;
     }
 
-    private function bootstrapForm(): Form
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $config = $this->createMock(FormConfigInterface::class);
-        $config->method('getInheritData')->willReturn(false);
-        $config->method('getName')->willReturn('');
+        $resolver->setDefault('a', 'a_default');
+    }
+}
 
-        return new Form($config);
+class UsageTrackingFormTypeExtension extends AbstractTypeExtension
+{
+    use UsageTrackingTrait;
+
+    private $defaultOptions;
+
+    public function __construct(array &$calls, array $defaultOptions)
+    {
+        $this->calls = &$calls;
+        $this->defaultOptions = $defaultOptions;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults($this->defaultOptions);
+    }
+
+    public static function getExtendedTypes(): iterable
+    {
+        yield FormType::class;
+    }
+}
+
+trait UsageTrackingTrait
+{
+    private $calls;
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $this->calls['buildForm'][] = $this;
+    }
+
+    public function buildView(FormView $view, FormInterface $form, array $options): void
+    {
+        $this->calls['buildView'][] = $this;
+    }
+
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        $this->calls['finishView'][] = $this;
     }
 }

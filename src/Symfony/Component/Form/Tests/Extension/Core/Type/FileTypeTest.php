@@ -17,7 +17,7 @@ use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class FileTypeTest extends BaseTypeTest
 {
@@ -25,10 +25,7 @@ class FileTypeTest extends BaseTypeTest
 
     protected function getExtensions()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnArgument(0);
-
-        return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);
+        return array_merge(parent::getExtensions(), [new CoreExtension(null, null, new IdentityTranslator())]);
     }
 
     // https://github.com/symfony/symfony/pull/5028
@@ -210,7 +207,7 @@ class FileTypeTest extends BaseTypeTest
             $this->assertTrue($form->isValid());
         } else {
             $this->assertFalse($form->isValid());
-            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
         }
     }
 
@@ -235,7 +232,7 @@ class FileTypeTest extends BaseTypeTest
             $this->assertTrue($form->isValid());
         } else {
             $this->assertFalse($form->isValid());
-            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
         }
     }
 
@@ -261,8 +258,8 @@ class FileTypeTest extends BaseTypeTest
         } else {
             $this->assertFalse($form->isValid());
             $this->assertCount(2, $form->getErrors());
-            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
-            $this->assertSame($expectedErrorMessage, $form->getErrors()[1]->getMessage());
+            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[1]->getMessage());
         }
     }
 
@@ -299,8 +296,8 @@ class FileTypeTest extends BaseTypeTest
         } else {
             $this->assertFalse($form->isValid());
             $this->assertCount(2, $form->getErrors());
-            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
-            $this->assertSame($expectedErrorMessage, $form->getErrors()[1]->getMessage());
+            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[1]->getMessage());
         }
     }
 
@@ -308,13 +305,13 @@ class FileTypeTest extends BaseTypeTest
     {
         return [
             'no error' => [\UPLOAD_ERR_OK, null],
-            'upload_max_filesize ini directive' => [\UPLOAD_ERR_INI_SIZE, 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.'],
-            'MAX_FILE_SIZE from form' => [\UPLOAD_ERR_FORM_SIZE, 'The file is too large.'],
-            'partially uploaded' => [\UPLOAD_ERR_PARTIAL, 'The file could not be uploaded.'],
-            'no file upload' => [\UPLOAD_ERR_NO_FILE, 'The file could not be uploaded.'],
-            'missing temporary directory' => [\UPLOAD_ERR_NO_TMP_DIR, 'The file could not be uploaded.'],
-            'write failure' => [\UPLOAD_ERR_CANT_WRITE, 'The file could not be uploaded.'],
-            'stopped by extension' => [\UPLOAD_ERR_EXTENSION, 'The file could not be uploaded.'],
+            'upload_max_filesize ini directive' => [\UPLOAD_ERR_INI_SIZE, '/The file is too large. Allowed maximum size is \d+ \S+\./'],
+            'MAX_FILE_SIZE from form' => [\UPLOAD_ERR_FORM_SIZE, '/The file is too large\./'],
+            'partially uploaded' => [\UPLOAD_ERR_PARTIAL, '/The file could not be uploaded\./'],
+            'no file upload' => [\UPLOAD_ERR_NO_FILE, '/The file could not be uploaded\./'],
+            'missing temporary directory' => [\UPLOAD_ERR_NO_TMP_DIR, '/The file could not be uploaded\./'],
+            'write failure' => [\UPLOAD_ERR_CANT_WRITE, '/The file could not be uploaded\./'],
+            'stopped by extension' => [\UPLOAD_ERR_EXTENSION, '/The file could not be uploaded\./'],
         ];
     }
 

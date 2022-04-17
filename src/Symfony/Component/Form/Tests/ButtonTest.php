@@ -12,27 +12,19 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ButtonTest extends TestCase
 {
-    private $dispatcher;
-
-    private $factory;
-
-    protected function setUp(): void
-    {
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->factory = $this->createMock(FormFactoryInterface::class);
-    }
-
     public function testSetParentOnSubmittedButton()
     {
         $this->expectException(AlreadySubmittedException::class);
@@ -83,6 +75,6 @@ class ButtonTest extends TestCase
 
     private function getFormBuilder()
     {
-        return new FormBuilder('form', null, $this->dispatcher, $this->factory);
+        return new FormBuilder('form', null, new EventDispatcher(), new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory())));
     }
 }

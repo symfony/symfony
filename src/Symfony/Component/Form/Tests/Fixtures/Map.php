@@ -20,6 +20,9 @@ class Map implements \ArrayAccess
         return isset($this->data[$offset]);
     }
 
+    /**
+     * @return mixed
+     */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {

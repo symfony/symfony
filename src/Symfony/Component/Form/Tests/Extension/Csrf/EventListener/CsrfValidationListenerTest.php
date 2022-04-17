@@ -76,17 +76,18 @@ class CsrfValidationListenerTest extends TestCase
 
     public function testMaxPostSizeExceeded()
     {
-        $serverParams = $this->createMock(ServerParams::class);
-        $serverParams
-            ->expects($this->once())
-            ->method('hasPostMaxSizeBeenExceeded')
-            ->willReturn(true)
-        ;
-
         $event = new FormEvent($this->form, ['csrf' => 'token']);
-        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, $serverParams);
+        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, new ServerParamsPostMaxSizeExceeded());
 
         $validation->preSubmit($event);
         $this->assertEmpty($this->form->getErrors());
+    }
+}
+
+class ServerParamsPostMaxSizeExceeded extends ServerParams
+{
+    public function hasPostMaxSizeBeenExceeded(): bool
+    {
+        return true;
     }
 }

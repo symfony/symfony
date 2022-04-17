@@ -220,17 +220,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed()
     {
-        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
-        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
-        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
-
-        $transformer = $this->getMockBuilder(PercentToLocalizedStringTransformer::class)
-            ->setMethods(['getNumberFormatter'])
-            ->setConstructorArgs([1, 'integer'])
-            ->getMock();
-        $transformer->expects($this->any())
-            ->method('getNumberFormatter')
-            ->willReturn($formatter);
+        $transformer = new PercentToLocalizedStringTransformerWithoutGrouping(1, 'integer');
 
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
@@ -294,5 +284,16 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer = new PercentToLocalizedStringTransformer();
 
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
+    }
+}
+
+class PercentToLocalizedStringTransformerWithoutGrouping extends PercentToLocalizedStringTransformer
+{
+    protected function getNumberFormatter(): \NumberFormatter
+    {
+        $formatter = parent::getNumberFormatter();
+        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
+
+        return $formatter;
     }
 }

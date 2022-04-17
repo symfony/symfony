@@ -366,7 +366,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     public function testTransformationFailedExceptionInvalidMessageIsUsed()
     {
-        $object = $this->createMock('\stdClass');
+        $object = new \stdClass();
 
         $form = $this
             ->getBuilder('name', '\stdClass', [

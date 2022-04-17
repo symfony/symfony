@@ -12,43 +12,27 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 
 class DataTransformerChainTest extends TestCase
 {
     public function testTransform()
     {
-        $transformer1 = $this->createMock(DataTransformerInterface::class);
-        $transformer1->expects($this->once())
-            ->method('transform')
-            ->with($this->identicalTo('foo'))
-            ->willReturn('bar');
-        $transformer2 = $this->createMock(DataTransformerInterface::class);
-        $transformer2->expects($this->once())
-            ->method('transform')
-            ->with($this->identicalTo('bar'))
-            ->willReturn('baz');
-
-        $chain = new DataTransformerChain([$transformer1, $transformer2]);
+        $chain = new DataTransformerChain([
+            new FixedDataTransformer(['foo' => 'bar']),
+            new FixedDataTransformer(['bar' => 'baz']),
+        ]);
 
         $this->assertEquals('baz', $chain->transform('foo'));
     }
 
     public function testReverseTransform()
     {
-        $transformer2 = $this->createMock(DataTransformerInterface::class);
-        $transformer2->expects($this->once())
-            ->method('reverseTransform')
-            ->with($this->identicalTo('foo'))
-            ->willReturn('bar');
-        $transformer1 = $this->createMock(DataTransformerInterface::class);
-        $transformer1->expects($this->once())
-            ->method('reverseTransform')
-            ->with($this->identicalTo('bar'))
-            ->willReturn('baz');
-
-        $chain = new DataTransformerChain([$transformer1, $transformer2]);
+        $chain = new DataTransformerChain([
+            new FixedDataTransformer(['baz' => 'bar']),
+            new FixedDataTransformer(['bar' => 'foo']),
+        ]);
 
         $this->assertEquals('baz', $chain->reverseTransform('foo'));
     }

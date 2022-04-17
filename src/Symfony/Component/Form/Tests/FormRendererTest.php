@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormRendererEngineInterface;
@@ -21,11 +22,7 @@ class FormRendererTest extends TestCase
 {
     public function testHumanize()
     {
-        $renderer = $this->getMockBuilder(FormRenderer::class)
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $renderer = new FormRenderer(new DummyFormRendererEngine());
 
         $this->assertEquals('Is active', $renderer->humanize('is_active'));
         $this->assertEquals('Is active', $renderer->humanize('isActive'));
@@ -43,5 +40,18 @@ class FormRendererTest extends TestCase
         $engine = $this->createMock(FormRendererEngineInterface::class);
         $renderer = new FormRenderer($engine);
         $renderer->searchAndRenderBlock($formView, 'row');
+    }
+}
+
+class DummyFormRendererEngine extends AbstractRendererEngine
+{
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = []): string
+    {
+        return '';
+    }
+
+    protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName): bool
+    {
+        return true;
     }
 }

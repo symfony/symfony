@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
-use Symfony\Component\Security\Core\Security;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
@@ -80,14 +79,14 @@ class HttpUtils
         }
         $setSession($newRequest, $request);
 
-        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-            $newRequest->attributes->set(Security::AUTHENTICATION_ERROR, $request->attributes->get(Security::AUTHENTICATION_ERROR));
+        if ($request->attributes->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
+            $newRequest->attributes->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $request->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR));
         }
-        if ($request->attributes->has(Security::ACCESS_DENIED_ERROR)) {
-            $newRequest->attributes->set(Security::ACCESS_DENIED_ERROR, $request->attributes->get(Security::ACCESS_DENIED_ERROR));
+        if ($request->attributes->has(SecurityRequestAttributes::ACCESS_DENIED_ERROR)) {
+            $newRequest->attributes->set(SecurityRequestAttributes::ACCESS_DENIED_ERROR, $request->attributes->get(SecurityRequestAttributes::ACCESS_DENIED_ERROR));
         }
-        if ($request->attributes->has(Security::LAST_USERNAME)) {
-            $newRequest->attributes->set(Security::LAST_USERNAME, $request->attributes->get(Security::LAST_USERNAME));
+        if ($request->attributes->has(SecurityRequestAttributes::LAST_USERNAME)) {
+            $newRequest->attributes->set(SecurityRequestAttributes::LAST_USERNAME, $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME));
         }
 
         if ($request->get('_format')) {

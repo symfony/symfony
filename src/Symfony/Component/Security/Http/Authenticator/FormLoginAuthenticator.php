@@ -19,7 +19,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -32,6 +31,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -132,11 +132,11 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $credentials['username'] = trim($credentials['username']);
 
-        if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
+        if (\strlen($credentials['username']) > self::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Invalid username.');
         }
 
-        $request->getSession()->set(Security::LAST_USERNAME, $credentials['username']);
+        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['username']);
 
         return $credentials;
     }

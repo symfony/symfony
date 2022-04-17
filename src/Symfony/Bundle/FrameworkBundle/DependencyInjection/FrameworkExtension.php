@@ -186,8 +186,8 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Semaphore\PersistingStoreInterface as SemaphoreStoreInterface;
 use Symfony\Component\Semaphore\Semaphore;
@@ -1020,7 +1020,7 @@ class FrameworkExtension extends Extension
                     throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
                 }
 
-                if (!class_exists(Security::class)) {
+                if (!class_exists(AuthenticationEvents::class)) {
                     throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security-core".');
                 }
 

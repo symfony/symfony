@@ -16,10 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
@@ -62,8 +62,8 @@ class FormLoginAuthenticatorTest extends TestCase
 
     public function provideUsernamesForLength()
     {
-        yield [str_repeat('x', Security::MAX_USERNAME_LENGTH + 1), false];
-        yield [str_repeat('x', Security::MAX_USERNAME_LENGTH - 1), true];
+        yield [str_repeat('x', AuthenticatorInterface::MAX_USERNAME_LENGTH + 1), false];
+        yield [str_repeat('x', AuthenticatorInterface::MAX_USERNAME_LENGTH - 1), true];
     }
 
     /**

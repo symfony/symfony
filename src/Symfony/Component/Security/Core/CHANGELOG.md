@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Deprecate the `Security` class, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+
 6.0
 ---
 

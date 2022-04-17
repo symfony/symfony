@@ -57,7 +57,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -1036,7 +1036,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass(Security::class);
+        $ref = new \ReflectionClass(AuthenticationEvents::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,

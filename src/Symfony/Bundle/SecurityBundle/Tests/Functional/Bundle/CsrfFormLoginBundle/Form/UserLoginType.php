@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * Form type for use with the Security component's form-based authentication
@@ -55,10 +55,10 @@ class UserLoginType extends AbstractType
          * session for an authentication error and last username.
          */
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
-            if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-                $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
+            if ($request->attributes->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
+                $error = $request->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
             } else {
-                $error = $request->getSession()->get(Security::AUTHENTICATION_ERROR);
+                $error = $request->getSession()->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
             }
 
             if ($error) {
@@ -66,7 +66,7 @@ class UserLoginType extends AbstractType
             }
 
             $event->setData(array_replace((array) $event->getData(), [
-                'username' => $request->getSession()->get(Security::LAST_USERNAME),
+                'username' => $request->getSession()->get(SecurityRequestAttributes::LAST_USERNAME),
             ]));
         });
     }

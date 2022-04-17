@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add the `Security` helper class
+
 6.1
 ---
 

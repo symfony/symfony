@@ -23,11 +23,11 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
     private $callback;
 
     /**
-     * The loaded choice list.
+     * The loaded choices.
      *
-     * @var ArrayChoiceList
+     * @var array|null
      */
-    private $choiceList;
+    private $choices;
 
     /**
      * @param callable $callback The callable returning an array of choices
@@ -42,11 +42,11 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        if (null !== $this->choiceList) {
-            return $this->choiceList;
+        if (null === $this->choices) {
+            $this->choices = ($this->callback)();
         }
 
-        return $this->choiceList = new ArrayChoiceList(($this->callback)(), $value);
+        return new ArrayChoiceList($this->choices, $value);
     }
 
     /**

@@ -29,7 +29,7 @@
         "symfony/stopwatch": "^3.4|^4.0|^5.0",
         "symfony/config": "^4.2|^5.0",
         "symfony/dependency-injection": "^3.4|^4.0|^5.0",
-        "symfony/form": "^4.4.11|^5.0.11",
+        "symfony/form": "^4.4.41|^5.0.11",
         "symfony/http-kernel": "^4.3.7",
         "symfony/messenger": "^4.4|^5.0",
         "symfony/property-access": "^3.4|^4.0|^5.0",

@@ -570,14 +570,8 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->buildPreliminaryFormTree($form);
         $this->dataCollector->collectSubmittedData($form);
 
-        $this->assertNotSame(
-            [
-                'forms' => [],
-                'forms_by_hash' => [],
-                'nb_errors' => 0,
-            ],
-            $this->dataCollector->getData()
-        );
+        $this->assertGreaterThan(0, \count($this->dataCollector->getData()['forms']));
+        $this->assertGreaterThan(0, \count($this->dataCollector->getData()['forms_by_hash']));
 
         $this->dataCollector->reset();
 

@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Add support for null-coalescing syntax
  * Add support for null-safe syntax when parsing object's methods and properties
  * Add new operators: `contains`, `starts with` and `ends with`
  * Support lexing numbers with the numeric literal separator `_`

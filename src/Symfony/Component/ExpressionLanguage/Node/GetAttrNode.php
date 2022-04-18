@@ -25,6 +25,7 @@ class GetAttrNode extends Node
     public const ARRAY_CALL = 3;
 
     private bool $isShortCircuited = false;
+    public bool $isNullCoalesce = false;
 
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type)
     {
@@ -72,8 +73,7 @@ class GetAttrNode extends Node
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
-
-                if (null === $obj && $this->nodes['attribute']->isNullSafe) {
+                if (null === $obj && ($this->nodes['attribute']->isNullSafe || $this->isNullCoalesce)) {
                     $this->isShortCircuited = true;
 
                     return null;
@@ -87,6 +87,10 @@ class GetAttrNode extends Node
                 }
 
                 $property = $this->nodes['attribute']->attributes['value'];
+
+                if ($this->isNullCoalesce) {
+                    return $obj->$property ?? null;
+                }
 
                 return $obj->$property;
 
@@ -118,8 +122,12 @@ class GetAttrNode extends Node
                     return null;
                 }
 
-                if (!\is_array($array) && !$array instanceof \ArrayAccess) {
+                if (!\is_array($array) && !$array instanceof \ArrayAccess && !(null === $array && $this->isNullCoalesce)) {
                     throw new \RuntimeException(sprintf('Unable to get an item of non-array "%s".', $this->nodes['node']->dump()));
+                }
+
+                if ($this->isNullCoalesce) {
+                    return $array[$this->nodes['attribute']->evaluate($functions, $values)] ?? null;
                 }
 
                 return $array[$this->nodes['attribute']->evaluate($functions, $values)];

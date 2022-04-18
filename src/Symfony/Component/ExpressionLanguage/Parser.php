@@ -176,6 +176,13 @@ class Parser
 
     protected function parseConditionalExpression(Node\Node $expr)
     {
+        while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '??')) {
+            $this->stream->next();
+            $expr2 = $this->parseExpression();
+
+            $expr = new Node\NullCoalesceNode($expr, $expr2);
+        }
+
         while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '?')) {
             $this->stream->next();
             if (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ':')) {

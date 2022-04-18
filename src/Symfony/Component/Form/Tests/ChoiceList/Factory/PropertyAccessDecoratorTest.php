@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
@@ -29,18 +26,12 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class PropertyAccessDecoratorTest extends TestCase
 {
     /**
-     * @var MockObject&ChoiceListFactoryInterface
-     */
-    private $decoratedFactory;
-
-    /**
      * @var PropertyAccessDecorator
      */
     private $factory;
 
     protected function setUp(): void
     {
-        $this->decoratedFactory = $this->createMock(ChoiceListFactoryInterface::class);
         $this->factory = new PropertyAccessDecorator(new DefaultChoiceListFactory());
     }
 
@@ -60,44 +51,28 @@ class PropertyAccessDecoratorTest extends TestCase
 
     public function testCreateFromChoicesFilterPropertyPath()
     {
-        $factory = new PropertyAccessDecorator($this->decoratedFactory);
-        $filteredChoices = [
-            'two' => (object) ['property' => 'value 2', 'filter' => true],
-        ];
+        $object1 = (object) ['property' => 'value 1', 'filter' => false];
+        $object2 = (object) ['property' => 'value 2', 'filter' => true];
         $choices = [
-            'one' => (object) ['property' => 'value 1', 'filter' => false],
-        ] + $filteredChoices;
+            'one' => $object1,
+            'two' => $object2,
+        ];
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($choices, $value, $callback) {
-                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
-            });
-
-        $this->assertSame(['value 2' => 'value 2'], $factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
+        $this->assertSame(['value 2' => $object2], $this->factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
     }
 
     public function testCreateFromChoicesFilterPropertyPathInstance()
     {
-        $factory = new PropertyAccessDecorator($this->decoratedFactory);
-        $filteredChoices = [
-            'two' => (object) ['property' => 'value 2', 'filter' => true],
-        ];
+        $object1 = (object) ['property' => 'value 1', 'filter' => false];
+        $object2 = (object) ['property' => 'value 2', 'filter' => true];
         $choices = [
-                'one' => (object) ['property' => 'value 1', 'filter' => false],
-        ] + $filteredChoices;
-
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($choices, $value, $callback) {
-                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
-            });
+            'one' => $object1,
+            'two' => $object2,
+        ];
 
         $this->assertSame(
-            ['value 2' => 'value 2'],
-            $factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices()
+            ['value 2' => $object2],
+            $this->factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices()
         );
     }
 
@@ -111,23 +86,15 @@ class PropertyAccessDecoratorTest extends TestCase
 
     public function testCreateFromLoaderFilterPropertyPath()
     {
-        $factory = new PropertyAccessDecorator($this->decoratedFactory);
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
-        $filteredChoices = [
-            'two' => (object) ['property' => 'value 2', 'filter' => true],
-        ];
+        $object1 = (object) ['property' => 'value 1', 'filter' => false];
+        $object2 = (object) ['property' => 'value 2', 'filter' => true];
         $choices = [
-                'one' => (object) ['property' => 'value 1', 'filter' => false],
-        ] + $filteredChoices;
+            'one' => $object1,
+            'two' => $object2,
+        ];
+        $loader = new ArrayChoiceLoader($choices);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($loader, $value, $callback) use ($choices) {
-                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
-            });
-
-        $this->assertSame(['value 2' => 'value 2'], $factory->createListFromLoader($loader, 'property', 'filter')->getChoices());
+        $this->assertSame(['value 2' => $object2], $this->factory->createListFromLoader($loader, 'property', 'filter')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494

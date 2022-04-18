@@ -2264,4 +2264,32 @@ class ChoiceTypeTest extends BaseTypeTest
 
         new ChoiceType(new DeprecatedChoiceListFactory());
     }
+
+    public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
+    {
+        $choiceLoader = new CallbackChoiceLoader(function () {
+            return [1, 2, 3];
+        });
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('choice_one', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+            ])
+            ->add('choice_two', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+                'choice_value' => function ($choice) {
+                    return $choice ? (string) $choice * 10 : '';
+                },
+            ])
+            ->createView()
+        ;
+
+        $this->assertSame('1', $view['choice_one']->vars['choices'][0]->value);
+        $this->assertSame('2', $view['choice_one']->vars['choices'][1]->value);
+        $this->assertSame('3', $view['choice_one']->vars['choices'][2]->value);
+
+        $this->assertSame('10', $view['choice_two']->vars['choices'][0]->value);
+        $this->assertSame('20', $view['choice_two']->vars['choices'][1]->value);
+        $this->assertSame('30', $view['choice_two']->vars['choices'][2]->value);
+    }
 }

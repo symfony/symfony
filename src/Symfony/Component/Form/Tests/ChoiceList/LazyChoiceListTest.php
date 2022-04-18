@@ -98,7 +98,7 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
-        $this->assertSame(3, $calls);
+        $this->assertSame(6, $calls);
     }
 
     public function testGetChoicesForValuesUsesLoadedList()

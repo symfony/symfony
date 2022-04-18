@@ -16,7 +16,6 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
@@ -274,12 +273,11 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithFilter()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $filter = function () {};
 
-        $list = $this->factory->createListFromLoader($loader, null, $filter);
+        $list = $this->factory->createListFromLoader(new ArrayChoiceLoader(), null, $filter);
 
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator($loader, $filter)), $list);
+        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $filter)), $list);
     }
 
     public function testCreateViewFlat()

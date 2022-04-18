@@ -12,11 +12,10 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\FormRendererEngineInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Tests\Fixtures\DummyFormRendererEngine;
 
 class FormRendererTest extends TestCase
 {
@@ -37,21 +36,7 @@ class FormRendererTest extends TestCase
         $formView->vars['name'] = 'foo';
         $formView->setRendered();
 
-        $engine = $this->createMock(FormRendererEngineInterface::class);
-        $renderer = new FormRenderer($engine);
+        $renderer = new FormRenderer(new DummyFormRendererEngine());
         $renderer->searchAndRenderBlock($formView, 'row');
-    }
-}
-
-class DummyFormRendererEngine extends AbstractRendererEngine
-{
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = []): string
-    {
-        return '';
-    }
-
-    protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName): bool
-    {
-        return true;
     }
 }

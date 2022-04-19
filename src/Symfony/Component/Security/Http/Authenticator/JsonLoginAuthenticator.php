@@ -170,8 +170,8 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         try {
             $credentials['username'] = $this->propertyAccessor->getValue($data, $this->options['username_path']);
 
-            if (!\is_string($credentials['username'])) {
-                throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
+            if (!\is_string($credentials['username']) || $credentials['username'] === "") {
+                throw new BadRequestHttpException(sprintf('The key "%s" must be a non empty string.', $this->options['username_path']));
             }
 
             if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
@@ -184,8 +184,8 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         try {
             $credentials['password'] = $this->propertyAccessor->getValue($data, $this->options['password_path']);
 
-            if (!\is_string($credentials['password'])) {
-                throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
+            if (!\is_string($credentials['password']) || $credentials['password'] === "") {
+                throw new BadRequestHttpException(sprintf('The key "%s" must be a non empty string.', $this->options['password_path']));
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);

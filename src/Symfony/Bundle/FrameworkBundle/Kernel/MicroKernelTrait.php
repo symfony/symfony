@@ -82,6 +82,10 @@ trait MicroKernelTrait
         } else {
             $routes->import($configDir.'/{routes}.php');
         }
+
+        if (false !== ($fileName = (new \ReflectionObject($this))->getFileName())) {
+            $routes->import($fileName, 'annotation');
+        }
     }
 
     /**

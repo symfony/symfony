@@ -35,11 +35,7 @@ final class SmsapiTransportFactory extends AbstractTransportFactory
         $test = filter_var($dsn->getOption('test', false), \FILTER_VALIDATE_BOOLEAN);
         $port = $dsn->getPort();
 
-        return (new SmsapiTransport($authToken, $from, $this->client, $this->dispatcher))
-            ->setFast($fast)
-            ->setHost($host)
-            ->setPort($port)
-            ->setTest($test);
+        return (new SmsapiTransport($authToken, $from, $this->client, $this->dispatcher))->setFast($fast)->setHost($host)->setPort($port)->setTest($test);
     }
 
     protected function getSupportedSchemes(): array

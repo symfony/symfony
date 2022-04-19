@@ -23,14 +23,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsapiTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): SmsapiTransport
+    public function createTransport(HttpClientInterface $client = null, bool $fast = false, bool $test = false): SmsapiTransport
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setFast(true)->setHost('test.host')->setTest(true);
+        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host')->setFast($fast)->setTest($test);
     }
 
     public function toStringProvider(): iterable
     {
-        yield ['smsapi://test.host?from=testFrom&fast=1', $this->createTransport()];
+        yield ['smsapi://test.host?from=testFrom', $this->createTransport()];
+        yield ['smsapi://test.host?from=testFrom&fast=1', $this->createTransport(null, true)];
+        yield ['smsapi://test.host?from=testFrom&test=1', $this->createTransport(null, false, true)];
+        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', $this->createTransport(null, true, true)];
     }
 
     public function supportedMessagesProvider(): iterable

@@ -64,7 +64,17 @@ final class SmsapiTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('smsapi://%s?from=%s&fast=%d', $this->getEndpoint(), $this->from, (int) $this->fast);
+        $dsn = sprintf('smsapi://%s?from=%s', $this->getEndpoint(), $this->from);
+
+        if ($this->fast) {
+            $dsn .= sprintf('&fast=%d', (int) $this->fast);
+        }
+
+        if ($this->test) {
+            $dsn .= sprintf('&test=%d', (int) $this->test);
+        }
+
+        return $dsn;
     }
 
     public function supports(MessageInterface $message): bool

@@ -22,15 +22,11 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 final class Middleware implements MiddlewareInterface
 {
-    private $debugDataHolder;
-    private $stopwatch;
-    private $connectionName;
-
-    public function __construct(DebugDataHolder $debugDataHolder, ?Stopwatch $stopwatch, string $connectionName = 'default')
-    {
-        $this->debugDataHolder = $debugDataHolder;
-        $this->stopwatch = $stopwatch;
-        $this->connectionName = $connectionName;
+    public function __construct(
+        private DebugDataHolder $debugDataHolder,
+        private ?Stopwatch $stopwatch,
+        private string $connectionName = 'default',
+    ) {
     }
 
     public function wrap(DriverInterface $driver): DriverInterface

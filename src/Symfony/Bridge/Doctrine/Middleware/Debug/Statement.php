@@ -23,16 +23,16 @@ use Doctrine\DBAL\ParameterType;
  */
 final class Statement extends AbstractStatementMiddleware
 {
-    private $debugDataHolder;
-    private $connectionName;
-    private $query;
+    private Query $query;
 
-    public function __construct(StatementInterface $statement, DebugDataHolder $debugDataHolder, string $connectionName, string $sql)
-    {
+    public function __construct(
+        StatementInterface $statement,
+        private DebugDataHolder $debugDataHolder,
+        private string $connectionName,
+        string $sql,
+    ) {
         parent::__construct($statement);
 
-        $this->debugDataHolder = $debugDataHolder;
-        $this->connectionName = $connectionName;
         $this->query = new Query($sql);
     }
 

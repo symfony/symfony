@@ -16,7 +16,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Bridge\Doctrine\Middleware\Debug\Middleware;
@@ -28,9 +28,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class MiddlewareTest extends TestCase
 {
-    private $debugDataHolder;
-    private $conn;
-    private $stopwatch;
+    private DebugDataHolder $debugDataHolder;
+    private Connection $conn;
+    private ?Stopwatch $stopwatch;
 
     protected function setUp(): void
     {
@@ -63,22 +63,17 @@ CREATE TABLE products (
 	price REAL NOT NULL,
 	stock INTEGER NOT NULL
 );
-EOT
-        );
+EOT);
     }
 
     public function provideExecuteMethod(): array
     {
         return [
             'executeStatement' => [
-                static function (object $target, ...$args) {
-                    return $target->executeStatement(...$args);
-                },
+                static fn (Statement|Connection $target, mixed ...$args) => $target->executeStatement(...$args),
             ],
             'executeQuery' => [
-                static function (object $target, ...$args): Result {
-                    return $target->executeQuery(...$args);
-                },
+                static fn (Statement|Connection $target, mixed ...$args) => $target->executeQuery(...$args),
             ],
         ];
     }
@@ -156,18 +151,8 @@ EOT
     public function provideEndTransactionMethod(): array
     {
         return [
-            'commit' => [
-                static function (Connection $conn): bool {
-                    return $conn->commit();
-                },
-                '"COMMIT"',
-            ],
-            'rollback' => [
-                static function (Connection $conn): bool {
-                    return $conn->rollBack();
-                },
-                '"ROLLBACK"',
-            ],
+            'commit' => [static fn (Connection $conn) => $conn->commit(), '"COMMIT"'],
+            'rollback' => [static fn (Connection $conn) => $conn->rollBack(), '"ROLLBACK"'],
         ];
     }
 
@@ -207,20 +192,12 @@ EOT
     {
         return [
             'commit and exec' => [
-                static function (Connection $conn, string $sql) {
-                    return $conn->executeStatement($sql);
-                },
-                static function (Connection $conn): bool {
-                    return $conn->commit();
-                },
+                static fn (Connection $conn, string $sql) => $conn->executeStatement($sql),
+                static fn (Connection $conn) => $conn->commit(),
             ],
             'rollback and query' => [
-                static function (Connection $conn, string $sql): Result {
-                    return $conn->executeQuery($sql);
-                },
-                static function (Connection $conn): bool {
-                    return $conn->rollBack();
-                },
+                static fn (Connection $conn, string $sql) => $conn->executeQuery($sql),
+                static fn (Connection $conn) => $conn->rollBack(),
             ],
         ];
     }

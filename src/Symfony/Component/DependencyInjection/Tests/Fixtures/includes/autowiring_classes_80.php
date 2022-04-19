@@ -2,7 +2,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\InnerService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 class AutowireSetter
@@ -48,5 +51,37 @@ class AutowireAttribute
         #[Autowire(service: 'invalid.id')]
         public ?\stdClass $invalid = null,
     ) {
+    }
+}
+
+interface AsDecoratorInterface
+{
+}
+
+class AsDecoratorFoo implements AsDecoratorInterface
+{
+}
+
+#[AsDecorator(decorates: AsDecoratorFoo::class, priority: 10)]
+class AsDecoratorBar10 implements AsDecoratorInterface
+{
+    public function __construct(string $arg1, #[InnerService] AsDecoratorInterface $inner)
+    {
+    }
+}
+
+#[AsDecorator(decorates: AsDecoratorFoo::class, priority: 20)]
+class AsDecoratorBar20 implements AsDecoratorInterface
+{
+    public function __construct(string $arg1, #[InnerService] AsDecoratorInterface $inner)
+    {
+    }
+}
+
+#[AsDecorator(decorates: \NonExistent::class, onInvalid: ContainerInterface::NULL_ON_INVALID_REFERENCE)]
+class AsDecoratorBaz implements AsDecoratorInterface
+{
+    public function __construct(#[InnerService] AsDecoratorInterface $inner = null)
+    {
     }
 }

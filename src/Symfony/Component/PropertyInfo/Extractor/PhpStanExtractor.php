@@ -196,8 +196,8 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
         $ucFirstProperty = ucfirst($property);
 
-        if ([$docBlock, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
-            $data = [$docBlock, self::PROPERTY, null, $declaringClass];
+        if ([$docBlock, $source, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
+            $data = [$docBlock, $source, null, $declaringClass];
         } elseif ([$docBlock, $_, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
             $data = [$docBlock, self::ACCESSOR, null, $declaringClass];
         } elseif ([$docBlock, $prefix, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)) {
@@ -210,7 +210,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     }
 
     /**
-     * @return array{PhpDocNode, string}|null
+     * @return array{PhpDocNode, int, string}|null
      */
     private function getDocBlockFromProperty(string $class, string $property): ?array
     {
@@ -221,7 +221,13 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
             return null;
         }
 
-        if (null === $rawDocNode = $reflectionProperty->getDocComment() ?: null) {
+        $source = self::PROPERTY;
+
+        if ($reflectionProperty->isPromoted()) {
+            $constructor = new \ReflectionMethod($class, '__construct');
+            $rawDocNode = $constructor->getDocComment();
+            $source = self::MUTATOR;
+        } elseif (null === $rawDocNode = $reflectionProperty->getDocComment() ?: null) {
             return null;
         }
 
@@ -229,7 +235,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $phpDocNode = $this->phpDocParser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
 
-        return [$phpDocNode, $reflectionProperty->class];
+        return [$phpDocNode, $source, $reflectionProperty->class];
     }
 
     /**

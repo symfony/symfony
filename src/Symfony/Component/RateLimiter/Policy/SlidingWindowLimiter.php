@@ -74,7 +74,10 @@ final class SlidingWindowLimiter implements LimiterInterface
             }
 
             $window->add($tokens);
-            $this->storage->save($window);
+
+            if (0 < $tokens) {
+                $this->storage->save($window);
+            }
 
             return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit);
         } finally {

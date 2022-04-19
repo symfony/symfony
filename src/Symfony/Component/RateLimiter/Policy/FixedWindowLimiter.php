@@ -75,7 +75,10 @@ final class FixedWindowLimiter implements LimiterInterface
 
                 $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
             }
-            $this->storage->save($window);
+
+            if (0 < $tokens) {
+                $this->storage->save($window);
+            }
         } finally {
             $this->lock->release();
         }

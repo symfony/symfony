@@ -116,10 +116,16 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request, 'The key "password" must be provided'];
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": 1, "password": "foo"}');
-        yield [$request, 'The key "username" must be a string.'];
+        yield [$request, 'The key "username" must be a non empty string.'];
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": 1}');
-        yield [$request, 'The key "password" must be a string.'];
+        yield [$request, 'The key "password" must be a non empty string.'];
+
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": ""}');
+        yield [$request, 'The key "username" must be a non empty string.'];
+
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "rimas", "password": ""}');
+        yield [$request, 'The key "password" must be a non empty string.'];
 
         $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": 1}', $username));

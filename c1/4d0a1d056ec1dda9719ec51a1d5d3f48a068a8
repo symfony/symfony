@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-19T08:32:43Z
+
+Shouldn't this target 4.4?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2022-04-19T08:45:34Z
+
+Well in Symfony the problem is only exposed since the default_uri config which was introduced in 5.x
+The fromUri method does not exist in 4.4.

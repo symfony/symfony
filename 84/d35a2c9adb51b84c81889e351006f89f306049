@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-24T10:51:40Z
+
+Thanks for the PR.
+
+I see several issues with the current approach:
+- loading *all* classes in the container is no-go (this could have a huge perf impact at compile-time)
+- unconditionally looking for attributes is no-go (this breaks their declarative property by making them imperative configuration)
+- we should avoid using a generic name (`Service`) - future needs can be handled by new attributes. We could use `#[AsDecorator]` maybe?
+- `decorationArgumentKey` and `decorationInnerName` don't make sense to me. We could use another attribute instead, put on an argument, to tell where the decorated service should be injected, eg `function __construct(#[DecoratedService] $decorated)`, or `#[Inner]`.
+
+Instead of adding a new pass, I think the attributes should be looked for in AutowirePass, where there is already some logic that deals with decoration. This would fix all listed issues I believe.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-11T17:20:08Z
+
+(please mind the PR title+description also ;))
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-04-14T20:27:42Z
+
+Thanks for your reviews ! Code and description have been updated :)
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-04-15T13:26:12Z
+
+I tried from a new demo application with :
+
+```php
+final class Foo implements FooInterface
+{
+    public function __invoke(): string
+    {
+        return 'new '.__CLASS__.'()';
+    }
+}
+
+#[AsDecorator(decorates: Foo::class, decorationPriority: 10)]
+final class Bar10 implements FooInterface
+{
+    private FooInterface $foo;
+
+    public function __construct(#[InnerService] FooInterface $foo)
+    {
+        $this->foo = $foo;
+    }
+
+    public function __invoke(): string
+    {
+        return 'new '.__CLASS__.'('.($this->foo)().')';
+    }
+}
+
+#[AsDecorator(decorates: Foo::class, decorationPriority: 20)]
+final class Bar20 implements FooInterface
+{
+    private FooInterface $foo;
+
+    public function __construct(#[InnerServicce] FooInterface $foo)
+    {
+        $this->foo = $foo;
+    }
+
+    public function __invoke(): string
+    {
+        return 'new '.__CLASS__.'('.($this->foo)().')';
+    }
+}
+
+#[AsController]
+class TestController
+{
+    private FooInterface $foo;
+
+    public function __construct(#[Autowire(service: Foo::class)] FooInterface $foo)
+    {
+        $this->foo = $foo;
+    }
+
+    #[Route('/test/')]
+    public function index(): Response
+    {
+        return new Response(($this->foo)());
+    }
+}
+```
+
+Calling `/test/` returns `new App\Services\Bar10(new App\Services\Bar20(new App\Services\Foo()))`.

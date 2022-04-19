@@ -149,6 +149,9 @@ class DoctrineLoaderTest extends TestCase
         $noAutoMappingConstraints = $noAutoMappingMetadata[0]->getConstraints();
         $this->assertCount(0, $noAutoMappingConstraints);
         $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
+
+        $anonymousClassMetadata = $validator->getMetadataFor(new class() {});
+        $this->assertCount(0, $anonymousClassMetadata->getConstraints());
     }
 
     /**

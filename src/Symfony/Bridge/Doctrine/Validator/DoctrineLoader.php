@@ -48,6 +48,11 @@ final class DoctrineLoader implements LoaderInterface
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $className = $metadata->getClassName();
+
+        if (false !== strpos($className, '@')) {
+            return false;
+        }
+
         try {
             $doctrineMetadata = $this->entityManager->getClassMetadata($className);
         } catch (MappingException|OrmMappingException $exception) {

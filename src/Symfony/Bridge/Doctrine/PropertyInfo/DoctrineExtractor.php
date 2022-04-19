@@ -231,6 +231,10 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
     private function getMetadata(string $class): ?ClassMetadata
     {
+        if (false !== strpos($class, '@')) {
+            return null;
+        }
+
         try {
             return $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException|OrmMappingException $exception) {

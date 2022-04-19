@@ -59,13 +59,13 @@ final class FixedWindowLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $window->getAvailableTokens($now);
+            $waitDuration = $window->calculateTimeForTokens(max(1, $tokens));
+
             if ($availableTokens >= $tokens) {
                 $window->add($tokens, $now);
 
-                $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
+                $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), true, $this->limit));
             } else {
-                $waitDuration = $window->calculateTimeForTokens($tokens);
-
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
                     throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));

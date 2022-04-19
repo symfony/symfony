@@ -63,15 +63,6 @@ class ResourceCaster
         return $a;
     }
 
-    public static function castMysqlLink($h, array $a, Stub $stub, bool $isNested)
-    {
-        $a['host'] = mysql_get_host_info($h);
-        $a['protocol'] = mysql_get_proto_info($h);
-        $a['server'] = mysql_get_server_info($h);
-
-        return $a;
-    }
-
     public static function castOpensslX509($h, array $a, Stub $stub, bool $isNested)
     {
         $stub->cut = -1;

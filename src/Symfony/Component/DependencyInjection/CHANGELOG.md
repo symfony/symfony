@@ -4,6 +4,8 @@ CHANGELOG
 6.1
 ---
 
+ * Add `#[MapDecorated]` attribute telling to which parameter the decorated service should be mapped in a decorator
+ * Add `#[AsDecorator]` attribute to make a service decorates another
  * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
  * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
  * Add an `env` function to the expression language provider

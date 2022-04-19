@@ -15,7 +15,7 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\InnerService;
+use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -273,8 +273,9 @@ class AutowirePass extends AbstractRecursivePass
                         break;
                     }
 
-                    if (InnerService::class === $attribute->getName()) {
-                        $arguments[$index] = new Reference($this->currentId.'.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+                    if (MapDecorated::class === $attribute->getName()) {
+                        $definition = $this->container->getDefinition($this->currentId);
+                        $arguments[$index] = new Reference($definition->innerServiceId ?? $this->currentId.'.inner', $definition->decorationOnInvalid ?? ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
                         break;
                     }

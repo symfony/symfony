@@ -714,9 +714,6 @@ EOD;
         $this->assertEquals('not yet', $dialog->ask($this->createStreamableInputInterfaceMock(null, false), $this->createOutputInterface(), $question));
     }
 
-    /**
-     * @requires function mb_strwidth
-     */
     public function testChoiceOutputFormattingQuestionForUtf8Keys()
     {
         $question = 'Lorem ipsum?';

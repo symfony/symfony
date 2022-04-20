@@ -13,6 +13,7 @@ CHANGELOG
  * Add `trust_x_sendfile_type_header` option
  * Add support for first-class callable route controller in `MicroKernelTrait`
  * Add tag `routing.condition_service` to autoconfigure routing condition services
+ * Automatically register kernel methods marked with the `Symfony\Component\Routing\Annotation\Route` attribute or annotation as controllers in `MicroKernelTrait`
 
 6.0
 ---

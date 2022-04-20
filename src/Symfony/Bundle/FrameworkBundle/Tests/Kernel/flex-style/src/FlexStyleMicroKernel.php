@@ -18,17 +18,26 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class FlexStyleMicroKernel extends Kernel
 {
-    use MicroKernelTrait;
+    use MicroKernelTrait {
+        configureRoutes as traitConfigureRoutes;
+    }
 
     private $cacheDir;
 
     public function halloweenAction(\stdClass $o)
     {
         return new Response($o->halloween);
+    }
+
+    #[Route('/easter')]
+    public function easterAction()
+    {
+        return new Response('easter');
     }
 
     public function createHalloween(LoggerInterface $logger, string $halloween)
@@ -73,6 +82,8 @@ class FlexStyleMicroKernel extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
+        $this->traitConfigureRoutes($routes);
+
         $routes->add('halloween', '/')->controller([$this, 'halloweenAction']);
         $routes->add('halloween2', '/h')->controller($this->halloweenAction(...));
     }

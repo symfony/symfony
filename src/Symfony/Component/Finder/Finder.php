@@ -441,6 +441,22 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Sorts files and directories by name case insensitive.
+     *
+     * This can be slow as all the matching files and directories must be retrieved for comparison.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByCaseInsensitiveName(bool $useNaturalSort = false): static
+    {
+        $this->sort = $useNaturalSort ? Iterator\SortableIterator::SORT_BY_NAME_NATURAL_CASE_INSENSITIVE : Iterator\SortableIterator::SORT_BY_NAME_CASE_INSENSITIVE;
+
+        return $this;
+    }
+
+    /**
      * Sorts files and directories by type (directories before files), then by name.
      *
      * This can be slow as all the matching files and directories must be retrieved for comparison.

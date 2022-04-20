@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-20T08:15:26Z
+
+Should we deprecate declaring routes with the `->controller([$this, 'foo'])` or `->controller($this->foo(...))` syntaxes then? I feel like being able to use the `Route` attribute directly without any configuration fills the same need but in a better way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-20T08:22:00Z
+
+Deprecating always has a cost, which needs to be justified. What would be the justification for the migration cost?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-04-20T08:23:22Z
+
+The "old" syntax still has use cases: for instance, you may want to register methods as controllers dynamically (using reflection or complex things like this). I would keep it (and it has been supported for years). However, we could update the docs to promote the new syntax.

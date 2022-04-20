@@ -229,7 +229,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     /**
      * Simulates sending the request.
      */
-    private static function writeRequest(self $response, array $options, ResponseInterface $mock)
+    private static function writeRequest(self $response, array $options, ResponseInterface $mock): void
     {
         $onProgress = $options['on_progress'] ?? static function () {};
         $response->info += $mock->getInfo() ?: [];
@@ -272,7 +272,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     /**
      * Simulates reading the response.
      */
-    private static function readResponse(self $response, array $options, ResponseInterface $mock, int &$offset)
+    private static function readResponse(self $response, array $options, ResponseInterface $mock, int &$offset): void
     {
         $onProgress = $options['on_progress'] ?? static function () {};
 

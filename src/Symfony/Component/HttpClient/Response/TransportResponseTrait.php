@@ -131,7 +131,7 @@ trait TransportResponseTrait
     /**
      * Ensures the request is always sent and that the response code was checked.
      */
-    private function doDestruct()
+    private function doDestruct(): void
     {
         $this->shouldBuffer = true;
 

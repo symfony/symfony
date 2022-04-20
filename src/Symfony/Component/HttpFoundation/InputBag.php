@@ -25,7 +25,7 @@ final class InputBag extends ParameterBag
      *
      * @param string|int|float|bool|null $default The default value if the input key does not exist
      *
-     * @return string|int|float|bool|null
+     * @return string|int|float|bool|array|null
      */
     public function get(string $key, $default = null)
     {

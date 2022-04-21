@@ -1,12 +1,6 @@
 CHANGELOG
 =========
 
-6.2
----
-
- * Add `params` variable to condition expression
- * Deprecate not passing route parameters as the fourth argument to `UrlMatcher::handleRouteRequirements()`
-
 6.1
 ---
 
@@ -16,6 +10,8 @@ CHANGELOG
  * Already encoded slashes are not decoded nor double-encoded anymore when generating URLs (query parameters)
  * Add `EnumRequirement` to help generate route requirements from a `\BackedEnum`
  * Add `Requirement`, a collection of universal regular-expression constants to use as route parameter requirements
+ * Add `params` variable to condition expression
+ * Deprecate not passing route parameters as the fourth argument to `UrlMatcher::handleRouteRequirements()`
 
 5.3
 ---

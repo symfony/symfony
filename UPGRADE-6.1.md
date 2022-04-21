@@ -32,6 +32,11 @@ HttpKernel
 
  * Deprecate StreamedResponseListener, it's not needed anymore
 
+Routing
+-------
+
+ * Add argument `$routeParameters` to `UrlMatcher::handleRouteRequirements()`
+
 Serializer
 ----------
 

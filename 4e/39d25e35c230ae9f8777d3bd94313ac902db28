@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-19T09:19:03Z
+
+Or maybe just rename `route_parameters` to `params`?
+` #[Route('/foo/{id}', requirements: ['id' => '\d+'], condition: "params.id < 100")]`
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-04-19T10:28:32Z
+
+> Thanks, that's a nice feature, and the implementation is perfect. This leaves me only bike-shedding :D
+>
+> So: what about injecting the parameter as variables directly in the expression? eg `#[Route('/foo/{id}', requirements: ['id' => '\d+'], condition: "id < 100")]`
+>
+> Of course we should then forbid to use context/request as var names, or at least give them higher priority.
+
+> Or maybe just rename `route_parameters` to `params`? ` #[Route('/foo/{id}', requirements: ['id' => '\d+'], condition: "params.id < 100")]`
+
+Thanks for the review, I've [renamed the variable to `params`](https://github.com/symfony/symfony/compare/50fa6ef0d22bc77329a78b2d5a8b6d5dc87ccc69..acefeb9b5a328e9c606ef86205d1fab269586c0e). I like the idea of injecting the parameters as variables as well, but as you mentioned, that might cause collisions with var names. This seems like the safer option, but if you want, I can inject them instead, I'm fine either way.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-04-19T16:52:20Z
+
+I prefer injecting a `params` variable.
+From prior experience in the `@Security` annotation of FrameworkExtraBundle, mixing predefined variables and user-defined variable names in the same expression is a mess regarding conflicts (and still requires injecting a variable allowing to access params that could not be injected as variables due to the conflict, with a weird DX when a few param names need a special access pattern, and a forever-freeze of the list of predefined variables to avoid BC breaks)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2022-04-20T19:06:25Z
+
+I agree with stof.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2022-04-20T19:10:20Z
+
+I think it would be ok to still release this in 6.1 before the RC. It fits with #44405 and it would make sense to document/new in symfony this together.

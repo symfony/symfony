@@ -225,7 +225,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function handleRouteRequirements(string $pathinfo, string $name, Route $route/*, array $routeParameters*/): array
     {
         if (\func_num_args() < 4) {
-            trigger_deprecation('symfony/routing', '6.2', 'The "%s()" method will have a new "array $routeParameters" argument in version 7.0, not defining it is deprecated.', __METHOD__);
+            trigger_deprecation('symfony/routing', '6.1', 'The "%s()" method will have a new "array $routeParameters" argument in version 7.0, not defining it is deprecated.', __METHOD__);
             $routeParameters = [];
         } else {
             $routeParameters = func_get_arg(3);

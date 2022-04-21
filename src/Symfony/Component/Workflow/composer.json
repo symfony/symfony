@@ -35,7 +35,7 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Workflow\\": "" },
-        "exclude-from-classmap": "/Tests/"
+        "exclude-from-classmap": ["/Tests/"]
     },
     "minimum-stability": "dev"
 }

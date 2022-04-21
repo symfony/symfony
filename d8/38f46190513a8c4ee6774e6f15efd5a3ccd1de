@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2022-04-13T07:51:14Z
+
+@nicolas-grekas I need to adapt tests don't I? The option needs to be set in alot of functional tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-13T07:58:09Z
+
+yes indeed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2022-04-19T12:26:51Z
+
+@nicolas-grekas is there a way to ignore this deprecation notice in Symfony tests when it's self triggered. otherwise I have to explicitly set the http_method_override: false in hundrets of test fixtures. kinda ugly and pointless.
+There are 114 yml files alone. Then the likely the same amount in xml and php.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-19T12:53:57Z
+
+Nope there's none, and that's on purpose to me: eat our own dog food. We're asking ppl to opt-in, including ourselves.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2022-04-19T14:20:04Z
+
+Well, users will not be affected when using the recipes. And the people who are, only need to change 1 line. We have to adjust hundrets of unrelated tests.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2022-04-20T14:20:04Z
+
+I fixed the tests and adding changelog/upgrade. This is ready now.

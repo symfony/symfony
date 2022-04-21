@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `params` variable to condition expression
+ * Deprecate not passing route parameters as the forth argument to `UrlMatcher::handleRouteRequirements()`
+
 6.1
 ---
 

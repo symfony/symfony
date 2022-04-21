@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-04-21T09:28:31Z
+
+For the iconv polyfill, I think the solution is to change the condition in `iconv_strlen` to `if (\PHP_VERSION_ID < 80200 && $hasXml)`, so that PHP 8.2+ always uses the `strlen2` implementation instead of `strlen1` (but keeping `strlen1` for older versions, as I think it is a bit faster)

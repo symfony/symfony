@@ -22,7 +22,10 @@
         "symfony/http-client-implementation": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Contracts\\HttpClient\\": "" }
+        "psr-4": { "Symfony\\Contracts\\HttpClient\\": "" },
+        "exclude-from-classmap": [
+            "/Test/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

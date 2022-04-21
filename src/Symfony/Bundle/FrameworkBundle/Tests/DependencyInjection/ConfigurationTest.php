@@ -33,7 +33,7 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
+        $config = $processor->processConfiguration(new Configuration(true), [['http_method_override' => false, 'secret' => 's3cr3t']]);
 
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
@@ -57,7 +57,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $processor->processConfiguration(
             new Configuration(true),
-            [['session' => ['name' => $sessionName]]]
+            [['http_method_override' => false, 'session' => ['name' => $sessionName]]]
         );
     }
 
@@ -77,7 +77,7 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [['assets' => null]]);
+        $config = $processor->processConfiguration($configuration, [['http_method_override' => false, 'assets' => null]]);
 
         $defaultConfig = [
             'enabled' => true,
@@ -103,6 +103,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
                 'assets' => [
                     'packages' => [
                         $packageName => [],
@@ -135,6 +136,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, [
                 [
+                    'http_method_override' => false,
                     'assets' => $assetConfig,
                 ],
             ]);
@@ -184,6 +186,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
                 'lock' => $lockConfig,
             ],
         ]);
@@ -244,11 +247,13 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
                 'lock' => [
                     'payload' => 'flock',
                 ],
             ],
             [
+                'http_method_override' => false,
                 'lock' => [
                     'payload' => 'semaphore',
                 ],
@@ -275,6 +280,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
                 'semaphore' => $semaphoreConfig,
             ],
         ]);
@@ -327,6 +333,7 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             'framework' => [
+                'http_method_override' => false,
                 'messenger' => [
                     'default_bus' => null,
                     'buses' => [
@@ -344,6 +351,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
                 'messenger' => [
                     'default_bus' => 'existing_bus',
                     'buses' => [
@@ -358,6 +366,7 @@ class ConfigurationTest extends TestCase
                 ],
             ],
             [
+                'http_method_override' => false,
                 'messenger' => [
                     'buses' => [
                         'common_bus' => [
@@ -406,6 +415,7 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
                 'messenger' => [
                     'default_bus' => 'foo',
                     'buses' => [
@@ -420,7 +430,7 @@ class ConfigurationTest extends TestCase
     protected static function getBundleDefaultConfig()
     {
         return [
-            'http_method_override' => true,
+            'http_method_override' => false,
             'trust_x_sendfile_type_header' => false,
             'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',

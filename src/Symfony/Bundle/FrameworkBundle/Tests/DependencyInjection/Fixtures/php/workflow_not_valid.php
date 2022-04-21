@@ -3,6 +3,7 @@
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'workflows' => [
         'my_workflow' => [
             'type' => 'state_machine',

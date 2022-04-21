@@ -120,6 +120,7 @@ class MicroKernelTraitTest extends TestCase
             protected function configureContainer(ContainerConfigurator $c): void
             {
                 $c->extension('framework', [
+                    'http_method_override' => false,
                     'router' => ['utf8' => true],
                 ]);
                 $c->services()->set('logger', NullLogger::class);

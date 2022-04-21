@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'form' => [
         'legacy_error_messages' => false,
     ],

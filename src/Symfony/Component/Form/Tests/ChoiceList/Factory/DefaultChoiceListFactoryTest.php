@@ -759,9 +759,6 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
-    /**
-     * @requires function Symfony\Component\Translation\TranslatableMessage::__construct
-     */
     public function testPassTranslatableMessageAsLabelDoesntCastItToString()
     {
         $view = $this->factory->createView(

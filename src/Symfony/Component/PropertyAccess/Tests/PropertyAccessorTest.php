@@ -907,9 +907,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testSetValueWrongTypeShouldThrowWrappedException()
     {
         $object = new TestClassTypedProperty();

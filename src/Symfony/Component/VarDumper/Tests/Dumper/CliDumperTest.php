@@ -293,9 +293,6 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
-    /**
-     * @requires function Twig\Template::getSourceContext
-     */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+');

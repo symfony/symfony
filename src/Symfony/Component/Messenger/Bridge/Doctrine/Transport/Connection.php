@@ -189,7 +189,11 @@ class Connection implements ResetInterface
                 $sql = str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql);
 
                 $wrappedQuery = $this->driverConnection->createQueryBuilder()
-                    ->select('w.*')
+                    ->select(
+                        'w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", '.
+                        'w.created_at AS "created_at", w.available_at AS "available_at", '.
+                        'w.delivered_at AS "delivered_at"'
+                    )
                     ->from($this->configuration['table_name'], 'w')
                     ->where('w.id IN('.$sql.')');
 

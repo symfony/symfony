@@ -31,6 +31,12 @@ class MysqlStore implements PersistingStoreInterface
 
     private int $connectionId;
 
+    private \PDOStatement $saveStmt;
+
+    private \PDOStatement $existsStmt;
+
+    private \PDOStatement $deleteStmt;
+
     public function __construct(\PDO|string $connOrDsn, array $options = [])
     {
         if ($connOrDsn instanceof \PDO) {
@@ -52,10 +58,11 @@ class MysqlStore implements PersistingStoreInterface
             return;
         }
 
+        $stmt = $this->saveStmt ??
+            $this->saveStmt = $this->getConnection()->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), -1, GET_LOCK(:name, 0))');
+
         $name = self::getLockName($key);
-        $stmt = $this->getConnection()->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), -1, GET_LOCK(:name, 0))');
-        $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
-        $stmt->execute();
+        $stmt->execute(['name' => $name]);
         $result = $stmt->fetchColumn();
 
         // lock acquired
@@ -83,9 +90,10 @@ class MysqlStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
-        $stmt = $this->getConnection()->prepare('DO RELEASE_LOCK(:name)');
-        $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
-        $stmt->execute();
+        $stmt = $this->deleteStmt ??
+            $this->deleteStmt = $this->getConnection()->prepare('DO RELEASE_LOCK(:name)');
+
+        $stmt->execute(['name' => self::getLockName($key)]);
 
         $key->removeState($this->getStateKey($key));
     }
@@ -97,18 +105,19 @@ class MysqlStore implements PersistingStoreInterface
             return false;
         }
 
-        $stmt = $this->getConnection()->prepare('SELECT IF(IS_USED_LOCK(:name) = CONNECTION_ID(), 1, 0)');
-        $stmt->bindValue(':name', self::getLockName($key), \PDO::PARAM_STR);
-        $stmt->execute();
+        $stmt = $this->existsStmt ??
+            $this->existsStmt = $this->getConnection()->prepare('SELECT IS_USED_LOCK(:name) = CONNECTION_ID()');
+
+        $stmt->execute(['name' => self::getLockName($key)]);
         $result = $stmt->fetchColumn();
 
-        if (1 === $result) {
-            return true;
+        if (1 !== $result) {
+            $key->removeState($stateKey);
+
+            return false;
         }
 
-        $key->removeState($stateKey);
-
-        return false;
+        return true;
     }
 
     private function getConnection(): \PDO

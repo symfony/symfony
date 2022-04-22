@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailjet\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\Mailjet\Mime\MailjetTemplatedEmail;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -133,6 +134,35 @@ class MailjetApiTransport extends AbstractApiTransport
             }
 
             $message['Headers'][$header->getName()] = $header->getBodyAsString();
+        }
+
+        if ($email instanceof MailjetTemplatedEmail) {
+            if ($email->getCampaignName()) {
+                $message['CustomCampaign'] = $email->getCampaignName();
+            }
+
+            if ($email->getTemplateId()) {
+                $message['TemplateLanguage'] = true;
+                $message['TemplateID'] = $email->getTemplateId();
+            }
+
+            if (\count($email->getVariables())) {
+                $message['Variables'] = $email->getVariables();
+            }
+
+            if ($email->getErrorReportingEmail()) {
+                $message['TemplateErrorReporting'] = [
+                    'Email' => $email->getErrorReportingEmail(),
+                ];
+            }
+
+            if ($email->isTemplateErrorDeliver()) {
+                $message['TemplateErrorDeliver'] = true;
+            }
+
+            if (\count($email->getAdditionalProperties())) {
+                $message = array_merge($message, $email->getAdditionalProperties());
+            }
         }
 
         return [

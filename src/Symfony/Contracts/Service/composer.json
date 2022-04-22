@@ -26,7 +26,10 @@
         "symfony/service-implementation": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Contracts\\Service\\": "" }
+        "psr-4": { "Symfony\\Contracts\\Service\\": "" },
+        "exclude-from-classmap": [
+            "/Test/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

@@ -34,7 +34,10 @@
         "symfony/event-dispatcher": "<5.4"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Workflow\\": "" }
+        "psr-4": { "Symfony\\Component\\Workflow\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev"
 }

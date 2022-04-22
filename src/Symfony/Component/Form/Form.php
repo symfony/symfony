@@ -818,10 +818,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
             $child = (string) $child;
 
-            if (null !== $type && !\is_string($type)) {
-                throw new UnexpectedTypeException($type, 'string or null');
-            }
-
             // Never initialize child forms automatically
             $options['auto_initialize'] = false;
 

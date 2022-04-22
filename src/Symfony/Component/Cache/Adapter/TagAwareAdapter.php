@@ -177,9 +177,11 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         }
 
         foreach ($this->getTagVersions([$itemTags]) as $tag => $version) {
-            if ($itemTags[$tag] !== $version && 1 !== $itemTags[$tag] - $version) {
-                return false;
+            if ($itemTags[$tag] === $version || \is_int($itemTags[$tag]) && \is_int($version) && 1 === $itemTags[$tag] - $version) {
+                continue;
             }
+
+            return false;
         }
 
         return true;
@@ -366,10 +368,11 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
                 foreach ($itemTags as $key => $tags) {
                     foreach ($tags as $tag => $version) {
-                        if ($tagVersions[$tag] !== $version && 1 !== $version - $tagVersions[$tag]) {
-                            unset($itemTags[$key]);
-                            continue 2;
+                        if ($tagVersions[$tag] === $version || \is_int($version) && \is_int($tagVersions[$tag]) && 1 === $version - $tagVersions[$tag]) {
+                            continue;
                         }
+                        unset($itemTags[$key]);
+                        continue 2;
                     }
                 }
                 $tagVersions = $tagKeys = null;
@@ -408,7 +411,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $tags = [];
         foreach ($tagVersions as $tag => $version) {
             $tags[$tag.static::TAGS_PREFIX] = $tag;
-            if ($fetchTagVersions || !isset($this->knownTagVersions[$tag])) {
+            if ($fetchTagVersions || !isset($this->knownTagVersions[$tag]) || !\is_int($version)) {
                 $fetchTagVersions = true;
                 continue;
             }
@@ -429,6 +432,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             $tagVersions[$tag = $tags[$tag]] = $version->get() ?: 0;
             if (isset($invalidatedTags[$tag])) {
                 $invalidatedTags[$tag] = $version->set(++$tagVersions[$tag]);
+            }
+            if (!\is_int($tagVersions[$tag])) {
+                unset($this->knownTagVersions[$tag]);
+                continue;
             }
             $this->knownTagVersions[$tag] = [$now, $tagVersions[$tag]];
         }

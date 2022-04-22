@@ -351,13 +351,13 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
 
                     /* prevent logging AJAX calls to static and inline files, like templates */
                     var path = url;
-                    if (url.substr(0, 1) === '/') {
+                    if (url.slice(0, 1) === '/') {
                         if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
-                            path = url.substr({{ request.basePath|length }});
+                            path = url.slice({{ request.basePath|length }});
                         }
                     }
                     else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
-                        path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
+                        path = url.slice({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
                     }
 
                     if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {

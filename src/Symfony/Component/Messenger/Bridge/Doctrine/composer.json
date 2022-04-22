@@ -22,7 +22,7 @@
         "symfony/service-contracts": "^1.1|^2|^3"
     },
     "require-dev": {
-        "doctrine/persistence": "^1.3|^2",
+        "doctrine/persistence": "^1.3|^2|^3",
         "symfony/property-access": "^5.4|^6.0",
         "symfony/serializer": "^5.4|^6.0"
     },

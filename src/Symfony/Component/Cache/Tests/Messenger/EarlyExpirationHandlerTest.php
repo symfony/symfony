@@ -21,9 +21,6 @@ use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @requires function Symfony\Component\DependencyInjection\ReverseContainer::__construct
- */
 class EarlyExpirationHandlerTest extends TestCase
 {
     public static function tearDownAfterClass(): void

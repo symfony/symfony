@@ -12,6 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-class InnerService
+class MapDecorated
 {
 }

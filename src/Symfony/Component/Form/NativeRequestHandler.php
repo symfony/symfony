@@ -190,6 +190,8 @@ class NativeRequestHandler implements RequestHandlerInterface
             return $data;
         }
 
+        // Remove extra key added by PHP 8.1.
+        unset($data['full_path']);
         $keys = array_keys($data);
         sort($keys);
 

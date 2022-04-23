@@ -87,7 +87,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
         $paramValues = [
@@ -140,7 +140,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function verifyToken(PersistentTokenInterface $token, string $tokenValue): bool
+    public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool
     {
         // Check if the token value matches the current persisted token
         if (hash_equals($token->getTokenValue(), $tokenValue)) {
@@ -177,7 +177,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function updateExistingToken(PersistentTokenInterface $token, string $tokenValue, \DateTimeInterface $lastUsed): void
+    public function updateExistingToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         if (!$token instanceof PersistentToken) {
             return;

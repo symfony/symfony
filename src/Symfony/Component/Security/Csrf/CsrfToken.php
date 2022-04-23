@@ -21,7 +21,7 @@ class CsrfToken
     private string $id;
     private string $value;
 
-    public function __construct(string $id, ?string $value)
+    public function __construct(string $id, #[\SensitiveParameter] ?string $value)
     {
         $this->id = $id;
         $this->value = $value ?? '';

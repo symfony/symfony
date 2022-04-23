@@ -85,7 +85,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function refreshToken(string $tokenId): CsrfToken
+    public function refreshToken(#[\SensitiveParameter] string $tokenId): CsrfToken
     {
         $namespacedId = $this->getNamespace().$tokenId;
         $value = $this->generator->generateToken();

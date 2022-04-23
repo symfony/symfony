@@ -32,7 +32,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function bind(string $dn = null, string $password = null)
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
     {
         $this->adapter->getConnection()->bind($dn, $password);
     }

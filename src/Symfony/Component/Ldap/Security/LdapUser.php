@@ -29,7 +29,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
     private array $roles;
     private array $extraFields;
 
-    public function __construct(Entry $entry, string $username, ?string $password, array $roles = [], array $extraFields = [])
+    public function __construct(Entry $entry, string $username, #[\SensitiveParameter] ?string $password, array $roles = [], array $extraFields = [])
     {
         if (!$username) {
             throw new \InvalidArgumentException('The username cannot be empty.');
@@ -97,7 +97,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->extraFields;
     }
 
-    public function setPassword(string $password)
+    public function setPassword(#[\SensitiveParameter] string $password)
     {
         $this->password = $password;
     }

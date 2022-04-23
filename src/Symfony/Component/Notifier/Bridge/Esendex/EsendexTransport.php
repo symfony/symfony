@@ -32,7 +32,7 @@ final class EsendexTransport extends AbstractTransport
     private string $accountReference;
     private string $from;
 
-    public function __construct(string $email, string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $email, #[\SensitiveParameter] string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->email = $email;
         $this->password = $password;

@@ -52,7 +52,7 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
         return version_compare(\extension_loaded('sodium') ? \SODIUM_LIBRARY_VERSION : phpversion('libsodium'), '1.0.14', '>=');
     }
 
-    public function hash(string $plainPassword): string
+    public function hash(#[\SensitiveParameter] string $plainPassword): string
     {
         if ($this->isPasswordTooLong($plainPassword)) {
             throw new InvalidPasswordException();
@@ -69,7 +69,7 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
         throw new LogicException('Libsodium is not available. You should either install the sodium extension or use a different password hasher.');
     }
 
-    public function verify(string $hashedPassword, string $plainPassword): bool
+    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword): bool
     {
         if ('' === $plainPassword) {
             return false;

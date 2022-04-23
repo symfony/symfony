@@ -31,7 +31,7 @@ final class ZulipTransport extends AbstractTransport
     private string $token;
     private string $channel;
 
-    public function __construct(string $email, string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $email, #[\SensitiveParameter] string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->email = $email;
         $this->token = $token;

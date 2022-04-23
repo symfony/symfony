@@ -36,7 +36,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     private ?TokenVerifierInterface $tokenVerifier;
     private string $secret;
 
-    public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
+    public function __construct(TokenProviderInterface $tokenProvider, #[\SensitiveParameter] string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
     {
         parent::__construct($userProvider, $requestStack, $options, $logger);
 

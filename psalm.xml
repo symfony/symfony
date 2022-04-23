@@ -35,5 +35,11 @@
                 <referencedClass name="UnitEnum"/>
             </errorLevel>
         </UndefinedDocblockClass>
+        <UndefinedAttributeClass>
+            <errorLevel type="suppress">
+                <!-- These classes have been added in PHP 8.2 -->
+                <referencedClass name="SensitiveParameter"/>
+            </errorLevel>
+        </UndefinedAttributeClass>
     </issueHandlers>
 </psalm>

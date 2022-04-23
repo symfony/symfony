@@ -83,7 +83,7 @@ class EsmtpTransport extends SmtpTransport
     /**
      * @return $this
      */
-    public function setPassword(string $password): static
+    public function setPassword(#[\SensitiveParameter] string $password): static
     {
         $this->password = $password;
 

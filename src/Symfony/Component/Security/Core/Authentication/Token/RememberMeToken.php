@@ -28,7 +28,7 @@ class RememberMeToken extends AbstractToken
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, string $firewallName, string $secret)
+    public function __construct(UserInterface $user, string $firewallName, #[\SensitiveParameter] string $secret)
     {
         parent::__construct($user->getRoles());
 

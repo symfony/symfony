@@ -33,7 +33,7 @@ final class SlackTransport extends AbstractTransport
     private string $accessToken;
     private ?string $chatChannel;
 
-    public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         if (!preg_match('/^xox(b-|p-|a-2)/', $accessToken)) {
             throw new InvalidArgumentException('A valid Slack token needs to start with "xoxb-", "xoxp-" or "xoxa-2". See https://api.slack.com/authentication/token-types for further information.');

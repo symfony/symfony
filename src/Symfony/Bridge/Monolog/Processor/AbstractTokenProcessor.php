@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Processor;
 
+use Monolog\LogRecord;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -19,9 +20,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
+ *
+ * @internal since Symfony 6.1
  */
 abstract class AbstractTokenProcessor
 {
+    use CompatibilityProcessor;
+
     /**
      * @var TokenStorageInterface
      */
@@ -36,7 +41,7 @@ abstract class AbstractTokenProcessor
 
     abstract protected function getToken(): ?TokenInterface;
 
-    public function __invoke(array $record): array
+    private function doInvoke(array|LogRecord $record): array|LogRecord
     {
         $record['extra'][$this->getKey()] = null;
 

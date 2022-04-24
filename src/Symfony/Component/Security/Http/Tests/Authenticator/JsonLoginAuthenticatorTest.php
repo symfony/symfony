@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -26,6 +27,8 @@ use Symfony\Component\Translation\Translator;
 
 class JsonLoginAuthenticatorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private $userProvider;
     /** @var JsonLoginAuthenticator */
     private $authenticator;
@@ -124,6 +127,26 @@ class JsonLoginAuthenticatorTest extends TestCase
         $username = str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": "foo"}', $username));
         yield [$request, 'Username too long.', BadCredentialsException::class];
+    }
+
+    /**
+     * @dataProvider provideEmptyAuthenticateData
+     *
+     * @group legacy
+     */
+    public function testAuthenticationForEmptyCredentialDeprecation($request)
+    {
+        $this->expectDeprecation('Since symfony/security 6.2: Passing empty string for username or password is deprecated and will be removed in 7.0');
+        $this->setUpAuthenticator();
+
+        $this->authenticator->authenticate($request);
+    }
+
+    public function provideEmptyAuthenticateData()
+    {
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "notempty"}');
+        yield [$request];
+
     }
 
     public function testAuthenticationFailureWithoutTranslator()

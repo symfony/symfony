@@ -161,6 +161,10 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
         }
 
+        if ('' === $credentials['username'] || '' === $credentials['password']) {
+            trigger_deprecation('symfony/security', '6.2', 'Passing an empty string as username or password parameter is deprecated.');
+        }
+
         return $credentials;
     }
 }

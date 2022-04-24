@@ -20,6 +20,7 @@ Security
  * Add maximum username length enforcement of 4096 characters in `UserBadge` to
    prevent [session storage flooding](https://symfony.com/blog/cve-2016-4423-large-username-storage-in-session)
  * Deprecate the `Symfony\Component\Security\Core\Security` class and service, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+ * Passing empty username or password parameter when using `JsonLoginAuthenticator` is not supported anymore
 
 Validator
 ---------

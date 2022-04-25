@@ -55,7 +55,11 @@ class MailjetApiTransportTest extends TestCase
             ->replyTo(new Address('qux@example.com', 'Qux'));
         $email->getHeaders()
             ->addTextHeader('X-authorized-header', 'authorized')
-            ->addTextHeader('X-MJ-TemplateLanguage', 'forbidden'); // This header is forbidden
+            ->addTextHeader('X-MJ-TemplateLanguage', 'forbidden') // This header is forbidden
+            ->addParameterizedHeader('Variables', 'Variables', ['foo' => 'bar'])
+            ->addTextHeader('TemplateLanguage', 'true')
+            ->addTextHeader('TemplateID', (string) 123456)
+            ->addTextHeader('CustomCampaign', 'campaign-example');
         $envelope = new Envelope(new Address('foo@example.com', 'Foo'), [new Address('bar@example.com', 'Bar'), new Address('baz@example.com', 'Baz')]);
 
         $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
@@ -96,6 +100,20 @@ class MailjetApiTransportTest extends TestCase
         $this->assertIsArray($replyTo);
         $this->assertEquals('qux@example.com', $replyTo['Email']);
         $this->assertEquals('Qux', $replyTo['Name']);
+
+        $this->assertArrayHasKey('Variables', $message);
+        $variables = $message['Variables'];
+        $this->assertIsArray($variables);
+        $this->assertEquals('bar', $variables['foo']);
+
+        $this->assertArrayHasKey('TemplateLanguage', $message);
+        $this->assertTrue($message['TemplateLanguage']);
+
+        $this->assertArrayHasKey('TemplateID', $message);
+        $this->assertEquals(123456, $message['TemplateID']);
+
+        $this->assertArrayHasKey('CustomCampaign', $message);
+        $this->assertEquals('campaign-example', $message['CustomCampaign']);
     }
 
     public function testSendSuccess()

@@ -13,7 +13,6 @@ namespace Symfony\Component\Mailer\Bridge\Mailjet\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Bridge\Mailjet\Mime\MailjetTemplatedEmail;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -38,6 +37,18 @@ class MailjetApiTransport extends AbstractApiTransport
         'X-MJ-TemplateErrorDeliver', 'X-MJ-TemplateErrorReporting', 'X-MJ-TemplateLanguage',
         'X-Mailjet-Debug', 'User-Agent', 'X-Mailer', 'X-MJ-CustomID', 'X-MJ-EventPayload', 'X-MJ-Vars',
         'X-Mailjet-TrackOpen', 'X-Mailjet-TrackClick', 'X-MJ-TemplateID', 'X-MJ-WorkflowID',
+    ];
+    private const ARRAY_API_PARAMETERS = [
+        'Variables', 'Headers', 'TemplateErrorReporting',
+    ];
+    private const BOOLEAN_API_PARAMETERS = [
+        'TemplateLanguage', 'TemplateErrorDeliver', 'DeduplicateCampaign',
+    ];
+    private const INTEGER_API_PARAMETERS = [
+        'TemplateID', 'Priority',
+    ];
+    private const STRING_API_PARAMETERS = [
+        'CustomCampaign', 'TrackClicks', 'CustomID', 'EventPayload', 'URLTags',
     ];
 
     private $privateKey;
@@ -129,40 +140,27 @@ class MailjetApiTransport extends AbstractApiTransport
         }
 
         foreach ($email->getHeaders()->all() as $header) {
-            if (\in_array($header->getName(), self::FORBIDDEN_HEADERS, true)) {
+            $name = $header->getName();
+            if (\in_array($name, self::FORBIDDEN_HEADERS, true)) {
                 continue;
             }
-
-            $message['Headers'][$header->getName()] = $header->getBodyAsString();
-        }
-
-        if ($email instanceof MailjetTemplatedEmail) {
-            if ($email->getCampaignName()) {
-                $message['CustomCampaign'] = $email->getCampaignName();
+            if (\in_array($name, self::ARRAY_API_PARAMETERS, true)) {
+                $message[$name] = $header->getParameters();
+                continue;
             }
-
-            if ($email->getTemplateId()) {
-                $message['TemplateLanguage'] = true;
-                $message['TemplateID'] = $email->getTemplateId();
+            if (\in_array($name, self::BOOLEAN_API_PARAMETERS, true)) {
+                $message[$name] = filter_var($header->getValue(), \FILTER_VALIDATE_BOOLEAN);
+                continue;
             }
-
-            if (\count($email->getVariables())) {
-                $message['Variables'] = $email->getVariables();
+            if (\in_array($name, self::INTEGER_API_PARAMETERS, true)) {
+                $message[$name] = (int) $header->getValue();
+                continue;
             }
-
-            if ($email->getErrorReportingEmail()) {
-                $message['TemplateErrorReporting'] = [
-                    'Email' => $email->getErrorReportingEmail(),
-                ];
+            if (\in_array($name, self::STRING_API_PARAMETERS, true)) {
+                $message[$name] = $header->getValue();
+                continue;
             }
-
-            if ($email->isTemplateErrorDeliver()) {
-                $message['TemplateErrorDeliver'] = true;
-            }
-
-            if (\count($email->getAdditionalProperties())) {
-                $message = array_merge($message, $email->getAdditionalProperties());
-            }
+            $message['Headers'][$name] = $header->getBodyAsString();
         }
 
         return [

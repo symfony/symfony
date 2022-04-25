@@ -25,9 +25,17 @@ class EnumRequirementTest extends TestCase
     public function testNotABackedEnum()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"Symfony\Component\Routing\Tests\Fixtures\Enum\TestUnitEnum" is not a \BackedEnum class.');
+        $this->expectExceptionMessage('"Symfony\Component\Routing\Tests\Fixtures\Enum\TestUnitEnum" is not a "BackedEnum" class.');
 
         new EnumRequirement(TestUnitEnum::class);
+    }
+
+    public function testCaseNotABackedEnum()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Case must be a "BackedEnum" instance, "string" given.');
+
+        new EnumRequirement(['wrong']);
     }
 
     public function testCaseFromAnotherEnum()
@@ -35,15 +43,15 @@ class EnumRequirementTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Routing\Tests\Fixtures\Enum\TestStringBackedEnum2::Spades" is not a case of "Symfony\Component\Routing\Tests\Fixtures\Enum\TestStringBackedEnum".');
 
-        new EnumRequirement(TestStringBackedEnum::class, TestStringBackedEnum::Diamonds, TestStringBackedEnum2::Spades);
+        new EnumRequirement([TestStringBackedEnum::Diamonds, TestStringBackedEnum2::Spades]);
     }
 
     /**
      * @dataProvider provideToString
      */
-    public function testToString(string $expected, string $enum, \BackedEnum ...$cases)
+    public function testToString(string $expected, string|array $cases = [])
     {
-        $this->assertSame($expected, (string) new EnumRequirement($enum, ...$cases));
+        $this->assertSame($expected, (string) new EnumRequirement($cases));
     }
 
     public function provideToString()
@@ -51,7 +59,8 @@ class EnumRequirementTest extends TestCase
         return [
             ['hearts|diamonds|clubs|spades', TestStringBackedEnum::class],
             ['10|20|30|40', TestIntBackedEnum::class],
-            ['diamonds|spades', TestStringBackedEnum::class, TestStringBackedEnum::Diamonds, TestStringBackedEnum::Spades],
+            ['diamonds|spades', [TestStringBackedEnum::Diamonds, TestStringBackedEnum::Spades]],
+            ['diamonds', [TestStringBackedEnum::Diamonds]],
             ['hearts|diamonds|clubs|spa\|des', TestStringBackedEnum2::class],
         ];
     }

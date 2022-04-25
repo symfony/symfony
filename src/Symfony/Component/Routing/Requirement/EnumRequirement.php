@@ -15,36 +15,42 @@ use Symfony\Component\Routing\Exception\InvalidArgumentException;
 
 final class EnumRequirement implements \Stringable
 {
-    /**
-     * @var string[]
-     */
-    private readonly array $values;
+    private string $requirement;
 
     /**
      * @template T of \BackedEnum
-     * @param class-string<T> $enum
-     * @param T ...$cases
+     *
+     * @param class-string<T>|list<T> $cases
      */
-    public function __construct(string $enum, \BackedEnum ...$cases)
+    public function __construct(string|array $cases = [])
     {
-        if (!\is_subclass_of($enum, \BackedEnum::class, true)) {
-            throw new InvalidArgumentException(sprintf('"%s" is not a \BackedEnum class.', $enum));
-        }
+        if (\is_string($cases)) {
+            if (!is_subclass_of($cases, \BackedEnum::class, true)) {
+                throw new InvalidArgumentException(sprintf('"%s" is not a "BackedEnum" class.', $cases));
+            }
 
-        foreach ($cases as $case) {
-            if (!$case instanceof $enum) {
-                throw new InvalidArgumentException(sprintf('"%s::%s" is not a case of "%s".', \get_class($case), $case->name, $enum));
+            $cases = $cases::cases();
+        } else {
+            $class = null;
+
+            foreach ($cases as $case) {
+                if (!$case instanceof \BackedEnum) {
+                    throw new InvalidArgumentException(sprintf('Case must be a "BackedEnum" instance, "%s" given.', get_debug_type($case)));
+                }
+
+                $class ??= \get_class($case);
+
+                if (!$case instanceof $class) {
+                    throw new InvalidArgumentException(sprintf('"%s::%s" is not a case of "%s".', get_debug_type($case), $case->name, $class));
+                }
             }
         }
 
-        $this->values = array_map(
-            static fn (\BackedEnum $e): string => $e->value,
-            $cases ?: $enum::cases(),
-        );
+        $this->requirement = implode('|', array_map(static fn ($e) => preg_quote($e->value), $cases));
     }
 
     public function __toString(): string
     {
-        return implode('|', array_map(preg_quote(...), $this->values));
+        return $this->requirement;
     }
 }

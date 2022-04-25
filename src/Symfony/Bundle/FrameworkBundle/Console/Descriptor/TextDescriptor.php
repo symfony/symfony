@@ -343,7 +343,7 @@ class TextDescriptor extends Descriptor
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
                 } elseif ($argument instanceof \UnitEnum) {
-                    $argumentsInformation[] = var_export($argument, true);
+                    $argumentsInformation[] = ltrim(var_export($argument, true), '\\');
                 } else {
                     $argumentsInformation[] = \is_array($argument) ? sprintf('Array (%d element(s))', \count($argument)) : $argument;
                 }

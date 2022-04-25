@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-30T16:35:46Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-30T17:29:18Z
+
+Thanks for having another look :)
+For 1. and 2., is it really better? To me, the main thing to optimize is the number of roundtrips to the backend. The changes here increase the number of roundtrips, so they should degrade perf to me.
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2022-03-31T06:54:10Z
+
+P.1 and p.2 don't change the number of roundtrips, they just force the adapter to always work the same and not to rely on quasi-uniqueness of tag versions in some situations. P.3 may change the number of roundtrips but only downward by allowing large sets of tags (500+) to be cached for the very next reads (until other tags are requested). And although smaller sets are not affected much, I would suggest to use pruning instead of LRU cut-off. Pruning only expired tags would allow use of all known tags in any read operaion during their TTLs (as it was before).

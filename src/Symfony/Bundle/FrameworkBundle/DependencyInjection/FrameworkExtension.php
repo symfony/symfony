@@ -17,6 +17,7 @@ use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\ContextFactory;
+use PhpParser\Parser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -218,6 +219,7 @@ use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
@@ -1333,6 +1335,14 @@ class FrameworkExtension extends Extension
 
         if (!ContainerBuilder::willBeAvailable('symfony/translation', LocaleSwitcher::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('translation.locale_switcher');
+        }
+
+        if (ContainerBuilder::willBeAvailable('nikic/php-parser', Parser::class, ['symfony/translation'])
+            && ContainerBuilder::willBeAvailable('symfony/translation', PhpAstExtractor::class, ['symfony/framework-bundle'])
+        ) {
+            $container->removeDefinition('translation.extractor.php');
+        } else {
+            $container->removeDefinition('translation.extractor.php_ast');
         }
 
         $loader->load('translation_providers.php');

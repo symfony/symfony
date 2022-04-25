@@ -12,27 +12,31 @@
 namespace Symfony\Component\Translation\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Extractor\PhpExtractor;
+use Symfony\Component\Translation\Extractor\PhpAstExtractor;
+use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\TranslatableMessageVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 use Symfony\Component\Translation\MessageCatalogue;
 
-/**
- * @group legacy
- */
-class PhpExtractorTest extends TestCase
+final class PhpAstExtractorTest extends TestCase
 {
     /**
      * @dataProvider resourcesProvider
-     *
-     * @param array|string $resource
      */
-    public function testExtraction($resource)
+    public function testExtraction(iterable|string $resource)
     {
-        // Arrange
-        $extractor = new PhpExtractor();
+        $extractor = new PhpAstExtractor([
+            new TransMethodVisitor(),
+            new TranslatableMessageVisitor(),
+            new ConstraintVisitor([
+                'NotBlank',
+                'Isbn',
+                'Length',
+            ], new TranslatableMessageVisitor()),
+        ]);
         $extractor->setPrefix('prefix');
         $catalogue = new MessageCatalogue('en');
 
-        // Act
         $extractor->extract($resource, $catalogue);
 
         $expectedHeredoc = <<<EOF
@@ -41,7 +45,6 @@ EOF;
         $expectedNowdoc = <<<'EOF'
 nowdoc key with whitespace and nonescaped \$\n sequences
 EOF;
-        // Assert
         $expectedCatalogue = [
             'messages' => [
                 'translatable single-quoted key' => 'prefixtranslatable single-quoted key',
@@ -110,25 +113,45 @@ EOF;
                 'other-domain-test-params-short-array' => 'prefixother-domain-test-params-short-array',
                 'other-domain-test-params-long-array' => 'prefixother-domain-test-params-long-array',
                 'typecast' => 'prefixtypecast',
+                'ordered-named-arguments-in-trans-method' => 'prefixordered-named-arguments-in-trans-method',
+                'disordered-named-arguments-in-trans-method' => 'prefixdisordered-named-arguments-in-trans-method',
+                'variable-assignation-inlined-in-trans-method-call1' => 'prefixvariable-assignation-inlined-in-trans-method-call1',
+                'variable-assignation-inlined-in-trans-method-call2' => 'prefixvariable-assignation-inlined-in-trans-method-call2',
+                'variable-assignation-inlined-in-trans-method-call3' => 'prefixvariable-assignation-inlined-in-trans-method-call3',
+                'variable-assignation-inlined-with-named-arguments-in-trans-method' => 'prefixvariable-assignation-inlined-with-named-arguments-in-trans-method',
+            ],
+            'validators' => [
+                'message-in-constraint-attribute' => 'prefixmessage-in-constraint-attribute',
+//                'custom Isbn message from attribute' => 'prefixcustom Isbn message from attribute',
+                'custom Isbn message from attribute with options as array' => 'prefixcustom Isbn message from attribute with options as array',
+                'custom Length exact message from attribute from named argument' => 'prefixcustom Length exact message from attribute from named argument',
+                'custom Length exact message from attribute from named argument 1/2' => 'prefixcustom Length exact message from attribute from named argument 1/2',
+                'custom Length min message from attribute from named argument 2/2' => 'prefixcustom Length min message from attribute from named argument 2/2',
+//                'custom Isbn message' => 'prefixcustom Isbn message',
+                'custom Isbn message with options as array' => 'prefixcustom Isbn message with options as array',
+                'custom Isbn message from named argument' => 'prefixcustom Isbn message from named argument',
+                'custom Length exact message from named argument' => 'prefixcustom Length exact message from named argument',
+                'custom Length exact message from named argument 1/2' => 'prefixcustom Length exact message from named argument 1/2',
+                'custom Length min message from named argument 2/2' => 'prefixcustom Length min message from named argument 2/2',
             ],
         ];
         $actualCatalogue = $catalogue->all();
 
         $this->assertEquals($expectedCatalogue, $actualCatalogue);
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translatable.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor-ast/translatable.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('translatable single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('translatable other-domain-test-no-params-short-array', 'not_messages'));
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translatable-fqn.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor-ast/translatable-fqn.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('translatable-fqn single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('translatable-fqn other-domain-test-no-params-short-array', 'not_messages'));
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translatable-short.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor-ast/translatable-short.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('translatable-short single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('translatable-short other-domain-test-no-params-short-array', 'not_messages'));
 
-        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translation.html.php';
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor-ast/translation.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
     }
@@ -137,7 +160,15 @@ EOF;
     {
         $catalogue = new MessageCatalogue('en');
 
-        $extractor = new PhpExtractor();
+        $extractor = new PhpAstExtractor([
+            new TransMethodVisitor(),
+            new TranslatableMessageVisitor(),
+            new ConstraintVisitor([
+                'NotBlank',
+                'Isbn',
+                'Length',
+            ], new TranslatableMessageVisitor()),
+        ]);
         $extractor->setPrefix('prefix');
         $extractor->extract(__DIR__.'/../fixtures/extractor-7.3/translation.html.php', $catalogue);
 
@@ -151,16 +182,16 @@ EOF;
         $this->assertEquals($expectedCatalogue, $catalogue->all());
     }
 
-    public function resourcesProvider()
+    public function resourcesProvider(): array
     {
-        $directory = __DIR__.'/../fixtures/extractor/';
+        $directory = __DIR__.'/../fixtures/extractor-ast/';
         $phpFiles = [];
         $splFiles = [];
         foreach (new \DirectoryIterator($directory) as $fileInfo) {
             if ($fileInfo->isDot()) {
                 continue;
             }
-            if (\in_array($fileInfo->getBasename(), ['translatable.html.php', 'translatable-fqn.html.php', 'translatable-short.html.php', 'translation.html.php'], true)) {
+            if (\in_array($fileInfo->getBasename(), ['translatable.html.php', 'translatable-fqn.html.php', 'translatable-short.html.php', 'translation.html.php', 'validator-constraints.php'], true)) {
                 $phpFiles[] = $fileInfo->getPathname();
             }
             $splFiles[] = $fileInfo->getFileInfo();

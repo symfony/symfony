@@ -26,7 +26,11 @@ use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Dumper\YamlFileDumper;
 use Symfony\Component\Translation\Extractor\ChainExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
+use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
+use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\TranslatableMessageVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
@@ -150,6 +154,19 @@ return static function (ContainerConfigurator $container) {
 
         ->set('translation.extractor.php', PhpExtractor::class)
             ->tag('translation.extractor', ['alias' => 'php'])
+
+        ->set('translation.extractor.php_ast', PhpAstExtractor::class)
+            ->args([tagged_iterator('translation.extractor.visitor')])
+            ->tag('translation.extractor', ['alias' => 'php'])
+
+        ->set('translation.extractor.visitor.trans_method', TransMethodVisitor::class)
+            ->tag('translation.extractor.visitor')
+
+        ->set('translation.extractor.visitor.translatable_message', TranslatableMessageVisitor::class)
+            ->tag('translation.extractor.visitor')
+
+        ->set('translation.extractor.visitor.constraint', ConstraintVisitor::class)
+            ->tag('translation.extractor.visitor')
 
         ->set('translation.reader', TranslationReader::class)
         ->alias(TranslationReaderInterface::class, 'translation.reader')

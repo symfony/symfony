@@ -96,6 +96,12 @@ Serializer
  * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
  * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
 
+Translation
+-----------
+
+ * Deprecate `PhpExtractor` in favor of `PhpAstExtractor`
+ * Add `PhpAstExtractor` (requires [nikic/php-parser](https://github.com/nikic/php-parser) to be installed)
+
 Validator
 ---------
 

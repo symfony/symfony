@@ -17,6 +17,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
+use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
+use Symfony\Component\Validator\Constraints\Isbn;
+use Symfony\Component\Validator\Constraints\IsbnValidator;
+use Symfony\Component\Validator\Constraints\LengthValidator;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotBlankValidator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TranslatorPassTest extends TestCase
 {
@@ -118,5 +125,25 @@ class TranslatorPassTest extends TestCase
 
         $this->assertSame('templates', $debugCommand->getArgument(4));
         $this->assertSame('templates', $updateCommand->getArgument(5));
+    }
+
+    public function testValidPhpAstExtractorConstraintVisitorArguments()
+    {
+        $container = new ContainerBuilder();
+        $container->register('translator.default')
+            ->setArguments([null, null, null, null]);
+        $container->register('validator');
+        $constraintVisitor = $container->register('translation.extractor.visitor.constraint', ConstraintVisitor::class);
+        $container->register('validator.not_blank', NotBlankValidator::class)
+            ->addTag('validator.constraint_validator');
+        $container->register('validator.isbn', IsbnValidator::class)
+            ->addTag('validator.constraint_validator');
+        $container->register('validator.length', LengthValidator::class)
+            ->addTag('validator.constraint_validator');
+
+        $pass = new TranslatorPass();
+        $pass->process($container);
+
+        $this->assertSame(['NotBlank', 'Isbn', 'Length'], $constraintVisitor->getArgument(0));
     }
 }

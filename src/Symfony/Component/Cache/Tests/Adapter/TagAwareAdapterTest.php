@@ -234,4 +234,109 @@ class TagAwareAdapterTest extends AdapterTestCase
     {
         return $this->createMock(AdapterInterface::class);
     }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase1()
+    {
+        $pool = $this->createCachePool();
+        $adapter = new FilesystemAdapter();
+
+        $itemKey = 'foo';
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set("\x00abc\xff"));
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+        $pool->hasItem($itemKey);
+        $pool->getItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase2()
+    {
+        $pool = $this->createCachePool();
+        $adapter = new FilesystemAdapter();
+
+        $itemKey = 'foo';
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set("\x00abc\xff"));
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+        sleep(100);
+        $pool->getItem($itemKey);
+        $pool->hasItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase3()
+    {
+        $pool = $this->createCachePool();
+        $adapter = new FilesystemAdapter();
+
+        $itemKey = 'foo';
+        $adapter->deleteItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+        $pool->getItem($itemKey);
+
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set("\x00abc\xff"));
+
+        $pool->hasItem($itemKey);
+        $pool->getItem($itemKey);
+        sleep(100);
+        $pool->getItem($itemKey);
+        $pool->hasItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase4()
+    {
+        $pool = $this->createCachePool();
+        $adapter = new FilesystemAdapter();
+
+        $itemKey = 'foo';
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set('abcABC'));
+
+        $item = $pool->getItem($itemKey);
+        $pool->save($item->tag('bar'));
+
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set('001122'));
+
+        $pool->invalidateTags(['bar']);
+        $pool->getItem($itemKey);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testToleranceForStringsAsTagVersionsCase5()
+    {
+        $pool = $this->createCachePool();
+        $pool2 = $this->createCachePool();
+        $adapter = new FilesystemAdapter();
+
+        $itemKey1 = 'foo';
+        $item = $pool->getItem($itemKey1);
+        $pool->save($item->tag('bar'));
+
+        $tag = $adapter->getItem('bar'.TagAwareAdapter::TAGS_PREFIX);
+        $adapter->save($tag->set('abcABC'));
+
+        $itemKey2 = 'baz';
+        $item = $pool2->getItem($itemKey2);
+        $pool2->save($item->tag('bar'));
+        foreach ($pool->getItems([$itemKey1, $itemKey2]) as $item) {
+            // run generator
+        }
+    }
 }

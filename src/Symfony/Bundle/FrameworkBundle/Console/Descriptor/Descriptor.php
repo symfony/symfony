@@ -157,7 +157,7 @@ abstract class Descriptor implements DescriptorInterface
             return $value;
         }
 
-        return preg_replace("/\n\s*/s", '', ltrim(var_export($value, true)), '\\');
+        return preg_replace("/\n\s*/s", '', var_export($value, true));
     }
 
     protected function formatParameter(mixed $value): string

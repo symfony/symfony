@@ -349,7 +349,7 @@ class TextDescriptor extends Descriptor
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
                 } elseif ($argument instanceof \UnitEnum) {
-                    $argumentsInformation[] = var_export($argument, true);
+                    $argumentsInformation[] = ltrim(var_export($argument, true), '\\');
                 } elseif ($argument instanceof AbstractArgument) {
                     $argumentsInformation[] = sprintf('Abstract argument (%s)', $argument->getText());
                 } else {

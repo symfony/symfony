@@ -193,12 +193,13 @@ class Exporter
     public static function export($value, string $indent = '')
     {
         switch (true) {
-            case \is_int($value) || \is_float($value) || $value instanceof \UnitEnum: return var_export($value, true);
+            case \is_int($value) || \is_float($value): return var_export($value, true);
             case [] === $value: return '[]';
             case false === $value: return 'false';
             case true === $value: return 'true';
             case null === $value: return 'null';
             case '' === $value: return "''";
+            case $value instanceof \UnitEnum: return ltrim(var_export($value, true), '\\');
         }
 
         if ($value instanceof Reference) {

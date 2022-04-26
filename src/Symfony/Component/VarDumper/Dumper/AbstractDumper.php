@@ -46,8 +46,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     {
         $this->flags = $flags;
         $this->setCharset($charset ?: ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8');
-        $this->decimalPoint = localeconv();
-        $this->decimalPoint = $this->decimalPoint['decimal_point'];
+        $this->decimalPoint = \PHP_VERSION_ID >= 80000 ? '.' : localeconv()['decimal_point'];
         $this->setOutput($output ?: static::$defaultOutput);
         if (!$output && \is_string(static::$defaultOutput)) {
             static::$defaultOutput = $this->outputStream;
@@ -120,8 +119,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      */
     public function dump(Data $data, $output = null)
     {
-        $this->decimalPoint = localeconv();
-        $this->decimalPoint = $this->decimalPoint['decimal_point'];
+        $this->decimalPoint = \PHP_VERSION_ID >= 80000 ? '.' : localeconv()['decimal_point'];
 
         if ($locale = $this->flags & (self::DUMP_COMMA_SEPARATOR | self::DUMP_TRAILING_COMMA) ? setlocale(\LC_NUMERIC, 0) : null) {
             setlocale(\LC_NUMERIC, 'C');

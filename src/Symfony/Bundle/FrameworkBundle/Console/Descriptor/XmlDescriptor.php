@@ -421,7 +421,7 @@ class XmlDescriptor extends Descriptor
                 }
             } elseif ($argument instanceof \UnitEnum) {
                 $argumentXML->setAttribute('type', 'constant');
-                $argumentXML->appendChild(new \DOMText(var_export($argument, true)));
+                $argumentXML->appendChild(new \DOMText(ltrim(var_export($argument, true), '\\')));
             } else {
                 $argumentXML->appendChild(new \DOMText($argument));
             }

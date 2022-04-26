@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Context\Encoder;
 
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class CsvEncoderContextBuilder
+final class CsvEncoderContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

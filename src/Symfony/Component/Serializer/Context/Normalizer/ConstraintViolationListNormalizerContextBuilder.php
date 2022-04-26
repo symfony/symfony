@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Context\Normalizer;
 
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 
@@ -19,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class ConstraintViolationListNormalizerContextBuilder
+final class ConstraintViolationListNormalizerContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Context;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 
 /**
@@ -21,13 +22,17 @@ class ContextBuilderTraitTest extends TestCase
 {
     public function testWithContext()
     {
-        $contextBuilder = new class() {
+        $contextBuilder = new class() implements ContextBuilderInterface {
             use ContextBuilderTrait;
         };
 
         $context = $contextBuilder->withContext(['foo' => 'bar'])->toArray();
 
         $this->assertSame(['foo' => 'bar'], $context);
+
+        $withContextBuilderObject = $contextBuilder->withContext($contextBuilder->withContext(['foo' => 'bar']))->toArray();
+
+        $this->assertSame(['foo' => 'bar'], $withContextBuilderObject);
     }
 
     public function testWith()

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Context\Normalizer;
 
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 
@@ -19,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class ProblemNormalizerContextBuilder
+final class ProblemNormalizerContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

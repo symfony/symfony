@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Context\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
@@ -22,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class UnwrappingDenormalizerContextBuilder
+final class UnwrappingDenormalizerContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

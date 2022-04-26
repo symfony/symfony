@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Context\Normalizer;
 
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class DateTimeNormalizerContextBuilder
+final class DateTimeNormalizerContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

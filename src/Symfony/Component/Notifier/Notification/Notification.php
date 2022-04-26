@@ -50,11 +50,14 @@ class Notification
         $this->channels = $channels;
     }
 
+    /**
+     * @return static
+     */
     public static function fromThrowable(\Throwable $exception, array $channels = []): self
     {
         $parts = explode('\\', \get_class($exception));
 
-        $notification = new self(sprintf('%s: %s', array_pop($parts), $exception->getMessage()), $channels);
+        $notification = new static(sprintf('%s: %s', array_pop($parts), $exception->getMessage()), $channels);
         if (class_exists(FlattenException::class)) {
             $notification->exception = $exception instanceof FlattenException ? $exception : FlattenException::createFromThrowable($exception);
         }

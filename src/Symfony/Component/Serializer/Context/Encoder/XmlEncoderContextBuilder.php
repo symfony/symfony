@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Context\Encoder;
 
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
@@ -19,7 +20,7 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class XmlEncoderContextBuilder
+final class XmlEncoderContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Context\Encoder;
 
+use Symfony\Component\Serializer\Context\ContextBuilderInterface;
 use Symfony\Component\Serializer\Context\ContextBuilderTrait;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class JsonEncoderContextBuilder
+final class JsonEncoderContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Serializer;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class SerializerContextBuilder
+final class SerializerContextBuilder implements ContextBuilderInterface
 {
     use ContextBuilderTrait;
 

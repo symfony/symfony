@@ -30,10 +30,14 @@ trait ContextBuilderTrait
     }
 
     /**
-     * @param array<string, mixed> $context
+     * @param ContextBuilderInterface|array<string, mixed> $context
      */
-    public function withContext(array $context): static
+    public function withContext(ContextBuilderInterface|array $context): static
     {
+        if ($context instanceof ContextBuilderInterface) {
+            $context = $context->toArray();
+        }
+
         $instance = new static();
         $instance->context = array_merge($this->context, $context);
 

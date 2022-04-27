@@ -150,10 +150,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             return;
         }
 
-        $name = $annot->getName();
-        if (null === $name) {
-            $name = $this->getDefaultRouteName($class, $method);
-        }
+        $name = $annot->getName() ?? $this->getDefaultRouteName($class, $method);
         $name = $globals['name'].$name;
 
         $requirements = $annot->getRequirements();
@@ -170,11 +167,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $schemes = array_merge($globals['schemes'], $annot->getSchemes());
         $methods = array_merge($globals['methods'], $annot->getMethods());
 
-        $host = $annot->getHost();
-        if (null === $host) {
-            $host = $globals['host'];
-        }
-
+        $host = $annot->getHost() ?? $globals['host'];
         $condition = $annot->getCondition() ?? $globals['condition'];
         $priority = $annot->getPriority() ?? $globals['priority'];
 

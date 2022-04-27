@@ -182,7 +182,7 @@ class Question
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
-        $this->autocompleterCallback = null === $callback ? null : $callback(...);
+        $this->autocompleterCallback = null === $callback || $callback instanceof \Closure ? $callback : \Closure::fromCallable($callback);
 
         return $this;
     }
@@ -194,7 +194,7 @@ class Question
      */
     public function setValidator(callable $validator = null): static
     {
-        $this->validator = null === $validator ? null : $validator(...);
+        $this->validator = null === $validator || $validator instanceof \Closure ? $validator : \Closure::fromCallable($validator);
 
         return $this;
     }
@@ -246,7 +246,7 @@ class Question
      */
     public function setNormalizer(callable $normalizer): static
     {
-        $this->normalizer = $normalizer(...);
+        $this->normalizer = $normalizer instanceof \Closure ? $normalizer : \Closure::fromCallable($normalizer);
 
         return $this;
     }

@@ -125,7 +125,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
         $setSession($subRequest, $request);
 
-        $subRequest->attributes->set('_renderer', 'inline');
+        $subRequest->attributes->set('_renderer', $this->getName());
 
         if ($request->get('_format')) {
             $subRequest->attributes->set('_format', $request->get('_format'));

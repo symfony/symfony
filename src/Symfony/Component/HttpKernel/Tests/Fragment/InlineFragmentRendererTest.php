@@ -31,6 +31,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class InlineFragmentRendererTest extends TestCase
 {
+    private function createRequestWithAttribute($url)
+    {
+        $request = Request::create('/');
+        $request->attributes->replace(['_renderer' => 'inline']);
+        return $request;
+    }
+
     public function testRender()
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
@@ -50,7 +57,7 @@ class InlineFragmentRendererTest extends TestCase
         $object = new \stdClass();
 
         $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller');
-        $subRequest->attributes->replace(['object' => $object, '_format' => 'html', '_controller' => 'main_controller', '_locale' => 'en']);
+        $subRequest->attributes->replace(['_renderer' => 'inline', 'object' => $object, '_format' => 'html', '_controller' => 'main_controller', '_locale' => 'en']);
         $subRequest->headers->set('x-forwarded-for', ['127.0.0.1']);
         $subRequest->headers->set('forwarded', ['for="127.0.0.1";host="localhost";proto=http']);
         $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
@@ -65,7 +72,7 @@ class InlineFragmentRendererTest extends TestCase
     {
         Request::setTrustedProxies([], 0);
 
-        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest = $this->createRequestWithAttribute('/');
         $expectedSubRequest->headers->set('x-forwarded-for', ['127.0.0.1']);
         $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
 
@@ -90,7 +97,7 @@ class InlineFragmentRendererTest extends TestCase
     {
         $exception = new \RuntimeException('foo');
         $kernel = $this->getKernel($this->throwException($exception));
-        $request = Request::create('/');
+        $request = $this->createRequestWithAttribute('/');
         $expectedEvent = new ExceptionEvent($kernel, $request, $kernel::SUB_REQUEST, $exception);
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())->method('dispatch')->with($expectedEvent, KernelEvents::EXCEPTION);
@@ -157,7 +164,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testLocaleAndFormatAreIsKeptInSubrequest()
     {
-        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest = $this->createRequestWithAttribute('/');
         $expectedSubRequest->attributes->set('_format', 'foo');
         $expectedSubRequest->setLocale('fr');
         if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
@@ -177,7 +184,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testESIHeaderIsKeptInSubrequest()
     {
-        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest = $this->createRequestWithAttribute('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
 
         if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
@@ -205,7 +212,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testHeadersPossiblyResultingIn304AreNotAssignedToSubrequest()
     {
-        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest = $this->createRequestWithAttribute('/');
         $expectedSubRequest->headers->set('x-forwarded-for', ['127.0.0.1']);
         $expectedSubRequest->headers->set('forwarded', ['for="127.0.0.1";host="localhost";proto=http']);
         $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
@@ -220,7 +227,7 @@ class InlineFragmentRendererTest extends TestCase
     {
         Request::setTrustedProxies(['1.1.1.1'], -1);
 
-        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest = $this->createRequestWithAttribute('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
         $expectedSubRequest->server->set('REMOTE_ADDR', '127.0.0.1');
         $expectedSubRequest->headers->set('x-forwarded-for', ['127.0.0.1']);
@@ -239,7 +246,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testIpAddressOfRangedTrustedProxyIsSetAsRemote()
     {
-        $expectedSubRequest = Request::create('/');
+        $expectedSubRequest = $this->createRequestWithAttribute('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
         $expectedSubRequest->server->set('REMOTE_ADDR', '127.0.0.1');
         $expectedSubRequest->headers->set('x-forwarded-for', ['127.0.0.1']);

@@ -59,7 +59,13 @@ final class Transports implements TransportInterface
             throw new InvalidArgumentException(sprintf('The "%s" transport does not exist (available transports: "%s").', $transport, implode('", "', array_keys($this->transports))));
         }
 
-        return $this->transports[$transport]->send($message, $envelope);
+        try {
+            return $this->transports[$transport]->send($message, $envelope);
+        } catch (\Throwable $e) {
+            $headers->addTextHeader('X-Transport', $transport);
+
+            throw $e;
+        }
     }
 
     public function __toString(): string

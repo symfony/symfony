@@ -7,6 +7,33 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.0-BETA2 (2022-04-27)
+
+ * feature #45282 [Serializer] Support canners in object normalizer (rmikalkenas)
+ * feature #46157 [Routing] Remove variadic constructor signature (wouterj)
+ * bug #46154 [Mailer] Restore X-Transport after failure (zenas1210)
+ * bug #46178 [DependencyInjection] Properly declare #[When] as allowed on functions (nicolas-grekas)
+ * bug #46171 [VarDumper] Fix dumping floats on PHP8 (nicolas-grekas)
+ * bug #46170 Fix dumping enums on PHP 8.2 (nicolas-grekas)
+ * bug #46143 [Cache] Prevent fatal errors on php 8 when running concurrently with TagAwareAdapter v6.1 (sbelyshkin)
+ * bug #45896 [Cache] Optimize caching of tags (sbelyshkin)
+ * bug #46149 Modify processing of uploaded files to be compatible with PHP 8.1 (p-golovin)
+ * feature #46112 [DependencyInjection] Rename `#[InnerService]` to `#[MapDecorated]` (chalasr)
+ * bug #46125 [FrameworkBundle] Always add CacheCollectorPass (fancyweb)
+ * feature #45989 [FrameworkBundle] deprecate not setting http_method_override (Tobion)
+ * feature #46042 [Routing] Add params variable to condition expression (HypeMC)
+ * feature #46115 [FrameworkBundle] Add support for route attributes in kernel controller methods (dunglas)
+ * bug #46121 Fix "Notice: Undefined index: headers" in messenger with Oracle (rjd22)
+ * feature #45834 [DependencyInjection] add AsDecorator class attribute and InnerService parameter attribute (Jean-Beru)
+ * bug #46106 [String] Fix ansi escape sequences regex (fancyweb)
+ * feature #46056 [PropertyInfo] Add support for promoted properties in PhpStanExtractor (simPod)
+ * feature #46047 [Notifier] smsapi - send messages in test mode (Patryk Kozłowski)
+ * bug #46097 [Routing] fix router base url when default uri has trailing slash (Tobion)
+ * feature #46052 [TwigBundle] Deprecate option "autoescape", use "autoescape_service[_method]" instead (nicolas-grekas)
+ * bug #46054 [SecurityBundle] Use config's secret in remember-me signatures (jderusse)
+ * feature #45528 [Routing] Add Requirement, a collection of universal regular-expressions constants to use as route parameter requirements (fancyweb)
+ * bug #46051 Don't replace symfony/security-guard (derrabus)
+
 * 6.1.0-BETA1 (2022-04-15)
 
  * feature #44798 [FrameworkBundle] Integrate the HtmlSanitizer component (tgalopin, wouterj)

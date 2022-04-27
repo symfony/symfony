@@ -7,6 +7,27 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.41 (2022-04-27)
+
+ * bug #46154 [Mailer] Restore X-Transport after failure (zenas1210)
+ * bug #46171 [VarDumper] Fix dumping floats on PHP8 (nicolas-grekas)
+ * bug #46170 Fix dumping enums on PHP 8.2 (nicolas-grekas)
+ * bug #46143 [Cache] Prevent fatal errors on php 8 when running concurrently with TagAwareAdapter v6.1 (sbelyshkin)
+ * bug #46149 Modify processing of uploaded files to be compatible with PHP 8.1 (p-golovin)
+ * bug #46125 [FrameworkBundle] Always add CacheCollectorPass (fancyweb)
+ * bug #46121 Fix "Notice: Undefined index: headers" in messenger with Oracle (rjd22)
+ * bug #45980 [Finder] Add support of no-capture regex modifier in MultiplePcreFilterIterator (available from PHP 8.2) (alexandre-daubois)
+ * bug #46008 [Workflow] Catch error when trying to get an uninitialized marking (lyrixx)
+ * bug #40998 [Form] Use reference date in reverse transform (KDederichs)
+ * bug #46012 [HttpKernel] Fix Symfony not working on SMB share (qinshuze)
+ * bug #45992 [Mailer] Return-Path has higher priority for envelope address than From address (tpetry)
+ * bug #45998 [HttpClient] Fix sending content-length when streaming the body (nicolas-grekas)
+ * bug #45565 Fix table header seperator wrapping (alamirault)
+ * bug #45968 [Intl] Update the ICU data to 71.1 - 4.4 (jderusse)
+ * bug #45947 [FrameworkBundle] [Command] Fix `debug:router --no-interaction` error … (WilliamBoulle)
+ * bug #45931 [Process] Fix Process::getEnv() when setEnv() hasn't been called before (asika32764)
+ * bug #45928 [ExpressionLanguage] Fix matching null against a regular expression (ausi)
+
 * 4.4.40 (2022-04-02)
 
  * bug #45910 [Messenger] reset connection on worker shutdown (SanderHagen)

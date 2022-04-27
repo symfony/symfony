@@ -35,6 +35,7 @@ class InlineFragmentRendererTest extends TestCase
     {
         $request = Request::create('/');
         $request->attributes->replace(['_renderer' => 'inline']);
+
         return $request;
     }
 

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-25T10:41:35Z
+
+Can you check if the build failure is related?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-04-25T11:04:19Z
+
+Fixed fabbot, the CI test failures are caused by changes in PHP 8.2 upstream. You can see the same errors in e.g. https://github.com/symfony/symfony/runs/6146660539
+
+Btw, let's mark PHP 8.2 tests as experimental again: https://github.com/symfony/symfony/pull/46160
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-25T13:49:29Z
+
+The benefit of using variadic was the type check enforced by PHP.
+I'm really fine doing that but I'd suggest going one step further and allow only one argument: array|string $cases
+When array, we should enforce that all cases have the same class.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-27T08:12:28Z
+
+> I'm really fine doing that but I'd suggest going one step further and allow only one argument: array|string $cases
+
+:+1: or :-1:?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-04-27T10:08:05Z
+
+:+1: for `string|array` - just updated the PR
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-27T10:31:21Z
+
+It's actually `\BackedEnum|array`, I updated it.

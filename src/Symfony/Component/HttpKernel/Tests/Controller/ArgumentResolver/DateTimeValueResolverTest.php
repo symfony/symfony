@@ -113,6 +113,21 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertNull($results[0]);
     }
 
+    public function testPreviouslyConvertedAttribute()
+    {
+        $resolver = new DateTimeValueResolver();
+
+        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null, true);
+        $request = self::requestWithAttributes(['dummy' => $datetime = new \DateTime()]);
+
+        /** @var \Generator $results */
+        $results = $resolver->resolve($request, $argument);
+        $results = iterator_to_array($results);
+
+        $this->assertCount(1, $results);
+        $this->assertSame($datetime, $results[0]);
+    }
+
     public function testCustomClass()
     {
         date_default_timezone_set('UTC');

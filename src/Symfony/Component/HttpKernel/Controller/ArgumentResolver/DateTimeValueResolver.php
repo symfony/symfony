@@ -40,6 +40,12 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
     {
         $value = $request->attributes->get($argument->getName());
 
+        if ($value instanceof \DateTimeInterface) {
+            yield $value;
+
+            return;
+        }
+
         if ($argument->isNullable() && !$value) {
             yield null;
 

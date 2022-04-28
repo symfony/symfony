@@ -54,10 +54,12 @@ ob_start();
 class TestSessionHandler extends AbstractSessionHandler
 {
     private $data;
+    private ?string $sessionId;
 
-    public function __construct($data = '')
+    public function __construct($data = '', $sessionId = null)
     {
         $this->data = $data;
+        $this->sessionId = $sessionId;
     }
 
     public function open(string $path, string $name): bool
@@ -130,7 +132,12 @@ class TestSessionHandler extends AbstractSessionHandler
 
     protected function doRead($sessionId): string
     {
-        echo __FUNCTION__.': ', $this->data, "\n";
+        if (isset($this->sessionId) && $sessionId !== $this->sessionId) {
+            echo __FUNCTION__ . ": invalid sessionId\n";
+
+            return '';
+        }
+        echo __FUNCTION__ . ': ', $this->data, "\n";
 
         return $this->data;
     }

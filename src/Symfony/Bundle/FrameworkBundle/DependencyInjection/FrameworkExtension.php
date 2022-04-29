@@ -2431,6 +2431,7 @@ class FrameworkExtension extends Extension
 
         $classToServices = [
             GmailTransportFactory::class => 'mailer.transport_factory.gmail',
+            InfobipTransportFactory::class => 'mailer.transport_factory.infobip',
             MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
             MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
             MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',

@@ -434,8 +434,8 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param $default The default value (for InputArgument::OPTIONAL mode only)
+     * @param int|null          $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param mixed             $default The default value (for InputArgument::OPTIONAL mode only)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @throws InvalidArgumentException When argument mode is not valid
@@ -457,9 +457,9 @@ class Command
     /**
      * Adds an option.
      *
-     * @param $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param $mode     The option mode: One of the InputOption::VALUE_* constants
-     * @param $default  The default value (must be null for InputOption::VALUE_NONE)
+     * @param string|array|null $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int|null          $mode     The option mode: One of the InputOption::VALUE_* constants
+     * @param mixed             $default  The default value (must be null for InputOption::VALUE_NONE)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible

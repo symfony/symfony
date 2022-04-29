@@ -48,6 +48,9 @@
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
+        ],
+        "files": [
+            "Loader/Configurator/functions.php"
         ]
     },
     "minimum-stability": "dev"

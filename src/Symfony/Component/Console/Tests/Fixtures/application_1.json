@@ -120,7 +120,7 @@
                 "completion [--debug] [--] [<shell>]"
             ],
             "description": "Dump the shell completion script",
-            "help": "The <info>completion</> command dumps the shell completion script required\nto use shell autocompletion (currently only bash completion is supported).\n\n<comment>Static installation\n-------------------</>\n\nDump the script to a global completion file and restart your shell:\n\n    <info>%%PHP_SELF%% completion bash | sudo tee /etc/bash_completion.d/%%COMMAND_NAME%%</>\n\nOr dump the script to a local file and source it:\n\n    <info>%%PHP_SELF%% completion bash > completion.sh</>\n\n    <comment># source the file whenever you use the project</>\n    <info>source completion.sh</>\n\n    <comment># or add this line at the end of your \"~/.bashrc\" file:</>\n    <info>source /path/to/completion.sh</>\n\n<comment>Dynamic installation\n--------------------</>\n\nAdd this to the end of your shell configuration file (e.g. <info>\"~/.bashrc\"</>):\n\n    <info>eval \"$(%%PHP_SELF_FULL%% completion bash)\"</>",
+            "help": "Dump the shell completion script",
             "definition": {
                 "arguments": {
                     "shell": {

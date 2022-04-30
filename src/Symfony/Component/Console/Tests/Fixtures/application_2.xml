@@ -53,32 +53,7 @@
         <usage>completion [--debug] [--] [&lt;shell&gt;]</usage>
       </usages>
       <description>Dump the shell completion script</description>
-      <help>The &lt;info&gt;completion&lt;/&gt; command dumps the shell completion script required
- to use shell autocompletion (currently only bash completion is supported).
- 
- &lt;comment&gt;Static installation
- -------------------&lt;/&gt;
- 
- Dump the script to a global completion file and restart your shell:
- 
-     &lt;info&gt;%%PHP_SELF%% completion bash | sudo tee /etc/bash_completion.d/%%COMMAND_NAME%%&lt;/&gt;
- 
- Or dump the script to a local file and source it:
- 
-     &lt;info&gt;%%PHP_SELF%% completion bash &gt; completion.sh&lt;/&gt;
- 
-     &lt;comment&gt;# source the file whenever you use the project&lt;/&gt;
-     &lt;info&gt;source completion.sh&lt;/&gt;
- 
-     &lt;comment&gt;# or add this line at the end of your "~/.bashrc" file:&lt;/&gt;
-     &lt;info&gt;source /path/to/completion.sh&lt;/&gt;
- 
- &lt;comment&gt;Dynamic installation
- --------------------&lt;/&gt;
- 
- Add this to the end of your shell configuration file (e.g. &lt;info&gt;"~/.bashrc"&lt;/&gt;):
- 
-     &lt;info&gt;eval "$(%%PHP_SELF_FULL%% completion bash)"&lt;/&gt;</help>
+      <help>Dump the shell completion script</help>
       <arguments>
         <argument name="shell" is_required="0" is_array="0">
           <description>The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given</description>

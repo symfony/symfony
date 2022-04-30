@@ -7,7 +7,7 @@
 
 function _sf_{{ COMMAND_NAME }}
     set sf_cmd (commandline -o)
-    set c (math (count (commandline -oc))) - 1)
+    set c (count (commandline -oc))
 
     set completecmd "$sf_cmd[1]" "_complete" "-sfish" "-S{{ VERSION }}"
 

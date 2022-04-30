@@ -379,6 +379,13 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->html('my value'));
     }
 
+    public function testEmojis()
+    {
+        $crawler = $this->createCrawler('<body><p>Hey 👋</p></body>');
+
+        $this->assertSame('<body><p>Hey 👋</p></body>', $crawler->html());
+    }
+
     public function testExtract()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');

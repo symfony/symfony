@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-30T16:27:12Z
+
+PR updated. Needs https://github.com/php/php-src/pull/8464 to be green. Thanks @derickr for the fix on PHP 8.2 :pray:

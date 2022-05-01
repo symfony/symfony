@@ -37,6 +37,7 @@
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/intl": "^5.4|^6.0",
+        "symfony/security-core": "^6.2",
         "symfony/security-csrf": "^5.4|^6.0",
         "symfony/translation": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
@@ -56,6 +57,7 @@
     },
     "suggest": {
         "symfony/validator": "For form validation.",
+        "symfony/security-core": "For hashing users passwords.",
         "symfony/security-csrf": "For protecting forms against CSRF attacks.",
         "symfony/twig-bridge": "For templating with Twig."
     },

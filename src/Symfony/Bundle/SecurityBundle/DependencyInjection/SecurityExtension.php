@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Form\Extension\PasswordHasher\PasswordHasherExtension;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
@@ -122,6 +123,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
             $container->removeDefinition('security.is_granted_attribute_expression_language');
+        }
+
+        if (!class_exists(PasswordHasherExtension::class)) {
+            $container->removeDefinition('form.listener.password_hasher');
+            $container->removeDefinition('form.type_extension.form.password_hasher');
+            $container->removeDefinition('form.type_extension.password.password_hasher');
         }
 
         // set some global scalars

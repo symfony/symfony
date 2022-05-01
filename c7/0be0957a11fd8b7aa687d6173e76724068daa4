@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-30T18:54:18Z
+
+>  or turning off the param converters in full, which has other side effects),
+
+Can you elaborate on the side effects? I'm really not fond of patching Symfony to support a mix of param converters and argument value resolvers
+
+---------------------------------------------------------------------------
+
+by mbabker at 2022-05-01T00:15:10Z
+
+> > or turning off the param converters in full, which has other side effects),
+>
+> Can you elaborate on the side effects? I'm really not fond of patching Symfony to support a mix of param converters and argument value resolvers
+
+If your app already relies on them, then turning off the param converters (especially with #43854 not making it into 6.1) ends up being a much bigger refactoring.  As much as I don't like the patch either, being a pragmatist here, I do think it solves the upgrade issue in a way that causes the least frustration for end-users (as otherwise you really either have to turn off the param converters and rewrite all controllers relying on those or mess with the container to remove one of the services to avoid the double-conversion issue), and this one condition can be re-evaluated or removed once we're at a version where both of the `SensioFrameworkExtraBundle` converters have replacements.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-05-01T01:35:22Z
+
+> especially with https://github.com/symfony/symfony/pull/43854 not making it into 6.1
+
+I thought it was in, thanks.

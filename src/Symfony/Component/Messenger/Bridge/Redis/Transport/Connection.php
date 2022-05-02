@@ -521,6 +521,51 @@ class Connection
         }
     }
 
+    public function getMessageCount(): int
+    {
+        $groups = $this->connection->xinfo('GROUPS', $this->stream) ?: [];
+
+        $lastDeliveredId = null;
+        foreach ($groups as $group) {
+            if ($group['name'] !== $this->group) {
+                continue;
+            }
+
+            // Use "lag" key provided by Redis 7.x. See https://redis.io/commands/xinfo-groups/#consumer-group-lag.
+            if (isset($group['lag'])) {
+                return $group['lag'];
+            }
+
+            if (!isset($group['last-delivered-id'])) {
+                return 0;
+            }
+
+            $lastDeliveredId = $group['last-delivered-id'];
+            break;
+        }
+
+        if (null === $lastDeliveredId) {
+            return 0;
+        }
+
+        // Iterate through the stream. See https://redis.io/commands/xrange/#iterating-a-stream.
+        $useExclusiveRangeInterval = version_compare(phpversion('redis'), '6.2.0', '>=');
+        $total = 0;
+        do {
+            if (!$range = $this->connection->xRange($this->stream, $lastDeliveredId, '+', 100)) {
+                return $total;
+            }
+
+            $total += \count($range);
+
+            if ($useExclusiveRangeInterval) {
+                $lastDeliveredId = preg_replace_callback('#\d+$#', static fn(array $matches) => (int) $matches[0] + 1, array_key_last($range));
+            } else {
+                $lastDeliveredId = '('.array_key_last($range);
+            }
+        } while (true);
+    }
+
     private function rawCommand(string $command, ...$arguments): mixed
     {
         try {

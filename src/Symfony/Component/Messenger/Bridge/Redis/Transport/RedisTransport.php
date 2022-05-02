@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class RedisTransport implements TransportInterface, SetupableTransportInterface
+class RedisTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
     private Connection $connection;
@@ -72,6 +73,14 @@ class RedisTransport implements TransportInterface, SetupableTransportInterface
     public function setup(): void
     {
         $this->connection->setup();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessageCount(): int
+    {
+        return $this->getReceiver()->getMessageCount();
     }
 
     private function getReceiver(): RedisReceiver

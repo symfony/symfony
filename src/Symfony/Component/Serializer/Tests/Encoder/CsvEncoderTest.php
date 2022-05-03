@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -698,5 +699,46 @@ CSV;
 
         $encoder = new CsvEncoder([CsvEncoder::END_OF_LINE => "\r\n"]);
         $this->assertSame("foo,bar\r\nhello,test\r\n", $encoder->encode($value, 'csv'));
+    }
+
+    public function testDecodeWithValidHeader()
+    {
+        $csv = "\xEF\xBB\xBF".<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV;
+        $this->assertEquals(
+            ['foo' => 'hello', 'bar' => 'hey ho'],
+            $this->encoder->decode(
+                $csv,
+                'csv',
+                [
+                    CsvEncoder::AS_COLLECTION_KEY => false,
+                    CsvEncoder::CHECK_VALID_HEADERS => true,
+                    CsvEncoder::HEADERS_KEY => ['foo', 'bar'],
+                ]
+            )
+        );
+    }
+
+    public function testDecodeWithUnvalidHeader()
+    {
+        $csv = "\xEF\xBB\xBF".<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV;
+
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('Invalid headers in content.');
+        $this->encoder->decode(
+            $csv,
+            'csv',
+            [
+                CsvEncoder::CHECK_VALID_HEADERS => true,
+                CsvEncoder::HEADERS_KEY => ['foo', 'bar', 'baz'],
+            ]
+        );
     }
 }

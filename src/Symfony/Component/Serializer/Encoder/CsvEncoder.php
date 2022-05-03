@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -33,6 +34,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public const NO_HEADERS_KEY = 'no_headers';
     public const END_OF_LINE = 'csv_end_of_line';
     public const OUTPUT_UTF8_BOM_KEY = 'output_utf8_bom';
+    public const CHECK_VALID_HEADERS = 'check_valid_headers';
 
     private const UTF8_BOM = "\xEF\xBB\xBF";
 
@@ -49,6 +51,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         self::NO_HEADERS_KEY => false,
         self::AS_COLLECTION_KEY => true,
         self::OUTPUT_UTF8_BOM_KEY => false,
+        self::CHECK_VALID_HEADERS => false,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -148,9 +151,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $headers = null;
         $nbHeaders = 0;
         $headerCount = [];
+        $headerFile = [];
         $result = [];
 
-        [$delimiter, $enclosure, $escapeChar, $keySeparator, , , , $asCollection] = $this->getCsvOptions($context);
+        [$delimiter, $enclosure, $escapeChar, $keySeparator, $expectedHeader, , , $asCollection] = $this->getCsvOptions($context);
 
         while (false !== ($cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar))) {
             $nbCols = \count($cols);
@@ -167,7 +171,14 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     foreach ($cols as $col) {
                         $header = explode($keySeparator, $col);
                         $headers[] = $header;
+                        $headerFile[] = $col;
                         $headerCount[] = \count($header);
+                    }
+
+                    if (($context[self::CHECK_VALID_HEADERS] ?? $this->defaultContext[self::CHECK_VALID_HEADERS])
+                        && \count(array_intersect($headerFile, $expectedHeader)) !== \count($expectedHeader)
+                    ) {
+                        throw new NotEncodableValueException('Invalid headers in content.');
                     }
 
                     continue;

@@ -131,16 +131,16 @@ EOF
         $force = $input->getOption('force');
         $deleteMissing = $input->getOption('delete-missing');
 
+        if (!$domains && $provider instanceof FilteringProvider) {
+            $domains = $provider->getDomains();
+        }
+
+        // Reading local translations must be done after retrieving the domains from the provider
+        // in order to manage only translations from configured domains
         $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
 
         if (!$domains) {
-            if ($provider instanceof FilteringProvider) {
-                $domains = $provider->getDomains();
-            }
-
-            if (!$domains) {
-                $domains = $this->getDomainsFromTranslatorBag($localTranslations);
-            }
+            $domains = $this->getDomainsFromTranslatorBag($localTranslations);
         }
 
         if (!$deleteMissing && $force) {

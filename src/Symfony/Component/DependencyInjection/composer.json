@@ -24,7 +24,8 @@
     "require-dev": {
         "symfony/yaml": "^5.4|^6.0",
         "symfony/config": "^6.1",
-        "symfony/expression-language": "^5.4|^6.0"
+        "symfony/expression-language": "^5.4|^6.0",
+        "phpdocumentor/reflection-docblock": "^5.3"
     },
     "suggest": {
         "symfony/yaml": "",

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireAsDecoratorPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
@@ -1185,5 +1186,22 @@ class AutowirePassTest extends TestCase
         $this->assertSame(AsDecoratorBar20::class.'.inner', (string) $container->getDefinition(AsDecoratorBar20::class)->getArgument(1));
         $this->assertSame(AsDecoratorBaz::class.'.inner', (string) $container->getDefinition(AsDecoratorBaz::class)->getArgument(0));
         $this->assertSame(2, $container->getDefinition(AsDecoratorBaz::class)->getArgument(0)->getInvalidBehavior());
+    }
+
+    public function testTaggedIterator(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register(A::class);
+        $container->register(APrime::class);
+        $container->register(TaggedIterator::class)->setAutowired(true);
+
+        $container->registerForAutoconfiguration(AInterface::class)->addTag('a');
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $argument = $container->getDefinition(TaggedIterator::class)->getArgument(0);
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $argument);
+        $this->assertSame('a', $argument->getTag());
     }
 }

@@ -14,6 +14,7 @@ CHANGELOG
  * Add argument type `closure` to help passing closures to services
  * Deprecate `ReferenceSetArgumentTrait`
  * Add `AbstractExtension` class for DI configuration/definition on a single file
+ * Autowire tagged iterators (needs `phpdocumentor/reflection-docblock`)
 
 6.0
 ---

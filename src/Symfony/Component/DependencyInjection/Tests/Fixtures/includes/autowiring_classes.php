@@ -30,6 +30,10 @@ class A implements AInterface
     }
 }
 
+class APrime implements AInterface
+{
+}
+
 class B extends A
 {
 }
@@ -410,5 +414,14 @@ final class ElsaAction
 {
     public function __construct(NotExisting $notExisting)
     {
+    }
+}
+
+class TaggedIterator
+{
+    /**
+     * @param AInterface[] $aCollection
+     */
+    public function __construct(iterable $aCollection) {
     }
 }

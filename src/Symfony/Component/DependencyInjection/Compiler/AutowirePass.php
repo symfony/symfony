@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\Types\Array_;
+use phpDocumentor\Reflection\Types\ContextFactory;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -31,11 +35,13 @@ use Symfony\Component\DependencyInjection\TypedReference;
 /**
  * Inspects existing service definitions and wires the autowired ones using the type hints of their classes.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Kévin Dunglas <kevin@dunglas.fr>
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class AutowirePass extends AbstractRecursivePass
 {
+    private static ?DocBlockFactory $docBlockFactory = null;
+
     private array $types;
     private array $ambiguousServiceTypes;
     private array $autowiringAliases;
@@ -291,6 +297,38 @@ class AutowirePass extends AbstractRecursivePass
                     continue;
                 }
 
+                // Autowire tagged iterators when possible
+                if (
+                    class_exists(DocBlockFactory::class)
+                    && $reflectionMethod->getDocComment()
+                    && ($parameterType = $parameter->getType())
+                    && $parameterType instanceof \ReflectionNamedType
+                    && 'iterable' === $parameterType->getName()
+                ) {
+                    if (null === self::$docBlockFactory) {
+                        self::$docBlockFactory = DocBlockFactory::createInstance();
+                    }
+
+                    $docBlock = self::$docBlockFactory->create($reflectionMethod, (new ContextFactory())->createFromReflector($reflectionMethod));
+                    foreach ($docBlock->getTagsByName('param') as $param) {
+                        if (
+                            !$param instanceof Param
+                            || !($phpDocType = $param->getType())
+                            || !$phpDocType instanceof Array_
+                            || $parameter->getName() !== $param->getVariableName()
+                            || !($fqsen = $phpDocType->getValueType()->getFqsen()?->__toString())
+                            || !($child = $this->container->getAutoconfiguredInstanceof()[ltrim($fqsen, '\\')] ?? null)
+                            || !$tags = $child->getTags()
+                        ) {
+                            continue;
+                        }
+
+                        $arguments[$index] = new TaggedIteratorArgument(key($tags));
+
+                        continue 2;
+                    }
+                }
+
                 // no default value? Then fail
                 if (!$parameter->isDefaultValueAvailable()) {
                     // For core classes, isDefaultValueAvailable() can
@@ -300,7 +338,7 @@ class AutowirePass extends AbstractRecursivePass
                         --$index;
                         break;
                     }
-                    $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, false);
+                    $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter );
                     $type = $type ? sprintf('is type-hinted "%s"', ltrim($type, '\\')) : 'has no type-hint';
 
                     throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" %s, you should configure its value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method, $type));

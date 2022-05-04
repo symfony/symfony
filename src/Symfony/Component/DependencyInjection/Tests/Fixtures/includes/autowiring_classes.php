@@ -30,7 +30,7 @@ class A implements AInterface
     }
 }
 
-class APrime implements AInterface
+class ABis implements AInterface
 {
 }
 

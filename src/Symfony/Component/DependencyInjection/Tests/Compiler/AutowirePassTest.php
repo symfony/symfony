@@ -1188,11 +1188,11 @@ class AutowirePassTest extends TestCase
         $this->assertSame(2, $container->getDefinition(AsDecoratorBaz::class)->getArgument(0)->getInvalidBehavior());
     }
 
-    public function testTaggedIterator(): void
+    public function testTaggedIterator()
     {
         $container = new ContainerBuilder();
         $container->register(A::class);
-        $container->register(APrime::class);
+        $container->register(ABis::class);
         $container->register(TaggedIterator::class)->setAutowired(true);
 
         $container->registerForAutoconfiguration(AInterface::class)->addTag('a');

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\TokenProcessor;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -31,7 +32,7 @@ class TokenProcessorTest extends TestCase
         $tokenStorage->method('getToken')->willReturn($token);
 
         $processor = new TokenProcessor($tokenStorage);
-        $record = ['extra' => []];
+        $record = RecordFactory::create();
         $record = $processor($record);
 
         $this->assertArrayHasKey('token', $record['extra']);

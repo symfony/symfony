@@ -15,6 +15,7 @@ use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\ContextFactory;
+use phpDocumentor\Reflection\Types\Iterable_;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -314,7 +315,7 @@ class AutowirePass extends AbstractRecursivePass
                         if (
                             !$param instanceof Param
                             || !($phpDocType = $param->getType())
-                            || !$phpDocType instanceof Array_
+                            || !$phpDocType instanceof Iterable_
                             || $parameter->getName() !== $param->getVariableName()
                             || !($fqsen = $phpDocType->getValueType()->getFqsen()?->__toString())
                             || !($child = $this->container->getAutoconfiguredInstanceof()[ltrim($fqsen, '\\')] ?? null)

@@ -420,7 +420,7 @@ final class ElsaAction
 class TaggedIterator
 {
     /**
-     * @param AInterface[] $aCollection
+     * @param iterable<AInterface> $aCollection
      */
     public function __construct(iterable $aCollection) {
     }

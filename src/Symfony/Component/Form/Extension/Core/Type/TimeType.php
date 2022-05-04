@@ -74,8 +74,10 @@ class TimeType extends AbstractType
                 }
             });
 
+            $parseFormat = null;
+
             if (null !== $options['reference_date']) {
-                $format = 'Y-m-d '.$format;
+                $parseFormat = 'Y-m-d '.$format;
 
                 $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($options) {
                     $data = $event->getData();
@@ -86,7 +88,7 @@ class TimeType extends AbstractType
                 });
             }
 
-            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
+            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format, $parseFormat));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = [
                 'error_bubbling' => true,

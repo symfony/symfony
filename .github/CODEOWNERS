@@ -24,13 +24,8 @@
 /src/Symfony/Component/Form/ @xabbuh @yceruto
 # HttpKernel
 /src/Symfony/Component/HttpKernel/Log/Logger.php @dunglas
-# LDAP
-/src/Symfony/Component/Ldap/ @csarrazi
 # Lock
 /src/Symfony/Component/Lock/ @jderusse
-# Messenger
-/src/Symfony/Bridge/Doctrine/Messenger/ @sroze
-/src/Symfony/Component/Messenger/ @sroze
 # Notifer
 /src/Symfony/Component/Notifier/ @OskarStark
 # OptionsResolver

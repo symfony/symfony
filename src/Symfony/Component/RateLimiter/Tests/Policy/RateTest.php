@@ -26,7 +26,7 @@ class RateTest extends TestCase
 
     public function provideRate(): iterable
     {
-        yield [new Rate(\DateInterval::createFromDateString('15 seconds'), 10)];
+        yield [new Rate(new \DateInterval('PT15S'), 10)];
         yield [Rate::perSecond(10)];
         yield [Rate::perMinute(10)];
         yield [Rate::perHour(10)];

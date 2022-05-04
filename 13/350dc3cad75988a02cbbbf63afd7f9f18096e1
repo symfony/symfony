@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-04-25T07:44:54Z
+
+The change being a BC break for classes extending Symfony handlers is also the reason why Symfony 4.x never added support for Monolog 2.
+I suggest that in Symfony 6.x (probably 6.2 due to being after the 6.1 feature freeze), we tag all our handlers and formatters as `@final` (or at least the methods of those handlers implementing the Monolog API if they are meant to provide their own inheritance-based extension point) to avoid that kind of blockages again in the future.
+And we will need to wait for Symfony 7.0 to support Monolog 3.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-04-25T07:55:39Z
+
+> And we will need to wait for Symfony 7.0 to support Monolog 3.
+
+That would be a very unfortunate timeframe. We could work with conditional traits to achieve compatibility for Monolog 2 + 3 and maintain BC if Monolog 2 is installed. Ideally, we could even drop Monolog 2 support in Symfony 7.0 then.
+
+And yes, implementations of external interfaces should be final.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-04-25T12:00:47Z
+
+> That would be a very unfortunate timeframe. We could work with conditional traits to achieve compatibility for Monolog 2 + 3 and maintain BC if Monolog 2 is installed. Ideally, we could even drop Monolog 2 support in Symfony 7.0 then.
+
+Indeed waiting for Symfony 7 would kinda suck, especially as Symfony 6.1 bumping PHP to 8.1 is what motivated me to do the same in Monolog and take advantage of readonly props & enums..
+
+Dropping Monolog 1/2 in Symfony 7 though absolutely would be a good idea.
+
+Anyway in https://github.com/symfony/symfony/pull/46153/commits/22b7ae61806565058b5511aeda061e982dedcc29 I added compatibility traits to get around BC break.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-04-25T12:47:19Z
+
+OK tests pass now on Monolog 1/2/3 for me. The psalm errors are bogus and should partially be resolved once it can run against Monolog 3.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-05-02T11:11:35Z
+
+Yes I think I'd add a deprecation for monolog 1/2 in 6.2 or 6.3 latest. Doing it in 6.1 would be a bit early probably. I'll definitely try to get a release of monolog out this week anyway, I hope this PR can be finalized/merged soon as well.
+
+It should be fairly easy to do in the if/else we have for the traits, no?

@@ -342,6 +342,30 @@ class ContextListenerTest extends TestCase
         $this->assertSame($usageIndex, $session->getUsageIndex());
     }
 
+    public function testOnKernelResponseRemoveListener()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit', ['ROLE_USER']));
+
+        $request = new Request();
+        $request->attributes->set('_security_firewall_run', '_security_session');
+
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $dispatcher = new EventDispatcher();
+        $httpKernel = $this->createMock(HttpKernelInterface::class);
+
+        $listener = new ContextListener($tokenStorage, [], 'session', null, $dispatcher, null, \Closure::fromCallable([$tokenStorage, 'getToken']));
+        $this->assertEmpty($dispatcher->getListeners());
+
+        $listener(new RequestEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $this->assertNotEmpty($dispatcher->getListeners());
+
+        $listener->onKernelResponse(new ResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, new Response()));
+        $this->assertEmpty($dispatcher->getListeners());
+    }
+
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());

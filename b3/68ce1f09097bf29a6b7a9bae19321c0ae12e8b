@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-05-05T13:20:02Z
+
+as this is considered a bugfix, should we merge it into lower branches ? Projects might use the first-class callable syntax with Symfony 5.4 too
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-05T14:18:20Z
+
+Indeed. Now targeting 4.4
+
+---------------------------------------------------------------------------
+
+by stof at 2022-05-05T14:42:51Z
+
+@nicolas-grekas I think you also need to fix the `TraceableEventDispatcher` class as it also contains a few `=== $listener`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-05T15:21:45Z
+
+Updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-05T15:29:48Z
+
+This behavior is new to PHP 8.1: https://3v4l.org/Zr0m7
+See https://github.com/php/php-src/commit/6a9daafed4d26cd26b730e07e9339e35fb833f58
+Updated to skip the tests on PHP < 8.1

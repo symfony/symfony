@@ -92,6 +92,14 @@ class InputArgumentTest extends TestCase
         $argument->setDefault('default');
     }
 
+    public function testSetDefaultWithRequiredArrayArgument()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
+        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+        $argument->setDefault([]);
+    }
+
     public function testSetDefaultWithArrayArgument()
     {
         $this->expectException(\LogicException::class);

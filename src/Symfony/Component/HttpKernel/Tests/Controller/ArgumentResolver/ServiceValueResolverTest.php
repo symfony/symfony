@@ -108,8 +108,6 @@ class ServiceValueResolverTest extends TestCase
 
     public function testErrorIsTruncated()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Cannot autowire argument $dummy of "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyController::index()": it references class "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyService" but no such service exists.');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
 
@@ -119,7 +117,10 @@ class ServiceValueResolverTest extends TestCase
         $container->compile();
 
         $request = $this->requestWithAttributes(['_controller' => [DummyController::class, 'index']]);
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', DummyServiceInterface::class, false, false, null);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cannot autowire argument $dummy of "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyController::index()": it references interface "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyServiceInterface" but no such service exists.');
         $container->get('argument_resolver.service')->resolve($request, $argument)->current();
     }
 
@@ -145,13 +146,17 @@ class ServiceValueResolverTest extends TestCase
     }
 }
 
+interface DummyServiceInterface
+{
+}
+
 class DummyService
 {
 }
 
 class DummyController
 {
-    public function index(DummyService $dummy)
+    public function index(DummyServiceInterface $dummy)
     {
     }
 }

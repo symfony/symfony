@@ -141,7 +141,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame(ServiceLocator::class, $locator->getClass());
         $this->assertFalse($locator->isPublic());
 
-        $expected = ['bar' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'bar'))];
+        $expected = ['bar' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'bar'))];
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
@@ -437,8 +437,8 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $expected = [
             'apiKey' => new ServiceClosureArgument(new Reference('the_api_key')),
-            'service1' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'imageStorage')),
-            'service2' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'service2')),
+            'service1' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'imageStorage')),
+            'service2' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'service2')),
         ];
         $this->assertEquals($expected, $locator->getArgument(0));
     }

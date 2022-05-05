@@ -25,7 +25,9 @@ use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Creates the service-locators required by ServiceValueResolver.
@@ -70,13 +72,21 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             if (!$r = $container->getReflectionClass($class)) {
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             }
-            $isContainerAware = $r->implementsInterface(ContainerAwareInterface::class) || is_subclass_of($class, AbstractController::class);
+
+            $excludedMethod = [];
+            if ($r->implementsInterface(ContainerAwareInterface::class) || is_subclass_of($class, AbstractController::class)) {
+                $excludedMethod['setContainer'] = true;
+            }
+            if ($r->implementsInterface(KernelInterface::class)) {
+                $excludedMethod['registerContainerConfiguration'] = true;
+                $excludedMethod['loadRoutes'] = true;
+            }
 
             // get regular public methods
             $methods = [];
             $arguments = [];
             foreach ($r->getMethods(\ReflectionMethod::IS_PUBLIC) as $r) {
-                if ('setContainer' === $r->name && $isContainerAware) {
+                if (!$r->getNumberOfParameters() || isset($excludedMethod[$r->name])) {
                     continue;
                 }
                 if (!$r->isConstructor() && !$r->isDestructor() && !$r->isAbstract()) {
@@ -150,11 +160,11 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     } elseif (is_subclass_of($type, \UnitEnum::class)) {
                         // do not attempt to register enum typed arguments if not already present in bindings
                         continue;
-                    } elseif (!$p->allowsNull()) {
+                    } elseif (!$p->allowsNull() && interface_exists($type, false)) {
                         $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
                     }
 
-                    if (Request::class === $type || SessionInterface::class === $type) {
+                    if (Request::class === $type || Response::class === $type || SessionInterface::class === $type) {
                         continue;
                     }
 

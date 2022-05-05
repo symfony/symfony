@@ -75,7 +75,7 @@ class ExceptionListener
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(KernelEvents::EXCEPTION, $this->onKernelException(...), 1);
+        $dispatcher->addListener(KernelEvents::EXCEPTION, [$this, 'onKernelException'], 1);
     }
 
     /**
@@ -83,7 +83,7 @@ class ExceptionListener
      */
     public function unregister(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->removeListener(KernelEvents::EXCEPTION, $this->onKernelException(...));
+        $dispatcher->removeListener(KernelEvents::EXCEPTION, [$this, 'onKernelException']);
     }
 
     /**

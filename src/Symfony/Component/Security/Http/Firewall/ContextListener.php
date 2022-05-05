@@ -85,7 +85,7 @@ class ContextListener extends AbstractListener
     public function authenticate(RequestEvent $event)
     {
         if (!$this->registered && null !== $this->dispatcher && $event->isMainRequest()) {
-            $this->dispatcher->addListener(KernelEvents::RESPONSE, $this->onKernelResponse(...));
+            $this->dispatcher->addListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
             $this->registered = true;
         }
 
@@ -162,7 +162,7 @@ class ContextListener extends AbstractListener
             return;
         }
 
-        $this->dispatcher?->removeListener(KernelEvents::RESPONSE, $this->onKernelResponse(...));
+        $this->dispatcher?->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
         $this->registered = false;
         $session = $request->getSession();
         $sessionId = $session->getId();

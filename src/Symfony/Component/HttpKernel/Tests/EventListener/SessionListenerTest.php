@@ -139,6 +139,24 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
+    public function testUninitializedSessionWithoutInitializedSession()
+    {
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $response = new Response();
+        $response->setSharedMaxAge(60);
+        $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+
+        $container = new ServiceLocator([]);
+
+        $listener = new SessionListener($container);
+        $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response));
+        $this->assertFalse($response->headers->has('Expires'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+    }
+
     public function testSurrogateMasterRequestIsPublic()
     {
         $session = $this->createMock(Session::class);

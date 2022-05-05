@@ -74,7 +74,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         // Always remove the internal header if present
         $response->headers->remove(self::NO_AUTO_CACHE_CONTROL_HEADER);
 
-        if (!$session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : $event->getRequest()->getSession()) {
+        if (!$session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : ($event->getRequest()->hasSession() ? $event->getRequest()->getSession() : null)) {
             return;
         }
 

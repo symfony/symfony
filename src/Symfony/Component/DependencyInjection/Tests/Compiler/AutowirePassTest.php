@@ -1145,7 +1145,7 @@ class AutowirePassTest extends TestCase
         $this->assertCount(8, $definition->getArguments());
         $this->assertEquals(new Reference('some.id'), $definition->getArgument(0));
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(1));
-        $this->assertSame('%some.parameter%/bar', $definition->getArgument(2));
+        $this->assertSame('foo/bar', $definition->getArgument(2));
         $this->assertEquals(new Reference('some.id'), $definition->getArgument(3));
         $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(4));
         $this->assertSame('bar', $definition->getArgument(5));

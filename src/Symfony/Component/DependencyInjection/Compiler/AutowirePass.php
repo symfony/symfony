@@ -263,6 +263,7 @@ class AutowirePass extends AbstractRecursivePass
 
                     if (Autowire::class === $attribute->getName()) {
                         $value = $attribute->newInstance()->value;
+                        $value = $this->container->getParameterBag()->resolveValue($value);
 
                         if ($value instanceof Reference && $parameter->allowsNull()) {
                             $value = new Reference($value, ContainerInterface::NULL_ON_INVALID_REFERENCE);

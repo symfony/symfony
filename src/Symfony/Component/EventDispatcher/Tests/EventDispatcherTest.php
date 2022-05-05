@@ -406,9 +406,6 @@ class EventDispatcherTest extends TestCase
         $this->assertTrue($testLoaded);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testNamedClosures()
     {
         $listener = new TestEventListener();

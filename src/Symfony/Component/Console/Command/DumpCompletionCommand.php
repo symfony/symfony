@@ -53,7 +53,7 @@ to use shell autocompletion (currently only bash completion is supported).
 
 Dump the script to a global completion file and restart your shell:
 
-    <info>%command.full_name% bash | sudo tee /etc/bash_completion.d/${commandName}</>
+    <info>%command.full_name% bash | sudo tee /etc/bash_completion.d/{$commandName}</>
 
 Or dump the script to a local file and source it:
 
@@ -70,7 +70,7 @@ Or dump the script to a local file and source it:
 
 Add this to the end of your shell configuration file (e.g. <info>"~/.bashrc"</>):
 
-    <info>eval "$(${fullCommand} completion bash)"</>
+    <info>eval "$({$fullCommand} completion bash)"</>
 EOH
             )
             ->addArgument('shell', InputArgument::OPTIONAL, 'The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given')

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `toArray` method to `Response`
+ * Add protected `getRequestClass` method to `AbstractBrowser`
 
 5.3
 ---

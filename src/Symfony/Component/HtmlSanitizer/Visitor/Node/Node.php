@@ -20,6 +20,25 @@ use Symfony\Component\HtmlSanitizer\TextSanitizer\StringSanitizer;
  */
 final class Node implements NodeInterface
 {
+    // HTML5 elements which are self-closing
+    private const VOID_ELEMENTS = [
+        'area' => true,
+        'base' => true,
+        'br' => true,
+        'col' => true,
+        'embed' => true,
+        'hr' => true,
+        'img' => true,
+        'input' => true,
+        'keygen' => true,
+        'link' => true,
+        'meta' => true,
+        'param' => true,
+        'source' => true,
+        'track' => true,
+        'wbr' => true,
+    ];
+
     private NodeInterface $parent;
     private string $tagName;
     private array $attributes = [];
@@ -56,7 +75,7 @@ final class Node implements NodeInterface
 
     public function render(): string
     {
-        if (!$this->children) {
+        if (isset(self::VOID_ELEMENTS[$this->tagName])) {
             return '<'.$this->tagName.$this->renderAttributes().' />';
         }
 

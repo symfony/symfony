@@ -126,7 +126,7 @@
         "doctrine/dbal": "^2.13.1|^3.0",
         "doctrine/orm": "^2.7.4",
         "guzzlehttp/promises": "^1.4",
-        "masterminds/html5": "^2.6",
+        "masterminds/html5": "^2.7.2",
         "monolog/monolog": "^1.25.1|^2",
         "nyholm/psr7": "^1.0",
         "pda/pheanstalk": "^4.0",

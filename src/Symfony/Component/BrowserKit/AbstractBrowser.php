@@ -356,8 +356,7 @@ abstract class AbstractBrowser
 
         $server['HTTPS'] = 'https' == parse_url($uri, \PHP_URL_SCHEME);
 
-        $requestFqcn = $this->getRequestClass();
-        $this->internalRequest = new $requestFqcn($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $this->internalRequest = $this->createRequest($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
 
         $this->request = $this->filterRequest($this->internalRequest);
 
@@ -401,12 +400,9 @@ abstract class AbstractBrowser
         return $this->crawler;
     }
 
-    /**
-     * @return class-string<Request>
-     */
-    protected function getRequestClass(): string
+    protected function createRequest(string $uri, string $method, array $parameters, array $files, array $cookies, array $server, string $content = null): Request
     {
-        return Request::class;
+        return new Request($uri, $method, $parameters, $files, $cookies, $server, $content);
     }
 
     /**

@@ -25,4 +25,25 @@ final class AutowiringFailedExceptionTest extends TestCase
 
         self::assertNull($exception->getMessageCallback());
     }
+
+    public function testLazyness()
+    {
+        $counter = 0;
+        $exception = new AutowiringFailedException(
+            'App\DummyService',
+            function () use (&$counter) {
+                ++$counter;
+
+                throw new \Exception('boo');
+            }
+        );
+
+        $this->assertSame(0, $counter);
+
+        $this->assertSame('boo', $exception->getMessage());
+        $this->assertSame(1, $counter);
+
+        $this->assertSame('boo', $exception->getMessage());
+        $this->assertSame(1, $counter);
+    }
 }

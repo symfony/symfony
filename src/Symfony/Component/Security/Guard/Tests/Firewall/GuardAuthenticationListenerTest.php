@@ -324,7 +324,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $this->guardAuthenticatorHandler = $this->createMock(GuardAuthenticatorHandler::class);
         $this->request = new Request([], [], [], [], [], []);
 
-        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MASTER_REQUEST);
+        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->rememberMeServices = $this->createMock(RememberMeServicesInterface::class);

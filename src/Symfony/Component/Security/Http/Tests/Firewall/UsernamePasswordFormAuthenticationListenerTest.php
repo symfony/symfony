@@ -264,7 +264,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             $csrfTokenManager
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function postOnlyDataProvider(): array

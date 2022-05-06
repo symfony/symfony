@@ -48,7 +48,7 @@ class RememberMeListenerTest extends TestCase
             ->method('setToken')
         ;
 
-        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST)));
+        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST)));
     }
 
     public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
@@ -67,7 +67,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST)));
+        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST)));
     }
 
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
@@ -100,7 +100,7 @@ class RememberMeListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
@@ -133,7 +133,7 @@ class RememberMeListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurityAuthenticationExceptionDuringAutoLoginTriggersLoginFail()
@@ -163,7 +163,7 @@ class RememberMeListenerTest extends TestCase
             ->method('authenticate')
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurity()
@@ -195,7 +195,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testSessionStrategy()
@@ -243,7 +243,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testSessionIsMigratedByDefault()
@@ -289,7 +289,7 @@ class RememberMeListenerTest extends TestCase
         $request = new Request();
         $request->setSession($session);
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()

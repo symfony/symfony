@@ -523,7 +523,7 @@ class SessionListenerTest extends TestCase
         $container = new ServiceLocator([]);
 
         $listener = new SessionListener($container);
-        $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response));
+        $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
         $this->assertFalse($response->headers->has('Expires'));
         $this->assertTrue($response->headers->hasCacheControlDirective('public'));
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));

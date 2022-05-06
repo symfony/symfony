@@ -36,9 +36,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
-/**
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
 class AutowirePassTest extends TestCase
 {
     public function testProcess()
@@ -1185,5 +1182,39 @@ class AutowirePassTest extends TestCase
         $this->assertSame(AsDecoratorBar20::class.'.inner', (string) $container->getDefinition(AsDecoratorBar20::class)->getArgument(1));
         $this->assertSame(AsDecoratorBaz::class.'.inner', (string) $container->getDefinition(AsDecoratorBaz::class)->getArgument(0));
         $this->assertSame(2, $container->getDefinition(AsDecoratorBaz::class)->getArgument(0)->getInvalidBehavior());
+    }
+
+    public function testTypeSymbolExcluded()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(Foo::class)->setAbstract(true)->addTag('container.excluded', ['source' => 'for tests']);
+        $aDefinition = $container->register('a', NotGuessableArgument::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        try {
+            $pass->process($container);
+            $this->fail('AutowirePass should have thrown an exception');
+        } catch (AutowiringFailedException $e) {
+            $this->assertSame('Cannot autowire service "a": argument "$k" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotGuessableArgument::__construct()" needs an instance of "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" but this type has been excluded for tests.', (string) $e->getMessage());
+        }
+    }
+
+    public function testTypeNamespaceExcluded()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(__NAMESPACE__)->setAbstract(true)->addTag('container.excluded');
+        $aDefinition = $container->register('a', NotGuessableArgument::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        try {
+            $pass->process($container);
+            $this->fail('AutowirePass should have thrown an exception');
+        } catch (AutowiringFailedException $e) {
+            $this->assertSame('Cannot autowire service "a": argument "$k" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotGuessableArgument::__construct()" needs an instance of "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" but this type has been excluded from autowiring.', (string) $e->getMessage());
+        }
     }
 }

@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub\DeeperBaz;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\BarInterface;
@@ -116,10 +116,15 @@ class FileLoaderTest extends TestCase
             'Prototype/{%other_dir%/AnotherSub,Foo.php}'
         );
 
-        $this->assertTrue($container->has(Bar::class));
-        $this->assertTrue($container->has(Baz::class));
-        $this->assertFalse($container->has(Foo::class));
-        $this->assertFalse($container->has(DeeperBaz::class));
+        $this->assertFalse($container->getDefinition(Bar::class)->isAbstract());
+        $this->assertFalse($container->getDefinition(Baz::class)->isAbstract());
+        $this->assertTrue($container->getDefinition(Foo::class)->isAbstract());
+        $this->assertTrue($container->getDefinition(AnotherSub::class)->isAbstract());
+
+        $this->assertFalse($container->getDefinition(Bar::class)->hasTag('container.excluded'));
+        $this->assertFalse($container->getDefinition(Baz::class)->hasTag('container.excluded'));
+        $this->assertTrue($container->getDefinition(Foo::class)->hasTag('container.excluded'));
+        $this->assertTrue($container->getDefinition(AnotherSub::class)->hasTag('container.excluded'));
 
         $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
 

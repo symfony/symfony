@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\Console\ConsoleEvents;
@@ -26,7 +27,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface as EventDispatcherInterfaceComponentAlias;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
@@ -218,5 +222,11 @@ return static function (ContainerConfigurator $container) {
         ->set('config_builder.warmer', ConfigBuilderCacheWarmer::class)
             ->args([service(KernelInterface::class), service('logger')->nullOnInvalid()])
             ->tag('kernel.cache_warmer')
+
+        // register as abstract and excluded, aka not-autowirable types
+        ->set(LoaderInterface::class)->abstract()->tag('container.excluded')
+        ->set(Request::class)->abstract()->tag('container.excluded')
+        ->set(Response::class)->abstract()->tag('container.excluded')
+        ->set(SessionInterface::class)->abstract()->tag('container.excluded')
     ;
 };

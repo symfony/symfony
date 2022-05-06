@@ -692,7 +692,7 @@ class YamlFileLoader extends FileLoader
             }
             $exclude = $service['exclude'] ?? null;
             $namespace = $service['namespace'] ?? $id;
-            $this->registerClasses($definition, $namespace, $service['resource'], $exclude);
+            $this->registerClasses($definition, $namespace, $service['resource'], $exclude, $file);
         } else {
             $this->setDefinition($id, $definition);
         }

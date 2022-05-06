@@ -633,6 +633,21 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(['AInterface' => $childDefA, 'BInterface' => $childDefB], $container->getAutoconfiguredInstanceof());
     }
 
+    public function testMergeWithExcludedServices()
+    {
+        $container = new ContainerBuilder();
+        $container->setAlias('bar', 'foo');
+        $container->register('foo', 'Bar\FooClass');
+        $config = new ContainerBuilder();
+        $config->register('bar', 'Bar')->addTag('container.excluded');
+        $config->register('foo', 'Bar')->addTag('container.excluded');
+        $config->register('baz', 'Bar')->addTag('container.excluded');
+        $container->merge($config);
+        $this->assertEquals(['service_container', 'foo', 'baz'], array_keys($container->getDefinitions()));
+        $this->assertFalse($container->getDefinition('foo')->hasTag('container.excluded'));
+        $this->assertTrue($container->getDefinition('baz')->hasTag('container.excluded'));
+    }
+
     public function testMergeThrowsExceptionForDuplicateAutomaticInstanceofDefinitions()
     {
         $this->expectException(InvalidArgumentException::class);

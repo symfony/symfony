@@ -75,6 +75,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
                 if ($isRoot) {
+                    if ($v->hasTag('container.excluded')) {
+                        continue;
+                    }
                     $this->currentId = $k;
                 }
                 if ($v !== $processedValue = $this->processValue($v, $isRoot)) {

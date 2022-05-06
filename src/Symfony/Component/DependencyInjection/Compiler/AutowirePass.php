@@ -503,7 +503,19 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeNotFoundMessage(TypedReference $reference, string $label, string $currentId): string
     {
-        if (!$r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
+        $type = $reference->getType();
+
+        $i = null;
+        $namespace = $type;
+        do {
+            $namespace = substr($namespace, 0, $i);
+
+            if ($this->container->hasDefinition($namespace) && $tag = $this->container->getDefinition($namespace)->getTag('container.excluded')) {
+                return sprintf('Cannot autowire service "%s": %s needs an instance of "%s" but this type has been excluded %s.', $currentId, $label, $type, $tag[0]['source'] ?? 'from autowiring');
+            }
+        } while (false !== $i = strrpos($namespace, '\\'));
+
+        if (!$r = $this->container->getReflectionClass($type, false)) {
             // either $type does not exist or a parent class does not exist
             try {
                 $resource = new ClassExistenceResource($type, false);

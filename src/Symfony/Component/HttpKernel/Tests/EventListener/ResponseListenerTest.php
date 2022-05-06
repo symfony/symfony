@@ -102,7 +102,7 @@ class ResponseListenerTest extends TestCase
         $request = Request::create('/');
         $request->setLocale('fr');
 
-        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('fr', $response->headers->get('Content-Language'));
@@ -118,7 +118,7 @@ class ResponseListenerTest extends TestCase
         $request = Request::create('/');
         $request->setLocale('de');
 
-        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('mi, en', $response->headers->get('Content-Language'));
@@ -133,7 +133,7 @@ class ResponseListenerTest extends TestCase
         $request = Request::create('/');
         $request->setLocale('fr');
 
-        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertNull($response->headers->get('Content-Language'));

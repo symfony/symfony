@@ -339,10 +339,10 @@ class ContextListenerTest extends TestCase
         $listener = new ContextListener($tokenStorage, [], 'session', null, $dispatcher, null, \Closure::fromCallable([$tokenStorage, 'getToken']));
         $this->assertEmpty($dispatcher->getListeners());
 
-        $listener(new RequestEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($httpKernel, $request, HttpKernelInterface::MAIN_REQUEST));
         $this->assertNotEmpty($dispatcher->getListeners());
 
-        $listener->onKernelResponse(new ResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, new Response()));
+        $listener->onKernelResponse(new ResponseEvent($httpKernel, $request, HttpKernelInterface::MAIN_REQUEST, new Response()));
         $this->assertEmpty($dispatcher->getListeners());
     }
 

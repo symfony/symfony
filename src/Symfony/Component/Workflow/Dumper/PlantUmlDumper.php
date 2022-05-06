@@ -103,8 +103,8 @@ class PlantUmlDumper implements DumperInterface
                         }
 
                         $lines = [
-                            "$fromEscaped -${transitionColor}-> ${transitionEscaped}${transitionLabel}",
-                            "$transitionEscaped -${transitionColor}-> ${toEscaped}${transitionLabel}",
+                            "{$fromEscaped} -{$transitionColor}-> {$transitionEscaped}{$transitionLabel}",
+                            "{$transitionEscaped} -{$transitionColor}-> {$toEscaped}{$transitionLabel}",
                         ];
                         foreach ($lines as $line) {
                             if (!\in_array($line, $code)) {
@@ -112,7 +112,7 @@ class PlantUmlDumper implements DumperInterface
                             }
                         }
                     } else {
-                        $code[] = "$fromEscaped -${transitionColor}-> $toEscaped: $transitionEscapedWithStyle";
+                        $code[] = "{$fromEscaped} -{$transitionColor}-> {$toEscaped}: {$transitionEscapedWithStyle}";
                     }
                 }
             }

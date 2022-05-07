@@ -10,6 +10,9 @@
             "symfony/translation": "source",
             "symfony/validator": "source",
             "*": "dist"
+        },
+        "allow-plugins": {
+            "symfony/flex": true
         }
     }
 }

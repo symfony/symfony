@@ -21,8 +21,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @final
- *
  * @internal
  */
 class SerializerDataCollector extends DataCollector implements LateDataCollectorInterface

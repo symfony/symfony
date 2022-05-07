@@ -23,8 +23,6 @@ use Symfony\Component\Serializer\Tests\Encoder\NormalizationAwareEncoder;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @final
- *
  * @internal
  */
 class TraceableEncoder implements EncoderInterface, DecoderInterface, SerializerAwareInterface

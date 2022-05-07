@@ -23,15 +23,17 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @final
  * @internal
  */
 class TraceableSerializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
 {
     public const DEBUG_TRACE_ID = 'debug_trace_id';
 
+    /**
+     * @param SerializerInterface&NormalizerInterface&DenormalizerInterface&EncoderInterface&DecoderInterface $serializer
+     */
     public function __construct(
-        private SerializerInterface&NormalizerInterface&DenormalizerInterface&EncoderInterface&DecoderInterface $serializer,
+        private SerializerInterface $serializer,
         private SerializerDataCollector $dataCollector,
     ) {
     }
@@ -39,7 +41,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     /**
      * {@inheritdoc}
      */
-    final public function serialize(mixed $data, string $format, array $context = []): string
+    public function serialize(mixed $data, string $format, array $context = []): string
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -55,7 +57,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     /**
      * {@inheritdoc}
      */
-    final public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
+    public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -71,7 +73,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     /**
      * {@inheritdoc}
      */
-    final public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -87,7 +89,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     /**
      * {@inheritdoc}
      */
-    final public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -103,7 +105,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     /**
      * {@inheritdoc}
      */
-    final public function encode(mixed $data, string $format, array $context = []): string
+    public function encode(mixed $data, string $format, array $context = []): string
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -119,7 +121,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     /**
      * {@inheritdoc}
      */
-    final public function decode(string $data, string $format, array $context = []): mixed
+    public function decode(string $data, string $format, array $context = []): mixed
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
 
@@ -134,49 +136,33 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $context
      */
-    final public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
-        $context = \func_num_args() > 2 ? \func_get_arg(2) : [];
-
         return $this->serializer->supportsNormalization($data, $format, $context);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $context
      */
-    final public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
-        $context = \func_num_args() > 3 ? \func_get_arg(3) : [];
-
         return $this->serializer->supportsDenormalization($data, $type, $format, $context);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $context
      */
-    final public function supportsEncoding(string $format /*, array $context = [] */): bool
+    public function supportsEncoding(string $format, array $context = []): bool
     {
-        $context = \func_num_args() > 1 ? \func_get_arg(1) : [];
-
         return $this->serializer->supportsEncoding($format, $context);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $context
      */
-    final public function supportsDecoding(string $format /*, array $context = [] */): bool
+    public function supportsDecoding(string $format, array $context = []): bool
     {
-        $context = \func_num_args() > 1 ? \func_get_arg(1) : [];
-
         return $this->serializer->supportsDecoding($format, $context);
     }
 }

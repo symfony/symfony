@@ -7,6 +7,9 @@
             "symfony/proxy-manager-bridge": "source",
             "symfony/validator": "source",
             "*": "dist"
+        },
+        "allow-plugins": {
+            "symfony/flex": true
         }
     }
 }

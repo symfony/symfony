@@ -32,7 +32,7 @@
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<5.4.9",
+        "symfony/event-dispatcher": "<5.4.9|>=6,<6.0.9",
         "symfony/security-bundle": "<5.4",
         "symfony/security-csrf": "<5.4"
     },

@@ -52,6 +52,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const STANDALONE = 'xml_standalone';
     public const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
     public const VERSION = 'xml_version';
+    public const NULLIFY_EMPTY_TAGS = 'nullify_empty_tags';
 
     private $defaultContext = [
         self::AS_COLLECTION => false,
@@ -61,6 +62,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::REMOVE_EMPTY_TAGS => false,
         self::ROOT_NODE_NAME => 'response',
         self::TYPE_CAST_ATTRIBUTES => true,
+        self::NULLIFY_EMPTY_TAGS => false,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -244,11 +246,14 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the input DOMNode into an array or a string.
      */
-    private function parseXml(\DOMNode $node, array $context = []): array|string
+    private function parseXml(\DOMNode $node, array $context = []): array|string|null
     {
         $data = $this->parseXmlAttributes($node, $context);
 
         $value = $this->parseXmlValue($node, $context);
+
+        $nullifyEmptyTags = (bool) ($context[self::NULLIFY_EMPTY_TAGS] ?? $this->defaultContext[self::NULLIFY_EMPTY_TAGS]);
+        $value = $nullifyEmptyTags && '' === $value ? null : $value;
 
         if (!\count($data)) {
             return $value;

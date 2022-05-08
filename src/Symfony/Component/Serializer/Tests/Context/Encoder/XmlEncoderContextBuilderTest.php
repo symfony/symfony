@@ -46,6 +46,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             ->withStandalone($values[XmlEncoder::STANDALONE])
             ->withTypeCastAttributes($values[XmlEncoder::TYPE_CAST_ATTRIBUTES])
             ->withVersion($values[XmlEncoder::VERSION])
+            ->withNullifyEmptyTags($values[XmlEncoder::NULLIFY_EMPTY_TAGS])
             ->toArray();
 
         $this->assertSame($values, $context);
@@ -68,6 +69,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::STANDALONE => false,
             XmlEncoder::TYPE_CAST_ATTRIBUTES => true,
             XmlEncoder::VERSION => '1.0',
+            XmlEncoder::NULLIFY_EMPTY_TAGS => false,
         ]];
 
         yield 'With null values' => [[
@@ -82,6 +84,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::STANDALONE => null,
             XmlEncoder::TYPE_CAST_ATTRIBUTES => null,
             XmlEncoder::VERSION => null,
+            XmlEncoder::NULLIFY_EMPTY_TAGS => null,
         ]];
     }
 }

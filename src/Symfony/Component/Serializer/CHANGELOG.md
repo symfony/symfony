@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecate supporting denormalization for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
  * Deprecate denormalizing to an abstract class in `UidNormalizer`
  * Add support for `can*()` methods to `ObjectNormalizer`
+ * Add `XmlEncoder::NULLIFY_EMPTY_TAGS` context option
 
 6.0
 ---

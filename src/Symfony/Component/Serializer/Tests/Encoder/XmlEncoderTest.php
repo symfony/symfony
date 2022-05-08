@@ -898,6 +898,33 @@ XML;
         $this->assertEquals($expected, $encoder->encode($data, 'xml'));
     }
 
+    public function testDecodeEmptyTags()
+    {
+        $encoder = new XmlEncoder([
+            XmlEncoder::NULLIFY_EMPTY_TAGS => true,
+        ]);
+
+        $source = <<<XML
+<?xml version="1.0"?>
+<document>
+    <empty_node_1 foo="bar"/>
+    <empty_node_2></empty_node_2>
+    <not_empty_node> </not_empty_node>
+</document>
+XML;
+
+        $expected = [
+            'empty_node_1' => [
+                '@foo' => 'bar',
+                '#' => null,
+            ],
+            'empty_node_2' => null,
+            'not_empty_node' => ' ',
+        ];
+
+        $this->assertSame($expected, $encoder->decode($source, 'xml'));
+    }
+
     private function createXmlEncoderWithEnvelopeNormalizer(): XmlEncoder
     {
         $normalizers = [

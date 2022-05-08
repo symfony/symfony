@@ -132,4 +132,12 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(XmlEncoder::VERSION, $version);
     }
+
+    /**
+     * Configures whether to decode empty tags to null.
+     */
+    public function withNullifyEmptyTags(?bool $nullifyEmptyTags): static
+    {
+        return $this->with(XmlEncoder::NULLIFY_EMPTY_TAGS, $nullifyEmptyTags);
+    }
 }

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-06-11T13:22:17Z
+
+Having 2 booleans named `horizontal` and `vertical` looks confusing to me.
+
+---------------------------------------------------------------------------
+
+by yoannrenard at 2021-06-11T13:27:57Z
+
+I agree with you @stof
+I was thinking of a parameter like `$orientation`, or `$direction` maybe, that could be `neutral`, `horizontal` or `vertical`. But I didn't like it either
+
+---------------------------------------------------------------------------
+
+by yoannrenard at 2022-03-20T10:31:14Z
+
+Thanks for your review @GromNaN
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-26T08:56:25Z
+
+@yoannrenard Can you please rebase again on 6.1?

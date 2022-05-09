@@ -123,11 +123,12 @@ class Section
      */
     public function startEvent($name, $category)
     {
-        if (!isset($this->events[$name])) {
-            $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category, $this->morePrecision);
+        $sanitizedName = $this->sanitizeName($name);
+        if (!isset($this->events[$sanitizedName])) {
+            $this->events[$sanitizedName] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category, $this->morePrecision);
         }
 
-        return $this->events[$name]->start();
+        return $this->events[$sanitizedName]->start();
     }
 
     /**
@@ -139,7 +140,8 @@ class Section
      */
     public function isEventStarted($name)
     {
-        return isset($this->events[$name]) && $this->events[$name]->isStarted();
+        $sanitizedName = $this->sanitizeName($name);
+        return isset($this->events[$sanitizedName]) && $this->events[$sanitizedName]->isStarted();
     }
 
     /**
@@ -153,11 +155,12 @@ class Section
      */
     public function stopEvent($name)
     {
-        if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not started.', $name));
+        $sanitizedName = $this->sanitizeName($name);
+        if (!isset($this->events[$sanitizedName])) {
+            throw new \LogicException(sprintf('Event "%s" is not started.', $sanitizedName));
         }
 
-        return $this->events[$name]->stop();
+        return $this->events[$sanitizedName]->stop();
     }
 
     /**
@@ -171,7 +174,8 @@ class Section
      */
     public function lap($name)
     {
-        return $this->stopEvent($name)->start();
+        $sanitizedName = $this->sanitizeName($name);
+        return $this->stopEvent($sanitizedName)->start();
     }
 
     /**
@@ -185,11 +189,12 @@ class Section
      */
     public function getEvent($name)
     {
-        if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not known.', $name));
+        $sanitizedName = $this->sanitizeName($name);
+        if (!isset($this->events[$sanitizedName])) {
+            throw new \LogicException(sprintf('Event "%s" is not known.', $sanitizedName));
         }
 
-        return $this->events[$name];
+        return $this->events[$sanitizedName];
     }
 
     /**
@@ -200,5 +205,17 @@ class Section
     public function getEvents()
     {
         return $this->events;
+    }
+
+    /**
+     *
+     * Removes all non printable characters from events
+     *
+     * @param string $name
+     * @return string
+     */
+    private function sanitizeName($name)
+    {
+        return preg_replace( '/[^[:print:]]/', '',$name);
     }
 }

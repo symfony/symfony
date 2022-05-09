@@ -171,6 +171,10 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
     private function getCurlCommand(array $trace): ?string
     {
+        if (!isset($trace['info']['debug'])) {
+            return null;
+        }
+
         $debug = explode("\n", $trace['info']['debug']);
         $url = $trace['url'];
         $command = ['curl', '--compressed'];

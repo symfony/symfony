@@ -141,6 +141,7 @@ class Section
     public function isEventStarted($name)
     {
         $sanitizedName = $this->sanitizeName($name);
+
         return isset($this->events[$sanitizedName]) && $this->events[$sanitizedName]->isStarted();
     }
 
@@ -175,6 +176,7 @@ class Section
     public function lap($name)
     {
         $sanitizedName = $this->sanitizeName($name);
+
         return $this->stopEvent($sanitizedName)->start();
     }
 
@@ -208,14 +210,14 @@ class Section
     }
 
     /**
-     *
-     * Removes all non printable characters from events
+     * Removes all non printable characters from events.
      *
      * @param string $name
+     *
      * @return string
      */
     private function sanitizeName($name)
     {
-        return preg_replace( '/[^[:print:]]/', '',$name);
+        return preg_replace('/[^[:print:]]/', '', $name);
     }
 }

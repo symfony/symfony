@@ -255,6 +255,15 @@ class SymfonyTestsListenerTrait
             $this->error = null;
         }
 
+        if (!$this->runsInSeparateProcess && -2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
+            if (\in_array('time-sensitive', $groups, true)) {
+                ClockMock::withClockMock(false);
+            }
+            if (\in_array('dns-sensitive', $groups, true)) {
+                DnsMock::withMockedHosts([]);
+            }
+        }
+
         if ($this->runsInSeparateProcess) {
             $deprecations = file_get_contents($this->runsInSeparateProcess);
             unlink($this->runsInSeparateProcess);
@@ -289,14 +298,6 @@ class SymfonyTestsListenerTrait
 
             $this->expectedDeprecations = $this->gatheredDeprecations = [];
             $this->previousErrorHandler = null;
-        }
-        if (!$this->runsInSeparateProcess && -2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
-            if (\in_array('time-sensitive', $groups, true)) {
-                ClockMock::withClockMock(false);
-            }
-            if (\in_array('dns-sensitive', $groups, true)) {
-                DnsMock::withMockedHosts([]);
-            }
         }
     }
 

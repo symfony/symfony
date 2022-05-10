@@ -102,6 +102,9 @@ class Connection
      */
     private $amqpDelayExchange;
 
+    /** @var int */
+    private $lastActivityTime = 0;
+
     public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
     {
         if (!\extension_loaded('amqp')) {
@@ -347,6 +350,8 @@ class Connection
         $attributes['delivery_mode'] = $attributes['delivery_mode'] ?? 2;
         $attributes['timestamp'] = $attributes['timestamp'] ?? time();
 
+        $this->lastActivityTime = time();
+
         $exchange->publish(
             $body,
             $routingKey,
@@ -510,6 +515,11 @@ class Connection
                     }
                 );
             }
+
+            $this->lastActivityTime = time();
+        } elseif (isset($this->connectionOptions['heartbeat']) && time() > $this->lastActivityTime + ($this->connectionOptions['heartbeat'] * 2)) {
+            $disconnectMethod = 'true' === ($this->connectionOptions['persistent'] ?? 'false') ? 'pdisconnect' : 'disconnect';
+            $this->amqpChannel->getConnection()->{$disconnectMethod}();
         }
 
         return $this->amqpChannel;

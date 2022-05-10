@@ -103,12 +103,16 @@ trait RedisTrait
             throw new CacheException(sprintf('Cannot find the "redis" extension nor the "predis/predis" package: "%s".', $dsn));
         }
 
-        $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:[^:@]*+:)?([^@]*+)@)?#', function ($m) use (&$auth) {
+        $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:[^@]*+:)?([^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m[2])) {
                 $auth = $m[2];
 
                 if ('' === $auth) {
                     $auth = null;
+                }
+
+                if (strpos($auth, ':')) {
+                    $auth = explode(':', $auth, 2);
                 }
             }
 

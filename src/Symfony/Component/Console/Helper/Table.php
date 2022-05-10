@@ -800,18 +800,18 @@ class Table
                         continue;
                     }
 
-                foreach ($row as $i => $cell) {
-                    if ($cell instanceof TableCell) {
-                        $textContent = Helper::removeDecoration($this->output->getFormatter(), $cell);
-                        $textLength = Helper::width($textContent);
-                        if ($textLength > 0) {
-                            $contentColumns = str_split($textContent, ceil($textLength / $cell->getColspan()));
-                            foreach ($contentColumns as $position => $content) {
-                                $row[$i + $position] = $content;
+                    foreach ($row as $i => $cell) {
+                        if ($cell instanceof TableCell) {
+                            $textContent = Helper::removeDecoration($this->output->getFormatter(), $cell);
+                            $textLength = Helper::width($textContent);
+                            if ($textLength > 0) {
+                                $contentColumns = str_split($textContent, ceil($textLength / $cell->getColspan()));
+                                foreach ($contentColumns as $position => $content) {
+                                    $row[$i + $position] = $content;
+                                }
                             }
                         }
                     }
-                }
 
                     $lengths[] = $this->getCellWidth($row, $column);
                 }

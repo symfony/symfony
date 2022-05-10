@@ -24,12 +24,12 @@ class Type
     public const BUILTIN_TYPE_FLOAT = 'float';
     public const BUILTIN_TYPE_STRING = 'string';
     public const BUILTIN_TYPE_BOOL = 'bool';
-    public const BUILTIN_TYPE_TRUE = 'true';
-    public const BUILTIN_TYPE_FALSE = 'false';
     public const BUILTIN_TYPE_RESOURCE = 'resource';
     public const BUILTIN_TYPE_OBJECT = 'object';
     public const BUILTIN_TYPE_ARRAY = 'array';
     public const BUILTIN_TYPE_NULL = 'null';
+    public const BUILTIN_TYPE_FALSE = 'false';
+    public const BUILTIN_TYPE_TRUE = 'true';
     public const BUILTIN_TYPE_CALLABLE = 'callable';
     public const BUILTIN_TYPE_ITERABLE = 'iterable';
 
@@ -43,12 +43,12 @@ class Type
         self::BUILTIN_TYPE_FLOAT,
         self::BUILTIN_TYPE_STRING,
         self::BUILTIN_TYPE_BOOL,
-        self::BUILTIN_TYPE_TRUE,
-        self::BUILTIN_TYPE_FALSE,
         self::BUILTIN_TYPE_RESOURCE,
         self::BUILTIN_TYPE_OBJECT,
         self::BUILTIN_TYPE_ARRAY,
         self::BUILTIN_TYPE_CALLABLE,
+        self::BUILTIN_TYPE_FALSE,
+        self::BUILTIN_TYPE_TRUE,
         self::BUILTIN_TYPE_NULL,
         self::BUILTIN_TYPE_ITERABLE,
     ];

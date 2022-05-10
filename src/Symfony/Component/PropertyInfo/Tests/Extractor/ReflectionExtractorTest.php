@@ -302,6 +302,21 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
+     * @dataProvider php82TypesProvider
+     * @requires PHP 8.2
+     */
+    public function testExtractPhp82Type($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy', $property, []));
+    }
+
+    public function php82TypesProvider()
+    {
+        yield ['nil', null];
+        yield ['false', [new Type(Type::BUILTIN_TYPE_FALSE)]];
+    }
+
+    /**
      * @dataProvider defaultValueProvider
      */
     public function testExtractWithDefaultValue($property, $type)

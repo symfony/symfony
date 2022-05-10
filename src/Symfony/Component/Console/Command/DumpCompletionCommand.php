@@ -41,7 +41,7 @@ final class DumpCompletionCommand extends Command
     {
         $fullCommand = $_SERVER['PHP_SELF'];
         $commandName = basename($fullCommand);
-        $fullCommand = realpath($fullCommand) ?: $fullCommand;
+        $fullCommand = @realpath($fullCommand) ?: $fullCommand;
 
         $this
             ->setHelp(<<<EOH

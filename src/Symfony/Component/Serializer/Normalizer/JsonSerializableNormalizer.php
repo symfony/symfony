@@ -27,7 +27,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if ($this->isCircularReference($object, $context)) {
-            return $this->handleCircularReference($object);
+            return $this->handleCircularReference($object, $format, $context);
         }
 
         if (!$object instanceof \JsonSerializable) {

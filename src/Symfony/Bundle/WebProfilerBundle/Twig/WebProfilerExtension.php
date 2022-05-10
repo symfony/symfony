@@ -122,9 +122,10 @@ class WebProfilerExtension extends ProfilerExtension
     public function makePrintable($message)
     {
         $sanitized = preg_replace('/[^[:print:]]/', '', $message);
-        if (strlen($sanitized) > 0) {
+        if ('' !== $sanitized) {
             return $sanitized;
         }
+
         return 'Invalid non UTF-8 input.';
     }
 

@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Twig\Environment;
 use Twig\Extension\ProfilerExtension;
 use Twig\Profiler\Profile;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
@@ -79,6 +80,13 @@ class WebProfilerExtension extends ProfilerExtension
         ];
     }
 
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('profiler_male_printable', [$this, 'makePrintable']),
+        ];
+    }
+
     public function dumpData(Environment $env, Data $data, $maxDepth = 0)
     {
         $this->dumper->setCharset($env->getCharset());
@@ -109,6 +117,15 @@ class WebProfilerExtension extends ProfilerExtension
         }
 
         return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';
+    }
+
+    public function makePrintable($message)
+    {
+        $sanitized = preg_replace('/[^[:print:]]/', '', $message);
+        if (strlen($sanitized) > 0) {
+            return $sanitized;
+        }
+        return 'Invalid non UTF-8 input.';
     }
 
     /**

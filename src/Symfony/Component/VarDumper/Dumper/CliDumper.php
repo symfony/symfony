@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Dumper;
 
 use Symfony\Component\VarDumper\Cloner\Cursor;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
@@ -84,6 +85,17 @@ class CliDumper extends AbstractDumper
         }
 
         $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: 'file://%f#L%l';
+    }
+
+    public function dump(Data $data, $output = null): ?string
+    {
+        if (!empty($this->backtrace)) {
+            $calledIn = $this->backtrace[0];
+            $this->line = sprintf("\033[%sm{$calledIn['file']}:{$calledIn['line']}\033[m", $this->styles['note']);
+            $this->dumpLine(0);
+        }
+
+        return parent::dump($data, $output);
     }
 
     /**

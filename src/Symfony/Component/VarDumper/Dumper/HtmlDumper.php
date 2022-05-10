@@ -978,6 +978,11 @@ EOHTML
 
         return false;
     }
+
+    public function setBacktrace(array $backtrace): void
+    {
+        // Disabled for HtmlDumper
+    }
 }
 
 function esc(string $str)

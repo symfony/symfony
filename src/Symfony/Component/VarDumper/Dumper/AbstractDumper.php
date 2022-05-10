@@ -34,6 +34,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     protected $decimalPoint = '.';
     protected $indentPad = '  ';
     protected $flags;
+    protected array $backtrace = [];
 
     private string $charset = '';
 
@@ -193,5 +194,10 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         }
 
         return iconv('CP850', 'UTF-8', $s);
+    }
+
+    public function setBacktrace(array $backtrace): void
+    {
+        $this->backtrace = $backtrace;
     }
 }

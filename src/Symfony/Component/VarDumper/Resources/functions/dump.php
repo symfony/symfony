@@ -17,7 +17,7 @@ if (!function_exists('dump')) {
      */
     function dump(mixed $var, mixed ...$moreVars): mixed
     {
-        VarDumper::dump($var);
+        VarDumper::dump($var, debug_backtrace());
 
         foreach ($moreVars as $v) {
             VarDumper::dump($v);

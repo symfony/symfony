@@ -37,10 +37,10 @@ class VarDumper
      */
     private static $handler;
 
-    public static function dump(mixed $var)
+    public static function dump(mixed $var, array $backtrace = null)
     {
         if (null === self::$handler) {
-            self::register();
+            self::register($backtrace ?? []);
         }
 
         return (self::$handler)($var);
@@ -60,7 +60,7 @@ class VarDumper
         return $prevHandler;
     }
 
-    private static function register(): void
+    private static function register(array $backtrace): void
     {
         $cloner = new VarCloner();
         $cloner->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
@@ -82,6 +82,8 @@ class VarDumper
             default:
                 $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? new CliDumper() : new HtmlDumper();
         }
+
+        $dumper->setBacktrace($backtrace);
 
         if (!$dumper instanceof ServerDumper) {
             $dumper = new ContextualizedDumper($dumper, [new SourceContextProvider()]);

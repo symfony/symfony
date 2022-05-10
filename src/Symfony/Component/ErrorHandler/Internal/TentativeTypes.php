@@ -1102,6 +1102,8 @@ class TentativeTypes
             'isDot' => 'bool',
             'rewind' => 'void',
             'valid' => 'bool',
+            'key' => 'mixed',
+            'current' => 'mixed',
             'next' => 'void',
             'seek' => 'void',
         ],

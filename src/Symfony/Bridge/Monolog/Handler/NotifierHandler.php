@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Handler\AbstractHandler;
+use Monolog\Level;
 use Monolog\Logger;
 use Monolog\LogRecord;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -31,7 +32,7 @@ class NotifierHandler extends AbstractHandler
 
     private NotifierInterface $notifier;
 
-    public function __construct(NotifierInterface $notifier, string|int|Level|LevelName $level = Logger::ERROR, bool $bubble = true)
+    public function __construct(NotifierInterface $notifier, string|int|Level $level = Logger::ERROR, bool $bubble = true)
     {
         $this->notifier = $notifier;
 

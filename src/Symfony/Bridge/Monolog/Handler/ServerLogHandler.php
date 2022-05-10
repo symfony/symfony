@@ -15,7 +15,6 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\FormattableHandlerTrait;
 use Monolog\Level;
-use Monolog\LevelName;
 use Monolog\Logger;
 use Monolog\LogRecord;
 use Symfony\Bridge\Monolog\Formatter\VarDumperFormatter;
@@ -77,7 +76,7 @@ trait ServerLogHandlerTrait
      */
     private $socket;
 
-    public function __construct(string $host, string|int|Level|LevelName $level = Logger::DEBUG, bool $bubble = true, array $context = [])
+    public function __construct(string $host, string|int|Level $level = Logger::DEBUG, bool $bubble = true, array $context = [])
     {
         parent::__construct($level, $bubble);
 

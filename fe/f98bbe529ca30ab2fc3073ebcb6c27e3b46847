@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by michaljusiega at 2022-04-09T16:56:40Z
+
+Thanks for PR. Can we wait for https://wiki.php.net/rfc/true-type RFC also?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-04-09T17:03:09Z
+
+I planned to do it as soon as it is merged if this PR is merged before "true" is available, but yeah I can definitely embed it as well in this pull request 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-27T11:57:13Z
+
+@alexandre-daubois Can you update the PropertyInfo's conflict rule + dev requirement for symfony/serializer so that it only allows serializer v4.4.42 or higher? That should fix the low-deps build
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-04-29T05:26:13Z
+
+I'll take a look into that as soon as possible!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-05-09T21:58:13Z
+
+Wait, it's the opposite actually 🤦‍♂️ Serializer needs `symfony/property-info` >=4.4.1. Sorry for the bad hint!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-05-10T07:04:00Z
+
+Right, makes more sense :smile: At least, I figured out what are high-deps/low-deps builds. Thank you Robin!

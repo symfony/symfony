@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-05-09T15:13:15Z
+
+Does the template handle well the case where the data does not have a `curlCommand` key ?
+I think it would be safer to assign it to `null` instead
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2022-05-09T17:46:48Z
+
+> I think it would be safer to assign it to null instead
+
+You're right - that is safer. Updated!

@@ -83,7 +83,7 @@ class WebProfilerExtension extends ProfilerExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('profiler_male_printable', [$this, 'makePrintable']),
+            new TwigFilter('profiler_make_printable', [$this, 'makePrintable']),
         ];
     }
 

@@ -168,7 +168,7 @@
 {% for name, event in events %}
 {% if '__section__' != name %}
 {
-    name: "{{ name|profiler_male_printable }}",
+    name: "{{ name|profiler_make_printable }}",
     category: "{{ event.category }}",
     origin: {{ "%F"|format(event.origin) }},
     starttime: {{ "%F"|format(event.starttime) }},

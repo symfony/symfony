@@ -26,6 +26,10 @@ class UniqueEntity extends Constraint
 {
     public const NOT_UNIQUE_ERROR = '23bd9dbf-6b9b-41cd-a99e-4844bcf3077f';
 
+    protected const ERROR_NAMES = [
+        self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
+    ];
+
     public $message = 'This value is already used.';
     public $service = 'doctrine.orm.validator.unique';
     public $em = null;
@@ -35,9 +39,10 @@ class UniqueEntity extends Constraint
     public $errorPath = null;
     public $ignoreNull = true;
 
-    protected static $errorNames = [
-        self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
-    ];
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     /**
      * {@inheritdoc}

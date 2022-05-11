@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentSer
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -935,11 +936,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        if (80100 <= \PHP_VERSION_ID) {
-            $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber_php81.php', $dumper->dump());
-        } else {
-            $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
-        }
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
     }
 
     public function testPrivateWithIgnoreOnInvalidReference()
@@ -958,6 +955,24 @@ class PhpDumperTest extends TestCase
 
         $container = new \Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference();
         $this->assertInstanceOf(\BazClass::class, $container->get('bar')->getBaz());
+    }
+
+    public function testEnvExpressionFunction()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', 'BarClass')
+            ->setPublic(true)
+            ->setProperty('foo', new Expression('env("BAR_FOO")'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Env_Expression_Function']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Env_Expression_Function();
+
+        $_ENV['BAR_FOO'] = 'Foo value';
+
+        $this->assertEquals('Foo value', $container->get('bar')->foo);
     }
 
     public function testArrayParameters()
@@ -1190,9 +1205,6 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testNewInInitializer()
     {
         $container = new ContainerBuilder();
@@ -1208,9 +1220,6 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_new_in_initializer.php', $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();
@@ -1219,16 +1228,37 @@ class PhpDumperTest extends TestCase
             ->setPublic(true)
             ->addArgument(FooUnitEnum::BAR);
 
+        $container->setParameter('unit_enum', FooUnitEnum::BAR);
+        $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        eval('?>'.$dumper->dump([
+        eval('?>'.$dumpedContainer = $dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_Enumeration',
         ]));
 
+        /** @var Container $container */
         $container = new \Symfony_DI_PhpDumper_Test_Enumeration();
 
         $this->assertSame(FooUnitEnum::BAR, $container->get('foo')->getBar());
+        $this->assertSame(FooUnitEnum::BAR, $container->getParameter('unit_enum'));
+        $this->assertSame([FooUnitEnum::BAR, FooUnitEnum::FOO], $container->getParameter('enum_array'));
+        $this->assertStringMatchesFormat(<<<'PHP'
+%A
+    private function getDynamicParameter(string $name)
+    {
+        $value = match ($name) {
+            'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
+            'enum_array' => [
+                0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
+                1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
+            ],
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
+%A
+PHP
+            , $dumpedContainer
+        );
     }
 
     public function testUninitializedSyntheticReference()
@@ -1479,6 +1509,44 @@ class PhpDumperTest extends TestCase
         $container->get('bar_user');
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testExpressionInFactory()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperty('bar', new Reference('bar'))
+        ;
+        $container
+            ->register('bar', 'string')
+            ->setFactory('@=arg(0) + args.get(0) + args.count()')
+            ->addArgument(123)
+        ;
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Expression_In_Factory']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Expression_In_Factory();
+
+        $this->assertSame(247, $container->get('foo')->bar);
+    }
+
+    public function testClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('closure', 'Closure')
+            ->setPublic('true')
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([new Reference('bar')]);
+        $container->register('bar', 'stdClass');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/closure.php', $dumper->dump());
     }
 }
 

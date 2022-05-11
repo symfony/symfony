@@ -449,7 +449,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     'file' => $r->getFileName(),
                     'line' => $r->getStartLine(),
                 ];
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 if (\is_callable($controller)) {
                     // using __call or  __callStatic
                     return [

@@ -34,16 +34,20 @@ class PropertyNormalizer extends AbstractObjectNormalizer
 {
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsNormalization(mixed $data, string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
     {
         return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */): bool
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
@@ -89,7 +93,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             if ($reflectionProperty->isStatic()) {
                 return false;
             }
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return false;
         }
 
@@ -124,13 +128,8 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return null;
-        }
-
-        // Override visibility
-        if (!$reflectionProperty->isPublic()) {
-            $reflectionProperty->setAccessible(true);
         }
 
         if ($reflectionProperty->hasType()) {
@@ -158,17 +157,12 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException) {
             return;
         }
 
         if ($reflectionProperty->isStatic()) {
             return;
-        }
-
-        // Override visibility
-        if (!$reflectionProperty->isPublic()) {
-            $reflectionProperty->setAccessible(true);
         }
 
         $reflectionProperty->setValue($object, $value);

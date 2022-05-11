@@ -43,7 +43,7 @@ final class EmailHtmlBodyContains extends Constraint
             throw new \LogicException('Unable to test a message HTML body on a RawMessage or Message instance.');
         }
 
-        return false !== mb_strpos($message->getHtmlBody(), $this->expectedText);
+        return str_contains($message->getHtmlBody(), $this->expectedText);
     }
 
     /**

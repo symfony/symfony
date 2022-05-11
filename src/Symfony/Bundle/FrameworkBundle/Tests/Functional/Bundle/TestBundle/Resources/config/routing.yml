@@ -60,3 +60,7 @@ array_controller:
 send_email:
     path:     /send_email
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::indexAction }
+
+uid:
+    resource: "../../Controller/UidController.php"
+    type: "annotation"

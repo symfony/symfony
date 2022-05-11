@@ -41,10 +41,15 @@ class CardScheme extends Constraint
     public const NOT_NUMERIC_ERROR = 'a2ad9231-e827-485f-8a1e-ef4d9a6d5c2e';
     public const INVALID_FORMAT_ERROR = 'a8faedbf-1c2f-4695-8d22-55783be8efed';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NOT_NUMERIC_ERROR => 'NOT_NUMERIC_ERROR',
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'Unsupported card type or invalid card number.';
     public $schemes;

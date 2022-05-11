@@ -61,7 +61,6 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('loadFile');
-        $m->setAccessible(true);
 
         $m->invoke($loader, 'foo.yml');
     }
@@ -74,7 +73,6 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator($path));
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('loadFile');
-        $m->setAccessible(true);
 
         $m->invoke($loader, $path.'/parameters.ini');
     }
@@ -946,9 +944,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertNull($iteratorArgument->getIndexAttribute());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testEnumeration()
     {
         $container = new ContainerBuilder();
@@ -960,9 +955,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testInvalidEnumeration()
     {
         $container = new ContainerBuilder();
@@ -1095,5 +1087,15 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('when-env.yaml');
 
         $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
+    }
+
+    public function testClosure()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('closure.yml');
+
+        $definition = $container->getDefinition('closure_property')->getProperties()['foo'];
+        $this->assertEquals((new Definition('Closure'))->setFactory(['Closure', 'fromCallable'])->addArgument(new Reference('bar')), $definition);
     }
 }

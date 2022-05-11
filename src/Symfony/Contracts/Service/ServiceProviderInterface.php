@@ -18,9 +18,23 @@ use Psr\Container\ContainerInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Mateusz Sip <mateusz.sip@gmail.com>
+ *
+ * @template T of mixed
  */
 interface ServiceProviderInterface extends ContainerInterface
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @return T
+     */
+    public function get(string $id): mixed;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has(string $id): bool;
+
     /**
      * Returns an associative array of service types keyed by the identifiers provided by the current container.
      *

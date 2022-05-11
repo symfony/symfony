@@ -59,7 +59,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         } elseif ($namespace instanceof \Closure || \is_string($namespace)) {
             $this->namespace = $namespace;
         } elseif (\is_callable($namespace)) {
-            $this->namespace = \Closure::fromCallable($namespace);
+            $this->namespace = $namespace(...);
         } else {
             throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', get_debug_type($namespace)));
         }

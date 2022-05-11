@@ -1,12 +1,12 @@
 <div id="sfwdt{{ token }}" class="sf-toolbar sf-display-none" role="region" aria-label="Symfony Web Debug Toolbar">
-    {% include('@WebProfiler/Profiler/toolbar.html.twig') with {
+    {{ include('@WebProfiler/Profiler/toolbar.html.twig', {
         templates: {
             'request': '@WebProfiler/Profiler/cancel.html.twig'
         },
         profile: null,
         profiler_url: url('_profiler', {token: token}),
         profiler_markup_version: 2,
-    } %}
+    }) }}
 </div>
 
 {{ include('@WebProfiler/Profiler/base_js.html.twig') }}

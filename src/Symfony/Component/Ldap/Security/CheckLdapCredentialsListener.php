@@ -13,7 +13,8 @@ namespace Symfony\Component\Ldap\Security;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
+use Symfony\Component\Ldap\Exception\InvalidSearchCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LogicException;
@@ -74,7 +75,11 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
         try {
             if ($ldapBadge->getQueryString()) {
                 if ('' !== $ldapBadge->getSearchDn() && '' !== $ldapBadge->getSearchPassword()) {
-                    $ldap->bind($ldapBadge->getSearchDn(), $ldapBadge->getSearchPassword());
+                    try {
+                        $ldap->bind($ldapBadge->getSearchDn(), $ldapBadge->getSearchPassword());
+                    } catch (InvalidCredentialsException) {
+                        throw new InvalidSearchCredentialsException();
+                    }
                 } else {
                     throw new LogicException('Using the "query_string" config without using a "search_dn" and a "search_password" is not supported.');
                 }
@@ -92,7 +97,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
             }
 
             $ldap->bind($dn, $presentedPassword);
-        } catch (ConnectionException $e) {
+        } catch (InvalidCredentialsException) {
             throw new BadCredentialsException('The presented password is invalid.');
         }
 

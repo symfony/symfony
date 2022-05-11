@@ -12,11 +12,13 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Connection as DBALConnection;
+use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -153,6 +155,14 @@ class Connection implements ResetInterface
 
     public function get(): ?array
     {
+        if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+            try {
+                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31']);
+            } catch (DriverException $e) {
+                // Ignore the exception
+            }
+        }
+
         get:
         $this->driverConnection->beginTransaction();
         try {
@@ -172,6 +182,22 @@ class Connection implements ResetInterface
                     sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
                     $sql
                 );
+            }
+
+            // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
+            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+                $sql = str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql);
+
+                $wrappedQuery = $this->driverConnection->createQueryBuilder()
+                    ->select(
+                        'w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", '.
+                        'w.created_at AS "created_at", w.available_at AS "available_at", '.
+                        'w.delivered_at AS "delivered_at"'
+                    )
+                    ->from($this->configuration['table_name'], 'w')
+                    ->where('w.id IN('.$sql.')');
+
+                $sql = $wrappedQuery->getSQL();
             }
 
             // use SELECT ... FOR UPDATE to lock table
@@ -224,6 +250,10 @@ class Connection implements ResetInterface
     public function ack(string $id): bool
     {
         try {
+            if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31'], ['id' => $id]) > 0;
+            }
+
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -233,6 +263,10 @@ class Connection implements ResetInterface
     public function reject(string $id): bool
     {
         try {
+            if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31'], ['id' => $id]) > 0;
+            }
+
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -404,6 +438,7 @@ class Connection implements ResetInterface
         $table->addColumn('headers', Types::TEXT)
             ->setNotnull(true);
         $table->addColumn('queue_name', Types::STRING)
+            ->setLength(190) // MySQL 5.6 only supports 191 characters on an indexed column in utf8mb4 mode
             ->setNotnull(true);
         $table->addColumn('created_at', Types::DATETIME_MUTABLE)
             ->setNotnull(true);
@@ -412,11 +447,8 @@ class Connection implements ResetInterface
         $table->addColumn('delivered_at', Types::DATETIME_MUTABLE)
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
-        // No indices on queue_name and available_at on MySQL to prevent deadlock issues when running multiple consumers.
-        if (!$this->driverConnection->getDatabasePlatform() instanceof MySqlPlatform) {
-            $table->addIndex(['queue_name']);
-            $table->addIndex(['available_at']);
-        }
+        $table->addIndex(['queue_name']);
+        $table->addIndex(['available_at']);
         $table->addIndex(['delivered_at']);
     }
 
@@ -453,8 +485,4 @@ class Connection implements ResetInterface
             ? $this->driverConnection->createSchemaManager()
             : $this->driverConnection->getSchemaManager();
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\Connection::class, false)) {
-    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);
 }

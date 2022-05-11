@@ -139,7 +139,7 @@ class UnicodeString extends AbstractUnicodeString
 
         try {
             $i = $this->ignoreCase ? grapheme_stripos($this->string, $needle, $offset) : grapheme_strpos($this->string, $needle, $offset);
-        } catch (\ValueError $e) {
+        } catch (\ValueError) {
             return null;
         }
 

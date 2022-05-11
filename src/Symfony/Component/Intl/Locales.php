@@ -43,7 +43,7 @@ final class Locales extends ResourceBundle
             self::readEntry(['Names', $locale]);
 
             return true;
-        } catch (MissingResourceException $e) {
+        } catch (MissingResourceException) {
             return \in_array($locale, self::getAliases(), true);
         }
     }

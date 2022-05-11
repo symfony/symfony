@@ -4,6 +4,7 @@ return [
     'some_clever_name' => [
         'first' => 'bar',
         'second' => 'foo',
+        'third' => null,
     ],
     'messenger' => [
         'transports' => [

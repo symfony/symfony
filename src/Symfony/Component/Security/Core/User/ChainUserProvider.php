@@ -59,7 +59,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         foreach ($this->providers as $provider) {
             try {
                 return $provider->loadUserByIdentifier($identifier);
-            } catch (UserNotFoundException $e) {
+            } catch (UserNotFoundException) {
                 // try next one
             }
         }
@@ -83,9 +83,9 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
                 }
 
                 return $provider->refreshUser($user);
-            } catch (UnsupportedUserException $e) {
+            } catch (UnsupportedUserException) {
                 // try next one
-            } catch (UserNotFoundException $e) {
+            } catch (UserNotFoundException) {
                 $supportedUserFound = true;
                 // try next one
             }
@@ -124,7 +124,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
             if ($provider instanceof PasswordUpgraderInterface) {
                 try {
                     $provider->upgradePassword($user, $newHashedPassword);
-                } catch (UnsupportedUserException $e) {
+                } catch (UnsupportedUserException) {
                     // ignore: password upgrades are opportunistic
                 }
             }

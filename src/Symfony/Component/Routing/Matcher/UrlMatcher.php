@@ -152,7 +152,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            $hasTrailingVar = $trimmedPathinfo !== $pathinfo && preg_match('#\{\w+\}/?$#', $route->getPath());
+            $hasTrailingVar = $trimmedPathinfo !== $pathinfo && preg_match('#\{[\w\x80-\xFF]+\}/?$#', $route->getPath());
 
             if ($hasTrailingVar && ($hasTrailingSlash || (null === $m = $matches[\count($compiledRoute->getPathVariables())] ?? null) || '/' !== ($m[-1] ?? '/')) && preg_match($regex, $trimmedPathinfo, $m)) {
                 if ($hasTrailingSlash) {
@@ -167,7 +167,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            $status = $this->handleRouteRequirements($pathinfo, $name, $route);
+            $attributes = $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
+
+            $status = $this->handleRouteRequirements($pathinfo, $name, $route, $attributes);
 
             if (self::REQUIREMENT_MISMATCH === $status[0]) {
                 continue;
@@ -190,7 +192,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, $status[1] ?? []));
+            return array_replace($attributes, $status[1] ?? []);
         }
 
         return [];
@@ -220,10 +222,25 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      *
      * @return array The first element represents the status, the second contains additional information
      */
-    protected function handleRouteRequirements(string $pathinfo, string $name, Route $route): array
+    protected function handleRouteRequirements(string $pathinfo, string $name, Route $route/*, array $routeParameters*/): array
     {
+        if (\func_num_args() < 4) {
+            trigger_deprecation('symfony/routing', '6.1', 'The "%s()" method will have a new "array $routeParameters" argument in version 7.0, not defining it is deprecated.', __METHOD__);
+            $routeParameters = [];
+        } else {
+            $routeParameters = func_get_arg(3);
+
+            if (!\is_array($routeParameters)) {
+                throw new \TypeError(sprintf('"%s": Argument $routeParameters is expected to be an array, got "%s".', __METHOD__, get_debug_type($routeParameters)));
+            }
+        }
+
         // expression condition
-        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), ['context' => $this->context, 'request' => $this->request ?: $this->createRequest($pathinfo)])) {
+        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), [
+            'context' => $this->context,
+            'request' => $this->request ?: $this->createRequest($pathinfo),
+            'params' => $routeParameters,
+        ])) {
             return [self::REQUIREMENT_MISMATCH, null];
         }
 

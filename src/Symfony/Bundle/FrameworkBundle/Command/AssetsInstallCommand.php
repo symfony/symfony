@@ -94,8 +94,7 @@ EOT
     {
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
-        $targetArg = rtrim($input->getArgument('target'), '/');
-
+        $targetArg = rtrim($input->getArgument('target') ?? '', '/');
         if (!$targetArg) {
             $targetArg = $this->getPublicDirectory($kernel->getContainer());
         }
@@ -203,7 +202,7 @@ EOT
         try {
             $this->symlink($originDir, $targetDir, true);
             $method = self::METHOD_RELATIVE_SYMLINK;
-        } catch (IOException $e) {
+        } catch (IOException) {
             $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
         }
 
@@ -220,7 +219,7 @@ EOT
         try {
             $this->symlink($originDir, $targetDir);
             $method = self::METHOD_ABSOLUTE_SYMLINK;
-        } catch (IOException $e) {
+        } catch (IOException) {
             // fall back to copy
             $method = $this->hardCopy($originDir, $targetDir);
         }

@@ -38,13 +38,13 @@ class Lexer
                 continue;
             }
 
-            if (preg_match('/[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/A', $expression, $match, 0, $cursor)) {
+            if (preg_match('/
+                (?(DEFINE)(?P<LNUM>[0-9]+(_[0-9]+)*))
+                (?:\.(?&LNUM)|(?&LNUM)(?:\.(?!\.)(?&LNUM)?)?)(?:[eE][+-]?(?&LNUM))?/Ax',
+                $expression, $match, 0, $cursor)
+            ) {
                 // numbers
-                $number = (float) $match[0];  // floats
-                if (preg_match('/^[0-9]+$/', $match[0]) && $number <= \PHP_INT_MAX) {
-                    $number = (int) $match[0]; // integers lower than the maximum
-                }
-                $tokens[] = new Token(Token::NUMBER_TYPE, $number, $cursor + 1);
+                $tokens[] = new Token(Token::NUMBER_TYPE, 0 + str_replace('_', '', $match[0]), $cursor + 1);
                 $cursor += \strlen($match[0]);
             } elseif (str_contains('([{', $expression[$cursor])) {
                 // opening bracket
@@ -69,10 +69,14 @@ class Lexer
                 // strings
                 $tokens[] = new Token(Token::STRING_TYPE, stripcslashes(substr($match[0], 1, -1)), $cursor + 1);
                 $cursor += \strlen($match[0]);
-            } elseif (preg_match('/(?<=^|[\s(])not in(?=[\s(])|\!\=\=|(?<=^|[\s(])not(?=[\s(])|(?<=^|[\s(])and(?=[\s(])|\=\=\=|\>\=|(?<=^|[\s(])or(?=[\s(])|\<\=|\*\*|\.\.|(?<=^|[\s(])in(?=[\s(])|&&|\|\||(?<=^|[\s(])matches|\=\=|\!\=|\*|~|%|\/|\>|\||\!|\^|&|\+|\<|\-/A', $expression, $match, 0, $cursor)) {
+            } elseif (preg_match('/(?<=^|[\s(])starts with(?=[\s(])|(?<=^|[\s(])ends with(?=[\s(])|(?<=^|[\s(])contains(?=[\s(])|(?<=^|[\s(])matches(?=[\s(])|(?<=^|[\s(])not in(?=[\s(])|(?<=^|[\s(])not(?=[\s(])|(?<=^|[\s(])and(?=[\s(])|\=\=\=|\!\=\=|(?<=^|[\s(])or(?=[\s(])|\|\||&&|\=\=|\!\=|\>\=|\<\=|(?<=^|[\s(])in(?=[\s(])|\.\.|\*\*|\!|\||\^|&|\<|\>|\+|\-|~|\*|\/|%/A', $expression, $match, 0, $cursor)) {
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
                 $cursor += \strlen($match[0]);
+            } elseif ('?' === $expression[$cursor] && '.' === ($expression[$cursor + 1] ?? '')) {
+                // null-safe
+                $tokens[] = new Token(Token::PUNCTUATION_TYPE, '?.', ++$cursor);
+                ++$cursor;
             } elseif (str_contains('.,?:', $expression[$cursor])) {
                 // punctuation
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);

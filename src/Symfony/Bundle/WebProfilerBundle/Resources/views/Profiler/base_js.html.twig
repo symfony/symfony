@@ -39,11 +39,29 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
         }
 
         if (navigator.clipboard) {
-            document.querySelectorAll('[data-clipboard-text]').forEach(function(element) {
-                removeClass(element, 'hidden');
-                element.addEventListener('click', function() {
-                    navigator.clipboard.writeText(element.getAttribute('data-clipboard-text'));
-                })
+            document.addEventListener('readystatechange', () => {
+                if (document.readyState !== 'complete') {
+                    return;
+                }
+
+                document.querySelectorAll('[data-clipboard-text]').forEach(function (element) {
+                    removeClass(element, 'hidden');
+                    element.addEventListener('click', function () {
+                        navigator.clipboard.writeText(element.getAttribute('data-clipboard-text'));
+
+                        if (element.classList.contains("label")) {
+                            let oldContent = element.textContent;
+
+                            element.textContent = "✅ Copied!";
+                            element.classList.add("status-success");
+
+                            setTimeout(() => {
+                                element.textContent = oldContent;
+                                element.classList.remove("status-success");
+                            }, 7000);
+                        }
+                    });
+                });
             });
         }
 
@@ -351,13 +369,13 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
 
                     /* prevent logging AJAX calls to static and inline files, like templates */
                     var path = url;
-                    if (url.substr(0, 1) === '/') {
+                    if (url.slice(0, 1) === '/') {
                         if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
-                            path = url.substr({{ request.basePath|length }});
+                            path = url.slice({{ request.basePath|length }});
                         }
                     }
                     else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
-                        path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
+                        path = url.slice({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
                     }
 
                     if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
@@ -796,7 +814,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                     input.addEventListener('change', () => { Sfjs.updateLogsTable(); });
                 });
 
-                document.querySelectorAll('.filter-select-all-or-none a').forEach((link) => {
+                document.querySelectorAll('.filter-select-all-or-none button').forEach((link) => {
                     link.addEventListener('click', () => {
                         const selectAll = link.classList.contains('select-all');
                         link.closest('.log-filter-content').querySelectorAll('input').forEach((input) => {
@@ -819,6 +837,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
             updateLogsTable: function() {
                 const selectedType = document.querySelector('#log-filter-type input:checked').value;
                 const priorities = document.querySelectorAll('#log-filter-priority input');
+                const allPriorities = Array.from(priorities).map((input) => input.value);
                 const selectedPriorities = Array.from(priorities).filter((input) => input.checked).map((input) => input.value);
                 const channels = document.querySelectorAll('#log-filter-channel input');
                 const selectedChannels = Array.from(channels).filter((input) => input.checked).map((input) => input.value);
@@ -836,7 +855,8 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                         return;
                     }
 
-                    if (false === selectedPriorities.includes(row.getAttribute('data-priority'))) {
+                    const priority = row.getAttribute('data-priority');
+                    if (false === selectedPriorities.includes(priority) && true === allPriorities.includes(priority)) {
                         row.style.display = 'none';
                         return;
                     }

@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `#[MapDecorated]` attribute telling to which parameter the decorated service should be mapped in a decorator
+ * Add `#[AsDecorator]` attribute to make a service decorates another
+ * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
+ * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
+ * Add an `env` function to the expression language provider
+ * Add an `Autowire` attribute to tell a parameter how to be autowired
+ * Allow using expressions as service factories
+ * Add argument type `closure` to help passing closures to services
+ * Deprecate `ReferenceSetArgumentTrait`
+ * Add `AbstractExtension` class for DI configuration/definition on a single file
+
 6.0
 ---
 

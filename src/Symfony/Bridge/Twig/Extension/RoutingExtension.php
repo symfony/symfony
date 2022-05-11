@@ -38,8 +38,8 @@ final class RoutingExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
-            new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
+            new TwigFunction('url', $this->getUrl(...), ['is_safe_callback' => $this->isUrlGenerationSafe(...)]),
+            new TwigFunction('path', $this->getPath(...), ['is_safe_callback' => $this->isUrlGenerationSafe(...)]),
         ];
     }
 

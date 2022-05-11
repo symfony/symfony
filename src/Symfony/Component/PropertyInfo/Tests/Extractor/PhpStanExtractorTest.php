@@ -12,13 +12,18 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type;
+
+require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
 
 /**
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
@@ -30,9 +35,15 @@ class PhpStanExtractorTest extends TestCase
      */
     private $extractor;
 
+    /**
+     * @var PhpDocExtractor
+     */
+    private $phpDocExtractor;
+
     protected function setUp(): void
     {
         $this->extractor = new PhpStanExtractor();
+        $this->phpDocExtractor = new PhpDocExtractor();
     }
 
     /**
@@ -116,6 +127,8 @@ class PhpStanExtractorTest extends TestCase
             ['arrayOfMixed', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), null)]],
             ['listOfStrings', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)]],
+            ['rootDummyItems', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RootDummyItem::class))]],
+            ['rootDummyItem', [new Type(Type::BUILTIN_TYPE_OBJECT, false, RootDummyItem::class)]],
         ];
     }
 
@@ -355,7 +368,7 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider unionTypesProvider
      */
-    public function testExtractorUnionTypes(string $property, array $types)
+    public function testExtractorUnionTypes(string $property, ?array $types)
     {
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType', $property));
     }
@@ -368,6 +381,8 @@ class PhpStanExtractorTest extends TestCase
             ['c', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)])]],
             ['d', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING)])])]],
             ['e', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class, true, [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING)])], [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_STRING, false, null, true, [], [new Type(Type::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
+            ['f', null],
+            ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)])]],
         ];
     }
 
@@ -410,6 +425,30 @@ class PhpStanExtractorTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')],
             $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy')
         );
+    }
+
+    public function testDummyNamespaceWithProperty()
+    {
+        $phpStanTypes = $this->extractor->getTypes(\B\Dummy::class, 'property');
+        $phpDocTypes = $this->phpDocExtractor->getTypes(\B\Dummy::class, 'property');
+
+        $this->assertEquals('A\Property', $phpStanTypes[0]->getClassName());
+        $this->assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
+    }
+
+    /**
+     * @dataProvider php80TypesProvider
+     */
+    public function testExtractPhp80Type($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes(Php80Dummy::class, $property, []));
+    }
+
+    public function php80TypesProvider()
+    {
+        return [
+            ['promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
+        ];
     }
 }
 

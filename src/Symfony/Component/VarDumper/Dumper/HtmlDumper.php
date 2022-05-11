@@ -369,7 +369,7 @@ return function (root, x) {
         if (/\bsf-dump-toggle\b/.test(a.className)) {
             e.preventDefault();
             if (!toggle(a, isCtrlKey(e))) {
-                var r = doc.getElementById(a.getAttribute('href').substr(1)),
+                var r = doc.getElementById(a.getAttribute('href').slice(1)),
                     s = r.previousSibling,
                     f = r.parentNode,
                     t = a.parentNode;
@@ -430,7 +430,7 @@ return function (root, x) {
                 x += elt.parentNode.getAttribute('data-depth')/1;
             }
         } else if (/\bsf-dump-ref\b/.test(elt.className) && (a = elt.getAttribute('href'))) {
-            a = a.substr(1);
+            a = a.slice(1);
             elt.className += ' '+a;
 
             if (/[\[{]$/.test(elt.previousSibling.nodeValue)) {
@@ -960,7 +960,7 @@ EOHTML
         }
         $this->lastDepth = $depth;
 
-        $this->line = mb_convert_encoding($this->line, 'HTML-ENTITIES', 'UTF-8');
+        $this->line = mb_encode_numericentity($this->line, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
 
         if (-1 === $depth) {
             AbstractDumper::dumpLine(0);

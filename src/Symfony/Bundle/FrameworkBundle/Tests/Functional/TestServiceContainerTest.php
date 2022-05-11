@@ -39,4 +39,22 @@ class TestServiceContainerTest extends AbstractWebTestCase
         $this->assertTrue(static::getContainer()->has('private_service'));
         $this->assertFalse(static::getContainer()->has(UnusedPrivateService::class));
     }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testBootKernel()
+    {
+        static::bootKernel(['test_case' => 'TestServiceContainer']);
+    }
+
+    /**
+     * @depends testBootKernel
+     */
+    public function testKernelIsNotInitialized()
+    {
+        self::assertNull(self::$class);
+        self::assertNull(self::$kernel);
+        self::assertFalse(self::$booted);
+    }
 }

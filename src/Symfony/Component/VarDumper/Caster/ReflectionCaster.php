@@ -83,7 +83,7 @@ class ReflectionCaster
         // Cannot create ReflectionGenerator based on a terminated Generator
         try {
             $reflectionGenerator = new \ReflectionGenerator($c);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $a[Caster::PREFIX_VIRTUAL.'closed'] = true;
 
             return $a;
@@ -144,7 +144,7 @@ class ReflectionCaster
             array_unshift($trace, [
                 'function' => 'yield',
                 'file' => $function->getExecutingFile(),
-                'line' => $function->getExecutingLine() - (int) (\PHP_VERSION_ID < 80100),
+                'line' => $function->getExecutingLine(),
             ]);
             $trace[] = $frame;
             $a[$prefix.'trace'] = new TraceStub($trace, false, 0, -1, -1);
@@ -298,7 +298,7 @@ class ReflectionCaster
                 if (null === $v) {
                     unset($a[$prefix.'allowsNull']);
                 }
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
             }
         }
 

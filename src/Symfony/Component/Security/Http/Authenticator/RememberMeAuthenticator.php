@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
@@ -106,7 +106,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         if (null !== $this->logger) {
-            if ($exception instanceof UsernameNotFoundException) {
+            if ($exception instanceof UserNotFoundException) {
                 $this->logger->info('User for remember-me cookie not found.', ['exception' => $exception]);
             } elseif ($exception instanceof UnsupportedUserException) {
                 $this->logger->warning('User class for remember-me cookie not supported.', ['exception' => $exception]);

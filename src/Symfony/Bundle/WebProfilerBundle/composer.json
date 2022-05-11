@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "symfony/config": "^5.4|^6.0",
         "symfony/framework-bundle": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0",
@@ -33,8 +33,7 @@
     "conflict": {
         "symfony/form": "<5.4",
         "symfony/mailer": "<5.4",
-        "symfony/messenger": "<5.4",
-        "symfony/dependency-injection": "<5.4"
+        "symfony/messenger": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },

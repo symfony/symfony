@@ -15,17 +15,20 @@ use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
+use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\KazInfoTeh\KazInfoTehTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
@@ -37,8 +40,10 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFact
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
+use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
@@ -104,6 +109,10 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
 
+        ->set('notifier.transport_factory.forty-six-elks', FortySixElksTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
         ->set('notifier.transport_factory.free-mobile', FreeMobileTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
@@ -145,6 +154,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.esendex', EsendexTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.sendberry', SendberryTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
@@ -238,8 +251,20 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
+        ->set('notifier.transport_factory.orange-sms', OrangeSmsTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
         ->set('notifier.transport_factory.expo', ExpoTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
-            ->tag('chatter.transport_factory')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.kaz-info-teh', KazInfoTehTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.engagespot', EngagespotTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
     ;
 };

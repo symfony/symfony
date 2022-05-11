@@ -33,13 +33,18 @@ class File extends Constraint
     public const TOO_LARGE_ERROR = 'df8637af-d466-48c6-a59d-e7126250a654';
     public const INVALID_MIME_TYPE_ERROR = '744f00bc-4389-4c74-92de-9a43cde55534';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NOT_FOUND_ERROR => 'NOT_FOUND_ERROR',
         self::NOT_READABLE_ERROR => 'NOT_READABLE_ERROR',
         self::EMPTY_ERROR => 'EMPTY_ERROR',
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
         self::INVALID_MIME_TYPE_ERROR => 'INVALID_MIME_TYPE_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $binaryFormat;
     public $mimeTypes = [];
@@ -152,7 +157,7 @@ class File extends Constraint
             $this->maxSize = $matches[1] * $factors[$unit = strtolower($matches[2])];
             $this->binaryFormat = $this->binaryFormat ?? (2 === \strlen($unit));
         } else {
-            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size.', $this->maxSize));
+            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size.', $maxSize));
         }
     }
 }

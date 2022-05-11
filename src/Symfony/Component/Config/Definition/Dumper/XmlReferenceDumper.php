@@ -13,10 +13,14 @@ namespace Symfony\Component\Config\Definition\Dumper;
 
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
+use Symfony\Component\Config\Definition\FloatNode;
+use Symfony\Component\Config\Definition\IntegerNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * Dumps an XML reference configuration for the given configuration/node instance.
@@ -100,27 +104,14 @@ class XmlReferenceDumper
                     if ($prototype->hasDefaultValue()) {
                         $prototypeValue = $prototype->getDefaultValue();
                     } else {
-                        switch (\get_class($prototype)) {
-                            case 'Symfony\Component\Config\Definition\ScalarNode':
-                                $prototypeValue = 'scalar value';
-                                break;
-
-                            case 'Symfony\Component\Config\Definition\FloatNode':
-                            case 'Symfony\Component\Config\Definition\IntegerNode':
-                                $prototypeValue = 'numeric value';
-                                break;
-
-                            case 'Symfony\Component\Config\Definition\BooleanNode':
-                                $prototypeValue = 'true|false';
-                                break;
-
-                            case 'Symfony\Component\Config\Definition\EnumNode':
-                                $prototypeValue = implode('|', array_map('json_encode', $prototype->getValues()));
-                                break;
-
-                            default:
-                                $prototypeValue = 'value';
-                        }
+                        $prototypeValue = match (\get_class($prototype)) {
+                            ScalarNode::class => 'scalar value',
+                            FloatNode::class,
+                            IntegerNode::class => 'numeric value',
+                            BooleanNode::class => 'true|false',
+                            EnumNode::class => implode('|', array_map('json_encode', $prototype->getValues())),
+                            default => 'value',
+                        };
                     }
                 }
             }

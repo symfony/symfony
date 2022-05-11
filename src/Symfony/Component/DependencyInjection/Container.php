@@ -103,7 +103,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return array|bool|string|int|float|null
+     * @return array|bool|string|int|float|\UnitEnum|null
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
@@ -117,7 +117,7 @@ class Container implements ContainerInterface, ResetInterface
         return $this->parameterBag->has($name);
     }
 
-    public function setParameter(string $name, array|bool|string|int|float|null $value)
+    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value)
     {
         $this->parameterBag->set($name, $value);
     }
@@ -194,7 +194,7 @@ class Container implements ContainerInterface, ResetInterface
     {
         return $this->services[$id]
             ?? $this->services[$id = $this->aliases[$id] ?? $id]
-            ?? ('service_container' === $id ? $this : ($this->factories[$id] ?? [$this, 'make'])($id, $invalidBehavior));
+            ?? ('service_container' === $id ? $this : ($this->factories[$id] ?? $this->make(...))($id, $invalidBehavior));
     }
 
     /**
@@ -281,7 +281,7 @@ class Container implements ContainerInterface, ResetInterface
                 if ($service instanceof ResetInterface) {
                     $service->reset();
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 continue;
             }
         }
@@ -345,7 +345,7 @@ class Container implements ContainerInterface, ResetInterface
         if (!$this->has($id = 'container.env_var_processors_locator')) {
             $this->set($id, new ServiceLocator([]));
         }
-        $this->getEnv ??= \Closure::fromCallable([$this, 'getEnv']);
+        $this->getEnv ??= $this->getEnv(...);
         $processors = $this->get($id);
 
         if (false !== $i = strpos($name, ':')) {

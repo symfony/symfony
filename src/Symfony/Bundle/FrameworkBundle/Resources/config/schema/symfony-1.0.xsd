@@ -31,6 +31,7 @@
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
             <xsd:element name="exceptions" type="exceptions" minOccurs="0" maxOccurs="1" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="semaphore" type="semaphore" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
@@ -38,10 +39,12 @@
             <xsd:element name="rate-limiter" type="rate_limiter" minOccurs="0" maxOccurs="1" />
             <xsd:element name="uid" type="uid" minOccurs="0" maxOccurs="1" />
             <xsd:element name="notifier" type="notifier" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="html-sanitizer" type="html-sanitizer" minOccurs="0" maxOccurs="1" />
             <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
+        <xsd:attribute name="trust-x-sendfile-type-header" type="xsd:boolean" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
@@ -481,6 +484,21 @@
         </xsd:simpleContent>
     </xsd:complexType>
 
+    <xsd:complexType name="semaphore">
+        <xsd:sequence>
+            <xsd:element name="resource" type="semaphore_resource" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="semaphore_resource">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="name" type="xsd:string" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
     <xsd:complexType name="messenger">
         <xsd:sequence>
             <xsd:element name="serializer" type="messenger_serializer" minOccurs="0" />
@@ -801,5 +819,66 @@
     <xsd:complexType name="admin-recipient" mixed="true">
         <xsd:attribute name="email" type="xsd:string" use="required" />
         <xsd:attribute name="phone" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="html-sanitizer">
+        <xsd:sequence>
+            <xsd:element name="sanitizer" type="sanitizer" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="default" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="sanitizer">
+        <xsd:sequence>
+            <xsd:element name="allow-element" type="element-option" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="block-element" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="drop-element" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="allow-attribute" type="attribute-option" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="drop-attribute" type="attribute-option" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="force-attribute" type="force-attribute" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="allowed-link-scheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="allowed-link-host" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="allowed-media-scheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="allowed-media-host" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="with-attribute-sanitizer" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="without-attribute-sanitizer" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="allow-safe-elements" type="xsd:boolean" />
+        <xsd:attribute name="allow-all-static-elements" type="xsd:boolean" />
+        <xsd:attribute name="force-https-urls" type="xsd:boolean" />
+        <xsd:attribute name="allow-relative-links" type="xsd:boolean" />
+        <xsd:attribute name="allow-relative-medias" type="xsd:boolean" />
+        <xsd:attribute name="max-input-length" type="xsd:positiveInteger" />
+    </xsd:complexType>
+
+    <xsd:complexType name="element-option">
+        <xsd:sequence>
+            <xsd:element name="attribute" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="attribute-option">
+        <xsd:sequence>
+            <xsd:element name="element" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="force-attribute">
+        <xsd:sequence>
+            <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:simpleContent>
+                        <xsd:extension base="xsd:string">
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:extension>
+                    </xsd:simpleContent>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 </xsd:schema>

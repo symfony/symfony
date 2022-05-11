@@ -215,9 +215,6 @@ class AnnotationLoaderTest extends TestCase
     {
         yield 'annotations' => ['Symfony\Component\Validator\Tests\Fixtures\Annotation'];
         yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield 'nested_attributes' => ['Symfony\Component\Validator\Tests\Fixtures\NestedAttribute'];
-        }
+        yield 'nested_attributes' => ['Symfony\Component\Validator\Tests\Fixtures\NestedAttribute'];
     }
 }

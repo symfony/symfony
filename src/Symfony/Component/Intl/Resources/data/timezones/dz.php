@@ -344,7 +344,7 @@ return [
         'Europe/Istanbul' => 'ཊཱར་ཀི་ཆུ་ཚོད།། (Istanbul་)',
         'Europe/Jersey' => 'གིརིན་ཝིཆ་ལུ་ཡོད་པའི་ཆུ་ཚོད། (Jersey་)',
         'Europe/Kaliningrad' => 'ཤར་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Kaliningrad་)',
-        'Europe/Kiev' => 'ཤར་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Kiev་)',
+        'Europe/Kiev' => 'ཤར་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Kyiv་)',
         'Europe/Kirov' => 'ཨུ་རུ་སུ་ཆུ་ཚོད།། (Kirov་)',
         'Europe/Lisbon' => 'ནུབ་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Lisbon་)',
         'Europe/Ljubljana' => 'དབུས་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Ljubljana་)',

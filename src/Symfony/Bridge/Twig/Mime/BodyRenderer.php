@@ -85,7 +85,7 @@ final class BodyRenderer implements BodyRendererInterface
         $payload = [$messageContext, $message->getTextTemplate(), $message->getHtmlTemplate()];
         try {
             $serialized = serialize($payload);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Serialization of 'Closure' is not allowed
             // Happens when context contain a closure, in that case, we assume that context always change.
             $serialized = random_bytes(8);

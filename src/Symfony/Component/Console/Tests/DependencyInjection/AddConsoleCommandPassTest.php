@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
@@ -281,17 +282,15 @@ class MyCommand extends Command
 {
 }
 
+#[AsCommand(name: 'default')]
 class NamedCommand extends Command
 {
-    protected static $defaultName = 'default';
 }
 
+#[AsCommand(name: '|cmdname|cmdalias', description: 'Just testing')]
 class DescribedCommand extends Command
 {
     public static $initCounter = 0;
-
-    protected static $defaultName = '|cmdname|cmdalias';
-    protected static $defaultDescription = 'Just testing';
 
     public function __construct()
     {

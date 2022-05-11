@@ -53,6 +53,8 @@ return [
         'he' => 'Afaan Hebrew',
         'hi' => 'Afaan Hindii',
         'hi_IN' => 'Afaan Hindii (India)',
+        'hi_Latn' => 'Afaan Hindii (Latin)',
+        'hi_Latn_IN' => 'Afaan Hindii (Latin, India)',
         'hr' => 'Afaan Croatian',
         'hu' => 'Afaan Hangaari',
         'ia' => 'Interlingua',

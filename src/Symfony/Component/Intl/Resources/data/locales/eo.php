@@ -127,6 +127,7 @@ return [
         'en_MP' => 'angla (Nord-Marianoj)',
         'en_MT' => 'angla (Malto)',
         'en_MU' => 'angla (Maŭricio)',
+        'en_MV' => 'angla (Maldivoj)',
         'en_MW' => 'angla (Malavio)',
         'en_MY' => 'angla (Malajzio)',
         'en_NA' => 'angla (Namibio)',

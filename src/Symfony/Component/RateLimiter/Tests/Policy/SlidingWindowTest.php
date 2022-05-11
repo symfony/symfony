@@ -28,11 +28,15 @@ class SlidingWindowTest extends TestCase
         $this->assertSame(2 * 10, $window->getExpirationTime());
 
         $data = serialize($window);
+        sleep(10);
         $cachedWindow = unserialize($data);
-        $this->assertNull($cachedWindow->getExpirationTime());
+        $this->assertSame(10, $cachedWindow->getExpirationTime());
 
         $new = SlidingWindow::createFromPreviousWindow($cachedWindow, 15);
         $this->assertSame(2 * 15, $new->getExpirationTime());
+
+        usleep(10.1);
+        $this->assertIsInt($new->getExpirationTime());
     }
 
     public function testInvalidInterval()
@@ -101,5 +105,14 @@ class SlidingWindowTest extends TestCase
         usleep(9.5 * 1e6);
         // should be 500ms left (10 - 9.5)
         $this->assertEqualsWithDelta(0.5, $window->getRetryAfter()->format('U.u') - microtime(true), 0.2);
+    }
+
+    public function testCreateAtExactTime()
+    {
+        ClockMock::register(SlidingWindow::class);
+        ClockMock::withClockMock(1234567890.000000);
+        $window = new SlidingWindow('foo', 10);
+        $window->getRetryAfter();
+        $this->assertEquals('1234567900.000000', $window->getRetryAfter()->format('U.u'));
     }
 }

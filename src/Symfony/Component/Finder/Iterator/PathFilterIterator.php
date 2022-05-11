@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
+use Symfony\Component\Finder\SplFileInfo;
+
 /**
  * PathFilterIterator filters files by path patterns (e.g. some/special/dir).
  *
  * @author Fabien Potencier  <fabien@symfony.com>
  * @author Włodzimierz Gajda <gajdaw@gajdaw.pl>
  *
- * @extends MultiplePcreFilterIterator<string, \SplFileInfo>
+ * @extends MultiplePcreFilterIterator<string, SplFileInfo>
  */
 class PathFilterIterator extends MultiplePcreFilterIterator
 {

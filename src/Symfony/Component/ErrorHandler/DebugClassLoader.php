@@ -112,6 +112,8 @@ class DebugClassLoader
     private static array $checkedClasses = [];
     private static array $final = [];
     private static array $finalMethods = [];
+    private static array $finalProperties = [];
+    private static array $finalConstants = [];
     private static array $deprecated = [];
     private static array $internal = [];
     private static array $internalMethods = [];
@@ -371,9 +373,12 @@ class DebugClassLoader
 
         $parent = get_parent_class($class) ?: null;
         self::$returnTypes[$class] = [];
+        $classIsTemplate = false;
 
         // Detect annotations on the class
         if ($doc = $this->parsePhpDoc($refl)) {
+            $classIsTemplate = isset($doc['template']);
+
             foreach (['final', 'deprecated', 'internal'] as $annotation) {
                 if (null !== $description = $doc[$annotation][0] ?? null) {
                     self::${$annotation}[$class] = '' !== $description ? ' '.$description.(preg_match('/[.!]$/', $description) ? '' : '.') : '.';
@@ -465,8 +470,10 @@ class DebugClassLoader
         self::$finalMethods[$class] = [];
         self::$internalMethods[$class] = [];
         self::$annotatedParameters[$class] = [];
+        self::$finalProperties[$class] = [];
+        self::$finalConstants[$class] = [];
         foreach ($parentAndOwnInterfaces as $use) {
-            foreach (['finalMethods', 'internalMethods', 'annotatedParameters', 'returnTypes'] as $property) {
+            foreach (['finalMethods', 'internalMethods', 'annotatedParameters', 'returnTypes', 'finalProperties', 'finalConstants'] as $property) {
                 if (isset(self::${$property}[$use])) {
                     self::${$property}[$class] = self::${$property}[$class] ? self::${$property}[$use] + self::${$property}[$class] : self::${$property}[$use];
                 }
@@ -516,6 +523,10 @@ class DebugClassLoader
 
             // To read method annotations
             $doc = $this->parsePhpDoc($method);
+
+            if (($classIsTemplate || isset($doc['template'])) && $method->hasReturnType()) {
+                unset($doc['return']);
+            }
 
             if (isset(self::$annotatedParameters[$class][$method->name])) {
                 $definedParameters = [];
@@ -613,6 +624,31 @@ class DebugClassLoader
             foreach ($doc['param'] as $parameterName => $parameterType) {
                 if (!isset($definedParameters[$parameterName])) {
                     self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its %s "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, interface_exists($className) ? 'interface' : 'parent class', $className);
+                }
+            }
+        }
+
+        $finals = isset(self::$final[$class]) || $refl->isFinal() ? [] : [
+            'finalConstants' => $refl->getReflectionConstants(\ReflectionClassConstant::IS_PUBLIC | \ReflectionClassConstant::IS_PROTECTED),
+            'finalProperties' => $refl->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED),
+        ];
+        foreach ($finals as $type => $reflectors) {
+            foreach ($reflectors as $r) {
+                if ($r->class !== $class) {
+                    continue;
+                }
+
+                $doc = $this->parsePhpDoc($r);
+
+                foreach ($parentAndOwnInterfaces as $use) {
+                    if (isset(self::${$type}[$use][$r->name]) && !isset($doc['deprecated']) && ('finalConstants' === $type || substr($use, 0, strrpos($use, '\\')) !== substr($use, 0, strrpos($class, '\\')))) {
+                        $msg = 'finalConstants' === $type ? '%s" constant' : '$%s" property';
+                        $deprecations[] = sprintf('The "%s::'.$msg.' is considered final. You should not override it in "%s".', self::${$type}[$use][$r->name], $r->name, $class);
+                    }
+                }
+
+                if (isset($doc['final']) || ('finalProperties' === $type && str_starts_with($class, 'Symfony\\') && !$r->hasType())) {
+                    self::${$type}[$class][$r->name] = $class;
                 }
             }
         }

@@ -148,7 +148,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             $preferredChoices = function ($choice) use ($accessor, $preferredChoices) {
                 try {
                     return $accessor->getValue($choice, $preferredChoices);
-                } catch (UnexpectedTypeException $e) {
+                } catch (UnexpectedTypeException) {
                     // Assume not preferred if not readable
                     return false;
                 }
@@ -173,7 +173,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             $groupBy = function ($choice) use ($accessor, $groupBy) {
                 try {
                     return $accessor->getValue($choice, $groupBy);
-                } catch (UnexpectedTypeException $e) {
+                } catch (UnexpectedTypeException) {
                     // Don't group if path is not readable
                     return null;
                 }

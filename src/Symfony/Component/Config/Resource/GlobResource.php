@@ -167,28 +167,31 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
             throw new \LogicException(sprintf('Extended glob pattern "%s" cannot be used as the Finder component is not installed.', $this->pattern));
         }
 
-        $finder = new Finder();
         $regex = Glob::toRegex($this->pattern);
         if ($this->recursive) {
             $regex = substr_replace($regex, '(/|$)', -2, 1);
         }
 
         $prefixLen = \strlen($this->prefix);
-        foreach ($finder->followLinks()->sortByName()->in($this->prefix) as $path => $info) {
-            $normalizedPath = str_replace('\\', '/', $path);
-            if (!preg_match($regex, substr($normalizedPath, $prefixLen)) || !$info->isFile()) {
-                continue;
-            }
-            if ($this->excludedPrefixes) {
-                do {
-                    if (isset($this->excludedPrefixes[$dirPath = $normalizedPath])) {
-                        continue 2;
-                    }
-                } while ($prefix !== $dirPath && $dirPath !== $normalizedPath = \dirname($dirPath));
-            }
 
-            yield $path => $info;
-        }
+        yield from (new Finder())
+            ->followLinks()
+            ->filter(function (\SplFileInfo $info) use ($regex, $prefixLen, $prefix) {
+                $normalizedPath = str_replace('\\', '/', $info->getPathname());
+                if (!preg_match($regex, substr($normalizedPath, $prefixLen)) || !$info->isFile()) {
+                    return false;
+                }
+                if ($this->excludedPrefixes) {
+                    do {
+                        if (isset($this->excludedPrefixes[$dirPath = $normalizedPath])) {
+                            return false;
+                        }
+                    } while ($prefix !== $dirPath && $dirPath !== $normalizedPath = \dirname($dirPath));
+                }
+            })
+            ->sortByName()
+            ->in($this->prefix)
+        ;
     }
 
     private function computeHash(): string

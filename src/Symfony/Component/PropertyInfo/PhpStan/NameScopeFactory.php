@@ -20,23 +20,37 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  */
 final class NameScopeFactory
 {
-    public function create(string $fullClassName): NameScope
+    public function create(string $calledClassName, string $declaringClassName = null): NameScope
     {
-        $path = explode('\\', $fullClassName);
-        $className = array_pop($path);
-        [$namespace, $uses] = $this->extractFromFullClassName($fullClassName);
+        $declaringClassName = $declaringClassName ?? $calledClassName;
 
-        foreach (class_uses($fullClassName) as $traitFullClassName) {
-            [, $traitUses] = $this->extractFromFullClassName($traitFullClassName);
-            $uses = array_merge($uses, $traitUses);
-        }
+        $path = explode('\\', $calledClassName);
+        $calledClassName = array_pop($path);
 
-        return new NameScope($className, $namespace, $uses);
+        $declaringReflection = new \ReflectionClass($declaringClassName);
+        [$declaringNamespace, $declaringUses] = $this->extractFromFullClassName($declaringReflection);
+        $declaringUses = array_merge($declaringUses, $this->collectUses($declaringReflection));
+
+        return new NameScope($calledClassName, $declaringNamespace, $declaringUses);
     }
 
-    private function extractFromFullClassName(string $fullClassName): array
+    private function collectUses(\ReflectionClass $reflection): array
     {
-        $reflection = new \ReflectionClass($fullClassName);
+        $uses = [$this->extractFromFullClassName($reflection)[1]];
+
+        foreach ($reflection->getTraits() as $traitReflection) {
+            $uses[] = $this->extractFromFullClassName($traitReflection)[1];
+        }
+
+        if (false !== $parentClass = $reflection->getParentClass()) {
+            $uses[] = $this->collectUses($parentClass);
+        }
+
+        return $uses ? array_merge(...$uses) : [];
+    }
+
+    private function extractFromFullClassName(\ReflectionClass $reflection): array
+    {
         $namespace = trim($reflection->getNamespaceName(), '\\');
         $fileName = $reflection->getFileName();
 

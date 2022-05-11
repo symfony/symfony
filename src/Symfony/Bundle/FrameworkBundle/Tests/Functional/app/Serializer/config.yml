@@ -2,7 +2,11 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    serializer: { enabled: true }
+    http_method_override: false
+    serializer:
+        enabled: true
+        default_context:
+            enable_max_depth: true
     property_info: { enabled: true }
 
 services:

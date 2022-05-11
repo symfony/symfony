@@ -369,7 +369,6 @@ class ContainerTest extends TestCase
     protected function getField($obj, $field)
     {
         $reflection = new \ReflectionProperty($obj, $field);
-        $reflection->setAccessible(true);
 
         return $reflection->getValue($obj);
     }
@@ -413,16 +412,6 @@ class ProjectServiceContainer extends Container
     public $__foo_bar;
     public $__foo_baz;
     public $__internal;
-    protected $privates;
-    protected $methodMap = [
-        'bar' => 'getBarService',
-        'foo_bar' => 'getFooBarService',
-        'foo.baz' => 'getFoo_BazService',
-        'circular' => 'getCircularService',
-        'throw_exception' => 'getThrowExceptionService',
-        'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
-        'internal_dependency' => 'getInternalDependencyService',
-    ];
 
     public function __construct()
     {
@@ -434,6 +423,15 @@ class ProjectServiceContainer extends Container
         $this->__internal = new \stdClass();
         $this->privates = [];
         $this->aliases = ['alias' => 'bar'];
+        $this->methodMap = [
+            'bar' => 'getBarService',
+            'foo_bar' => 'getFooBarService',
+            'foo.baz' => 'getFoo_BazService',
+            'circular' => 'getCircularService',
+            'throw_exception' => 'getThrowExceptionService',
+            'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
+            'internal_dependency' => 'getInternalDependencyService',
+        ];
     }
 
     protected function getInternalService()

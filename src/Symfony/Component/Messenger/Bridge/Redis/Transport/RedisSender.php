@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -42,12 +43,8 @@ class RedisSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delayInMs = null !== $delayStamp ? $delayStamp->getDelay() : 0;
 
-        $this->connection->add($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
+        $id = $this->connection->add($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
 
-        return $envelope;
+        return $envelope->with(new TransportMessageIdStamp($id));
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisSender::class, false)) {
-    class_alias(RedisSender::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisSender::class);
 }

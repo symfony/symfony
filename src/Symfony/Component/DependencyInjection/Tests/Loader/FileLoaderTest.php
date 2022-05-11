@@ -89,7 +89,7 @@ class FileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('sub_dir', 'Sub');
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
-        $loader->autoRegisterAliasesForSinglyImplementedInterfaces = false;
+        $loader->noAutoRegisterAliasesForSinglyImplementedInterfaces();
 
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*');
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*'); // loading twice should not be an issue
@@ -270,7 +270,10 @@ class FileLoaderTest extends TestCase
 
 class TestFileLoader extends FileLoader
 {
-    public $autoRegisterAliasesForSinglyImplementedInterfaces = true;
+    public function noAutoRegisterAliasesForSinglyImplementedInterfaces()
+    {
+        $this->autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    }
 
     public function load(mixed $resource, string $type = null): mixed
     {

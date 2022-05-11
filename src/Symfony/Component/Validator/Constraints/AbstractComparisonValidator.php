@@ -71,7 +71,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
 
             try {
                 $comparedValue = new $dateTimeClass($comparedValue);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, $dateTimeClass, get_debug_type($constraint)));
             }
         }

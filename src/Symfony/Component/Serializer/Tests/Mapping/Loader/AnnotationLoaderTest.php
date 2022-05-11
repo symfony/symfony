@@ -28,10 +28,7 @@ abstract class AnnotationLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;
 
-    /**
-     * @var AnnotationLoader
-     */
-    private $loader;
+    protected AnnotationLoader $loader;
 
     protected function setUp(): void
     {

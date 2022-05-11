@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\AuthenticatorInterface;
+use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 /**
@@ -29,10 +30,11 @@ class EsmtpTransport extends SmtpTransport
     private array $authenticators = [];
     private string $username = '';
     private string $password = '';
+    private array $capabilities;
 
-    public function __construct(string $host = 'localhost', int $port = 0, bool $tls = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $host = 'localhost', int $port = 0, bool $tls = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, AbstractStream $stream = null)
     {
-        parent::__construct(null, $dispatcher, $logger);
+        parent::__construct($stream, $dispatcher, $logger);
 
         // order is important here (roughly most secure and popular first)
         $this->authenticators = [
@@ -98,24 +100,32 @@ class EsmtpTransport extends SmtpTransport
         $this->authenticators[] = $authenticator;
     }
 
-    protected function doHeloCommand(): void
+    public function executeCommand(string $command, array $codes): string
+    {
+        return [250] === $codes && str_starts_with($command, 'HELO ') ? $this->doEhloCommand() : parent::executeCommand($command, $codes);
+    }
+
+    final protected function getCapabilities(): array
+    {
+        return $this->capabilities;
+    }
+
+    private function doEhloCommand(): string
     {
         try {
             $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-        } catch (TransportExceptionInterface $e) {
-            parent::doHeloCommand();
-
-            return;
+        } catch (TransportExceptionInterface) {
+            return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
         }
 
-        $capabilities = $this->getCapabilities($response);
+        $this->capabilities = $this->parseCapabilities($response);
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
         // WARNING: !$stream->isTLS() is right, 100% sure :)
         // if you think that the ! should be removed, read the code again
         // if doing so "fixes" your issue then it probably means your SMTP server behaves incorrectly or is wrongly configured
-        if (!$stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $capabilities)) {
+        if (!$stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $this->capabilities)) {
             $this->executeCommand("STARTTLS\r\n", [220]);
 
             if (!$stream->startTLS()) {
@@ -124,20 +134,20 @@ class EsmtpTransport extends SmtpTransport
 
             try {
                 $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-                $capabilities = $this->getCapabilities($response);
-            } catch (TransportExceptionInterface $e) {
-                parent::doHeloCommand();
-
-                return;
+                $this->capabilities = $this->parseCapabilities($response);
+            } catch (TransportExceptionInterface) {
+                return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
             }
         }
 
-        if (\array_key_exists('AUTH', $capabilities)) {
-            $this->handleAuth($capabilities['AUTH']);
+        if (\array_key_exists('AUTH', $this->capabilities)) {
+            $this->handleAuth($this->capabilities['AUTH']);
         }
+
+        return $response;
     }
 
-    private function getCapabilities(string $ehloResponse): array
+    private function parseCapabilities(string $ehloResponse): array
     {
         $capabilities = [];
         $lines = explode("\r\n", trim($ehloResponse));
@@ -174,12 +184,12 @@ class EsmtpTransport extends SmtpTransport
             } catch (TransportExceptionInterface $e) {
                 try {
                     $this->executeCommand("RSET\r\n", [250]);
-                } catch (TransportExceptionInterface $_) {
+                } catch (TransportExceptionInterface) {
                     // ignore this exception as it probably means that the server error was final
                 }
 
                 // keep the error message, but tries the other authenticators
-                $errors[$authenticator->getAuthKeyword()] = $e;
+                $errors[$authenticator->getAuthKeyword()] = $e->getMessage();
             }
         }
 

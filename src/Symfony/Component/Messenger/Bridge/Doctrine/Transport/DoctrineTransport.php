@@ -129,7 +129,3 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
         return $this->sender ??= new DoctrineSender($this->connection, $this->serializer);
     }
 }
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport::class, false)) {
-    class_alias(DoctrineTransport::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport::class);
-}

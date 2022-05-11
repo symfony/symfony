@@ -28,10 +28,9 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 {
     use ProxyTrait;
 
-    private const METADATA_EXPIRY_OFFSET = 1527506807;
-
     private ?\Closure $createCacheItem = null;
     private ?CacheItem $cacheItemPrototype = null;
+    private static \Closure $packCacheItem;
 
     public function __construct(CacheItemPoolInterface $pool)
     {
@@ -67,6 +66,15 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
             return $createCacheItem($key, null, $allowInt)->set($value);
         };
+        self::$packCacheItem ??= \Closure::bind(
+            static function (CacheItem $item) {
+                $item->newMetadata = $item->metadata;
+
+                return $item->pack();
+            },
+            null,
+            CacheItem::class
+        );
     }
 
     /**
@@ -163,20 +171,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         }
 
         foreach ($items as $key => $item) {
-            if (!$item->isHit()) {
-                $values[$key] = $default;
-                continue;
-            }
-            $values[$key] = $item->get();
-
-            if (!$metadata = $item->getMetadata()) {
-                continue;
-            }
-            unset($metadata[CacheItem::METADATA_TAGS]);
-
-            if ($metadata) {
-                $values[$key] = ["\x9D".pack('VN', (int) (0.1 + $metadata[CacheItem::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[CacheItem::METADATA_CTIME])."\x5F" => $values[$key]];
-            }
+            $values[$key] = $item->isHit() ? (self::$packCacheItem)($item) : $default;
         }
 
         return $values;

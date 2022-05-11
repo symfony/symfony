@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
@@ -86,11 +87,26 @@ class ChainEncoderTest extends TestCase
 
         $this->assertFalse($sut->needsNormalization(self::FORMAT_1));
     }
+
+    public function testNeedsNormalizationTraceableEncoder()
+    {
+        $traceableEncoder = $this->createMock(TraceableEncoder::class);
+        $traceableEncoder->method('needsNormalization')->willReturn(true);
+        $traceableEncoder->method('supportsEncoding')->willReturn(true);
+
+        $this->assertTrue((new ChainEncoder([$traceableEncoder]))->needsNormalization('format'));
+
+        $traceableEncoder = $this->createMock(TraceableEncoder::class);
+        $traceableEncoder->method('needsNormalization')->willReturn(false);
+        $traceableEncoder->method('supportsEncoding')->willReturn(true);
+
+        $this->assertFalse((new ChainEncoder([$traceableEncoder]))->needsNormalization('format'));
+    }
 }
 
 class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareInterface
 {
-    public function supportsEncoding(string $format): bool
+    public function supportsEncoding(string $format, array $context = []): bool
     {
         return true;
     }

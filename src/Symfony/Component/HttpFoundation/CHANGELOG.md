@@ -1,12 +1,19 @@
 CHANGELOG
 =========
 
-6.1
+6.2
 ---
 
  * Add method `convertString` to `ParameterBag`
  * Rename method `getInt` to `convertInt` in `ParameterBag`
  
+6.1
+---
+
+ * Add stale while revalidate and stale if error cache header
+ * Allow dynamic session "ttl" when using a remote storage
+ * Send `Content-Length` when calling `Response::send()` and the content is a non-empty string
+
 6.0
 ---
 

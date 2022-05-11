@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\FooReadonly;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooSerializable;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\VarExporter\Tests\Fixtures\MySerializable;
@@ -93,6 +94,10 @@ class VarExporterTest extends TestCase
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
         $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+
+        if (\PHP_VERSION_ID < 80200 && 'datetime' === $testName) {
+            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
+        }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
         if ('incomplete-class' === $testName || 'external-references' === $testName) {
@@ -118,9 +123,15 @@ class VarExporterTest extends TestCase
         yield ['bool', true, true];
         yield ['simple-array', [123, ['abc']], true];
         yield ['partially-indexed-array', [5 => true, 1 => true, 2 => true, 6 => true], true];
-        yield ['datetime', \DateTime::createFromFormat('U', 0)];
+        yield ['datetime', [
+            \DateTime::createFromFormat('U', 0),
+            \DateTimeImmutable::createFromFormat('U', 0),
+            $tz = new \DateTimeZone('Europe/Paris'),
+            $interval = ($start = new \DateTime('2009-10-11', $tz))->diff(new \DateTime('2009-10-18', $tz)),
+            new \DatePeriod($start, $interval, 4),
+        ]];
 
-        $value = new \ArrayObject();
+        $value = \PHP_VERSION_ID >= 70406 ? new ArrayObject() : new \ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
@@ -192,11 +203,9 @@ class VarExporterTest extends TestCase
         $value = new \Error();
 
         $rt = new \ReflectionProperty(\Error::class, 'trace');
-        $rt->setAccessible(true);
         $rt->setValue($value, ['file' => __FILE__, 'line' => 123]);
 
         $rl = new \ReflectionProperty(\Error::class, 'line');
-        $rl->setAccessible(true);
         $rl->setValue($value, 234);
 
         yield ['error', $value];
@@ -224,9 +233,8 @@ class VarExporterTest extends TestCase
 
         yield ['php74-serializable', new Php74Serializable()];
 
-        if (\PHP_VERSION_ID >= 80100) {
-            yield ['unit-enum', [FooUnitEnum::Bar], true];
-        }
+        yield ['unit-enum', [FooUnitEnum::Bar], true];
+        yield ['readonly', new FooReadonly('k', 'v')];
     }
 
     public function testUnicodeDirectionality()
@@ -423,4 +431,9 @@ class Php74Serializable implements \Serializable
     {
         throw new \BadMethodCallException();
     }
+}
+
+#[\AllowDynamicProperties]
+class ArrayObject extends \ArrayObject
+{
 }

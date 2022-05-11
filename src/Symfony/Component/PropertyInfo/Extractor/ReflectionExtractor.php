@@ -105,7 +105,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -170,7 +170,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     {
         try {
             $reflection = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
         if (!$reflectionConstructor = $reflection->getConstructor()) {
@@ -234,7 +234,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -262,7 +262,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     {
         try {
             $reflClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -314,7 +314,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     {
         try {
             $reflClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -478,7 +478,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -515,7 +515,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             if (null !== $reflectionPropertyType && $types = $this->extractFromReflectionType($reflectionPropertyType, $reflectionProperty->getDeclaringClass())) {
                 return $types;
             }
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
@@ -576,7 +576,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $reflectionPropertyType = $reflectionProperty->getType();
 
             return null !== $reflectionPropertyType && $reflectionPropertyType->allowsNull();
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             // Return false if the property doesn't exist
         }
 
@@ -589,7 +589,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $reflectionProperty = new \ReflectionProperty($class, $property);
 
             return (bool) ($reflectionProperty->getModifiers() & $this->propertyReflectionFlags);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             // Return false if the property doesn't exist
         }
 
@@ -616,7 +616,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 if (0 === $reflectionMethod->getNumberOfRequiredParameters()) {
                     return [$reflectionMethod, $prefix];
                 }
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 // Return null if the property doesn't exist
             }
         }
@@ -652,7 +652,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                     if ($reflectionMethod->getNumberOfParameters() >= 1) {
                         return [$reflectionMethod, $prefix];
                     }
-                } catch (\ReflectionException $e) {
+                } catch (\ReflectionException) {
                     // Try the next prefix if the method doesn't exist
                 }
             }

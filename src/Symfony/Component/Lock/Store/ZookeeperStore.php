@@ -45,11 +45,15 @@ class ZookeeperStore implements PersistingStoreInterface
         }
 
         $host = $params['host'] ?? '';
-        if (isset($params['port'])) {
-            $host .= ':'.$params['port'];
+        $hosts = explode(',', $host);
+
+        foreach ($hosts as $index => $host) {
+            if (isset($params['port'])) {
+                $hosts[$index] = $host.':'.$params['port'];
+            }
         }
 
-        return new \Zookeeper($host);
+        return new \Zookeeper(implode(',', $hosts));
     }
 
     /**
@@ -96,7 +100,7 @@ class ZookeeperStore implements PersistingStoreInterface
         $resource = $this->getKeyResource($key);
         try {
             return $this->zookeeper->get($resource) === $this->getUniqueToken($key);
-        } catch (\ZookeeperException $ex) {
+        } catch (\ZookeeperException) {
             return false;
         }
     }

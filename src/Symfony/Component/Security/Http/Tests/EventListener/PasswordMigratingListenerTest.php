@@ -83,12 +83,15 @@ class PasswordMigratingListenerTest extends TestCase
         $userLoader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
         $userLoader->expects($this->any())->method('loadUserByIdentifier')->willReturn($this->user);
 
-        $userLoader->expects($this->once())
+        $userLoader->expects($this->exactly(2))
             ->method('upgradePassword')
             ->with($this->user, 'new-hash')
         ;
 
         $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', [$userLoader, 'loadUserByIdentifier']), [new PasswordUpgradeBadge('pa$$word')]));
+        $this->listener->onLoginSuccess($event);
+
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', $userLoader->loadUserByIdentifier(...)), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
     }
 

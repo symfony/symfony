@@ -16,7 +16,6 @@ use Symfony\Bundle\SecurityBundle\RememberMe\DecoratedRememberMeHandler;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -71,6 +70,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             $tokenVerifier = $this->createTokenVerifier($container, $firewallName, $config['token_verifier'] ?? null);
             $container->setDefinition($rememberMeHandlerId, new ChildDefinition('security.authenticator.persistent_remember_me_handler'))
                 ->replaceArgument(0, new Reference($tokenProviderId))
+                ->replaceArgument(1, $config['secret'])
                 ->replaceArgument(2, new Reference($userProviderId))
                 ->replaceArgument(4, $config)
                 ->replaceArgument(6, $tokenVerifier)
@@ -79,6 +79,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             $signatureHasherId = 'security.authenticator.remember_me_signature_hasher.'.$firewallName;
             $container->setDefinition($signatureHasherId, new ChildDefinition('security.authenticator.remember_me_signature_hasher'))
                 ->replaceArgument(1, $config['signature_properties'])
+                ->replaceArgument(2, $config['secret'])
             ;
 
             $container->setDefinition($rememberMeHandlerId, new ChildDefinition('security.authenticator.signature_remember_me_handler'))
@@ -140,7 +141,10 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         ;
 
         $builder
-            ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()
+            ->scalarNode('secret')
+                ->cannotBeEmpty()
+                ->defaultValue('%kernel.secret%')
+            ->end()
             ->scalarNode('service')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()
@@ -187,54 +191,6 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
                 $builder->scalarNode($name)->defaultValue($value);
             }
         }
-    }
-
-    private function generateRememberMeServicesTemplateId(array $config, string $id): string
-    {
-        if (isset($config['service'])) {
-            return $config['service'];
-        }
-
-        if (isset($config['token_provider'])) {
-            return 'security.authentication.rememberme.services.persistent';
-        }
-
-        return 'security.authentication.rememberme.services.simplehash';
-    }
-
-    private function createRememberMeServices(ContainerBuilder $container, string $id, string $templateId, array $userProviders, array $config): void
-    {
-        $rememberMeServicesId = $templateId.'.'.$id;
-
-        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new ChildDefinition($templateId));
-        $rememberMeServices->replaceArgument(1, $config['secret']);
-        $rememberMeServices->replaceArgument(2, $id);
-
-        if (isset($config['token_provider'])) {
-            $tokenProviderId = $this->createTokenProvider($container, $id, $config['token_provider']);
-            $rememberMeServices->addMethodCall('setTokenProvider', [new Reference($tokenProviderId)]);
-        }
-
-        // remember-me options
-        $mergedOptions = array_intersect_key($config, $this->options);
-        if ('auto' === $mergedOptions['secure']) {
-            $mergedOptions['secure'] = null;
-        }
-
-        $rememberMeServices->replaceArgument(3, $mergedOptions);
-
-        if ($config['user_providers']) {
-            $userProviders = [];
-            foreach ($config['user_providers'] as $providerName) {
-                $userProviders[] = new Reference('security.user.provider.concrete.'.$providerName);
-            }
-        }
-
-        if (0 === \count($userProviders)) {
-            throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
-        }
-
-        $rememberMeServices->replaceArgument(0, new IteratorArgument(array_unique($userProviders)));
     }
 
     private function createTokenProvider(ContainerBuilder $container, string $firewallName, array $config): string

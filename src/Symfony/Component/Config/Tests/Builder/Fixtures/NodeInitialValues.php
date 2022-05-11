@@ -17,6 +17,7 @@ class NodeInitialValues implements ConfigurationInterface
                     ->children()
                         ->scalarNode('first')->end()
                         ->scalarNode('second')->end()
+                        ->scalarNode('third')->end()
                     ->end()
                 ->end()
 

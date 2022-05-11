@@ -95,10 +95,7 @@ class PhpFileLoader extends FileLoader
      */
     private function executeCallback(callable $callback, ContainerConfigurator $containerConfigurator, string $path)
     {
-        if (!$callback instanceof \Closure) {
-            $callback = \Closure::fromCallable($callback);
-        }
-
+        $callback = $callback(...);
         $arguments = [];
         $configBuilders = [];
         $r = new \ReflectionFunction($callback);

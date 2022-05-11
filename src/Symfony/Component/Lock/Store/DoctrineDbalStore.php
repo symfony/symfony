@@ -89,7 +89,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
                 ParameterType::STRING,
                 ParameterType::STRING,
             ]);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
             if (!$this->conn->isTransactionActive() || $this->platformSupportsTableCreationInTransaction()) {
                 $this->createTable();
             }
@@ -102,10 +102,10 @@ class DoctrineDbalStore implements PersistingStoreInterface
                     ParameterType::STRING,
                     ParameterType::STRING,
                 ]);
-            } catch (DBALException $e) {
+            } catch (DBALException) {
                 $this->putOffExpiration($key, $this->initialTtl);
             }
-        } catch (DBALException $e) {
+        } catch (DBALException) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }
@@ -223,28 +223,17 @@ class DoctrineDbalStore implements PersistingStoreInterface
     private function getCurrentTimestampStatement(): string
     {
         $platform = $this->conn->getDatabasePlatform();
-        switch (true) {
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform:
-                return 'UNIX_TIMESTAMP()';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
-                return 'strftime(\'%s\',\'now\')';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
-                return 'CAST(EXTRACT(epoch FROM NOW()) AS INT)';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform:
-                return '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
-                return 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())';
-
-            default:
-                return (string) time();
-        }
+        return match (true) {
+            $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform => 'UNIX_TIMESTAMP()',
+            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform => 'strftime(\'%s\',\'now\')',
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform => 'CAST(EXTRACT(epoch FROM NOW()) AS INT)',
+            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600',
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform => 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())',
+            default => (string) time(),
+        };
     }
 
     /**
@@ -254,15 +243,13 @@ class DoctrineDbalStore implements PersistingStoreInterface
     {
         $platform = $this->conn->getDatabasePlatform();
 
-        switch (true) {
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
-                return true;
-            default:
-                return false;
-        }
+        return match (true) {
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform => true,
+            default => false,
+        };
     }
 }

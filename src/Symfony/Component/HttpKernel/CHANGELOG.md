@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `BackedEnumValueResolver` to resolve backed enum cases from request attributes in controller arguments
+ * Add `DateTimeValueResolver` to resolve request attributes into DateTime objects in controller arguments
+ * Deprecate StreamedResponseListener, it's not needed anymore
+ * Add `Profiler::isEnabled()` so collaborating collector services may elect to omit themselves
+ * Add the `UidValueResolver` argument value resolver
+ * Add `AbstractBundle` class for DI configuration/definition on a single file
+
 6.0
 ---
 
@@ -14,7 +24,7 @@ CHANGELOG
 ---
 
  * Add the ability to enable the profiler using a request query parameter, body parameter or attribute
- * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead
+ * Deprecate `AbstractTestSessionListener` and `TestSessionListener`, use `AbstractSessionListener` and `SessionListener` instead
  * Deprecate the `fileLinkFormat` parameter of `DebugHandlersListener`
  * Add support for configuring log level, and status code by exception class
  * Allow ignoring "kernel.reset" methods that don't exist with "on_invalid" attribute

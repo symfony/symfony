@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
+
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -57,6 +59,16 @@ class ParentDummy
      * @var parent
      */
     public $parentAnnotationNoParent;
+
+    /**
+     * @var RootDummyItem[]
+     */
+    public $rootDummyItems;
+
+    /**
+     * @var \Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem
+     */
+    public $rootDummyItem;
 
     /**
      * @return bool|null

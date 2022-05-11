@@ -74,7 +74,6 @@ class RoundRobinTransportTest extends TestCase
         $t2->expects($this->exactly(3))->method('send');
         $t = new RoundRobinTransport([$t1, $t2]);
         $p = new \ReflectionProperty($t, 'cursor');
-        $p->setAccessible(true);
         $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 0, [$t1]);
@@ -92,7 +91,6 @@ class RoundRobinTransportTest extends TestCase
         $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2], 60);
         $p = new \ReflectionProperty($t, 'cursor');
-        $p->setAccessible(true);
         $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);
@@ -114,7 +112,6 @@ class RoundRobinTransportTest extends TestCase
             ->willReturnOnConsecutiveCalls($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2], 3);
         $p = new \ReflectionProperty($t, 'cursor');
-        $p->setAccessible(true);
         $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);
@@ -130,14 +127,12 @@ class RoundRobinTransportTest extends TestCase
     private function assertTransports(RoundRobinTransport $transport, int $cursor, array $deadTransports)
     {
         $p = new \ReflectionProperty($transport, 'cursor');
-        $p->setAccessible(true);
         if (-1 !== $cursor) {
             $this->assertSame($cursor, $p->getValue($transport));
         }
         $cursor = $p->getValue($transport);
 
         $p = new \ReflectionProperty($transport, 'deadTransports');
-        $p->setAccessible(true);
         $this->assertSame($deadTransports, iterator_to_array($p->getValue($transport)));
 
         return $cursor;

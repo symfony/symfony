@@ -98,7 +98,6 @@ EOPHP;
             eval(sprintf($code, $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
             $r = new \ReflectionClass(ReflectionClassResource::class);
             $generateSignature = $r->getMethod('generateSignature');
-            $generateSignature->setAccessible(true);
             $generateSignature = $generateSignature->getClosure($r->newInstanceWithoutConstructor());
             $expectedSignature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
         }
@@ -122,11 +121,7 @@ EOPHP;
         yield [false, 0, "// line change\n\n"];
         yield [true, 0, '/** class docblock */'];
         yield [true, 0, '#[Foo]'];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 0, '#[Foo(new MissingClass)]'];
-        }
-
+        yield [true, 0, '#[Foo(new MissingClass)]'];
         yield [true, 1, 'abstract class %s'];
         yield [true, 1, 'final class %s'];
         yield [true, 1, 'class %s extends Exception'];
@@ -136,11 +131,7 @@ EOPHP;
         yield [true, 4, '/** pub docblock */'];
         yield [true, 5, 'protected $pub = [];'];
         yield [true, 5, 'public $pub = [123];'];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 5, '#[Foo(new MissingClass)] public $pub = [];'];
-        }
-
+        yield [true, 5, '#[Foo(new MissingClass)] public $pub = [];'];
         yield [true, 6, '/** prot docblock */'];
         yield [true, 7, 'private $prot;'];
         yield [false, 8, '/** priv docblock */'];
@@ -153,12 +144,8 @@ EOPHP;
         yield [true, 13, 'protected function prot($a = [123]) {}'];
         yield [true, 13, '#[Foo] protected function prot($a = []) {}'];
         yield [true, 13, 'protected function prot(#[Foo] $a = []) {}'];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 13, '#[Foo(new MissingClass)] protected function prot($a = []) {}'];
-            yield [true, 13, 'protected function prot(#[Foo(new MissingClass)] $a = []) {}'];
-        }
-
+        yield [true, 13, '#[Foo(new MissingClass)] protected function prot($a = []) {}'];
+        yield [true, 13, 'protected function prot(#[Foo(new MissingClass)] $a = []) {}'];
         yield [false, 14, '/** priv docblock */'];
         yield [false, 15, ''];
 
@@ -167,17 +154,13 @@ EOPHP;
         yield [true, 5, 'public array $pub;'];
         yield [false, 7, 'protected int $prot;'];
         yield [false, 9, 'private string $priv;'];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 17, 'public function __construct(private $bar = new \stdClass()) {}'];
-            yield [true, 17, 'public function ccc($bar = new \stdClass()) {}'];
-            yield [true, 17, 'public function ccc($bar = new MissingClass()) {}'];
-        }
-
+        yield [true, 17, 'public function __construct(private $bar = new \stdClass()) {}'];
+        yield [true, 17, 'public function ccc($bar = new \stdClass()) {}'];
+        yield [true, 17, 'public function ccc($bar = new MissingClass()) {}'];
         yield [true, 17, 'public function ccc($bar = 187) {}'];
         yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
         yield [true, 17, 'public function ccc($bar = parent::BOOM) {}'];
-        yield [\PHP_VERSION_ID < 80100, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
+        yield [false, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 
     public function testEventSubscriber()

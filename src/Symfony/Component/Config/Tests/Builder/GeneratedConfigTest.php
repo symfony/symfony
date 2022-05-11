@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Config\Tests\Builder;
 
 use PHPUnit\Framework\TestCase;
@@ -19,6 +28,11 @@ use Symfony\Config\AddToListConfig;
  * Test to use the generated config and test its output.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @covers \Symfony\Component\Config\Builder\ClassBuilder
+ * @covers \Symfony\Component\Config\Builder\ConfigBuilderGenerator
+ * @covers \Symfony\Component\Config\Builder\Method
+ * @covers \Symfony\Component\Config\Builder\Property
  */
 class GeneratedConfigTest extends TestCase
 {
@@ -73,8 +87,9 @@ class GeneratedConfigTest extends TestCase
         $expectedCode = $basePath.$name;
 
         // to regenerate snapshot files, uncomment these lines
-        // (new Filesystem())->remove($expectedCode);
-        // $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
+        //(new Filesystem())->remove($expectedCode);
+        //$this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
+        //$this->markTestIncomplete('Re-comment the line above and relaunch the tests');
 
         $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
         $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);

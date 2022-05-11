@@ -5,7 +5,7 @@
 
     {% if events.messages|length %}
         {% set icon %}
-            {% include('@WebProfiler/Icon/notifier.svg') %}
+            {{ source('@WebProfiler/Icon/notifier.svg') }}
             <span class="sf-toolbar-value">{{ events.messages|length }}</span>
         {% endset %}
 
@@ -68,7 +68,7 @@
     {% set events = collector.events %}
 
     <span class="label {{ events.messages|length ? '' : 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/notifier.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/notifier.svg') }}</span>
 
         <strong>Notifications</strong>
         {% if events.messages|length > 0 %}

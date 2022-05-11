@@ -115,7 +115,7 @@ class KernelBrowser extends HttpKernelBrowser
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, \is_object($user) ? \get_class($user) : \gettype($user)));
+            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, get_debug_type($user)));
         }
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
@@ -156,6 +156,7 @@ class KernelBrowser extends HttpKernelBrowser
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
         if ($this->hasPerformedRequest && $this->reboot) {
+            $this->kernel->boot();
             $this->kernel->shutdown();
         } else {
             $this->hasPerformedRequest = true;

@@ -38,7 +38,7 @@ class AbstractNormalizerDummy extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return true;
     }
@@ -53,7 +53,7 @@ class AbstractNormalizerDummy extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return true;
     }

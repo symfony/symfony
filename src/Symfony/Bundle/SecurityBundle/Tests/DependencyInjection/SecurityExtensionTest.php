@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -250,6 +251,80 @@ class SecurityExtensionTest extends TestCase
         );
     }
 
+    public function testRegisterAccessControlWithSpecifiedRequestMatcherService()
+    {
+        $container = $this->getRawContainer();
+
+        $requestMatcherId = 'My\Test\RequestMatcher';
+        $requestMatcher = new RequestMatcher('/');
+        $container->set($requestMatcherId, $requestMatcher);
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['request_matcher' => $requestMatcherId],
+            ],
+        ]);
+
+        $container->compile();
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $this->assertCount(3, $args);
+        $this->assertSame($requestMatcherId, (string) $args[0]);
+    }
+
+    /** @dataProvider provideAdditionalRequestMatcherConstraints */
+    public function testRegisterAccessControlWithRequestMatcherAndAdditionalOptionsThrowsInvalidException(array $additionalConstraints)
+    {
+        $container = $this->getRawContainer();
+
+        $requestMatcherId = 'My\Test\RequestMatcher';
+        $requestMatcher = new RequestMatcher('/');
+        $container->set($requestMatcherId, $requestMatcher);
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                array_merge(['request_matcher' => $requestMatcherId], $additionalConstraints),
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
+
+        $container->compile();
+    }
+
+    public function provideAdditionalRequestMatcherConstraints()
+    {
+        yield 'Invalid configuration with path' => [['path' => '^/url']];
+        yield 'Invalid configuration with host' => [['host' => 'example.com']];
+        yield 'Invalid configuration with port' => [['port' => 80]];
+        yield 'Invalid configuration with methods' => [['methods' => ['POST']]];
+        yield 'Invalid configuration with ips' => [['ips' => ['0.0.0.0']]];
+    }
+
     public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
     {
         $container = $this->getRawContainer();
@@ -391,6 +466,46 @@ class SecurityExtensionTest extends TestCase
         $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
         $this->assertEquals(\stdClass::class, $handler->getClass());
         $this->assertEquals([['firewall' => 'default']], $handler->getTag('security.remember_me_handler'));
+    }
+
+    public function testSecretRememberMeHasher()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['secret' => 'very'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_signature_hasher.default');
+        $this->assertSame('very', $handler->getArgument(2));
+    }
+
+    public function testSecretRememberMeHandler()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['secret' => 'very', 'token_provider' => 'token_provider_id'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
+        $this->assertSame('very', $handler->getArgument(1));
     }
 
     public function sessionConfigurationProvider()

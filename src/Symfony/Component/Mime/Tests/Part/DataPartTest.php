@@ -135,6 +135,24 @@ class DataPartTest extends TestCase
         $this->assertTrue($p->hasContentId());
     }
 
+    public function testGetFilename()
+    {
+        $p = new DataPart('content', null);
+        self::assertNull($p->getFilename());
+
+        $p = new DataPart('content', 'filename');
+        self::assertSame('filename', $p->getFilename());
+    }
+
+    public function testGetContentType()
+    {
+        $p = new DataPart('content');
+        self::assertSame('application/octet-stream', $p->getContentType());
+
+        $p = new DataPart('content', null, 'application/pdf');
+        self::assertSame('application/pdf', $p->getContentType());
+    }
+
     public function testSerialize()
     {
         $r = fopen('php://memory', 'r+', false);

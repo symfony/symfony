@@ -84,7 +84,7 @@ final class Intl
                     preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
 
                     self::$icuVersion = trim($matches[1]);
-                } catch (\ReflectionException $e) {
+                } catch (\ReflectionException) {
                     self::$icuVersion = null;
                 }
             }
@@ -106,7 +106,7 @@ final class Intl
      */
     public static function getIcuStubVersion(): string
     {
-        return '70.1';
+        return '71.1';
     }
 
     /**

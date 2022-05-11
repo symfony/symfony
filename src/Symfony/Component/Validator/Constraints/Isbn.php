@@ -33,13 +33,18 @@ class Isbn extends Constraint
     public const CHECKSUM_FAILED_ERROR = '2881c032-660f-46b6-8153-d352d9706640';
     public const TYPE_NOT_RECOGNIZED_ERROR = 'fa54a457-f042-441f-89c4-066ee5bdd3e1';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
         self::TYPE_NOT_RECOGNIZED_ERROR => 'TYPE_NOT_RECOGNIZED_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $isbn10Message = 'This value is not a valid ISBN-10.';
     public $isbn13Message = 'This value is not a valid ISBN-13.';

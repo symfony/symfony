@@ -55,7 +55,7 @@ class Process implements \IteratorAggregate
     private $hasCallback = false;
     private $commandline;
     private $cwd;
-    private $env;
+    private $env = [];
     private $input;
     private $starttime;
     private $lastOutputTime;
@@ -176,7 +176,7 @@ class Process implements \IteratorAggregate
      * In order to inject dynamic values into command-lines, we strongly recommend using placeholders.
      * This will save escaping values, which is not portable nor secure anyway:
      *
-     *   $process = Process::fromShellCommandline('my_command "$MY_VAR"');
+     *   $process = Process::fromShellCommandline('my_command "${:MY_VAR}"');
      *   $process->run(null, ['MY_VAR' => $theValue]);
      *
      * @param string         $command The command line to pass to the shell of the OS
@@ -308,7 +308,7 @@ class Process implements \IteratorAggregate
         $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : $this->getDefaultEnv();
 
         if (\is_array($commandline = $this->commandline)) {
-            $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
+            $commandline = implode(' ', array_map($this->escapeArgument(...), $commandline));
 
             if ('\\' !== \DIRECTORY_SEPARATOR) {
                 // exec is mandatory to deal with sending a signal to the process
@@ -946,7 +946,7 @@ class Process implements \IteratorAggregate
      */
     public function getCommandLine(): string
     {
-        return \is_array($this->commandline) ? implode(' ', array_map([$this, 'escapeArgument'], $this->commandline)) : $this->commandline;
+        return \is_array($this->commandline) ? implode(' ', array_map($this->escapeArgument(...), $this->commandline)) : $this->commandline;
     }
 
     /**

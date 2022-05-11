@@ -84,12 +84,12 @@ class UuidFactory
             return $namespace;
         }
 
-        switch ($namespace) {
-            case 'dns': return new UuidV1(Uuid::NAMESPACE_DNS);
-            case 'url': return new UuidV1(Uuid::NAMESPACE_URL);
-            case 'oid': return new UuidV1(Uuid::NAMESPACE_OID);
-            case 'x500': return new UuidV1(Uuid::NAMESPACE_X500);
-            default: return Uuid::fromString($namespace);
-        }
+        return match ($namespace) {
+            'dns' => new UuidV1(Uuid::NAMESPACE_DNS),
+            'url' => new UuidV1(Uuid::NAMESPACE_URL),
+            'oid' => new UuidV1(Uuid::NAMESPACE_OID),
+            'x500' => new UuidV1(Uuid::NAMESPACE_X500),
+            default => Uuid::fromString($namespace),
+        };
     }
 }

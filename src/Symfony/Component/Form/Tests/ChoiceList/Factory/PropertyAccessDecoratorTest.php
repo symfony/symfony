@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
-use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
@@ -27,122 +26,75 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class PropertyAccessDecoratorTest extends TestCase
 {
     /**
-     * @var MockObject&ChoiceListFactoryInterface
-     */
-    private $decoratedFactory;
-
-    /**
      * @var PropertyAccessDecorator
      */
     private $factory;
 
     protected function setUp(): void
     {
-        $this->decoratedFactory = $this->createMock(ChoiceListFactoryInterface::class);
-        $this->factory = new PropertyAccessDecorator($this->decoratedFactory);
+        $this->factory = new PropertyAccessDecorator(new DefaultChoiceListFactory());
     }
 
     public function testCreateFromChoicesPropertyPath()
     {
-        $choices = [(object) ['property' => 'value']];
+        $object = (object) ['property' => 'value'];
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($choices, $callback) {
-                return new ArrayChoiceList(array_map($callback, $choices));
-            });
-
-        $this->assertSame(['value' => 'value'], $this->factory->createListFromChoices($choices, 'property')->getChoices());
+        $this->assertSame(['value' => $object], $this->factory->createListFromChoices([$object], 'property')->getChoices());
     }
 
     public function testCreateFromChoicesPropertyPathInstance()
     {
-        $choices = [(object) ['property' => 'value']];
+        $object = (object) ['property' => 'value'];
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($choices, $callback) {
-                return new ArrayChoiceList(array_map($callback, $choices));
-            });
-
-        $this->assertSame(['value' => 'value'], $this->factory->createListFromChoices($choices, new PropertyPath('property'))->getChoices());
+        $this->assertSame(['value' => $object], $this->factory->createListFromChoices([$object], new PropertyPath('property'))->getChoices());
     }
 
     public function testCreateFromChoicesFilterPropertyPath()
     {
-        $filteredChoices = [
-            'two' => (object) ['property' => 'value 2', 'filter' => true],
-        ];
+        $object1 = (object) ['property' => 'value 1', 'filter' => false];
+        $object2 = (object) ['property' => 'value 2', 'filter' => true];
         $choices = [
-            'one' => (object) ['property' => 'value 1', 'filter' => false],
-        ] + $filteredChoices;
+            'one' => $object1,
+            'two' => $object2,
+        ];
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($choices, $value, $callback) {
-                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
-            });
-
-        $this->assertSame(['value 2' => 'value 2'], $this->factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
+        $this->assertSame(['value 2' => $object2], $this->factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
     }
 
     public function testCreateFromChoicesFilterPropertyPathInstance()
     {
-        $filteredChoices = [
-            'two' => (object) ['property' => 'value 2', 'filter' => true],
-        ];
+        $object1 = (object) ['property' => 'value 1', 'filter' => false];
+        $object2 = (object) ['property' => 'value 2', 'filter' => true];
         $choices = [
-                'one' => (object) ['property' => 'value 1', 'filter' => false],
-        ] + $filteredChoices;
-
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($choices, $value, $callback) {
-                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
-            });
+            'one' => $object1,
+            'two' => $object2,
+        ];
 
         $this->assertSame(
-            ['value 2' => 'value 2'],
+            ['value 2' => $object2],
             $this->factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices()
         );
     }
 
     public function testCreateFromLoaderPropertyPath()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $object = (object) ['property' => 'value'];
+        $loader = new ArrayChoiceLoader([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($loader, $callback) {
-                return new ArrayChoiceList((array) $callback((object) ['property' => 'value']));
-            });
-
-        $this->assertSame(['value' => 'value'], $this->factory->createListFromLoader($loader, 'property')->getChoices());
+        $this->assertSame(['value' => $object], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
     public function testCreateFromLoaderFilterPropertyPath()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
-        $filteredChoices = [
-            'two' => (object) ['property' => 'value 2', 'filter' => true],
-        ];
+        $object1 = (object) ['property' => 'value 1', 'filter' => false];
+        $object2 = (object) ['property' => 'value 2', 'filter' => true];
         $choices = [
-                'one' => (object) ['property' => 'value 1', 'filter' => false],
-        ] + $filteredChoices;
+            'one' => $object1,
+            'two' => $object2,
+        ];
+        $loader = new ArrayChoiceLoader($choices);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($loader, $value, $callback) use ($choices) {
-                return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
-            });
-
-        $this->assertSame(['value 2' => 'value 2'], $this->factory->createListFromLoader($loader, 'property', 'filter')->getChoices());
+        $this->assertSame(['value 2' => $object2], $this->factory->createListFromLoader($loader, 'property', 'filter')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -150,212 +102,122 @@ class PropertyAccessDecoratorTest extends TestCase
     {
         $choices = [null];
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($choices, $callback) {
-                return new ArrayChoiceList(array_map($callback, $choices));
-            });
-
-        $this->assertSame([null], $this->factory->createListFromChoices($choices, 'property')->getChoices());
+        $this->assertSame(['' => null], $this->factory->createListFromChoices($choices, 'property')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494
     public function testCreateFromChoiceLoaderAssumeNullIfValuePropertyPathUnreadable()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader([null]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($loader, $callback) {
-                return new ArrayChoiceList((array) $callback(null));
-            });
-
-        $this->assertSame([], $this->factory->createListFromLoader($loader, 'property')->getChoices());
+        $this->assertSame(['' => null], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
     public function testCreateFromLoaderPropertyPathInstance()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $object = (object) ['property' => 'value'];
+        $loader = new ArrayChoiceLoader([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($loader, $callback) {
-                return new ArrayChoiceList((array) $callback((object) ['property' => 'value']));
-            });
-
-        $this->assertSame(['value' => 'value'], $this->factory->createListFromLoader($loader, new PropertyPath('property'))->getChoices());
+        $this->assertSame(['value' => $object], $this->factory->createListFromLoader($loader, new PropertyPath('property'))->getChoices());
     }
 
     public function testCreateViewPreferredChoicesAsPropertyPath()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred) {
-                return new ChoiceListView((array) $preferred((object) ['property' => true]));
-            });
-
-        $this->assertSame([true], $this->factory->createView($list, 'property')->choices);
+        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, 'preferred_choice')->choices);
+        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, 'preferred_choice')->preferredChoices);
     }
 
     public function testCreateViewPreferredChoicesAsPropertyPathInstance()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred) {
-                return new ChoiceListView((array) $preferred((object) ['property' => true]));
-            });
-
-        $this->assertSame([true], $this->factory->createView($list, 'property')->choices);
+        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice'))->choices);
+        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice'))->preferredChoices);
     }
 
     // https://github.com/symfony/symfony/issues/5494
     public function testCreateViewAssumeNullIfPreferredChoicesPropertyPathUnreadable()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred) {
-                return new ChoiceListView((array) $preferred((object) ['category' => null]));
-            });
-
-        $this->assertSame([false], $this->factory->createView($list, 'category.preferred')->choices);
+        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice.property'))->choices);
+        $this->assertEquals([], $this->factory->createView($list, new PropertyPath('preferred_choice.property'))->preferredChoices);
     }
 
     public function testCreateViewLabelsAsPropertyPath()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label) {
-                return new ChoiceListView((array) $label((object) ['property' => 'label']));
-            });
-
-        $this->assertSame(['label'], $this->factory->createView($list, null, 'property')->choices);
+        $this->assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, 'view_label')->choices);
     }
 
     public function testCreateViewLabelsAsPropertyPathInstance()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label) {
-                return new ChoiceListView((array) $label((object) ['property' => 'label']));
-            });
-
-        $this->assertSame(['label'], $this->factory->createView($list, null, new PropertyPath('property'))->choices);
+        $this->assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, new PropertyPath('view_label'))->choices);
     }
 
     public function testCreateViewIndicesAsPropertyPath()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label, $index) {
-                return new ChoiceListView((array) $index((object) ['property' => 'index']));
-            });
-
-        $this->assertSame(['index'], $this->factory->createView($list, null, null, 'property')->choices);
+        $this->assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, 'view_index')->choices);
     }
 
     public function testCreateViewIndicesAsPropertyPathInstance()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label, $index) {
-                return new ChoiceListView((array) $index((object) ['property' => 'index']));
-            });
-
-        $this->assertSame(['index'], $this->factory->createView($list, null, null, new PropertyPath('property'))->choices);
+        $this->assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, new PropertyPath('view_index'))->choices);
     }
 
     public function testCreateViewGroupsAsPropertyPath()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, null, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return new ChoiceListView((array) $groupBy((object) ['property' => 'group']));
-            });
-
-        $this->assertSame(['group'], $this->factory->createView($list, null, null, null, 'property')->choices);
+        $this->assertEquals(['bar' => new ChoiceGroupView('bar', [new ChoiceView($object, '0', '0')])], $this->factory->createView($list, null, null, null, 'view_group')->choices);
     }
 
     public function testCreateViewGroupsAsPropertyPathInstance()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, null, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return new ChoiceListView((array) $groupBy((object) ['property' => 'group']));
-            });
-
-        $this->assertSame(['group'], $this->factory->createView($list, null, null, null, new PropertyPath('property'))->choices);
+        $this->assertEquals(['bar' => new ChoiceGroupView('bar', [new ChoiceView($object, '0', '0')])], $this->factory->createView($list, null, null, null, new PropertyPath('view_group'))->choices);
     }
 
     // https://github.com/symfony/symfony/issues/5494
     public function testCreateViewAssumeNullIfGroupsPropertyPathUnreadable()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
-
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, null, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return new ChoiceListView((array) $groupBy((object) ['group' => null]));
-            });
+        $list = new ArrayChoiceList([]);
 
         $this->assertSame([], $this->factory->createView($list, null, null, null, 'group.name')->choices);
     }
 
     public function testCreateViewAttrAsPropertyPath()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, null, null, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
-                return new ChoiceListView((array) $attr((object) ['property' => 'attr']));
-            });
-
-        $this->assertSame(['attr'], $this->factory->createView($list, null, null, null, null, 'property')->choices);
+        $this->assertEquals([new ChoiceView($object, '0', '0', ['baz' => 'foobar'])], $this->factory->createView($list, null, null, null, null, 'view_attribute')->choices);
     }
 
     public function testCreateViewAttrAsPropertyPathInstance()
     {
-        $list = $this->createMock(ChoiceListInterface::class);
+        $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
+        $list = new ArrayChoiceList([$object]);
 
-        $this->decoratedFactory->expects($this->once())
-            ->method('createView')
-            ->with($list, null, null, null, null, $this->isInstanceOf(\Closure::class))
-            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
-                return new ChoiceListView((array) $attr((object) ['property' => 'attr']));
-            });
-
-        $this->assertSame(['attr'], $this->factory->createView($list, null, null, null, null, new PropertyPath('property'))->choices);
+        $this->assertEquals([new ChoiceView($object, '0', '0', ['baz' => 'foobar'])], $this->factory->createView($list, null, null, null, null, new PropertyPath('view_attribute'))->choices);
     }
 }

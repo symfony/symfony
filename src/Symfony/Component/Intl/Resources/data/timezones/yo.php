@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'Ìgbà Tọọki (Istanbul)',
         'Europe/Jersey' => 'Greenwich Mean Time (Jersey)',
         'Europe/Kaliningrad' => 'Àkókò Ìhà Ìlà Oòrùn Europe (Kaliningrad)',
-        'Europe/Kiev' => 'Àkókò Ìhà Ìlà Oòrùn Europe (Kiev)',
+        'Europe/Kiev' => 'Àkókò Ìhà Ìlà Oòrùn Europe (Kyiv)',
         'Europe/Kirov' => 'Ìgbà Rọṣia (Kirov)',
         'Europe/Lisbon' => 'Àkókò Ìwọ Oòrùn Europe (Lisbon)',
         'Europe/Ljubljana' => 'Àkókò Àárin Europe (Ljubljana)',

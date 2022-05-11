@@ -39,7 +39,7 @@ class AutowiringFailedException extends RuntimeException
         parent::__construct('', $code, $previous);
 
         $this->message = new class($this->message, $this->messageCallback) {
-            private string $message;
+            private string|self $message;
             private ?\Closure $messageCallback;
 
             public function __construct(&$message, &$messageCallback)

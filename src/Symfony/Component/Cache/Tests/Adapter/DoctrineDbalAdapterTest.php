@@ -136,7 +136,6 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     {
         $o = new \ReflectionObject($cache);
         $connProp = $o->getProperty('conn');
-        $connProp->setAccessible(true);
 
         /** @var Connection $conn */
         $conn = $connProp->getValue($cache);

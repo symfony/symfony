@@ -31,7 +31,7 @@ class OptionsResolverWrapper extends OptionsResolver
     {
         try {
             parent::setNormalizer($option, $normalizer);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -45,7 +45,7 @@ class OptionsResolverWrapper extends OptionsResolver
     {
         try {
             parent::setAllowedValues($option, $allowedValues);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -59,7 +59,7 @@ class OptionsResolverWrapper extends OptionsResolver
     {
         try {
             parent::addAllowedValues($option, $allowedValues);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -75,7 +75,7 @@ class OptionsResolverWrapper extends OptionsResolver
     {
         try {
             parent::setAllowedTypes($option, $allowedTypes);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -91,7 +91,7 @@ class OptionsResolverWrapper extends OptionsResolver
     {
         try {
             parent::addAllowedTypes($option, $allowedTypes);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 

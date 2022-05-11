@@ -15,11 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\AutowireAsDecoratorPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -29,6 +31,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -271,9 +274,6 @@ class AutowirePassTest extends TestCase
         $this->assertSame('b', (string) $aDefinition->getArgument(0));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testTypeNotGuessableIntersectionType()
     {
         $container = new ContainerBuilder();
@@ -291,9 +291,6 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testGuessableIntersectionType()
     {
         $container = new ContainerBuilder();
@@ -1126,5 +1123,67 @@ class AutowirePassTest extends TestCase
 
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorInterface::class));
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorImpl::class));
+    }
+
+    public function testAutowireAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AutowireAttribute::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->register('some.id', \stdClass::class);
+        $container->setParameter('some.parameter', 'foo');
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition(AutowireAttribute::class);
+
+        $this->assertCount(8, $definition->getArguments());
+        $this->assertEquals(new Reference('some.id'), $definition->getArgument(0));
+        $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(1));
+        $this->assertSame('foo/bar', $definition->getArgument(2));
+        $this->assertEquals(new Reference('some.id'), $definition->getArgument(3));
+        $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(4));
+        $this->assertSame('bar', $definition->getArgument(5));
+        $this->assertSame('@bar', $definition->getArgument(6));
+        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(7));
+
+        $container->compile();
+
+        $service = $container->get(AutowireAttribute::class);
+
+        $this->assertInstanceOf(\stdClass::class, $service->service);
+        $this->assertSame('foo', $service->expression);
+        $this->assertSame('foo/bar', $service->value);
+        $this->assertInstanceOf(\stdClass::class, $service->serviceAsValue);
+        $this->assertSame('foo', $service->expressionAsValue);
+        $this->assertSame('bar', $service->rawValue);
+        $this->assertSame('@bar', $service->escapedRawValue);
+        $this->assertNull($service->invalid);
+    }
+
+    public function testAsDecoratorAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AsDecoratorFoo::class);
+        $container->register(AsDecoratorBar10::class)->setAutowired(true)->setArgument(0, 'arg1');
+        $container->register(AsDecoratorBar20::class)->setAutowired(true)->setArgument(0, 'arg1');
+        $container->register(AsDecoratorBaz::class)->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireAsDecoratorPass())->process($container);
+        (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $this->assertSame(AsDecoratorBar10::class.'.inner', (string) $container->getDefinition(AsDecoratorBar10::class)->getArgument(1));
+
+        $this->assertSame(AsDecoratorBar20::class.'.inner', (string) $container->getDefinition(AsDecoratorBar20::class)->getArgument(1));
+        $this->assertSame(AsDecoratorBaz::class.'.inner', (string) $container->getDefinition(AsDecoratorBaz::class)->getArgument(0));
+        $this->assertSame(2, $container->getDefinition(AsDecoratorBaz::class)->getArgument(0)->getInvalidBehavior());
     }
 }

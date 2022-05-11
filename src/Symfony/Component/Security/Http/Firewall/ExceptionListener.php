@@ -75,7 +75,7 @@ class ExceptionListener
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(KernelEvents::EXCEPTION, [$this, 'onKernelException'], 1);
+        $dispatcher->addListener(KernelEvents::EXCEPTION, $this->onKernelException(...), 1);
     }
 
     /**
@@ -83,7 +83,7 @@ class ExceptionListener
      */
     public function unregister(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->removeListener(KernelEvents::EXCEPTION, [$this, 'onKernelException']);
+        $dispatcher->removeListener(KernelEvents::EXCEPTION, $this->onKernelException(...));
     }
 
     /**
@@ -189,7 +189,7 @@ class ExceptionListener
             $this->throwUnauthorizedException($authException);
         }
 
-        $this->logger?->debug('Calling Authentication entry point.');
+        $this->logger?->debug('Calling Authentication entry point.', ['entry_point' => $this->authenticationEntryPoint]);
 
         if (!$this->stateless) {
             $this->setTargetPath($request);
@@ -204,7 +204,7 @@ class ExceptionListener
 
         try {
             $response = $this->authenticationEntryPoint->start($request, $authException);
-        } catch (NotAnEntryPointException $e) {
+        } catch (NotAnEntryPointException) {
             $this->throwUnauthorizedException($authException);
         }
 

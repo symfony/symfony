@@ -351,6 +351,14 @@ class EmailTest extends TestCase
         // 2 parts only, not 3 (text + embedded image once)
         $this->assertCount(2, $parts = $body->getParts());
         $this->assertStringMatchesFormat('html content <img src=3D"cid:%s@symfony">', $parts[0]->bodyToString());
+
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('<div background="cid:test.gif"></div>');
+        $e->embed($image, 'test.gif');
+        $body = $e->getBody();
+        $this->assertInstanceOf(RelatedPart::class, $body);
+        $this->assertCount(2, $parts = $body->getParts());
+        $this->assertStringMatchesFormat('<div background=3D"cid:%s@symfony"></div>', $parts[0]->bodyToString());
     }
 
     public function testAttachments()

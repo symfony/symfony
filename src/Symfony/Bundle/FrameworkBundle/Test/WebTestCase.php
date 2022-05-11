@@ -45,7 +45,7 @@ abstract class WebTestCase extends KernelTestCase
 
         try {
             $client = $kernel->getContainer()->get('test.client');
-        } catch (ServiceNotFoundException $e) {
+        } catch (ServiceNotFoundException) {
             if (class_exists(KernelBrowser::class)) {
                 throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
             }

@@ -24,11 +24,7 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
  */
 class Query extends AbstractQuery
 {
-    // As of PHP 7.2, we can use LDAP_CONTROL_PAGEDRESULTS instead of this
-    public const PAGINATION_OID = '1.2.840.113556.1.4.319';
-
-    /** @var Connection */
-    protected $connection;
+    public const PAGINATION_OID = \LDAP_CONTROL_PAGEDRESULTS;
 
     /** @var resource[]|Result[] */
     private array $results;
@@ -79,19 +75,12 @@ class Query extends AbstractQuery
             $this->results = [];
             $con = $this->connection->getResource();
 
-            switch ($this->options['scope']) {
-                case static::SCOPE_BASE:
-                    $func = 'ldap_read';
-                    break;
-                case static::SCOPE_ONE:
-                    $func = 'ldap_list';
-                    break;
-                case static::SCOPE_SUB:
-                    $func = 'ldap_search';
-                    break;
-                default:
-                    throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope']));
-            }
+            $func = match ($this->options['scope']) {
+                static::SCOPE_BASE => 'ldap_read',
+                static::SCOPE_ONE => 'ldap_list',
+                static::SCOPE_SUB => 'ldap_search',
+                default => throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope'])),
+            };
 
             $itemsLeft = $maxItems = $this->options['maxItems'];
             $pageSize = $this->options['pageSize'];

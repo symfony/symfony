@@ -15,11 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $this->getService = $this->getService(...);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',

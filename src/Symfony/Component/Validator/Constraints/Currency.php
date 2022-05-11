@@ -27,9 +27,14 @@ class Currency extends Constraint
 {
     public const NO_SUCH_CURRENCY_ERROR = '69945ac1-2db4-405f-bec7-d2772f73df52';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NO_SUCH_CURRENCY_ERROR => 'NO_SUCH_CURRENCY_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This value is not a valid currency.';
 

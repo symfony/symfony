@@ -118,7 +118,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $filesystem->dumpFile($this->file, $content);
         try {
             $filesystem->chmod($this->file, $mode, $umask);
-        } catch (IOException $e) {
+        } catch (IOException) {
             // discard chmod failure (some filesystem may not support it)
         }
 
@@ -126,7 +126,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);
-            } catch (IOException $e) {
+            } catch (IOException) {
                 // discard chmod failure (some filesystem may not support it)
             }
         }

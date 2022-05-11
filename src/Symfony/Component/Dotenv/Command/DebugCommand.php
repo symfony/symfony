@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Dotenv\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,9 +23,17 @@ use Symfony\Component\Dotenv\Dotenv;
  *
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
+#[AsCommand(name: 'debug:dotenv', description: 'Lists all dotenv files with variables and values')]
 final class DebugCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultName = 'debug:dotenv';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultDescription = 'Lists all dotenv files with variables and values';
 
     private $kernelEnvironment;

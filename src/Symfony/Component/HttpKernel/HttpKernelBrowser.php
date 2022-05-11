@@ -188,7 +188,7 @@ EOF;
     /**
      * {@inheritdoc}
      *
-     * @param Request $request
+     * @param Response $response
      */
     protected function filterResponse(object $response): DomResponse
     {

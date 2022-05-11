@@ -46,6 +46,10 @@ class RedisReceiver implements ReceiverInterface
 
         $redisEnvelope = json_decode($message['data']['message'] ?? '', true);
 
+        if (null === $redisEnvelope) {
+            return [];
+        }
+
         try {
             if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                 $envelope = $this->serializer->decode([
@@ -91,8 +95,4 @@ class RedisReceiver implements ReceiverInterface
 
         return $redisReceivedStamp;
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisReceiver::class, false)) {
-    class_alias(RedisReceiver::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisReceiver::class);
 }

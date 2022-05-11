@@ -325,7 +325,7 @@
 {% block form_help -%}
     {%- if help is not empty -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
-        <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+        <div id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if translation_domain is same as(false) -%}
                 {%- if help_html is same as(false) -%}
                     {{- help -}}
@@ -339,7 +339,7 @@
                     {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
                 {%- endif -%}
             {%- endif -%}
-        </p>
+        </div>
     {%- endif -%}
 {%- endblock form_help %}
 

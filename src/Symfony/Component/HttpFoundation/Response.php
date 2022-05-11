@@ -98,6 +98,8 @@ class Response
         'proxy_revalidate' => false,
         'max_age' => true,
         's_maxage' => true,
+        'stale_if_error' => true,         // RFC5861
+        'stale_while_revalidate' => true, // RFC5861
         'immutable' => false,
         'last_modified' => true,
         'etag' => true,
@@ -369,6 +371,10 @@ class Response
      */
     public function send(): static
     {
+        if (\is_string($this->content) && '' !== $this->content && !$this->headers->has('Transfer-Encoding')) {
+            $this->headers->set('Content-Length', \strlen($this->content));
+        }
+
         $this->sendHeaders();
         $this->sendContent();
 
@@ -698,7 +704,7 @@ class Response
     {
         try {
             return $this->headers->getDate('Expires');
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             // according to RFC 2616 invalid date formats (e.g. "0" and "-1") must be treated as in the past
             return \DateTime::createFromFormat('U', time() - 172800);
         }
@@ -769,6 +775,38 @@ class Response
     public function setMaxAge(int $value): static
     {
         $this->headers->addCacheControlDirective('max-age', $value);
+
+        return $this;
+    }
+
+    /**
+     * Sets the number of seconds after which the response should no longer be returned by shared caches when backend is down.
+     *
+     * This method sets the Cache-Control stale-if-error directive.
+     *
+     * @return $this
+     *
+     * @final
+     */
+    public function setStaleIfError(int $value): static
+    {
+        $this->headers->addCacheControlDirective('stale-if-error', $value);
+
+        return $this;
+    }
+
+    /**
+     * Sets the number of seconds after which the response should no longer return stale content by shared caches.
+     *
+     * This method sets the Cache-Control stale-while-revalidate directive.
+     *
+     * @return $this
+     *
+     * @final
+     */
+    public function setStaleWhileRevalidate(int $value): static
+    {
+        $this->headers->addCacheControlDirective('stale-while-revalidate', $value);
 
         return $this;
     }
@@ -946,6 +984,14 @@ class Response
             $this->setSharedMaxAge($options['s_maxage']);
         }
 
+        if (isset($options['stale_while_revalidate'])) {
+            $this->setStaleWhileRevalidate($options['stale_while_revalidate']);
+        }
+
+        if (isset($options['stale_if_error'])) {
+            $this->setStaleIfError($options['stale_if_error']);
+        }
+
         foreach (self::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES as $directive => $hasValue) {
             if (!$hasValue && isset($options[$directive])) {
                 if ($options[$directive]) {
@@ -1064,8 +1110,7 @@ class Response
         $lastModified = $this->headers->get('Last-Modified');
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
-        if ($ifNoneMatchEtags = $request->getETags()) {
-            $etag = $this->getEtag();
+        if (($ifNoneMatchEtags = $request->getETags()) && (null !== $etag = $this->getEtag())) {
             if (0 == strncmp($etag, 'W/', 2)) {
                 $etag = substr($etag, 2);
             }

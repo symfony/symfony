@@ -348,8 +348,6 @@ class FileProfilerStorageTest extends TestCase
     {
         $r = new \ReflectionMethod($this->storage, 'readLineFromFile');
 
-        $r->setAccessible(true);
-
         $h = tmpfile();
 
         fwrite($h, "line1\n\n\nline2\n");

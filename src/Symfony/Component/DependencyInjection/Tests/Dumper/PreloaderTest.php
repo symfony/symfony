@@ -30,7 +30,6 @@ class PreloaderTest extends TestCase
     public function testPreload()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -45,7 +44,6 @@ class PreloaderTest extends TestCase
     public function testPreloadSkipsNonExistingInterface()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -56,7 +54,6 @@ class PreloaderTest extends TestCase
     public function testPreloadUnion()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -67,9 +64,6 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(E::class, false));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testPreloadIntersection()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');

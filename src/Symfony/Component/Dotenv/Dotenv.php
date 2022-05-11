@@ -142,7 +142,7 @@ final class Dotenv
         $env = is_file($p) ? include $p : null;
         $k = $this->envKey;
 
-        if (\is_array($env) && (!isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {
+        if (\is_array($env) && ($overrideExistingVars || !isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {
             $this->populate($env, $overrideExistingVars);
         } else {
             $this->loadEnv($path, $k, $defaultEnv, $testEnvs, $overrideExistingVars);
@@ -463,7 +463,7 @@ final class Dotenv
 
             try {
                 $process->mustRun();
-            } catch (ProcessException $e) {
+            } catch (ProcessException) {
                 throw $this->createFormatException(sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
             }
 

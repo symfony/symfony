@@ -1,10 +1,16 @@
 Security Component - HTTP Integration
 =====================================
 
-Security provides an infrastructure for sophisticated authorization systems,
-which makes it possible to easily separate the actual authorization logic from
-so called user providers that hold the users credentials. It is inspired by
-the Java Spring framework.
+The Security HTTP component provides an HTTP integration of the Security Core
+component. It allows securing (parts of) your application using firewalls and
+provides authenticators to authenticate visitors.
+
+Getting Started
+---------------
+
+```
+$ composer require symfony/security-http
+```
 
 Sponsor
 -------

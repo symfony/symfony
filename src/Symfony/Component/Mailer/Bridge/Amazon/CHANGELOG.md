@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for `X-SES-MESSAGE-TAGS`
+
 6.0
 ---
 

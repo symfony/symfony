@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\LazyCommand;
@@ -38,9 +39,11 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
 {
@@ -231,7 +234,6 @@ class ApplicationTest extends TestCase
         // simulate --help
         $r = new \ReflectionObject($application);
         $p = $r->getProperty('wantHelps');
-        $p->setAccessible(true);
         $p->setValue($application, true);
         $command = $application->get('foo:bar');
         $this->assertInstanceOf(HelpCommand::class, $command, '->get() returns the help command if --help is provided as the input');
@@ -1170,6 +1172,25 @@ class ApplicationTest extends TestCase
         $this->assertTrue($passedRightValue, '-> exit code 1 was passed in the console.terminate event');
     }
 
+    /**
+     * @testWith [-1]
+     *           [-32000]
+     */
+    public function testRunReturnsExitCodeOneForNegativeExceptionCode($exceptionCode)
+    {
+        $exception = new \Exception('', $exceptionCode);
+
+        $application = $this->getMockBuilder(Application::class)->setMethods(['doRun'])->getMock();
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+            ->method('doRun')
+            ->willThrowException($exception);
+
+        $exitCode = $application->run(new ArrayInput([]), new NullOutput());
+
+        $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is '.$exceptionCode);
+    }
+
     public function testAddingOptionWithDuplicateShortcut()
     {
         $this->expectException(\LogicException::class);
@@ -1882,6 +1903,39 @@ class ApplicationTest extends TestCase
         $application->add($command);
         $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
     }
+
+    /**
+     * @group tty
+     */
+    public function testSignalableRestoresStty()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('stty not available');
+        }
+
+        if (!SignalRegistry::isSupported()) {
+            $this->markTestSkipped('pcntl signals not available');
+        }
+
+        $previousSttyMode = shell_exec('stty -g');
+
+        $p = new Process(['php', __DIR__.'/Fixtures/application_signalable.php']);
+        $p->setTty(true);
+        $p->start();
+
+        for ($i = 0; $i < 10 && shell_exec('stty -g') === $previousSttyMode; ++$i) {
+            usleep(100000);
+        }
+
+        $this->assertNotSame($previousSttyMode, shell_exec('stty -g'));
+        $p->signal(\SIGINT);
+        $p->wait();
+
+        $sttyMode = shell_exec('stty -g');
+        shell_exec('stty '.$previousSttyMode);
+
+        $this->assertSame($previousSttyMode, $sttyMode);
+    }
 }
 
 class CustomApplication extends Application
@@ -1933,12 +1987,11 @@ class DisabledCommand extends Command
     }
 }
 
+#[AsCommand(name: 'signal')]
 class SignableCommand extends Command implements SignalableCommandInterface
 {
     public $signaled = false;
     public $loop = 100;
-
-    protected static $defaultName = 'signal';
 
     public function getSubscribedSignals(): array
     {

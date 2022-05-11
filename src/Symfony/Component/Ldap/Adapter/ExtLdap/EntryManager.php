@@ -105,7 +105,7 @@ class EntryManager implements EntryManagerInterface
     {
         $con = $this->getConnectionResource();
 
-        if (!@ldap_rename($con, $entry->getDn(), $newRdn, null, $removeOldRdn)) {
+        if (!@ldap_rename($con, $entry->getDn(), $newRdn, '', $removeOldRdn)) {
             throw new LdapException(sprintf('Could not rename entry "%s" to "%s": ', $entry->getDn(), $newRdn).ldap_error($con), ldap_errno($con));
         }
     }

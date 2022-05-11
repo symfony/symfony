@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 {
     private AccessDecisionManagerInterface $manager;
-    private AccessDecisionStrategyInterface $strategy;
+    private ?AccessDecisionStrategyInterface $strategy = null;
     /** @var iterable<mixed, VoterInterface> */
     private iterable $voters = [];
     private array $decisionLog = []; // All decision logs
@@ -39,10 +39,8 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         if ($this->manager instanceof AccessDecisionManager) {
             // The strategy and voters are stored in a private properties of the decorated service
             $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'strategy');
-            $reflection->setAccessible(true);
             $this->strategy = $reflection->getValue($manager);
             $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'voters');
-            $reflection->setAccessible(true);
             $this->voters = $reflection->getValue($manager);
         }
     }
@@ -109,8 +107,4 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     {
         return $this->decisionLog;
     }
-}
-
-if (!class_exists(DebugAccessDecisionManager::class, false)) {
-    class_alias(TraceableAccessDecisionManager::class, DebugAccessDecisionManager::class);
 }

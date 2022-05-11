@@ -18,8 +18,12 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
+trigger_deprecation('symfony/validator', '6.1', 'The "%s" constraint is deprecated since symfony 6.1, use "ExpressionSyntaxValidator" instead.', ExpressionLanguageSyntaxValidator::class);
+
 /**
  * @author Andrey Sevastianov <mrpkmail@gmail.com>
+ *
+ * @deprecated since symfony 6.1, use ExpressionSyntaxValidator instead
  */
 class ExpressionLanguageSyntaxValidator extends ConstraintValidator
 {

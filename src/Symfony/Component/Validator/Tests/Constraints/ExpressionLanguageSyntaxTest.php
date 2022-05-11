@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
+/**
+ * @group legacy
+ */
 class ExpressionLanguageSyntaxTest extends TestCase
 {
     public function testValidatedByStandardValidator()

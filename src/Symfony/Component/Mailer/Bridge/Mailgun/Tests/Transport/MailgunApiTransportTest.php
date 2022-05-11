@@ -73,11 +73,10 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
-        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+        $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
+        $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
 
         $this->assertArrayHasKey('h:foo', $payload);
         $this->assertEquals('foo-value', $payload['h:foo']);
@@ -110,7 +109,6 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('h:bar', $payload, 'We should prefix headers with "h:" to keep BC');
@@ -255,12 +253,11 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
-        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
-        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
-        $this->assertArrayHasKey('h:custom-header', $payload);
-        $this->assertEquals('value', $payload['h:custom-header']);
+        $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
+        $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
+        $this->assertArrayHasKey('h:Custom-Header', $payload);
+        $this->assertEquals('value', $payload['h:Custom-Header']);
         $this->assertArrayHasKey(0, $payload);
         $this->assertArrayHasKey(1, $payload);
         $this->assertSame('password-reset', $payload[0]['o:tag']);

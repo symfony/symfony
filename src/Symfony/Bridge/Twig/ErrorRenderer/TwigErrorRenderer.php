@@ -36,7 +36,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
     {
         $this->twig = $twig;
         $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
-        $this->debug = !\is_callable($debug) || $debug instanceof \Closure ? $debug : \Closure::fromCallable($debug);
+        $this->debug = \is_bool($debug) ? $debug : $debug(...);
     }
 
     /**

@@ -20,6 +20,10 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopedMessage;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopedMessageNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeObject;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
@@ -572,6 +576,33 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeIgnoreDocumentType()
+    {
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<!DOCTYPE people>
+<people>
+    <person>
+        <firstname>Benjamin</firstname>
+        <lastname>Alexandre</lastname>
+    </person>
+    <person>
+        <firstname>Damien</firstname>
+        <lastname>Clay</lastname>
+    </person>
+</people>
+XML;
+        $expected = ['person' => [
+          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+        ]];
+        $this->assertEquals($expected, $this->encoder->decode(
+            $source,
+            'xml',
+            [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_DOCUMENT_TYPE_NODE]]
+        ));
+    }
+
     public function testDecodePreserveComments()
     {
         $source = <<<'XML'
@@ -807,6 +838,23 @@ XML;
         (new XmlEncoder())->encode(tmpfile(), 'xml');
     }
 
+    public function testReentrantXmlEncoder()
+    {
+        $envelope = new EnvelopeObject();
+        $message = new EnvelopedMessage();
+        $message->text = 'Symfony is great';
+        $envelope->message = $message;
+
+        $encoder = $this->createXmlEncoderWithEnvelopeNormalizer();
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response><message>PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxyZXNwb25zZT48dGV4dD5TeW1mb255IGlzIGdyZWF0PC90ZXh0PjwvcmVzcG9uc2U+Cg==</message></response>
+
+XML;
+
+        $this->assertSame($expected, $encoder->encode($envelope, 'xml'));
+    }
+
     public function testEncodeComment()
     {
         $expected = <<<'XML'
@@ -850,6 +898,21 @@ XML;
         $this->assertEquals($expected, $encoder->encode($data, 'xml'));
     }
 
+    private function createXmlEncoderWithEnvelopeNormalizer(): XmlEncoder
+    {
+        $normalizers = [
+            $envelopeNormalizer = new EnvelopeNormalizer(),
+            new EnvelopedMessageNormalizer(),
+        ];
+
+        $encoder = new XmlEncoder();
+        $serializer = new Serializer($normalizers, ['xml' => $encoder]);
+        $encoder->setSerializer($serializer);
+        $envelopeNormalizer->setSerializer($serializer);
+
+        return $encoder;
+    }
+
     private function createXmlEncoderWithDateTimeNormalizer(): XmlEncoder
     {
         $encoder = new XmlEncoder();
@@ -859,10 +922,7 @@ XML;
         return $encoder;
     }
 
-    /**
-     * @return MockObject&NormalizerInterface
-     */
-    private function createMockDateTimeNormalizer(): NormalizerInterface
+    private function createMockDateTimeNormalizer(): MockObject&NormalizerInterface
     {
         $mock = $this->createMock(CustomNormalizer::class);
 

@@ -348,6 +348,8 @@ class TextDescriptor extends Descriptor
                     $argumentsInformation[] = sprintf('Service locator (%d element(s))', \count($argument->getValues()));
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
+                } elseif ($argument instanceof \UnitEnum) {
+                    $argumentsInformation[] = ltrim(var_export($argument, true), '\\');
                 } elseif ($argument instanceof AbstractArgument) {
                     $argumentsInformation[] = sprintf('Abstract argument (%s)', $argument->getText());
                 } else {
@@ -561,7 +563,7 @@ class TextDescriptor extends Descriptor
             } else {
                 $r = new \ReflectionFunction($controller);
             }
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             if (\is_array($controller)) {
                 $controller = implode('::', $controller);
             }
@@ -580,7 +582,7 @@ class TextDescriptor extends Descriptor
 
             try {
                 $r = new \ReflectionMethod($container->findDefinition($id)->getClass(), $method);
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 return $anchorText;
             }
         }

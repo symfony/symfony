@@ -296,7 +296,6 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
@@ -306,7 +305,6 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler('sqlite::memory:');
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
@@ -324,7 +322,6 @@ class PdoSessionHandlerTest extends TestCase
                 continue;
             }
             $property = $reflection->getProperty($property);
-            $property->setAccessible(true);
             $this->assertSame($expectedValue, $property->getValue($storage));
         }
     }
@@ -346,6 +343,21 @@ class PdoSessionHandlerTest extends TestCase
         yield ['sqlite://localhost/:memory:', 'sqlite::memory:'];
         yield ['mssql://localhost/test', 'sqlsrv:server=localhost;Database=test'];
         yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
+    }
+
+    public function testTtl()
+    {
+        foreach ([60, fn () => 60] as $ttl) {
+            $pdo = $this->getMemorySqlitePdo();
+            $storage = new PdoSessionHandler($pdo, ['ttl' => $ttl]);
+
+            $storage->open('', 'sid');
+            $storage->read('id');
+            $storage->write('id', 'data');
+            $storage->close();
+
+            $this->assertEqualsWithDelta(time() + 60, $pdo->query('SELECT sess_lifetime FROM sessions')->fetchColumn(), 5);
+        }
     }
 
     /**

@@ -106,10 +106,7 @@ class CachePoolDeleteCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @return MockObject&KernelInterface
-     */
-    private function getKernel(): KernelInterface
+    private function getKernel(): MockObject&KernelInterface
     {
         $container = $this->createMock(ContainerInterface::class);
 

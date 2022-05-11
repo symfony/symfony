@@ -112,7 +112,7 @@ class ControllerResolver implements ControllerResolverInterface
                 if ((new \ReflectionMethod($class, $method))->isStatic()) {
                     return $class.'::'.$method;
                 }
-            } catch (\ReflectionException $reflectionException) {
+            } catch (\ReflectionException) {
                 throw $e;
             }
 

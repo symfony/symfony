@@ -75,6 +75,8 @@ class ReflectionExtractorTest extends TestCase
                 'files',
                 'propertyTypeStatic',
                 'parentAnnotationNoParent',
+                'rootDummyItems',
+                'rootDummyItem',
                 'a',
                 'DOB',
                 'Id',
@@ -135,6 +137,8 @@ class ReflectionExtractorTest extends TestCase
                 'files',
                 'propertyTypeStatic',
                 'parentAnnotationNoParent',
+                'rootDummyItems',
+                'rootDummyItem',
                 'date',
                 'c',
                 'ct',
@@ -184,6 +188,8 @@ class ReflectionExtractorTest extends TestCase
                 'files',
                 'propertyTypeStatic',
                 'parentAnnotationNoParent',
+                'rootDummyItems',
+                'rootDummyItem',
             ],
             $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
@@ -280,7 +286,6 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php81TypesProvider
-     * @requires PHP 8.1
      */
     public function testExtractPhp81Type($property, array $type = null)
     {
@@ -293,6 +298,21 @@ class ReflectionExtractorTest extends TestCase
             ['nothing', null],
             ['collection', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Traversable'), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Countable')]],
         ];
+    }
+
+    /**
+     * @dataProvider php82TypesProvider
+     * @requires PHP 8.2
+     */
+    public function testExtractPhp82Type($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy', $property, []));
+    }
+
+    public function php82TypesProvider()
+    {
+        yield ['nil', null];
+        yield ['false', [new Type(Type::BUILTIN_TYPE_FALSE)]];
     }
 
     /**

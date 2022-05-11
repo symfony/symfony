@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
+use Symfony\Bundle\FrameworkBundle\Command\CachePoolInvalidateTagsCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand;
@@ -90,6 +91,12 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.cache_pool_prune', CachePoolPruneCommand::class)
             ->args([
                 [],
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.cache_pool_invalidate_tags', CachePoolInvalidateTagsCommand::class)
+            ->args([
+                tagged_locator('cache.taggable', 'pool'),
             ])
             ->tag('console.command')
 

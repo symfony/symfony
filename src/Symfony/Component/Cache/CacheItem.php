@@ -22,6 +22,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 final class CacheItem implements ItemInterface
 {
     private const METADATA_EXPIRY_OFFSET = 1527506807;
+    private const VALUE_WRAPPER = "\xA9";
 
     protected string $key;
     protected mixed $value = null;
@@ -109,7 +110,7 @@ final class CacheItem implements ItemInterface
         if (!$this->isTaggable) {
             throw new LogicException(sprintf('Cache item "%s" comes from a non tag-aware pool: you cannot tag it.', $this->key));
         }
-        if (!is_iterable($tags)) {
+        if (!\is_array($tags) && !$tags instanceof \Traversable) { // don't use is_iterable(), it's slow
             $tags = [$tags];
         }
         foreach ($tags as $tag) {
@@ -180,5 +181,39 @@ final class CacheItem implements ItemInterface
             }
             @trigger_error(strtr($message, $replace), \E_USER_WARNING);
         }
+    }
+
+    private function pack(): mixed
+    {
+        if (!$m = $this->newMetadata) {
+            return $this->value;
+        }
+        $valueWrapper = self::VALUE_WRAPPER;
+
+        return new $valueWrapper($this->value, $m + ['expiry' => $this->expiry]);
+    }
+
+    private function unpack(): bool
+    {
+        $v = $this->value;
+        $valueWrapper = self::VALUE_WRAPPER;
+
+        if ($v instanceof $valueWrapper) {
+            $this->value = $v->value;
+            $this->metadata = $v->metadata;
+
+            return true;
+        }
+
+        if (!\is_array($v) || 1 !== \count($v) || 10 !== \strlen($k = (string) array_key_first($v)) || "\x9D" !== $k[0] || "\0" !== $k[5] || "\x5F" !== $k[9]) {
+            return false;
+        }
+
+        // BC with pools populated before v6.1
+        $this->value = $v[$k];
+        $this->metadata = unpack('Vexpiry/Nctime', substr($k, 1, -1));
+        $this->metadata['expiry'] += self::METADATA_EXPIRY_OFFSET;
+
+        return true;
     }
 }

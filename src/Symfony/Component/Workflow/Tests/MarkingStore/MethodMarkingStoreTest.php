@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Workflow\Tests\MarkingStore;
 
 use PHPUnit\Framework\TestCase;
@@ -76,6 +85,30 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(1, $marking->getPlaces());
         $this->assertSame('first_place', (string) $subject->getMarking());
+    }
+
+    public function testGetMarkingWithUninitializedProperty()
+    {
+        $subject = new SubjectWithType();
+
+        $markingStore = new MethodMarkingStore(true);
+
+        $marking = $markingStore->getMarking($subject);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertCount(0, $marking->getPlaces());
+    }
+
+    public function testGetMarkingWithUninitializedProperty2()
+    {
+        $subject = new SubjectWithType();
+
+        $markingStore = new MethodMarkingStore(true, 'marking2');
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Typed property Symfony\Component\Workflow\Tests\MarkingStore\SubjectWithType::$marking must not be accessed before initialization');
+
+        $markingStore->getMarking($subject);
     }
 
     private function createValueObject(string $markingValue)

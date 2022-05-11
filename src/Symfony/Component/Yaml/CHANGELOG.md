@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * In cases where it will likely improve readability, strings containing single quotes will be double-quoted
+
 5.4
 ---
 

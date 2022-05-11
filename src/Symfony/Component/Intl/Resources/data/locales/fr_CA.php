@@ -36,6 +36,8 @@ return [
         'ks' => 'kashmiri',
         'ks_Arab' => 'kashmiri (arabe)',
         'ks_Arab_IN' => 'kashmiri (arabe, Inde)',
+        'ks_Deva' => 'kashmiri (devanagari)',
+        'ks_Deva_IN' => 'kashmiri (devanagari, Inde)',
         'ks_IN' => 'kashmiri (Inde)',
         'ky_KG' => 'kirghize (Kirghizistan)',
         'lu' => 'luba-katanga',

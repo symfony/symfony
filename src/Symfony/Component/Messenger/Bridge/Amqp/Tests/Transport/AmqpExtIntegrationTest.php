@@ -213,6 +213,7 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertSame($expectedOutput.<<<'TXT'
 Get envelope with message: Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage
 with stamps: [
+    "Symfony\\Component\\Messenger\\Stamp\\SerializedMessageStamp",
     "Symfony\\Component\\Messenger\\Bridge\\Amqp\\Transport\\AmqpReceivedStamp",
     "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp",
     "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp",

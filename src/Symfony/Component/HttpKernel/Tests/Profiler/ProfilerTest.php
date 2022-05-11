@@ -83,6 +83,28 @@ class ProfilerTest extends TestCase
         $this->assertCount(0, $profiler->find(null, null, null, null, null, null, '204'));
     }
 
+    public function testIsInitiallyEnabled()
+    {
+        self::assertTrue((new Profiler($this->storage))->isEnabled());
+    }
+
+    public function testDisable()
+    {
+        $profiler = new Profiler($this->storage);
+        $profiler->disable();
+
+        self::assertFalse($profiler->isEnabled());
+    }
+
+    public function testEnable()
+    {
+        $profiler = new Profiler($this->storage);
+        $profiler->disable();
+        $profiler->enable();
+
+        self::assertTrue($profiler->isEnabled());
+    }
+
     protected function setUp(): void
     {
         $this->tmp = tempnam(sys_get_temp_dir(), 'sf_profiler');

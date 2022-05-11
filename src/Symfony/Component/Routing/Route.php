@@ -216,7 +216,7 @@ class Route implements \Serializable
     public function setOptions(array $options): static
     {
         $this->options = [
-            'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
+            'compiler_class' => RouteCompiler::class,
         ];
 
         return $this->addOptions($options);
@@ -416,7 +416,7 @@ class Route implements \Serializable
             return $pattern;
         }
 
-        return preg_replace_callback('#\{(!?)(\w++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
+        return preg_replace_callback('#\{(!?)([\w\x80-\xFF]++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
             if (isset($m[4][0])) {
                 $this->setDefault($m[2], '?' !== $m[4] ? substr($m[4], 1) : null);
             }

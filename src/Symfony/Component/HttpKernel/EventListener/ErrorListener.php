@@ -96,7 +96,6 @@ class ErrorListener implements EventSubscriberInterface
             } while ($prev = $wrapper->getPrevious());
 
             $prev = new \ReflectionProperty($wrapper instanceof \Exception ? \Exception::class : \Error::class, 'previous');
-            $prev->setAccessible(true);
             $prev->setValue($wrapper, $throwable);
 
             throw $e;
@@ -124,7 +123,7 @@ class ErrorListener implements EventSubscriberInterface
             return;
         }
 
-        $r = new \ReflectionFunction(\Closure::fromCallable($event->getController()));
+        $r = new \ReflectionFunction($event->getController()(...));
         $r = $r->getParameters()[$k] ?? null;
 
         if ($r && (!($r = $r->getType()) instanceof \ReflectionNamedType || \in_array($r->getName(), [FlattenException::class, LegacyFlattenException::class], true))) {

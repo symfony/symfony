@@ -4,7 +4,10 @@ CHANGELOG
 6.1
 ---
 
+ * Add support to display table vertically when calling setVertical()
  * Add method `__toString()` to `InputInterface`
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Add suggested values for arguments and options in input definition, for input completion
 
 6.0
 ---

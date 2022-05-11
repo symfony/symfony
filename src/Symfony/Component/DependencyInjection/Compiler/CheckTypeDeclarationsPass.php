@@ -210,6 +210,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         $class = null;
 
         if ($value instanceof Definition) {
+            if ($value->getFactory()) {
+                return;
+            }
+
             $class = $value->getClass();
 
             if ($class && isset(self::BUILTIN_TYPES[strtolower($class)])) {
@@ -222,7 +226,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         } elseif ($value instanceof Expression) {
             try {
                 $value = $this->getExpressionLanguage()->evaluate($value, ['container' => $this->container]);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // If a service from the expression cannot be fetched from the container, we skip the validation.
                 return;
             }
@@ -237,7 +241,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 if ('' === preg_replace('/'.$envPlaceholderUniquePrefix.'_\w+_[a-f0-9]{32}/U', '', $value, -1, $c) && 1 === $c) {
                     try {
                         $value = $this->container->resolveEnvPlaceholders($value, true);
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         // If an env placeholder cannot be resolved, we skip the validation.
                         return;
                     }

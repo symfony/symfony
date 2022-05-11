@@ -45,8 +45,8 @@ class XliffLintCommand extends Command
     {
         parent::__construct($name);
 
-        $this->directoryIteratorProvider = null === $directoryIteratorProvider || $directoryIteratorProvider instanceof \Closure ? $directoryIteratorProvider : \Closure::fromCallable($directoryIteratorProvider);
-        $this->isReadableProvider = null === $isReadableProvider || $isReadableProvider instanceof \Closure ? $isReadableProvider : \Closure::fromCallable($isReadableProvider);
+        $this->directoryIteratorProvider = null === $directoryIteratorProvider ? null : $directoryIteratorProvider(...);
+        $this->isReadableProvider = null === $isReadableProvider ? null : $isReadableProvider(...);
         $this->requireStrictFileNames = $requireStrictFileNames;
     }
 
@@ -156,16 +156,12 @@ EOF
 
     private function display(SymfonyStyle $io, array $files)
     {
-        switch ($this->format) {
-            case 'txt':
-                return $this->displayTxt($io, $files);
-            case 'json':
-                return $this->displayJson($io, $files);
-            case 'github':
-                return $this->displayTxt($io, $files, true);
-            default:
-                throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format));
-        }
+        return match ($this->format) {
+            'txt' => $this->displayTxt($io, $files),
+            'json' => $this->displayJson($io, $files),
+            'github' => $this->displayTxt($io, $files, true),
+            default => throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format)),
+        };
     }
 
     private function displayTxt(SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false)

@@ -92,7 +92,7 @@ class HelpCommandTest extends TestCase
 
         yield 'nothing' => [
             [''],
-            [],
+            ['completion', 'help', 'list', 'foo:bar'],
         ];
 
         yield 'command_name' => [

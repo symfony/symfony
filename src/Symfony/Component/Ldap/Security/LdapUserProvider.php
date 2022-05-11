@@ -12,8 +12,9 @@
 namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Exception\ExceptionInterface;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
+use Symfony\Component\Ldap\Exception\InvalidSearchCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -75,15 +76,13 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     {
         try {
             $this->ldap->bind($this->searchDn, $this->searchPassword);
-            $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
-            $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
-            $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
-        } catch (ConnectionException $e) {
-            $e = new UserNotFoundException(sprintf('User "%s" not found.', $identifier), 0, $e);
-            $e->setUserIdentifier($identifier);
-
-            throw $e;
+        } catch (InvalidCredentialsException) {
+            throw new InvalidSearchCredentialsException();
         }
+
+        $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
+        $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
+        $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
 
         $entries = $search->execute();
         $count = \count($entries);
@@ -108,7 +107,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             if (null !== $this->uidKey) {
                 $identifier = $this->getAttributeValue($entry, $this->uidKey);
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
         }
 
         return $this->loadUser($identifier, $entry);
@@ -145,7 +144,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             $user->getEntry()->setAttribute($this->passwordAttribute, [$newHashedPassword]);
             $this->ldap->getEntryManager()->update($user->getEntry());
             $user->setPassword($newHashedPassword);
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             // ignore failed password upgrades
         }
     }

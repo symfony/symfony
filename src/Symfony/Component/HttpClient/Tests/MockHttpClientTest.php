@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Tests;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -194,6 +195,43 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame(0, $response->getStatusCode());
     }
 
+    public function testFixContentLength()
+    {
+        $client = new MockHttpClient();
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+            'headers' => ['Content-Length: 4'],
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('Content-Length: 7', $requestOptions['headers'][0]);
+        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('Content-Length: 7', $requestOptions['headers'][1]);
+        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => "8\r\nSymfony \r\n5\r\nis aw\r\n6\r\nesome!\r\n0\r\n\r\n",
+            'headers' => ['Transfer-Encoding: chunked'],
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame(['Content-Length: 19'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => '',
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertFalse(isset($requestOptions['normalized_headers']['content-length']));
+    }
+
     public function testThrowExceptionInBodyGenerator()
     {
         $mockHttpClient = new MockHttpClient([
@@ -232,6 +270,15 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
         $this->assertSame(3, $chunks[2]->getOffset());
         $this->assertSame('bar ccc', $chunks[2]->getError());
+    }
+
+    public function testMergeDefaultOptions()
+    {
+        $mockHttpClient = new MockHttpClient(null, 'https://example.com');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: scheme is missing');
+        $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
     }
 
     public function testExceptionDirectlyInBody()

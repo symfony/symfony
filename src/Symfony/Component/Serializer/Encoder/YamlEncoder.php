@@ -58,7 +58,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     {
         $context = array_merge($this->defaultContext, $context);
 
-        if (isset($context[self::PRESERVE_EMPTY_OBJECTS])) {
+        if ($context[self::PRESERVE_EMPTY_OBJECTS] ?? false) {
             $context[self::YAML_FLAGS] |= Yaml::DUMP_OBJECT_AS_MAP;
         }
 
@@ -67,8 +67,10 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsEncoding(string $format): bool
+    public function supportsEncoding(string $format /*, array $context = [] */): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
@@ -85,8 +87,10 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsDecoding(string $format): bool
+    public function supportsDecoding(string $format /*, array $context = [] */): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }

@@ -75,7 +75,7 @@ class RangeValidator extends ConstraintValidator
 
                 try {
                     $min = new $dateTimeClass($min);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $min, $dateTimeClass, get_debug_type($constraint)));
                 }
             }
@@ -85,7 +85,7 @@ class RangeValidator extends ConstraintValidator
 
                 try {
                     $max = new $dateTimeClass($max);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, $dateTimeClass, get_debug_type($constraint)));
                 }
             }
@@ -192,7 +192,7 @@ class RangeValidator extends ConstraintValidator
 
         try {
             new \DateTime($boundary);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
 

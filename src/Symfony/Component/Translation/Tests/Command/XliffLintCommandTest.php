@@ -172,7 +172,7 @@ EOF;
     public function testPassingClosureAndCallableToConstructor()
     {
         $command = new XliffLintCommand('translation:xliff:lint',
-            \Closure::fromCallable([$this, 'testPassingClosureAndCallableToConstructor']),
+            $this->testPassingClosureAndCallableToConstructor(...),
             [$this, 'testPassingClosureAndCallableToConstructor']
         );
 

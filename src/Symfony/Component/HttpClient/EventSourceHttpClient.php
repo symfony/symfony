@@ -84,7 +84,7 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
 
                     return;
                 }
-            } catch (TransportExceptionInterface $e) {
+            } catch (TransportExceptionInterface) {
                 $state->lastError = $lastError ?? microtime(true);
 
                 if (null === $state->buffer || ($isTimeout && microtime(true) - $state->lastError < $state->reconnectionTime)) {

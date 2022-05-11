@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 trait FactoryTrait
 {
@@ -21,12 +22,16 @@ trait FactoryTrait
      *
      * @return $this
      */
-    final public function factory(string|array|ReferenceConfigurator $factory): static
+    final public function factory(string|array|ReferenceConfigurator|Expression $factory): static
     {
         if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);
 
             throw new InvalidArgumentException(sprintf('Invalid factory "%s": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'%s\'), \'%s\']" instead.', $factory, $factoryParts[0], $factoryParts[1]));
+        }
+
+        if ($factory instanceof Expression) {
+            $factory = '@='.$factory;
         }
 
         $this->definition->setFactory(static::processValue($factory, true));

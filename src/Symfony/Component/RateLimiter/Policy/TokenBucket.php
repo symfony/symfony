@@ -20,7 +20,6 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
-    private string $stringRate;
     private string $id;
     private Rate $rate;
     private int $tokens;
@@ -35,8 +34,6 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
     {
-        unset($this->stringRate);
-
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
@@ -79,22 +76,32 @@ final class TokenBucket implements LimiterStateInterface
         return $this->rate->calculateTimeForTokens($this->burstSize);
     }
 
-    /**
-     * @internal
-     */
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        $this->stringRate = (string) $this->rate;
-
-        return ['id', 'tokens', 'timer', 'burstSize', 'stringRate'];
+        return [
+            pack('N', $this->burstSize).$this->id => $this->tokens,
+            (string) $this->rate => $this->timer,
+        ];
     }
 
-    /**
-     * @internal
-     */
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
-        $this->rate = Rate::fromString($this->stringRate);
-        unset($this->stringRate);
+        // BC layer for old objects serialized via __sleep
+        if (5 === \count($data)) {
+            $data = array_values($data);
+            $this->id = $data[0];
+            $this->tokens = $data[1];
+            $this->timer = $data[2];
+            $this->burstSize = $data[3];
+            $this->rate = Rate::fromString($data[4]);
+
+            return;
+        }
+
+        [$this->tokens, $this->timer] = array_values($data);
+        [$pack, $rate] = array_keys($data);
+        $this->rate = Rate::fromString($rate);
+        $this->burstSize = unpack('Na', $pack)['a'];
+        $this->id = substr($pack, 4);
     }
 }

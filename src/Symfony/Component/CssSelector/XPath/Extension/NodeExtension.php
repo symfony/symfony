@@ -65,15 +65,15 @@ class NodeExtension extends AbstractExtension
     public function getNodeTranslators(): array
     {
         return [
-            'Selector' => [$this, 'translateSelector'],
-            'CombinedSelector' => [$this, 'translateCombinedSelector'],
-            'Negation' => [$this, 'translateNegation'],
-            'Function' => [$this, 'translateFunction'],
-            'Pseudo' => [$this, 'translatePseudo'],
-            'Attribute' => [$this, 'translateAttribute'],
-            'Class' => [$this, 'translateClass'],
-            'Hash' => [$this, 'translateHash'],
-            'Element' => [$this, 'translateElement'],
+            'Selector' => $this->translateSelector(...),
+            'CombinedSelector' => $this->translateCombinedSelector(...),
+            'Negation' => $this->translateNegation(...),
+            'Function' => $this->translateFunction(...),
+            'Pseudo' => $this->translatePseudo(...),
+            'Attribute' => $this->translateAttribute(...),
+            'Class' => $this->translateClass(...),
+            'Hash' => $this->translateHash(...),
+            'Element' => $this->translateElement(...),
         ];
     }
 

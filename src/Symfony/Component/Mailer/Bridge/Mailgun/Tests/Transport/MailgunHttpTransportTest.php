@@ -128,7 +128,6 @@ class MailgunHttpTransportTest extends TestCase
 
         $transport = new MailgunHttpTransport('key', 'domain');
         $method = new \ReflectionMethod(MailgunHttpTransport::class, 'addMailgunHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(4, $email->getHeaders()->toArray());

@@ -91,7 +91,6 @@ class ValidatorBuilderTest extends TestCase
         $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
 
         $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
-        $r->setAccessible(true);
 
         $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
     }
@@ -108,7 +107,6 @@ class ValidatorBuilderTest extends TestCase
         $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
 
         $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
-        $r->setAccessible(true);
 
         $this->assertSame($reader, $r->getValue($loaders[0]));
     }

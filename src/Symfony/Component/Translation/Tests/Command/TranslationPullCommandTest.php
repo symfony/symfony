@@ -47,9 +47,11 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
     {
         $arrayLoader = new ArrayLoader();
         $filenameEn = $this->createFile();
+        $filenameEnIcu = $this->createFile(['say_hello' => 'Welcome, {firstname}!'], 'en', 'messages+intl-icu.%locale%.xlf');
         $filenameFr = $this->createFile(['note' => 'NOTE'], 'fr');
+        $filenameFrIcu = $this->createFile(['say_hello' => 'Bonjour, {firstname}!'], 'fr', 'messages+intl-icu.%locale%.xlf');
         $locales = ['en', 'fr'];
-        $domains = ['messages'];
+        $domains = ['messages', 'messages+intl-icu'];
 
         $providerReadTranslatorBag = new TranslatorBag();
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
@@ -57,9 +59,15 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             'new.foo' => 'newFoo',
         ], 'en'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'say_hello' => 'Welcome, {firstname}!',
+        ], 'en', 'messages+intl-icu'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
             'note' => 'NOTE',
             'new.foo' => 'nouveauFoo',
         ], 'fr'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'say_hello' => 'Bonjour, {firstname}!',
+        ], 'fr', 'messages+intl-icu'));
 
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())
@@ -72,9 +80,9 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
-        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages']]);
+        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages', 'messages+intl-icu']]);
 
-        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages, messages+intl-icu"', trim($tester->getDisplay()));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -99,6 +107,23 @@ XLIFF
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="1IHotcu" resname="say_hello">
+                <source>say_hello</source>
+                <target>Welcome, {firstname}!</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameEnIcu));
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
         <header>
             <tool tool-id="symfony" tool-name="Symfony"/>
@@ -117,6 +142,23 @@ XLIFF
 </xliff>
 XLIFF
             , file_get_contents($filenameFr));
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="1IHotcu" resname="say_hello">
+                <source>say_hello</source>
+                <target>Bonjour, {firstname}!</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameFrIcu));
     }
 
     public function testPullNewXlf20Messages()
@@ -560,10 +602,6 @@ XLIFF
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $application = new Application();
         $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], 'en', ['loco', 'crowdin', 'lokalise']));
 

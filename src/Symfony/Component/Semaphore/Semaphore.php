@@ -82,7 +82,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
             $this->logger->debug('Successfully acquired the "{resource}" semaphore.', ['resource' => $this->key]);
 
             return true;
-        } catch (SemaphoreAcquiringException $e) {
+        } catch (SemaphoreAcquiringException) {
             $this->logger->notice('Failed to acquire the "{resource}" semaphore. Someone else already acquired the semaphore.', ['resource' => $this->key]);
 
             return false;

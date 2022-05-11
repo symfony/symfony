@@ -690,6 +690,8 @@ class Request
 
     /**
      * Gets the Session.
+     *
+     * @throws SessionNotFoundException When session is not set properly
      */
     public function getSession(): SessionInterface
     {
@@ -1873,7 +1875,7 @@ class Request
             if (class_exists(\Locale::class, false)) {
                 \Locale::setDefault($locale);
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
     }
 

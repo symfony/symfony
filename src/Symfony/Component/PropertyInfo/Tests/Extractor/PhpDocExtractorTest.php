@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
-use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type;
@@ -135,10 +136,6 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
     {
-        if (!class_exists(Collection::class)) {
-            $this->markTestSkipped('Collections are not implemented in current phpdocumentor/type-resolver version');
-        }
-
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }
 
@@ -388,6 +385,11 @@ class PhpDocExtractorTest extends TestCase
         ];
     }
 
+    public function testUnknownPseudoType()
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'scalar')], $this->extractor->getTypes(PseudoTypeDummy::class, 'unknownPseudoType'));
+    }
+
     /**
      * @dataProvider constructorTypesProvider
      */
@@ -427,6 +429,22 @@ class PhpDocExtractorTest extends TestCase
             ['numericString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
             ['traitString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
             ['positiveInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+        ];
+    }
+
+    /**
+     * @dataProvider promotedPropertyProvider
+     */
+    public function testExtractPromotedProperty(string $property, ?array $types)
+    {
+        $this->assertEquals($types, $this->extractor->getTypes(Php80Dummy::class, $property));
+    }
+
+    public function promotedPropertyProvider(): array
+    {
+        return [
+            ['promoted', null],
+            ['promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
         ];
     }
 }

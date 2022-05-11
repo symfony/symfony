@@ -38,7 +38,7 @@ class IcuResFileLoader implements LoaderInterface
 
         try {
             $rb = new \ResourceBundle($locale, $resource);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $rb = null;
         }
 

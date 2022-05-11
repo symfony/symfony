@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/translation-contracts": "^2.3|^3.0"
     },
@@ -28,6 +28,7 @@
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/intl": "^5.4|^6.0",
         "symfony/polyfill-intl-icu": "^1.21",
+        "symfony/routing": "^5.4|^6.0",
         "symfony/service-contracts": "^1.1.2|^2|^3",
         "symfony/yaml": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",

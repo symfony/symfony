@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Formatter;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -24,9 +25,13 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  *
  * @author Tobias Schultze <http://tobion.de>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since Symfony 6.1
  */
 class ConsoleFormatter implements FormatterInterface
 {
+    use CompatibilityFormatter;
+
     public const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
     public const SIMPLE_DATE = 'H:i:s';
 
@@ -72,14 +77,14 @@ class ConsoleFormatter implements FormatterInterface
         if (class_exists(VarCloner::class)) {
             $this->cloner = new VarCloner();
             $this->cloner->addCasters([
-                '*' => [$this, 'castObject'],
+                '*' => $this->castObject(...),
             ]);
 
             $this->outputBuffer = fopen('php://memory', 'r+');
             if ($this->options['multiline']) {
                 $output = $this->outputBuffer;
             } else {
-                $output = [$this, 'echoLine'];
+                $output = $this->echoLine(...);
             }
 
             $this->dumper = new CliDumper($output, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
@@ -98,11 +103,11 @@ class ConsoleFormatter implements FormatterInterface
         return $records;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function format(array $record): mixed
+    private function doFormat(array|LogRecord $record): mixed
     {
+        if ($record instanceof LogRecord) {
+            $record = $record->toArray();
+        }
         $record = $this->replacePlaceHolder($record);
 
         if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {

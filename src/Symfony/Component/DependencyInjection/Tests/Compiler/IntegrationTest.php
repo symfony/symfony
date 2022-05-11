@@ -28,6 +28,9 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutocon
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomMethodAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomParameterAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomPropertyAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface2;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService1;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
@@ -43,6 +46,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithoutIndex;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedConsumerWithExclude;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
@@ -559,7 +563,6 @@ class IntegrationTest extends TestCase
 
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
-        $factories->setAccessible(true);
 
         self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
     }
@@ -589,7 +592,6 @@ class IntegrationTest extends TestCase
 
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
-        $factories->setAccessible(true);
 
         self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
@@ -998,6 +1000,44 @@ class IntegrationTest extends TestCase
         self::assertSame('bar', $service->foo);
         self::assertSame(6, $service->sum);
         self::assertTrue($service->hasBeenConfigured);
+    }
+
+    public function testTaggedIteratorAndLocatorWithExclude()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AutoconfiguredService1::class)
+            ->addTag(AutoconfiguredInterface2::class)
+            ->setPublic(true)
+        ;
+        $container->register(AutoconfiguredService2::class)
+            ->addTag(AutoconfiguredInterface2::class)
+            ->setPublic(true)
+        ;
+        $container->register(TaggedConsumerWithExclude::class)
+            ->addTag(AutoconfiguredInterface2::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition(AutoconfiguredService1::class)->hasTag(AutoconfiguredInterface2::class));
+        $this->assertTrue($container->getDefinition(AutoconfiguredService2::class)->hasTag(AutoconfiguredInterface2::class));
+        $this->assertTrue($container->getDefinition(TaggedConsumerWithExclude::class)->hasTag(AutoconfiguredInterface2::class));
+
+        $s = $container->get(TaggedConsumerWithExclude::class);
+
+        $items = iterator_to_array($s->items->getIterator());
+        $this->assertCount(2, $items);
+        $this->assertInstanceOf(AutoconfiguredService1::class, $items[0]);
+        $this->assertInstanceOf(AutoconfiguredService2::class, $items[1]);
+
+        $locator = $s->locator;
+        $this->assertTrue($locator->has(AutoconfiguredService1::class));
+        $this->assertTrue($locator->has(AutoconfiguredService2::class));
+        $this->assertFalse($locator->has(TaggedConsumerWithExclude::class));
     }
 }
 

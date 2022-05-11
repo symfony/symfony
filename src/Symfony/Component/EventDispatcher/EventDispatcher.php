@@ -108,7 +108,7 @@ class EventDispatcher implements EventDispatcherInterface
                     $v[0] = $v[0]();
                     $v[1] ??= '__invoke';
                 }
-                if ($v === $listener) {
+                if ($v === $listener || ($listener instanceof \Closure && $v == $listener)) {
                     return $priority;
                 }
             }
@@ -164,7 +164,7 @@ class EventDispatcher implements EventDispatcherInterface
                     $v[0] = $v[0]();
                     $v[1] ??= '__invoke';
                 }
-                if ($v === $listener) {
+                if ($v === $listener || ($listener instanceof \Closure && $v == $listener)) {
                     unset($listeners[$k], $this->sorted[$eventName], $this->optimized[$eventName]);
                 }
             }
@@ -240,7 +240,7 @@ class EventDispatcher implements EventDispatcherInterface
         $this->sorted[$eventName] = [];
 
         foreach ($this->listeners[$eventName] as &$listeners) {
-            foreach ($listeners as $k => &$listener) {
+            foreach ($listeners as &$listener) {
                 if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
                     $listener[0] = $listener[0]();
                     $listener[1] ??= '__invoke';
@@ -267,10 +267,10 @@ class EventDispatcher implements EventDispatcherInterface
                             $listener[0] = $listener[0]();
                             $listener[1] ??= '__invoke';
                         }
-                        ($closure = \Closure::fromCallable($listener))(...$args);
+                        ($closure = $listener(...))(...$args);
                     };
                 } else {
-                    $closure = $listener instanceof \Closure || $listener instanceof WrappedListener ? $listener : \Closure::fromCallable($listener);
+                    $closure = $listener instanceof WrappedListener ? $listener : $listener(...);
                 }
             }
         }

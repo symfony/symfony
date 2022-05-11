@@ -78,7 +78,7 @@ EOF
 
         $builder = $this->getContainerBuilder($this->getApplication()->getKernel());
         $serviceIds = $builder->getServiceIds();
-        $serviceIds = array_filter($serviceIds, [$this, 'filterToServiceTypes']);
+        $serviceIds = array_filter($serviceIds, $this->filterToServiceTypes(...));
 
         if ($search = $input->getArgument('search')) {
             $searchNormalized = preg_replace('/[^a-zA-Z0-9\x7f-\xff $]++/', '', $search);
@@ -169,7 +169,7 @@ EOF
         if ($input->mustSuggestArgumentValuesFor('search')) {
             $builder = $this->getContainerBuilder($this->getApplication()->getKernel());
 
-            $suggestions->suggestValues(array_filter($builder->getServiceIds(), [$this, 'filterToServiceTypes']));
+            $suggestions->suggestValues(array_filter($builder->getServiceIds(), $this->filterToServiceTypes(...)));
         }
     }
 }

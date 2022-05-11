@@ -25,9 +25,7 @@ final class HandlerDescriptor
 
     public function __construct(callable $handler, array $options = [])
     {
-        if (!$handler instanceof \Closure) {
-            $handler = \Closure::fromCallable($handler);
-        }
+        $handler = $handler(...);
 
         $this->handler = $handler;
         $this->options = $options;

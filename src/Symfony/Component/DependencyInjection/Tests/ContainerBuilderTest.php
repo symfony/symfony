@@ -517,6 +517,19 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals('foobar', $builder->get('foo')->arguments['foo']);
     }
 
+    public function testEnvExpressionFunction()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', 'BarClass')
+            ->setPublic(true)
+            ->setProperty('foo', new Expression('env("BAR_FOO")'));
+        $container->compile(true);
+
+        $_ENV['BAR_FOO'] = 'Foo value';
+
+        $this->assertEquals('Foo value', $container->get('bar')->foo);
+    }
+
     public function testCreateServiceWithAbstractArgument()
     {
         $this->expectException(RuntimeException::class);
@@ -1159,7 +1172,6 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionProperty($container, 'resources');
-        $r->setAccessible(true);
         $resources = $r->getValue($container);
 
         $classInList = false;
@@ -1709,6 +1721,25 @@ class ContainerBuilderTest extends TestCase
         $container->get(B::class);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testExpressionInFactory()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperty('bar', new Reference('bar'))
+        ;
+        $container
+            ->register('bar', 'string')
+            ->setFactory('@=arg(0) + args.get(0) + args.count()')
+            ->addArgument(123)
+        ;
+
+        $container->compile();
+
+        $this->assertSame(247, $container->get('foo')->bar);
     }
 
     public function testFindTags()

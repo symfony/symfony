@@ -293,9 +293,6 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
-    /**
-     * @requires function Twig\Template::getSourceContext
-     */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+');
@@ -379,75 +376,6 @@ EOTXT
   +"foo": &1 "foo"
   +"bar": &1 "foo"
 }
-
-EOTXT
-            ,
-            $out
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @requires PHP < 8.1
-     */
-    public function testSpecialVars56()
-    {
-        $var = $this->getSpecialVars();
-
-        $this->assertDumpEquals(
-            <<<'EOTXT'
-array:3 [
-  0 => array:1 [
-    0 => &1 array:1 [
-      0 => &1 array:1 [&1]
-    ]
-  ]
-  1 => array:1 [
-    "GLOBALS" => & array:1 [ …1]
-  ]
-  2 => &3 array:1 [
-    "GLOBALS" => &3 array:1 [&3]
-  ]
-]
-EOTXT
-            ,
-            $var
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @requires PHP < 8.1
-     */
-    public function testGlobals()
-    {
-        $var = $this->getSpecialVars();
-        unset($var[0]);
-        $out = '';
-
-        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
-            if ($depth >= 0) {
-                $out .= str_repeat('  ', $depth).$line."\n";
-            }
-        });
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var);
-        $dumper->dump($data);
-
-        $this->assertSame(
-            <<<'EOTXT'
-array:2 [
-  1 => array:1 [
-    "GLOBALS" => & array:1 [ …1]
-  ]
-  2 => &2 array:1 [
-    "GLOBALS" => &2 array:1 [&2]
-  ]
-]
 
 EOTXT
             ,

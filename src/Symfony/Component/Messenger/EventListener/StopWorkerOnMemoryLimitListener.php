@@ -30,7 +30,7 @@ class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
         $this->memoryLimit = $memoryLimit;
         $this->logger = $logger;
         $memoryResolver ??= static fn () => memory_get_usage(true);
-        $this->memoryResolver = $memoryResolver instanceof \Closure ? $memoryResolver : \Closure::fromCallable($memoryResolver);
+        $this->memoryResolver = $memoryResolver(...);
     }
 
     public function onWorkerRunning(WorkerRunningEvent $event): void

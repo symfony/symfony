@@ -15,7 +15,7 @@ class Placeholders implements ConfigurationInterface
             ->children()
                 ->booleanNode('enabled')->defaultFalse()->end()
                 ->floatNode('favorite_float')->end()
-                 ->arrayNode('good_integers')
+                ->arrayNode('good_integers')
                     ->integerPrototype()->end()
                 ->end()
             ->end()

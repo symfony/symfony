@@ -29,6 +29,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     private Client $mongo;
     private Collection $collection;
     private array $options;
+    private int|\Closure|null $ttl;
 
     /**
      * Constructor.
@@ -39,7 +40,8 @@ class MongoDbSessionHandler extends AbstractSessionHandler
      *  * id_field: The field name for storing the session id [default: _id]
      *  * data_field: The field name for storing the session data [default: data]
      *  * time_field: The field name for storing the timestamp [default: time]
-     *  * expiry_field: The field name for storing the expiry-timestamp [default: expires_at].
+     *  * expiry_field: The field name for storing the expiry-timestamp [default: expires_at]
+     *  * ttl: The time to live in seconds.
      *
      * It is strongly recommended to put an index on the `expiry_field` for
      * garbage-collection. Alternatively it's possible to automatically expire
@@ -74,6 +76,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
             'time_field' => 'time',
             'expiry_field' => 'expires_at',
         ], $options);
+        $this->ttl = $this->options['ttl'] ?? null;
     }
 
     public function close(): bool
@@ -105,7 +108,8 @@ class MongoDbSessionHandler extends AbstractSessionHandler
      */
     protected function doWrite(string $sessionId, string $data): bool
     {
-        $expiry = new UTCDateTime((time() + (int) ini_get('session.gc_maxlifetime')) * 1000);
+        $ttl = ($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? ini_get('session.gc_maxlifetime');
+        $expiry = new UTCDateTime((time() + (int) $ttl) * 1000);
 
         $fields = [
             $this->options['time_field'] => new UTCDateTime(),
@@ -124,7 +128,8 @@ class MongoDbSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp(string $sessionId, string $data): bool
     {
-        $expiry = new UTCDateTime((time() + (int) ini_get('session.gc_maxlifetime')) * 1000);
+        $ttl = ($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? ini_get('session.gc_maxlifetime');
+        $expiry = new UTCDateTime((time() + (int) $ttl) * 1000);
 
         $this->getCollection()->updateOne(
             [$this->options['id_field'] => $sessionId],

@@ -16,11 +16,11 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class DefaultChoiceListFactoryTest extends TestCase
@@ -254,7 +254,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoader()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $list = $this->factory->createListFromLoader($loader);
 
@@ -263,7 +263,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithValues()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $value = function () {};
         $list = $this->factory->createListFromLoader($loader, $value);
@@ -273,12 +273,11 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithFilter()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $filter = function () {};
 
-        $list = $this->factory->createListFromLoader($loader, null, $filter);
+        $list = $this->factory->createListFromLoader(new ArrayChoiceLoader(), null, $filter);
 
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator($loader, $filter)), $list);
+        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $filter)), $list);
     }
 
     public function testCreateViewFlat()
@@ -729,11 +728,11 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // index
             null, // group
             function ($object, $key) {
-                switch ($key) {
-                    case 'B': return ['attr1' => 'value1'];
-                    case 'C': return ['attr2' => 'value2'];
-                    default: return [];
-                }
+                return match ($key) {
+                    'B' => ['attr1' => 'value1'],
+                    'C' => ['attr2' => 'value2'],
+                    default => [],
+                };
             }
         );
 
@@ -749,20 +748,17 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // index
             null, // group
             function ($object, $key, $value) {
-                switch ($value) {
-                    case '1': return ['attr1' => 'value1'];
-                    case '2': return ['attr2' => 'value2'];
-                    default: return [];
-                }
+                return match ($value) {
+                    '1' => ['attr1' => 'value1'],
+                    '2' => ['attr2' => 'value2'],
+                    default => [],
+                };
             }
         );
 
         $this->assertFlatViewWithAttr($view);
     }
 
-    /**
-     * @requires function Symfony\Component\Translation\TranslatableMessage::__construct
-     */
     public function testPassTranslatableMessageAsLabelDoesntCastItToString()
     {
         $view = $this->factory->createView(
@@ -852,10 +848,10 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // group
             null, // attr
             function ($object, $key) {
-                switch ($key) {
-                    case 'D': return ['%placeholder1%' => 'value1'];
-                    default: return [];
-                }
+                return match ($key) {
+                    'D' => ['%placeholder1%' => 'value1'],
+                    default => [],
+                };
             }
         );
 
@@ -872,10 +868,10 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // group
             null, // attr
             function ($object, $key, $value) {
-                switch ($value) {
-                    case '3': return ['%placeholder1%' => 'value1'];
-                    default: return [];
-                }
+                return match ($value) {
+                    '3' => ['%placeholder1%' => 'value1'],
+                    default => [],
+                };
             }
         );
 

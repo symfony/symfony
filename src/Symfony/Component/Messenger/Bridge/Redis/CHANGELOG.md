@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for Redis Sentinel
+
 6.0
 ---
 

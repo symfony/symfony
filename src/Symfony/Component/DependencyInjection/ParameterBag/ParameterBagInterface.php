@@ -45,7 +45,7 @@ interface ParameterBagInterface
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
-    public function get(string $name): array|bool|string|int|float|null;
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|null;
 
     /**
      * Removes a parameter.
@@ -57,7 +57,7 @@ interface ParameterBagInterface
      *
      * @throws LogicException if the parameter cannot be set
      */
-    public function set(string $name, array|bool|string|int|float|null $value);
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value);
 
     /**
      * Returns true if a parameter name is defined.

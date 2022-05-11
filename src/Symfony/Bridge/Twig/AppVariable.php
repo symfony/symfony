@@ -139,7 +139,7 @@ class AppVariable
             if (null === $session = $this->getSession()) {
                 return [];
             }
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return [];
         }
 

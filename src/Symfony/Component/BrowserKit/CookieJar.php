@@ -122,7 +122,7 @@ class CookieJar
         foreach ($cookies as $cookie) {
             try {
                 $this->set(Cookie::fromString($cookie, $uri));
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // invalid cookies are just ignored
             }
         }
@@ -180,7 +180,7 @@ class CookieJar
                 }
 
                 foreach ($namedCookies as $cookie) {
-                    if ($cookie->isSecure() && 'https' != $parts['scheme']) {
+                    if ($cookie->isSecure() && 'https' !== $parts['scheme']) {
                         continue;
                     }
 

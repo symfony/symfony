@@ -185,7 +185,6 @@ class ErrorHandler
             $this->setDefaultLogger($bootstrappingLogger);
         }
         $traceReflector = new \ReflectionProperty(\Exception::class, 'trace');
-        $traceReflector->setAccessible(true);
         $this->configureException = \Closure::bind(static function ($e, $trace, $file = null, $line = null) use ($traceReflector) {
             $traceReflector->setValue($e, $trace);
             $e->file = $file ?? $e->file;
@@ -630,7 +629,7 @@ class ErrorHandler
                 self::$exitCode = 255;
                 $handler->handleException($fatalError);
             }
-        } catch (FatalError $e) {
+        } catch (FatalError) {
             // Ignore this re-throw
         }
 

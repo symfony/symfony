@@ -43,6 +43,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
     use LoggerAwareTrait;
 
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
+    private static array $emptyDefaults = self::OPTIONS_DEFAULTS;
     private AmpClientState $multi;
 
     /**
@@ -56,7 +57,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
      */
     public function __construct(array $defaultOptions = [], callable $clientConfigurator = null, int $maxHostConnections = 6, int $maxPendingPushes = 50)
     {
-        $this->defaultOptions['buffer'] = $this->defaultOptions['buffer'] ?? \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
+        $this->defaultOptions['buffer'] ??= self::shouldBuffer(...);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);
@@ -89,7 +90,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
             }
         }
 
-        if ('' !== $options['body'] && 'POST' === $method && !isset($options['normalized_headers']['content-type'])) {
+        if (('' !== $options['body'] || 'POST' === $method || isset($options['normalized_headers']['content-length'])) && !isset($options['normalized_headers']['content-type'])) {
             $options['headers'][] = 'Content-Type: application/x-www-form-urlencoded';
         }
 

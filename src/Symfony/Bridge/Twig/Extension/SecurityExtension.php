@@ -46,7 +46,7 @@ final class SecurityExtension extends AbstractExtension
 
         try {
             return $this->securityChecker->isGranted($role, $object);
-        } catch (AuthenticationCredentialsNotFoundException $e) {
+        } catch (AuthenticationCredentialsNotFoundException) {
             return false;
         }
     }
@@ -75,9 +75,9 @@ final class SecurityExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('is_granted', [$this, 'isGranted']),
-            new TwigFunction('impersonation_exit_url', [$this, 'getImpersonateExitUrl']),
-            new TwigFunction('impersonation_exit_path', [$this, 'getImpersonateExitPath']),
+            new TwigFunction('is_granted', $this->isGranted(...)),
+            new TwigFunction('impersonation_exit_url', $this->getImpersonateExitUrl(...)),
+            new TwigFunction('impersonation_exit_path', $this->getImpersonateExitPath(...)),
         ];
     }
 }

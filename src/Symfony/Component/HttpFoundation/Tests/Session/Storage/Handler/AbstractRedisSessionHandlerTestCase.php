@@ -42,7 +42,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
             self::markTestSkipped('Extension redis required.');
         }
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }
@@ -164,6 +164,19 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
         $this->assertLessThan($redisTtl, $ttl - 5);
         $this->assertGreaterThan($redisTtl, $ttl + 5);
+
+        $options = [
+            'prefix' => self::PREFIX,
+            'ttl' => fn () => $ttl,
+        ];
+
+        $handler = new RedisSessionHandler($this->redisClient, $options);
+        $handler->write('id', 'data');
+        $redisTtl = $this->redisClient->ttl(self::PREFIX.'id');
+
+        $this->assertLessThan($redisTtl, $ttl - 5);
+        $this->assertGreaterThan($redisTtl, $ttl + 5);
+
     }
 
     public function getTtlFixtures(): array

@@ -57,6 +57,7 @@ class Connection
         'key',
         'verify',
         'sasl_method',
+        'connection_name',
     ];
 
     private const AVAILABLE_QUEUE_OPTIONS = [
@@ -558,8 +559,4 @@ class Connection
     {
         return $amqpStamp?->getRoutingKey() ?? $this->getDefaultPublishRoutingKey();
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\Connection::class, false)) {
-    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\AmqpExt\Connection::class);
 }

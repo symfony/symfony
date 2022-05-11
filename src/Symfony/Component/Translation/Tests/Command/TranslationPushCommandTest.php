@@ -17,7 +17,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
+use Symfony\Component\Translation\Provider\FilteringProvider;
 use Symfony\Component\Translation\Provider\ProviderInterface;
+use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\TranslatorBag;
 
@@ -259,15 +261,73 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
+    public function testPushWithProviderDomains()
+    {
+        $arrayLoader = new ArrayLoader();
+        $xliffLoader = new XliffFileLoader();
+        $locales = ['en', 'fr'];
+        $domains = ['messages'];
+
+        // Simulate existing messages on Provider
+        $providerReadTranslatorBag = new TranslatorBag();
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
+
+        $provider = $this->createMock(FilteringProvider::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->with($domains, $locales)
+            ->willReturn($providerReadTranslatorBag);
+        $provider->expects($this->once())
+            ->method('getDomains')
+            ->willReturn(['messages']);
+
+        $filenameEn = $this->createFile([
+            'note' => 'NOTE',
+            'new.foo' => 'newFoo',
+        ]);
+        $filenameFr = $this->createFile([
+            'note' => 'NOTE',
+            'new.foo' => 'nouveauFoo',
+        ], 'fr');
+        $localTranslatorBag = new TranslatorBag();
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameEn, 'en'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameFr, 'fr'));
+
+        $provider->expects($this->once())
+            ->method('write')
+            ->with($localTranslatorBag->diff($providerReadTranslatorBag));
+
+        $provider->expects($this->once())
+            ->method('__toString')
+            ->willReturn('null://default');
+
+        $reader = new TranslationReader();
+        $reader->addLoader('xlf', new XliffFileLoader());
+
+        $command = new TranslationPushCommand(
+            new TranslationProviderCollection([
+                'loco' => $provider,
+            ]),
+            $reader,
+            [$this->translationAppDir.'/translations'],
+            $locales
+        );
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->find('translation:push'));
+
+        $tester->execute(['--locales' => ['en', 'fr']]);
+
+        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+    }
+
     /**
      * @dataProvider provideCompletionSuggestions
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $application = new Application();
         $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], ['loco', 'crowdin', 'lokalise']));
 

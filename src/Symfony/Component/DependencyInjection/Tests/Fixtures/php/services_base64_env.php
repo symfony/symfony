@@ -35,7 +35,7 @@ class Symfony_DI_PhpDumper_Test_Base64Parameters extends Container
         return true;
     }
 
-    public function getParameter(string $name): array|string|int|float|bool|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
@@ -77,10 +77,10 @@ class Symfony_DI_PhpDumper_Test_Base64Parameters extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'hello': $value = $this->getEnv('base64:foo'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $value = match ($name) {
+            'hello' => $this->getEnv('base64:foo'),
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

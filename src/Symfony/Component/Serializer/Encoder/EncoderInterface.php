@@ -32,7 +32,8 @@ interface EncoderInterface
     /**
      * Checks whether the serializer can encode to given format.
      *
-     * @param string $format Format name
+     * @param string $format  Format name
+     * @param array  $context Options that normalizers/encoders have access to
      */
-    public function supportsEncoding(string $format): bool;
+    public function supportsEncoding(string $format /*, array $context = [] */): bool;
 }

@@ -55,7 +55,7 @@ class MandrillApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mandrill server.', $response, 0, $e);
@@ -124,7 +124,10 @@ class MandrillApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
-                $payload['message']['tags'] = explode(',', $header->getValue());
+                $payload['message']['tags'] = array_merge(
+                    $payload['message']['tags'] ?? [],
+                    explode(',', $header->getValue())
+                );
 
                 continue;
             }
@@ -135,7 +138,7 @@ class MandrillApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['message']['headers'][$name] = $header->getBodyAsString();
+            $payload['message']['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $payload;

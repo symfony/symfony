@@ -95,8 +95,10 @@ class JsonDecode implements DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsDecoding(string $format): bool
+    public function supportsDecoding(string $format /*, array $context = [] */): bool
     {
         return JsonEncoder::FORMAT === $format;
     }

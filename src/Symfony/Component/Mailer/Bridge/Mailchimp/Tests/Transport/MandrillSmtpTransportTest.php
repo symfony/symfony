@@ -24,17 +24,17 @@ class MandrillSmtpTransportTest extends TestCase
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
         $email->getHeaders()->add(new TagHeader('password-reset,user'));
+        $email->getHeaders()->add(new TagHeader('another'));
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
 
         $transport = new MandrillSmtpTransport('user', 'password');
         $method = new \ReflectionMethod(MandrillSmtpTransport::class, 'addMandrillHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(3, $email->getHeaders()->toArray());
         $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
-        $this->assertSame('X-MC-Tags: password-reset,user', $email->getHeaders()->get('X-MC-Tags')->toString());
+        $this->assertSame('X-MC-Tags: password-reset,user,another', $email->getHeaders()->get('X-MC-Tags')->toString());
         $this->assertSame('X-MC-Metadata: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-MC-Metadata')->toString());
     }
 }

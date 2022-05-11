@@ -107,6 +107,17 @@ class ArgumentMetadataFactoryTest extends TestCase
         ], $arguments);
     }
 
+    public function testNamedClosure()
+    {
+        $arguments = $this->factory->createArgumentMetadata($this->signature1(...));
+
+        $this->assertEquals([
+            new ArgumentMetadata('foo', self::class, false, false, null),
+            new ArgumentMetadata('bar', 'array', false, false, null),
+            new ArgumentMetadata('baz', 'callable', false, false, null),
+        ], $arguments);
+    }
+
     public function testNullableTypesSignature()
     {
         $arguments = $this->factory->createArgumentMetadata([new NullableController(), 'action']);

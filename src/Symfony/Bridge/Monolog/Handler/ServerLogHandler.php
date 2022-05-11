@@ -14,12 +14,19 @@ namespace Symfony\Bridge\Monolog\Handler;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\FormattableHandlerTrait;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Symfony\Bridge\Monolog\Formatter\VarDumperFormatter;
 
 if (trait_exists(FormattableHandlerTrait::class)) {
+    /**
+     * @final since Symfony 6.1
+     */
     class ServerLogHandler extends AbstractProcessingHandler
     {
+        use CompatibilityHandler;
+        use CompatibilityProcessingHandler;
         use ServerLogHandlerTrait;
 
         /**
@@ -31,8 +38,13 @@ if (trait_exists(FormattableHandlerTrait::class)) {
         }
     }
 } else {
+    /**
+     * @final since Symfony 6.1
+     */
     class ServerLogHandler extends AbstractProcessingHandler
     {
+        use CompatibilityHandler;
+        use CompatibilityProcessingHandler;
         use ServerLogHandlerTrait;
 
         /**
@@ -47,6 +59,8 @@ if (trait_exists(FormattableHandlerTrait::class)) {
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @internal since Symfony 6.1
  */
 trait ServerLogHandlerTrait
 {
@@ -62,7 +76,7 @@ trait ServerLogHandlerTrait
      */
     private $socket;
 
-    public function __construct(string $host, string|int $level = Logger::DEBUG, bool $bubble = true, array $context = [])
+    public function __construct(string $host, string|int|Level $level = Logger::DEBUG, bool $bubble = true, array $context = [])
     {
         parent::__construct($level, $bubble);
 
@@ -74,10 +88,7 @@ trait ServerLogHandlerTrait
         $this->context = stream_context_create($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(array $record): bool
+    private function doHandle(array|LogRecord $record): bool
     {
         if (!$this->isHandling($record)) {
             return false;
@@ -96,7 +107,7 @@ trait ServerLogHandlerTrait
         return parent::handle($record);
     }
 
-    protected function write(array $record): void
+    private function doWrite(array|LogRecord $record): void
     {
         $recordFormatted = $this->formatRecord($record);
 
@@ -139,7 +150,7 @@ trait ServerLogHandlerTrait
         return $socket;
     }
 
-    private function formatRecord(array $record): string
+    private function formatRecord(array|LogRecord $record): string
     {
         $recordFormatted = $record['formatted'];
 

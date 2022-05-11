@@ -8,6 +8,10 @@ defaults:
   run:
     shell: bash
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
 jobs:
 
   tests:
@@ -20,21 +24,15 @@ jobs:
       matrix:
         include:
           - php: '8.1'
-            os: ubuntu-20.04
-          - php: '8.0'
-            os: macos-11
-          - php: '8.0'
+          - php: '8.1'
             mode: high-deps
-            os: ubuntu-20.04
           - php: '8.1'
             mode: low-deps
-            os: ubuntu-20.04
           - php: '8.2'
-            mode: experimental
-            os: ubuntu-20.04
+            #mode: experimental
       fail-fast: false
 
-    runs-on: "${{ matrix.os }}"
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
@@ -56,11 +54,6 @@ jobs:
           extensions: "${{ env.extensions }}"
           tools: flex
 
-      - name: Install Homebrew packages
-        if: "matrix.os == 'macos-11'"
-        run: |
-          brew install parallel
-
       - name: Configure environment
         run: |
           git config --global user.email ""
@@ -72,7 +65,7 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COLUMNS=120 >> $GITHUB_ENV
-          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data$([[ ${{ matrix.os }} = macos* ]] && echo ',transient-on-macos')" >> $GITHUB_ENV
+          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi' >> $GITHUB_ENV
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
@@ -146,13 +139,13 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "matrix.php == '8.1' && ! matrix.mode && matrix.os != 'macos-11'"
+        if: "matrix.php == '8.1' && ! matrix.mode"
         run: |
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent
           git diff --exit-code
 
       - name: Run tests
@@ -223,13 +216,18 @@ jobs:
 
           [[ ! $X ]] || (exit 1)
 
+      - name: Run TTY tests
+        if: "! matrix.mode"
+        run: |
+            script -e -c './phpunit --group tty' /dev/null
+
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '8.0' && ! matrix.mode && matrix.os != 'macos-11'"
+        if: "matrix.php == '8.1' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.0.2-pcntl-sigchild.tar.bz2
-          tar -xjf php-8.0.2-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.2-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.1.2-pcntl-sigchild.tar.bz2
           cd ..
 
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

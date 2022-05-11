@@ -16,16 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-mbstring": "~1.0"
-    },
-    "require-dev": {
-        "symfony/css-selector": "^5.4|^6.0",
+        "symfony/polyfill-mbstring": "~1.0",
         "masterminds/html5": "^2.6"
     },
-    "conflict": {
-        "masterminds/html5": "<2.6"
+    "require-dev": {
+        "symfony/css-selector": "^5.4|^6.0"
     },
     "suggest": {
         "symfony/css-selector": ""

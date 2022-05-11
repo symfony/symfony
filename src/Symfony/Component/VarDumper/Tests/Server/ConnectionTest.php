@@ -22,9 +22,6 @@ class ConnectionTest extends TestCase
 {
     private const VAR_DUMPER_SERVER = 'tcp://127.0.0.1:9913';
 
-    /**
-     * @group transient-on-macos
-     */
     public function testDump()
     {
         $cloner = new VarCloner();

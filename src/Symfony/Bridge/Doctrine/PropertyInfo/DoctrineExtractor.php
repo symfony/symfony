@@ -135,13 +135,16 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         }
 
         if ($metadata->hasField($property)) {
+            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
+            if (null !== $enumClass = $metadata->getFieldMapping($property)['enumType'] ?? null) {
+                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass)];
+            }
+
             $typeOfField = $metadata->getTypeOfField($property);
 
             if (!$builtinType = $this->getPhpType($typeOfField)) {
                 return null;
             }
-
-            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
 
             switch ($builtinType) {
                 case Type::BUILTIN_TYPE_OBJECT:
@@ -209,7 +212,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         try {
             return $this->entityManager->getClassMetadata($class);
-        } catch (MappingException|OrmMappingException $exception) {
+        } catch (MappingException|OrmMappingException) {
             return null;
         }
     }
@@ -244,47 +247,33 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
      */
     private function getPhpType(string $doctrineType): ?string
     {
-        switch ($doctrineType) {
-            case Types::SMALLINT:
-            case Types::INTEGER:
-                return Type::BUILTIN_TYPE_INT;
-
-            case Types::FLOAT:
-                return Type::BUILTIN_TYPE_FLOAT;
-
-            case Types::BIGINT:
-            case Types::STRING:
-            case Types::TEXT:
-            case Types::GUID:
-            case Types::DECIMAL:
-                return Type::BUILTIN_TYPE_STRING;
-
-            case Types::BOOLEAN:
-                return Type::BUILTIN_TYPE_BOOL;
-
-            case Types::BLOB:
-            case Types::BINARY:
-                return Type::BUILTIN_TYPE_RESOURCE;
-
-            case Types::OBJECT:
-            case Types::DATE_MUTABLE:
-            case Types::DATETIME_MUTABLE:
-            case Types::DATETIMETZ_MUTABLE:
-            case 'vardatetime':
-            case Types::TIME_MUTABLE:
-            case Types::DATE_IMMUTABLE:
-            case Types::DATETIME_IMMUTABLE:
-            case Types::DATETIMETZ_IMMUTABLE:
-            case Types::TIME_IMMUTABLE:
-            case Types::DATEINTERVAL:
-                return Type::BUILTIN_TYPE_OBJECT;
-
-            case Types::ARRAY:
-            case Types::SIMPLE_ARRAY:
-            case 'json_array':
-                return Type::BUILTIN_TYPE_ARRAY;
-        }
-
-        return null;
+        return match ($doctrineType) {
+            Types::SMALLINT,
+            Types::INTEGER => Type::BUILTIN_TYPE_INT,
+            Types::FLOAT => Type::BUILTIN_TYPE_FLOAT,
+            Types::BIGINT,
+            Types::STRING,
+            Types::TEXT,
+            Types::GUID,
+            Types::DECIMAL => Type::BUILTIN_TYPE_STRING,
+            Types::BOOLEAN => Type::BUILTIN_TYPE_BOOL,
+            Types::BLOB,
+            Types::BINARY => Type::BUILTIN_TYPE_RESOURCE,
+            Types::OBJECT,
+            Types::DATE_MUTABLE,
+            Types::DATETIME_MUTABLE,
+            Types::DATETIMETZ_MUTABLE,
+            'vardatetime',
+            Types::TIME_MUTABLE,
+            Types::DATE_IMMUTABLE,
+            Types::DATETIME_IMMUTABLE,
+            Types::DATETIMETZ_IMMUTABLE,
+            Types::TIME_IMMUTABLE,
+            Types::DATEINTERVAL => Type::BUILTIN_TYPE_OBJECT,
+            Types::ARRAY,
+            Types::SIMPLE_ARRAY,
+            'json_array' => Type::BUILTIN_TYPE_ARRAY,
+            default => null,
+        };
     }
 }

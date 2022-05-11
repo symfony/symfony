@@ -12,7 +12,7 @@
 
 {% block menu %}
     <span class="label {{ collector.hasexception ? 'label-status-error' : 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/exception.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/exception.svg') }}</span>
         <strong>Exception</strong>
         {% if collector.hasexception %}
             <span class="count">

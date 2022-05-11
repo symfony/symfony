@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -40,6 +41,7 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyHandlerWithCustomMethods;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQuery;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler;
@@ -105,13 +107,52 @@ class MessengerPassTest extends TestCase
         $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [DummyHandler::class], [['from_transport' => 'async']]);
     }
 
+    public function testHandledMessageTypeResolvedWithMethodAndNoHandlesViaTagAttributes()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container
+            ->register(DummyHandlerWithCustomMethods::class, DummyHandlerWithCustomMethods::class)
+            ->addTag('messenger.message_handler', [
+                'method' => 'handleDummyMessage',
+            ])
+            ->addTag('messenger.message_handler', [
+                'method' => 'handleSecondMessage',
+            ]);
+
+        (new MessengerPass())->process($container);
+
+        $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertArrayHasKey(DummyMessage::class, $handlersMapping);
+        $this->assertHandlerDescriptor(
+            $container,
+            $handlersMapping,
+            DummyMessage::class,
+            [[DummyHandlerWithCustomMethods::class, 'handleDummyMessage']]
+        );
+
+        $this->assertArrayHasKey(SecondMessage::class, $handlersMapping);
+        $this->assertHandlerDescriptor(
+            $container,
+            $handlersMapping,
+            SecondMessage::class,
+            [[DummyHandlerWithCustomMethods::class, 'handleSecondMessage']]
+        );
+    }
+
     public function testTaggedMessageHandler()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
-        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute): void {
+        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
             $tagAttributes = get_object_vars($attribute);
             $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
             unset($tagAttributes['fromTransport']);
+            if ($reflector instanceof \ReflectionMethod) {
+                if (isset($tagAttributes['method'])) {
+                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                }
+                $tagAttributes['method'] = $reflector->getName();
+            }
 
             $definition->addTag('messenger.message_handler', $tagAttributes);
         });
@@ -128,9 +169,15 @@ class MessengerPassTest extends TestCase
         $this->assertSame(HandlersLocator::class, $handlersLocatorDefinition->getClass());
 
         $handlerDescriptionMapping = $handlersLocatorDefinition->getArgument(0);
-        $this->assertCount(1, $handlerDescriptionMapping);
+        $this->assertCount(2, $handlerDescriptionMapping);
 
         $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [TaggedDummyHandler::class], [[]]);
+        $this->assertHandlerDescriptor(
+            $container,
+            $handlerDescriptionMapping,
+            SecondMessage::class,
+            [[TaggedDummyHandler::class, 'handleSecondMessage']]
+        );
     }
 
     public function testProcessHandlersByBus()

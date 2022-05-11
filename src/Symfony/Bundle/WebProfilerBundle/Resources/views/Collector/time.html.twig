@@ -9,7 +9,7 @@
     {% set status_color = has_time_events and collector.duration > 1000 ? 'yellow' %}
 
     {% set icon %}
-        {{ include('@WebProfiler/Icon/time.svg') }}
+        {{ source('@WebProfiler/Icon/time.svg') }}
         <span class="sf-toolbar-value">{{ total_time }}</span>
         <span class="sf-toolbar-label">ms</span>
     {% endset %}
@@ -30,7 +30,7 @@
 
 {% block menu %}
     <span class="label">
-        <span class="icon">{{ include('@WebProfiler/Icon/time.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/time.svg') }}</span>
         <strong>Performance</strong>
     </span>
 {% endblock %}
@@ -144,10 +144,10 @@
   </defs>
 </svg>
 <style type="text/css">
-{% include '@WebProfiler/Collector/time.css.twig' %}
+{{ include('@WebProfiler/Collector/time.css.twig') }}
 </style>
 <script>
-{% include '@WebProfiler/Collector/time.js' %}
+{{ source('@WebProfiler/Collector/time.js') }}
 </script>
 {% endblock %}
 

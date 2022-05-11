@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\SwitchUserTokenProcessor;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -33,7 +34,7 @@ class SwitchUserTokenProcessorTest extends TestCase
         $tokenStorage->method('getToken')->willReturn($switchUserToken);
 
         $processor = new SwitchUserTokenProcessor($tokenStorage);
-        $record = ['extra' => []];
+        $record = RecordFactory::create();
         $record = $processor($record);
 
         $expected = [

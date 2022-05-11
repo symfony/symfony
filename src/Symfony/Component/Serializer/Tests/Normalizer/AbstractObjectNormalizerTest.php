@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -257,18 +258,15 @@ class AbstractObjectNormalizerTest extends TestCase
         $classDiscriminatorResolver = new class() implements ClassDiscriminatorResolverInterface {
             public function getMappingForClass(string $class): ?ClassDiscriminatorMapping
             {
-                switch ($class) {
-                    case AbstractDummy::class:
-                        return new ClassDiscriminatorMapping('type', [
-                            'foo' => AbstractDummyFirstChild::class,
-                        ]);
-                    case AbstractDummyFirstChild::class:
-                        return new ClassDiscriminatorMapping('nested_type', [
-                            'bar' => AbstractDummySecondChild::class,
-                        ]);
-                    default:
-                        return null;
-                }
+                return match ($class) {
+                    AbstractDummy::class => new ClassDiscriminatorMapping('type', [
+                        'foo' => AbstractDummyFirstChild::class,
+                    ]),
+                    AbstractDummyFirstChild::class => new ClassDiscriminatorMapping('nested_type', [
+                        'bar' => AbstractDummySecondChild::class,
+                    ]),
+                    default => null,
+                };
             }
 
             public function getMappingForMappedObject($object): ?ClassDiscriminatorMapping
@@ -386,6 +384,17 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $normalizedData = $normalizer->normalize(new EmptyDummy(), 'any', ['preserve_empty_objects' => true]);
         $this->assertEquals(new \ArrayObject(), $normalizedData);
+    }
+
+    public function testDenormalizeRecursiveWithObjectAttributeWithStringValue()
+    {
+        $extractor = new ReflectionExtractor();
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([$normalizer]);
+
+        $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
+
+        $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
     }
 }
 
@@ -535,7 +544,7 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
         return null;
     }
 
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return true;
     }

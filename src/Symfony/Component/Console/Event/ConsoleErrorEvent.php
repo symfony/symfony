@@ -47,7 +47,6 @@ final class ConsoleErrorEvent extends ConsoleEvent
         $this->exitCode = $exitCode;
 
         $r = new \ReflectionProperty($this->error, 'code');
-        $r->setAccessible(true);
         $r->setValue($this->error, $this->exitCode);
     }
 

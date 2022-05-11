@@ -1,3 +1,4 @@
 framework:
+    http_method_override: false
     php_errors:
         throw: false

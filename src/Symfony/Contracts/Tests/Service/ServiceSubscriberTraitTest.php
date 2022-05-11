@@ -40,6 +40,32 @@ class ServiceSubscriberTraitTest extends TestCase
 
         $this->assertSame($container, (new TestService())->setContainer($container));
     }
+
+    public function testParentNotCalledIfHasMagicCall()
+    {
+        $container = new class([]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+        $service = new class() extends ParentWithMagicCall {
+            use ServiceSubscriberTrait;
+        };
+
+        $this->assertNull($service->setContainer($container));
+        $this->assertSame([], $service::getSubscribedServices());
+    }
+
+    public function testParentNotCalledIfNoParent()
+    {
+        $container = new class([]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+        $service = new class() {
+            use ServiceSubscriberTrait;
+        };
+
+        $this->assertNull($service->setContainer($container));
+        $this->assertSame([], $service::getSubscribedServices());
+    }
 }
 
 class ParentTestService
@@ -74,6 +100,19 @@ class ChildTestService extends TestService
     #[SubscribedService]
     public function aChildService(): Service3
     {
+    }
+}
+
+class ParentWithMagicCall
+{
+    public function __call($method, $args)
+    {
+        throw new \BadMethodCallException('Should not be called.');
+    }
+
+    public static function __callStatic($method, $args)
+    {
+        throw new \BadMethodCallException('Should not be called.');
     }
 }
 

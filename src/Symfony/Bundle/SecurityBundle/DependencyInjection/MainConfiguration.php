@@ -134,6 +134,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->fixXmlConfig('ip')
                         ->fixXmlConfig('method')
                         ->children()
+                            ->scalarNode('request_matcher')->defaultNull()->end()
                             ->scalarNode('requires_channel')->defaultNull()->end()
                             ->scalarNode('path')
                                 ->defaultNull()

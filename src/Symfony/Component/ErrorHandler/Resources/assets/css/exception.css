@@ -225,7 +225,7 @@ header .container { display: flex; justify-content: space-between; }
 .trace-line + .trace-line { border-top: var(--border); }
 .trace-line:hover { background: var(--base-1); }
 .trace-line a { color: var(--base-6); }
-.trace-line .icon { opacity: .4; position: absolute; left: 10px; top: 11px; }
+.trace-line .icon { opacity: .4; position: absolute; left: 10px; }
 .trace-line .icon svg { fill: var(--base-5); height: 16px; width: 16px; }
 .trace-line .icon.icon-copy { left: auto; top: auto; padding-left: 5px; display: none }
 .trace-line:hover .icon.icon-copy:not(.hidden) { display: inline-block }

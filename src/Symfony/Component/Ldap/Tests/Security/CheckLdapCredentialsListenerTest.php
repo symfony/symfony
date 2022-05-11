@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
 use Symfony\Component\Ldap\Security\LdapBadge;
@@ -41,10 +41,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         $this->ldap = $this->createMock(LdapInterface::class);
     }
 
@@ -61,10 +57,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function provideShouldNotCheckPassport()
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         // no LdapBadge
         yield [new TestAuthenticator(), new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'))];
 
@@ -110,10 +102,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function provideWrongPassportData()
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         // no password credentials
         yield [new SelfValidatingPassport(new UserBadge('test'), [new LdapBadge('app.ldap')])];
     }
@@ -133,7 +121,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->expectExceptionMessage('The presented password is invalid.');
 
         $this->ldap->method('escape')->willReturnArgument(0);
-        $this->ldap->expects($this->any())->method('bind')->willThrowException(new ConnectionException());
+        $this->ldap->expects($this->any())->method('bind')->willThrowException(new InvalidCredentialsException());
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent());

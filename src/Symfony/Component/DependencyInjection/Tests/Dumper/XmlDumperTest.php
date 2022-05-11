@@ -49,13 +49,6 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
     }
 
-    public function testAddParameters()
-    {
-        $container = include self::$fixturesPath.'//containers/container8.php';
-        $dumper = new XmlDumper($container);
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
-    }
-
     public function testAddService()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
@@ -244,9 +237,6 @@ class XmlDumperTest extends TestCase
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_abstract.xml'), $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();
@@ -254,6 +244,9 @@ class XmlDumperTest extends TestCase
             ->register(FooClassWithEnumAttribute::class, FooClassWithEnumAttribute::class)
             ->setPublic(true)
             ->addArgument(FooUnitEnum::BAR);
+
+        $container->setParameter('unit_enum', FooUnitEnum::BAR);
+        $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
 
         $container->compile();
         $dumper = new XmlDumper($container);

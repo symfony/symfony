@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
  */
-final class PushMessage implements MessageInterface
+class PushMessage implements MessageInterface
 {
     private $transport;
     private $subject;

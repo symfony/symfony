@@ -15,24 +15,30 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
 /**
  * @author Alexander Borisov <boshurik@gmail.com>
+ *
+ * @final since Symfony 6.1
  */
 class MailerHandler extends AbstractProcessingHandler
 {
+    use CompatibilityProcessingHandler;
+
     private MailerInterface $mailer;
     private \Closure|Email $messageTemplate;
 
-    public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int|Level $level = Logger::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 
         $this->mailer = $mailer;
-        $this->messageTemplate = !\is_callable($messageTemplate) || $messageTemplate instanceof \Closure ? $messageTemplate : \Closure::fromCallable($messageTemplate);
+        $this->messageTemplate = $messageTemplate instanceof Email ? $messageTemplate : $messageTemplate(...);
     }
 
     /**
@@ -42,11 +48,21 @@ class MailerHandler extends AbstractProcessingHandler
     {
         $messages = [];
 
-        foreach ($records as $record) {
-            if ($record['level'] < $this->level) {
-                continue;
+        if (Logger::API >= 3) {
+            /** @var LogRecord $record */
+            foreach ($records as $record) {
+                if ($record->level->isLowerThan($this->level)) {
+                    continue;
+                }
+                $messages[] = $this->processRecord($record);
             }
-            $messages[] = $this->processRecord($record);
+        } else {
+            foreach ($records as $record) {
+                if ($record['level'] < $this->level) {
+                    continue;
+                }
+                $messages[] = $this->processRecord($record);
+            }
         }
 
         if (!empty($messages)) {
@@ -57,7 +73,7 @@ class MailerHandler extends AbstractProcessingHandler
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record): void
+    private function doWrite(array|LogRecord $record): void
     {
         $this->send((string) $record['formatted'], [$record]);
     }
@@ -125,7 +141,7 @@ class MailerHandler extends AbstractProcessingHandler
         return $message;
     }
 
-    protected function getHighestRecord(array $records): array
+    protected function getHighestRecord(array $records): array|LogRecord
     {
         $highestRecord = null;
         foreach ($records as $record) {

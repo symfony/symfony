@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Parameters implementing `TranslatableInterface` are processed
+ * Add the file extension to the `XliffFileDumper` constructor
 
 5.4
 ---

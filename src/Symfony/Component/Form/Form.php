@@ -704,7 +704,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
         return FormUtil::isEmpty($this->modelData) ||
             // arrays, countables
-            ((\is_array($this->modelData) || $this->modelData instanceof \Countable) && 0 === \count($this->modelData)) ||
+            (is_countable($this->modelData) && 0 === \count($this->modelData)) ||
             // traversables that are not countable
             ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
@@ -817,10 +817,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             }
 
             $child = (string) $child;
-
-            if (null !== $type && !\is_string($type)) {
-                throw new UnexpectedTypeException($type, 'string or null');
-            }
 
             // Never initialize child forms automatically
             $options['auto_initialize'] = false;

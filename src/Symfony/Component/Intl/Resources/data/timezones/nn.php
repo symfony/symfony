@@ -264,7 +264,7 @@ return [
         'Europe/Gibraltar' => 'sentraleuropeisk tid (Gibraltar)',
         'Europe/Helsinki' => 'austeuropeisk tid (Helsinki)',
         'Europe/Kaliningrad' => 'austeuropeisk tid (Kaliningrad)',
-        'Europe/Kiev' => 'austeuropeisk tid (Kiev)',
+        'Europe/Kiev' => 'austeuropeisk tid (Kyiv)',
         'Europe/Lisbon' => 'vesteuropeisk tid (Lisbon)',
         'Europe/Ljubljana' => 'sentraleuropeisk tid (Ljubljana)',
         'Europe/Luxembourg' => 'sentraleuropeisk tid (Luxembourg)',

@@ -61,6 +61,9 @@ class Parser
             '<=' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             'not in' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             'in' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
+            'contains' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
+            'starts with' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
+            'ends with' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             'matches' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             '..' => ['precedence' => 25, 'associativity' => self::OPERATOR_LEFT],
             '+' => ['precedence' => 30, 'associativity' => self::OPERATOR_LEFT],
@@ -332,7 +335,8 @@ class Parser
     {
         $token = $this->stream->current;
         while (Token::PUNCTUATION_TYPE == $token->type) {
-            if ('.' === $token->value) {
+            if ('.' === $token->value || '?.' === $token->value) {
+                $isNullSafe = '?.' === $token->value;
                 $this->stream->next();
                 $token = $this->stream->current;
                 $this->stream->next();
@@ -356,7 +360,7 @@ class Parser
                     throw new SyntaxError('Expected name.', $token->cursor, $this->stream->getExpression());
                 }
 
-                $arg = new Node\ConstantNode($token->value, true);
+                $arg = new Node\ConstantNode($token->value, true, $isNullSafe);
 
                 $arguments = new Node\ArgumentsNode();
                 if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '(')) {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -28,6 +29,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -85,12 +88,33 @@ class CommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->addArgument() adds an argument to the command');
     }
 
+    public function testAddArgumentFull()
+    {
+        $command = new \TestCommand();
+        $command->addArgument('foo', InputArgument::OPTIONAL, 'Description', 'default', ['a', 'b']);
+        $argument = $command->getDefinition()->getArgument('foo');
+        $this->assertSame('Description', $argument->getDescription());
+        $this->assertSame('default', $argument->getDefault());
+        $this->assertTrue($argument->hasCompletion());
+    }
+
     public function testAddOption()
     {
         $command = new \TestCommand();
         $ret = $command->addOption('foo');
         $this->assertEquals($command, $ret, '->addOption() implements a fluent interface');
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
+    }
+
+    public function testAddOptionFull()
+    {
+        $command = new \TestCommand();
+        $command->addOption('foo', ['f'], InputOption::VALUE_OPTIONAL, 'Description', 'default', ['a', 'b']);
+        $option = $command->getDefinition()->getOption('foo');
+        $this->assertSame('f', $option->getShortcut());
+        $this->assertSame('Description', $option->getDescription());
+        $this->assertSame('default', $option->getDefault());
+        $this->assertTrue($option->hasCompletion());
     }
 
     public function testSetHidden()
@@ -227,7 +251,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command);
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasArgument('bar'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
@@ -249,7 +272,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command, false);
         $this->assertTrue($command->getDefinition()->hasOption('bar'), '->mergeApplicationDefinition(false) merges the application and the command options');
         $this->assertFalse($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition(false) does not merge the application arguments');
@@ -420,18 +442,58 @@ class CommandTest extends TestCase
         $this->assertSame(['f'], $command->getAliases());
     }
 
+    /**
+     * @group legacy
+     */
+    public function testDefaultNameProperty()
+    {
+        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultName" for setting a command name is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
+
+        $this->assertSame('my:command', MyCommand::getDefaultName());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDefaultDescriptionProperty()
+    {
+        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultDescription" for setting a command description is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
+
+        $this->assertSame('This is a command I wrote all by myself', MyCommand::getDefaultDescription());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testStaticDefaultProperties()
+    {
+        $command = new MyCommand();
+
+        $this->assertSame('my:command', $command->getName());
+        $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
+    }
+
+    public function testAttributeOverridesProperty()
+    {
+        $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
+        $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
+
+        $command = new MyAnnotatedCommand();
+
+        $this->assertSame('my:command', $command->getName());
+        $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
+    }
+
     public function testDefaultCommand()
     {
         $apl = new Application();
         $apl->setDefaultCommand(Php8Command::getDefaultName());
         $property = new \ReflectionProperty($apl, 'defaultCommand');
-        $property->setAccessible(true);
 
         $this->assertEquals('foo', $property->getValue($apl));
 
         $apl->setDefaultCommand(Php8Command2::getDefaultName());
         $property = new \ReflectionProperty($apl, 'defaultCommand');
-        $property->setAccessible(true);
 
         $this->assertEquals('foo2', $property->getValue($apl));
     }
@@ -454,4 +516,31 @@ class Php8Command extends Command
 #[AsCommand(name: 'foo2', description: 'desc2', hidden: true)]
 class Php8Command2 extends Command
 {
+}
+
+class MyCommand extends Command
+{
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultName = 'my:command';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultDescription = 'This is a command I wrote all by myself';
+}
+
+#[AsCommand(name: 'my:command', description: 'This is a command I wrote all by myself')]
+class MyAnnotatedCommand extends Command
+{
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultName = 'i-shall-be-ignored';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultDescription = 'This description should be ignored.';
 }

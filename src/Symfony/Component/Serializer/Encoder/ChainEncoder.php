@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -47,7 +48,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
     {
         try {
             $this->getEncoder($format, $context);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             return false;
         }
 
@@ -60,6 +61,10 @@ class ChainEncoder implements ContextAwareEncoderInterface
     public function needsNormalization(string $format, array $context = []): bool
     {
         $encoder = $this->getEncoder($format, $context);
+
+        if ($encoder instanceof TraceableEncoder) {
+            return $encoder->needsNormalization();
+        }
 
         if (!$encoder instanceof NormalizationAwareInterface) {
             return true;

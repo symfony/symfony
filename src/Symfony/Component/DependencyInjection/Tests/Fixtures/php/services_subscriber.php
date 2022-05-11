@@ -15,11 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $this->getService = $this->getService(...);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => 'getTestServiceSubscriberService',
@@ -44,10 +44,10 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.DlIAmAe' => true,
-            '.service_locator.t5IGRMW' => true,
-            '.service_locator.zFfA7ng' => true,
-            '.service_locator.zFfA7ng.foo_service' => true,
+            '.service_locator.JmEob1b' => true,
+            '.service_locator.KIgkoLM' => true,
+            '.service_locator.qUb.lJI' => true,
+            '.service_locator.qUb.lJI.foo_service' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
         ];
     }

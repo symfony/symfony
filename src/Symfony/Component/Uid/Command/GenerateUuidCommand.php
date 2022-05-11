@@ -157,7 +157,7 @@ EOF
                 $create = function () use ($namespace, $name): Uuid {
                     try {
                         $factory = $this->factory->nameBased($namespace);
-                    } catch (\LogicException $e) {
+                    } catch (\LogicException) {
                         throw new \InvalidArgumentException('Missing namespace: use the "--namespace" option or configure a default namespace in the underlying factory.');
                     }
 
@@ -166,11 +166,11 @@ EOF
                 break;
 
             case $random:
-                $create = [$this->factory->randomBased(), 'create'];
+                $create = $this->factory->randomBased()->create(...);
                 break;
 
             default:
-                $create = [$this->factory, 'create'];
+                $create = $this->factory->create(...);
                 break;
         }
 

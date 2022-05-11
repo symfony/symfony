@@ -103,30 +103,19 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         // connect if we are not yet
         $conn = $this->getConnection();
 
-        switch ($this->driver) {
-            case 'mysql':
-                // We use varbinary for the ID column because it prevents unwanted conversions:
-                // - character set conversions between server and client
-                // - trailing space removal
-                // - case-insensitivity
-                // - language processing like é == e
-                $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(255) NOT NULL PRIMARY KEY, $this->dataCol MEDIUMBLOB NOT NULL, $this->lifetimeCol INTEGER UNSIGNED, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB";
-                break;
-            case 'sqlite':
-                $sql = "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            case 'pgsql':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            case 'oci':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR2(255) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            case 'sqlsrv':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol VARBINARY(MAX) NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            default:
-                throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
-        }
+        $sql = match ($this->driver) {
+            // We use varbinary for the ID column because it prevents unwanted conversions:
+            // - character set conversions between server and client
+            // - trailing space removal
+            // - case-insensitivity
+            // - language processing like é == e
+            'mysql' => "CREATE TABLE $this->table ($this->idCol VARBINARY(255) NOT NULL PRIMARY KEY, $this->dataCol MEDIUMBLOB NOT NULL, $this->lifetimeCol INTEGER UNSIGNED, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB",
+            'sqlite' => "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            'pgsql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            'oci' => "CREATE TABLE $this->table ($this->idCol VARCHAR2(255) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            'sqlsrv' => "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol VARBINARY(MAX) NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            default => throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver)),
+        };
 
         $conn->exec($sql);
     }
@@ -146,7 +135,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $delete = $connection->prepare($deleteSql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return true;
         }
         $delete->bindValue(':time', time(), \PDO::PARAM_INT);
@@ -156,7 +145,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
         try {
             return $delete->execute();
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return true;
         }
     }
@@ -243,7 +232,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $conn->exec($sql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
         }
 
         return true;
@@ -259,7 +248,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         try {
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute(array_values($ids));
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
         }
 
         return true;
@@ -312,7 +301,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $lifetime = $lifetime ?: null;
         try {
             $stmt = $conn->prepare($sql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                 $this->createTable();
             }
@@ -347,7 +336,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         foreach ($values as $id => $data) {
             try {
                 $stmt->execute();
-            } catch (\PDOException $e) {
+            } catch (\PDOException) {
                 if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                     $this->createTable();
                 }
@@ -356,7 +345,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $driver && !$stmt->rowCount()) {
                 try {
                     $insertStmt->execute();
-                } catch (\PDOException $e) {
+                } catch (\PDOException) {
                     // A concurrent write won, let it be
                 }
             }

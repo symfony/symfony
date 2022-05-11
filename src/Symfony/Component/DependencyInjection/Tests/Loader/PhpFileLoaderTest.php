@@ -94,8 +94,11 @@ class PhpFileLoaderTest extends TestCase
         yield ['php7'];
         yield ['anonymous'];
         yield ['lazy_fqcn'];
+        yield ['inline_binding'];
         yield ['remove'];
         yield ['config_builder'];
+        yield ['expression_factory'];
+        yield ['closure'];
     }
 
     public function testAutoConfigureAndChildDefinition()

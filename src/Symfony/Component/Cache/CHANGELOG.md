@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for ACL auth in RedisAdapter
+ * Improve reliability and performance of `TagAwareAdapter` by making tag versions an integral part of item value
+
 6.0
 ---
 

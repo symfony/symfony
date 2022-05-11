@@ -62,12 +62,7 @@ class LoaderLoadException extends \Exception
             $message .= sprintf(' Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
             $message .= sprintf(' If the bundle is registered, make sure the bundle path "%s" is not empty.', $resource);
         } elseif (null !== $type) {
-            // maybe there is no loader for this specific type
-            if ('annotation' === $type) {
-                $message .= ' Make sure to use PHP 8+ or that annotations are installed and enabled.';
-            } else {
-                $message .= sprintf(' Make sure there is a loader supporting the "%s" type.', $type);
-            }
+            $message .= sprintf(' Make sure there is a loader supporting the "%s" type.', $type);
         }
 
         parent::__construct($message, $code, $previous);

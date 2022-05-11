@@ -51,7 +51,7 @@ class RoundRobinTransport implements TransportInterface
         while ($transport = $this->getNextTransport()) {
             try {
                 return $transport->send($message, $envelope);
-            } catch (TransportExceptionInterface $e) {
+            } catch (TransportExceptionInterface) {
                 $this->deadTransports[$transport] = microtime(true);
             }
         }

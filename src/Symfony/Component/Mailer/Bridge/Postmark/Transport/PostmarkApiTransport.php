@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
@@ -61,7 +62,7 @@ class PostmarkApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Postmark server.', $response, 0, $e);
@@ -97,6 +98,10 @@ class PostmarkApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
+                if (isset($payload['Tag'])) {
+                    throw new TransportException('Postmark only allows a single tag per email.');
+                }
+
                 $payload['Tag'] = $header->getValue();
 
                 continue;
@@ -115,7 +120,7 @@ class PostmarkApiTransport extends AbstractApiTransport
             }
 
             $payload['Headers'][] = [
-                'Name' => $name,
+                'Name' => $header->getName(),
                 'Value' => $header->getBodyAsString(),
             ];
         }

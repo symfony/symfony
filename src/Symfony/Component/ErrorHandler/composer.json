@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "psr/log": "^1|^2|^3",
         "symfony/var-dumper": "^5.4|^6.0"
     },

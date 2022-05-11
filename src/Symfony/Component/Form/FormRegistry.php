@@ -129,7 +129,7 @@ class FormRegistry implements FormRegistryInterface
 
         try {
             $this->getType($name);
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             return false;
         }
 

@@ -243,7 +243,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
             try {
                 $value[$name] = $child->finalize($value[$name]);
-            } catch (UnsetKeyException $e) {
+            } catch (UnsetKeyException) {
                 unset($value[$name]);
             }
         }
@@ -285,7 +285,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             if (isset($this->children[$name])) {
                 try {
                     $normalized[$name] = $this->children[$name]->normalize($val);
-                } catch (UnsetKeyException $e) {
+                } catch (UnsetKeyException) {
                 }
                 unset($value[$name]);
             } elseif (!$this->removeExtraKeys) {

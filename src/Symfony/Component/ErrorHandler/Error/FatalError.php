@@ -73,7 +73,6 @@ class FatalError extends \Error
         ] as $property => $value) {
             if (null !== $value) {
                 $refl = new \ReflectionProperty(\Error::class, $property);
-                $refl->setAccessible(true);
                 $refl->setValue($this, $value);
             }
         }

@@ -4,6 +4,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 return static function (ContainerConfigurator $container) {
     $container->extension('framework', [
+        'http_method_override' => false,
         'mailer' => [
             'transports' => [
                 'transport1' => 'smtp://example1.com',

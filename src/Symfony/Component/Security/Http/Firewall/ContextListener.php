@@ -68,7 +68,7 @@ class ContextListener extends AbstractListener
         $this->dispatcher = $dispatcher;
 
         $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver();
-        $this->sessionTrackerEnabler = null === $sessionTrackerEnabler || $sessionTrackerEnabler instanceof \Closure ? $sessionTrackerEnabler : \Closure::fromCallable($sessionTrackerEnabler);
+        $this->sessionTrackerEnabler = null === $sessionTrackerEnabler ? null : $sessionTrackerEnabler(...);
     }
 
     /**
@@ -85,7 +85,7 @@ class ContextListener extends AbstractListener
     public function authenticate(RequestEvent $event)
     {
         if (!$this->registered && null !== $this->dispatcher && $event->isMainRequest()) {
-            $this->dispatcher->addListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
+            $this->dispatcher->addListener(KernelEvents::RESPONSE, $this->onKernelResponse(...));
             $this->registered = true;
         }
 
@@ -162,7 +162,7 @@ class ContextListener extends AbstractListener
             return;
         }
 
-        $this->dispatcher?->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
+        $this->dispatcher?->removeListener(KernelEvents::RESPONSE, $this->onKernelResponse(...));
         $this->registered = false;
         $session = $request->getSession();
         $sessionId = $session->getId();
@@ -234,7 +234,7 @@ class ContextListener extends AbstractListener
                 }
 
                 return $token;
-            } catch (UnsupportedUserException $e) {
+            } catch (UnsupportedUserException) {
                 // let's try the next user provider
             } catch (UserNotFoundException $e) {
                 $this->logger?->warning('Username could not be found in the selected user provider.', ['username' => $e->getUserIdentifier(), 'provider' => \get_class($provider)]);

@@ -71,7 +71,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     {
         $response = new BinaryFileResponse(__FILE__);
 
-        $iso88591EncodedFilename = utf8_decode('föö.html');
+        $iso88591EncodedFilename = mb_convert_encoding('föö.html', 'ISO-8859-1', 'UTF-8');
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $iso88591EncodedFilename);
 
         // the parameter filename* is invalid in this case (rawurldecode('f%F6%F6') does not provide a UTF-8 string but an ISO-8859-1 encoded one)
@@ -310,7 +310,6 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response = new BinaryFileResponse($file, 200, ['Content-Type' => 'application/octet-stream']);
         $reflection = new \ReflectionObject($response);
         $property = $reflection->getProperty('file');
-        $property->setAccessible(true);
         $property->setValue($response, $file);
 
         $response->prepare($request);

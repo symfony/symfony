@@ -105,6 +105,17 @@ class SymfonyRuntime extends GenericRuntime
                 ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
                 ->usePutenv($options['use_putenv'] ?? false)
                 ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
+
+            if ($this->input && ($options['dotenv_overload'] ?? false)) {
+                if ($this->input->getParameterOption(['--env', '-e'], $_SERVER[$envKey], true) !== $_SERVER[$envKey]) {
+                    throw new \LogicException(sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
+                }
+
+                if ($_SERVER[$debugKey] && $this->input->hasParameterOption('--no-debug', true)) {
+                    putenv($debugKey.'='.$_SERVER[$debugKey] = $_ENV[$debugKey] = '0');
+                }
+            }
+
             $options['debug'] ??= '1' === $_SERVER[$debugKey];
             $options['disable_dotenv'] = true;
         } else {
@@ -163,24 +174,15 @@ class SymfonyRuntime extends GenericRuntime
 
     protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed
     {
-        switch ($type) {
-            case Request::class:
-                return Request::createFromGlobals();
+        return match ($type) {
+            Request::class => Request::createFromGlobals(),
+            InputInterface::class => $this->getInput(),
+            OutputInterface::class => $this->output ??= new ConsoleOutput(),
+            Application::class => $this->console ??= new Application(),
+            Command::class => $this->command ??= new Command(),
+            default => parent::getArgument($parameter, $type),
+        };
 
-            case InputInterface::class:
-                return $this->getInput();
-
-            case OutputInterface::class:
-                return $this->output ??= new ConsoleOutput();
-
-            case Application::class:
-                return $this->console ??= new Application();
-
-            case Command::class:
-                return $this->command ??= new Command();
-        }
-
-        return parent::getArgument($parameter, $type);
     }
 
     protected static function register(GenericRuntime $runtime): GenericRuntime

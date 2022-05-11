@@ -74,7 +74,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     {
         try {
             $this->getEngine($name);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return false;
         }
 

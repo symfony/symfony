@@ -43,7 +43,7 @@ final class MercureTransportFactory extends AbstractTransportFactory
 
         try {
             $hub = $this->registry->getHub($hubId);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             throw new IncompleteDsnException(sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
         }
 

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Functional;
 
 use Psr\Log\NullLogger;
@@ -42,6 +51,7 @@ class WebProfilerBundleKernel extends Kernel
     protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
     {
         $containerBuilder->loadFromExtension('framework', [
+            'http_method_override' => false,
             'secret' => 'foo-secret',
             'profiler' => ['only_exceptions' => false],
             'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],

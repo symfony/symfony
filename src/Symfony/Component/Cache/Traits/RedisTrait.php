@@ -15,6 +15,7 @@ use Predis\Command\Redis\UNLINK;
 use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Connection\Aggregate\ReplicationInterface;
+use Predis\Response\ErrorInterface;
 use Predis\Response\Status;
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -93,9 +94,13 @@ trait RedisTrait
             throw new CacheException(sprintf('Cannot find the "redis" extension nor the "predis/predis" package: "%s".', $dsn));
         }
 
-        $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:[^:@]*+:)?([^@]*+)@)?#', function ($m) use (&$auth) {
-            if (isset($m[2])) {
-                $auth = $m[2];
+        $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
+            if (isset($m['password'])) {
+                if (\in_array($m['user'], ['', 'default'], true)) {
+                    $auth = $m['password'];
+                } else {
+                    $auth = [$m['user'], $m['password']];
+                }
 
                 if ('' === $auth) {
                     $auth = null;
@@ -180,7 +185,7 @@ trait RedisTrait
 
             $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts, $tls) {
                 $host = $hosts[0]['host'] ?? $hosts[0]['path'];
-                $port = $hosts[0]['port'] ?? null;
+                $port = $hosts[0]['port'] ?? 0;
 
                 if (isset($hosts[0]['host']) && $tls) {
                     $host = 'tls://'.$host;
@@ -234,11 +239,11 @@ trait RedisTrait
             }
         } elseif (is_a($class, \RedisArray::class, true)) {
             foreach ($hosts as $i => $host) {
-                switch ($host['scheme']) {
-                    case 'tcp': $hosts[$i] = $host['host'].':'.$host['port']; break;
-                    case 'tls': $hosts[$i] = 'tls://'.$host['host'].':'.$host['port']; break;
-                    default: $hosts[$i] = $host['path'];
-                }
+                $hosts[$i] = match ($host['scheme']) {
+                    'tcp' => $host['host'].':'.$host['port'],
+                    'tls' => 'tls://'.$host['host'].':'.$host['port'],
+                    default => $host['path'],
+                };
             }
             $params['lazy_connect'] = $params['lazy'] ?? true;
             $params['connect_timeout'] = $params['timeout'];
@@ -255,11 +260,11 @@ trait RedisTrait
         } elseif (is_a($class, \RedisCluster::class, true)) {
             $initializer = static function () use ($class, $params, $dsn, $hosts) {
                 foreach ($hosts as $i => $host) {
-                    switch ($host['scheme']) {
-                        case 'tcp': $hosts[$i] = $host['host'].':'.$host['port']; break;
-                        case 'tls': $hosts[$i] = 'tls://'.$host['host'].':'.$host['port']; break;
-                        default: $hosts[$i] = $host['path'];
-                    }
+                    $hosts[$i] = match ($host['scheme']) {
+                        'tcp' => $host['host'].':'.$host['port'],
+                        'tls' => 'tls://'.$host['host'].':'.$host['port'],
+                        default => $host['path'],
+                    };
                 }
 
                 try {
@@ -299,7 +304,13 @@ trait RedisTrait
                 $params['parameters']['database'] = $params['dbindex'];
             }
             if (null !== $auth) {
-                $params['parameters']['password'] = $auth;
+                if (\is_array($auth)) {
+                    // ACL
+                    $params['parameters']['username'] = $auth[0];
+                    $params['parameters']['password'] = $auth[1];
+                } else {
+                    $params['parameters']['password'] = $auth;
+                }
             }
             if (1 === \count($hosts) && !($params['redis_cluster'] || $params['redis_sentinel'])) {
                 $hosts = $hosts[0];
@@ -391,7 +402,7 @@ trait RedisTrait
             }
 
             $info = $host->info('Server');
-            $info = $info['Server'] ?? $info;
+            $info = !$info instanceof ErrorInterface ? $info['Server'] ?? $info : ['redis_version' => '2.0'];
 
             if (!$host instanceof \Predis\ClientInterface) {
                 $prefix = \defined('Redis::SCAN_PREFIX') && (\Redis::SCAN_PREFIX & $host->getOption(\Redis::OPT_SCAN)) ? '' : $host->getOption(\Redis::OPT_PREFIX);
@@ -454,7 +465,7 @@ trait RedisTrait
             if ($unlink) {
                 try {
                     $unlink = false !== $this->redis->unlink($ids);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                     $unlink = false;
                 }
             }

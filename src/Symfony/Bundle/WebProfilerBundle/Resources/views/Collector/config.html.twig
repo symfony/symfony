@@ -20,7 +20,7 @@
 
     {% set icon %}
         <span class="sf-toolbar-label">
-            {{ include('@WebProfiler/Icon/symfony.svg') }}
+            {{ source('@WebProfiler/Icon/symfony.svg') }}
         </span>
         <span class="sf-toolbar-value">{{ collector.symfonyState is defined ? collector.symfonyversion : 'n/a' }}</span>
     {% endset %}
@@ -108,7 +108,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.symfonyState == 'eol' ? 'red' : collector.symfonyState in ['eom', 'dev'] ? 'yellow' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/config.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/config.svg') }}</span>
         <strong>Configuration</strong>
     </span>
 {% endblock %}
@@ -191,17 +191,17 @@
 
     <div class="metrics">
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
             <span class="label">OPcache</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no-gray') ~ '.svg') }}</span>
+            <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no-gray') ~ '.svg') }}</span>
             <span class="label">APCu</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no-gray') ~ '.svg') }}</span>
+            <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no-gray') ~ '.svg') }}</span>
             <span class="label">Xdebug</span>
         </div>
     </div>

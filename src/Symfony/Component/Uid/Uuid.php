@@ -64,15 +64,15 @@ class Uuid extends AbstractUid
             return new NilUuid();
         }
 
-        switch ($uuid[14]) {
-            case UuidV1::TYPE: return new UuidV1($uuid);
-            case UuidV3::TYPE: return new UuidV3($uuid);
-            case UuidV4::TYPE: return new UuidV4($uuid);
-            case UuidV5::TYPE: return new UuidV5($uuid);
-            case UuidV6::TYPE: return new UuidV6($uuid);
-        }
+        return match ((int) $uuid[14]) {
+            UuidV1::TYPE => new UuidV1($uuid),
+            UuidV3::TYPE => new UuidV3($uuid),
+            UuidV4::TYPE => new UuidV4($uuid),
+            UuidV5::TYPE => new UuidV5($uuid),
+            UuidV6::TYPE => new UuidV6($uuid),
+            default => new self($uuid),
+        };
 
-        return new self($uuid);
     }
 
     final public static function v1(): UuidV1

@@ -19,14 +19,15 @@ class ChoiceQuestionTest extends TestCase
     /**
      * @dataProvider selectUseCases
      */
-    public function testSelectUseCases($multiSelect, $answers, $expected, $message)
+    public function testSelectUseCases($multiSelect, $answers, $expected, $message, $default = null)
     {
         $question = new ChoiceQuestion('A question', [
             'First response',
             'Second response',
             'Third response',
             'Fourth response',
-        ]);
+            null,
+        ], $default);
 
         $question->setMultiselect($multiSelect);
 
@@ -58,6 +59,19 @@ class ChoiceQuestionTest extends TestCase
                 ['First response,Second response', ' First response , Second response '],
                 ['First response', 'Second response'],
                 'When passed multiple answers on MultiSelect, the defaultValidator must return these answers as an array',
+            ],
+            [
+                false,
+                [null],
+                null,
+                'When used null as default single answer on singleSelect, the defaultValidator must return this answer as null',
+            ],
+            [
+                false,
+                ['First response'],
+                'First response',
+                'When used a string as default single answer on singleSelect, the defaultValidator must return this answer as a string',
+                'First response',
             ],
             [
                 false,

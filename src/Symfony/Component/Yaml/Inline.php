@@ -177,6 +177,14 @@ class Inline
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
+                $singleQuoted = Escaper::escapeWithSingleQuotes($value);
+                if (!str_contains($value, "'")) {
+                    return $singleQuoted;
+                }
+                // Attempt double-quoting the string instead to see if it's more efficient.
+                $doubleQuoted = Escaper::escapeWithDoubleQuotes($value);
+
+                return \strlen($doubleQuoted) < \strlen($singleQuoted) ? $doubleQuoted : $singleQuoted;
             case Parser::preg_match('{^[0-9]+[_0-9]*$}', $value):
             case Parser::preg_match(self::getHexRegex(), $value):
             case Parser::preg_match(self::getTimestampRegex(), $value):
@@ -362,7 +370,7 @@ class Inline
                         try {
                             $pos = 0;
                             $value = self::parseMapping('{'.$value.'}', $flags, $pos, $references);
-                        } catch (\InvalidArgumentException $e) {
+                        } catch (\InvalidArgumentException) {
                             // no, it's not
                         }
                     }
@@ -620,21 +628,18 @@ class Inline
                         return (float) substr($scalar, 8);
                     case str_starts_with($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
-                    default:
-                        throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                 }
-                // no break
+
+                throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
             case preg_match('/^(?:\+|-)?0o(?P<value>[0-7_]++)$/', $scalar, $matches):
                 $value = str_replace('_', '', $matches['value']);
 
                 if ('-' === $scalar[0]) {
                     return -octdec($value);
-                } else {
-                    return octdec($value);
                 }
 
+                return octdec($value);
             // Optimize for returning strings.
-            // no break
             case \in_array($scalar[0], ['+', '-', '.'], true) || is_numeric($scalar[0]):
                 if (Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar)) {
                     $scalar = str_replace('_', '', $scalar);
@@ -670,7 +675,7 @@ class Inline
                             if (false !== $scalar = $time->getTimestamp()) {
                                 return $scalar;
                             }
-                        } catch (\ValueError $e) {
+                        } catch (\ValueError) {
                             // no-op
                         }
 

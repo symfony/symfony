@@ -117,7 +117,7 @@ class StreamWrapper
         return false;
     }
 
-    public function stream_read(int $count)
+    public function stream_read(int $count): string|false
     {
         if (\is_resource($this->content)) {
             // Empty the internal activity list

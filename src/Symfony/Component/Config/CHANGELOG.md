@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow using environment variables in `EnumNode`
+ * Add Node's information in generated Config
+ * Add `DefinitionFileLoader` class to load a TreeBuilder definition from an external file
+ * Add `DefinitionConfigurator` helper
+
 6.0
 ---
 

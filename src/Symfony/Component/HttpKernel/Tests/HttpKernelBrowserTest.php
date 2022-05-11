@@ -59,7 +59,6 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new Response();
         $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
@@ -80,7 +79,6 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new StreamedResponse(function () {
             echo 'foo';

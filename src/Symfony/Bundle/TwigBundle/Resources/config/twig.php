@@ -75,7 +75,7 @@ return static function (ContainerConfigurator $container) {
             ->call('setRequestStack', [service('request_stack')->ignoreOnInvalid()])
 
         ->set('twig.template_iterator', TemplateIterator::class)
-            ->args([service('kernel'), abstract_arg('Twig paths'), param('twig.default_path')])
+            ->args([service('kernel'), abstract_arg('Twig paths'), param('twig.default_path'), abstract_arg('File name pattern')])
 
         ->set('twig.template_cache_warmer', TemplateCacheWarmer::class)
             ->args([service(ContainerInterface::class), service('twig.template_iterator')])

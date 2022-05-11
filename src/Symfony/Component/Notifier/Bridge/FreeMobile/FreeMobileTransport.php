@@ -60,7 +60,7 @@ final class FreeMobileTransport extends AbstractTransport
         $endpoint = sprintf('https://%s', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
-            'json' => [
+            'query' => [
                 'user' => $this->login,
                 'pass' => $this->password,
                 'msg' => $message->getSubject(),

@@ -438,7 +438,6 @@ class ArrayNodeDefinitionTest extends TestCase
     protected function getField(object $object, string $field)
     {
         $reflection = new \ReflectionProperty($object, $field);
-        $reflection->setAccessible(true);
 
         return $reflection->getValue($object);
     }

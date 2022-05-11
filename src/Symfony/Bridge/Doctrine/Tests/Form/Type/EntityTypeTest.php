@@ -63,8 +63,6 @@ class EntityTypeTest extends BaseTypeTest
      */
     private $emRegistry;
 
-    protected static $supportedFeatureSetVersion = 404;
-
     protected function setUp(): void
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
@@ -1312,10 +1310,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame($choiceList1, $choiceList3);
     }
 
-    /**
-     * @return MockObject&ManagerRegistry
-     */
-    protected function createRegistryMock($name, $em): ManagerRegistry
+    protected function createRegistryMock($name, $em): MockObject&ManagerRegistry
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())

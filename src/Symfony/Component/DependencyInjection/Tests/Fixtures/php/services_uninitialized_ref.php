@@ -58,11 +58,11 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $instance->foo1 = ($this->services['foo1'] ?? null);
         $instance->foo2 = null;
         $instance->foo3 = ($this->privates['foo3'] ?? null);
-        $instance->closures = [0 => function () {
+        $instance->closures = [0 => #[\Closure(name: 'foo1', class: 'stdClass')] function () {
             return ($this->services['foo1'] ?? null);
-        }, 1 => function () {
+        }, 1 => #[\Closure(name: 'foo2')] function () {
             return null;
-        }, 2 => function () {
+        }, 2 => #[\Closure(name: 'foo3', class: 'stdClass')] function () {
             return ($this->privates['foo3'] ?? null);
         }];
         $instance->iter = new RewindableGenerator(function () {

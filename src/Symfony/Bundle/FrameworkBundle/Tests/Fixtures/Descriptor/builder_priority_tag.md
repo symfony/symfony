@@ -44,6 +44,20 @@ Definitions
     - Attr2: val2
 - Tag: `tag2`
 
+### definition_4
+
+- Class: `Full\Qualified\Class4`
+- Public: yes
+- Synthetic: yes
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Autoconfigured: no
+- File: `/path/to/file`
+- Tag: `tag1`
+    - Priority: 0
+
 ### definition_2
 
 - Class: `Full\Qualified\Class2`

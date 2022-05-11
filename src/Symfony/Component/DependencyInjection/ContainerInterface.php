@@ -48,7 +48,7 @@ interface ContainerInterface extends PsrContainerInterface
     public function initialized(string $id): bool;
 
     /**
-     * @return array|bool|string|int|float|null
+     * @return array|bool|string|int|float|\UnitEnum|null
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
@@ -56,5 +56,5 @@ interface ContainerInterface extends PsrContainerInterface
 
     public function hasParameter(string $name): bool;
 
-    public function setParameter(string $name, array|bool|string|int|float|null $value);
+    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value);
 }

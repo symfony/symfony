@@ -92,6 +92,14 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return $this->authenticator instanceof InteractiveAuthenticatorInterface && $this->authenticator->isInteractive();
     }
 
+    /**
+     * @internal
+     */
+    public function getAuthenticator(): AuthenticatorInterface
+    {
+        return $this->authenticator;
+    }
+
     public function __call($method, $args)
     {
         return $this->authenticator->{$method}(...$args);

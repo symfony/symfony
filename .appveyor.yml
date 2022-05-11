@@ -3,10 +3,6 @@ clone_depth: 2
 clone_folder: c:\projects\symfony
 image: Visual Studio 2019
 
-cache:
-    - composer.phar
-    - .phpunit -> phpunit
-
 init:
     - SET PATH=c:\php;%PATH%
     - SET COMPOSER_NO_INTERACTION=1
@@ -17,11 +13,13 @@ init:
 
 install:
     - mkdir c:\php && cd c:\php
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.0.2-Win32-vs16-x86.zip
-    - 7z x php-8.0.2-Win32-vs16-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.0-Win32-vs16-x86.zip
+    - 7z x php-8.1.0-Win32-vs16-x86.zip -y >nul
     - cd ext
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.21-8.0-ts-vs16-x86.zip
-    - 7z x php_apcu-5.1.21-8.0-ts-vs16-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.21-8.1-ts-vs16-x86.zip
+    - 7z x php_apcu-5.1.21-8.1-ts-vs16-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7rc1-8.1-ts-vs16-x86.zip
+    - 7z x php_redis-5.3.7rc1-8.1-ts-vs16-x86.zip -y >nul
     - cd ..
     - copy /Y php.ini-development php.ini-min
     - echo memory_limit=-1 >> php.ini-min
@@ -37,17 +35,18 @@ install:
     - echo opcache.enable_cli=1 >> php.ini-max
     - echo extension=php_openssl.dll >> php.ini-max
     - echo extension=php_apcu.dll >> php.ini-max
+    - echo extension=php_redis.dll >> php.ini-max
     - echo apc.enable_cli=1 >> php.ini-max
     - echo extension=php_intl.dll >> php.ini-max
     - echo extension=php_mbstring.dll >> php.ini-max
     - echo extension=php_fileinfo.dll >> php.ini-max
     - echo extension=php_pdo_sqlite.dll >> php.ini-max
     - echo extension=php_curl.dll >> php.ini-max
+    - echo extension=php_sodium.dll >> php.ini-max
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
-    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/2.0.0/composer.phar)
-    - php composer.phar self-update --2
-    - copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
+    - appveyor DownloadFile https://getcomposer.org/download/latest-stable/composer.phar
+    - mkdir %APPDATA%\Composer && copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
     - git config --global user.email ""
     - git config --global user.name "Symfony"
     - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -o '[0-9][0-9]*\.[0-9]'"`) DO (SET SYMFONY_VERSION=%%F)
@@ -55,6 +54,7 @@ install:
     - SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev
     - php composer.phar update --no-progress --ansi
     - php phpunit install
+    - choco install memurai-developer
 
 test_script:
     - SET X=0

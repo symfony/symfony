@@ -16,15 +16,15 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "ext-xml": "*",
+        "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/twig-bridge": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0"
     },
     "require-dev": {
         "symfony/config": "^5.4|^6.0",
-        "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/web-profiler-bundle": "^5.4|^6.0"
     },
     "conflict": {

@@ -16,13 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2"
+        "php": ">=8.1"
     },
     "suggest": {
         "symfony/translation-implementation": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Contracts\\Translation\\": "" }
+        "psr-4": { "Symfony\\Contracts\\Translation\\": "" },
+        "exclude-from-classmap": [
+            "/Test/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

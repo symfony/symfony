@@ -64,7 +64,7 @@ final class TranslationExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('t', [$this, 'createTranslatable']),
+            new TwigFunction('t', $this->createTranslatable(...)),
         ];
     }
 
@@ -74,7 +74,7 @@ final class TranslationExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('trans', [$this, 'trans']),
+            new TwigFilter('trans', $this->trans(...)),
         ];
     }
 

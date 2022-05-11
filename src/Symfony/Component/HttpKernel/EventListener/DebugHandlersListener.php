@@ -55,7 +55,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 
-        $this->exceptionHandler = null === $exceptionHandler || $exceptionHandler instanceof \Closure ? $exceptionHandler : \Closure::fromCallable($exceptionHandler);
+        $this->exceptionHandler = null === $exceptionHandler ? null : $exceptionHandler(...);
         $this->logger = $logger;
         $this->levels = $levels ?? \E_ALL;
         $this->throwAt = \is_int($throwAt) ? $throwAt : (null === $throwAt ? null : ($throwAt ? \E_ALL : null));

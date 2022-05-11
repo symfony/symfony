@@ -63,7 +63,6 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             throw $e;
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
-            $r->setAccessible(true);
             $r->setValue($e, sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
 
             throw $e;
@@ -114,6 +113,8 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setChanges($parentDef->getChanges());
 
         $def->setBindings($definition->getBindings() + $parentDef->getBindings());
+
+        $def->setSynthetic($definition->isSynthetic());
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();

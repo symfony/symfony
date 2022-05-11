@@ -226,7 +226,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         return null === self::$delay ? 1 : 0;
     }
 
-    private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, CancellationTokenSource $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, Promise &$pause)
+    private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, CancellationTokenSource $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, Promise &$pause): \Generator
     {
         $request->setInformationalResponseHandler(static function (Response $response) use ($multi, $id, &$info, &$headers) {
             self::addResponseHeaders($response, $info, $headers);
@@ -285,7 +285,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         self::stopLoop();
     }
 
-    private static function followRedirects(Request $originRequest, AmpClientState $multi, array &$info, array &$headers, CancellationTokenSource $canceller, array $options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, Promise &$pause)
+    private static function followRedirects(Request $originRequest, AmpClientState $multi, array &$info, array &$headers, CancellationTokenSource $canceller, array $options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, Promise &$pause): \Generator
     {
         yield $pause;
 
@@ -313,7 +313,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 $location = $urlResolver::parseUrl($location);
                 $location = $urlResolver::resolveUrl($location, $previousUrl);
                 $info['redirect_url'] = implode('', $location);
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 return $response;
             }
 
@@ -327,7 +327,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 // Discard body of redirects
                 while (null !== yield $response->getBody()->read()) {
                 }
-            } catch (HttpException|StreamException $e) {
+            } catch (HttpException|StreamException) {
                 // Ignore streaming errors on previous responses
             }
 
@@ -399,7 +399,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     /**
      * Accepts pushed responses only if their headers related to authentication match the request.
      */
-    private static function getPushedResponse(Request $request, AmpClientState $multi, array &$info, array &$headers, array $options, ?LoggerInterface $logger)
+    private static function getPushedResponse(Request $request, AmpClientState $multi, array &$info, array &$headers, array $options, ?LoggerInterface $logger): \Generator
     {
         if ('' !== $options['body']) {
             return null;

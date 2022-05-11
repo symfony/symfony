@@ -37,9 +37,9 @@ class SerializerErrorRenderer implements ErrorRendererInterface
     public function __construct(SerializerInterface $serializer, string|callable $format, ErrorRendererInterface $fallbackErrorRenderer = null, bool|callable $debug = false)
     {
         $this->serializer = $serializer;
-        $this->format = \is_string($format) || $format instanceof \Closure ? $format : \Closure::fromCallable($format);
+        $this->format = \is_string($format) ? $format : $format(...);
         $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
-        $this->debug = \is_bool($debug) || $debug instanceof \Closure ? $debug : \Closure::fromCallable($debug);
+        $this->debug = \is_bool($debug) ? $debug : $debug(...);
     }
 
     /**
@@ -68,7 +68,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
                 'debug' => $debug,
             ]))
             ->setHeaders($flattenException->getHeaders() + $headers);
-        } catch (NotEncodableValueException $e) {
+        } catch (NotEncodableValueException) {
             return $this->fallbackErrorRenderer->render($exception);
         }
     }

@@ -17,10 +17,12 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Service\ResetInterface;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -40,6 +42,12 @@ class TwigExtension extends Extension
 
         if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'])) {
             $loader->load('form.php');
+
+            if (is_subclass_of(AbstractRendererEngine::class, ResetInterface::class)) {
+                $container->getDefinition('twig.form.engine')->addTag('kernel.reset', [
+                    'method' => 'reset',
+                ]);
+            }
         }
 
         if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'])) {
@@ -96,6 +104,12 @@ class TwigExtension extends Extension
 
         // paths are modified in ExtensionPass if forms are enabled
         $container->getDefinition('twig.template_iterator')->replaceArgument(1, $config['paths']);
+
+        $container->getDefinition('twig.template_iterator')->replaceArgument(3, $config['file_name_pattern']);
+
+        if ($container->hasDefinition('twig.command.lint')) {
+            $container->getDefinition('twig.command.lint')->replaceArgument(1, $config['file_name_pattern'] ?: ['*.twig']);
+        }
 
         foreach ($this->getBundleTemplatePaths($container, $config) as $name => $paths) {
             $namespace = $this->normalizeBundleName($name);

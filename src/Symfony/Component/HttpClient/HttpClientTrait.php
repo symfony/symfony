@@ -88,16 +88,32 @@ trait HttpClientTrait
             unset($options['json']);
 
             if (!isset($options['normalized_headers']['content-type'])) {
-                $options['normalized_headers']['content-type'] = [$options['headers'][] = 'Content-Type: application/json'];
+                $options['normalized_headers']['content-type'] = ['Content-Type: application/json'];
             }
         }
 
         if (!isset($options['normalized_headers']['accept'])) {
-            $options['normalized_headers']['accept'] = [$options['headers'][] = 'Accept: */*'];
+            $options['normalized_headers']['accept'] = ['Accept: */*'];
         }
 
         if (isset($options['body'])) {
+            if (\is_array($options['body'])) {
+                $options['normalized_headers']['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
+            }
+
             $options['body'] = self::normalizeBody($options['body']);
+
+            if (\is_string($options['body'])
+                && (string) \strlen($options['body']) !== substr($h = $options['normalized_headers']['content-length'][0] ?? '', 16)
+                && ('' !== $h || '' !== $options['body'])
+            ) {
+                if ('chunked' === substr($options['normalized_headers']['transfer-encoding'][0] ?? '', \strlen('Transfer-Encoding: '))) {
+                    unset($options['normalized_headers']['transfer-encoding']);
+                    $options['body'] = self::dechunk($options['body']);
+                }
+
+                $options['normalized_headers']['content-length'] = [substr_replace($h ?: 'Content-Length: ', \strlen($options['body']), 16)];
+            }
         }
 
         if (isset($options['peer_fingerprint'])) {
@@ -138,11 +154,11 @@ trait HttpClientTrait
         if (null !== $url) {
             // Merge auth with headers
             if (($options['auth_basic'] ?? false) && !($options['normalized_headers']['authorization'] ?? false)) {
-                $options['normalized_headers']['authorization'] = [$options['headers'][] = 'Authorization: Basic '.base64_encode($options['auth_basic'])];
+                $options['normalized_headers']['authorization'] = ['Authorization: Basic '.base64_encode($options['auth_basic'])];
             }
             // Merge bearer with headers
             if (($options['auth_bearer'] ?? false) && !($options['normalized_headers']['authorization'] ?? false)) {
-                $options['normalized_headers']['authorization'] = [$options['headers'][] = 'Authorization: Bearer '.$options['auth_bearer']];
+                $options['normalized_headers']['authorization'] = ['Authorization: Bearer '.$options['auth_bearer']];
             }
 
             unset($options['auth_basic'], $options['auth_bearer']);
@@ -159,8 +175,12 @@ trait HttpClientTrait
 
         // Finalize normalization of options
         $options['http_version'] = (string) ($options['http_version'] ?? '') ?: null;
-        $options['timeout'] = (float) ($options['timeout'] ?? ini_get('default_socket_timeout'));
+        if (0 > $options['timeout'] = (float) ($options['timeout'] ?? ini_get('default_socket_timeout'))) {
+            $options['timeout'] = 172800.0; // 2 days
+        }
+
         $options['max_duration'] = isset($options['max_duration']) ? (float) $options['max_duration'] : 0;
+        $options['headers'] = array_merge(...array_values($options['normalized_headers']));
 
         return [$url, $options];
     }
@@ -188,8 +208,10 @@ trait HttpClientTrait
         // Option "query" is never inherited from defaults
         $options['query'] ??= [];
 
-        foreach ($defaultOptions as $k => $v) {
-            if ('normalized_headers' !== $k && !isset($options[$k])) {
+        $options += $defaultOptions;
+
+        foreach (self::$emptyDefaults ?? [] as $k => $v) {
+            if (!isset($options[$k])) {
                 $options[$k] = $v;
             }
         }
@@ -226,9 +248,9 @@ trait HttpClientTrait
 
             $alternatives = [];
 
-            foreach ($defaultOptions as $key => $v) {
-                if (levenshtein($name, $key) <= \strlen($name) / 3 || str_contains($key, $name)) {
-                    $alternatives[] = $key;
+            foreach ($defaultOptions as $k => $v) {
+                if (levenshtein($name, $k) <= \strlen($name) / 3 || str_contains($k, $name)) {
+                    $alternatives[] = $k;
                 }
             }
 
@@ -352,19 +374,35 @@ trait HttpClientTrait
         return $body;
     }
 
+    private static function dechunk(string $body): string
+    {
+        $h = fopen('php://temp', 'w+');
+        stream_filter_append($h, 'dechunk', \STREAM_FILTER_WRITE);
+        fwrite($h, $body);
+        $body = stream_get_contents($h, -1, 0);
+        rewind($h);
+        ftruncate($h, 0);
+
+        if (fwrite($h, '-') && '' !== stream_get_contents($h, -1, 0)) {
+            throw new TransportException('Request body has broken chunked encoding.');
+        }
+
+        return $body;
+    }
+
     /**
      * @throws InvalidArgumentException When an invalid fingerprint is passed
      */
     private static function normalizePeerFingerprint(mixed $fingerprint): array
     {
         if (\is_string($fingerprint)) {
-            switch (\strlen($fingerprint = str_replace(':', '', $fingerprint))) {
-                case 32: $fingerprint = ['md5' => $fingerprint]; break;
-                case 40: $fingerprint = ['sha1' => $fingerprint]; break;
-                case 44: $fingerprint = ['pin-sha256' => [$fingerprint]]; break;
-                case 64: $fingerprint = ['sha256' => $fingerprint]; break;
-                default: throw new InvalidArgumentException(sprintf('Cannot auto-detect fingerprint algorithm for "%s".', $fingerprint));
-            }
+            $fingerprint = match (\strlen($fingerprint = str_replace(':', '', $fingerprint))) {
+                32 => ['md5' => $fingerprint],
+                40 => ['sha1' => $fingerprint],
+                44 => ['pin-sha256' => [$fingerprint]],
+                64 => ['sha256' => $fingerprint],
+                default => throw new InvalidArgumentException(sprintf('Cannot auto-detect fingerprint algorithm for "%s".', $fingerprint)),
+            };
         } elseif (\is_array($fingerprint)) {
             foreach ($fingerprint as $algo => $hash) {
                 $fingerprint[$algo] = 'pin-sha256' === $algo ? (array) $hash : str_replace(':', '', $hash);

@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Serializer\Debug\TraceableEncoder;
+use Symfony\Component\Serializer\Debug\TraceableNormalizer;
 
 /**
  * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
@@ -34,18 +37,34 @@ class SerializerPass implements CompilerPassInterface
             return;
         }
 
-        if (!$normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container)) {
+        if (!$normalizers = $container->findTaggedServiceIds('serializer.normalizer')) {
             throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the "serializer" service.');
         }
 
-        $serializerDefinition = $container->getDefinition('serializer');
-        $serializerDefinition->replaceArgument(0, $normalizers);
+        if ($container->getParameter('kernel.debug') && $container->hasDefinition('serializer.data_collector')) {
+            foreach (array_keys($normalizers) as $normalizer) {
+                $container->register('debug.'.$normalizer, TraceableNormalizer::class)
+                    ->setDecoratedService($normalizer, null, 255)
+                    ->setArguments([new Reference('debug.'.$normalizer.'.inner'), new Reference('serializer.data_collector')]);
+            }
+        }
 
-        if (!$encoders = $this->findAndSortTaggedServices('serializer.encoder', $container)) {
+        $serializerDefinition = $container->getDefinition('serializer');
+        $serializerDefinition->replaceArgument(0, $this->findAndSortTaggedServices('serializer.normalizer', $container));
+
+        if (!$encoders = $container->findTaggedServiceIds('serializer.encoder')) {
             throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the "serializer" service.');
         }
 
-        $serializerDefinition->replaceArgument(1, $encoders);
+        if ($container->getParameter('kernel.debug') && $container->hasDefinition('serializer.data_collector')) {
+            foreach (array_keys($encoders) as $encoder) {
+                $container->register('debug.'.$encoder, TraceableEncoder::class)
+                    ->setDecoratedService($encoder, null, 255)
+                    ->setArguments([new Reference('debug.'.$encoder.'.inner'), new Reference('serializer.data_collector')]);
+            }
+        }
+
+        $serializerDefinition->replaceArgument(1, $this->findAndSortTaggedServices('serializer.encoder', $container));
 
         if (!$container->hasParameter('serializer.default_context')) {
             return;

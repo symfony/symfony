@@ -153,6 +153,11 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             [1048577, '1Mi', '1048577', '1048576', 'bytes'],
             [1053818, '1Mi', '1029.12', '1024', 'KiB'],
             [1053819, '1Mi', '1.01', '1', 'MiB'],
+
+            // $limit < $coef, @see FileValidator::factorizeSizes()
+            [169632, '100k', '169.63', '100', 'kB'],
+            [1000001, '990k', '1000', '990', 'kB'],
+            [123, '80', '123', '80', 'bytes'],
         ];
     }
 
@@ -185,6 +190,9 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function provideMaxSizeNotExceededTests()
     {
         return [
+            // 0 has no effect
+            [100, 0],
+
             // limit in bytes
             [1000, 1000],
             [1000000, 1000000],
@@ -495,7 +503,6 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             // access FileValidator::factorizeSizes() private method to format max file size
             $reflection = new \ReflectionClass(\get_class(new FileValidator()));
             $method = $reflection->getMethod('factorizeSizes');
-            $method->setAccessible(true);
             [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
             // it correctly parses the maxSize option and not only uses simple string comparison
@@ -506,12 +513,21 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ], '1000G'];
 
             $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
-                '{{ limit }}' => '0.1',
-                '{{ suffix }}' => 'MB',
+                '{{ limit }}' => '100',
+                '{{ suffix }}' => 'kB',
             ], '100K'];
         }
 
         return $tests;
+    }
+
+    public function testNegativeMaxSize()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('"-1" is not a valid maximum size.');
+
+        $file = new File();
+        $file->maxSize = -1;
     }
 
     abstract protected function getFile($filename);

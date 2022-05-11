@@ -63,6 +63,25 @@
                 }
             ]
         },
+        "definition_4": {
+            "class": "Full\\Qualified\\Class4",
+            "public": true,
+            "synthetic": true,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "file": "\/path\/to\/file",
+            "tags": [
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "priority": 0
+                    }
+                }
+            ]
+        },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
             "public": true,

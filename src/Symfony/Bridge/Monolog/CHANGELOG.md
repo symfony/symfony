@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for Monolog 3
+
 6.0
 ---
 

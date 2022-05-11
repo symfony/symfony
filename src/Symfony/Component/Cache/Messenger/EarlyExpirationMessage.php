@@ -29,7 +29,7 @@ final class EarlyExpirationMessage
         try {
             $item = clone $item;
             $item->set(null);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
 

@@ -32,6 +32,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Discord\DiscordTransportFactory::class,
             'package' => 'symfony/discord-notifier',
         ],
+        'engagespot' => [
+            'class' => Bridge\Engagespot\EngagespotTransportFactory::class,
+            'package' => 'symfony/engagespot-notifier',
+        ],
         'esendex' => [
             'class' => Bridge\Esendex\EsendexTransportFactory::class,
             'package' => 'symfony/esendex-notifier',
@@ -51,6 +55,10 @@ class UnsupportedSchemeException extends LogicException
         'firebase' => [
             'class' => Bridge\Firebase\FirebaseTransportFactory::class,
             'package' => 'symfony/firebase-notifier',
+        ],
+        'forty-six-elks' => [
+            'class' => Bridge\FortySixElks\FortySixElksTransportFactory::class,
+            'package' => 'symfony/forty-six-elks-notifier',
         ],
         'freemobile' => [
             'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
@@ -120,6 +128,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\OneSignal\OneSignalTransportFactory::class,
             'package' => 'symfony/one-signal-notifier',
         ],
+        'orange-sms' => [
+            'class' => Bridge\OrangeSms\OrangeSmsTransportFactory::class,
+            'package' => 'symfony/orange-sms-notifier',
+        ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',
@@ -127,6 +139,10 @@ class UnsupportedSchemeException extends LogicException
         'rocketchat' => [
             'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
             'package' => 'symfony/rocket-chat-notifier',
+        ],
+        'sendberry' => [
+            'class' => Bridge\Sendberry\SendberryTransportFactory::class,
+            'package' => 'symfony/sendberry-notifier',
         ],
         'sendinblue' => [
             'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,

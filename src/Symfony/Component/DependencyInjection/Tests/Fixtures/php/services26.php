@@ -59,7 +59,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         return $this->services['test'] = new ${($_ = $this->getEnv('FOO')) && false ?: "_"}($this->getEnv('Bar'), 'foo'.$this->getEnv('string:FOO').'baz', $this->getEnv('int:Baz'));
     }
 
-    public function getParameter(string $name): array|string|int|float|bool|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
@@ -104,13 +104,13 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'bar': $value = $this->getEnv('FOO'); break;
-            case 'baz': $value = $this->getEnv('int:Baz'); break;
-            case 'json': $value = $this->getEnv('json:file:json_file'); break;
-            case 'db_dsn': $value = $this->getEnv('resolve:DB'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $value = match ($name) {
+            'bar' => $this->getEnv('FOO'),
+            'baz' => $this->getEnv('int:Baz'),
+            'json' => $this->getEnv('json:file:json_file'),
+            'db_dsn' => $this->getEnv('resolve:DB'),
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

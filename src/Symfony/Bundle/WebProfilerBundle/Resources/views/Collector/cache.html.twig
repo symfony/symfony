@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% if collector.totals.calls > 0 %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/cache.svg') }}
+            {{ source('@WebProfiler/Icon/cache.svg') }}
             <span class="sf-toolbar-value">{{ collector.totals.calls }}</span>
             <span class="sf-toolbar-info-piece-additional-detail">
                 <span class="sf-toolbar-label">in</span>
@@ -37,7 +37,7 @@
 {% block menu %}
     <span class="label {{ collector.totals.calls == 0 ? 'disabled' }}">
     <span class="icon">
-        {{ include('@WebProfiler/Icon/cache.svg') }}
+        {{ source('@WebProfiler/Icon/cache.svg') }}
     </span>
     <strong>Cache</strong>
 </span>

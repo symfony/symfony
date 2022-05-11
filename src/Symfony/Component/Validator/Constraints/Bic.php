@@ -33,13 +33,18 @@ class Bic extends Constraint
     public const INVALID_CASE_ERROR = '11884038-3312-4ae5-9d04-699f782130c7';
     public const INVALID_IBAN_COUNTRY_CODE_ERROR = '29a2c3bb-587b-4996-b6f5-53081364cea5';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_LENGTH_ERROR => 'INVALID_LENGTH_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::INVALID_BANK_CODE_ERROR => 'INVALID_BANK_CODE_ERROR',
         self::INVALID_COUNTRY_CODE_ERROR => 'INVALID_COUNTRY_CODE_ERROR',
         self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This is not a valid Business Identifier Code (BIC).';
     public $ibanMessage = 'This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.';

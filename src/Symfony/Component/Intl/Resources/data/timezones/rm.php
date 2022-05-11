@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'temp: Tirchia (Istanbul)',
         'Europe/Jersey' => 'Temp Greenwich (Saint Helier)',
         'Europe/Kaliningrad' => 'Temp da l’Europa Orientala (Kaliningrad)',
-        'Europe/Kiev' => 'Temp da l’Europa Orientala (Kiev)',
+        'Europe/Kiev' => 'Temp da l’Europa Orientala (Kyiv)',
         'Europe/Kirov' => 'temp: Russia (Kirov)',
         'Europe/Lisbon' => 'Temp da l’Europa dal Vest (Lissabon)',
         'Europe/Ljubljana' => 'Temp da l’Europa Centrala (Ljubljana)',

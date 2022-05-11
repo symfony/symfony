@@ -36,7 +36,7 @@ class ValidatorExtension extends AbstractExtension
     {
         $this->legacyErrorMessages = $legacyErrorMessages;
 
-        $metadata = $validator->getMetadataFor('Symfony\Component\Form\Form');
+        $metadata = $validator->getMetadataFor(\Symfony\Component\Form\Form::class);
 
         // Register the form constraints in the validator programmatically.
         // This functionality is required when using the Form component without

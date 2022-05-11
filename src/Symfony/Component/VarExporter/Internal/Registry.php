@@ -60,7 +60,7 @@ class Registry
     {
         $reflector = self::$reflectors[$class] ?? self::getClassReflector($class, true, false);
 
-        return self::$factories[$class] = \Closure::fromCallable([$reflector, 'newInstanceWithoutConstructor']);
+        return self::$factories[$class] = [$reflector, 'newInstanceWithoutConstructor'](...);
     }
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
@@ -85,7 +85,7 @@ class Registry
             try {
                 $proto = $reflector->newInstanceWithoutConstructor();
                 $instantiableWithoutConstructor = true;
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 $proto = $reflector->implementsInterface('Serializable') && !method_exists($class, '__unserialize') ? 'C:' : 'O:';
                 if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
                     $proto = null;
@@ -132,10 +132,8 @@ class Registry
                     new \ReflectionProperty(\Error::class, 'trace'),
                     new \ReflectionProperty(\Exception::class, 'trace'),
                 ];
-                $setTrace[0]->setAccessible(true);
-                $setTrace[1]->setAccessible(true);
-                $setTrace[0] = \Closure::fromCallable([$setTrace[0], 'setValue']);
-                $setTrace[1] = \Closure::fromCallable([$setTrace[1], 'setValue']);
+                $setTrace[0] = $setTrace[0]->setValue(...);
+                $setTrace[1] = $setTrace[1]->setValue(...);
             }
 
             $setTrace[$proto instanceof \Exception]($proto, []);

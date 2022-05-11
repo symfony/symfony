@@ -12,8 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -54,6 +56,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValu
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
+use Symfony\Component\Serializer\Tests\Php80Dummy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -104,6 +107,7 @@ class ObjectNormalizerTest extends TestCase
         $obj->setBaz(true);
         $obj->setCamelCase('camelcase');
         $obj->setObject($object);
+        $obj->setGo(true);
 
         $this->serializer
             ->expects($this->once())
@@ -120,6 +124,7 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => 'string_object',
+                'go' => true,
             ],
             $this->normalizer->normalize($obj, 'any')
         );
@@ -397,6 +402,11 @@ class ObjectNormalizerTest extends TestCase
         return new ObjectNormalizer();
     }
 
+    protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): ObjectNormalizer
+    {
+        return new ObjectNormalizer(null, null, null, $this->getCallbackPropertyTypeExtractor());
+    }
+
     // circular reference
 
     protected function getNormalizerForCircularReference(array $defaultContext): ObjectNormalizer
@@ -661,6 +671,7 @@ class ObjectNormalizerTest extends TestCase
             'camelCase' => null,
             'object' => null,
             'bar' => null,
+            'go' => null,
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, ['not_serializable' => function () {
@@ -715,6 +726,22 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'jsonld')->number);
     }
 
+    public function testDoesntHaveIssuesWithUnionConstTypes()
+    {
+        if (!class_exists(PhpStanExtractor::class) || !class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('phpstan/phpdoc-parser required for this test');
+        }
+
+        $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(), new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+
+        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], \get_class(new class() {
+            /** @var self::*|null */
+            public $foo;
+        }))->foo);
+    }
+
     public function testExtractAttributesRespectsFormat()
     {
         $normalizer = new FormatAndContextAwareNormalizer();
@@ -735,6 +762,22 @@ class ObjectNormalizerTest extends TestCase
         $data->bar = 'foo';
 
         $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, null, ['include_foo_and_bar' => true]));
+    }
+
+    public function testDenormalizeFalsePseudoType()
+    {
+        // given a serializer that extracts the attribute types of an object via ReflectionExtractor
+        $propertyTypeExtractor = new PropertyInfoExtractor([], [new ReflectionExtractor()], [], [], []);
+        $objectNormalizer = new ObjectNormalizer(null, null, null, $propertyTypeExtractor);
+
+        $serializer = new Serializer([$objectNormalizer]);
+
+        // when denormalizing some data into an object where an attribute uses the false pseudo type
+        /** @var Php80Dummy $object */
+        $object = $serializer->denormalize(['canBeFalseOrString' => false], Php80Dummy::class);
+
+        // then the attribute that declared false was filled correctly
+        $this->assertFalse($object->canBeFalseOrString);
     }
 
     public function testAdvancedNameConverter()
@@ -765,6 +808,7 @@ class ObjectNormalizerTest extends TestCase
         $obj->setBaz(true);
         $obj->setCamelCase('camelcase');
         $obj->unwantedProperty = 'notwanted';
+        $obj->setGo(false);
 
         $this->assertEquals(
             [
@@ -774,6 +818,7 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => null,
+                'go' => false,
             ],
             $normalizer->normalize($obj, 'any')
         );
@@ -802,6 +847,7 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => null,
+                'go' => null,
             ],
             $normalizer->normalize($obj, 'any')
         );

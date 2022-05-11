@@ -2,6 +2,7 @@ imports:
     - { resource: ./base_config.yml }
 
 framework:
+    http_method_override: false
     lock: ~
     rate_limiter: ~
 

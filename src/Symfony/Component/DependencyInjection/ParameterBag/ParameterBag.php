@@ -59,7 +59,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function get(string $name): array|bool|string|int|float|null
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!\array_key_exists($name, $this->parameters)) {
             if (!$name) {
@@ -99,7 +99,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, array|bool|string|int|float|null $value)
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
     {
         $this->parameters[$name] = $value;
     }

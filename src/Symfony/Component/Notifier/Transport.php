@@ -15,9 +15,11 @@ use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
+use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
@@ -28,11 +30,13 @@ use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransport;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
+use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
@@ -68,9 +72,11 @@ final class Transport
         AmazonSnsTransportFactory::class,
         ClickatellTransportFactory::class,
         DiscordTransportFactory::class,
+        EngagespotTransportFactory::class,
         EsendexTransportFactory::class,
         ExpoTransportFactory::class,
         FirebaseTransportFactory::class,
+        FortySixElksTransportFactory::class,
         FreeMobileTransportFactory::class,
         GatewayApiTransportFactory::class,
         GitterTransportFactory::class,
@@ -81,11 +87,13 @@ final class Transport
         MattermostTransportFactory::class,
         MessageBirdTransportFactory::class,
         MessageMediaTransportFactory::class,
-        MicrosoftTeamsTransport::class,
+        MicrosoftTeamsTransportFactory::class,
         MobytTransportFactory::class,
         OctopushTransportFactory::class,
+        OrangeSmsTransportFactory::class,
         OvhCloudTransportFactory::class,
         RocketChatTransportFactory::class,
+        SendberryTransportFactory::class,
         SendinblueTransportFactory::class,
         SinchTransportFactory::class,
         SlackTransportFactory::class,

@@ -50,7 +50,6 @@ class DebugClassLoaderTest extends TestCase
             if (\is_array($function) && $function[0] instanceof DebugClassLoader) {
                 $reflClass = new \ReflectionClass($function[0]);
                 $reflProp = $reflClass->getProperty('classLoader');
-                $reflProp->setAccessible(true);
 
                 $this->assertNotInstanceOf(DebugClassLoader::class, $reflProp->getValue($function[0]));
 
@@ -400,6 +399,61 @@ class DebugClassLoaderTest extends TestCase
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::static()" might add "static" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
         ], $deprecations);
     }
+
+    public function testOverrideFinalProperty()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists(Fixtures\OverrideFinalProperty::class, true);
+        class_exists(Fixtures\FinalProperty\OverrideFinalPropertySameNamespace::class, true);
+        class_exists('Test\\'.OverrideOutsideFinalProperty::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalProperty\FinalProperty::$pub" property is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\OverrideFinalProperty".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalProperty\FinalProperty::$prot" property is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\OverrideFinalProperty".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalProperty\FinalProperty::$implicitlyFinal" property is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\OverrideFinalProperty".',
+            'The "Test\Symfony\Component\ErrorHandler\Tests\FinalProperty\OutsideFinalProperty::$final" property is considered final. You should not override it in "Test\Symfony\Component\ErrorHandler\Tests\OverrideOutsideFinalProperty".'
+        ], $deprecations);
+    }
+
+    public function testOverrideFinalConstant()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists(Fixtures\FinalConstant\OverrideFinalConstant::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstants::OVERRIDDEN_FINAL_PARENT_CLASS" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstants2::OVERRIDDEN_FINAL_PARENT_PARENT_CLASS" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant".',
+        ], $deprecations);
+    }
+
+    public function testOverrideFinalConstant81()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists( Fixtures\FinalConstant\OverrideFinalConstant81::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstantsInterface::OVERRIDDEN_FINAL_INTERFACE" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant81".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstantsInterface2::OVERRIDDEN_FINAL_INTERFACE_2" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant81".',
+        ], $deprecations);
+    }
 }
 
 class ClassLoader
@@ -486,6 +540,10 @@ class ClassLoader
             return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnType.php';
         } elseif ('Test\\'.Fixtures\OutsideInterface::class === $class) {
             return $fixtureDir.\DIRECTORY_SEPARATOR.'OutsideInterface.php';
+        } elseif ('Test\\'.OverrideOutsideFinalProperty::class === $class) {
+            return $fixtureDir.'OverrideOutsideFinalProperty.php';
+        } elseif ('Test\\Symfony\\Component\\ErrorHandler\\Tests\\FinalProperty\\OutsideFinalProperty' === $class) {
+            return $fixtureDir.'FinalProperty'.\DIRECTORY_SEPARATOR.'OutsideFinalProperty.php';
         }
     }
 }

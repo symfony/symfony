@@ -80,7 +80,7 @@ class LoggerDataCollectorTest extends TestCase
         $this->assertCount(1, $processedLogs);
 
         $this->assertEquals($processedLogs[0]['type'], 'deprecation');
-        $this->assertEquals($processedLogs[0]['errorCounter'], 1);
+        $this->assertEquals($processedLogs[0]['errorCount'], 1);
         $this->assertEquals($processedLogs[0]['timestamp'], (new \DateTimeImmutable())->setTimestamp(filemtime($path))->format(\DateTimeInterface::RFC3339_EXTENDED));
         $this->assertEquals($processedLogs[0]['priority'], 100);
         $this->assertEquals($processedLogs[0]['priorityName'], 'DEBUG');

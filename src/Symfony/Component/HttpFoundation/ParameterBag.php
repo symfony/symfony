@@ -128,7 +128,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter value converted to integer.
      * 
-     * @deprecated 6.1
+     * @deprecated 6.2
      */
     public function getInt(string $key, int $default = 0): int
     {

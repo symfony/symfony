@@ -52,6 +52,10 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
             $transport->setLocalDomain($localDomain);
         }
 
+        if (null !== ($maxPerSecond = $dsn->getOption('max_per_second'))) {
+            $transport->setMaxPerSecond((float) $maxPerSecond);
+        }
+
         if (null !== ($restartThreshold = $dsn->getOption('restart_threshold'))) {
             $transport->setRestartThreshold((int) $restartThreshold, (int) $dsn->getOption('restart_threshold_sleep', 0));
         }

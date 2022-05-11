@@ -731,7 +731,7 @@ hello,"hey ho"
 CSV;
 
         $this->expectException(NotEncodableValueException::class);
-        $this->expectExceptionMessage('Invalid headers in content.');
+        $this->expectExceptionMessage('Expected foo,bar,baz headers, got foo,bar.');
         $this->encoder->decode(
             $csv,
             'csv',

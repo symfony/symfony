@@ -151,7 +151,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $headers = null;
         $nbHeaders = 0;
         $headerCount = [];
-        $headerFile = [];
         $result = [];
 
         [$delimiter, $enclosure, $escapeChar, $keySeparator, $expectedHeaders, , , $asCollection] = $this->getCsvOptions($context);
@@ -171,14 +170,20 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     foreach ($cols as $col) {
                         $header = explode($keySeparator, $col);
                         $headers[] = $header;
-                        $headerFile[] = $col;
                         $headerCount[] = \count($header);
                     }
 
                     if (($context[self::CHECK_VALID_HEADERS] ?? $this->defaultContext[self::CHECK_VALID_HEADERS])
-                        && \count(array_intersect($headerFile, $expectedHeader)) !== \count($expectedHeader)
+                        && \count($cols) !== \count($expectedHeaders)
+                        && \count(array_intersect($cols, $expectedHeaders)) !== \count($expectedHeaders)
                     ) {
-                        throw new NotEncodableValueException('Invalid headers in content.');
+                        throw new NotEncodableValueException(
+                            sprintf(
+                                'Expected %s headers, got %s.',
+                                implode(',', $expectedHeaders),
+                                implode(',', $cols)
+                            )
+                        );
                     }
 
                     continue;

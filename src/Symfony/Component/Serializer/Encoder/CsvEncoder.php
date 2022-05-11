@@ -154,7 +154,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $headerFile = [];
         $result = [];
 
-        [$delimiter, $enclosure, $escapeChar, $keySeparator, $expectedHeader, , , $asCollection] = $this->getCsvOptions($context);
+        [$delimiter, $enclosure, $escapeChar, $keySeparator, $expectedHeaders, , , $asCollection] = $this->getCsvOptions($context);
 
         while (false !== ($cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar))) {
             $nbCols = \count($cols);

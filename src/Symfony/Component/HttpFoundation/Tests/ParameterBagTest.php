@@ -134,7 +134,7 @@ class ParameterBagTest extends TestCase
     }
 
     /**
-     * @deprecated 6.1
+     * @deprecated 6.2
      */
     public function testGetInt()
     {

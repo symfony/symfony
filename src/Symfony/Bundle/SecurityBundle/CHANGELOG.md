@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `allowed_time_drift` option to the OIDC token handler configuration
+ * Allow disabling the redirection on successful logout by passing `null` to the `target` option
 
 8.1
 ---

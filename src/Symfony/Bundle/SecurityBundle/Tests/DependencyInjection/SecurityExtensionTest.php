@@ -932,6 +932,25 @@ class SecurityExtensionTest extends TestCase
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 
+    public function testDisableLogoutTarget()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'main' => [
+                    'logout' => [
+                        'target' => null,
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.logout.listener.default.main'));
+    }
+
     public function testClearSiteDataLogoutListenerEnabled()
     {
         $container = $this->getRawContainer();

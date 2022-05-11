@@ -126,13 +126,14 @@ class LogoutListenerTest extends TestCase
 
     public function testNoResponseSet()
     {
-        $listener = $this->getListener();
+        $listener = new LogoutListener($this->tokenStorage, new HttpUtils(), $this->eventDispatcher);
         $request = Request::create('/logout');
-
-        $this->expectException(\RuntimeException::class);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->assertTrue($listener->supports($request));
-        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener->authenticate($event);
+
+        $this->assertNull($event->getResponse());
     }
 
     #[DataProvider('provideInvalidCsrfTokens')]

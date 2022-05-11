@@ -177,7 +177,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                         && \count($cols) !== \count($expectedHeaders)
                         && \count(array_intersect($cols, $expectedHeaders)) !== \count($expectedHeaders)
                     ) {
-                        throw new NotEncodableValueException(sprintf('Expected %s headers, got %s.', implode(',', $expectedHeaders), implode(',', $cols)));
+                        throw new NotEncodableValueException(sprintf('Expected "%s" headers, got "%s".', implode(',', $expectedHeaders), implode(',', $cols)));
                     }
 
                     continue;

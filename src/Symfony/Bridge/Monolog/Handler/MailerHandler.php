@@ -16,7 +16,6 @@ use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
-use Monolog\LevelName;
 use Monolog\Logger;
 use Monolog\LogRecord;
 use Symfony\Component\Mailer\MailerInterface;
@@ -34,7 +33,7 @@ class MailerHandler extends AbstractProcessingHandler
     private MailerInterface $mailer;
     private \Closure|Email $messageTemplate;
 
-    public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int|Level|LevelName $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int|Level $level = Logger::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 

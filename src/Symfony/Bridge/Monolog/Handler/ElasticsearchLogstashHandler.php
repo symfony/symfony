@@ -17,7 +17,6 @@ use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\FormattableHandlerTrait;
 use Monolog\Handler\ProcessableHandlerTrait;
 use Monolog\Level;
-use Monolog\LevelName;
 use Monolog\Logger;
 use Monolog\LogRecord;
 use Symfony\Component\HttpClient\HttpClient;
@@ -61,7 +60,7 @@ class ElasticsearchLogstashHandler extends AbstractHandler
      */
     private \SplObjectStorage $responses;
 
-    public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, string|int|Level|LevelName $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, string|int|Level $level = Logger::DEBUG, bool $bubble = true)
     {
         if (!interface_exists(HttpClientInterface::class)) {
             throw new \LogicException(sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));

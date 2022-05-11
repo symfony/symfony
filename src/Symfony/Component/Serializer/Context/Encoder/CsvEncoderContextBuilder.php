@@ -138,10 +138,10 @@ final class CsvEncoderContextBuilder implements ContextBuilderInterface
     }
 
     /**
-     * Configures whether cols header are checked before encoding.
+     * Configures whether cols headers are checked before encoding.
      */
-    public function withCheckValidHeaders(?bool $checkValidHeader): static
+    public function withCheckValidHeaders(?bool $checkValidHeaders): static
     {
-        return $this->with(CsvEncoder::CHECK_VALID_HEADERS, $checkValidHeader);
+        return $this->with(CsvEncoder::CHECK_VALID_HEADERS, $checkValidHeaders);
     }
 }

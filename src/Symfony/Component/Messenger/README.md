@@ -7,7 +7,7 @@ other applications or via message queues.
 Sponsor
 -------
 
-The Messenger component for Symfony 5.4/6.0 is [backed][1] by [SensioLabs][2].
+The Messenger component for Symfony 6.1 is [backed][1] by [SensioLabs][2].
 
 As the creator of Symfony, SensioLabs supports companies using Symfony, with an
 offering encompassing consultancy, expertise, services, training, and technical

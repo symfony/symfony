@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Config;
+namespace Symfony\Config\ScalarNormalizedTypes\Nested;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -8,9 +8,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This class is automatically generated to help in creating a config.
  */
-class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuilderInterface
+class NestedListObjectConfig 
 {
-    private $anyValue;
+    private $name;
     private $_usedProperties = [];
 
     /**
@@ -18,25 +18,20 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function anyValue($value): self
+    public function name($value): self
     {
-        $this->_usedProperties['anyValue'] = true;
-        $this->anyValue = $value;
+        $this->_usedProperties['name'] = true;
+        $this->name = $value;
 
         return $this;
     }
 
-    public function getExtensionAlias(): string
-    {
-        return 'variable_type';
-    }
-
     public function __construct(array $value = [])
     {
-        if (array_key_exists('any_value', $value)) {
-            $this->_usedProperties['anyValue'] = true;
-            $this->anyValue = $value['any_value'];
-            unset($value['any_value']);
+        if (array_key_exists('name', $value)) {
+            $this->_usedProperties['name'] = true;
+            $this->name = $value['name'];
+            unset($value['name']);
         }
 
         if ([] !== $value) {
@@ -47,8 +42,8 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     public function toArray(): array
     {
         $output = [];
-        if (isset($this->_usedProperties['anyValue'])) {
-            $output['any_value'] = $this->anyValue;
+        if (isset($this->_usedProperties['name'])) {
+            $output['name'] = $this->name;
         }
 
         return $output;

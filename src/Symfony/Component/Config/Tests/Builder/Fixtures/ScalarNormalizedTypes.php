@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Config\Tests\Builder\Fixtures;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -26,11 +35,23 @@ class ScalarNormalizedTypes implements ConfigurationInterface
                         ->prototype('scalar')->end()
                     ->end()
                 ->end()
+                ->arrayNode('object')
+                    ->addDefaultsIfNotSet()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return !\is_array($v); })
+                        ->then(function ($v) { return ['enabled' => $v]; })
+                    ->end()
+                    ->children()
+                        ->booleanNode('enabled')->defaultNull()->end()
+                        ->scalarNode('date_format')->end()
+                        ->booleanNode('remove_used_context_fields')->end()
+                    ->end()
+                ->end()
                 ->arrayNode('list_object')
                     ->beforeNormalization()
                         ->always()
                         ->then(function ($values) {
-                            //inspired by Workflow places
+                            // inspired by Workflow places
                             if (isset($values[0]) && \is_string($values[0])) {
                                 return array_map(function (string $value) {
                                     return ['name' => $value];
@@ -51,19 +72,65 @@ class ScalarNormalizedTypes implements ConfigurationInterface
 
                             return array_values($values);
                         })
+                    ->end()
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('name')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->arrayNode('data')
+                                ->normalizeKeys(false)
+                                ->defaultValue([])
+                                ->prototype('variable')->end()
+                            ->end()
                         ->end()
-                        ->isRequired()
-                        ->requiresAtLeastOneElement()
-                        ->prototype('array')
+                    ->end()
+                ->end()
+                ->arrayNode('keyed_list_object')
+                    ->useAttributeAsKey('class')
+                    ->prototype('array')
+                        ->beforeNormalization()
+                            ->ifTrue(function ($v) { return !\is_array($v); })
+                            ->then(function ($v) { return ['enabled' => $v]; })
+                        ->end()
+                        ->children()
+                            ->booleanNode('enabled')->defaultTrue()->end()
+                            ->arrayNode('settings')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('nested')
+                    ->children()
+                        ->arrayNode('nested_object')
+                            ->addDefaultsIfNotSet()
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return !\is_array($v); })
+                                ->then(function ($v) { return ['enabled' => $v]; })
+                            ->end()
                             ->children()
-                                ->scalarNode('name')
-                                    ->isRequired()
-                                    ->cannotBeEmpty()
-                                ->end()
-                                ->arrayNode('data')
-                                    ->normalizeKeys(false)
-                                    ->defaultValue([])
-                                    ->prototype('variable')
+                                ->booleanNode('enabled')->defaultNull()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('nested_list_object')
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return isset($v[0]) && \is_string($v[0]); })
+                                ->then(function ($values) {
+                                    return array_map(function (string $value) {
+                                        return ['name' => $value];
+                                    }, $values);
+                                })
+                            ->end()
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('name')
+                                        ->isRequired()
+                                        ->cannotBeEmpty()
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-11T15:32:18Z
+
+> I wonder what prevents us from allowing HttpKernel ^4.4 to be used with ErrorHandler ^5.0?
+
+This was done in 7ec445b130ae8f095ce305ffb7a88e15e262113d by @nicolas-grekas. Not sure if he still knows why he did that back then.

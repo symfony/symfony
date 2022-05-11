@@ -46,6 +46,7 @@ class CsvEncoderContextBuilderTest extends TestCase
             ->withNoHeaders($values[CsvEncoder::NO_HEADERS_KEY])
             ->withEndOfLine($values[CsvEncoder::END_OF_LINE])
             ->withOutputUtf8Bom($values[CsvEncoder::OUTPUT_UTF8_BOM_KEY])
+            ->withCheckValidHeaders($values[CsvEncoder::CHECK_VALID_HEADERS])
             ->toArray();
 
         $this->assertSame($values, $context);
@@ -67,6 +68,7 @@ class CsvEncoderContextBuilderTest extends TestCase
             CsvEncoder::NO_HEADERS_KEY => false,
             CsvEncoder::END_OF_LINE => 'EOL',
             CsvEncoder::OUTPUT_UTF8_BOM_KEY => false,
+            CsvEncoder::CHECK_VALID_HEADERS => true,
         ]];
 
         yield 'With null values' => [[
@@ -80,6 +82,7 @@ class CsvEncoderContextBuilderTest extends TestCase
             CsvEncoder::NO_HEADERS_KEY => null,
             CsvEncoder::END_OF_LINE => null,
             CsvEncoder::OUTPUT_UTF8_BOM_KEY => null,
+            CsvEncoder::CHECK_VALID_HEADERS => null,
         ]];
     }
 
@@ -96,6 +99,7 @@ class CsvEncoderContextBuilderTest extends TestCase
             ->withNoHeaders(null)
             ->withEndOfLine(null)
             ->withOutputUtf8Bom(null)
+            ->withCheckValidHeaders(null)
             ->toArray();
 
         $this->assertSame([
@@ -109,6 +113,7 @@ class CsvEncoderContextBuilderTest extends TestCase
             CsvEncoder::NO_HEADERS_KEY => null,
             CsvEncoder::END_OF_LINE => null,
             CsvEncoder::OUTPUT_UTF8_BOM_KEY => null,
+            CsvEncoder::CHECK_VALID_HEADERS => null,
         ], $context);
     }
 

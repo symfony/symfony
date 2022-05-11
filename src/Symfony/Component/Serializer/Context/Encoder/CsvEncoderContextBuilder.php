@@ -136,4 +136,12 @@ final class CsvEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(CsvEncoder::OUTPUT_UTF8_BOM_KEY, $outputUtf8Bom);
     }
+
+    /**
+     * Configures whether cols header are checked before encoding.
+     */
+    public function withCheckValidHeaders(?bool $checkValidHeader): static
+    {
+        return $this->with(CsvEncoder::CHECK_VALID_HEADERS, $checkValidHeader);
+    }
 }

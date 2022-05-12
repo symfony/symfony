@@ -7,6 +7,7 @@ CHANGELOG
  * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs
  * Automatically resolve handled message type when method different from `__invoke` is used as handler
  * Allow `#[AsMessageHandler]` attribute on methods
+ * Customization of the receivers priorities thanks to a specification in the command argument `bin/console messenger:consume async_redis^2 async_doctrine^1`
 
 6.0
 ---

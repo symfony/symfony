@@ -271,8 +271,8 @@ EOF
 
         foreach ($receiversArgument as $receiverInput) {
             $split = explode('^', $receiverInput);
-            if (count($split) === 2) {
-                $receiverPriorities[intval($split[1])][] = $split[0];
+            if (2 === \count($split)) {
+                $receiverPriorities[(int)($split[1])][] = $split[0];
             } else {
                 $receiverDefault[] = $receiverInput;
             }

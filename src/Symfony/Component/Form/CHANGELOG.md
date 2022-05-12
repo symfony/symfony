@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add a `prototype_options` option to `CollectionType`
+ * Add `init_value` option to `FormType` to set form value that has no underlying object, created event listener `InitFormValueListener`
 
 6.0
 ---

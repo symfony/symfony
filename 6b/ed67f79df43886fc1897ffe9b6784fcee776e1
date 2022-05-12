@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-05-12T09:25:49Z
+
+That's `Copy as cURL` in Firefox/Chrome DevTools and the project owner seems to agree with that spelling.
+https://daniel.haxx.se/blog/2015/11/23/copy-as-curl/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-12T09:32:05Z
+
+> That's Copy as cURL in Firefox/Chrome DevTools and the project owner seems to agree with that spelling.
+
+We should then close this PR, isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-05-12T09:35:01Z
+
+Based on the answer of the project owner on Twitter, I would say we should merge it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-05-12T09:37:26Z
+
+> That's Copy as cURL in Firefox/Chrome DevTools and the project owner seems to agree with that spelling.
+
+I wanted to send a PR on chrome too, but... I was too lazy!

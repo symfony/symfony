@@ -159,6 +159,14 @@ final class AsyncContext
                 $onProgress($dlNow, $dlSize, $thisInfo + $info);
             };
         }
+        
+        if ($maxDuration = $options['max_duration'] ?? false) {
+            $totalElapsed = 0;
+            foreach ($this->info['previous_info'] as $req) {
+                $totalElapsed += $req['total_time'];
+            }
+            $options['timeout'] = ceil($maxDuration - $totalElapsed);
+        }
 
         return $this->response = $this->client->request($method, $url, ['buffer' => false] + $options);
     }

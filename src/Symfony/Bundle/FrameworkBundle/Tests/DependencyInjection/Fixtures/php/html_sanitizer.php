@@ -3,9 +3,8 @@
 $container->loadFromExtension('framework', [
     'http_method_override' => false,
     'html_sanitizer' => [
-        'default' => 'my.sanitizer',
         'sanitizers' => [
-            'my.sanitizer' => [
+            'default' => [
                 'allow_safe_elements' => true,
                 'allow_all_static_elements' => true,
                 'allow_elements' => [

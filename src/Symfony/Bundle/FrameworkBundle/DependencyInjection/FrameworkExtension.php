@@ -69,6 +69,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
@@ -484,6 +485,9 @@ class FrameworkExtension extends Extension
 
                 $container->removeDefinition('form.type_extension.form.validator');
                 $container->removeDefinition('form.type_guesser.validator');
+            }
+            if (!$this->isConfigEnabled($container, $config['html_sanitizer']) || !class_exists(TextTypeHtmlSanitizerExtension::class)) {
+                $container->removeDefinition('form.type_extension.form.html_sanitizer');
             }
         } else {
             $container->removeDefinition('console.command.form_debug');
@@ -2740,13 +2744,14 @@ class FrameworkExtension extends Extension
 
             // Create the sanitizer and link its config
             $sanitizerId = 'html_sanitizer.sanitizer.'.$sanitizerName;
-            $container->register($sanitizerId, HtmlSanitizer::class)->addArgument(new Reference($configId));
+            $container->register($sanitizerId, HtmlSanitizer::class)
+                ->addTag('html_sanitizer', ['sanitizer' => $sanitizerName])
+                ->addArgument(new Reference($configId));
 
-            $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
+            if ('default' !== $sanitizerName) {
+                $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
+            }
         }
-
-        $default = $config['default'] ? 'html_sanitizer.sanitizer.'.$config['default'] : 'html_sanitizer';
-        $container->setAlias(HtmlSanitizerInterface::class, new Reference($default));
     }
 
     private function resolveTrustedHeaders(array $headers): int

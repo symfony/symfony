@@ -151,6 +151,7 @@ return static function (ContainerConfigurator $container) {
                 'ROLE_ALLOWED_TO_SWITCH',
                 service('event_dispatcher')->nullOnInvalid(),
                 false, // Stateless
+                abstract_arg('Target Url'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

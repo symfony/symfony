@@ -51,8 +51,9 @@ class SwitchUserListener extends AbstractListener
     private ?LoggerInterface $logger;
     private ?EventDispatcherInterface $dispatcher;
     private bool $stateless;
+    private ?string $targetUrl;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false, ?string $targetUrl = null)
     {
         if ('' === $firewallName) {
             throw new \InvalidArgumentException('$firewallName must not be empty.');
@@ -68,6 +69,7 @@ class SwitchUserListener extends AbstractListener
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->stateless = $stateless;
+        $this->targetUrl = $targetUrl;
     }
 
     /**
@@ -122,7 +124,7 @@ class SwitchUserListener extends AbstractListener
         if (!$this->stateless) {
             $request->query->remove($this->usernameParameter);
             $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
-            $response = new RedirectResponse($request->getUri(), 302);
+            $response = new RedirectResponse($this->targetUrl ?? $request->getUri(), 302);
 
             $event->setResponse($response);
         }

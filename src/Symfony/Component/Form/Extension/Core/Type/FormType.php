@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\DataAccessor\ChainAccessor;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
+use Symfony\Component\Form\Extension\Core\EventListener\InitFormValueListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -64,6 +65,10 @@ class FormType extends BaseType
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
+        }
+
+        if (null !== $options['init_value']) {
+            $builder->addEventSubscriber(new InitFormValueListener());
         }
 
         $builder->setIsEmptyCallback($options['is_empty_callback']);
@@ -188,6 +193,7 @@ class FormType extends BaseType
         $resolver->setDefaults([
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
+            'init_value' => null,
             'trim' => true,
             'required' => true,
             'property_path' => null,

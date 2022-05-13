@@ -311,7 +311,7 @@ class Table
     public function render()
     {
         $divider = new TableSeparator();
-        $isCellWithColspan = static fn ($cell): bool => $cell instanceof TableCell && $cell->getColspan() >= 2;
+        $isCellWithColspan = static fn ($cell) => $cell instanceof TableCell && $cell->getColspan() >= 2;
 
         $horizontal = self::DISPLAY_ORIENTATION_HORIZONTAL === $this->displayOrientation;
         $vertical = self::DISPLAY_ORIENTATION_VERTICAL === $this->displayOrientation;
@@ -334,30 +334,36 @@ class Table
                 }
             }
         } elseif ($vertical) {
-            $maxHeaderLength = array_reduce($this->headers[0] ?? [], static fn (int $max, string $header) => max($max, mb_strlen($header)), 0);
+            $formatter = $this->output->getFormatter();
+            $maxHeaderLength = array_reduce($this->headers[0] ?? [], static fn ($max, $header) => max($max, Helper::width(Helper::removeDecoration($formatter, $header))), 0);
 
             foreach ($this->rows as $row) {
                 if ($row instanceof TableSeparator) {
                     continue;
                 }
 
-                if (0 < \count($rows)) {
+                if ($rows) {
                     $rows[] = [$divider];
                 }
 
-                $containsColspan = 0 < \count(array_filter($row, $isCellWithColspan));
+                $containsColspan = false;
+                foreach ($row as $cell) {
+                    if ($containsColspan = $isCellWithColspan($cell)) {
+                        break;
+                    }
+                }
 
                 $headers = $this->headers[0] ?? [];
                 $maxRows = max(\count($headers), \count($row));
                 for ($i = 0; $i < $maxRows; ++$i) {
                     $cell = (string) ($row[$i] ?? '');
-                    if ([] !== $headers && !$containsColspan) {
+                    if ($headers && !$containsColspan) {
                         $rows[] = [sprintf(
                             '<comment>%s</>: %s',
                             str_pad($headers[$i] ?? '', $maxHeaderLength, ' ', \STR_PAD_LEFT),
                             $cell
                         )];
-                    } elseif (!empty($cell)) {
+                    } elseif ('' !== $cell) {
                         $rows[] = [$cell];
                     }
                 }
@@ -443,7 +449,7 @@ class Table
      */
     private function renderRowSeparator(int $type = self::SEPARATOR_MID, string $title = null, string $titleFormat = null)
     {
-        if (0 === $count = $this->numberOfColumns) {
+        if (!$count = $this->numberOfColumns) {
             return;
         }
 
@@ -652,7 +658,7 @@ class Table
             ++$numberOfRows; // Add row for header separator
         }
 
-        if (\count($this->rows) > 0) {
+        if ($this->rows) {
             ++$numberOfRows; // Add row for footer separator
         }
 

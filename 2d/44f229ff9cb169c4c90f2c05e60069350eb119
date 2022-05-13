@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-05-13T11:10:54Z
+
+Restored the array_filter around list of names as getName is technically nullable.. I don't know if there would be a use case here for a command without a name but anyway better safe than sorry as suggestions need a string.

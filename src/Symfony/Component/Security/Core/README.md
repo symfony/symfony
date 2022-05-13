@@ -41,7 +41,7 @@ if (!$accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
 Sponsor
 -------
 
-The Security component for Symfony 5.4/6.0 is [backed][1] by [SymfonyCasts][2].
+The Security component for Symfony 6.1 is [backed][1] by [SymfonyCasts][2].
 
 Learn Symfony faster by watching real projects being built and actively coding
 along with them. SymfonyCasts bridges that learning gap, bringing you video

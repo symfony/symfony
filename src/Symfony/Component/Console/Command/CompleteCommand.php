@@ -105,11 +105,12 @@ final class CompleteCommand extends Command
             } elseif (
                 $completionInput->mustSuggestArgumentValuesFor('command')
                 && $command->getName() !== $completionInput->getCompletionValue()
+                && !\in_array($completionInput->getCompletionValue(), $command->getAliases(), true)
             ) {
                 $this->log('  No command found, completing using the Application class.');
 
                 // expand shortcut names ("cache:cl<TAB>") into their full name ("cache:clear")
-                $suggestions->suggestValue($command->getName());
+                $suggestions->suggestValues(array_filter(array_merge([$command->getName()], $command->getAliases())));
             } else {
                 $command->mergeApplicationDefinition();
                 $completionInput->bind($command->getDefinition());

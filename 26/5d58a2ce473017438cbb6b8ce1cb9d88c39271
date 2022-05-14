@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-04-19T15:23:29Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2022-04-19T15:29:03Z
+
+I changed the target branch to 6.1 as that's what your branch is currently based on, allowing to have a clean diff.
+
+The expected target of the bugfix (which will require rebasing the git branch, not only editing the PR metadata) is either 4.4 or 5.4 (depending on whether 4.4 is affected, which is probably the case as you said that this code hasn't changed since 2017). But there is no chance that the lowest affected version is 6.0
+
+---------------------------------------------------------------------------
+
+by Perturbatio at 2022-04-19T15:31:03Z
+
+> I changed the target branch to 6.1 as that's what your branch is currently based on, allowing to have a clean diff.
+>
+> The expected target of the bugfix (which will require rebasing the git branch, not only editing the PR metadata) is either 4.4 or 5.4 (depending on whether 4.4 is affected, which is probably the case as you said that this code hasn't changed since 2017). But there is no chance that the lowest affected version is 6.0
+
+Yeah, I think I'm misunderstanding where to branch from , It's not difficult to create a patch for this since it's such a tiny change.  Is there a branch I *should* be creating this from to PR into?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-04-19T15:34:07Z
+
+@Perturbatio if the lowest affected maintained version is 4.4 (which is likely the case for this bug), the fix needs to be applied to 4.4. The easiest for that is to create your branch directly from the 4.4 branch. But you can still change that after the fact with a rebase. See https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request (be careful about the last step requiring a force push, not a merge of the upstream feature branch, which is a common mistake done when following that doc not carefully)
+
+---------------------------------------------------------------------------
+
+by Perturbatio at 2022-04-20T11:21:26Z
+
+@stof The current set of failing tests (TextDescriptorTest) pass locally, but in GitHub (only in
+`PHPUnit / Tests (8.1, low-deps) (pull_request)` ), they don't seem to have any expected value.  Is there something that might prevent the tests from reading data from the fixtures for this specific test run?

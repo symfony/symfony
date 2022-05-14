@@ -7,6 +7,38 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.0-RC1 (2022-05-14)
+
+ * feature #46335 [Form][FrameworkBundle][TwigBundle] Add Twig filter, form-type extension and improve service definitions for HtmlSanitizer (nicolas-grekas)
+ * bug #46114 Fixes "Incorrectly nested style tag found" error when using multi-line header content (Perturbatio)
+ * bug #46325 [Ldap] Fix LDAP connection options (buffcode)
+ * bug #46341 Fix aliases handling in command name completion (Seldaek)
+ * bug #46317 [Security/Http] Ignore invalid URLs found in failure/success paths (nicolas-grekas)
+ * bug #46309 [Security] Fix division by zero (tvlooy)
+ * bug #46327 [HttpKernel] Allow ErrorHandler ^5.0 to be used in HttpKernel 4.4 (mpdude)
+ * bug #46310 [MonologBridge] Fix LevelName being removed in Monolog 3.0 (Seldaek)
+ * bug #46297 [Serializer] Fix JsonSerializableNormalizer ignores circular reference handler in $context (BreyndotEchse)
+ * bug #46291 [Console] Suppress unhandled error in some specific use-cases. (rw4lll)
+ * bug #46302 [ErrorHandler] Fix list of tentative return types (nicolas-grekas)
+ * bug #46293 [HttpClient] "debug" is missing if a request failed to even start (weaverryan)
+ * bug #45981 [Serializer][PropertyInfo] Fix support for "false" built-in type on PHP 8.2 (alexandre-daubois)
+ * feature #41676 [Console] Table vertical rendering (yoannrenard)
+ * bug #46277 [HttpKernel] Fix SessionListener without session in request (edditor)
+ * bug #46282 [DoctrineBridge] Treat firstResult === 0 like null (derrabus)
+ * bug #46239 [Translation] Refresh local translations on PushCommand if the provider has domains (Florian-B)
+ * bug #46274 [HtmlSanitizer] Fix node renderer handling of self-closing (void) elements (omniError)
+ * bug #46276 [DependencyInjection] Fix lazyness of AutowiringFailedException (nicolas-grekas)
+ * bug #46278 [Workflow] Fix deprecated syntax for interpolated strings (nicolas-grekas)
+ * bug #46264 [Console] Better required argument check in InputArgument (jnoordsij)
+ * bug #46272 [DependencyInjection] Fix resolving parameters found in #[Autowire] (nicolas-grekas)
+ * bug #46262 [EventDispatcher] Fix removing listeners when using first-class callable syntax (javer)
+ * feature #46153 [MonologBridge] Add support for Monolog 3 (Seldaek)
+ * bug #46199 [HttpKernel] Handle previously converted `DateTime` arguments (mbabker)
+ * bug #46216 [Form] fix populating single widget time view data with different timezones (xabbuh)
+ * bug #46221 [DomCrawler][VarDumper] Fix html-encoding emojis (nicolas-grekas)
+ * bug #46220 [Console] Fix fish completion script (wouterj)
+ * bug #46167 [VarExporter] Fix exporting DateTime objects on PHP 8.2 (nicolas-grekas)
+
 * 6.1.0-BETA2 (2022-04-27)
 
  * feature #45282 [Serializer] Support canners in object normalizer (rmikalkenas)

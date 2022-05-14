@@ -29,6 +29,12 @@ class Connection extends AbstractConnection
     private const LDAP_INVALID_CREDENTIALS = 0x31;
     private const LDAP_TIMEOUT = 0x55;
     private const LDAP_ALREADY_EXISTS = 0x44;
+    private const PRECONNECT_OPTIONS = [
+        ConnectionOptions::DEBUG_LEVEL,
+        ConnectionOptions::X_TLS_CACERTDIR,
+        ConnectionOptions::X_TLS_CACERTFILE,
+        ConnectionOptions::X_TLS_REQUIRE_CERT,
+    ];
 
     private bool $bound = false;
 
@@ -143,10 +149,18 @@ class Connection extends AbstractConnection
             return;
         }
 
+        foreach ($this->config['options'] as $name => $value) {
+            if (\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {
+                $this->setOption($name, $value);
+            }
+        }
+
         $this->connection = ldap_connect($this->config['connection_string']);
 
         foreach ($this->config['options'] as $name => $value) {
-            $this->setOption($name, $value);
+            if (!\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {
+                $this->setOption($name, $value);
+            }
         }
 
         if (false === $this->connection) {

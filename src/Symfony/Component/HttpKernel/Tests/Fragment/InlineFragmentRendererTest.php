@@ -155,7 +155,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('Foo', ob_get_clean());
     }
 
-    public function testLocaleAndFormatAreIsKeptInSubrequest()
+    public function testLocaleAndFormatAreKeptInSubrequest()
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->attributes->set('_format', 'foo');

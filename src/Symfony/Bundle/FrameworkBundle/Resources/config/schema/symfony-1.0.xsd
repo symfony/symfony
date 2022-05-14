@@ -826,7 +826,6 @@
             <xsd:element name="sanitizer" type="sanitizer" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="default" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="sanitizer">

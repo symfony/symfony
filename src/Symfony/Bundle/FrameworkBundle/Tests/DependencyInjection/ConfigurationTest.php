@@ -652,7 +652,6 @@ class ConfigurationTest extends TestCase
             ],
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
-                'default' => null,
                 'sanitizers' => [],
             ],
             'exceptions' => [],

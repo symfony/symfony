@@ -19,8 +19,10 @@ use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
+use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
@@ -112,6 +114,10 @@ return static function (ContainerConfigurator $container) {
         ->set('form.type_extension.form.transformation_failure_handling', TransformationFailureExtension::class)
             ->args([service('translator')->ignoreOnInvalid()])
             ->tag('form.type_extension', ['extended-type' => FormType::class])
+
+        ->set('form.type_extension.form.html_sanitizer', TextTypeHtmlSanitizerExtension::class)
+            ->args([tagged_locator('html_sanitizer', 'sanitizer')])
+            ->tag('form.type_extension', ['extended-type' => TextType::class])
 
         ->set('form.type_extension.form.http_foundation', FormTypeHttpFoundationExtension::class)
             ->args([service('form.type_extension.form.request_handler')])

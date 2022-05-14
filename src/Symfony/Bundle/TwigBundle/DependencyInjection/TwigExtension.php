@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
@@ -52,6 +53,10 @@ class TwigExtension extends Extension
 
         if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'])) {
             $loader->load('console.php');
+        }
+
+        if (!$container::willBeAvailable('symfony/html-sanitizer', HtmlSanitizerInterface::class, ['symfony/twig-bundle'])) {
+            $container->removeDefinition('twig.extension.htmlsanitizer');
         }
 
         if ($container::willBeAvailable('symfony/mailer', Mailer::class, ['symfony/twig-bundle'])) {

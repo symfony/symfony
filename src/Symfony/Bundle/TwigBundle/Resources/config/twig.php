@@ -18,6 +18,7 @@ use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Extension\CodeExtension;
 use Symfony\Bridge\Twig\Extension\ExpressionExtension;
+use Symfony\Bridge\Twig\Extension\HtmlSanitizerExtension;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
@@ -117,6 +118,9 @@ return static function (ContainerConfigurator $container) {
             ->args([service('debug.stopwatch')->ignoreOnInvalid(), param('kernel.debug')])
 
         ->set('twig.extension.expression', ExpressionExtension::class)
+
+        ->set('twig.extension.htmlsanitizer', HtmlSanitizerExtension::class)
+            ->args([tagged_locator('html_sanitizer', 'sanitizer')])
 
         ->set('twig.extension.httpkernel', HttpKernelExtension::class)
 

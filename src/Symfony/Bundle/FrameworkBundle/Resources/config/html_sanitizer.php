@@ -13,13 +13,18 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('html_sanitizer.config', HtmlSanitizerConfig::class)
+        ->set('html_sanitizer.config.default', HtmlSanitizerConfig::class)
             ->call('allowSafeElements')
 
-        ->set('html_sanitizer', HtmlSanitizer::class)
+        ->set('html_sanitizer.sanitizer.default', HtmlSanitizer::class)
             ->args([service('html_sanitizer.config')])
+            ->tag('html_sanitizer', ['name' => 'default'])
+
+        ->alias('html_sanitizer', 'html_sanitizer.sanitizer.default')
+        ->alias(HtmlSanitizerInterface::class, 'html_sanitizer')
     ;
 };

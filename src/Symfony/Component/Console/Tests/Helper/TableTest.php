@@ -1938,10 +1938,10 @@ EOTXT
             ->setVertical()
             ->setStyle($style);
 
-        if (!empty($headerTitle)) {
+        if ('' !== $headerTitle) {
             $table->setHeaderTitle($headerTitle);
         }
-        if (!empty($footerTitle)) {
+        if ('' !== $footerTitle) {
             $table->setFooterTitle($footerTitle);
         }
 

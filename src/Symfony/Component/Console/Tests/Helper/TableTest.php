@@ -615,8 +615,8 @@ TABLE
                 'default',
                 <<<'TABLE'
 +-------+------------+
-[39;49m| [39;49m[37;41mDont break[39;49m[39;49m         |[39;49m
-[39;49m| [39;49m[37;41mhere[39;49m               |
+[37;41m| [39;49m[37;41mDont break[39;49m[37;41m         |[39;49m
+[37;41m| here[39;49m               |
 +-------+------------+
 [39;49m| foo   | [39;49m[37;41mDont break[39;49m[39;49m |[39;49m
 [39;49m| bar   | [39;49m[37;41mhere[39;49m       |
@@ -1077,6 +1077,26 @@ TABLE;
 | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
 | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
 +---------------+--------- Page 1/2 -------+------------------+
+
+TABLE
+                ,
+                true,
+           ],
+            'header contains multiple lines' => [
+                'Multiline'."\n".'header'."\n".'here',
+                'footer',
+                'default',
+                <<<'TABLE'
++---------------+--- Multiline
+header
+here +------------------+
+| ISBN          | Title                    | Author           |
++---------------+--------------------------+------------------+
+| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+| 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
+| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
++---------------+---------- footer --------+------------------+
 
 TABLE
             ],

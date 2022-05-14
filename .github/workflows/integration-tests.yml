@@ -91,7 +91,7 @@ jobs:
       zookeeper:
         image: wurstmeister/zookeeper:3.4.6
       kafka:
-        image: wurstmeister/kafka:2.12-2.4.1
+        image: wurstmeister/kafka:2.12-2.0.1
         ports:
           - 9092:9092
         env:

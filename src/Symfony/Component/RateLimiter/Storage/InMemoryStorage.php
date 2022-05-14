@@ -22,15 +22,7 @@ class InMemoryStorage implements StorageInterface
 
     public function save(LimiterStateInterface $limiterState): void
     {
-        if (isset($this->buckets[$limiterState->getId()])) {
-            [$expireAt, ] = $this->buckets[$limiterState->getId()];
-        }
-
-        if (null !== ($expireSeconds = $limiterState->getExpirationTime())) {
-            $expireAt = microtime(true) + $expireSeconds;
-        }
-
-        $this->buckets[$limiterState->getId()] = [$expireAt, serialize($limiterState)];
+        $this->buckets[$limiterState->getId()] = [$this->getExpireAt($limiterState), serialize($limiterState)];
     }
 
     public function fetch(string $limiterStateId): ?LimiterStateInterface
@@ -56,5 +48,14 @@ class InMemoryStorage implements StorageInterface
         }
 
         unset($this->buckets[$limiterStateId]);
+    }
+
+    private function getExpireAt(LimiterStateInterface $limiterState): ?float
+    {
+        if (null !== $expireSeconds = $limiterState->getExpirationTime()) {
+            return microtime(true) + $expireSeconds;
+        }
+
+        return $this->buckets[$limiterState->getId()][0] ?? null;
     }
 }

@@ -108,11 +108,13 @@ jobs:
       - name: Install system dependencies
         run: |
           echo "::group::apt-get update"
+          sudo wget -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | sudo apt-key add -
+          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2004 focal focal/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
           sudo apt-get update
           echo "::endgroup::"
 
           echo "::group::install tools & libraries"
-          sudo apt-get install librdkafka-dev redis-server
+          sudo apt-get install librdkafka-dev redis-server libcouchbase-dev
           sudo -- sh -c 'echo unixsocket /var/run/redis/redis-server.sock >> /etc/redis/redis.conf'
           sudo -- sh -c 'echo unixsocketperm 777 >> /etc/redis/redis.conf'
           sudo service redis-server restart
@@ -129,7 +131,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "json,couchbase,memcached,mongodb-1.12.0,redis-5.3.4,rdkafka,xsl,ldap"
+          extensions: "json,couchbase-3.2.2,memcached,mongodb-1.12.0,redis-5.3.4,rdkafka,xsl,ldap"
           ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           tools: pecl

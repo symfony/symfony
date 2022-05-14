@@ -623,7 +623,7 @@ class Table
                 }
                 $escaped = implode("\n", array_map([OutputFormatter::class, 'escapeTrailingBackslash'], explode("\n", $cell)));
                 $cell = $cell instanceof TableCell ? new TableCell($escaped, ['colspan' => $cell->getColspan()]) : $escaped;
-                $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
+                $lines = explode("\n", str_replace("\n", "<fg=default;bg=default></>\n", $cell));
                 foreach ($lines as $lineKey => $line) {
                     if ($colspan > 1) {
                         $line = new TableCell($line, ['colspan' => $colspan]);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests;
 
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -19,6 +20,7 @@ use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\Mime\Test\Constraint\EmailHeaderSame;
 
 class EmailTest extends TestCase
 {
@@ -383,5 +385,15 @@ class EmailTest extends TestCase
         $n = unserialize(serialize($e));
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());
         $this->assertEquals($e->getBody(), $n->getBody());
+    }
+
+    public function testMissingHeaderDoesNotThrowError()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Email has header "foo" with value "bar" (value is null).');
+
+        $e = new Email();
+        $emailHeaderSame = new EmailHeaderSame('foo', 'bar');
+        $emailHeaderSame->evaluate($e);
     }
 }

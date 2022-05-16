@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Attribute;
 
+use BackedEnum;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -23,9 +24,9 @@ final class Target
 {
     public string $name;
 
-    public function __construct(string $name)
+    public function __construct(string|BackedEnum $name)
     {
-        $this->name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name))));
+        $this->name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name instanceof BackedEnum ? $name->value : $name))));
     }
 
     public static function parseName(\ReflectionParameter $parameter): string

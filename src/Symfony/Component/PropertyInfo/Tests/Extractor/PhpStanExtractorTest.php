@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
@@ -439,15 +440,16 @@ class PhpStanExtractorTest extends TestCase
     /**
      * @dataProvider php80TypesProvider
      */
-    public function testExtractPhp80Type($property, array $type = null)
+    public function testExtractPhp80Type(string $class, $property, array $type = null)
     {
-        $this->assertEquals($type, $this->extractor->getTypes(Php80Dummy::class, $property, []));
+        $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
     }
 
     public function php80TypesProvider()
     {
         return [
-            ['promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            [Php80Dummy::class, 'promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            [Php80PromotedDummy::class, 'promoted', null],
         ];
     }
 }

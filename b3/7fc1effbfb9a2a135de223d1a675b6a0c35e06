@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-05-05T09:07:33Z
+
+Hey!
+
+I think @BradJonesLLC has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by peter17 at 2022-05-11T15:46:34Z
+
+Link bug #45755
+
+---------------------------------------------------------------------------
+
+by peter17 at 2022-05-11T15:50:00Z
+
+@nicolas-grekas Any idea about this? Thanks a lot in advance. Best regards
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-14T11:21:49Z
+
+I don't think changing a superglobal to accommodate some code is the correct approach.
+Can you figure out another way that doesn't involve mutating `$_COOKIE`?
+
+---------------------------------------------------------------------------
+
+by peter17 at 2022-05-14T11:23:16Z
+
+Thanks for your feedback. I understand your concern. I will try to find a better way!
+
+---------------------------------------------------------------------------
+
+by peter17 at 2022-05-14T19:29:17Z
+
+@nicolas-grekas I propose a new way that does not involve mutating a superglobal: I use the native PHP functions to generate a new session ID. Therefore, session_start will work normally.
+
+Best regards
+
+---------------------------------------------------------------------------
+
+by peter17 at 2022-05-14T19:33:12Z
+
+NB: the Appveyor build failed with "Build execution time has reached the maximum allowed time for your plan (20 minutes)."
+
+I don't think this failure is relevant. I could not find how to retry the build.
+
+---------------------------------------------------------------------------
+
+by peter17 at 2022-05-17T09:59:54Z
+
+@nicolas-grekas thanks for your review, I applied the requested changes.
+
+I will attempt to write a test.
+
+Best regards
+
+---------------------------------------------------------------------------
+
+by peter17 at 2022-05-17T11:42:34Z
+
+@nicolas-grekas I added a test. It fails without my patch and passes with it.
+
+Best regards

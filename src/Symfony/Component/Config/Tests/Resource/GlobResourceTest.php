@@ -208,4 +208,29 @@ class GlobResourceTest extends TestCase
 
         $this->assertEquals($p->getValue($resource), $p->getValue($newResource));
     }
+
+    public function testPhar()
+    {
+        $s = \DIRECTORY_SEPARATOR;
+        $cwd = getcwd();
+        chdir(\dirname(__DIR__).'/Fixtures');
+        try {
+            $resource = new GlobResource('phar://some.phar', '*', true);
+            $files = array_keys(iterator_to_array($resource));
+            $this->assertSame(["phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php", "phar://some.phar{$s}schema{$s}project-1.0.xsd"], $files);
+
+            $resource = new GlobResource("phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php", '', true);
+            $files = array_keys(iterator_to_array($resource));
+            $this->assertSame(["phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php"], $files);
+        } finally {
+            chdir($cwd);
+        }
+    }
+
+    public function testFilePrefix()
+    {
+        $resource = new GlobResource(__FILE__, '/**/', true);
+        $files = array_keys(iterator_to_array($resource));
+        $this->assertSame([], $files);
+    }
 }

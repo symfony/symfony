@@ -38,11 +38,11 @@ ReflectionClass {
   +name: "ReflectionClass"
 %Aimplements: array:%d [
 %A]
-  constants: array:3 [
+  constants: array:%d [
     "IS_IMPLICIT_ABSTRACT" => 16
     "IS_EXPLICIT_ABSTRACT" => %d
     "IS_FINAL" => %d
-  ]
+%A]
   properties: array:%d [
     "name" => ReflectionProperty {
 %A    +name: "name"

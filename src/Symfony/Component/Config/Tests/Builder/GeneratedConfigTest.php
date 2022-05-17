@@ -56,6 +56,7 @@ class GeneratedConfigTest extends TestCase
     public function fixtureNames()
     {
         $array = [
+            'ScalarNormalizedTypes' => 'scalar_normalized_types',
             'PrimitiveTypes' => 'primitive_types',
             'VariableType' => 'variable_type',
             'AddToList' => 'add_to_list',

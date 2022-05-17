@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Config;
+namespace Symfony\Config\ScalarNormalizedTypes;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -8,15 +8,15 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This class is automatically generated to help in creating a config.
  */
-class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuilderInterface
+class ObjectConfig 
 {
     private $enabled;
-    private $favoriteFloat;
-    private $goodIntegers;
+    private $dateFormat;
+    private $removeUsedContextFields;
     private $_usedProperties = [];
 
     /**
-     * @default false
+     * @default null
      * @param ParamConfigurator|bool $value
      * @return $this
      */
@@ -30,33 +30,28 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
 
     /**
      * @default null
-     * @param ParamConfigurator|float $value
+     * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function favoriteFloat($value): static
+    public function dateFormat($value): static
     {
-        $this->_usedProperties['favoriteFloat'] = true;
-        $this->favoriteFloat = $value;
+        $this->_usedProperties['dateFormat'] = true;
+        $this->dateFormat = $value;
 
         return $this;
     }
 
     /**
-     * @param ParamConfigurator|list<ParamConfigurator|int> $value
-     *
+     * @default null
+     * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function goodIntegers(ParamConfigurator|array $value): static
+    public function removeUsedContextFields($value): static
     {
-        $this->_usedProperties['goodIntegers'] = true;
-        $this->goodIntegers = $value;
+        $this->_usedProperties['removeUsedContextFields'] = true;
+        $this->removeUsedContextFields = $value;
 
         return $this;
-    }
-
-    public function getExtensionAlias(): string
-    {
-        return 'placeholders';
     }
 
     public function __construct(array $value = [])
@@ -67,16 +62,16 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
             unset($value['enabled']);
         }
 
-        if (array_key_exists('favorite_float', $value)) {
-            $this->_usedProperties['favoriteFloat'] = true;
-            $this->favoriteFloat = $value['favorite_float'];
-            unset($value['favorite_float']);
+        if (array_key_exists('date_format', $value)) {
+            $this->_usedProperties['dateFormat'] = true;
+            $this->dateFormat = $value['date_format'];
+            unset($value['date_format']);
         }
 
-        if (array_key_exists('good_integers', $value)) {
-            $this->_usedProperties['goodIntegers'] = true;
-            $this->goodIntegers = $value['good_integers'];
-            unset($value['good_integers']);
+        if (array_key_exists('remove_used_context_fields', $value)) {
+            $this->_usedProperties['removeUsedContextFields'] = true;
+            $this->removeUsedContextFields = $value['remove_used_context_fields'];
+            unset($value['remove_used_context_fields']);
         }
 
         if ([] !== $value) {
@@ -90,11 +85,11 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         if (isset($this->_usedProperties['enabled'])) {
             $output['enabled'] = $this->enabled;
         }
-        if (isset($this->_usedProperties['favoriteFloat'])) {
-            $output['favorite_float'] = $this->favoriteFloat;
+        if (isset($this->_usedProperties['dateFormat'])) {
+            $output['date_format'] = $this->dateFormat;
         }
-        if (isset($this->_usedProperties['goodIntegers'])) {
-            $output['good_integers'] = $this->goodIntegers;
+        if (isset($this->_usedProperties['removeUsedContextFields'])) {
+            $output['remove_used_context_fields'] = $this->removeUsedContextFields;
         }
 
         return $output;

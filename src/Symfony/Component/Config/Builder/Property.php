@@ -23,6 +23,7 @@ class Property
     private string $name;
     private string $originalName;
     private bool $array = false;
+    private bool $scalarsAllowed = false;
     private ?string $type = null;
     private ?string $content = null;
 
@@ -46,6 +47,11 @@ class Property
     {
         $this->array = false;
         $this->type = $type;
+
+        if (str_ends_with($type, '|scalar')) {
+            $this->scalarsAllowed = true;
+            $this->type = $type = substr($type, 0, -7);
+        }
 
         if (str_ends_with($type, '[]')) {
             $this->array = true;
@@ -71,5 +77,10 @@ class Property
     public function isArray(): bool
     {
         return $this->array;
+    }
+
+    public function areScalarsAllowed(): bool
+    {
+        return $this->scalarsAllowed;
     }
 }

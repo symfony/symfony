@@ -21,7 +21,7 @@ return static function (ContainerConfigurator $container) {
             ->call('allowSafeElements')
 
         ->set('html_sanitizer.sanitizer.default', HtmlSanitizer::class)
-            ->args([service('html_sanitizer.config')])
+            ->args([service('html_sanitizer.config.default')])
             ->tag('html_sanitizer', ['name' => 'default'])
 
         ->alias('html_sanitizer', 'html_sanitizer.sanitizer.default')

@@ -293,4 +293,13 @@ class NativeSessionStorageTest extends TestCase
 
         $this->assertEquals($storage->getBag('flashes'), $bag);
     }
+
+    public function testRegenerateInvalidSessionId()
+    {
+        $_COOKIE[session_name()] = '&~[';
+        $started = (new NativeSessionStorage())->start();
+
+        $this->assertTrue($started);
+        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,}$/', session_id());
+    }
 }

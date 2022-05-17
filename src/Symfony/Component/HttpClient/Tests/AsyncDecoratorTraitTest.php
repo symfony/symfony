@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\AsyncDecoratorTrait;
 use Symfony\Component\HttpClient\DecoratorTrait;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
@@ -338,5 +339,29 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Instance of "Symfony\Component\HttpClient\Response\NativeResponse" is already consumed and cannot be managed by "Symfony\Component\HttpClient\Response\AsyncResponse". A decorated client should not call any of the response\'s methods in its "request()" method.');
         $response->getStatusCode();
+    }
+
+    public function testMaxDuration()
+    {
+        $sawFirst = false;
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$sawFirst) {
+            try {
+                if (!$chunk->isFirst() || !$sawFirst) {
+                    $sawFirst = $sawFirst || $chunk->isFirst();
+                    yield $chunk;
+                }
+            } catch (TransportExceptionInterface $e) {
+                $context->getResponse()->cancel();
+                $context->replaceRequest('GET', 'http://localhost:8057/timeout-body', ['timeout' => 0.4]);
+            }
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/timeout-body', ['max_duration' => 0.75, 'timeout' => 0.4]);
+
+        $this->assertSame(0.75, $response->getInfo('max_duration'));
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Max duration was reached for "http://localhost:8057/timeout-body".');
+        $response->getContent();
     }
 }

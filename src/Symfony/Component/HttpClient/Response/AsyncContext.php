@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Response;
 
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -152,12 +153,17 @@ final class AsyncContext
      */
     public function replaceRequest(string $method, string $url, array $options = []): ResponseInterface
     {
-        $this->info['previous_info'][] = $this->response->getInfo();
+        $this->info['previous_info'][] = $info = $this->response->getInfo();
         if (null !== $onProgress = $options['on_progress'] ?? null) {
             $thisInfo = &$this->info;
             $options['on_progress'] = static function (int $dlNow, int $dlSize, array $info) use (&$thisInfo, $onProgress) {
                 $onProgress($dlNow, $dlSize, $thisInfo + $info);
             };
+        }
+        if (0 < ($info['max_duration'] ?? 0) && 0 < ($info['total_time'] ?? 0)) {
+            if (0 >= $options['max_duration'] = $info['max_duration'] - $info['total_time']) {
+                throw new TransportException(sprintf('Max duration was reached for "%s".', $info['url']));
+            }
         }
 
         return $this->response = $this->client->request($method, $url, ['buffer' => false] + $options);

@@ -140,6 +140,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->info['http_method'] = $method;
         $response->info['http_code'] = 0;
         $response->info['user_data'] = $options['user_data'] ?? null;
+        $response->info['max_duration'] = $options['max_duration'] ?? null;
         $response->info['url'] = $url;
 
         if ($mock instanceof self) {
@@ -285,6 +286,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->info = [
             'start_time' => $response->info['start_time'],
             'user_data' => $response->info['user_data'],
+            'max_duration' => $response->info['max_duration'],
             'http_code' => $response->info['http_code'],
         ] + $info + $response->info;
 

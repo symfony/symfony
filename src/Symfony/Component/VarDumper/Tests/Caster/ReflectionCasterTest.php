@@ -39,7 +39,7 @@ ReflectionClass {
   +name: "ReflectionClass"
 %Aimplements: array:%d [
 %A]
-  constants: array:3 [
+  constants: array:%d [
     0 => ReflectionClassConstant {
       +name: "IS_IMPLICIT_ABSTRACT"
       +class: "ReflectionClass"
@@ -58,7 +58,7 @@ ReflectionClass {
       modifiers: "public"
       value: %d
     }
-  ]
+%A]
   properties: array:%d [
     "name" => ReflectionProperty {
 %A    +name: "name"

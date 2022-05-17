@@ -227,7 +227,11 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
             $constructor = new \ReflectionMethod($class, '__construct');
             $rawDocNode = $constructor->getDocComment();
             $source = self::MUTATOR;
-        } elseif (null === $rawDocNode = $reflectionProperty->getDocComment() ?: null) {
+        } else {
+            $rawDocNode = $reflectionProperty->getDocComment();
+        }
+
+        if (!$rawDocNode) {
             return null;
         }
 

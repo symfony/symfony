@@ -10,6 +10,7 @@ CHANGELOG
  * Add `Profiler::isEnabled()` so collaborating collector services may elect to omit themselves
  * Add the `UidValueResolver` argument value resolver
  * Add `AbstractBundle` class for DI configuration/definition on a single file
+ * Update the path of a bundle placed in the `src/` directory to the parent directory when `AbstractBundle` is used
 
 6.0
 ---

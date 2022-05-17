@@ -68,7 +68,7 @@ class ClassBuilder
             }
             $require .= sprintf('require_once __DIR__.\DIRECTORY_SEPARATOR.\'%s\';', implode('\'.\DIRECTORY_SEPARATOR.\'', $path))."\n";
         }
-        $use = '';
+        $use = $require ? "\n" : '';
         foreach (array_keys($this->use) as $statement) {
             $use .= sprintf('use %s;', $statement)."\n";
         }
@@ -81,7 +81,7 @@ class ClassBuilder
         foreach ($this->methods as $method) {
             $lines = explode("\n", $method->getContent());
             foreach ($lines as $line) {
-                $body .= '    '.$line."\n";
+                $body .= ($line ? '    '.$line : '')."\n";
             }
         }
 
@@ -89,9 +89,7 @@ class ClassBuilder
 
 namespace NAMESPACE;
 
-REQUIRE
-USE
-
+REQUIREUSE
 /**
  * This class is automatically generated to help in creating a config.
  */

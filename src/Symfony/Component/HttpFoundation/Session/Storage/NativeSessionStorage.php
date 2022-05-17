@@ -145,6 +145,12 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \RuntimeException(sprintf('Failed to start the session because headers have already been sent by "%s" at line %d.', $file, $line));
         }
 
+        $sessionId = $_COOKIE[session_name()] ?? null;
+        if ($sessionId && !preg_match('/^[a-zA-Z0-9,-]{22,}$/', $sessionId)) {
+            // the session ID in the header is invalid, create a new one
+            session_id(session_create_id());
+        }
+
         // ok to try and start the session
         if (!session_start()) {
             throw new \RuntimeException('Failed to start the session.');

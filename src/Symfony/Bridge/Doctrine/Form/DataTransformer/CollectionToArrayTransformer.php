@@ -46,9 +46,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms choice keys into entities.
-     *
-     * @param mixed $array An array of entities
+     * Transforms an array into a collection.
      */
     public function reverseTransform(mixed $array): Collection
     {

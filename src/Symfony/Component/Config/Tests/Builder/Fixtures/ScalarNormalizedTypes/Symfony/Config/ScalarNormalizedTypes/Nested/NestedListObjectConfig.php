@@ -18,7 +18,7 @@ class NestedListObjectConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function name($value): self
+    public function name($value): static
     {
         $this->_usedProperties['name'] = true;
         $this->name = $value;

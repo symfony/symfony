@@ -19,7 +19,7 @@ class NestedConfig
     /**
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|$this
      */
-    public function nestedObject($value = [])
+    public function nestedObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|static
     {
         if (!\is_array($value)) {
             $this->_usedProperties['nestedObject'] = true;
@@ -41,7 +41,7 @@ class NestedConfig
     /**
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|$this
      */
-    public function nestedListObject($value = [])
+    public function nestedListObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|static
     {
         $this->_usedProperties['nestedListObject'] = true;
         if (!\is_array($value)) {

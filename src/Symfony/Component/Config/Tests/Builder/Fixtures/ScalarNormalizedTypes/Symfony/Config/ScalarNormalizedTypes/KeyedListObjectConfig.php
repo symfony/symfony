@@ -19,7 +19,7 @@ class KeyedListObjectConfig
      * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function enabled($value): self
+    public function enabled($value): static
     {
         $this->_usedProperties['enabled'] = true;
         $this->enabled = $value;
@@ -28,10 +28,11 @@ class KeyedListObjectConfig
     }
 
     /**
-     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
+     *
      * @return $this
      */
-    public function settings($value): self
+    public function settings(ParamConfigurator|array $value): static
     {
         $this->_usedProperties['settings'] = true;
         $this->settings = $value;

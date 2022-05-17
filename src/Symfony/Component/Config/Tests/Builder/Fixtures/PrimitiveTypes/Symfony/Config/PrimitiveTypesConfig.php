@@ -2,10 +2,8 @@
 
 namespace Symfony\Config;
 
-
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 
 /**
  * This class is automatically generated to help in creating a config.
@@ -19,7 +17,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     private $scalarNode;
     private $scalarNodeWithDefault;
     private $_usedProperties = [];
-    
+
     /**
      * @default null
      * @param ParamConfigurator|bool $value
@@ -29,10 +27,10 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     {
         $this->_usedProperties['booleanNode'] = true;
         $this->booleanNode = $value;
-    
+
         return $this;
     }
-    
+
     /**
      * @default null
      * @param ParamConfigurator|'foo'|'bar'|'baz' $value
@@ -42,10 +40,10 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     {
         $this->_usedProperties['enumNode'] = true;
         $this->enumNode = $value;
-    
+
         return $this;
     }
-    
+
     /**
      * @default null
      * @param ParamConfigurator|float $value
@@ -55,10 +53,10 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     {
         $this->_usedProperties['floatNode'] = true;
         $this->floatNode = $value;
-    
+
         return $this;
     }
-    
+
     /**
      * @default null
      * @param ParamConfigurator|int $value
@@ -68,10 +66,10 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     {
         $this->_usedProperties['integerNode'] = true;
         $this->integerNode = $value;
-    
+
         return $this;
     }
-    
+
     /**
      * @default null
      * @param ParamConfigurator|mixed $value
@@ -81,10 +79,10 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     {
         $this->_usedProperties['scalarNode'] = true;
         $this->scalarNode = $value;
-    
+
         return $this;
     }
-    
+
     /**
      * @default true
      * @param ParamConfigurator|mixed $value
@@ -94,59 +92,58 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     {
         $this->_usedProperties['scalarNodeWithDefault'] = true;
         $this->scalarNodeWithDefault = $value;
-    
+
         return $this;
     }
-    
+
     public function getExtensionAlias(): string
     {
         return 'primitive_types';
     }
-    
+
     public function __construct(array $value = [])
     {
-    
         if (array_key_exists('boolean_node', $value)) {
             $this->_usedProperties['booleanNode'] = true;
             $this->booleanNode = $value['boolean_node'];
             unset($value['boolean_node']);
         }
-    
+
         if (array_key_exists('enum_node', $value)) {
             $this->_usedProperties['enumNode'] = true;
             $this->enumNode = $value['enum_node'];
             unset($value['enum_node']);
         }
-    
+
         if (array_key_exists('float_node', $value)) {
             $this->_usedProperties['floatNode'] = true;
             $this->floatNode = $value['float_node'];
             unset($value['float_node']);
         }
-    
+
         if (array_key_exists('integer_node', $value)) {
             $this->_usedProperties['integerNode'] = true;
             $this->integerNode = $value['integer_node'];
             unset($value['integer_node']);
         }
-    
+
         if (array_key_exists('scalar_node', $value)) {
             $this->_usedProperties['scalarNode'] = true;
             $this->scalarNode = $value['scalar_node'];
             unset($value['scalar_node']);
         }
-    
+
         if (array_key_exists('scalar_node_with_default', $value)) {
             $this->_usedProperties['scalarNodeWithDefault'] = true;
             $this->scalarNodeWithDefault = $value['scalar_node_with_default'];
             unset($value['scalar_node_with_default']);
         }
-    
+
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
     }
-    
+
     public function toArray(): array
     {
         $output = [];
@@ -168,7 +165,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
         if (isset($this->_usedProperties['scalarNodeWithDefault'])) {
             $output['scalar_node_with_default'] = $this->scalarNodeWithDefault;
         }
-    
+
         return $output;
     }
 

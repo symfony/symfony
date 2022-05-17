@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Config\AddToList\Messenger;
+namespace Symfony\Config\ScalarNormalizedTypes\Nested;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -8,30 +8,30 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This class is automatically generated to help in creating a config.
  */
-class RoutingConfig 
+class NestedListObjectConfig 
 {
-    private $senders;
+    private $name;
     private $_usedProperties = [];
 
     /**
-     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
-     *
+     * @default null
+     * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function senders(ParamConfigurator|array $value): static
+    public function name($value): self
     {
-        $this->_usedProperties['senders'] = true;
-        $this->senders = $value;
+        $this->_usedProperties['name'] = true;
+        $this->name = $value;
 
         return $this;
     }
 
     public function __construct(array $value = [])
     {
-        if (array_key_exists('senders', $value)) {
-            $this->_usedProperties['senders'] = true;
-            $this->senders = $value['senders'];
-            unset($value['senders']);
+        if (array_key_exists('name', $value)) {
+            $this->_usedProperties['name'] = true;
+            $this->name = $value['name'];
+            unset($value['name']);
         }
 
         if ([] !== $value) {
@@ -42,8 +42,8 @@ class RoutingConfig
     public function toArray(): array
     {
         $output = [];
-        if (isset($this->_usedProperties['senders'])) {
-            $output['senders'] = $this->senders;
+        if (isset($this->_usedProperties['name'])) {
+            $output['name'] = $this->name;
         }
 
         return $output;

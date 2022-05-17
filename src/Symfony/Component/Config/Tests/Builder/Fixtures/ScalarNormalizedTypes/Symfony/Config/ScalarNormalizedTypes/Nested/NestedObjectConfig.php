@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Config\AddToList\Messenger;
+namespace Symfony\Config\ScalarNormalizedTypes\Nested;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -8,30 +8,30 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This class is automatically generated to help in creating a config.
  */
-class RoutingConfig 
+class NestedObjectConfig 
 {
-    private $senders;
+    private $enabled;
     private $_usedProperties = [];
 
     /**
-     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
-     *
+     * @default null
+     * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function senders(ParamConfigurator|array $value): static
+    public function enabled($value): self
     {
-        $this->_usedProperties['senders'] = true;
-        $this->senders = $value;
+        $this->_usedProperties['enabled'] = true;
+        $this->enabled = $value;
 
         return $this;
     }
 
     public function __construct(array $value = [])
     {
-        if (array_key_exists('senders', $value)) {
-            $this->_usedProperties['senders'] = true;
-            $this->senders = $value['senders'];
-            unset($value['senders']);
+        if (array_key_exists('enabled', $value)) {
+            $this->_usedProperties['enabled'] = true;
+            $this->enabled = $value['enabled'];
+            unset($value['enabled']);
         }
 
         if ([] !== $value) {
@@ -42,8 +42,8 @@ class RoutingConfig
     public function toArray(): array
     {
         $output = [];
-        if (isset($this->_usedProperties['senders'])) {
-            $output['senders'] = $this->senders;
+        if (isset($this->_usedProperties['enabled'])) {
+            $output['enabled'] = $this->enabled;
         }
 
         return $output;

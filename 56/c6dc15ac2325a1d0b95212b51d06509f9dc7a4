@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-05-14T14:05:17Z
+
+> Is there a way to do this only when the node actually has a beforeNormalization? Unless I missed something, right now this will always generate the adaptative code while it might not be needed when beforeNormalization isn't defined.
+
+@nicolas-grekas As far as I can tell there's no way to currently know if there are any `$normalizationClosures` set or not, a `hasNormalizationClosures` method could be added to the `BaseNode`, but that would be a new feature if I'm not mistaking.
+Another way would be by using the reflection api.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-14T14:07:21Z
+
+Let's do it by reflection then: that's within the same package, that's fine.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-05-15T18:06:20Z
+
+> Let's do it by reflection then: that's within the same package, that's fine.
+
+@nicolas-grekas The adaptive code is now conditionally generated depending on whether there are normalization closures set or not.  I added a new method to the `Builder/Property` class, I think this shouldn't be a problem since it's an internal class, but even if it is a problem, the code can easily be moved to a private method in `ConfigBuilderGenerator`, it's just a little cleaner this way.

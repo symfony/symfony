@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing\Attribute;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+
 /**
  * Service tag to autoconfigure routing condition services.
  *
@@ -37,11 +39,12 @@ namespace Symfony\Bundle\FrameworkBundle\Routing\Attribute;
  *     }
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class AsRoutingConditionService
+class AsRoutingConditionService extends AutoconfigureTag
 {
     public function __construct(
-        public ?string $alias = null,
-        public int $priority = 0,
+        string $alias = null,
+        int $priority = 0,
     ) {
+        parent::__construct('routing.condition_service', ['alias' => $alias, 'priority' => $priority]);
     }
 }

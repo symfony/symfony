@@ -28,6 +28,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
             'package' => 'symfony/clickatell-notifier',
         ],
+        'contact-everyone' => [
+            'class' => Bridge\ContactEveryone\ContactEveryoneTransportFactory::class,
+            'package' => 'symfony/contact-everyone-notifier',
+        ],
         'discord' => [
             'class' => Bridge\Discord\DiscordTransportFactory::class,
             'package' => 'symfony/discord-notifier',

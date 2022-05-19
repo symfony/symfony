@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
@@ -59,7 +60,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     /**
      * @return ExtensionInterface
      */
-    protected function findExtension($name)
+    protected function findExtension($name, ContainerBuilder $container)
     {
         $bundles = $this->initializeBundles();
         $minScore = \INF;
@@ -79,20 +80,18 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
                 $guess = $bundle->getName();
                 $minScore = $distance;
             }
+        }
 
-            $extension = $bundle->getContainerExtension();
+        if ($container->hasExtension($name)) {
+            return $container->getExtension($name);
+        }
 
-            if ($extension) {
-                if ($name === $extension->getAlias()) {
-                    return $extension;
-                }
+        foreach ($container->getExtensions() as $extension) {
+            $distance = levenshtein($name, $extension->getAlias());
 
-                $distance = levenshtein($name, $extension->getAlias());
-
-                if ($distance < $minScore) {
-                    $guess = $extension->getAlias();
-                    $minScore = $distance;
-                }
+            if ($distance < $minScore) {
+                $guess = $extension->getAlias();
+                $minScore = $distance;
             }
         }
 

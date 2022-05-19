@@ -79,9 +79,9 @@ EOF
             return 0;
         }
 
-        $extension = $this->findExtension($name);
-        $extensionAlias = $extension->getAlias();
         $container = $this->compileContainer();
+        $extension = $this->findExtension($name, $container);
+        $extensionAlias = $extension->getAlias();
 
         $config = $container->resolveEnvPlaceholders(
             $container->getParameterBag()->resolveValue(

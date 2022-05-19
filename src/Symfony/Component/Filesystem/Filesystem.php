@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class Filesystem
 {
-    private static $lastError;
+    private static ?string $lastError = null;
 
     /**
      * Copies a file.
@@ -50,12 +50,12 @@ class Filesystem
 
         if ($doCopy) {
             // https://bugs.php.net/64634
-            if (!$source = self::box('fopen', $originFile, 'r')) {
+            if (!$source = self::box(fopen(...), $originFile, 'r')) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s" because source file could not be opened for reading: ', $originFile, $targetFile).self::$lastError, 0, null, $originFile);
             }
 
             // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
-            if (!$target = self::box('fopen', $targetFile, 'w', false, stream_context_create(['ftp' => ['overwrite' => true]]))) {
+            if (!$target = self::box(fopen(...), $targetFile, 'w', false, stream_context_create(['ftp' => ['overwrite' => true]]))) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing: ', $originFile, $targetFile).self::$lastError, 0, null, $originFile);
             }
 
@@ -70,7 +70,7 @@ class Filesystem
 
             if ($originIsLocal) {
                 // Like `cp`, preserve executable permission bits
-                self::box('chmod', $targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
+                self::box(chmod(...), $targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
 
                 if ($bytesCopied !== $bytesOrigin = filesize($originFile)) {
                     throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
@@ -91,7 +91,7 @@ class Filesystem
                 continue;
             }
 
-            if (!self::box('mkdir', $dir, $mode, true) && !is_dir($dir)) {
+            if (!self::box(mkdir(...), $dir, $mode, true) && !is_dir($dir)) {
                 throw new IOException(sprintf('Failed to create "%s": ', $dir).self::$lastError, 0, null, $dir);
             }
         }
@@ -128,7 +128,7 @@ class Filesystem
     public function touch(string|iterable $files, int $time = null, int $atime = null)
     {
         foreach ($this->toIterable($files) as $file) {
-            if (!($time ? self::box('touch', $file, $time, $atime) : self::box('touch', $file))) {
+            if (!($time ? self::box(touch(...), $file, $time, $atime) : self::box(touch(...), $file))) {
                 throw new IOException(sprintf('Failed to touch "%s": ', $file).self::$lastError, 0, null, $file);
             }
         }
@@ -156,7 +156,7 @@ class Filesystem
         foreach ($files as $file) {
             if (is_link($file)) {
                 // See https://bugs.php.net/52176
-                if (!(self::box('unlink', $file) || '\\' !== \DIRECTORY_SEPARATOR || self::box('rmdir', $file)) && file_exists($file)) {
+                if (!(self::box(unlink(...), $file) || '\\' !== \DIRECTORY_SEPARATOR || self::box(rmdir(...), $file)) && file_exists($file)) {
                     throw new IOException(sprintf('Failed to remove symlink "%s": ', $file).self::$lastError);
                 }
             } elseif (is_dir($file)) {
@@ -170,7 +170,7 @@ class Filesystem
                         }
                     }
 
-                    if (!file_exists($tmpName) && self::box('rename', $file, $tmpName)) {
+                    if (!file_exists($tmpName) && self::box(rename(...), $file, $tmpName)) {
                         $origFile = $file;
                         $file = $tmpName;
                     } else {
@@ -181,16 +181,16 @@ class Filesystem
                 $filesystemIterator = new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS);
                 self::doRemove(iterator_to_array($filesystemIterator, true), true);
 
-                if (!self::box('rmdir', $file) && file_exists($file) && !$isRecursive) {
+                if (!self::box(rmdir(...), $file) && file_exists($file) && !$isRecursive) {
                     $lastError = self::$lastError;
 
-                    if (null !== $origFile && self::box('rename', $file, $origFile)) {
+                    if (null !== $origFile && self::box(rename(...), $file, $origFile)) {
                         $file = $origFile;
                     }
 
                     throw new IOException(sprintf('Failed to remove directory "%s": ', $file).$lastError);
                 }
-            } elseif (!self::box('unlink', $file) && (str_contains(self::$lastError, 'Permission denied') || file_exists($file))) {
+            } elseif (!self::box(unlink(...), $file) && (str_contains(self::$lastError, 'Permission denied') || file_exists($file))) {
                 throw new IOException(sprintf('Failed to remove file "%s": ', $file).self::$lastError);
             }
         }
@@ -208,7 +208,7 @@ class Filesystem
     public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false)
     {
         foreach ($this->toIterable($files) as $file) {
-            if (\is_int($mode) && !self::box('chmod', $file, $mode & ~$umask)) {
+            if (\is_int($mode) && !self::box(chmod(...), $file, $mode & ~$umask)) {
                 throw new IOException(sprintf('Failed to chmod file "%s": ', $file).self::$lastError, 0, null, $file);
             }
             if ($recursive && is_dir($file) && !is_link($file)) {
@@ -232,11 +232,11 @@ class Filesystem
                 $this->chown(new \FilesystemIterator($file), $user, true);
             }
             if (is_link($file) && \function_exists('lchown')) {
-                if (!self::box('lchown', $file, $user)) {
+                if (!self::box(lchown(...), $file, $user)) {
                     throw new IOException(sprintf('Failed to chown file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             } else {
-                if (!self::box('chown', $file, $user)) {
+                if (!self::box(chown(...), $file, $user)) {
                     throw new IOException(sprintf('Failed to chown file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             }
@@ -258,11 +258,11 @@ class Filesystem
                 $this->chgrp(new \FilesystemIterator($file), $group, true);
             }
             if (is_link($file) && \function_exists('lchgrp')) {
-                if (!self::box('lchgrp', $file, $group)) {
+                if (!self::box(lchgrp(...), $file, $group)) {
                     throw new IOException(sprintf('Failed to chgrp file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             } else {
-                if (!self::box('chgrp', $file, $group)) {
+                if (!self::box(chgrp(...), $file, $group)) {
                     throw new IOException(sprintf('Failed to chgrp file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             }
@@ -282,7 +282,7 @@ class Filesystem
             throw new IOException(sprintf('Cannot rename because the target "%s" already exists.', $target), 0, null, $target);
         }
 
-        if (!self::box('rename', $origin, $target)) {
+        if (!self::box(rename(...), $origin, $target)) {
             if (is_dir($origin)) {
                 // See https://bugs.php.net/54097 & https://php.net/rename#113943
                 $this->mirror($origin, $target, null, ['override' => $overwrite, 'delete' => $overwrite]);
@@ -337,7 +337,7 @@ class Filesystem
             $this->remove($targetDir);
         }
 
-        if (!self::box('symlink', $originDir, $targetDir)) {
+        if (!self::box(symlink(...), $originDir, $targetDir)) {
             $this->linkException($originDir, $targetDir, 'symbolic');
         }
     }
@@ -368,7 +368,7 @@ class Filesystem
                 $this->remove($targetFile);
             }
 
-            if (!self::box('link', $originFile, $targetFile)) {
+            if (!self::box(link(...), $originFile, $targetFile)) {
                 $this->linkException($originFile, $targetFile, 'hard');
             }
         }
@@ -592,7 +592,7 @@ class Filesystem
         // If no scheme or scheme is "file" or "gs" (Google Cloud) create temp file in local filesystem
         if ((null === $scheme || 'file' === $scheme || 'gs' === $scheme) && '' === $suffix) {
             // If tempnam failed or no scheme return the filename otherwise prepend the scheme
-            if ($tmpFile = self::box('tempnam', $hierarchy, $prefix)) {
+            if ($tmpFile = self::box(tempnam(...), $hierarchy, $prefix)) {
                 if (null !== $scheme && 'gs' !== $scheme) {
                     return $scheme.'://'.$tmpFile;
                 }
@@ -610,12 +610,12 @@ class Filesystem
 
             // Use fopen instead of file_exists as some streams do not support stat
             // Use mode 'x+' to atomically check existence and create to avoid a TOCTOU vulnerability
-            if (!$handle = self::box('fopen', $tmpFile, 'x+')) {
+            if (!$handle = self::box(fopen(...), $tmpFile, 'x+')) {
                 continue;
             }
 
             // Close the file if it was successfully opened
-            self::box('fclose', $handle);
+            self::box(fclose(...), $handle);
 
             return $tmpFile;
         }
@@ -647,16 +647,16 @@ class Filesystem
         $tmpFile = $this->tempnam($dir, basename($filename));
 
         try {
-            if (false === self::box('file_put_contents', $tmpFile, $content)) {
+            if (false === self::box(file_put_contents(...), $tmpFile, $content)) {
                 throw new IOException(sprintf('Failed to write file "%s": ', $filename).self::$lastError, 0, null, $filename);
             }
 
-            self::box('chmod', $tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());
+            self::box(chmod(...), $tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());
 
             $this->rename($tmpFile, $filename, true);
         } finally {
             if (file_exists($tmpFile)) {
-                self::box('unlink', $tmpFile);
+                self::box(unlink(...), $tmpFile);
             }
         }
     }
@@ -683,7 +683,7 @@ class Filesystem
 
         $lock = \func_num_args() > 2 && func_get_arg(2);
 
-        if (false === self::box('file_put_contents', $filename, $content, \FILE_APPEND | ($lock ? \LOCK_EX : 0))) {
+        if (false === self::box(file_put_contents(...), $filename, $content, \FILE_APPEND | ($lock ? \LOCK_EX : 0))) {
             throw new IOException(sprintf('Failed to write file "%s": ', $filename).self::$lastError, 0, null, $filename);
         }
     }
@@ -706,7 +706,7 @@ class Filesystem
     private static function box(callable $func, mixed ...$args): mixed
     {
         self::$lastError = null;
-        set_error_handler(__CLASS__.'::handleError');
+        set_error_handler(self::handleError(...));
         try {
             return $func(...$args);
         } finally {

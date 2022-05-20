@@ -30,7 +30,7 @@
         "symfony/cache": "^5.4|^6.0",
         "symfony/config": "^4.4|^5.0|^6.0",
         "symfony/dependency-injection": "^4.4|^5.0|^6.0",
-        "symfony/form": "^5.1.3|^6.0",
+        "symfony/form": "^5.4.9|^6.0",
         "symfony/http-kernel": "^5.0|^6.0",
         "symfony/messenger": "^4.4|^5.0|^6.0",
         "symfony/doctrine-messenger": "^5.1|^6.0",

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-04-19T08:23:54Z
+
+When working on #46030 I stumbled over the tests for `LazyChoiceList` which did not make much sense to me compared to the application. I ended up with the solution in #46101 which is similar to yours here. But, I am not sure that this actually is a bugfix or if the test were not just misformulated.
+
+For the other changes here I am not sure that this really is the way to go. If I am not missing anything we don't have anything that states that a `ChoiceLoaderInterface` implementation must return the same list on subsequent calls of `loadChoiceList()`, do we?

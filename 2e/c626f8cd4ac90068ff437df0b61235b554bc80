@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-19T11:19:42Z
+
+This is trading an exception for another one, isn't it? Would this really solve the linked issue, if it's solvable?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-19T11:28:32Z
+
+Yes, instead of a `TypeError` that confuses the user by telling them that something is not a `callable`, they would now get an exception simply saying that linking failed. I don't think that the issue is actually solvable.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-19T11:35:23Z
+
+We could then throw a more specific exception, telling that symlink is disabled.
+And I also think Composer should consider not trying to symlink when the function doesn't exist.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-19T11:37:54Z
+
+Alternatively, we could replace the passed `'symlink'` string with a closure:
+
+```php
+$symlink = static function($originDir, $targetDir) {
+    return symlink($originDir, $targetDir);
+};
+
+if (!self::box($symlink, $originDir, $targetDir)) {
+    $this->linkException($originDir, $targetDir, 'symbolic');
+}
+```
+
+This way, the user would get a fatal error `Call to undefined function symlink()`. PHP 8.1 would allow us to achieve the same thing more elegantly, see #46408 for a patch against the 6.1 branch.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-19T11:42:04Z
+
+> I also think Composer should consider not trying to symlink when the function doesn't exist.
+
+Symlinking could fail for other reasons, so attempting the symlink and catching Symfony's IOException should be the proper workflow. Let's throw this exception also when the function is disabled.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-19T11:47:39Z
+
+I've added a more specific error message.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-19T11:57:27Z
+
+If we go with #46408, we should ensure that the behavior will be the same in both branches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-19T12:01:55Z
+
+Using `Closure::fromCallable` will throw `TypeError: Failed to create closure from callable: function "foo" not found or invalid function name`
+Using `foo(...)` will throw `Error: Call to undefined function foo()`
+
+We need to chose one from TypeError, Error or IOException :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-19T12:15:45Z
+
+I think we could remove the `callable` type hint on the `box()` method (replace it by `string`), and do the check there, with a nice IOException.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-19T13:10:41Z
+
+What I like about the current approach is that we'd do an early exit and skip the whole operation if the function is unavailable.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-19T13:18:08Z
+
+Let's do both then: add the same check in box after changing its type hint, just in case any other methods are disabled?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-20T09:15:35Z
+
+Agreed. 👍🏻

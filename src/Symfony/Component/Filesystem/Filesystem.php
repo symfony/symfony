@@ -318,6 +318,8 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
+        self::assertFunctionExists('symlink');
+
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $originDir = strtr($originDir, '/', '\\');
             $targetDir = strtr($targetDir, '/', '\\');
@@ -354,6 +356,8 @@ class Filesystem
      */
     public function hardlink($originFile, $targetFiles)
     {
+        self::assertFunctionExists('link');
+
         if (!$this->exists($originFile)) {
             throw new FileNotFoundException(null, 0, null, $originFile);
         }
@@ -737,13 +741,22 @@ class Filesystem
         return 2 === \count($components) ? [$components[0], $components[1]] : [null, $components[0]];
     }
 
+    private static function assertFunctionExists(string $func): void
+    {
+        if (!\function_exists($func)) {
+            throw new IOException(sprintf('Unable to perform filesystem operation because the "%s()" function has been disabled.', $func));
+        }
+    }
+
     /**
      * @param mixed ...$args
      *
      * @return mixed
      */
-    private static function box(callable $func, ...$args)
+    private static function box(string $func, ...$args)
     {
+        self::assertFunctionExists($func);
+
         self::$lastError = null;
         set_error_handler(__CLASS__.'::handleError');
         try {

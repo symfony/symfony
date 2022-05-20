@@ -32,7 +32,7 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['RESULT'], $list->getChoices());
         $this->assertSame(['RESULT'], $list->getChoices());
-        $this->assertSame(1, $calls);
+        $this->assertSame(2, $calls);
     }
 
     public function testGetValuesLoadsLoadedListOnFirstCall()
@@ -46,7 +46,7 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['RESULT'], $list->getValues());
         $this->assertSame(['RESULT'], $list->getValues());
-        $this->assertSame(1, $calls);
+        $this->assertSame(2, $calls);
     }
 
     public function testGetStructuredValuesLoadsLoadedListOnFirstCall()
@@ -60,7 +60,7 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['RESULT'], $list->getStructuredValues());
         $this->assertSame(['RESULT'], $list->getStructuredValues());
-        $this->assertSame(1, $calls);
+        $this->assertSame(2, $calls);
     }
 
     public function testGetOriginalKeysLoadsLoadedListOnFirstCall()
@@ -79,7 +79,7 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
         $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
-        $this->assertSame(3, $calls);
+        $this->assertSame(6, $calls);
     }
 
     public function testGetChoicesForValuesForwardsCallIfListNotLoaded()
@@ -98,7 +98,7 @@ class LazyChoiceListTest extends TestCase
 
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
-        $this->assertSame(3, $calls);
+        $this->assertSame(6, $calls);
     }
 
     public function testGetChoicesForValuesUsesLoadedList()

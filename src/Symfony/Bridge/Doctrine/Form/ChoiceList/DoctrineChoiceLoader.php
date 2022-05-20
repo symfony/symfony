@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 
 /**
@@ -29,9 +28,9 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     private $objectLoader;
 
     /**
-     * @var ChoiceListInterface
+     * @var array|null
      */
-    private $choiceList;
+    private $choices;
 
     /**
      * Creates a new choice loader.
@@ -74,15 +73,13 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        if ($this->choiceList) {
-            return $this->choiceList;
+        if (null === $this->choices) {
+            $this->choices = $this->objectLoader
+                ? $this->objectLoader->getEntities()
+                : $this->manager->getRepository($this->class)->findAll();
         }
 
-        $objects = $this->objectLoader
-            ? $this->objectLoader->getEntities()
-            : $this->manager->getRepository($this->class)->findAll();
-
-        return $this->choiceList = new ArrayChoiceList($objects, $value);
+        return new ArrayChoiceList($this->choices, $value);
     }
 
     /**
@@ -100,7 +97,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         $optimize = $this->idReader && (null === $value || \is_array($value) && $value[0] === $this->idReader);
 
         // Attention: This optimization does not check choices for existence
-        if ($optimize && !$this->choiceList && $this->idReader->isSingleId()) {
+        if ($optimize && !$this->choices && $this->idReader->isSingleId()) {
             $values = [];
 
             // Maintain order and indices of the given objects
@@ -136,7 +133,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         // a single-field identifier
         $optimize = $this->idReader && (null === $value || \is_array($value) && $this->idReader === $value[0]);
 
-        if ($optimize && !$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
+        if ($optimize && !$this->choices && $this->objectLoader && $this->idReader->isSingleId()) {
             $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);
             $objectsById = [];
             $objects = [];

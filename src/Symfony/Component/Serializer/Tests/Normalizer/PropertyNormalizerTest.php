@@ -294,6 +294,36 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyNormalizer($classMetadataFactory);
     }
 
+    protected function getNormalizerAllowingObjectsWithoutProperties(): PropertyNormalizer
+    {
+        return new PropertyNormalizer(null, null, null, null, null, [], true);
+    }
+
+    public function testNormalizeObjectWithoutAnyProperties()
+    {
+        $normalizer = $this->getNormalizerAllowingObjectsWithoutProperties();
+        $obj = new StaticPropertyDummy();
+
+        $this->assertTrue($normalizer->supportsNormalization($obj));
+
+        $this->assertEquals(
+            [],
+            $normalizer->normalize($obj),
+        );
+    }
+
+    public function testDenormalizeObjectWithoutAnyProperties()
+    {
+        $normalizer = $this->getNormalizerAllowingObjectsWithoutProperties();
+        $obj = new StaticPropertyDummy();
+
+        $this->assertTrue($normalizer->supportsDenormalization($obj, \get_class($obj)));
+        $this->assertEquals(
+            $obj,
+            $normalizer->denormalize([], \get_class($obj)),
+        );
+    }
+
     public function testGroupsNormalizeWithNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));

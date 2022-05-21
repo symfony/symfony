@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by kbond at 2022-05-17T17:51:46Z
+
+What about looking for the `composer.json` directory like `Kernel::getProjectDir()`?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-05-17T17:55:14Z
+
+I'm behind the intentions of this change, but this seems very unrelated to `AbstractBundle` (which has "A Bundle that provides configuration hooks." as description).
+
+Also from a documentation point of view, this makes things harder to follow: "You can also extend from `AbstractBundle` and handle the configuration in the bundle class. When doing this, make sure your bundle also follows the new bundle structure. [...]"
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-05-17T17:59:33Z
+
+@wouter, I guess you're thinking a new method on the `BundleInterface` and provide a deprecation path? Maybe `BundleInterface::getRootDir()`?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-05-17T17:59:55Z
+
+Looking at it as a documentation maintainer, I think it actually makes sense to rename `AbstractBundle` to e.g. `AbstractConfigurableBundle` (to avoid any confusing between the abstract `Bundle` and `AbstractBundle`, and better describe what `AbstractBundle` is adding on top of `Bundle`).
+
+And then find a way to make this change backwards compatible in 6.2 for `Bundle` (e.g. by following @kbond's idea), or using the same migration path as was used in the Kernel/MicroKernelTrait. That also means we improve this for everyone, not just the bundles using the new configurable bundle feature.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-05-17T18:12:33Z
+
+> Also from a documentation point of view, this makes things harder to follow: "You can also extend from AbstractBundle and handle the configuration in the bundle class. When doing this, make sure your bundle also follows the new bundle structure. [...]"
+
+@wouterj  we are currently promoting the use of the new structure, but it is not mandatory at all, you can use the old structure also with this new `AbstractBundle` class without any problems. Indeed, the test added for `AbstractBundle` is using the old structure.
+
+The subject is mostly about how to determine the best bundle path when you're using the new/old structure. The old one is not deprecated at this moment, so we cannot deprecate the bundle path either.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-05-17T18:18:24Z
+
+> What about looking for the composer.json directory like Kernel::getProjectDir()?
+
+@kbond I've hesitated to do that. Even if it's not recommended you still can create bundles in your app. In that case, there is no composer.json at the bundle level and the algorithm may be lost with the project composer.json.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-05-17T18:36:47Z
+
+Given that there is now an `AbstractBundle` class, why would any new bundle extends `Bundle`?
+The latter seems it could be deprecated unless the burden of the change is too heavy and should wait 7.1.
+Why rename `AbstractBundle ` if its purpose can be to supersede `Bundle` in the long term?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-05-17T18:49:15Z
+
+> Looking at it as a documentation maintainer, I think it actually makes sense to rename `AbstractBundle` to e.g. `AbstractConfigurableBundle` (to avoid any confusing between the abstract `Bundle` and `AbstractBundle`, and better describe what `AbstractBundle` is adding on top of `Bundle`).
+>
+> And then find a way to make this change backwards compatible in 6.2 for `Bundle` (e.g. by following @kbond's idea), or using the same migration path as was used in the Kernel/MicroKernelTrait. That also means we improve this for everyone, not just the bundles using the new configurable bundle feature.
+
+@wouterj I don't have any objection to renaming the class for the better. However, it's not the same scenario that `Kernel/MicroKernelTrait`, bundles need to be compatible with several Symfony versions. If your bundle needs to support previous versions (before 6.1) then you cannot use `AbstractBundle`. That's the same for any deprecation introduced in the `Bundle` class which would have a huge impact on the bundle ecosystem.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-05-17T19:41:46Z
+
+> Why rename `AbstractBundle` if its purpose can be to supersede `Bundle` in the long term?
+
+I didn't know about this goal. If this is the case, I agree that a rename wouldn't make sense.
+However, this has some other implications. For instance, we have to consider what to do with bundles that would like to keep DI classes separate (e.g. FrameworkBundle). Currently, they will have to implement an interface they don't want to use and have to override `getContainerExtension()` to keep the DI classes separately (but let's not continue this in this PR discussion).
+
+---
+
+> The subject is mostly about how to determine the best bundle path when you're using the new/old structure. The old one is not deprecated at this moment, so we cannot deprecate the bundle path either.
+
+I must admit that I missed the check for the legacy structure, I'm less -1 know I understand the goal is to make a BC implementation (supporting both old and new structures).
+However, the current implementation breaks for the bundle variant with only `src/` and `tests/` directories (see e.g. all Symfony bundles that are not part of the monorepo - except from MonologBundle).
+
+> If your bundle needs to support previous versions (before 6.1) then you cannot use `AbstractBundle`. That's the same for any deprecation introduced in the `Bundle` class which would have a huge impact on the bundle ecosystem.
+
+Agreed. So I think it's safe to say that this new class wouldn't be used by a large part of the ecosystem before Symfony 5.4 reaches eom. This means we don't need to rush this change during RC phase, as we probably have time till 6.4 to polish features before a large part of the ecosystem is considering changing to `AbstractBundle` (as long as the change is BC, which is the goal here).
+
+Taking a bit more time here is also good to determine the roadmap for bundles in Symfony 6.x. E.g. if we want to deprecate `Bundle`, this change is great when BC. But if we want to keep `Bundle` and `AbstractBundle`, this change must be moved to `Bundle` imho.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-05-17T20:21:09Z
+
+> However, this has some other implications. For instance, we have to consider what to do with bundles that would like to keep DI classes separate (e.g. FrameworkBundle). Currently, they will have to implement an interface they don't want to use and have to override getContainerExtension() to keep the DI classes separately (but let's not continue this in this PR discussion).
+
+For those cases, you can use the new `AbstractExtension`. It provides the same feature that `AbstractBundle` but only for extensions concern. I mean, `Bundle` + `AbstractExtension`.
+
+> However, the current implementation breaks for the bundle variant with only `src/` and `tests/` directories (see e.g. all Symfony bundles that are not part of the monorepo - except from MonologBundle).
+
+No breaks as they are not using the `AbstractBundle` after the release, and they cannot unless the minimum `symfony/http-kernel` dependency is exclusively 6.1 or higher. Even if you want, it's up to you to upgrade to the new structure or not. You can move the `src/Resources/` directory to `config/` (supported since 4.4) or update the `getPath()` to keep the old structure.
+
+> Agreed. So I think it's safe to say that this new class wouldn't be used by a large part of the ecosystem before Symfony 5.4 reaches eom. This means we don't need to rush this change during RC phase, as we probably have time till 6.4 to polish features before a large part of the ecosystem is considering changing to AbstractBundle (as long as the change is BC, which is the goal here).
+
+Changing the `AbstractBundle::getPath()` in 6.2+ will be a BC break and then we have to provide a deprecation/migration path which is what I am trying to prevent now.
+
+> Taking a bit more time here is also good to determine the roadmap for bundles in Symfony 6.x. E.g. if we want to deprecate Bundle, this change is great when BC. But if we want to keep Bundle and AbstractBundle, this change must be moved to Bundle IMHO.
+
+Yes, I expect at some point deprecating `Bundle` and `Extension` classes as their similar `AbstractBundle` and `AbstractExtension` are better now.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-05-18T06:53:53Z
+
+> For those cases, you can use the new `AbstractExtension`. It provides the same feature that `AbstractBundle` but only for extensions concern. I mean, `Bundle` + `AbstractExtension`.
+
+And then overriding `Bundle::getContainerExtension()` to return the `AbstractExtension`. But thinking more about this, I think that's indeed OK: the default is the easiest way and you need a little tweaking when using the more advanced method.
+
+---
+
+Overall, I've removed my negative vote. I was misunderstanding `AbstractBundle` as "configurable bundle" instead of "the new way forward for bundles". Now, this change makes more sense to me. Thanks for your patience :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-05-18T13:09:02Z
+
+> And then overriding `Bundle::getContainerExtension()` to return the AbstractExtension. But thinking more about this, I think that's indeed OK: the default is the easiest way and you need a little tweaking when using the more advanced method.
+
+If the extension class is not respecting the location and naming conventions, yes, you'll have to override `Bundle::getContainerExtension()`, but by extending from `Bundle` it's like today, the convention will look at `src/DependencyInjection/FooExtension` class which could extend from `AbstractExtension` and get all new things.
+
+@wouterj thanks to you for the discussion!

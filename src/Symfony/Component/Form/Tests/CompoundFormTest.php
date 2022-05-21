@@ -1057,7 +1057,8 @@ class CompoundFormTest extends TestCase
         $this->assertNull($this->form->get('foo')->getData());
         $this->assertSame('Submitted data was expected to be text or number, array given.', $this->form->get('foo')->getTransformationFailure()->getMessage());
 
-        $this->assertSame(['bar'], $this->form->get('bar')->getData());
+        $this->assertNull($this->form->get('bar')->getData());
+        $this->assertSame('Submitted data was expected to be text or number, array given.', $this->form->get('bar')->getTransformationFailure()->getMessage());
     }
 
     public function testFileUpload()

@@ -89,10 +89,9 @@ EOF
             return 0;
         }
 
-        $container = $this->getContainerBuilder();
-        $extension = $this->findExtension($name, $container);
+        $extension = $this->findExtension($name);
 
-        $configuration = $extension->getConfiguration([], $container);
+        $configuration = $extension->getConfiguration([], $this->getContainerBuilder());
 
         $this->validateConfiguration($extension, $configuration);
 

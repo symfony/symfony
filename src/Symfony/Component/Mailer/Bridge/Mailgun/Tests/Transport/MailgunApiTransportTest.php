@@ -37,20 +37,20 @@ class MailgunApiTransportTest extends TestCase
     {
         return [
             [
-                new MailgunApiTransport('ACCESS_KEY', 'DOMAIN'),
-                'mailgun+api://api.mailgun.net?domain=DOMAIN',
+                new MailgunApiTransport('ACCESS_KEY'),
+                'mailgun+api://api.mailgun.net',
             ],
             [
-                new MailgunApiTransport('ACCESS_KEY', 'DOMAIN', 'us-east-1'),
-                'mailgun+api://api.us-east-1.mailgun.net?domain=DOMAIN',
+                new MailgunApiTransport('ACCESS_KEY', 'us-east-1'),
+                'mailgun+api://api.us-east-1.mailgun.net',
             ],
             [
-                (new MailgunApiTransport('ACCESS_KEY', 'DOMAIN'))->setHost('example.com'),
-                'mailgun+api://example.com?domain=DOMAIN',
+                (new MailgunApiTransport('ACCESS_KEY'))->setHost('example.com'),
+                'mailgun+api://example.com',
             ],
             [
-                (new MailgunApiTransport('ACCESS_KEY', 'DOMAIN'))->setHost('example.com')->setPort(99),
-                'mailgun+api://example.com:99?domain=DOMAIN',
+                (new MailgunApiTransport('ACCESS_KEY'))->setHost('example.com')->setPort(99),
+                'mailgun+api://example.com:99',
             ],
         ];
     }
@@ -71,7 +71,7 @@ class MailgunApiTransportTest extends TestCase
         $email->getHeaders()->addTextHeader('amp-html', 'amp-html-value');
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
-        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $transport = new MailgunApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
         $payload = $method->invoke($transport, $email, $envelope);
 
@@ -107,7 +107,7 @@ class MailgunApiTransportTest extends TestCase
 
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
-        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $transport = new MailgunApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
         $payload = $method->invoke($transport, $email, $envelope);
 
@@ -119,7 +119,7 @@ class MailgunApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.us-east-1.mailgun.net:8984/v3/symfony/messages', $url);
+            $this->assertSame('https://api.us-east-1.mailgun.net:8984/v3/symfony.com/messages', $url);
             $this->assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
             $content = '';
@@ -136,7 +136,7 @@ class MailgunApiTransportTest extends TestCase
                 'http_code' => 200,
             ]);
         });
-        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us-east-1', $client);
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'us-east-1', $client);
         $transport->setPort(8984);
 
         $mail = new Email();
@@ -165,7 +165,7 @@ class MailgunApiTransportTest extends TestCase
                 'http_code' => 200,
             ]);
         });
-        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us-east-1', $client);
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'us-east-1', $client);
 
         $mail = new Email();
         $mail->subject('Hello!')
@@ -186,7 +186,7 @@ class MailgunApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages', $url);
+            $this->assertSame('https://api.mailgun.net:8984/v3/symfony.com/messages', $url);
             $this->assertStringContainsStringIgnoringCase('Authorization: Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
@@ -196,7 +196,7 @@ class MailgunApiTransportTest extends TestCase
                 ],
             ]);
         });
-        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us', $client);
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'us', $client);
         $transport->setPort(8984);
 
         $mail = new Email();
@@ -214,7 +214,7 @@ class MailgunApiTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages', $url);
+            $this->assertSame('https://api.mailgun.net:8984/v3/symfony.com/messages', $url);
             $this->assertStringContainsStringIgnoringCase('Authorization: Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
             // NOTE: Mailgun API does this even if "Accept" request header value is "application/json".
@@ -225,7 +225,7 @@ class MailgunApiTransportTest extends TestCase
                 ],
             ]);
         });
-        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us', $client);
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'us', $client);
         $transport->setPort(8984);
 
         $mail = new Email();
@@ -251,7 +251,7 @@ class MailgunApiTransportTest extends TestCase
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
-        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $transport = new MailgunApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
         $payload = $method->invoke($transport, $email, $envelope);
         $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);

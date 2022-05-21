@@ -67,32 +67,32 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('mailgun+api', 'default', self::USER, self::PASSWORD),
-            new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new MailgunApiTransport(self::USER, null, $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('mailgun+api', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu']),
-            new MailgunApiTransport(self::USER, self::PASSWORD, 'eu', $client, $dispatcher, $logger),
+            new MailgunApiTransport(self::USER, 'eu', $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('mailgun+api', 'example.com', self::USER, self::PASSWORD, 8080),
-            (new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new MailgunApiTransport(self::USER, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [
             new Dsn('mailgun', 'default', self::USER, self::PASSWORD),
-            new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new MailgunHttpTransport(self::USER, null, $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('mailgun+https', 'default', self::USER, self::PASSWORD),
-            new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new MailgunHttpTransport(self::USER, null, $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('mailgun+https', 'example.com', self::USER, self::PASSWORD, 8080),
-            (new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+            (new MailgunHttpTransport(self::USER, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [

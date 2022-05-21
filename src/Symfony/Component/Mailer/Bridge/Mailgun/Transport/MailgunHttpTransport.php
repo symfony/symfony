@@ -33,13 +33,11 @@ class MailgunHttpTransport extends AbstractHttpTransport
     private const HOST = 'api.%region_dot%mailgun.net';
 
     private string $key;
-    private string $domain;
     private ?string $region;
 
-    public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $key, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
-        $this->domain = $domain;
         $this->region = $region;
 
         parent::__construct($client, $dispatcher, $logger);
@@ -47,7 +45,7 @@ class MailgunHttpTransport extends AbstractHttpTransport
 
     public function __toString(): string
     {
-        return sprintf('mailgun+https://%s?domain=%s', $this->getEndpoint(), $this->domain);
+        return sprintf('mailgun+https://%s', $this->getEndpoint());
     }
 
     protected function doSendHttp(SentMessage $message): ResponseInterface
@@ -61,7 +59,9 @@ class MailgunHttpTransport extends AbstractHttpTransport
             $headers[] = $header->toString();
         }
 
-        $endpoint = sprintf('%s/v3/%s/messages.mime', $this->getEndpoint(), urlencode($this->domain));
+        $senderAddress = $message->getEnvelope()->getSender()->getAddress();
+        $domain = substr($senderAddress, strpos($senderAddress, '@') + 1);
+        $endpoint = sprintf('%s/v3/%s/messages.mime', $this->getEndpoint(), urlencode($domain));
         $response = $this->client->request('POST', 'https://'.$endpoint, [
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,

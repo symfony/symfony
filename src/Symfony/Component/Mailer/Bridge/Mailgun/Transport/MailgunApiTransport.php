@@ -34,13 +34,11 @@ class MailgunApiTransport extends AbstractApiTransport
     private const HOST = 'api.%region_dot%mailgun.net';
 
     private string $key;
-    private string $domain;
     private ?string $region;
 
-    public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $key, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
-        $this->domain = $domain;
         $this->region = $region;
 
         parent::__construct($client, $dispatcher, $logger);
@@ -48,7 +46,7 @@ class MailgunApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('mailgun+api://%s?domain=%s', $this->getEndpoint(), $this->domain);
+        return sprintf('mailgun+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -59,7 +57,9 @@ class MailgunApiTransport extends AbstractApiTransport
             $headers[] = $header->toString();
         }
 
-        $endpoint = sprintf('%s/v3/%s/messages', $this->getEndpoint(), urlencode($this->domain));
+        $senderAddress = $sentMessage->getEnvelope()->getSender()->getAddress();
+        $domain = substr($senderAddress, strpos($senderAddress, '@') + 1);
+        $endpoint = sprintf('%s/v3/%s/messages', $this->getEndpoint(), urlencode($domain));
         $response = $this->client->request('POST', 'https://'.$endpoint, [
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,

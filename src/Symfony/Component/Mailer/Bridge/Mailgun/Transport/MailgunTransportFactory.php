@@ -31,11 +31,11 @@ final class MailgunTransportFactory extends AbstractTransportFactory
         $port = $dsn->getPort();
 
         if ('mailgun+api' === $scheme) {
-            return (new MailgunApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
+            return (new MailgunApiTransport($user, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
         if ('mailgun+https' === $scheme || 'mailgun' === $scheme) {
-            return (new MailgunHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
+            return (new MailgunHttpTransport($user, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
         if ('mailgun+smtp' === $scheme || 'mailgun+smtps' === $scheme) {

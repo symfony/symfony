@@ -36,20 +36,20 @@ class MailgunHttpTransportTest extends TestCase
     {
         return [
             [
-                new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN'),
-                'mailgun+https://api.mailgun.net?domain=DOMAIN',
+                new MailgunHttpTransport('ACCESS_KEY'),
+                'mailgun+https://api.mailgun.net',
             ],
             [
-                new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN', 'us-east-1'),
-                'mailgun+https://api.us-east-1.mailgun.net?domain=DOMAIN',
+                new MailgunHttpTransport('ACCESS_KEY', 'us-east-1'),
+                'mailgun+https://api.us-east-1.mailgun.net',
             ],
             [
-                (new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN'))->setHost('example.com'),
-                'mailgun+https://example.com?domain=DOMAIN',
+                (new MailgunHttpTransport('ACCESS_KEY'))->setHost('example.com'),
+                'mailgun+https://example.com',
             ],
             [
-                (new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN'))->setHost('example.com')->setPort(99),
-                'mailgun+https://example.com:99?domain=DOMAIN',
+                (new MailgunHttpTransport('ACCESS_KEY'))->setHost('example.com')->setPort(99),
+                'mailgun+https://example.com:99',
             ],
         ];
     }
@@ -58,7 +58,7 @@ class MailgunHttpTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.us-east-1.mailgun.net:8984/v3/symfony/messages.mime', $url);
+            $this->assertSame('https://api.us-east-1.mailgun.net:8984/v3/symfony.com/messages.mime', $url);
             $this->assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
             $content = '';
@@ -75,7 +75,7 @@ class MailgunHttpTransportTest extends TestCase
                 'http_code' => 200,
             ]);
         });
-        $transport = new MailgunHttpTransport('ACCESS_KEY', 'symfony', 'us-east-1', $client);
+        $transport = new MailgunHttpTransport('ACCESS_KEY', 'us-east-1', $client);
         $transport->setPort(8984);
 
         $mail = new Email();
@@ -93,7 +93,7 @@ class MailgunHttpTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages.mime', $url);
+            $this->assertSame('https://api.mailgun.net:8984/v3/symfony.com/messages.mime', $url);
             $this->assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
@@ -103,7 +103,7 @@ class MailgunHttpTransportTest extends TestCase
                 ],
             ]);
         });
-        $transport = new MailgunHttpTransport('ACCESS_KEY', 'symfony', 'us', $client);
+        $transport = new MailgunHttpTransport('ACCESS_KEY', 'us', $client);
         $transport->setPort(8984);
 
         $mail = new Email();
@@ -126,7 +126,7 @@ class MailgunHttpTransportTest extends TestCase
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
 
-        $transport = new MailgunHttpTransport('key', 'domain');
+        $transport = new MailgunHttpTransport('key');
         $method = new \ReflectionMethod(MailgunHttpTransport::class, 'addMailgunHeaders');
         $method->invoke($transport, $email);
 

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app;
 
 use Psr\Log\NullLogger;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Extension\TestDumpExtension;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -80,6 +81,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
     protected function build(ContainerBuilder $container)
     {
         $container->register('logger', NullLogger::class);
+        $container->registerExtension(new TestDumpExtension());
     }
 
     public function __sleep(): array

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
@@ -1949,7 +1950,12 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
-        $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        $this->assertInstanceOf(TransformationFailedException::class, $form->getTransformationFailure());
+        if (!$multiple && !$expanded) {
+            $this->assertEquals('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+        } else {
+            $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        }
     }
 
     public function invalidNestedValueTestMatrix()
@@ -2246,5 +2252,33 @@ class ChoiceTypeTest extends BaseTypeTest
             new ChoiceView('b', 'b', 'Fabien'),
             new ChoiceView('c', 'c', 'Kris'),
         ], $form->createView()->vars['choices']);
+    }
+
+    public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
+    {
+        $choiceLoader = new CallbackChoiceLoader(function () {
+            return [1, 2, 3];
+        });
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('choice_one', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+            ])
+            ->add('choice_two', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+                'choice_value' => function ($choice) {
+                    return $choice ? (string) $choice * 10 : '';
+                },
+            ])
+            ->createView()
+        ;
+
+        $this->assertSame('1', $view['choice_one']->vars['choices'][0]->value);
+        $this->assertSame('2', $view['choice_one']->vars['choices'][1]->value);
+        $this->assertSame('3', $view['choice_one']->vars['choices'][2]->value);
+
+        $this->assertSame('10', $view['choice_two']->vars['choices'][0]->value);
+        $this->assertSame('20', $view['choice_two']->vars['choices'][1]->value);
+        $this->assertSame('30', $view['choice_two']->vars['choices'][2]->value);
     }
 }

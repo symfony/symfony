@@ -85,6 +85,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         if (\array_key_exists('user_data', $options)) {
             $this->info['user_data'] = $options['user_data'];
         }
+        if (\array_key_exists('max_duration', $options)) {
+            $this->info['max_duration'] = $options['max_duration'];
+        }
     }
 
     public function getStatusCode(): int

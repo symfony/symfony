@@ -70,6 +70,15 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString(sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
     }
 
+    public function testDumpExtensionConfigWithoutBundle()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'test_dump']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('enabled: true', $tester->getDisplay());
+    }
+
     public function testDumpUndefinedBundleOption()
     {
         $tester = $this->createCommandTester();

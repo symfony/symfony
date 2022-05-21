@@ -70,6 +70,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
             'interval' => $o[6],
             'recurrences' => 5,
             'include_start_date' => true,
+            'include_end_date' => false,
         ],
     ]
 );

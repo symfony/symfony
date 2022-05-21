@@ -198,6 +198,16 @@ class HttpOptions
     /**
      * @return $this
      */
+    public function setMaxDuration(float $maxDuration): static
+    {
+        $this->options['max_duration'] = $maxDuration;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function bindTo(string $bindto): static
     {
         $this->options['bindto'] = $bindto;

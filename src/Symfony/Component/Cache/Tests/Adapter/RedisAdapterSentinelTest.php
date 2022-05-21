@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**

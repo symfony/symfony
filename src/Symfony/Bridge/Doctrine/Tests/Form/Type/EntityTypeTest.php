@@ -1776,4 +1776,32 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals($collection, $form->getNormData());
         $this->assertEquals($collection, $form->getData());
     }
+
+    public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->add('entity_two', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'choice_value' => function ($choice) {
+                    return $choice ? $choice->name : '';
+                },
+            ])
+            ->createView()
+        ;
+
+        $this->assertSame('1', $view['entity_one']->vars['choices'][1]->value);
+        $this->assertSame('2', $view['entity_one']->vars['choices'][2]->value);
+
+        $this->assertSame('Foo', $view['entity_two']->vars['choices']['Foo']->value);
+        $this->assertSame('Bar', $view['entity_two']->vars['choices']['Bar']->value);
+    }
 }

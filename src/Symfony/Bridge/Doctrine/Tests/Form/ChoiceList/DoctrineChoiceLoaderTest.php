@@ -153,8 +153,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertEquals($choiceList, $loaded = $loader->loadChoiceList());
 
         // no further loads on subsequent calls
-
-        $this->assertSame($loaded, $loader->loadChoiceList());
+        $this->assertEquals($loaded, $loader->loadChoiceList());
     }
 
     public function testLoadValuesForChoices()

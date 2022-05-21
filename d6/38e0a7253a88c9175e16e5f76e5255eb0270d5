@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by r-martins at 2022-05-18T04:31:46Z
+
+Thanks for that, @nicolas-grekas.
+I tested your PR with the following test:
+```php
+$url = 'http://localhost:8888/sleep3.php';
+$response = $client->request('POST', $url, [
+    'body' => ['foo'=>'bar'],
+    'max_duration' => 11
+]);
+```
+
+Then, the first and the second request fails after 6 seconds and the third would succeed after 5 seconds (total 6+6+5=**17**).
+
+But it turns out that the [part of code where you would change the max_duration](https://github.com/symfony/symfony/pull/46382/files#r875452842) for the retries is never reached, unless the $options['max_duration'] is **not** set. The above request succeeded after around 20 seconds, not triggering the expected timeout error.
+
+If I remove `!`, then yes, I get a timeout error on the further attempts.
+
+If you want to use it, my stupid test script was:
+
+```php
+<?php
+$count = (int)@file_get_contents('.count') == 0 ? 1 : (int)@file_get_contents('.count');
+if ($count <=2) {
+    file_put_contents('.count', ++$count);
+    sleep(6);
+    echo '500';
+    http_response_code(500);
+    exit;
+}
+
+if ($count > 2) {
+    sleep(5);
+    unlink('.count');
+    echo $count . ' attempt. SUCCESS!';
+    exit;
+}
+```
+Serve it with php -S and do the test above.
+
+---------------------------------------------------------------------------
+
+by r-martins at 2022-05-18T04:45:15Z
+
+_To think..._
+Let's say your `max_duration` is 30 seconds, and the first attempt failed after 29.8 seconds.
+Is it worth it to retry with 0.2 second timeout?
+
+We can write another Strategy and deal with it in the `shouldRetry` method. But for most cases, I think that having a `min_duration` or something like that with a reasonable default value would make things easier.
+
+With the current `max_duration` (when working), if we are doing a payment capture request and the second attempt times out after 0.2 second, the payment may have been processed and debited from the customer (after 4 seconds for example), but we would have had a timeout error and asked the customer to try again.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-18T11:40:41Z
+
+Thanks for checking @r-martins! This is now fixed.
+
+> Let's say your max_duration is 30 seconds, and the first attempt failed after 29.8 seconds.
+> Is it worth it to retry with 0.2 second timeout?
+
+This reasoning applies to any duration, 0.2 or longer. I don't like the idea of adding a min-duration option because hey, what would be a sensible value for that?!
+
+> With the current max_duration (when working), if we are doing a payment capture request and the second attempt times out after 0.2 second, the payment may have been processed and debited from the customer (after 4 seconds for example), but we would have had a timeout error and asked the customer to try again.
+
+Retries do not happen for non idempotent requests by default. If your strategy retries eg POST requests, then this issue is unrelated to the max_duration as it can happen with any retries. To guard against these, you need to use something like [Stripe's `Idempotency-Key`](https://stripe.com/docs/api/idempotent_requests).
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by r-martins at 2022-05-19T04:19:19Z
+
+Thanks for the update @nicolas-grekas. I could test and it's working as expected now.
+And yes, my strategy currently retries post requests as the API I'm consuming does not support indempotency-* headers. ;(
+
+Lastly, could you suggest a way to merge your PR in my project? I'm afraid waiting for a new release may take too long. I saw you have it separately, and also http-client is a separated project... Can you advise?

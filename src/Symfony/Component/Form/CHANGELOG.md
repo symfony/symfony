@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Deprecate using `DateTime` or `DateTimeImmutable` model data with a different timezone than configured with the
+   `model_timezone` option in `DateType`, `DateTimeType`, and `TimeType`
+
 6.3
 ---
 

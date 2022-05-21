@@ -62,10 +62,10 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $this->assertArrayHasKey(Dummy::class, $compiledMetadata);
         $this->assertEquals([
             [
-                'foo' => [[], null, null, null],
-                'bar' => [[], null, null, null],
-                'baz' => [[], null, null, null],
-                'qux' => [[], null, null, null],
+                'foo' => [[], null, [], null],
+                'bar' => [[], null, [], null],
+                'baz' => [[], null, [], null],
+                'qux' => [[], null, [], null],
             ],
             null,
         ], $compiledMetadata[Dummy::class]);
@@ -73,9 +73,9 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $this->assertArrayHasKey(MaxDepthDummy::class, $compiledMetadata);
         $this->assertEquals([
             [
-                'foo' => [[], 2, null, null],
-                'bar' => [[], 3, null, null],
-                'child' => [[], null, null, null],
+                'foo' => [[], 2, [], null],
+                'bar' => [[], 3, [], null],
+                'child' => [[], null, [], null],
             ],
             null,
         ], $compiledMetadata[MaxDepthDummy::class]);
@@ -83,10 +83,16 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $this->assertArrayHasKey(SerializedNameDummy::class, $compiledMetadata);
         $this->assertEquals([
             [
-                'foo' => [[], null, 'baz', null],
-                'bar' => [[], null, 'qux', null],
-                'quux' => [[], null, null, null],
-                'child' => [[], null, null, null],
+                'foo' => [[], null, ['*' => 'baz'], null],
+                'bar' => [[], null, ['*' => 'qux'], null],
+                'quux' => [[], null, [], null],
+                'child' => [[], null, [], null],
+                'corge' => [[], null, [
+                    'a' => 'nameTwo',
+                    'b' => 'nameTwo',
+                    'c' => 'nameThree',
+                    '*' => 'nameOne',
+                ], null],
             ],
             null,
         ], $compiledMetadata[SerializedNameDummy::class]);
@@ -94,8 +100,8 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $this->assertArrayHasKey(SerializedPathDummy::class, $compiledMetadata);
         $this->assertEquals([
             [
-                'three' => [[], null, null, '[one][two]'],
-                'seven' => [[], null, null, '[three][four]'],
+                'three' => [[], null, [], '[one][two]'],
+                'seven' => [[], null, [], '[three][four]'],
             ],
             null,
         ], $compiledMetadata[SerializedPathDummy::class]);

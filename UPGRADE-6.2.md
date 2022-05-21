@@ -108,6 +108,11 @@ Translation
  * Deprecate `PhpExtractor` in favor of `PhpAstExtractor`
  * Add `PhpAstExtractor` (requires [nikic/php-parser](https://github.com/nikic/php-parser) to be installed)
 
+Serializer
+----------
+
+ * Add argument `$groups` to `AttributeMetadata::setSerializedName()` and `AttributeMetadata::getSerializedName()`
+
 Validator
 ---------
 

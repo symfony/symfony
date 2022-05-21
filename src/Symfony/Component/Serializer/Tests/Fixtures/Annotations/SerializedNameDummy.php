@@ -33,6 +33,13 @@ class SerializedNameDummy
     public $child;
 
     /**
+     * @SerializedName("nameOne")
+     * @SerializedName("nameTwo", groups={"a", "b"})
+     * @SerializedName("nameThree", groups="c")
+     */
+    public $corge;
+
+    /**
      * @SerializedName("qux")
      */
     public function getBar()

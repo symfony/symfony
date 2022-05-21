@@ -89,8 +89,15 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
+
         $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+        $this->assertEquals([
+            'a' => 'nameTwo',
+            'b' => 'nameTwo',
+            'c' => 'nameThree',
+            '*' => 'nameOne',
+        ], $attributesMetadata['corge']->getSerializedNames());
     }
 
     public function testLoadSerializedPath()

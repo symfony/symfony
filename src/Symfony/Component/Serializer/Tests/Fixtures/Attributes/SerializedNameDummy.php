@@ -30,6 +30,11 @@ class SerializedNameDummy
      */
     public $child;
 
+    #[SerializedName('nameOne')]
+    #[SerializedName('nameTwo', ['a', 'b'])]
+    #[SerializedName('nameThree', ['c'])]
+    public $corge;
+
     #[SerializedName('qux')]
     public function getBar()
     {

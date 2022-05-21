@@ -86,11 +86,24 @@ class YamlFileLoader extends FileLoader
                 }
 
                 if (isset($data['serialized_name'])) {
-                    if (!\is_string($data['serialized_name']) || '' === $data['serialized_name']) {
-                        throw new MappingException(sprintf('The "serialized_name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
-                    }
+                    $serializedNames = $data['serialized_name'];
 
-                    $attributeMetadata->setSerializedName($data['serialized_name']);
+                    if (\is_string($serializedNames)) {
+                        if ('' === $serializedNames) {
+                            throw new MappingException(sprintf('The "serialized_name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+                        $attributeMetadata->setSerializedName($serializedNames, []);
+                    } elseif (\is_array($serializedNames)) {
+                        foreach ($serializedNames as $serializedName => $groups) {
+                            if (!\is_string($serializedName) || !$serializedName) {
+                                throw new MappingException(sprintf('The key for "serialized_name" array must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                            }
+
+                            $attributeMetadata->setSerializedName($serializedName, (array) $groups);
+                        }
+                    } else {
+                        throw new MappingException(sprintf('The "serialized_name" value must be a non-empty string or an array of serialized name/groups in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
                 }
 
                 if (isset($data['serialized_path'])) {

@@ -54,6 +54,19 @@
         <xsd:attribute name="class" type="xsd:string" use="required" />
     </xsd:complexType>
 
+    <xsd:complexType name="serialized-name">
+        <xsd:sequence minOccurs="0">
+            <xsd:element name="group" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1" />
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
     <xsd:complexType name="attribute">
         <xsd:annotation>
             <xsd:documentation><![CDATA[
@@ -65,6 +78,7 @@
             <xsd:element name="context" type="context" maxOccurs="unbounded" />
             <xsd:element name="normalization_context" type="context" maxOccurs="unbounded" />
             <xsd:element name="denormalization_context" type="context" maxOccurs="unbounded" />
+            <xsd:element name="serialized_name" type="serialized-name" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="max-depth">

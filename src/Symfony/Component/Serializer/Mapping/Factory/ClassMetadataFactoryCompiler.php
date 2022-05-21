@@ -47,7 +47,7 @@ EOF;
                 $attributesMetadata[$attributeMetadata->getName()] = [
                     $attributeMetadata->getGroups(),
                     $attributeMetadata->getMaxDepth(),
-                    $attributeMetadata->getSerializedName(),
+                    $attributeMetadata->getSerializedNames(),
                     $attributeMetadata->getSerializedPath(),
                 ];
             }

@@ -31,6 +31,21 @@ class SerializedNameTest extends TestCase
     public function testSerializedNameParameters()
     {
         $maxDepth = new SerializedName('foo');
-        $this->assertEquals('foo', $maxDepth->getSerializedName());
+        $this->assertSame('foo', $maxDepth->getSerializedName());
+        $this->assertSame([], $maxDepth->getGroups());
+    }
+
+    public function testSerializedNameParametersWithArrayGroups()
+    {
+        $maxDepth = new SerializedName('foo', ['bar', 'baz']);
+        $this->assertSame('foo', $maxDepth->getSerializedName());
+        $this->assertSame(['bar', 'baz'], $maxDepth->getGroups());
+    }
+
+    public function testSerializedNameParametersWithStringGroup()
+    {
+        $maxDepth = new SerializedName('foo', 'bar');
+        $this->assertSame('foo', $maxDepth->getSerializedName());
+        $this->assertSame(['bar'], $maxDepth->getGroups());
     }
 }

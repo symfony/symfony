@@ -67,7 +67,13 @@ class XmlFileLoader extends FileLoader
                 }
 
                 if (isset($attribute['serialized-name'])) {
-                    $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
+                    $attributeMetadata->setSerializedName((string) $attribute['serialized-name'], []);
+                }
+
+                foreach ($attribute->serialized_name as $node) {
+                    $serializedName = (string) $node['name'];
+                    $groups = (array) $node->group;
+                    $attributeMetadata->setSerializedName('' === $serializedName ? null : $serializedName, $groups);
                 }
 
                 if (isset($attribute['serialized-path'])) {

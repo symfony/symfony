@@ -16,6 +16,8 @@ use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -1954,7 +1956,12 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
-        $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        $this->assertInstanceOf(TransformationFailedException::class, $form->getTransformationFailure());
+        if (!$multiple && !$expanded) {
+            $this->assertEquals('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+        } else {
+            $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        }
     }
 
     public function invalidNestedValueTestMatrix()

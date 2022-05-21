@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class TestDumpExtension extends Extension implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('test_dump');
         $treeBuilder->getRootNode()
@@ -30,11 +30,11 @@ class TestDumpExtension extends Extension implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ConfigurationInterface
     {
         return $this;
     }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -42,5 +43,13 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
         $this->expectExceptionMessage('Cannot use both "redis_cluster" and "redis_sentinel" at the same time:');
         $dsn = 'redis:?host[redis1]&host[redis2]&host[redis3]&redis_cluster=1&redis_sentinel=mymaster';
         RedisAdapter::createConnection($dsn);
+    }
+
+    public function testSentinelRequiresPredis()
+    {
+        $this->expectException(CacheException::class);
+        $this->expectExceptionMessage('Cannot use Redis Sentinel: class "Redis" does not extend "Predis\Client":');
+        $dsn = 'redis:?host[redis1]&host[redis2]&host[redis3]&redis_cluster=1&redis_sentinel=mymaster';
+        RedisAdapter::createConnection($dsn, ['class' => \Redis::class]);
     }
 }

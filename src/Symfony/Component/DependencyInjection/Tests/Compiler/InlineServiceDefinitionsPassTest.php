@@ -325,6 +325,34 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame('inline', (string) $values[0]);
     }
 
+    public function testDoNotInline()
+    {
+        $container = new ContainerBuilder();
+        $container->register('decorated1', 'decorated1')->addTag('container.do_not_inline');
+        $container->register('decorated2', 'decorated2')->addTag('container.do_not_inline');
+        $container->setAlias('alias2', 'decorated2');
+
+        $container
+            ->register('s1', 's1')
+            ->setDecoratedService('decorated1')
+            ->setPublic(true)
+            ->setProperties(['inner' => new Reference('s1.inner')]);
+
+        $container
+            ->register('s2', 's2')
+            ->setDecoratedService('alias2')
+            ->setPublic(true)
+            ->setProperties(['inner' => new Reference('s2.inner')]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasAlias('alias2'));
+        $this->assertEquals(new Reference('decorated2'), $container->getDefinition('s2')->getProperties()['inner']);
+        $this->assertEquals(new Reference('s1.inner'), $container->getDefinition('s1')->getProperties()['inner']);
+        $this->assertSame('decorated2', $container->getDefinition('decorated2')->getClass());
+        $this->assertSame('decorated1', $container->getDefinition('s1.inner')->getClass());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         (new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()))->process($container);

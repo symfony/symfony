@@ -182,6 +182,10 @@ trait RedisTrait
             $class = $params['redis_cluster'] ? \RedisCluster::class : (1 < \count($hosts) ? \RedisArray::class : \Redis::class);
         } else {
             $class = $params['class'] ?? \Predis\Client::class;
+
+            if (isset($params['redis_sentinel']) && !is_a($class, \Predis\Client::class, true) && !class_exists(\RedisSentinel::class)) {
+                throw new CacheException(sprintf('Cannot use Redis Sentinel: class "%s" does not extend "Predis\Client" and ext-redis >= 5.2 not found: "%s".', $class, $dsn));
+            }
         }
 
         if (is_a($class, \Redis::class, true)) {

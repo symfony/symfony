@@ -1729,22 +1729,19 @@ class ApplicationTest extends TestCase
     public function testGetDisabledLazyCommand()
     {
         $this->expectException(CommandNotFoundException::class);
-        $application = new Application();
-        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => function () { return new DisabledCommand(); }]));
+        $application = $this->setupDisabledLazyCommand();
         $application->get('disabled');
     }
 
     public function testHasReturnsFalseForDisabledLazyCommand()
     {
-        $application = new Application();
-        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => function () { return new DisabledCommand(); }]));
+        $application = $this->setupDisabledLazyCommand();
         $this->assertFalse($application->has('disabled'));
     }
 
     public function testAllExcludesDisabledLazyCommand()
     {
-        $application = new Application();
-        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => function () { return new DisabledCommand(); }]));
+        $application = $this->setupDisabledLazyCommand();
         $this->assertArrayNotHasKey('disabled', $application->all());
     }
 
@@ -1936,6 +1933,22 @@ class ApplicationTest extends TestCase
 
         $this->assertSame($previousSttyMode, $sttyMode);
     }
+
+    private function setupDisabledLazyCommand(): Application
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container
+            ->register('lazy-command', DisabledLazyCommand::class)
+            ->addTag('console.command', ['command' => 'disabled']);
+        $container->compile();
+
+        $application = new Application();
+        $application->setCommandLoader($container->get('console.command_loader'));
+        $application->setAutoExit(false);
+
+        return $application;
+    }
 }
 
 class CustomApplication extends Application
@@ -1984,6 +1997,17 @@ class LazyTestCommand extends Command
 
 class DisabledCommand extends Command
 {
+    public function isEnabled(): bool
+    {
+        return false;
+    }
+}
+
+class DisabledLazyCommand extends Command
+{
+    protected static $defaultName = 'lazy';
+    protected static $defaultDescription = 'lazy';
+
     public function isEnabled(): bool
     {
         return false;

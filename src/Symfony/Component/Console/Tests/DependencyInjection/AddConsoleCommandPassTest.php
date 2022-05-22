@@ -146,9 +146,9 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(['cmdalias'], $command->getAliases());
         $this->assertSame('Just testing', $command->getDescription());
         $this->assertTrue($command->isHidden());
-        $this->assertTrue($command->isEnabled());
         $this->assertSame($initCounter, DescribedCommand::$initCounter);
 
+        $this->assertTrue($command->isEnabled());
         $this->assertSame('', $command->getHelp());
         $this->assertSame(1 + $initCounter, DescribedCommand::$initCounter);
     }

@@ -131,7 +131,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 $definition->addMethodCall('setDescription', [$description]);
 
                 $container->register('.'.$id.'.lazy', LazyCommand::class)
-                    ->setArguments([$commandName, $aliases, $description, $isHidden, new ServiceClosureArgument($lazyCommandRefs[$id])]);
+                    ->setArguments([$commandName, $aliases, $description, $isHidden, new ServiceClosureArgument($lazyCommandRefs[$id]), null]);
 
                 $lazyCommandRefs[$id] = new Reference('.'.$id.'.lazy');
             }

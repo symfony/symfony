@@ -45,6 +45,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\VarExporter\Hydrator;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -974,7 +975,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
-    private function createService(Definition $definition, array &$inlineServices, bool $isConstructorArgument = false, string $id = null, bool $tryProxy = true): mixed
+    private function createService(Definition $definition, array &$inlineServices, bool $isConstructorArgument = false, string $id = null, bool|object $tryProxy = true): mixed
     {
         if (null === $id && isset($inlineServices[$h = spl_object_hash($definition)])) {
             return $inlineServices[$h];
@@ -993,12 +994,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
 
-        if ($tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator) || $proxy instanceof RealServiceInstantiator) {
+        if (true === $tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator) || $proxy instanceof RealServiceInstantiator) {
             $proxy = $proxy->instantiateProxy(
                 $this,
                 $definition,
-                $id, function () use ($definition, &$inlineServices, $id) {
-                    return $this->createService($definition, $inlineServices, true, $id, false);
+                $id, function ($proxy = false) use ($definition, &$inlineServices, $id) {
+                    return $this->createService($definition, $inlineServices, true, $id, $proxy);
                 }
             );
             $this->shareService($definition, $proxy, $id, $inlineServices);
@@ -1029,12 +1030,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $arguments = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($arguments)), $inlineServices, $isConstructorArgument);
 
-        if (null !== $id && $definition->isShared() && isset($this->services[$id]) && ($tryProxy || !$definition->isLazy())) {
+        if (null !== $id && $definition->isShared() && isset($this->services[$id]) && (true === $tryProxy || !$definition->isLazy())) {
             return $this->services[$id];
         }
 
         if (null !== $factory) {
             $service = $factory(...$arguments);
+
+            if (\is_object($tryProxy)) {
+                if (\get_class($service) !== $definition->getClass()) {
+                    throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', $definition->getClass(), get_debug_type($service)));
+                }
+
+                $tryProxy = Hydrator::hydrate($tryProxy, (array) $service);
+            }
 
             if (!$definition->isDeprecated() && \is_array($factory) && \is_string($factory[0])) {
                 $r = new \ReflectionClass($factory[0]);
@@ -1046,7 +1055,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
-            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs(array_values($arguments));
+            if (\is_object($tryProxy)) {
+                if ($r->getConstructor()) {
+                    $tryProxy->__construct(...array_values($arguments));
+                }
+
+                $service = $tryProxy;
+            } else {
+                $service = $r->getConstructor() ? $r->newInstanceArgs(array_values($arguments)) : $r->newInstance();
+            }
 
             if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
                 trigger_deprecation('', '', 'The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name);
@@ -1060,7 +1077,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        if (null === $lastWitherIndex && ($tryProxy || !$definition->isLazy())) {
+        if (null === $lastWitherIndex && (true === $tryProxy || !$definition->isLazy())) {
             // share only if proxying failed, or if not a proxy, and if no withers are found
             $this->shareService($definition, $service, $id, $inlineServices);
         }
@@ -1073,7 +1090,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         foreach ($definition->getMethodCalls() as $k => $call) {
             $service = $this->callMethod($service, $call, $inlineServices);
 
-            if ($lastWitherIndex === $k && ($tryProxy || !$definition->isLazy())) {
+            if ($lastWitherIndex === $k && (true === $tryProxy || !$definition->isLazy())) {
                 // share only if proxying failed, or if not a proxy, and this is the last wither
                 $this->shareService($definition, $service, $id, $inlineServices);
             }

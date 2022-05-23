@@ -70,6 +70,15 @@ class ProjectServiceContainer extends Container
         return $factory();
     }
 
+    protected function hydrateProxy($proxy, $instance)
+    {
+        if (!\in_array(\get_class($instance), [\get_class($proxy), get_parent_class($proxy)], true)) {
+            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', get_parent_class($proxy), get_debug_type($instance)));
+        }
+
+        return \Symfony\Component\VarExporter\Hydrator::hydrate($proxy, (array) $instance);
+    }
+
     /**
      * Gets the public 'lazy_foo' shared service.
      *
@@ -77,7 +86,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getLazyFooService($lazyLoad = true)
     {
-        if ($lazyLoad) {
+        if (true === $lazyLoad) {
             return $this->services['lazy_foo'] = $this->createProxy('FooClass_8976cfa', function () {
                 return \FooClass_8976cfa::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
                     $wrappedInstance = $this->getLazyFooService(false);

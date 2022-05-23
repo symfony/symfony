@@ -9,23 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
+namespace Symfony\Bridge\ProxyManager\Internal;
 
 use Laminas\Code\Generator\ClassGenerator;
-use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator as BaseGenerator;
+use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
+use ProxyManager\ProxyGenerator\ProxyGeneratorInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @internal
  */
-class LazyLoadingValueHolderGenerator extends BaseGenerator
+class ProxyGenerator implements ProxyGeneratorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function generate(\ReflectionClass $originalClass, ClassGenerator $classGenerator, array $proxyOptions = []): void
     {
-        parent::generate($originalClass, $classGenerator, $proxyOptions);
+        (new LazyLoadingValueHolderGenerator())->generate($originalClass, $classGenerator, $proxyOptions);
 
         foreach ($classGenerator->getMethods() as $method) {
             if (str_starts_with($originalClass->getFilename(), __FILE__)) {
@@ -43,7 +44,11 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
     public function getProxifiedClass(Definition $definition): ?string
     {
         if (!$definition->hasTag('proxy')) {
-            return ($class = $definition->getClass()) && (class_exists($class) || interface_exists($class, false)) ? $class : null;
+            if (!($class = $definition->getClass()) || !(class_exists($class) || interface_exists($class, false))) {
+                return null;
+            }
+
+            return (new \ReflectionClass($class))->name;
         }
         if (!$definition->isLazy()) {
             throw new \InvalidArgumentException(sprintf('Invalid definition for service of class "%s": setting the "proxy" tag on a service requires it to be "lazy".', $definition->getClass()));

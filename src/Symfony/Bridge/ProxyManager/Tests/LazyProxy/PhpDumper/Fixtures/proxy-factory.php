@@ -7,7 +7,7 @@ return new class
 
     public function getFooService($lazyLoad = true)
     {
-        if ($lazyLoad) {
+        if (true === $lazyLoad) {
             return $this->privates['foo'] = $this->createProxy('SunnyInterface_1eff735', function () {
                 return \SunnyInterface_1eff735::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
                     $wrappedInstance = $this->getFooService(false);

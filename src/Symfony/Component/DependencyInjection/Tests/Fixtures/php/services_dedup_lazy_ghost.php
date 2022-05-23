@@ -60,7 +60,7 @@ class ProjectServiceContainer extends Container
     {
         // lazy factory for stdClass
 
-        return new \stdClass();
+        return $lazyLoad;
     }
 
     /**
@@ -72,7 +72,7 @@ class ProjectServiceContainer extends Container
     {
         // lazy factory for stdClass
 
-        return new \stdClass();
+        return $lazyLoad;
     }
 }
 

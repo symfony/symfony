@@ -654,7 +654,8 @@ EOF;
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
-        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
+        $asGhostObject = false;
+        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition, $asGhostObject);
         $instantiation = '';
 
         $lastWitherIndex = null;
@@ -677,7 +678,7 @@ EOF;
             $instantiation .= ' = ';
         }
 
-        return $this->addNewInstance($definition, '        '.$return.$instantiation, $id);
+        return $this->addNewInstance($definition, '        '.$return.$instantiation, $id, $asGhostObject);
     }
 
     private function isTrivialInstance(Definition $definition): bool
@@ -881,7 +882,8 @@ EOF;
                 $factory = sprintf('$this->factories%s[%s]', $definition->isPublic() ? '' : "['service_container']", $this->doExport($id));
             }
 
-            if ($isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition)) {
+            $asGhostObject = false;
+            if ($isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition, $asGhostObject)) {
                 if (!$definition->isShared()) {
                     $code .= sprintf('        %s ??= ', $factory);
 
@@ -893,8 +895,9 @@ EOF;
                         $code .= sprintf("\$this->%s(...);\n\n", $methodName);
                     }
                 }
+                $lazyLoad = $asGhostObject ? '$proxy' : 'false';
 
-                $factoryCode = $asFile ? 'self::do($container, false)' : sprintf('$this->%s(false)', $methodName);
+                $factoryCode = $asFile ? sprintf('self::do($container, %s)', $lazyLoad) : sprintf('$this->%s(%s)', $methodName, $lazyLoad);
                 $factoryCode = $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $factoryCode);
                 $code .= $asFile ? preg_replace('/function \(([^)]*+)\)( {|:)/', 'function (\1) use ($container)\2', $factoryCode) : $factoryCode;
             }
@@ -1037,6 +1040,9 @@ EOTXT
             return $code;
         }
 
+        $asGhostObject = false;
+        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($inlineDef, $asGhostObject);
+
         if (isset($this->definitionVariables[$inlineDef])) {
             $isSimpleInstance = false;
         } else {
@@ -1047,7 +1053,7 @@ EOTXT
             if ('instance' === $name) {
                 $code .= $this->addServiceInstance($id, $definition, $isSimpleInstance);
             } else {
-                $code .= $this->addNewInstance($inlineDef, '        $'.$name.' = ', $id);
+                $code .= $this->addNewInstance($inlineDef, '        $'.$name.' = ', $id, $asGhostObject);
             }
 
             if ('' !== $inline = $this->addInlineVariables($id, $definition, $arguments, false)) {
@@ -1057,7 +1063,7 @@ EOTXT
             }
 
             $code .= $this->addServiceProperties($inlineDef, $name);
-            $code .= $this->addServiceMethodCalls($inlineDef, $name, !$this->getProxyDumper()->isProxyCandidate($inlineDef) && $inlineDef->isShared() && !isset($this->singleUsePrivateIds[$id]) ? $id : null);
+            $code .= $this->addServiceMethodCalls($inlineDef, $name, !$isProxyCandidate && $inlineDef->isShared() && !isset($this->singleUsePrivateIds[$id]) ? $id : null);
             $code .= $this->addServiceConfigurator($inlineDef, $name);
         }
 
@@ -1110,7 +1116,7 @@ EOTXT
         }
     }
 
-    private function addNewInstance(Definition $definition, string $return = '', string $id = null): string
+    private function addNewInstance(Definition $definition, string $return = '', string $id = null, bool $asGhostObject = false): string
     {
         $tail = $return ? ";\n" : '';
 
@@ -1131,6 +1137,11 @@ EOTXT
         if (null !== $definition->getFactory()) {
             $callable = $definition->getFactory();
 
+            if ($asGhostObject) {
+                $return .= '$this->hydrateProxy($lazyLoad, ';
+                $tail = ')'.$tail;
+            }
+
             if (['Closure', 'fromCallable'] === $callable && [0] === array_keys($definition->getArguments())) {
                 $callable = $definition->getArgument(0);
                 $arguments = ['...'];
@@ -1146,7 +1157,8 @@ EOTXT
                 }
 
                 if ($callable[0] instanceof Reference
-                    || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))) {
+                    || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))
+                ) {
                     return $return.sprintf('%s->%s(%s)', $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
                 }
 
@@ -1181,7 +1193,15 @@ EOTXT
             throw new RuntimeException('Cannot dump definitions which have no class nor factory.');
         }
 
-        return $return.sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments)).$tail;
+        if (!$asGhostObject) {
+            return $return.sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments)).$tail;
+        }
+
+        if (!method_exists($class, '__construct')) {
+            return $return.'$lazyLoad'.$tail;
+        }
+
+        return $return.sprintf('($lazyLoad->__construct(%s) && false ?: $lazyLoad)', implode(', ', $arguments)).$tail;
     }
 
     private function startClass(string $class, string $baseClass, bool $hasProxyClasses): string
@@ -1301,6 +1321,15 @@ EOF;
     protected function createProxy(\$class, \Closure \$factory)
     {
         {$proxyLoader}return \$factory();
+    }
+
+    protected function hydrateProxy(\$proxy, \$instance)
+    {
+        if (!\in_array(\get_class(\$instance), [\get_class(\$proxy), get_parent_class(\$proxy)], true)) {
+            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1\$s".', get_parent_class(\$proxy), get_debug_type(\$instance)));
+        }
+
+        return \Symfony\Component\VarExporter\Hydrator::hydrate(\$proxy, (array) \$instance);
     }
 
 EOF;
@@ -1847,7 +1876,10 @@ EOF;
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');
             }
 
-            return $this->addNewInstance($value);
+            $asGhostObject = false;
+            $this->getProxyDumper()->isProxyCandidate($value, $asGhostObject);
+
+            return $this->addNewInstance($value, '', null, $asGhostObject);
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {

@@ -675,6 +675,8 @@ class FrameworkExtension extends Extension
             ->addTag('routing.route_loader');
 
         $container->setParameter('container.behavior_describing_tags', [
+            'annotations.cached_reader',
+            'container.do_not_inline',
             'container.service_locator',
             'container.service_subscriber',
             'kernel.event_subscriber',
@@ -1657,11 +1659,9 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('annotations.cached_reader')
-            ->setPublic(true) // set to false in AddAnnotationsCachedReaderPass
             ->replaceArgument(2, $config['debug'])
             // reference the cache provider without using it until AddAnnotationsCachedReaderPass runs
             ->addArgument(new ServiceClosureArgument(new Reference($cacheService)))
-            ->addTag('annotations.cached_reader')
         ;
 
         $container->setAlias('annotation_reader', 'annotations.cached_reader');

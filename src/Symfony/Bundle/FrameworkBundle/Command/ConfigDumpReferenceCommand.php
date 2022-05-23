@@ -110,7 +110,7 @@ EOF
         if ($extension instanceof ConfigurationInterface) {
             $configuration = $extension;
         } else {
-            $configuration = $extension->getConfiguration([], $this->getContainerBuilder());
+            $configuration = $extension->getConfiguration([], $this->getContainerBuilder($this->getApplication()->getKernel()));
         }
 
         $this->validateConfiguration($extension, $configuration);

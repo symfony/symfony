@@ -1969,6 +1969,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasParameter('container.behavior_describing_tags'));
         $this->assertEquals([
+            'annotations.cached_reader',
+            'container.do_not_inline',
             'container.service_locator',
             'container.service_subscriber',
             'kernel.event_subscriber',

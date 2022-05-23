@@ -38,6 +38,8 @@ return static function (ContainerConfigurator $container) {
                 inline_service(ArrayAdapter::class),
                 abstract_arg('Debug-Flag'),
             ])
+            ->tag('annotations.cached_reader')
+            ->tag('container.do_not_inline')
 
         ->set('annotations.filesystem_cache_adapter', FilesystemAdapter::class)
             ->args([

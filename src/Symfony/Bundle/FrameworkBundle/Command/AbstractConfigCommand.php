@@ -16,7 +16,6 @@ use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
@@ -61,7 +60,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     /**
      * @return ExtensionInterface
      */
-    protected function findExtension(string $name, ContainerBuilder $container)
+    protected function findExtension(string $name)
     {
         $bundles = $this->initializeBundles();
         $minScore = \INF;
@@ -98,6 +97,8 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
                 $minScore = $distance;
             }
         }
+
+        $container = $this->getContainerBuilder();
 
         if ($container->hasExtension($name)) {
             return $container->getExtension($name);

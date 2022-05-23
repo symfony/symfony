@@ -105,13 +105,12 @@ EOF
             return 0;
         }
 
-        $container = $this->getContainerBuilder($this->getApplication()->getKernel());
-        $extension = $this->findExtension($name, $container);
+        $extension = $this->findExtension($name);
 
         if ($extension instanceof ConfigurationInterface) {
             $configuration = $extension;
         } else {
-            $configuration = $extension->getConfiguration([], $container);
+            $configuration = $extension->getConfiguration([], $this->getContainerBuilder());
         }
 
         $this->validateConfiguration($extension, $configuration);

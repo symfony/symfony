@@ -92,7 +92,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
             }
         }
 
-        $container = $this->getContainerBuilder();
+        $container = $this->getContainerBuilder($kernel);
 
         if ($container->hasExtension($name)) {
             return $container->getExtension($name);

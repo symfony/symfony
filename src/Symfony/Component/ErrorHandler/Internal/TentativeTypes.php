@@ -37,7 +37,7 @@ class TentativeTypes
         'DateTime' => [
             '__wakeup' => 'void',
             '__set_state' => 'DateTime',
-            'createFromImmutable' => 'DateTime',
+            'createFromImmutable' => 'static',
             'createFromFormat' => 'DateTime|false',
             'getLastErrors' => 'array|false',
             'format' => 'string',
@@ -72,7 +72,7 @@ class TentativeTypes
             'setDate' => 'DateTimeImmutable',
             'setISODate' => 'DateTimeImmutable',
             'setTimestamp' => 'DateTimeImmutable',
-            'createFromMutable' => 'DateTimeImmutable',
+            'createFromMutable' => 'static',
         ],
         'DateTimeZone' => [
             'getName' => 'string',
@@ -1150,8 +1150,8 @@ class TentativeTypes
             'getFlags' => 'int',
             'setMaxLineLen' => 'void',
             'getMaxLineLen' => 'int',
-            'hasChildren' => 'bool',
-            'getChildren' => '?RecursiveIterator',
+            'hasChildren' => 'false',
+            'getChildren' => 'null',
             'seek' => 'void',
             'getCurrentLine' => 'string',
         ],
@@ -1240,7 +1240,7 @@ class TentativeTypes
             'current' => 'never',
             'next' => 'void',
             'key' => 'never',
-            'valid' => 'bool',
+            'valid' => 'false',
             'rewind' => 'void',
         ],
         'CallbackFilterIterator' => [

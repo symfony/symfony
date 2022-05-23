@@ -29,7 +29,6 @@ class AddAnnotationsCachedReaderPass implements CompilerPassInterface
         // "annotation_reader" at build time don't get any cache
         foreach ($container->findTaggedServiceIds('annotations.cached_reader') as $id => $tags) {
             $reader = $container->getDefinition($id);
-            $reader->setPublic(false);
             $properties = $reader->getProperties();
 
             if (isset($properties['cacheProviderBackup'])) {

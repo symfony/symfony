@@ -90,9 +90,9 @@ EOF
             return 0;
         }
 
-        $container = $this->compileContainer();
-        $extension = $this->findExtension($name, $container);
+        $extension = $this->findExtension($name);
         $extensionAlias = $extension->getAlias();
+        $container = $this->compileContainer();
 
         $config = $this->getConfig($extension, $container);
 
@@ -193,8 +193,7 @@ EOF
 
         if ($input->mustSuggestArgumentValuesFor('path') && null !== $name = $input->getArgument('name')) {
             try {
-                $container = $this->compileContainer();
-                $config = $this->getConfig($this->findExtension($name, $container), $container);
+                $config = $this->getConfig($this->findExtension($name), $this->compileContainer());
                 $paths = array_keys(self::buildPathsCompletion($config));
                 $suggestions->suggestValues($paths);
             } catch (LogicException $e) {

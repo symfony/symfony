@@ -30,6 +30,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'chatter.transport_factory',
         'config_cache.resource_checker',
         'console.command',
+        'container.do_not_inline',
         'container.env_var_loader',
         'container.env_var_processor',
         'container.hot_path',

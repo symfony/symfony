@@ -18,10 +18,14 @@
     "require": {
         "php": ">=8.1",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
-        "symfony/dependency-injection": "^5.4|^6.0"
+        "symfony/dependency-injection": "^6.2",
+        "symfony/var-exporter": "^6.2"
     },
     "require-dev": {
         "symfony/config": "^5.4|^6.0"
+    },
+    "conflict": {
+        "symfony/doctrine-bridge": "<6.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" },

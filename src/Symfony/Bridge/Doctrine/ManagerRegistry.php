@@ -50,26 +50,38 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
         if (!$manager instanceof LazyLoadingInterface) {
             throw new \LogicException('Resetting a non-lazy manager service is not supported. '.(interface_exists(LazyLoadingInterface::class) && class_exists(RuntimeInstantiator::class) ? sprintf('Declare the "%s" service as lazy.', $name) : 'Try running "composer require symfony/proxy-manager-bridge".'));
         }
+
+        $load = \Closure::bind(function () use ($name) {
+            if (isset($this->aliases[$name])) {
+                $name = $this->aliases[$name];
+            }
+            if (isset($this->fileMap[$name])) {
+                return fn ($lazyLoad) => $this->load($this->fileMap[$name], $lazyLoad);
+            }
+
+            return $this->{$this->methodMap[$name]}(...);
+        }, $this->container, Container::class)();
+
         if ($manager instanceof GhostObjectInterface) {
-            throw new \LogicException('Resetting a lazy-ghost-object manager service is not supported.');
-        }
-        $manager->setProxyInitializer(\Closure::bind(
-            function (&$wrappedInstance, LazyLoadingInterface $manager) use ($name) {
-                if (isset($this->aliases[$name])) {
-                    $name = $this->aliases[$name];
-                }
-                if (isset($this->fileMap[$name])) {
-                    $wrappedInstance = $this->load($this->fileMap[$name], false);
-                } else {
-                    $wrappedInstance = $this->{$this->methodMap[$name]}(false);
+            $initializer = function (GhostObjectInterface $manager, string $method, array $parameters, &$initializer, array $properties) use ($load) {
+                $instance = $load($manager);
+                $initializer = null;
+
+                if ($instance !== $manager) {
+                    throw new \LogicException(sprintf('A lazy initializer should return the ghost object proxy it was given as argument, but an instance of "%s" was returned.', get_debug_type($instance)));
                 }
 
+                return true;
+            };
+        } else {
+            $initializer = function (&$wrappedInstance, LazyLoadingInterface $manager) use ($load) {
+                $wrappedInstance = $load(false);
                 $manager->setProxyInitializer(null);
 
                 return true;
-            },
-            $this->container,
-            Container::class
-        ));
+            };
+        }
+
+        $manager->setProxyInitializer($initializer);
     }
 }

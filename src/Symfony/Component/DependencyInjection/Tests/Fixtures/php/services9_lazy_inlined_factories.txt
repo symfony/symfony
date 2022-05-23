@@ -6,7 +6,7 @@ namespace Container%s;
 
 include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
 
-class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
+class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\GhostObjectInterface
 %A
 
 if (!\class_exists('FooClass_%s', false)) {
@@ -88,10 +88,13 @@ class ProjectServiceContainer extends Container
     {
         if (true === $lazyLoad) {
             return $this->services['lazy_foo'] = $this->createProxy('FooClass_8976cfa', function () {
-                return \FooClass_8976cfa::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
-                    $wrappedInstance = $this->getLazyFooService(false);
+                return \FooClass_8976cfa::staticProxyConstructor(function (\ProxyManager\Proxy\GhostObjectInterface $proxy, string $method, array $parameters, &$initializer, array $properties) {
+                    $instance = $this->getLazyFooService($proxy);
+                    $initializer = null;
 
-                    $proxy->setProxyInitializer(null);
+                    if ($instance !== $proxy) {
+                        throw new \LogicException(sprintf('A lazy initializer should return the ghost object proxy it was given as argument, but an instance of "%s" was returned.', get_debug_type($instance)));
+                    }
 
                     return true;
                 });
@@ -100,7 +103,7 @@ class ProjectServiceContainer extends Container
 
         include_once $this->targetDir.''.'/Fixtures/includes/foo_lazy.php';
 
-        return new \Bar\FooClass(new \Bar\FooLazyClass());
+        return ($lazyLoad->__construct(new \Bar\FooLazyClass()) && false ?: $lazyLoad);
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null

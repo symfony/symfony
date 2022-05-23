@@ -12,8 +12,10 @@
 namespace Symfony\Bridge\ProxyManager\LazyProxy\Instantiator;
 
 use ProxyManager\Configuration;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
+use ProxyManager\Proxy\GhostObjectInterface;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Bridge\ProxyManager\Internal\LazyLoadingFactoryTrait;
 use Symfony\Bridge\ProxyManager\Internal\ProxyGenerator;
@@ -43,18 +45,36 @@ class RuntimeInstantiator implements InstantiatorInterface
      */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object
     {
-        $proxifiedClass = new \ReflectionClass($this->generator->getProxifiedClass($definition));
+        $proxifiedClass = new \ReflectionClass($this->generator->getProxifiedClass($definition, $asGhostObject));
+        $generator = $this->generator->asGhostObject($asGhostObject);
 
-        $factory = new class($this->config, $this->generator) extends LazyLoadingValueHolderFactory {
-            use LazyLoadingFactoryTrait;
-        };
+        if ($asGhostObject) {
+            $factory = new class($this->config, $generator) extends LazyLoadingGhostFactory {
+                use LazyLoadingFactoryTrait;
+            };
 
-        $initializer = static function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
-            $wrappedInstance = $realInstantiator();
-            $proxy->setProxyInitializer(null);
+            $initializer = static function (GhostObjectInterface $proxy, string $method, array $parameters, &$initializer, array $properties) use ($realInstantiator) {
+                $instance = $realInstantiator($proxy);
+                $initializer = null;
 
-            return true;
-        };
+                if ($instance !== $proxy) {
+                    throw new \LogicException(sprintf('A lazy initializer should return the ghost object proxy it was given as argument, but an instance of "%s" was returned.', get_debug_type($instance)));
+                }
+
+                return true;
+            };
+        } else {
+            $factory = new class($this->config, $generator) extends LazyLoadingValueHolderFactory {
+                use LazyLoadingFactoryTrait;
+            };
+
+            $initializer = static function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
+                $wrappedInstance = $realInstantiator();
+                $proxy->setProxyInitializer(null);
+
+                return true;
+            };
+        }
 
         return $factory->createProxy($proxifiedClass->name, $initializer, [
             'fluentSafe' => $definition->hasTag('proxy'),

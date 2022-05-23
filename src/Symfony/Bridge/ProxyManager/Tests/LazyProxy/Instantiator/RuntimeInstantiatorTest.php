@@ -12,8 +12,7 @@
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Instantiator;
 
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Proxy\LazyLoadingInterface;
-use ProxyManager\Proxy\ValueHolderInterface;
+use ProxyManager\Proxy\GhostObjectInterface;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -40,22 +39,19 @@ class RuntimeInstantiatorTest extends TestCase
 
     public function testInstantiateProxy()
     {
-        $instance = new \stdClass();
         $container = $this->createMock(ContainerInterface::class);
         $definition = new Definition('stdClass');
-        $instantiator = function () use ($instance) {
-            return $instance;
+        $instantiator = function ($proxy) {
+            return $proxy;
         };
 
-        /* @var $proxy LazyLoadingInterface|ValueHolderInterface */
+        /* @var $proxy GhostObjectInterface */
         $proxy = $this->instantiator->instantiateProxy($container, $definition, 'foo', $instantiator);
 
-        $this->assertInstanceOf(LazyLoadingInterface::class, $proxy);
-        $this->assertInstanceOf(ValueHolderInterface::class, $proxy);
+        $this->assertInstanceOf(GhostObjectInterface::class, $proxy);
         $this->assertFalse($proxy->isProxyInitialized());
 
         $proxy->initializeProxy();
-
-        $this->assertSame($instance, $proxy->getWrappedValueHolderValue());
+        $this->assertTrue($proxy->isProxyInitialized());
     }
 }

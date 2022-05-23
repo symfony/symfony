@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper;
 
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\GhostObjectInterface;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -47,7 +47,7 @@ class PhpDumperTest extends TestCase
 
         $proxy = $container->get('foo');
         $this->assertInstanceOf(\stdClass::class, $proxy);
-        $this->assertInstanceOf(LazyLoadingInterface::class, $proxy);
+        $this->assertInstanceOf(GhostObjectInterface::class, $proxy);
         $this->assertSame($proxy, $container->get('foo'));
 
         $this->assertFalse($proxy->isProxyInitialized());
@@ -62,8 +62,10 @@ class PhpDumperTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('foo', 'stdClass')->setPublic(true);
-        $container->getDefinition('foo')->setLazy(true);
+        $container->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setLazy(true)
+            ->setProperty('bar', 123);
         $container->compile();
 
         $dumper = new PhpDumper($container);

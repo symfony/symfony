@@ -7,17 +7,24 @@ class LazyServiceProjectServiceContainer extends Container
     {
         if (true === $lazyLoad) {
             return $this->services['foo'] = $this->createProxy('stdClass_%s', function () {
-                return %S\stdClass_%s(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
-                    $wrappedInstance = $this->getFooService(false);
+                return \stdClass_%s::staticProxyConstructor(function (\ProxyManager\Proxy\GhostObjectInterface $proxy, string $method, array $parameters, &$initializer, array $properties) {
+                    $instance = $this->getFooService($proxy);
+                    $initializer = null;
 
-                    $proxy->setProxyInitializer(null);
+                    if ($instance !== $proxy) {
+                        throw new \LogicException(sprintf('A lazy initializer should return the ghost object proxy it was given as argument, but an instance of "%s" was returned.', get_debug_type($instance)));
+                    }
 
                     return true;
                 });
             });
         }
 
-        return new \stdClass();
+        $instance = $lazyLoad;
+
+        $instance->bar = 123;
+
+        return $instance;
     }
 }
 

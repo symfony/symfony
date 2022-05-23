@@ -12,8 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests;
 
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Proxy\LazyLoadingInterface;
-use ProxyManager\Proxy\ValueHolderInterface;
+use ProxyManager\Proxy\GhostObjectInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
@@ -38,13 +37,16 @@ class ManagerRegistryTest extends TestCase
         $registry->setTestContainer($container);
 
         $foo = $container->get('foo');
-        $foo->bar = 123;
-        $this->assertTrue(isset($foo->bar));
 
+        $foo->bar = 234;
+        $this->assertSame(234, $foo->bar);
         $registry->resetManager();
 
+        self::assertFalse($foo->isProxyInitialized());
+        $foo->initializeProxy();
+
         $this->assertSame($foo, $container->get('foo'));
-        $this->assertObjectNotHasAttribute('bar', $foo);
+        $this->assertSame(123, $foo->bar);
     }
 
     /**
@@ -77,8 +79,7 @@ class ManagerRegistryTest extends TestCase
         $service = $container->get('foo');
 
         self::assertInstanceOf(\stdClass::class, $service);
-        self::assertInstanceOf(LazyLoadingInterface::class, $service);
-        self::assertInstanceOf(ValueHolderInterface::class, $service);
+        self::assertInstanceOf(GhostObjectInterface::class, $service);
         self::assertFalse($service->isProxyInitialized());
 
         $service->initializeProxy();
@@ -87,12 +88,7 @@ class ManagerRegistryTest extends TestCase
         self::assertTrue($service->isProxyInitialized());
 
         $registry->resetManager();
-        $service->initializeProxy();
-
-        $wrappedValue = $service->getWrappedValueHolderValue();
-        self::assertInstanceOf(\stdClass::class, $wrappedValue);
-        self::assertNotInstanceOf(LazyLoadingInterface::class, $wrappedValue);
-        self::assertNotInstanceOf(ValueHolderInterface::class, $wrappedValue);
+        self::assertFalse($service->isProxyInitialized());
     }
 
     private function dumpLazyServiceProjectAsFilesServiceContainer()
@@ -104,6 +100,7 @@ class ManagerRegistryTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', \stdClass::class)
+            ->setProperty('bar', 123)
             ->setPublic(true)
             ->setLazy(true);
         $container->compile();

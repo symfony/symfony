@@ -72,6 +72,7 @@ class ProxyDumperTest extends TestCase
         $definition = new Definition(__CLASS__);
 
         $definition->setLazy(true);
+        $definition->addTag('proxy', ['interface' => __CLASS__]);
 
         $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
 
@@ -87,6 +88,7 @@ class ProxyDumperTest extends TestCase
     public function testCorrectAssigning(Definition $definition, $access)
     {
         $definition->setLazy(true);
+        $definition->addTag('proxy', ['interface' => __CLASS__]);
 
         $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
 

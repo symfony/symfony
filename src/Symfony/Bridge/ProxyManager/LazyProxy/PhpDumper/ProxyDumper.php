@@ -42,9 +42,7 @@ class ProxyDumper implements DumperInterface
      */
     public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): bool
     {
-        $asGhostObject = false;
-
-        return ($definition->isLazy() || $definition->hasTag('proxy')) && $this->proxyGenerator->getProxifiedClass($definition);
+        return ($definition->isLazy() || $definition->hasTag('proxy')) && $this->proxyGenerator->getProxifiedClass($definition, $asGhostObject);
     }
 
     /**
@@ -58,8 +56,29 @@ class ProxyDumper implements DumperInterface
             $instantiation .= sprintf(' $this->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
         }
 
-        $proxifiedClass = new \ReflectionClass($this->proxyGenerator->getProxifiedClass($definition));
+        $proxifiedClass = new \ReflectionClass($this->proxyGenerator->getProxifiedClass($definition, $asGhostObject));
         $proxyClass = $this->getProxyClassName($proxifiedClass->name);
+
+        if ($asGhostObject) {
+            return <<<EOF
+        if (true === \$lazyLoad) {
+            $instantiation \$this->createProxy('$proxyClass', function () {
+                return \\$proxyClass::staticProxyConstructor(function (\ProxyManager\Proxy\GhostObjectInterface \$proxy, string \$method, array \$parameters, &\$initializer, array \$properties) {
+                    \$instance = $factoryCode;
+                    \$initializer = null;
+
+                    if (\$instance !== \$proxy) {
+                        throw new \LogicException(sprintf('A lazy initializer should return the ghost object proxy it was given as argument, but an instance of "%s" was returned.', get_debug_type(\$instance)));
+                    }
+
+                    return true;
+                });
+            });
+        }
+
+
+EOF;
+        }
 
         return <<<EOF
         if (true === \$lazyLoad) {
@@ -96,10 +115,10 @@ EOF;
 
     private function generateProxyClass(Definition $definition): ClassGenerator
     {
-        $class = $this->proxyGenerator->getProxifiedClass($definition);
+        $class = $this->proxyGenerator->getProxifiedClass($definition, $asGhostObject);
         $generatedClass = new ClassGenerator($this->getProxyClassName($class));
 
-        $this->proxyGenerator->generate(new \ReflectionClass($class), $generatedClass, [
+        $this->proxyGenerator->asGhostObject($asGhostObject)->generate(new \ReflectionClass($class), $generatedClass, [
             'fluentSafe' => $definition->hasTag('proxy'),
             'skipDestructor' => true,
         ]);

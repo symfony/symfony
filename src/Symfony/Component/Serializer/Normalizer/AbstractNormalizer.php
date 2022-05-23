@@ -113,6 +113,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const IGNORED_ATTRIBUTES = 'ignored_attributes';
 
     /**
+     * The default group can be use on the serialization context to explicitly
+     * tell the serializer to allow properties without defined groups.
+     */
+    public const DEFAULT_GROUP_FOR_ATTRIBUTE_WITHOUT_GROUPS = '_default';
+
+    /**
      * @internal
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
@@ -259,7 +265,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     protected function getAttributeGroups(AttributeMetadataInterface $attributeMetadata): array
     {
-        $groups = empty($attributeMetadata->getGroups()) ? ['_default'] : $attributeMetadata->getGroups();
+        $groups = empty($attributeMetadata->getGroups()) ? [self::DEFAULT_GROUP_FOR_ATTRIBUTE_WITHOUT_GROUPS] : $attributeMetadata->getGroups();
 
         return array_merge($groups, ['*']);
     }

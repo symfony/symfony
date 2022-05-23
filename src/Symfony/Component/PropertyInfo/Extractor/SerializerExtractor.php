@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Lists available properties using Symfony Serializer Component metadata.
@@ -59,7 +60,7 @@ class SerializerExtractor implements PropertyListExtractorInterface
 
     private function getAttributeGroups(AttributeMetadataInterface $serializerAttributeMetadata): array
     {
-        $groups = empty($serializerAttributeMetadata->getGroups()) ? ['_default'] : $serializerAttributeMetadata->getGroups();
+        $groups = empty($serializerAttributeMetadata->getGroups()) ? [AbstractNormalizer::DEFAULT_GROUP_FOR_ATTRIBUTE_WITHOUT_GROUPS] : $serializerAttributeMetadata->getGroups();
 
         return array_merge($groups, ['*']);
     }

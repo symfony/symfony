@@ -7,6 +7,8 @@ CHANGELOG
 * Add support for constructor promoted properties to `Context` attribute
 * Add context option `PropertyNormalizer::NORMALIZE_VISIBILITY` with bitmask flags `PropertyNormalizer::NORMALIZE_PUBLIC`, `PropertyNormalizer::NORMALIZE_PROTECTED`, `PropertyNormalizer::NORMALIZE_PRIVATE`
 * Add method `withNormalizeVisibility` to `PropertyNormalizerContextBuilder`
+* Add `allowNormalizationOfObjectsWithoutAnyProperties` option to `PropertyNormalizer`
+* Add `allowNormalizationOfObjectsWithoutAnyGetters` option to `GetSetMethodNormalizer`
 
 6.1
 ---

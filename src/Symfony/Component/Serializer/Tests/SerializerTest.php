@@ -194,7 +194,7 @@ class SerializerTest extends TestCase
 
     public function testSerialize()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([new GetSetMethodNormalizer(null, null, null, null, null, [], true)], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $result = $serializer->serialize(Model::fromArray($data), 'json');
         $this->assertEquals(json_encode($data), $result);
@@ -246,7 +246,7 @@ class SerializerTest extends TestCase
 
     public function testDeserialize()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([new GetSetMethodNormalizer(null, null, null, null, null, [], true)], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $result = $serializer->deserialize(json_encode($data), Model::class, 'json');
         $this->assertEquals($data, $result->toArray());
@@ -254,7 +254,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeUseCache()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([new GetSetMethodNormalizer(null, null, null, null, null, [], true)], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $serializer->deserialize(json_encode($data), Model::class, 'json');
         $data = ['title' => 'bar', 'numbers' => [2, 8]];
@@ -288,14 +288,14 @@ class SerializerTest extends TestCase
 
     public function testDeserializeSupported()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], []);
+        $serializer = new Serializer([new GetSetMethodNormalizer(null, null, null, null, null, [], true)], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $this->assertTrue($serializer->supportsDenormalization(json_encode($data), Model::class, 'json'));
     }
 
     public function testDeserializeNotSupported()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], []);
+        $serializer = new Serializer([new GetSetMethodNormalizer(null, null, null, null, null, [], false)], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $this->assertFalse($serializer->supportsDenormalization(json_encode($data), 'stdClass', 'json'));
     }
@@ -327,8 +327,8 @@ class SerializerTest extends TestCase
     {
         $serializer = new Serializer(
             [
-                new GetSetMethodNormalizer(),
-                new PropertyNormalizer(),
+                new GetSetMethodNormalizer(null, null, null, null, null, [], true),
+                new PropertyNormalizer(null, null, null, null, null, [], true),
                 new ObjectNormalizer(),
                 new CustomNormalizer(),
                 new ArrayDenormalizer(),
@@ -354,7 +354,7 @@ class SerializerTest extends TestCase
 
         $serializer = new Serializer(
             [
-                new GetSetMethodNormalizer(),
+                new GetSetMethodNormalizer(null, null, null, null, null, [], true),
                 new ArrayDenormalizer(),
             ],
             [
@@ -529,14 +529,14 @@ class SerializerTest extends TestCase
     public function testNormalizeTransformEmptyArrayObjectToArray()
     {
         $serializer = new Serializer(
-            [
-                new PropertyNormalizer(),
-                new ObjectNormalizer(),
-                new ArrayDenormalizer(),
-            ],
-            [
-                'json' => new JsonEncoder(),
-            ]
+          [
+              new PropertyNormalizer(null, null, null, null, null, [], true),
+              new ObjectNormalizer(),
+              new ArrayDenormalizer(),
+          ],
+          [
+              'json' => new JsonEncoder(),
+          ]
         );
 
         $object = [];
@@ -552,14 +552,14 @@ class SerializerTest extends TestCase
     public function provideObjectOrCollectionTests()
     {
         $serializer = new Serializer(
-            [
-                new PropertyNormalizer(),
-                new ObjectNormalizer(),
-                new ArrayDenormalizer(),
-            ],
-            [
-                'json' => new JsonEncoder(),
-            ]
+          [
+              new PropertyNormalizer(null, null, null, null, null, [], true),
+              new ObjectNormalizer(),
+              new ArrayDenormalizer(),
+          ],
+          [
+              'json' => new JsonEncoder(),
+          ]
         );
 
         $data = [];

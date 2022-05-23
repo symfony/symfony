@@ -56,6 +56,10 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         }
 
         $this->allowNormalizationOfObjectsWithoutAnyProperties = $allowNormalizationOfObjectsWithoutAnyProperties;
+
+        if (\func_num_args() < 7) {
+            trigger_deprecation('symfony/serializer', '6.2', '$allowNormalizationOfObjectsWithoutAnyProperties parameter of %s() should be explicitly provided since the default value will change to `true` in symfony/serializer >=7.0', __METHOD__);
+        }
     }
 
     /**

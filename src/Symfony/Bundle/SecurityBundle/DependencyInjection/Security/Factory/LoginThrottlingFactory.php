@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
 /**
@@ -56,10 +55,6 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): array
     {
-        if (!class_exists(LoginThrottlingListener::class)) {
-            throw new \LogicException('Login throttling requires symfony/security-http:^5.2.');
-        }
-
         if (!class_exists(RateLimiterFactory::class)) {
             throw new \LogicException('Login throttling requires the Rate Limiter component. Try running "composer require symfony/rate-limiter".');
         }

@@ -31,6 +31,8 @@
                 </service>
             </argument>
             <argument /><!-- Debug-Flag -->
+            <tag name="annotations.cached_reader" />
+            <tag name="container.do_not_inline" />
         </service>
 
         <service id="annotations.filesystem_cache_adapter" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">

@@ -18,18 +18,50 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolve
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 class UserValueResolverTest extends TestCase
 {
-    public function testResolveNoToken()
+    public function testResolveNoTokenWhenArgumentIsNullable()
     {
         $tokenStorage = new TokenStorage();
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
+        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null, true);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+    }
+
+    public function testResolveNoTokenWhenArgumentHasDefaultValue()
+    {
+        $tokenStorage = new TokenStorage();
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, true, null, true);
+
+        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+    }
+
+    public function testResolveNoTokenWhenArgumentIsNotNullable()
+    {
+        $tokenStorage = new TokenStorage();
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null, false);
+
+        $this->expectException(AccessDeniedException::class);
+
+        $resolver->supports(Request::create('/'), $metadata);
+    }
+
+    public function testResolveNoTokenWhenArgumentDoesNotHaveDefaultValue()
+    {
+        $tokenStorage = new TokenStorage();
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null, false);
+
+        $this->expectException(AccessDeniedException::class);
+
+        $resolver->supports(Request::create('/'), $metadata);
     }
 
     public function testResolveNoUser()

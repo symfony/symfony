@@ -449,6 +449,7 @@ class PhpStanExtractorTest extends TestCase
     {
         return [
             [Php80Dummy::class, 'promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            [Php80Dummy::class, 'promoted', null],
             [Php80PromotedDummy::class, 'promoted', null],
         ];
     }

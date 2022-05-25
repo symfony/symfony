@@ -91,7 +91,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     {
         $this->services['baz'] = $instance = new \stdClass();
 
-        $instance->foo3 = ($this->privates['foo3'] ?? ($this->privates['foo3'] = new \stdClass()));
+        $instance->foo3 = $this->privates['foo3'] ??= new \stdClass();
 
         return $instance;
     }

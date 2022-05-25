@@ -674,7 +674,7 @@ class getTaggedIteratorService extends ProjectServiceContainer
     {
         return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () use ($container) {
             yield 0 => ($container->services['foo'] ?? $container->load('getFooService'));
-            yield 1 => ($container->privates['tagged_iterator_foo'] ?? ($container->privates['tagged_iterator_foo'] = new \Bar()));
+            yield 1 => $container->privates['tagged_iterator_foo'] ??= new \Bar();
         }, 2));
     }
 }

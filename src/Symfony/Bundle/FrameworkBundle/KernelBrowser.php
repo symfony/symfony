@@ -47,6 +47,7 @@ class KernelBrowser extends HttpKernelBrowser
      */
     public function getContainer(): ContainerInterface
     {
+        \assert($this->kernel instanceof KernelInterface);
         $container = $this->kernel->getContainer();
 
         return $container->has('test.service_container') ? $container->get('test.service_container') : $container;
@@ -57,6 +58,8 @@ class KernelBrowser extends HttpKernelBrowser
      */
     public function getKernel(): KernelInterface
     {
+        \assert($this->kernel instanceof KernelInterface);
+
         return $this->kernel;
     }
 
@@ -153,6 +156,7 @@ class KernelBrowser extends HttpKernelBrowser
      */
     protected function doRequest(object $request): Response
     {
+        \assert($this->kernel instanceof KernelInterface);
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
         if ($this->hasPerformedRequest && $this->reboot) {

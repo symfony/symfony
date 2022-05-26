@@ -61,11 +61,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * @var array<string, BundleInterface>
      */
     protected $bundles = [];
-
+    /** @var ContainerInterface|null */
     protected $container;
+    /** @var string */
     protected $environment;
+    /** @var bool */
     protected $debug;
+    /** @var bool */
     protected $booted = false;
+    /** @var float|null */
     protected $startTime;
 
     private string $projectDir;
@@ -210,7 +214,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function getHttpKernel(): HttpKernelInterface
     {
-        return $this->container->get('http_kernel');
+        $service = $this->container->get('http_kernel');
+        \assert($service instanceof HttpKernelInterface);
+
+        return $service;
     }
 
     /**
@@ -773,7 +780,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
+            \assert(\is_array($trustedProxies) || \is_string($trustedProxies));
+            $trustedHeaderSet = $container->getParameter('kernel.trusted_headers');
+            \assert(\is_int($trustedHeaderSet));
+            Request::setTrustedProxies(
+                \is_array($trustedProxies)
+                    ? $trustedProxies
+                    : array_map('trim', explode(',', $trustedProxies)),
+                $trustedHeaderSet
+            );
         }
 
         return $container;

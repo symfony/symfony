@@ -50,8 +50,11 @@ class_exists(KernelEvents::class);
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
+    /** @var ControllerResolverInterface */
     protected $resolver;
+    /** @var RequestStack */
     protected $requestStack;
     private ArgumentResolverInterface $argumentResolver;
 
@@ -196,7 +199,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * operations such as {@link RequestStack::getParentRequest()} can lead to
      * weird results.
      */
-    private function finishRequest(Request $request, int $type)
+    private function finishRequest(Request $request, int $type): void
     {
         $this->dispatcher->dispatch(new FinishRequestEvent($this, $request, $type), KernelEvents::FINISH_REQUEST);
         $this->requestStack->pop();

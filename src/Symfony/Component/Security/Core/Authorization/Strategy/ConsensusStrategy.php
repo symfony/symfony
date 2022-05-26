@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -29,6 +31,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander M. Turek <me@derrabus.de>
+ * @author Antoine Lamirault <lamiraultantoine@gmail.com>
  */
 final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Stringable
 {
@@ -41,8 +44,53 @@ final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Strin
         $this->allowIfEqualGrantedDeniedDecisions = $allowIfEqualGrantedDeniedDecisions;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getDecision(\Traversable $votes): AccessDecision
+    {
+        $currentVotes = [];
+
+        /** @var Vote $vote */
+        $grant = 0;
+        $deny = 0;
+        foreach ($votes as $vote) {
+            $currentVotes[] = $vote;
+            if ($vote->isGranted()) {
+                ++$grant;
+            } elseif ($vote->isDenied()) {
+                ++$deny;
+            }
+        }
+
+        if ($grant > $deny) {
+            return AccessDecision::createGranted($currentVotes);
+        }
+
+        if ($deny > $grant) {
+            return AccessDecision::createDenied($currentVotes);
+        }
+
+        if ($grant > 0) {
+            return $this->allowIfEqualGrantedDeniedDecisions
+                ? AccessDecision::createGranted($currentVotes)
+                : AccessDecision::createDenied($currentVotes)
+            ;
+        }
+
+        return $this->allowIfAllAbstainDecisions
+            ? AccessDecision::createGranted($currentVotes)
+            : AccessDecision::createDenied($currentVotes)
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function decide(\Traversable $results): bool
     {
+        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+
         $grant = 0;
         $deny = 0;
         foreach ($results as $result) {

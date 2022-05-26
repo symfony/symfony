@@ -12,21 +12,53 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class RoleVoterTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
-     * @dataProvider getVoteTests
+     * @dataProvider getGetVoteTests
      */
-    public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
+    public function testGetVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
     {
         $voter = new RoleVoter();
 
+        $this->assertEquals($expected, $voter->getVote($this->getTokenWithRoleNames($roles), null, $attributes));
+    }
+
+    public function getGetVoteTests()
+    {
+        return [
+            [[], [], Vote::createAbstain()],
+            [[], ['FOO'], Vote::createAbstain()],
+            [[], ['ROLE_FOO'], Vote::createDenied()],
+            [['ROLE_FOO'], ['ROLE_FOO'], Vote::createGranted()],
+            [['ROLE_FOO'], ['FOO', 'ROLE_FOO'], Vote::createGranted()],
+            [['ROLE_BAR', 'ROLE_FOO'], ['ROLE_FOO'], Vote::createGranted()],
+
+            // Test mixed Types
+            [[], [[]], Vote::createAbstain()],
+            [[], [new \stdClass()], Vote::createAbstain()],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getVoteTests
+     */
+    public function testVoteUsingTokenThatReturnsRoleNamesLegacy($roles, $attributes, $expected)
+    {
+        $voter = new RoleVoter();
+
+        $this->expectDeprecation('Since symfony/security-core 6.2: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 

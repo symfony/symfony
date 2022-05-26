@@ -13,8 +13,10 @@ namespace Symfony\Component\Security\Core\Test;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -29,12 +31,26 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
      *
      * @param VoterInterface[] $voters
      */
-    final public function testDecide(AccessDecisionStrategyInterface $strategy, array $voters, bool $expected)
+    final public function testGetDecision(AccessDecisionStrategyInterface $strategy, array $voters, AccessDecision $expected)
     {
         $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager($voters, $strategy);
 
-        $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO']));
+        $this->assertEquals($expected, $manager->getDecision($token, ['ROLE_FOO']));
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideStrategyTests
+     *
+     * @param VoterInterface[] $voters
+     */
+    final public function testDecideLegacy(AccessDecisionStrategyInterface $strategy, array $voters, AccessDecision $expected)
+    {
+        $token = $this->createMock(TokenInterface::class);
+        $manager = new AccessDecisionManager($voters, $strategy);
+
+        $this->assertSame($expected->isGranted(), $manager->decide($token, ['ROLE_FOO']));
     }
 
     /**

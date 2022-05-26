@@ -40,13 +40,13 @@ class AuthenticatedVoter implements CacheableVoterInterface
         $this->authenticationTrustResolver = $authenticationTrustResolver;
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
     {
         if ($attributes === [self::PUBLIC_ACCESS]) {
-            return VoterInterface::ACCESS_GRANTED;
+            return Vote::createGranted();
         }
 
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        $result = Vote::createAbstain();
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
@@ -56,33 +56,40 @@ class AuthenticatedVoter implements CacheableVoterInterface
                 continue;
             }
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = Vote::createDenied();
 
             if (self::IS_AUTHENTICATED_FULLY === $attribute
                 && $this->authenticationTrustResolver->isFullFledged($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_AUTHENTICATED_REMEMBERED === $attribute
                 && ($this->authenticationTrustResolver->isRememberMe($token)
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_AUTHENTICATED === $attribute && $this->authenticationTrustResolver->isAuthenticated($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_REMEMBERED === $attribute && $this->authenticationTrustResolver->isRememberMe($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_IMPERSONATOR === $attribute && $token instanceof SwitchUserToken) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
         }
 
         return $result;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    {
+        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+
+        return $this->getVote($token, $subject, $attributes)->getAccess();
     }
 
     public function supportsAttribute(string $attribute): bool

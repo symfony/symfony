@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -47,8 +48,32 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         }
     }
 
+    public function getDecision(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): AccessDecision
+    {
+        $currentDecisionLog = [
+            'attributes' => $attributes,
+            'object' => $object,
+            'voterDetails' => [],
+        ];
+
+        $this->currentLog[] = &$currentDecisionLog;
+
+        $result = $this->manager->getDecision($token, $attributes, $object, $allowMultipleAttributes);
+
+        $currentDecisionLog['result'] = $result;
+
+        $this->decisionLog[] = array_pop($this->currentLog); // Using a stack since getDecision can be called by voters
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {
+        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+
         $currentDecisionLog = [
             'attributes' => $attributes,
             'object' => $object,
@@ -69,11 +94,16 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * Adds voter vote and class to the voter details.
      *
-     * @param array $attributes attributes used for the vote
-     * @param int   $vote       vote of the voter
+     * @param array    $attributes attributes used for the vote
+     * @param Vote|int $vote       vote of the voter
      */
-    public function addVoterVote(VoterInterface $voter, array $attributes, int $vote): void
+    public function addVoterVote(VoterInterface $voter, array $attributes, Vote|int $vote): void
     {
+        if (!$vote instanceof Vote) {
+            trigger_deprecation('symfony/security-core', '6.2', 'Passing an int as the third argument to "%s::addVoterVote()" is deprecated, pass an instance of "%s" instead.', __CLASS__, Vote::class);
+            $vote = new Vote($vote);
+        }
+
         $currentLogIndex = \count($this->currentLog) - 1;
         $this->currentLog[$currentLogIndex]['voterDetails'][] = [
             'voter' => $voter,

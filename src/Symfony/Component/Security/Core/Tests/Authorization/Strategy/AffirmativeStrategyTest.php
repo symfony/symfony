@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Authorization\Strategy;
+namespace Symfony\Component\Security\Core\Tests\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class AffirmativeStrategyTest extends AccessDecisionStrategyTestCase
@@ -20,13 +22,23 @@ class AffirmativeStrategyTest extends AccessDecisionStrategyTestCase
     {
         $strategy = new AffirmativeStrategy();
 
-        yield [$strategy, self::getVoters(1, 0, 0), true];
-        yield [$strategy, self::getVoters(1, 2, 0), true];
-        yield [$strategy, self::getVoters(0, 1, 0), false];
-        yield [$strategy, self::getVoters(0, 0, 1), false];
+        yield [$strategy, self::getVoters(1, 0, 0), AccessDecision::createGranted([
+            Vote::createGranted(),
+        ])];
+        yield [$strategy, self::getVoters(1, 2, 0), AccessDecision::createGranted([
+            Vote::createGranted(),
+        ])];
+        yield [$strategy, self::getVoters(0, 1, 0), AccessDecision::createDenied([
+            Vote::createDenied(),
+        ])];
+        yield [$strategy, self::getVoters(0, 0, 1), AccessDecision::createDenied([
+            Vote::createAbstain(),
+        ])];
 
         $strategy = new AffirmativeStrategy(true);
 
-        yield [$strategy, self::getVoters(0, 0, 1), true];
+        yield [$strategy, self::getVoters(0, 0, 1), AccessDecision::createGranted([
+            Vote::createAbstain(),
+        ])];
     }
 }

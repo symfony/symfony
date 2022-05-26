@@ -33,13 +33,25 @@ class TraceableVoter implements CacheableVoterInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
+    {
+        if (method_exists($this->voter, 'getVote')) {
+            $vote = $this->voter->getVote($token, $subject, $attributes);
+        } else {
+            $result = $this->voter->vote($token, $subject, $attributes);
+            $vote = new Vote($result);
+        }
+
+        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $vote), 'debug.security.authorization.vote');
+
+        return $vote;
+    }
+
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        $result = $this->voter->vote($token, $subject, $attributes);
+        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
 
-        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $result), 'debug.security.authorization.vote');
-
-        return $result;
+        return $this->getVote($token, $subject, $attributes)->getAccess();
     }
 
     public function getDecoratedVoter(): VoterInterface

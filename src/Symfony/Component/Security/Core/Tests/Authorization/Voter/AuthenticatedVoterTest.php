@@ -12,28 +12,64 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthenticatedVoterTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
-     * @dataProvider getVoteTests
+     * @dataProvider getGetVoteTests
      */
-    public function testVote($authenticated, $attributes, $expected)
+    public function testGetVote($authenticated, $attributes, $expected)
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
+        $this->assertEquals($expected, $voter->getVote($this->getToken($authenticated), null, $attributes));
+    }
+
+    public static function getGetVoteTests()
+    {
+        return [
+            ['fully', [], Vote::createAbstain()],
+            ['fully', ['FOO'], Vote::createAbstain()],
+            ['remembered', [], Vote::createAbstain()],
+            ['remembered', ['FOO'], Vote::createAbstain()],
+
+            ['fully', ['IS_AUTHENTICATED_REMEMBERED'], Vote::createGranted()],
+            ['remembered', ['IS_AUTHENTICATED_REMEMBERED'], Vote::createGranted()],
+
+            ['fully', ['IS_AUTHENTICATED_FULLY'], Vote::createGranted()],
+            ['remembered', ['IS_AUTHENTICATED_FULLY'], Vote::createDenied()],
+
+            ['fully', ['IS_IMPERSONATOR'], Vote::createDenied()],
+            ['remembered', ['IS_IMPERSONATOR'], Vote::createDenied()],
+            ['impersonated', ['IS_IMPERSONATOR'], Vote::createGranted()],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getVoteTestsLegacy
+     */
+    public function testVoteLegacy($authenticated, $attributes, $expected)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->expectDeprecation('Since symfony/security-core 6.2: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
     }
 
-    public static function getVoteTests()
+    public static function getVoteTestsLegacy()
     {
         return [
             ['fully', [], VoterInterface::ACCESS_ABSTAIN],

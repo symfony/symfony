@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -21,6 +23,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander M. Turek <me@derrabus.de>
+ * @author Antoine Lamirault <lamiraultantoine@gmail.com>
  */
 final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Stringable
 {
@@ -31,8 +34,38 @@ final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Strin
         $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
     }
 
+    public function getDecision(\Traversable $votes): AccessDecision
+    {
+        $currentVotes = [];
+        $grant = 0;
+
+        /** @var Vote $vote */
+        foreach ($votes as $vote) {
+            $currentVotes[] = $vote;
+            if ($vote->isDenied()) {
+                return AccessDecision::createDenied($currentVotes);
+            }
+
+            if ($vote->isGranted()) {
+                ++$grant;
+            }
+        }
+
+        // no deny votes
+        if ($grant > 0) {
+            return AccessDecision::createGranted($currentVotes);
+        }
+
+        return $this->allowIfAllAbstainDecisions
+            ? AccessDecision::createGranted($currentVotes)
+            : AccessDecision::createDenied($currentVotes)
+        ;
+    }
+
     public function decide(\Traversable $results): bool
     {
+        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+
         $grant = 0;
         foreach ($results as $result) {
             if (VoterInterface::ACCESS_DENIED === $result) {

@@ -49,9 +49,9 @@ class ExpressionVoter implements CacheableVoterInterface
         return true;
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
     {
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        $result = Vote::createAbstain();
         $variables = null;
         foreach ($attributes as $attribute) {
             if (!$attribute instanceof Expression) {
@@ -60,13 +60,20 @@ class ExpressionVoter implements CacheableVoterInterface
 
             $variables ??= $this->getVariables($token, $subject);
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = Vote::createDenied();
             if ($this->expressionLanguage->evaluate($attribute, $variables)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
         }
 
         return $result;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    {
+        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+
+        return $this->getVote($token, $subject, $attributes)->getAccess();
     }
 
     private function getVariables(TokenInterface $token, mixed $subject): array

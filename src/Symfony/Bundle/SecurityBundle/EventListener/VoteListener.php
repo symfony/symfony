@@ -33,7 +33,7 @@ class VoteListener implements EventSubscriberInterface
 
     public function onVoterVote(VoteEvent $event): void
     {
-        $this->traceableAccessDecisionManager->addVoterVote($event->getVoter(), $event->getAttributes(), $event->getVote());
+        $this->traceableAccessDecisionManager->addVoterVote($event->getVoter(), $event->getAttributes(), $event->getVoteDecision());
     }
 
     public static function getSubscribedEvents(): array

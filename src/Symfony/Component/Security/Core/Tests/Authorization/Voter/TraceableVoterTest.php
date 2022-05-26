@@ -12,15 +12,19 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Event\VoteEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class TraceableVoterTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testGetDecoratedVoterClass()
     {
         $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
@@ -30,6 +34,38 @@ class TraceableVoterTest extends TestCase
     }
 
     public function testVote()
+    {
+        $voter = $this
+            ->getMockBuilder(VoterInterface::class)
+            ->setMethods(['getVote', 'vote'])
+            ->getMock();
+
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $token = $this->getMockBuilder(TokenInterface::class)->getMockForAbstractClass();
+
+        $vote = Vote::createDenied();
+
+        $voter
+            ->expects($this->once())
+            ->method('getVote')
+            ->with($token, 'anysubject', ['attr1'])
+            ->willReturn($vote);
+
+        $eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(new VoteEvent($voter, 'anysubject', ['attr1'], $vote), 'debug.security.authorization.vote');
+
+        $sut = new TraceableVoter($voter, $eventDispatcher);
+        $result = $sut->getVote($token, 'anysubject', ['attr1']);
+
+        $this->assertSame($vote, $result);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testVoteLegacy()
     {
         $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
 
@@ -48,6 +84,8 @@ class TraceableVoterTest extends TestCase
             ->with(new VoteEvent($voter, 'anysubject', ['attr1'], VoterInterface::ACCESS_DENIED), 'debug.security.authorization.vote');
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
+
+        $this->expectDeprecation('Since symfony/security-core 6.2: Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.');
         $result = $sut->vote($token, 'anysubject', ['attr1']);
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);

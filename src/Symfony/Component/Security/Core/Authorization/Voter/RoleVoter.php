@@ -27,9 +27,9 @@ class RoleVoter implements CacheableVoterInterface
         $this->prefix = $prefix;
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
     {
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        $result = Vote::createAbstain();
         $roles = $this->extractRoles($token);
 
         foreach ($attributes as $attribute) {
@@ -37,15 +37,22 @@ class RoleVoter implements CacheableVoterInterface
                 continue;
             }
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = Vote::createDenied();
             foreach ($roles as $role) {
                 if ($attribute === $role) {
-                    return VoterInterface::ACCESS_GRANTED;
+                    return Vote::createGranted();
                 }
             }
         }
 
         return $result;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    {
+        trigger_deprecation('symfony/security-core', '6.2', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+
+        return $this->getVote($token, $subject, $attributes)->getAccess();
     }
 
     public function supportsAttribute(string $attribute): bool

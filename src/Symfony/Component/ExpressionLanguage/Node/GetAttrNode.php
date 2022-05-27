@@ -24,6 +24,8 @@ class GetAttrNode extends Node
     public const METHOD_CALL = 2;
     public const ARRAY_CALL = 3;
 
+    private bool $isShortCircuited = false;
+
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type)
     {
         parent::__construct(
@@ -70,9 +72,16 @@ class GetAttrNode extends Node
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
+
                 if (null === $obj && $this->nodes['attribute']->isNullSafe) {
+                    $this->isShortCircuited = true;
+
                     return null;
                 }
+                if (null === $obj && $this->isShortCircuited()) {
+                    return null;
+                }
+
                 if (!\is_object($obj)) {
                     throw new \RuntimeException(sprintf('Unable to get property "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
@@ -83,9 +92,16 @@ class GetAttrNode extends Node
 
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
+
                 if (null === $obj && $this->nodes['attribute']->isNullSafe) {
+                    $this->isShortCircuited = true;
+
                     return null;
                 }
+                if (null === $obj && $this->isShortCircuited()) {
+                    return null;
+                }
+
                 if (!\is_object($obj)) {
                     throw new \RuntimeException(sprintf('Unable to call method "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
@@ -97,12 +113,24 @@ class GetAttrNode extends Node
 
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values);
+
+                if (null === $array && $this->isShortCircuited()) {
+                    return null;
+                }
+
                 if (!\is_array($array) && !$array instanceof \ArrayAccess) {
                     throw new \RuntimeException(sprintf('Unable to get an item of non-array "%s".', $this->nodes['node']->dump()));
                 }
 
                 return $array[$this->nodes['attribute']->evaluate($functions, $values)];
         }
+    }
+
+    private function isShortCircuited(): bool
+    {
+        return $this->isShortCircuited
+            || ($this->nodes['node'] instanceof self && $this->nodes['node']->isShortCircuited())
+        ;
     }
 
     public function toArray()

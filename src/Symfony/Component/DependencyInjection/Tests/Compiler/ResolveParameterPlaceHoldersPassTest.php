@@ -97,6 +97,20 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->assertCount(1, $definition->getErrors());
     }
 
+    public function testOnlyProxyTagIsResolved()
+    {
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->setParameter('a_param', 'here_you_go');
+        $definition = $containerBuilder->register('def');
+        $definition->addTag('foo', ['bar' => '%a_param%']);
+        $definition->addTag('proxy', ['interface' => '%a_param%']);
+
+        $pass = new ResolveParameterPlaceHoldersPass(true, false);
+        $pass->process($containerBuilder);
+
+        $this->assertSame(['foo' => [['bar' => '%a_param%']], 'proxy' => [['interface' => 'here_you_go']]], $definition->getTags());
+    }
+
     private function createContainerBuilder(): ContainerBuilder
     {
         $containerBuilder = new ContainerBuilder();

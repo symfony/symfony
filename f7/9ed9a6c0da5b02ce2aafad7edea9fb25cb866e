@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-05-18T08:42:45Z
+
+appveyor error not related to this PR: `Messenger\Bridge\Redis`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-05-18T10:14:27Z
+
+That's a new feature, so 6.2.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-05-18T10:15:32Z
+
+Well, to me, that's a bugfix of the completion of option names
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-05-18T10:23:24Z
+
+I agree it's a bugfix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-05-18T10:28:55Z
+
+No, it's not. Even the description is clear about that: "Add negation of [negatable options](https://symfony.com/blog/new-in-symfony-5-3-negatable-command-options)". Adding something is not a bug fix (or at least, not anymore).
+
+---------------------------------------------------------------------------
+
+by stof at 2022-05-18T10:34:33Z
+
+Well, the same description could be written as "ensure that all option names are completable for negatable options"
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-05-18T10:35:14Z
+
+Yea, I thought the same when reading the description. My reasoning is that completion should seamlessly handle any kind of option, otherwise it's buggy.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-05-18T12:18:11Z
+
+Shell completion is a form of documentation of the available options. Not suggesting the negative form `--no-ansi` is a defect that leads to a failure to understand for users of CLI tools. It would be a shame to have this bug once Composer enable completion.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-05-23T19:44:04Z
+
+I think the tester should be fixed also.
+ https://github.com/symfony/symfony/blob/a05702965e9fc0de7ce77d1641e772e2fbfe9911/src/Symfony/Component/Console/Tester/CommandCompletionTester.php#L51

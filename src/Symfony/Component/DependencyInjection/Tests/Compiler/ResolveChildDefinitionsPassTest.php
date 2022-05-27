@@ -121,6 +121,31 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertEquals([], $def->getTags());
     }
 
+    public function testProcessCopiesTagsProxy()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+            ->addTag('proxy', ['a' => 'b'])
+        ;
+
+        $container
+            ->setDefinition('child1', new ChildDefinition('parent'))
+        ;
+        $container
+            ->setDefinition('child2', (new ChildDefinition('parent'))->addTag('proxy', ['c' => 'd']))
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child1');
+        $this->assertSame(['proxy' => [['a' => 'b']]], $def->getTags());
+
+        $def = $container->getDefinition('child2');
+        $this->assertSame(['proxy' => [['c' => 'd']]], $def->getTags());
+    }
+
     public function testProcessDoesNotCopyDecoratedService()
     {
         $container = new ContainerBuilder();

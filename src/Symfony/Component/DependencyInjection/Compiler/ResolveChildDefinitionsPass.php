@@ -193,6 +193,12 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         // and it's not legal on an instanceof
         $def->setAutoconfigured($definition->isAutoconfigured());
 
+        if (!$def->hasTag('proxy')) {
+            foreach ($parentDef->getTag('proxy') as $v) {
+                $def->addTag('proxy', $v);
+            }
+        }
+
         return $def;
     }
 }

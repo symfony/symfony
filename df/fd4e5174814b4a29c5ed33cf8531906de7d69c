@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-05-24T15:16:28Z
+
+Btw, this makes me think that the clean representation for the proxy type might be a dedicated property in the definition rather than a tag (but this cannot be changed in 4.4 anyway)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-24T15:22:27Z
+
+> the clean representation for the proxy type might be a dedicated property in the definition
+
+Mostly yes, or make `setLazy()` accept an array of proxified interfaces. But the current way works and this is quite a niche feature so I'd keep it as is for the time being.

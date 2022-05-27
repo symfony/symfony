@@ -22,7 +22,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('html_sanitizer.sanitizer.default', HtmlSanitizer::class)
             ->args([service('html_sanitizer.config.default')])
-            ->tag('html_sanitizer', ['name' => 'default'])
+            ->tag('html_sanitizer', ['sanitizer' => 'default'])
 
         ->alias('html_sanitizer', 'html_sanitizer.sanitizer.default')
         ->alias(HtmlSanitizerInterface::class, 'html_sanitizer')

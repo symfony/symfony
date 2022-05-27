@@ -39,10 +39,10 @@ final class Instantiator
      *         Bar::class => ['privateBarProperty' => $propertyValue],
      *     ]);
      *
-     * Instances of ArrayObject, ArrayIterator and SplObjectHash can be created
+     * Instances of ArrayObject, ArrayIterator and SplObjectStorage can be created
      * by using the special "\0" property name to define their internal value:
      *
-     *     // creates an SplObjectHash where $info1 is attached to $obj1, etc.
+     *     // creates an SplObjectStorage where $info1 is attached to $obj1, etc.
      *     Instantiator::instantiate(SplObjectStorage::class, ["\0" => [$obj1, $info1, $obj2, $info2...]]);
      *
      *     // creates an ArrayObject populated with $inputArray

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2022-05-24T08:19:24Z
+
+I don't know, sorry.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-24T08:33:26Z
+
+~OK, let's go with https://github.com/doctrine/DoctrineBundle/pull/1528 for now~
+
+---------------------------------------------------------------------------
+
+by stof at 2022-05-24T08:34:02Z
+
+To me, the best solution for that would be to implement `EntityManager::reset`, that would recreate a UnitOfWork and reopen the EntityManager, instead of having to replace the EntityManager instance itself. This way, an EntityManager could be reset safely in a long running process like a queue consumer, even in case an exception happens when handling one message.
+This would remove the need to use a proxy for the EntityManager (which was just a hacky way of making the EntityManager compatible with such use case).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-24T08:44:25Z
+
+What this mean @stof is that we cannot implement https://github.com/symfony/symfony/issues/35345 until ORM figured out a proper way to reset its state. Did I get you correctly?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-24T14:07:09Z
+
+I updated the PR to throw instead of ignoring. This shouldn't happen in practice since we don't generate ghost object proxies, but let's merge as a defensive measure.

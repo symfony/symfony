@@ -122,7 +122,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $this->services['bar3'] = $instance = new \BarCircular();
 
-        $a = ($this->services['foobar3'] ?? ($this->services['foobar3'] = new \FoobarCircular()));
+        $a = $this->services['foobar3'] ??= new \FoobarCircular();
 
         $instance->addFoobar($a, $a);
 

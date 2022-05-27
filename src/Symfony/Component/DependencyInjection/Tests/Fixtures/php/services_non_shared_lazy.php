@@ -65,7 +65,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService($lazyLoad = true)
     {
-        $this->factories['service_container']['foo'] = $this->factories['service_container']['foo'] ?? $this->getFooService(...);
+        $this->factories['service_container']['foo'] ??= $this->getFooService(...);
 
         // lazy factory for stdClass
 

@@ -19,7 +19,7 @@ class getNonSharedFooService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->factories['non_shared_foo'] = $container->factories['non_shared_foo'] ?? function () use ($container) {
+        $container->factories['non_shared_foo'] ??= function () use ($container) {
             return self::do($container);
         };
 

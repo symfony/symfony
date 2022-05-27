@@ -884,7 +884,7 @@ EOF;
 
             if ($isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition)) {
                 if (!$definition->isShared()) {
-                    $code .= sprintf('        %s = %1$s ?? ', $factory);
+                    $code .= sprintf('        %s ??= ', $factory);
 
                     if ($asFile) {
                         $code .= "function () {\n";
@@ -1953,7 +1953,7 @@ EOF;
                 }
                 $code = $this->addNewInstance($definition, '', $id);
                 if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
-                    $code = sprintf('$this->%s[%s] = %s', $definition->isPublic() ? 'services' : 'privates', $this->doExport($id), $code);
+                    return sprintf('$this->%s[%s] ??= %s', $definition->isPublic() ? 'services' : 'privates', $this->doExport($id), $code);
                 }
                 $code = "($code)";
             } else {

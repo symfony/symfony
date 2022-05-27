@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-05-23T08:11:41Z
+
+That's unfortunately too late, that will be for 6.2.
+There are many other such requirements we could add (and this one is not critical for the feature to be useful).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-05-25T18:26:12Z
+
+Alright then, rebased and added the proper note in the CHANGELOG.

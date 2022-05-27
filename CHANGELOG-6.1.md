@@ -7,6 +7,38 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.0 (2022-05-27)
+
+ * bug #46453 [PropertyInfo] Fix resolution of partially docblock covered constructors (ostrolucky)
+ * bug #46454 [ExpressionLanguage] Fix null-safe chaining (HypeMC)
+ * bug #46386 [Console]  Fix missing negative variation of negatable options in shell completion (GromNaN)
+ * bug #46387 [Console] Complete negatable options (Fish) (GromNaN)
+ * bug #46448 [DependencyInjection] Fix "proxy" tag: resolve its parameters and pass it to child definitions (nicolas-grekas)
+ * bug #46442 [FrameworkBundle] Revert "bug #46125  Always add CacheCollectorPass (fancyweb)" (chalasr)
+ * bug #46443 [DoctrineBridge] Don't reinit managers when they are proxied as ghost objects (nicolas-grekas)
+ * bug #46427 [FrameworkBundle] fix wiring of annotations.cached_reader (nicolas-grekas)
+ * bug #46425 [DependencyInjection] Ignore unused bindings defined by attribute (nicolas-grekas)
+ * bug #46434 [FrameworkBundle] Fix BC break in abstract config commands (yceruto)
+ * bug #46424 [Form] do not accept array input when a form is not multiple (xabbuh)
+ * bug #46367 [Mime] Throw exception when body in Email attach method is not ok (alamirault)
+ * bug #46421 [VarDumper][VarExporter] Deal with DatePeriod->include_end_date on PHP 8.2 (nicolas-grekas)
+ * bug #46401 [Cache] Throw when "redis_sentinel" is used with a non-Predis "class" option (buffcode)
+ * bug #46414 Bootstrap 4 fieldset for row errors (konradkozaczenko)
+ * bug #46412 [FrameworkBundle] Fix dumping extension config without bundle (yceruto)
+ * bug #46385 [HttpKernel] New bundle path convention when `AbstractBundle` is used (yceruto)
+ * bug #46382 [HttpClient] Honor "max_duration" when replacing requests with async decorators (nicolas-grekas)
+ * bug #46407 [Filesystem] Safeguard (sym)link calls (derrabus)
+ * bug #46098 [Form] Fix same choice loader with different choice values (HeahDude)
+ * bug #46380 [HttpClient] Add missing HttpOptions::setMaxDuration() (nicolas-grekas)
+ * bug #46377 [HttpKernel] Fix missing null type in `ErrorListener::__construct()` (chalasr)
+ * bug #46249 [HttpFoundation] [Session] Regenerate invalid session id (peter17)
+ * bug #46373 [HtmlSanitizer] Fix default config service definition (wouterj)
+ * bug #46328 [Config] Allow scalar configuration in PHP Configuration (jderusse, HypeMC)
+ * bug #46366 [Mime] Add null check for EmailHeaderSame (magikid)
+ * bug #46361 [PropertyInfo] Ignore empty doc-block for promoted properties in PhpStanExtractor (BoShurik)
+ * bug #46364 [Config] Fix looking for single files in phars with GlobResource (nicolas-grekas)
+ * bug #46365 [HttpKernel] Revert "bug #46327  Allow ErrorHandler ^5.0 to be used" (nicolas-grekas)
+
 * 6.1.0-RC1 (2022-05-14)
 
  * feature #46335 [Form][FrameworkBundle][TwigBundle] Add Twig filter, form-type extension and improve service definitions for HtmlSanitizer (nicolas-grekas)

@@ -239,6 +239,10 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $phpDocNode = $this->phpDocParser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
 
+        if (self::MUTATOR === $source && !$this->filterDocBlockParams($phpDocNode, $property)) {
+            return null;
+        }
+
         return [$phpDocNode, $source, $reflectionProperty->class];
     }
 

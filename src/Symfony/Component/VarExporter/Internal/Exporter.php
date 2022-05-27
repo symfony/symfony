@@ -72,7 +72,7 @@ class Exporter
             }
 
             $class = \get_class($value);
-            $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
+            $reflector = Registry::$reflectors[$class] ??= Registry::getClassReflector($class);
 
             if ($reflector->hasMethod('__serialize')) {
                 if (!$reflector->getMethod('__serialize')->isPublic()) {
@@ -108,7 +108,7 @@ class Exporter
                 $arrayValue = (array) $value;
             } elseif ($value instanceof \Serializable
                 || $value instanceof \__PHP_Incomplete_Class
-                || PHP_VERSION_ID < 80200 && $value instanceof \DatePeriod
+                || \PHP_VERSION_ID < 80200 && $value instanceof \DatePeriod
             ) {
                 ++$objectsCount;
                 $objectsPool[$value] = [$id = \count($objectsPool), serialize($value), [], 0];
@@ -372,7 +372,7 @@ class Exporter
     private static function getArrayObjectProperties($value, $proto): array
     {
         $reflector = $value instanceof \ArrayIterator ? 'ArrayIterator' : 'ArrayObject';
-        $reflector = Registry::$reflectors[$reflector] ?? Registry::getClassReflector($reflector);
+        $reflector = Registry::$reflectors[$reflector] ??= Registry::getClassReflector($reflector);
 
         $properties = [
             $arrayValue = (array) $value,

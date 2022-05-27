@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-25T10:49:33Z
+
+Does the psalm failure make sense to anyone?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-05-25T11:00:16Z
+
+This error is because Psalm sees the returned value as being of type `object`, and not as being of type `T` (it fails to see that the instantiation bypassing the constructor actually produces an instance of the class name passed as argument). Given the magic happening in that instantiation, I would say that this is totally fine (and won't be reported for next PRs, as our CI only reports *new* issues detecting by psalm, not all of them)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-27T09:56:45Z
+
+/cc @symfony/mergers this PR is ready and blocking #46458 if you have some time for a review :pray:

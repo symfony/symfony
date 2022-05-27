@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 class FirePHPHandler extends BaseFirePHPHandler
 {
     private array $headers = [];
-    private Response $response;
+    private ?Response $response = null;
 
     /**
      * Adds the headers to the response once it's created.
@@ -61,7 +61,7 @@ class FirePHPHandler extends BaseFirePHPHandler
             return;
         }
 
-        if ($this->response) {
+        if (null !== $this->response) {
             $this->response->headers->set($header, $content);
         } else {
             $this->headers[$header] = $content;

@@ -14,7 +14,7 @@ index d68ae4c8b3..8e980a9e70 100644
       * @return TestContainer
       */
 -    protected static function getContainer(): ContainerInterface
-+    protected static function getContainer(): TestContainer
++    protected static function getContainer(): Container
      {
          if (!static::$booted) {
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php

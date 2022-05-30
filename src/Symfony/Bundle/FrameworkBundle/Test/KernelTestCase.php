@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -83,7 +84,7 @@ abstract class KernelTestCase extends TestCase
      *
      * Using this method is the best way to get a container from your test code.
      *
-     * @return TestContainer
+     * @return Container
      */
     protected static function getContainer(): ContainerInterface
     {

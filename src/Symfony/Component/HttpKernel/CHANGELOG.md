@@ -7,6 +7,7 @@ CHANGELOG
  * Add constructor argument `bool $catchThrowable` to `HttpKernel`
  * Add `ControllerEvent::getAttributes()` to handle attributes on controllers
  * Add `#[Cache]` to describe the default HTTP cache headers on controllers
+ * Add `absolute_uri` option to surrogate fragment renderers
 
 6.1
 ---

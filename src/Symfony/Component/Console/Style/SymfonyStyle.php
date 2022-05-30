@@ -411,6 +411,13 @@ class SymfonyStyle extends OutputStyle
         return (new Table($output))->setStyle($style);
     }
 
+    public function hr(string $word = '─', string $format = '%s'): void
+    {
+        $line_width = (new Terminal())->getWidth() ?: self::MAX_LINE_LENGTH;
+        $line = str_repeat($word, $line_width / mb_strlen($word));
+        $this->output->writeln(sprintf($format, $line));
+    }
+
     private function getProgressBar(): ProgressBar
     {
         return $this->progressBar

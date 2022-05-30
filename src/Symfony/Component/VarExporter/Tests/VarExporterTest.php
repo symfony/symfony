@@ -131,7 +131,7 @@ class VarExporterTest extends TestCase
             new \DatePeriod($start, $interval, 4),
         ]];
 
-        $value = \PHP_VERSION_ID >= 70406 ? new ArrayObject() : new \ArrayObject();
+        $value = new ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * added `SymfonyStyle::hr() to render horizontal rulers`
+
 6.1
 ---
 

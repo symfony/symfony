@@ -165,4 +165,12 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     {
         return $this->serializer->supportsDecoding($format, $context);
     }
+
+    /**
+     * Proxies all method calls to the original serializer.
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        return $this->serializer->{$method}(...$arguments);
+    }
 }

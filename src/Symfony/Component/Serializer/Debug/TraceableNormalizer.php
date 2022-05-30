@@ -150,4 +150,12 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
     {
         return $this->normalizer instanceof CacheableSupportsMethodInterface && $this->normalizer->hasCacheableSupportsMethod();
     }
+
+    /**
+     * Proxies all method calls to the original normalizer.
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        return $this->normalizer->{$method}(...$arguments);
+    }
 }

@@ -17,7 +17,11 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CredentialsInterface;
 
 /**
- * The default implementation for passports.
+ * A Passport contains all security-related information that needs to be
+ * validated during authentication.
+ *
+ * A passport badge can be used to add any additional information to the
+ * passport.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
@@ -59,6 +63,12 @@ class Passport implements UserPassportInterface
     }
 
     /**
+     * Adds a new security badge.
+     *
+     * A passport can hold only one instance of the same security badge.
+     * This method replaces the current badge if it is already set on this
+     * passport.
+     *
      * @return $this
      */
     public function addBadge(BadgeInterface $badge): PassportInterface

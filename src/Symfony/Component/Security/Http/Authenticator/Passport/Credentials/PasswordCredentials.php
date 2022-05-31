@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\LogicException;
 /**
  * Implements password credentials.
  *
- * These plaintext passwords are checked by the UserPasswordEncoder during
+ * These plaintext passwords are checked by the UserPasswordHasher during
  * authentication.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>

@@ -121,4 +121,12 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
     {
         return !$this->encoder instanceof NormalizationAwareEncoder;
     }
+
+    /**
+     * Proxies all method calls to the original encoder.
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        return $this->encoder->{$method}(...$arguments);
+    }
 }

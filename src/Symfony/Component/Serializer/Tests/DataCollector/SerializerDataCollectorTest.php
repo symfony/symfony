@@ -276,6 +276,27 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertSame([], $dataCollector->getData());
     }
 
+    public function testDoNotCollectPartialTraces()
+    {
+        $dataCollector = new SerializerDataCollector();
+
+        $dataCollector->collectNormalization('traceIdOne', DateTimeNormalizer::class, 1.0);
+        $dataCollector->collectDenormalization('traceIdTwo', DateTimeNormalizer::class, 1.0);
+        $dataCollector->collectEncoding('traceIdThree', CsvEncoder::class, 10.0);
+        $dataCollector->collectDecoding('traceIdFour', JsonEncoder::class, 1.0);
+
+        $dataCollector->lateCollect();
+
+        $data = $dataCollector->getData();
+
+        $this->assertSame([], $data['serialize']);
+        $this->assertSame([], $data['deserialize']);
+        $this->assertSame([], $data['normalize']);
+        $this->assertSame([], $data['denormalize']);
+        $this->assertSame([], $data['encode']);
+        $this->assertSame([], $data['decode']);
+    }
+
     /**
      * Cast cloned vars to be able to test nested values.
      */

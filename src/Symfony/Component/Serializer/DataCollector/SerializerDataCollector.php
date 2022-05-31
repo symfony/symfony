@@ -179,6 +179,10 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
         ];
 
         foreach ($this->collected as $collected) {
+            if (!isset($collected['data'])) {
+                continue;
+            }
+
             $data = [
                 'data' => $this->cloneVar($collected['data']),
                 'dataType' => get_debug_type($collected['data']),

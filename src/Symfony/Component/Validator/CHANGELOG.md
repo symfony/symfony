@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate the "loose" e-mail validation mode, use "html5" instead
+
 6.1
 ---
 

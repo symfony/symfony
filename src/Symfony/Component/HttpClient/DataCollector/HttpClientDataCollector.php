@@ -197,7 +197,11 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
                 $dataArg[] = '--data '.escapeshellarg($body);
             } elseif (\is_array($body)) {
                 foreach ($body as $key => $value) {
-                    $dataArg[] = '--data '.escapeshellarg("$key=$value");
+                    if (\is_array($value)) {
+                        $dataArg[] = '--data '.urldecode(http_build_query($value));
+                    } else {
+                        $dataArg[] = '--data '.escapeshellarg("$key=$value");
+                    }
                 }
             } else {
                 return null;

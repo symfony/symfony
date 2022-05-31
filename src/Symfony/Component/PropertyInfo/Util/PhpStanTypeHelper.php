@@ -117,6 +117,10 @@ final class PhpStanTypeHelper
         if ($node instanceof GenericTypeNode) {
             [$mainType] = $this->extractTypes($node->type, $nameScope);
 
+            if (Type::BUILTIN_TYPE_INT === $mainType->getBuiltinType()) {
+                return [$mainType];
+            }
+
             $collectionKeyTypes = $mainType->getCollectionKeyTypes();
             $collectionKeyValues = [];
             if (1 === \count($node->genericTypes)) {

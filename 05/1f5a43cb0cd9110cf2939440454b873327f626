@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2022-05-31T11:56:39Z
+
+looks a good plan @javiereguiluz 👌
+
+Regarding a best solution: in #46495 you mention having the full URL as a title to be able to have it shown by hovering it.
+This is already the case: https://github.com/symfony/symfony/blob/f4361fb15c6a39a52315ad5d556d461e481349db/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/base_js.html.twig#L223

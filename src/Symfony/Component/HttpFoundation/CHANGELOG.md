@@ -6,7 +6,6 @@ CHANGELOG
 
  * Add stale while revalidate and stale if error cache header
  * Allow dynamic session "ttl" when using a remote storage
- * Send `Content-Length` when calling `Response::send()` and the content is a non-empty string
 
 6.0
 ---

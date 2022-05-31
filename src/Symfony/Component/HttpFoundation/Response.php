@@ -371,10 +371,6 @@ class Response
      */
     public function send(): static
     {
-        if (\is_string($this->content) && '' !== $this->content && !$this->headers->has('Transfer-Encoding')) {
-            $this->headers->set('Content-Length', \strlen($this->content));
-        }
-
         $this->sendHeaders();
         $this->sendContent();
 

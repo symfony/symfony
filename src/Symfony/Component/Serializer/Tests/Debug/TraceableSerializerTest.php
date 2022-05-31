@@ -145,10 +145,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'normalized';
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return true;
     }
@@ -158,10 +155,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'denormalized';
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return true;
     }
@@ -171,10 +165,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'encoded';
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsEncoding(string $format /*, array $context = [] */): bool
+    public function supportsEncoding(string $format, array $context = []): bool
     {
         return true;
     }
@@ -184,10 +175,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'decoded';
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDecoding(string $format /*, array $context = [] */): bool
+    public function supportsDecoding(string $format, array $context = []): bool
     {
         return true;
     }

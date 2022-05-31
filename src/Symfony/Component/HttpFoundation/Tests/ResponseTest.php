@@ -57,20 +57,6 @@ class ResponseTest extends ResponseTestCase
         $this->assertObjectHasAttribute('statusCode', $responseSent);
         $this->assertObjectHasAttribute('statusText', $responseSent);
         $this->assertObjectHasAttribute('charset', $responseSent);
-        $this->assertFalse($responseSent->headers->has('Content-Length'));
-
-        ob_start();
-
-        $response = new Response('foo');
-        $responseSent = $response->send();
-        $this->assertSame('3', $responseSent->headers->get('Content-Length'));
-
-        $response = new Response('bar');
-        $response->headers->set('Transfer-Encoding', 'chunked');
-        $responseSent = $response->send();
-        $this->assertFalse($responseSent->headers->has('Content-Length'));
-
-        $this->assertSame('foobar', ob_get_clean());
     }
 
     public function testGetCharset()

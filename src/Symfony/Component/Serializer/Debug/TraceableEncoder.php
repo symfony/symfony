@@ -55,16 +55,12 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
 
     /**
      * {@inheritDoc}
-     *
-     * @param array $context
      */
-    public function supportsEncoding(string $format /*, array $context = [] */): bool
+    public function supportsEncoding(string $format, array $context = []): bool
     {
         if (!$this->encoder instanceof EncoderInterface) {
             return false;
         }
-
-        $context = \func_num_args() > 1 ? func_get_arg(1) : [];
 
         return $this->encoder->supportsEncoding($format, $context);
     }
@@ -91,16 +87,12 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
 
     /**
      * {@inheritDoc}
-     *
-     * @param array $context
      */
-    public function supportsDecoding(string $format /*, array $context = [] */): bool
+    public function supportsDecoding(string $format, array $context = []): bool
     {
         if (!$this->encoder instanceof DecoderInterface) {
             return false;
         }
-
-        $context = \func_num_args() > 1 ? func_get_arg(1) : [];
 
         return $this->encoder->supportsDecoding($format, $context);
     }
@@ -120,5 +112,13 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
     public function needsNormalization(): bool
     {
         return !$this->encoder instanceof NormalizationAwareEncoder;
+    }
+
+    /**
+     * Proxies all method calls to the original encoder.
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        return $this->encoder->{$method}(...$arguments);
     }
 }

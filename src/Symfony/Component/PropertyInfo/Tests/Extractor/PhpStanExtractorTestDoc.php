@@ -438,6 +438,23 @@ class PhpStanExtractorTest extends TestCase
     }
 
     /**
+     * @dataProvider intRangeTypeProvider
+     */
+    public function testExtractorIntRangeType(string $property, ?array $types)
+    {
+        $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy', $property));
+    }
+
+    public function intRangeTypeProvider(): array
+    {
+        return [
+            ['a', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['b', [new Type(Type::BUILTIN_TYPE_INT, true)]],
+            ['c', [new Type(Type::BUILTIN_TYPE_INT)]],
+        ];
+    }
+
+    /**
      * @dataProvider php80TypesProvider
      */
     public function testExtractPhp80Type(string $class, $property, array $type = null)

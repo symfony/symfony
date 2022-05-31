@@ -401,6 +401,23 @@ class PhpStanExtractorTest extends TestCase
         $this->assertEquals('A\Property', $phpStanTypes[0]->getClassName());
         $this->assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
     }
+
+    /**
+     * @dataProvider intRangeTypeProvider
+     */
+    public function testExtractorIntRangeType(string $property, ?array $types)
+    {
+        $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy', $property));
+    }
+
+    public function intRangeTypeProvider(): array
+    {
+        return [
+            ['a', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['b', [new Type(Type::BUILTIN_TYPE_INT, true)]],
+            ['c', [new Type(Type::BUILTIN_TYPE_INT)]],
+        ];
+    }
 }
 
 class PhpStanOmittedParamTagTypeDocBlock

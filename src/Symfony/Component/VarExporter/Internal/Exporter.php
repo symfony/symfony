@@ -133,7 +133,7 @@ class Exporter
                 $i = 0;
                 $n = (string) $name;
                 if ('' === $n || "\0" !== $n[0]) {
-                    $c = \PHP_VERSION_ID >= 80100 && $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
+                    $c = $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
                 } elseif ('*' === $n[1]) {
                     $n = substr($n, 3);
                     $c = $reflector->getProperty($n)->class;

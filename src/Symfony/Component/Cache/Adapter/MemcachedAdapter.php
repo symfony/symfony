@@ -56,7 +56,7 @@ class MemcachedAdapter extends AbstractAdapter
     public function __construct(\Memcached $client, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
-            throw new CacheException('Memcached '.(\PHP_VERSION_ID >= 80100 ? '> 3.1.5' : '>= 2.2.0').' is required.');
+            throw new CacheException('Memcached > 3.1.5 is required.');
         }
         if ('Memcached' === \get_class($client)) {
             $opt = $client->getOption(\Memcached::OPT_SERIALIZER);
@@ -76,7 +76,7 @@ class MemcachedAdapter extends AbstractAdapter
 
     public static function isSupported()
     {
-        return \extension_loaded('memcached') && version_compare(phpversion('memcached'), \PHP_VERSION_ID >= 80100 ? '3.1.6' : '2.2.0', '>=');
+        return \extension_loaded('memcached') && version_compare(phpversion('memcached'), '3.1.6', '>=');
     }
 
     /**
@@ -100,7 +100,7 @@ class MemcachedAdapter extends AbstractAdapter
             throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, "%s" given.', get_debug_type($servers)));
         }
         if (!static::isSupported()) {
-            throw new CacheException('Memcached '.(\PHP_VERSION_ID >= 80100 ? '> 3.1.5' : '>= 2.2.0').' is required.');
+            throw new CacheException('Memcached > 3.1.5 is required.');
         }
         set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
         try {

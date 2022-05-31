@@ -233,30 +233,8 @@
         {% if required -%}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
         {%- endif -%}
-        {% if label is empty -%}
-            {%- if label_format is not empty -%}
-                {% set label = label_format|replace({
-                    '%name%': name,
-                    '%id%': id,
-                }) %}
-            {%- else -%}
-                {% set label = name|humanize %}
-            {%- endif -%}
-        {%- endif -%}
         <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
-        {%- if translation_domain is same as(false) -%}
-            {%- if label_html is same as(false) -%}
-                {{- label -}}
-            {%- else -%}
-                {{- label|raw -}}
-            {%- endif -%}
-        {%- else -%}
-            {%- if label_html is same as(false) -%}
-                {{- label|trans(label_translation_parameters, translation_domain) -}}
-            {%- else -%}
-                {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
-            {%- endif -%}
-        {%- endif -%}
+        {{- block('form_label_content') -}}
         {% block form_label_errors %}{{- form_errors(form) -}}{% endblock form_label_errors %}</{{ element|default('label') }}>
     {%- else -%}
         {%- if errors|length > 0 -%}
@@ -283,33 +261,11 @@
         {%- if required -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
         {%- endif -%}
-        {%- if label is not same as(false) and label is empty -%}
-            {%- if label_format is not empty -%}
-                {%- set label = label_format|replace({
-                    '%name%': name,
-                    '%id%': id,
-                }) -%}
-            {%- else -%}
-                {%- set label = name|humanize -%}
-            {%- endif -%}
-        {%- endif -%}
 
         {{ widget|raw }}
         <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if label is not same as(false) -%}
-                {%- if translation_domain is same as(false) -%}
-                    {%- if label_html is same as(false) -%}
-                        {{- label -}}
-                    {%- else -%}
-                        {{- label|raw -}}
-                    {%- endif -%}
-                {%- else -%}
-                    {%- if label_html is same as(false) -%}
-                        {{- label|trans(label_translation_parameters, translation_domain) -}}
-                    {%- else -%}
-                        {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
-                    {%- endif -%}
-                {%- endif -%}
+                {{- block('form_label_content') -}}
             {%- endif -%}
             {{- form_errors(form) -}}
         </label>
@@ -353,19 +309,7 @@
     {%- if help is not empty -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text text-muted')|trim}) -%}
         <small id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
-            {%- if translation_domain is same as(false) -%}
-                {%- if help_html is same as(false) -%}
-                    {{- help -}}
-                {%- else -%}
-                    {{- help|raw -}}
-                {%- endif -%}
-            {%- else -%}
-                {%- if help_html is same as(false) -%}
-                    {{- help|trans(help_translation_parameters, translation_domain) -}}
-                {%- else -%}
-                    {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
-                {%- endif -%}
-            {%- endif -%}
+            {{- block('form_help_content') -}}
         </small>
     {%- endif -%}
 {%- endblock form_help %}

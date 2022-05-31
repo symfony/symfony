@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `form_label_content` and `form_help_content` block to form themes
+
 6.1
 ---
 

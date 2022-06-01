@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-01T12:19:27Z
+
+(please check the ci failures)
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-06-01T12:21:17Z
+
+> (please check the ci failures)
+
+Not sure how to fix these errors because I've already updated all places.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-01T12:54:28Z
+
+Well, according to the CI failure, you haven't updated the XML test for that config
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-06-01T12:59:19Z
+
+> Well, according to the CI failure, you haven't updated the XML test for that config
+
+Found it, thanks :)

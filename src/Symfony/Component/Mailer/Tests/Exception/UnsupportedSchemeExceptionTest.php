@@ -38,10 +38,10 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             MailgunTransportFactory::class => false,
             MailjetTransportFactory::class => false,
             MandrillTransportFactory::class => false,
+            OhMySmtpTransportFactory::class => false,
             PostmarkTransportFactory::class => false,
             SendgridTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
-            OhMySmtpTransportFactory::class => false,
             SesTransportFactory::class => false,
         ]);
     }
@@ -65,10 +65,10 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['mailgun', 'symfony/mailgun-mailer'];
         yield ['mailjet', 'symfony/mailjet-mailer'];
         yield ['mandrill', 'symfony/mailchimp-mailer'];
+        yield ['ohmysmtp', 'symfony/oh-my-smtp-mailer'];
         yield ['postmark', 'symfony/postmark-mailer'];
         yield ['sendgrid', 'symfony/sendgrid-mailer'];
         yield ['sendinblue', 'symfony/sendinblue-mailer'];
-        yield ['ohmysmtp', 'symfony/oh-my-smtp-mailer'];
         yield ['ses', 'symfony/amazon-mailer'];
     }
 

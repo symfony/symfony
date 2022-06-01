@@ -61,7 +61,7 @@ class DataPart extends TextPart
             $contentType = self::$mimeTypes->getMimeTypes($ext)[0] ?? 'application/octet-stream';
         }
 
-        if (false === is_readable($path)) {
+        if (!is_file($path) || !is_readable($path)) {
             throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
         }
 

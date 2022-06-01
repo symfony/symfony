@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Tests\Part;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\IdentificationHeader;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
@@ -125,6 +126,12 @@ class DataPartTest extends TestCase
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
             new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'photo.gif', 'filename' => 'photo.gif'])
         ), $p->getPreparedHeaders());
+    }
+
+    public function testFromPathWithNotAFile()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        DataPart::fromPath(__DIR__.'/../Fixtures/mimetypes/');
     }
 
     public function testHasContentId()

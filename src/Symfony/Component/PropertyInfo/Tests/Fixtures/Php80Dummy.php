@@ -17,8 +17,9 @@ class Php80Dummy
 
     /**
      * @param string $promotedAndMutated
+     * @param array<string> $collection
      */
-    public function __construct(private mixed $promoted, private mixed $promotedAndMutated)
+    public function __construct(private mixed $promoted, private mixed $promotedAndMutated, private array $collection)
     {
     }
 

@@ -2682,8 +2682,8 @@ class FrameworkExtension extends Extension
                 $def->addMethodCall('allowSafeElements', [], true);
             }
 
-            if ($sanitizerConfig['allow_all_static_elements']) {
-                $def->addMethodCall('allowAllStaticElements', [], true);
+            if ($sanitizerConfig['allow_static_elements']) {
+                $def->addMethodCall('allowStaticElements', [], true);
             }
 
             // Configures elements

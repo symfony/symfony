@@ -2149,7 +2149,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('Allows "safe" elements and attributes.')
                                         ->defaultFalse()
                                     ->end()
-                                    ->booleanNode('allow_all_static_elements')
+                                    ->booleanNode('allow_static_elements')
                                         ->info('Allows all static elements and attributes from the W3C Sanitizer API standard.')
                                         ->defaultFalse()
                                     ->end()

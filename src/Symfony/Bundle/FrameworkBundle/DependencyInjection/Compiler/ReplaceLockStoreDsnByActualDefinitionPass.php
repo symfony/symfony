@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Lock\Store\StoreFactory;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Replaces aliases passed to lock store factory with actual service definitions.
@@ -29,19 +29,19 @@ class ReplaceLockStoreDsnByActualDefinitionPass implements CompilerPassInterface
             $factory = $definition->getFactory();
 
             if (
-                $factory === null ||
-                $factory[0] !== StoreFactory::class
+                null === $factory ||
+                StoreFactory::class !== $factory[0]
             ) {
                 continue;
             }
 
             $connection = $definition->getArgument(0);
 
-            if (!is_string($connection)) {
+            if (!\is_string($connection)) {
                 continue;
             }
 
-            if (!$connection[0] === '@') {
+            if ('@' === !$connection[0]) {
                 continue;
             }
 

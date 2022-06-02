@@ -21,11 +21,12 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
     private ContainerInterface $container;
+    /** @var \Traversable<EnvVarLoaderInterface> */
     private \Traversable $loaders;
     private array $loadedVars = [];
 
     /**
-     * @param EnvVarLoaderInterface[] $loaders
+     * @param \Traversable<EnvVarLoaderInterface>|null $loaders
      */
     public function __construct(ContainerInterface $container, \Traversable $loaders = null)
     {
@@ -56,6 +57,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'string' => 'string',
             'trim' => 'string',
             'require' => 'bool|int|float|string|array',
+            'enum' => \BackedEnum::class,
         ];
     }
 
@@ -86,6 +88,26 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return $array[$key];
         }
 
+        if ('enum' === $prefix) {
+            if (false === $i) {
+                throw new RuntimeException(sprintf('Invalid env "enum:%s": a "%s" class-string should be provided.', $name, \BackedEnum::class));
+            }
+
+            $next = substr($name, $i + 1);
+            $backedEnumClassName = substr($name, 0, $i);
+            $backedEnumValue = $getEnv($next);
+
+            if (!\is_string($backedEnumValue) && !\is_int($backedEnumValue)) {
+                throw new RuntimeException(sprintf('Resolved value of "%s" did not result in a string or int value.', $next));
+            }
+
+            if (!is_subclass_of($backedEnumClassName, \BackedEnum::class)) {
+                throw new RuntimeException(sprintf('"%s" is not a "%s".', $backedEnumClassName, \BackedEnum::class));
+            }
+
+            return $backedEnumClassName::tryFrom($backedEnumValue) ?? throw new RuntimeException(sprintf('Enum value "%s" is not backed by "%s".', $backedEnumValue, $backedEnumClassName));
+        }
+
         if ('default' === $prefix) {
             if (false === $i) {
                 throw new RuntimeException(sprintf('Invalid env "default:%s": a fallback parameter should be provided.', $name));
@@ -112,7 +134,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('file' === $prefix || 'require' === $prefix) {
-            if (!is_scalar($file = $getEnv($name))) {
+            if (!\is_scalar($file = $getEnv($name))) {
                 throw new RuntimeException(sprintf('Invalid file name: env var "%s" is non-scalar.', $name));
             }
             if (!is_file($file)) {
@@ -184,7 +206,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return null;
         }
 
-        if (!is_scalar($env)) {
+        if (!\is_scalar($env)) {
             throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to "%s".', $name, $prefix));
         }
 
@@ -283,7 +305,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                     $value = $this->container->getParameter($match[1]);
                 }
 
-                if (!is_scalar($value)) {
+                if (!\is_scalar($value)) {
                     throw new RuntimeException(sprintf('Parameter "%s" found when resolving env var "%s" must be scalar, "%s" given.', $match[1], $name, get_debug_type($value)));
                 }
 

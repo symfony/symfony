@@ -1539,7 +1539,7 @@ EOF;
             $export = $this->exportParameters([$value], '', 12, $hasEnum);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
-            if ($hasEnum || preg_match("/\\\$this->(?:getEnv\('(?:[-.\w]*+:)*+\w++'\)|targetDir\.'')/", $export[1])) {
+            if ($hasEnum || preg_match("/\\\$this->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w++'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
             } else {
                 $php[] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
@@ -1952,7 +1952,7 @@ EOF;
                 return $dumpedValue;
             }
 
-            if (!preg_match("/\\\$this->(?:getEnv\('(?:[-.\w]*+:)*+\w++'\)|targetDir\.'')/", $dumpedValue)) {
+            if (!preg_match("/\\\$this->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w++'\)|targetDir\.'')/", $dumpedValue)) {
                 return sprintf('$this->parameters[%s]', $this->doExport($name));
             }
         }

@@ -24,8 +24,9 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0);
-        $dataCollector->collectDeserialize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 1.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
+        $dataCollector->collectDeserialize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 1.0, $caller);
 
         $dataCollector->lateCollect();
         $collectedData = $this->castCollectedData($dataCollector->getData());
@@ -39,6 +40,7 @@ class SerializerDataCollectorTest extends TestCase
             'context' => ['foo' => 'bar'],
             'normalization' => [],
             'encoding' => [],
+            'caller' => $caller,
         ]], $collectedData['serialize']);
 
         $this->assertSame([[
@@ -50,6 +52,7 @@ class SerializerDataCollectorTest extends TestCase
             'context' => ['foo' => 'bar'],
             'normalization' => [],
             'encoding' => [],
+            'caller' => $caller,
         ]], $collectedData['deserialize']);
     }
 
@@ -57,8 +60,9 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectNormalize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0);
-        $dataCollector->collectDenormalize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 1.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+        $dataCollector->collectNormalize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
+        $dataCollector->collectDenormalize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 1.0, $caller);
 
         $dataCollector->lateCollect();
         $collectedData = $this->castCollectedData($dataCollector->getData());
@@ -72,6 +76,7 @@ class SerializerDataCollectorTest extends TestCase
             'context' => ['foo' => 'bar'],
             'normalization' => [],
             'encoding' => [],
+            'caller' => $caller,
         ]], $collectedData['normalize']);
 
         $this->assertSame([[
@@ -83,6 +88,7 @@ class SerializerDataCollectorTest extends TestCase
             'context' => ['foo' => 'bar'],
             'normalization' => [],
             'encoding' => [],
+            'caller' => $caller,
         ]], $collectedData['denormalize']);
     }
 
@@ -90,8 +96,9 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectEncode('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0);
-        $dataCollector->collectDecode('traceIdTwo', 'data', 'format', ['foo' => 'bar'], 1.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+        $dataCollector->collectEncode('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
+        $dataCollector->collectDecode('traceIdTwo', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
 
         $dataCollector->lateCollect();
         $collectedData = $this->castCollectedData($dataCollector->getData());
@@ -105,6 +112,7 @@ class SerializerDataCollectorTest extends TestCase
             'context' => ['foo' => 'bar'],
             'normalization' => [],
             'encoding' => [],
+            'caller' => $caller,
         ]], $collectedData['encode']);
 
         $this->assertSame([[
@@ -116,6 +124,7 @@ class SerializerDataCollectorTest extends TestCase
             'context' => ['foo' => 'bar'],
             'normalization' => [],
             'encoding' => [],
+            'caller' => $caller,
         ]], $collectedData['decode']);
     }
 
@@ -123,8 +132,9 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectNormalize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 20.0);
-        $dataCollector->collectDenormalize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 20.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+        $dataCollector->collectNormalize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 20.0, $caller);
+        $dataCollector->collectDenormalize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 20.0, $caller);
 
         $dataCollector->collectNormalization('traceIdOne', DateTimeNormalizer::class, 1.0);
         $dataCollector->collectNormalization('traceIdOne', DateTimeNormalizer::class, 2.0);
@@ -178,8 +188,9 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectEncode('traceIdOne', 'data', 'format', ['foo' => 'bar'], 20.0);
-        $dataCollector->collectDecode('traceIdTwo', 'data', 'format', ['foo' => 'bar'], 20.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+        $dataCollector->collectEncode('traceIdOne', 'data', 'format', ['foo' => 'bar'], 20.0, $caller);
+        $dataCollector->collectDecode('traceIdTwo', 'data', 'format', ['foo' => 'bar'], 20.0, $caller);
 
         $dataCollector->collectEncoding('traceIdOne', JsonEncoder::class, 1.0);
         $dataCollector->collectEncoding('traceIdOne', JsonEncoder::class, 2.0);
@@ -233,13 +244,14 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0);
-        $dataCollector->collectDeserialize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 1.0);
-        $dataCollector->collectNormalize('traceIdThree', 'data', 'format', ['foo' => 'bar'], 20.0);
-        $dataCollector->collectDenormalize('traceIdFour', 'data', 'type', 'format', ['foo' => 'bar'], 20.0);
-        $dataCollector->collectEncode('traceIdFive', 'data', 'format', ['foo' => 'bar'], 20.0);
-        $dataCollector->collectDecode('traceIdSix', 'data', 'format', ['foo' => 'bar'], 20.0);
-        $dataCollector->collectSerialize('traceIdSeven', 'data', 'format', ['foo' => 'bar'], 1.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
+        $dataCollector->collectDeserialize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 1.0, $caller);
+        $dataCollector->collectNormalize('traceIdThree', 'data', 'format', ['foo' => 'bar'], 20.0, $caller);
+        $dataCollector->collectDenormalize('traceIdFour', 'data', 'type', 'format', ['foo' => 'bar'], 20.0, $caller);
+        $dataCollector->collectEncode('traceIdFive', 'data', 'format', ['foo' => 'bar'], 20.0, $caller);
+        $dataCollector->collectDecode('traceIdSix', 'data', 'format', ['foo' => 'bar'], 20.0, $caller);
+        $dataCollector->collectSerialize('traceIdSeven', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
 
         $dataCollector->lateCollect();
 
@@ -250,13 +262,15 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0);
-        $dataCollector->collectDeserialize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 2.0);
-        $dataCollector->collectNormalize('traceIdThree', 'data', 'format', ['foo' => 'bar'], 3.0);
-        $dataCollector->collectDenormalize('traceIdFour', 'data', 'type', 'format', ['foo' => 'bar'], 4.0);
-        $dataCollector->collectEncode('traceIdFive', 'data', 'format', ['foo' => 'bar'], 5.0);
-        $dataCollector->collectDecode('traceIdSix', 'data', 'format', ['foo' => 'bar'], 6.0);
-        $dataCollector->collectSerialize('traceIdSeven', 'data', 'format', ['foo' => 'bar'], 7.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+
+        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
+        $dataCollector->collectDeserialize('traceIdTwo', 'data', 'type', 'format', ['foo' => 'bar'], 2.0, $caller);
+        $dataCollector->collectNormalize('traceIdThree', 'data', 'format', ['foo' => 'bar'], 3.0, $caller);
+        $dataCollector->collectDenormalize('traceIdFour', 'data', 'type', 'format', ['foo' => 'bar'], 4.0, $caller);
+        $dataCollector->collectEncode('traceIdFive', 'data', 'format', ['foo' => 'bar'], 5.0, $caller);
+        $dataCollector->collectDecode('traceIdSix', 'data', 'format', ['foo' => 'bar'], 6.0, $caller);
+        $dataCollector->collectSerialize('traceIdSeven', 'data', 'format', ['foo' => 'bar'], 7.0, $caller);
 
         $dataCollector->lateCollect();
 
@@ -267,7 +281,8 @@ class SerializerDataCollectorTest extends TestCase
     {
         $dataCollector = new SerializerDataCollector();
 
-        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0);
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+        $dataCollector->collectSerialize('traceIdOne', 'data', 'format', ['foo' => 'bar'], 1.0, $caller);
         $dataCollector->lateCollect();
 
         $this->assertNotSame([], $dataCollector->getData());

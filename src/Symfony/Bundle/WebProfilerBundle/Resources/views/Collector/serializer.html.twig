@@ -188,7 +188,9 @@
 {% macro render_normalizer_cell(item, index, method) %}
     {% set nested_normalizers_id = 'nested-normalizers-' ~ method ~ '-' ~ index %}
 
+    {% if item.normalizer is defined %}
     <span class="nowrap"><a href="{{ item.normalizer.file|file_link(item.normalizer.line) }}" title="{{ item.normalizer.file }}">{{ item.normalizer.class }}</a> ({{ '%.2f'|format(item.normalizer.time * 1000) }} ms)</span>
+    {% endif %}
 
     {% if item.normalization|length > 1 %}
         <div>
@@ -207,7 +209,9 @@
 {% macro render_encoder_cell(item, index, method) %}
     {% set nested_encoders_id = 'nested-encoders-' ~ method ~ '-' ~ index %}
 
+    {% if item.encoder is defined %}
     <span class="nowrap"><a href="{{ item.encoder.file|file_link(item.encoder.line) }}" title="{{ item.encoder.file }}">{{ item.encoder.class }}</a> ({{ '%.2f'|format(item.encoder.time * 1000) }} ms)</span>
+    {% endif %}
 
     {% if item.encoding|length > 1 %}
         <div>

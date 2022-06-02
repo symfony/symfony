@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -21,9 +22,11 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class EmailValidatorTest extends ConstraintValidatorTestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function createValidator()
     {
-        return new EmailValidator(Email::VALIDATION_MODE_LOOSE);
+        return new EmailValidator(Email::VALIDATION_MODE_HTML5);
     }
 
     public function testUnknownDefaultModeTriggerException()
@@ -76,6 +79,24 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ['fabien@symfony.com'],
             ['example@example.co.uk'],
             ['fabien_potencier@example.fr'],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getValidEmails
+     * @dataProvider getEmailsOnlyValidInLooseMode
+     */
+    public function testValidInLooseModeEmails($email)
+    {
+        $this->validator->validate($email, new Email(['mode' => Email::VALIDATION_MODE_LOOSE]));
+
+        $this->assertNoViolation();
+    }
+
+    public function getEmailsOnlyValidInLooseMode()
+    {
+        return [
             ['example@example.co..uk'],
             ['{}~!@!@£$%%^&*().!@£$%^&*()'],
             ['example@example.co..uk'],
@@ -98,11 +119,29 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ["\x20example@example.co.uk\x20"],
+            ["example@example.com\x0B\x0B"],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getValidEmailsWithWhitespaces
+     * @dataProvider getEmailsWithWhitespacesOnlyValidInLooseMode
+     */
+    public function testValidNormalizedEmailsInLooseMode($email)
+    {
+        $this->validator->validate($email, new Email(['mode' => Email::VALIDATION_MODE_LOOSE, 'normalizer' => 'trim']));
+
+        $this->assertNoViolation();
+    }
+
+    public function getEmailsWithWhitespacesOnlyValidInLooseMode()
+    {
+        return [
             ["\x09\x09example@example.co..uk\x09\x09"],
             ["\x0A{}~!@!@£$%%^&*().!@£$%^&*()\x0A"],
             ["\x0D\x0Dexample@example.co..uk\x0D\x0D"],
             ["\x00example@-example.com"],
-            ["example@example.com\x0B\x0B"],
         ];
     }
 
@@ -214,8 +253,13 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
              ->assertRaised();
     }
 
+    /**
+     * @group legacy
+     */
     public function testModeLoose()
     {
+        $this->expectDeprecation('Since symfony/validator 6.2: The "loose" mode is deprecated. The default mode will be changed to "html5" in 7.0.');
+
         $constraint = new Email(['mode' => Email::VALIDATION_MODE_LOOSE]);
 
         $this->validator->validate('example@example..com', $constraint);

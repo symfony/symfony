@@ -30,7 +30,7 @@ class CollectionType extends AbstractType
             $prototypeOptions = array_replace([
                 'required' => $options['required'],
                 'label' => $options['prototype_name'].'label__',
-            ], $options['entry_options']);
+            ], array_replace($options['entry_options'], $options['prototype_options']));
 
             if (null !== $options['prototype_data']) {
                 $prototypeOptions['data'] = $options['prototype_data'];
@@ -120,6 +120,7 @@ class CollectionType extends AbstractType
             'prototype_name' => '__name__',
             'entry_type' => TextType::class,
             'entry_options' => [],
+            'prototype_options' => [],
             'delete_empty' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true)
@@ -130,6 +131,7 @@ class CollectionType extends AbstractType
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
+        $resolver->setAllowedTypes('prototype_options', 'array');
     }
 
     /**

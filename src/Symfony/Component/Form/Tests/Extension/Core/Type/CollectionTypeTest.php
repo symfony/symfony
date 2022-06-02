@@ -515,6 +515,23 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
+    public function testPrototypeOptionsOverrideEntryOptions()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'entry_options' => [
+                'help' => null,
+            ],
+            'prototype_options' => [
+                'help' => 'foo',
+            ],
+        ]);
+
+        $this->assertSame('foo', $form->createView()->vars['prototype']->vars['help']);
+    }
+
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull([], [], []);

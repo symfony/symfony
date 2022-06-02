@@ -7,6 +7,11 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+
+* 5.4.10 (2022-06-02)
+
+ * Add a `prototype_options` option to `CollectionType`
+
 * 5.4.9 (2022-05-27)
 
  * bug #46386 [Console]  Fix missing negative variation of negatable options in shell completion (GromNaN)

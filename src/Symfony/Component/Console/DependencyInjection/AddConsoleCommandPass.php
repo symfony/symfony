@@ -55,7 +55,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 if (!$r->isSubclassOf(Command::class)) {
                     throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, $this->commandTag, Command::class));
                 }
-                $commandName = $class::getDefaultName();
+                $commandName = $class::getDefaultName() !== null ? str_replace('%', '%%', $class::getDefaultName()) : null;
             }
 
             if (null === $commandName) {

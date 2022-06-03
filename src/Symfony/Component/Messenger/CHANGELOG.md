@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add new `messenger:stats` command that return a list of transports with their "to be processed" message count.
+
 6.1
 ---
 

@@ -108,6 +108,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
@@ -503,6 +504,7 @@ class FrameworkExtension extends Extension
             $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
+            $container->removeDefinition('console.command.messenger_stats');
             $container->removeDefinition('console.command.messenger_debug');
             $container->removeDefinition('console.command.messenger_stop_workers');
             $container->removeDefinition('console.command.messenger_setup_transports');
@@ -1964,6 +1966,10 @@ class FrameworkExtension extends Extension
     {
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
+        }
+
+        if (!class_exists(StatsCommand::class)) {
+            $container->removeDefinition('console.command.messenger_stats');
         }
 
         $loader->load('messenger.php');

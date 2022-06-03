@@ -1898,7 +1898,7 @@ class FrameworkExtension extends Extension
             // Generate stores
             $storeDefinitions = [];
             foreach ($resourceStores as $resourceStore) {
-                if (is_string($resourceStore) && !empty($resourceStore) && $resourceStore[0] === '@') {
+                if (\is_string($resourceStore) && !empty($resourceStore) && '@' === $resourceStore[0]) {
                     $storeDsn = new Reference(substr($resourceStore, 1));
                 } else {
                     $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);

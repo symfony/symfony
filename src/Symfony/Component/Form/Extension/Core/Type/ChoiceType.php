@@ -121,6 +121,13 @@ class ChoiceType extends AbstractType
                     $data = (array) (string) $data;
                 }
 
+                // Remove null values
+                foreach ($data as $key => $value) {
+                    if (null === $value) {
+                        unset($data[$key]);
+                    }
+                }
+
                 // A map from submitted values to integers
                 $valueMap = array_flip($data);
 

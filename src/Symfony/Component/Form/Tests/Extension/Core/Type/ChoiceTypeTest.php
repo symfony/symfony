@@ -2200,4 +2200,17 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('20', $view['choice_two']->vars['choices'][1]->value);
         $this->assertSame('30', $view['choice_two']->vars['choices'][2]->value);
     }
+
+    public function testArrayFlipDoesNotThrowErrorOnNullInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => ['test'],
+        ]);
+
+        $form->submit([null]);
+
+        $this->assertSame([], $form->getData());
+    }
 }

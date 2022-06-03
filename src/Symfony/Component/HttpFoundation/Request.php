@@ -134,22 +134,22 @@ class Request
     protected $content;
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $languages;
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $charsets;
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $encodings;
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $acceptableContentTypes;
 
@@ -199,7 +199,7 @@ class Request
     protected $defaultLocale = 'en';
 
     /**
-     * @var array
+     * @var array<string, string[]>
      */
     protected static $formats;
 
@@ -578,6 +578,8 @@ class Request
 
     /**
      * Gets the list of trusted proxies.
+     *
+     * @return string[]
      */
     public static function getTrustedProxies(): array
     {
@@ -612,6 +614,8 @@ class Request
 
     /**
      * Gets the list of trusted host patterns.
+     *
+     * @return string[]
      */
     public static function getTrustedHosts(): array
     {
@@ -1246,6 +1250,8 @@ class Request
 
     /**
      * Gets the mime types associated with the format.
+     *
+     * @return string[]
      */
     public static function getMimeTypes(string $format): array
     {
@@ -1285,7 +1291,7 @@ class Request
     /**
      * Associates a format with mime types.
      *
-     * @param string|array $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
+     * @param string|string[] $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
      */
     public function setFormat(?string $format, string|array $mimeTypes)
     {
@@ -1568,6 +1574,8 @@ class Request
 
     /**
      * Gets a list of languages acceptable by the client browser ordered in the user browser preferences.
+     *
+     * @return string[]
      */
     public function getLanguages(): array
     {
@@ -1606,6 +1614,8 @@ class Request
 
     /**
      * Gets a list of charsets acceptable by the client browser in preferable order.
+     *
+     * @return string[]
      */
     public function getCharsets(): array
     {
@@ -1618,6 +1628,8 @@ class Request
 
     /**
      * Gets a list of encodings acceptable by the client browser in preferable order.
+     *
+     * @return string[]
      */
     public function getEncodings(): array
     {
@@ -1630,6 +1642,8 @@ class Request
 
     /**
      * Gets a list of content types acceptable by the client browser in preferable order.
+     *
+     * @return string[]
      */
     public function getAcceptableContentTypes(): array
     {

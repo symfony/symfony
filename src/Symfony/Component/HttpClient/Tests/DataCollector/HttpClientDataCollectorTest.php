@@ -343,6 +343,28 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertNull($curlCommand);
     }
 
+    /**
+     * @requires extension openssl
+     */
+    public function testItDoesNotGeneratesCurlCommandsForNotEncodableBody()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'body' => "\0",
+                ],
+            ],
+        ]));
+        $sut->collect(new Request(), new Response());
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNull($curlCommand);
+    }
+
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient
     {
         $httpClient = new TraceableHttpClient(new NativeHttpClient());

@@ -20,7 +20,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTra
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ReplaceLockStoreDsnByActualDefinitionPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SessionPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
@@ -161,7 +160,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new RemoveUnusedSessionMarshallingHandlerPass());
         $container->addCompilerPass(new SessionPass());
-        $container->addCompilerPass(new ReplaceLockStoreDsnByActualDefinitionPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);

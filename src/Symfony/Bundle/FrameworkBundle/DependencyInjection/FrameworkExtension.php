@@ -1898,10 +1898,15 @@ class FrameworkExtension extends Extension
             // Generate stores
             $storeDefinitions = [];
             foreach ($resourceStores as $resourceStore) {
-                $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+                if (is_string($resourceStore) && !empty($resourceStore) && $resourceStore[0] === '@') {
+                    $storeDsn = new Reference(substr($resourceStore, 1));
+                } else {
+                    $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+                }
+
                 $storeDefinition = new Definition(interface_exists(StoreInterface::class) ? StoreInterface::class : PersistingStoreInterface::class);
                 $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
-                $storeDefinition->setArguments([$resourceStore]);
+                $storeDefinition->setArguments([$storeDsn]);
 
                 $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 

@@ -107,6 +107,7 @@ class XmlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+        $this->assertFalse($attributesMetadata['notIgnored']->isIgnored());
     }
 
     protected function getLoaderForContextMapping(): LoaderInterface

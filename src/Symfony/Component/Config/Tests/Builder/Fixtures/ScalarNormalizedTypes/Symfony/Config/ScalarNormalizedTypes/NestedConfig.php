@@ -10,14 +10,18 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This class is automatically generated to help in creating a config.
  */
-class NestedConfig 
+class NestedConfig
 {
     private $nestedObject;
     private $nestedListObject;
     private $_usedProperties = [];
 
     /**
+     * @template T
+     * @psalm-param T $value
+     *
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|$this
+     * @psalm-return (T is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig : static)
      */
     public function nestedObject($value = [])
     {
@@ -39,7 +43,11 @@ class NestedConfig
     }
 
     /**
+     * @template T
+     * @psalm-param T $value
+     *
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|$this
+     * @psalm-return (T is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig : static)
      */
     public function nestedListObject($value = [])
     {

@@ -143,7 +143,11 @@ public function NAME(): string
         );
         $body = $hasNormalizationClosures ? '
 /**
+ * @template T
+ * @psalm-param T $value
+ *
  * @return CLASS|$this
+ * @psalm-return (T is array ? CLASS : static)
  */
 public function NAME($value = [])
 {
@@ -262,7 +266,11 @@ public function NAME(string $VAR, $VALUE): self
         if (null === $key = $node->getKeyAttribute()) {
             $body = $hasNormalizationClosures ? '
 /**
+ * @template T
+ * @psalm-param T $value
+ *
  * @return CLASS|$this
+ * @psalm-return (T is array ? CLASS : static)
  */
 public function NAME($value = [])
 {
@@ -285,7 +293,11 @@ public function NAME(array $value = []): CLASS
         } else {
             $body = $hasNormalizationClosures ? '
 /**
+ * @template T
+ * @psalm-param T $value
+ *
  * @return CLASS|$this
+ * @psalm-return (T is array ? CLASS : static)
  */
 public function NAME(string $VAR, $VALUE = [])
 {

@@ -48,7 +48,11 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template T
+     * @psalm-param T $value
+     *
      * @return \Symfony\Config\ScalarNormalizedTypes\ObjectConfig|$this
+     * @psalm-return (T is array ? \Symfony\Config\ScalarNormalizedTypes\ObjectConfig : static)
      */
     public function object($value = [])
     {
@@ -70,7 +74,11 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template T
+     * @psalm-param T $value
+     *
      * @return \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|$this
+     * @psalm-return (T is array ? \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig : static)
      */
     public function listObject($value = [])
     {
@@ -85,7 +93,11 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template T
+     * @psalm-param T $value
+     *
      * @return \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|$this
+     * @psalm-return (T is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig : static)
      */
     public function keyedListObject(string $class, $value = [])
     {

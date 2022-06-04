@@ -173,6 +173,7 @@ abstract class CompleteConfigurationTest extends TestCase
                     'target' => '/',
                     'invalidate_session' => true,
                     'delete_cookies' => [],
+                    'enable_csrf' => null,
                 ],
             ],
             [

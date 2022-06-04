@@ -210,10 +210,23 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('logout')
                 ->treatTrueLike([])
                 ->canBeUnset()
+                ->beforeNormalization()
+                    ->ifTrue(fn ($v): bool => \is_array($v) && (isset($v['csrf_token_generator']) xor isset($v['enable_csrf'])))
+                    ->then(function (array $v): array {
+                        if (isset($v['csrf_token_generator'])) {
+                            $v['enable_csrf'] = true;
+                        } elseif ($v['enable_csrf']) {
+                            $v['csrf_token_generator'] = 'security.csrf.token_generator';
+                        }
+
+                        return $v;
+                    })
+                ->end()
                 ->children()
-                    ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
-                    ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
+                    ->booleanNode('enable_csrf')->defaultNull()->end()
                     ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
+                    ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
+                    ->scalarNode('csrf_token_generator')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
                     ->booleanNode('invalidate_session')->defaultTrue()->end()

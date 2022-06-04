@@ -177,6 +177,7 @@
         <xsd:attribute name="csrf-parameter" type="xsd:string" />
         <xsd:attribute name="csrf-token-generator" type="xsd:string" />
         <xsd:attribute name="csrf-token-id" type="xsd:string" />
+        <xsd:attribute name="enable-csrf" type="xsd:boolean" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="target" type="xsd:string" />
         <xsd:attribute name="invalidate-session" type="xsd:boolean" />

@@ -426,7 +426,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
             // add CSRF provider
-            if (isset($firewall['logout']['csrf_token_generator'])) {
+            if ($firewall['logout']['enable_csrf']) {
                 $logoutListener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 

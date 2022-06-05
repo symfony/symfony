@@ -51,6 +51,12 @@ class BackedEnumValueResolver implements ArgumentValueResolverInterface
             return;
         }
 
+        if ($value instanceof \BackedEnum) {
+            yield $value;
+
+            return;
+        }
+
         if (!\is_int($value) && !\is_string($value)) {
             throw new \LogicException(sprintf('Could not resolve the "%s $%s" controller argument: expecting an int or string, got %s.', $argument->getType(), $argument->getName(), get_debug_type($value)));
         }

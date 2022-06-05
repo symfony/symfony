@@ -2,6 +2,65 @@
 
 {% import _self as helper %}
 
+{% block toolbar %}
+    {% if collector.handledCount > 0 or collector.calls|length %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/serializer.svg') }}
+            <span class="sf-toolbar-value">
+                {{ collector.handledCount }}
+            </span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Total calls</b>
+                <span class="sf-toolbar-status">{{ collector.handledCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Total time</b>
+                <span>
+                    {{ '%.2f'|format(collector.totalTime * 1000) }} <span class="unit">ms</span>
+                </span>
+            </div>
+
+            <div class="detailed-metrics">
+                <div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Serialize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.serialize|length }}</span>
+                    </div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Deserialize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.deserialize|length }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Encode</b>
+                        <span class="sf-toolbar-status">{{ collector.data.encode|length }}</span>
+                    </div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Decode</b>
+                        <span class="sf-toolbar-status">{{ collector.data.decode|length }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Normalize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.normalize|length }}</span>
+                    </div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Denormalize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.denormalize|length }}</span>
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+    {% endif %}
+{% endblock %}
+
 {% block menu %}
     <span class="label {{ not collector.handledCount ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/serializer.svg') }}</span>

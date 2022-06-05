@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * A base class to make form login authentication easier!
@@ -50,7 +50,7 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         if ($request->hasSession()) {
-            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+            $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
         }
 
         $url = $this->getLoginUrl($request);

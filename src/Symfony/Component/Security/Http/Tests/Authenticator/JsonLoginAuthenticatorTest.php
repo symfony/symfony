@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -121,7 +121,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": 1}');
         yield [$request, 'The key "password" must be a string.'];
 
-        $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
+        $username = str_repeat('x', AuthenticatorInterface::MAX_USERNAME_LENGTH + 1);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": 1}', $username));
         yield [$request, 'Invalid username.', BadCredentialsException::class];
     }

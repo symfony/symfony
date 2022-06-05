@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\RateLimiter;
 use Symfony\Component\HttpFoundation\RateLimiter\AbstractRequestRateLimiter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * A default login throttling limiter.
@@ -37,7 +37,7 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 
     protected function getLimiters(Request $request): array
     {
-        $username = $request->attributes->get(Security::LAST_USERNAME, '');
+        $username = $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME, '');
         $username = preg_match('//u', $username) ? mb_strtolower($username, 'UTF-8') : strtolower($username);
 
         return [

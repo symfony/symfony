@@ -9,20 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Core\Tests;
+namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security\Security;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
-/**
- * @group legacy
- */
 class SecurityTest extends TestCase
 {
     public function testGetToken()
@@ -84,15 +82,8 @@ class SecurityTest extends TestCase
         $this->assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
     }
 
-    private function createContainer($serviceId, $serviceObject)
+    private function createContainer(string $serviceId, object $serviceObject): ContainerInterface
     {
-        $container = $this->createMock(ContainerInterface::class);
-
-        $container->expects($this->atLeastOnce())
-            ->method('get')
-            ->with($serviceId)
-            ->willReturn($serviceObject);
-
-        return $container;
+        return new ServiceLocator([$serviceId => fn () => $serviceObject]);
     }
 }

@@ -49,7 +49,9 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         $result = $this->serializer->serialize($data, $format, $context);
         $time = microtime(true) - $startTime;
 
-        $this->dataCollector->collectSerialize($traceId, $data, $format, $context, $time);
+        $caller = $this->getCaller(__FUNCTION__, SerializerInterface::class);
+
+        $this->dataCollector->collectSerialize($traceId, $data, $format, $context, $time, $caller);
 
         return $result;
     }
@@ -65,7 +67,9 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         $result = $this->serializer->deserialize($data, $type, $format, $context);
         $time = microtime(true) - $startTime;
 
-        $this->dataCollector->collectDeserialize($traceId, $data, $type, $format, $context, $time);
+        $caller = $this->getCaller(__FUNCTION__, SerializerInterface::class);
+
+        $this->dataCollector->collectDeserialize($traceId, $data, $type, $format, $context, $time, $caller);
 
         return $result;
     }
@@ -81,7 +85,9 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         $result = $this->serializer->normalize($object, $format, $context);
         $time = microtime(true) - $startTime;
 
-        $this->dataCollector->collectNormalize($traceId, $object, $format, $context, $time);
+        $caller = $this->getCaller(__FUNCTION__, NormalizerInterface::class);
+
+        $this->dataCollector->collectNormalize($traceId, $object, $format, $context, $time, $caller);
 
         return $result;
     }
@@ -97,7 +103,9 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         $result = $this->serializer->denormalize($data, $type, $format, $context);
         $time = microtime(true) - $startTime;
 
-        $this->dataCollector->collectDenormalize($traceId, $data, $type, $format, $context, $time);
+        $caller = $this->getCaller(__FUNCTION__, DenormalizerInterface::class);
+
+        $this->dataCollector->collectDenormalize($traceId, $data, $type, $format, $context, $time, $caller);
 
         return $result;
     }
@@ -113,7 +121,9 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         $result = $this->serializer->encode($data, $format, $context);
         $time = microtime(true) - $startTime;
 
-        $this->dataCollector->collectEncode($traceId, $data, $format, $context, $time);
+        $caller = $this->getCaller(__FUNCTION__, EncoderInterface::class);
+
+        $this->dataCollector->collectEncode($traceId, $data, $format, $context, $time, $caller);
 
         return $result;
     }
@@ -129,7 +139,9 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         $result = $this->serializer->decode($data, $format, $context);
         $time = microtime(true) - $startTime;
 
-        $this->dataCollector->collectDecode($traceId, $data, $format, $context, $time);
+        $caller = $this->getCaller(__FUNCTION__, DecoderInterface::class);
+
+        $this->dataCollector->collectDecode($traceId, $data, $format, $context, $time, $caller);
 
         return $result;
     }
@@ -172,5 +184,30 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     public function __call(string $method, array $arguments): mixed
     {
         return $this->serializer->{$method}(...$arguments);
+    }
+
+    private function getCaller(string $method, string $interface): array
+    {
+        $trace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 8);
+
+        $file = $trace[0]['file'];
+        $line = $trace[0]['line'];
+
+        for ($i = 1; $i < 8; ++$i) {
+            if (isset($trace[$i]['class'], $trace[$i]['function'])
+                && $method === $trace[$i]['function']
+                && is_a($trace[$i]['class'], $interface, true)
+            ) {
+                $file = $trace[$i]['file'];
+                $line = $trace[$i]['line'];
+
+                break;
+            }
+        }
+
+        $name = str_replace('\\', '/', $file);
+        $name = substr($name, strrpos($name, '/') + 1);
+
+        return compact('name', 'file', 'line');
     }
 }

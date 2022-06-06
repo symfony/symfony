@@ -95,6 +95,12 @@ class BackedEnumValueResolverTest extends TestCase
             ),
             [null],
         ];
+
+        yield 'already resolved attribute value' => [
+            self::createRequest(['suit' => Suit::Hearts]),
+            self::createArgumentMetadata('suit', Suit::class),
+            [Suit::Hearts],
+        ];
     }
 
     public function testResolveThrowsNotFoundOnInvalidValue()

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `Security` helper class
+ * Deprecate the `Symfony\Component\Security\Core\Security` service alias, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
 
 6.1
 ---

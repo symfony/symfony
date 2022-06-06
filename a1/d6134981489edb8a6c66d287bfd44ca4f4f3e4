@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-06-06T16:50:20Z
+
+You still get a `TypeError` with the patch, isn't it?
+Answer: no, I made the new class extends the deprecated one.

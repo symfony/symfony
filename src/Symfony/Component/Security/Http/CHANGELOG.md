@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate `RememberMeHandler` not implementing `getUserIdentifierForCookie()`; `AbstractRememberMeHandler` has a default implementation
+ * Deprecate `RememberMeHandler` not implementing `getRememberMeDetails()`; `AbstractRememberMeHandler` has a default implementation
+ * Add `getRememberMeDetails()` method to `Symfony\Component\Security\Http\RememberMe\AbstractRememberMeHandler`
+ * Add `getUserIdentifierForCookie()` method to `Symfony\Component\Security\Http\RememberMe\AbstractRememberMeHandler`
+
 6.0
 ---
 

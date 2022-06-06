@@ -31,7 +31,11 @@ class RememberMeAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
+        $this->rememberMeHandler = $this->getMockBuilder(RememberMeHandlerInterface::class)
+            ->onlyMethods(get_class_methods(RememberMeHandlerInterface::class))
+            ->addMethods(['getRememberMeDetails', 'getUserIdentifierForCookie'])
+            ->getMock();
+
         $this->tokenStorage = new TokenStorage();
         $this->authenticator = new RememberMeAuthenticator($this->rememberMeHandler, 's3cr3t', $this->tokenStorage, '_remember_me_cookie');
     }
@@ -67,6 +71,15 @@ class RememberMeAuthenticatorTest extends TestCase
     {
         $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 1, 'secret');
         $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => $rememberMeDetails->toString()]);
+
+        $this->rememberMeHandler->expects($this->once())->method('getRememberMeDetails')
+            ->with($rememberMeDetails->toString())
+            ->willReturn($rememberMeDetails);
+
+        $this->rememberMeHandler->expects($this->once())->method('getUserIdentifierForCookie')
+            ->with($rememberMeDetails)
+            ->willReturn('wouter');
+
         $passport = $this->authenticator->authenticate($request);
 
         $this->rememberMeHandler->expects($this->once())->method('consumeRememberMeCookie')->with($this->callback(function ($arg) use ($rememberMeDetails) {
@@ -86,7 +99,46 @@ class RememberMeAuthenticatorTest extends TestCase
     {
         $this->expectException(AuthenticationException::class);
 
-        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
+        $encodedData = base64_encode('foo:bar');
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => $encodedData]);
+
+        $this->rememberMeHandler->expects($this->once())->method('getRememberMeDetails')->with($encodedData)->willThrowException(new AuthenticationException());
         $this->authenticator->authenticate($request);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testAuthenticateDeprecatedCodePath()
+    {
+        $mock = $this->getMockBuilder(RememberMeHandlerInterface::class)
+            ->getMock();
+
+        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 1, 'secret');
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => $rememberMeDetails->toString()]);
+
+        $authenticator = new RememberMeAuthenticator($mock, 's3cr3t', $this->tokenStorage, '_remember_me_cookie');
+        $passport = $authenticator->authenticate($request);
+
+        $mock->expects($this->once())->method('consumeRememberMeCookie')->with($this->callback(function ($arg) use ($rememberMeDetails) {
+            return $rememberMeDetails == $arg;
+        }));
+        $passport->getUser(); // trigger the user loader
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testAuthenticateWithoutOldTokenDeprecatedCodePath()
+    {
+        $mock = $this->getMockBuilder(RememberMeHandlerInterface::class)
+            ->getMock();
+
+        $this->expectException(AuthenticationException::class);
+
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
+
+        $authenticator = new RememberMeAuthenticator($mock, 's3cr3t', $this->tokenStorage, '_remember_me_cookie');
+        $authenticator->authenticate($request);
     }
 }

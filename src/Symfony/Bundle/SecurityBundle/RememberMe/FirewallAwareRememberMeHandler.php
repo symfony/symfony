@@ -51,4 +51,9 @@ final class FirewallAwareRememberMeHandler implements RememberMeHandlerInterface
     {
         $this->getForFirewall()->clearRememberMeCookie();
     }
+
+    public function getUserIdentifierForCookie(RememberMeDetails $rememberMeDetails): string
+    {
+        return $this->getForFirewall()->getUserIdentifierForCookie($rememberMeDetails);
+    }
 }

@@ -20,13 +20,14 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Patrick Elshof <tyrelcher@protonmail.com>
  */
 abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 {
     private UserProviderInterface $userProvider;
-    protected $requestStack;
-    protected $options;
-    protected $logger;
+    protected RequestStack $requestStack;
+    protected array $options;
+    protected ?LoggerInterface $logger;
 
     public function __construct(UserProviderInterface $userProvider, RequestStack $requestStack, array $options = [], LoggerInterface $logger = null)
     {
@@ -87,6 +88,29 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
         $this->logger?->debug('Clearing remember-me cookie.', ['name' => $this->options['name']]);
 
         $this->createCookie(null);
+    }
+
+    /**
+     * Retrieves the User Identifier for the RememberMe cookie.
+     *
+     * If the cookie is required to contain the User Identifier {@see UserInterface::getUserIdentifier()}
+     * then it can simply be retrieved from the provided cookie details; if not, then it could be retrieved
+     * from elsewhere based on some other information provided (e.g. in a database).
+     */
+    public function getUserIdentifierForCookie(RememberMeDetails $rememberMeDetails): string
+    {
+        return $rememberMeDetails->getUserIdentifier();
+    }
+
+    /**
+     * Retrieves the RememberMeDetails using the raw cookie.
+     *
+     * This method allows the authenticator to retrieve the cookie details without needing
+     * to care about the implementation details used by the RememberMeHandler.
+     */
+    public function getRememberMeDetails(string $rawCookie): RememberMeDetails
+    {
+        return RememberMeDetails::fromRawCookie($rawCookie);
     }
 
     /**

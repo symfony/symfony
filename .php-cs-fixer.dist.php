@@ -1,8 +1,26 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 if (!file_exists(__DIR__.'/src')) {
     exit(0);
 }
+
+$fileHeaderComment = <<<'EOF'
+This file is part of the Symfony package.
+
+(c) Fabien Potencier <fabien@symfony.com>
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+EOF;
 
 return (new PhpCsFixer\Config())
     ->setRules([
@@ -11,7 +29,9 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'protected_to_private' => false,
+        'native_constant_invocation' => ['strict' => false],
         'nullable_type_declaration_for_default_null_value' => ['use_nullable_type_declaration' => false],
+        'header_comment' => ['header' => $fileHeaderComment],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(
@@ -27,6 +47,7 @@ return (new PhpCsFixer\Config())
                 'Symfony/Bundle/FrameworkBundle/Resources/views/Form',
                 // explicit trigger_error tests
                 'Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/',
+                'Symfony/Component/Intl/Resources/data/',
             ])
             // Support for older PHPunit version
             ->notPath('Symfony/Bridge/PhpUnit/SymfonyTestsListener.php')
@@ -40,6 +61,8 @@ return (new PhpCsFixer\Config())
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom/_name_entry_label.html.php')
             // explicit trigger_error tests
             ->notPath('Symfony/Component/ErrorHandler/Tests/DebugClassLoaderTest.php')
+            // stop removing spaces on the end of the line in strings
+            ->notPath('Symfony/Component/Messenger/Tests/Command/FailedMessagesShowCommandTest.php')
     )
     ->setCacheFile('.php-cs-fixer.cache')
 ;

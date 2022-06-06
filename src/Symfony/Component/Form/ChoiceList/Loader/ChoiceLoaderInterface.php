@@ -34,7 +34,7 @@ interface ChoiceLoaderInterface
      * @param callable|null $value The callable which generates the values
      *                             from choices
      *
-     * @return ChoiceListInterface The loaded choice list
+     * @return ChoiceListInterface
      */
     public function loadChoiceList(callable $value = null);
 
@@ -52,7 +52,7 @@ interface ChoiceLoaderInterface
      *                              values in this array are ignored
      * @param callable|null $value  The callable generating the choice values
      *
-     * @return array An array of choices
+     * @return array
      */
     public function loadChoicesForValues(array $values, callable $value = null);
 
@@ -70,7 +70,7 @@ interface ChoiceLoaderInterface
      *                               this array are ignored
      * @param callable|null $value   The callable generating the choice values
      *
-     * @return string[] An array of choice values
+     * @return string[]
      */
     public function loadValuesForChoices(array $choices, callable $value = null);
 }

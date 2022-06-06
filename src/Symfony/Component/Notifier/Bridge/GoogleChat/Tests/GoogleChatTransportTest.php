@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoogleChat\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatOptions;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransport;
@@ -22,23 +21,25 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class GoogleChatTransportTest extends TestCase
+final class GoogleChatTransportTest extends TransportTestCase
 {
     /**
      * @return GoogleChatTransport
      */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $threadKey = null): TransportInterface
     {
-        return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $client ?? $this->createMock(HttpClientInterface::class));
+        return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
     {
         yield ['googlechat://chat.googleapis.com/My-Space', $this->createTransport()];
+        yield ['googlechat://chat.googleapis.com/My-Space?thread_key=abcdefg', $this->createTransport(null, 'abcdefg')];
     }
 
     public function supportedMessagesProvider(): iterable
@@ -125,8 +126,7 @@ final class GoogleChatTransportTest extends TestCase
             return $response;
         });
 
-        $transport = $this->createTransport($client);
-        $transport->setThreadKey('My-Thread');
+        $transport = $this->createTransport($client, 'My-Thread');
 
         $sentMessage = $transport->send(new ChatMessage('testMessage'));
 

@@ -25,11 +25,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class CachePoolPruneCommand extends Command
 {
     protected static $defaultName = 'cache:pool:prune';
+    protected static $defaultDescription = 'Prune cache pools';
 
     private $pools;
 
     /**
-     * @param iterable|PruneableInterface[] $pools
+     * @param iterable<mixed, PruneableInterface> $pools
      */
     public function __construct(iterable $pools)
     {
@@ -44,7 +45,7 @@ final class CachePoolPruneCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Prune cache pools')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command deletes all expired items from all pruneable pools.
 

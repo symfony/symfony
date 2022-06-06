@@ -66,8 +66,6 @@ final class Intl
 
     /**
      * Returns whether the intl extension is installed.
-     *
-     * @return bool Returns true if the intl extension is installed, false otherwise
      */
     public static function isExtensionLoaded(): bool
     {
@@ -76,8 +74,6 @@ final class Intl
 
     /**
      * Returns the version of the installed ICU library.
-     *
-     * @return string|null The ICU version or NULL if it could not be determined
      */
     public static function getIcuVersion(): ?string
     {
@@ -106,8 +102,6 @@ final class Intl
 
     /**
      * Returns the version of the installed ICU data.
-     *
-     * @return string The version of the installed ICU data
      */
     public static function getIcuDataVersion(): string
     {
@@ -120,18 +114,14 @@ final class Intl
 
     /**
      * Returns the ICU version that the stub classes mimic.
-     *
-     * @return string The ICU version of the stub classes
      */
     public static function getIcuStubVersion(): string
     {
-        return '68.2';
+        return '71.1';
     }
 
     /**
      * Returns the absolute path to the data directory.
-     *
-     * @return string The absolute path to the data directory
      */
     public static function getDataDirectory(): string
     {

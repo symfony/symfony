@@ -76,18 +76,24 @@ class HttpCache extends BaseHttpCache
     /**
      * Returns an array of options to customize the Cache configuration.
      *
-     * @return array An array of options
+     * @return array
      */
     protected function getOptions()
     {
         return [];
     }
 
+    /**
+     * @return SurrogateInterface
+     */
     protected function createSurrogate()
     {
         return $this->surrogate ?? new Esi();
     }
 
+    /**
+     * @return StoreInterface
+     */
     protected function createStore()
     {
         return $this->store ?? new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');

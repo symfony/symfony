@@ -18,8 +18,6 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 class ChatChannel extends AbstractChannel
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LockedException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
@@ -32,6 +32,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
+ * @group legacy
  */
 class GuardAuthenticationListenerTest extends TestCase
 {
@@ -258,7 +259,7 @@ class GuardAuthenticationListenerTest extends TestCase
     public function exceptionsToHide()
     {
         return [
-            [new UsernameNotFoundException()],
+            [new UserNotFoundException()],
             [new LockedException()],
         ];
     }
@@ -323,7 +324,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $this->guardAuthenticatorHandler = $this->createMock(GuardAuthenticatorHandler::class);
         $this->request = new Request([], [], [], [], [], []);
 
-        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MASTER_REQUEST);
+        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->rememberMeServices = $this->createMock(RememberMeServicesInterface::class);

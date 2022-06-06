@@ -37,7 +37,29 @@
         <xsd:element name="services" type="services" />
         <xsd:group ref="foreign" />
       </xsd:sequence>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="when" type="when" />
+      </xsd:sequence>
     </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="when">
+    <xsd:sequence>
+      <xsd:group ref="foreign" />
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="imports" type="imports" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="parameters" type="parameters" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="services" type="services" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+    </xsd:sequence>
+    <xsd:attribute name="env" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:group name="foreign">

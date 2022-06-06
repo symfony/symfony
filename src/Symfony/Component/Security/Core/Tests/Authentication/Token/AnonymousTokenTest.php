@@ -14,15 +14,21 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
+/**
+ * @group legacy
+ */
 class AnonymousTokenTest extends TestCase
 {
     public function testConstructor()
     {
-        $token = new AnonymousToken('foo', 'bar');
-        $this->assertTrue($token->isAuthenticated());
-
         $token = new AnonymousToken('foo', 'bar', ['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+    }
+
+    public function testIsAuthenticated()
+    {
+        $token = new AnonymousToken('foo', 'bar');
+        $this->assertTrue($token->isAuthenticated());
     }
 
     public function testGetKey()

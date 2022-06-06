@@ -15,12 +15,16 @@ use Monolog\Handler\SwiftMailerHandler as BaseSwiftMailerHandler;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
+trigger_deprecation('symfony/monolog-bridge', '5.4', '"%s" is deprecated and will be removed in 6.0.', SwiftMailerHandler::class);
+
 /**
  * Extended SwiftMailerHandler that flushes mail queue if necessary.
  *
  * @author Philipp Kräutli <pkraeutli@astina.ch>
  *
  * @final
+ *
+ * @deprecated since Symfony 5.4
  */
 class SwiftMailerHandler extends BaseSwiftMailerHandler
 {

@@ -7,7 +7,7 @@
 
     <framework:config>
         <framework:serializer enabled="true" />
-        <framework:messenger>
+        <framework:messenger reset-on-message="true">
             <framework:serializer default-serializer="messenger.transport.symfony_serializer">
                 <framework:symfony-serializer format="csv">
                     <framework:context>

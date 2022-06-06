@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
@@ -43,7 +44,7 @@ trait TraceableListenerTrait
         return [
             'response' => $this->response,
             'time' => $this->time,
-            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener),
+            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener instanceof TraceableAuthenticatorManagerListener ? $this->listener->getAuthenticatorManagerListener() : $this->listener),
         ];
     }
 }

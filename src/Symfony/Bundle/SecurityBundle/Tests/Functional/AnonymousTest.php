@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+/**
+ * @group legacy
+ */
 class AnonymousTest extends AbstractWebTestCase
 {
     public function testAnonymous()

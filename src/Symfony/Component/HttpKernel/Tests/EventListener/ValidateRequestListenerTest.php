@@ -27,7 +27,7 @@ class ValidateRequestListenerTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function testListenerThrowsWhenMasterRequestHasInconsistentClientIps()
+    public function testListenerThrowsWhenMainRequestHasInconsistentClientIps()
     {
         $this->expectException(ConflictingHeadersException::class);
         $dispatcher = new EventDispatcher();
@@ -40,7 +40,7 @@ class ValidateRequestListenerTest extends TestCase
         $request->headers->set('X_FORWARDED_FOR', '3.3.3.3');
 
         $dispatcher->addListener(KernelEvents::REQUEST, [new ValidateRequestListener(), 'onKernelRequest']);
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $dispatcher->dispatch($event, KernelEvents::REQUEST);
     }

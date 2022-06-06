@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -62,6 +71,22 @@ class EnvVarProcessorTest extends TestCase
         });
 
         $this->assertSame($processed, $result);
+    }
+
+    /**
+     * @dataProvider validBools
+     */
+    public function testGetEnvNot($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('not', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame(!$processed, $result);
     }
 
     public function validBools()
@@ -491,6 +516,109 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
+     * @dataProvider validResolve
+     */
+    public function testGetEnvResolve($value, $processed)
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('bar', $value);
+        $container->compile();
+
+        $processor = new EnvVarProcessor($container);
+
+        $result = $processor->getEnv('resolve', 'foo', function () {
+            return '%bar%';
+        });
+
+        $this->assertSame($processed, $result);
+    }
+
+    public function validResolve()
+    {
+        return [
+            ['string', 'string'],
+            [1, '1'],
+            [1.1, '1.1'],
+            [true, '1'],
+            [false, ''],
+        ];
+    }
+
+    public function testGetEnvResolveNoMatch()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('resolve', 'foo', function () {
+            return '%%';
+        });
+
+        $this->assertSame('%', $result);
+    }
+
+    /**
+     * @dataProvider notScalarResolve
+     */
+    public function testGetEnvResolveNotScalar($value)
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter "bar" found when resolving env var "foo" must be scalar');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('bar', $value);
+        $container->compile();
+
+        $processor = new EnvVarProcessor($container);
+
+        $processor->getEnv('resolve', 'foo', function () {
+            return '%bar%';
+        });
+    }
+
+    public function notScalarResolve()
+    {
+        return [
+            [null],
+            [[]],
+        ];
+    }
+
+    public function testGetEnvResolveNestedEnv()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(BAR)', 'BAR in container');
+        $container->compile();
+
+        $processor = new EnvVarProcessor($container);
+        $getEnv = \Closure::fromCallable([$processor, 'getEnv']);
+
+        $result = $processor->getEnv('resolve', 'foo', function ($name) use ($getEnv) {
+            return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
+        });
+
+        $this->assertSame('BAR in container', $result);
+    }
+
+    public function testGetEnvResolveNestedRealEnv()
+    {
+        $_ENV['BAR'] = 'BAR in environment';
+
+        $container = new ContainerBuilder();
+        $container->setParameter('env(BAR)', 'BAR in container');
+        $container->compile();
+
+        $processor = new EnvVarProcessor($container);
+        $getEnv = \Closure::fromCallable([$processor, 'getEnv']);
+
+        $result = $processor->getEnv('resolve', 'foo', function ($name) use ($getEnv) {
+            return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
+        });
+
+        $this->assertSame('BAR in environment', $result);
+
+        unset($_ENV['BAR']);
+    }
+
+    /**
      * @dataProvider validCsv
      */
     public function testGetEnvCsv($value, $processed)
@@ -624,8 +752,8 @@ CSV;
     public function provideGetEnvUrlPath()
     {
         return [
-            [null, 'https://symfony.com'],
-            [null, 'https://symfony.com/'],
+            ['', 'https://symfony.com'],
+            ['', 'https://symfony.com/'],
             ['/', 'https://symfony.com//'],
             ['blog', 'https://symfony.com/blog'],
             ['blog/', 'https://symfony.com/blog/'],

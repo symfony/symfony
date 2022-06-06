@@ -49,36 +49,42 @@ return static function (ContainerConfigurator $container) {
         ->set('routing.loader.xml', XmlFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.yml', YamlFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.php', PhpFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.glob', GlobFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.directory', DirectoryLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.container', ContainerLoader::class)
             ->args([
                 tagged_locator('routing.route_loader'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 

@@ -24,6 +24,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FormValidator extends ConstraintValidator
 {
+    /**
+     * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>>
+     */
     private $resolvedGroups;
 
     /**
@@ -110,7 +113,7 @@ class FormValidator extends ConstraintValidator
                 foreach ($constraints as $constraint) {
                     // For the "Valid" constraint, validate the data in all groups
                     if ($constraint instanceof Valid) {
-                        if (\is_object($data)) {
+                        if (\is_object($data) || \is_array($data)) {
                             $validator->atPath('data')->validate($data, $constraint, $groups);
                         }
 
@@ -203,7 +206,7 @@ class FormValidator extends ConstraintValidator
     /**
      * Returns the validation groups of the given form.
      *
-     * @return string|GroupSequence|array<string|GroupSequence> The validation groups
+     * @return string|GroupSequence|array<string|GroupSequence>
      */
     private function getValidationGroups(FormInterface $form)
     {
@@ -244,7 +247,7 @@ class FormValidator extends ConstraintValidator
      *
      * @param string|GroupSequence|array<string|GroupSequence>|callable $groups The validation groups
      *
-     * @return GroupSequence|array<string|GroupSequence> The validation groups
+     * @return GroupSequence|array<string|GroupSequence>
      */
     private static function resolveValidationGroups($groups, FormInterface $form)
     {

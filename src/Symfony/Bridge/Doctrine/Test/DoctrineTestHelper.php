@@ -24,6 +24,8 @@ use PHPUnit\Framework\TestCase;
  * Provides utility functions needed in tests.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since Symfony 5.3
  */
 class DoctrineTestHelper
 {
@@ -36,6 +38,10 @@ class DoctrineTestHelper
     {
         if (!\extension_loaded('pdo_sqlite')) {
             TestCase::markTestSkipped('Extension pdo_sqlite is required.');
+        }
+
+        if (__CLASS__ === static::class) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);
         }
 
         if (null === $config) {
@@ -55,6 +61,10 @@ class DoctrineTestHelper
      */
     public static function createTestConfiguration()
     {
+        if (__CLASS__ === static::class) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);
+        }
+
         $config = new Configuration();
         $config->setEntityNamespaces(['SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures']);
         $config->setAutoGenerateProxyClasses(true);
@@ -70,6 +80,10 @@ class DoctrineTestHelper
      */
     public static function createTestConfigurationWithXmlLoader()
     {
+        if (__CLASS__ === static::class) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);
+        }
+
         $config = static::createTestConfiguration();
 
         $driverChain = new MappingDriverChain();

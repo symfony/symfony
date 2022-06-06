@@ -13,14 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Unique;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class UniqueTest extends TestCase
 {
+    /**
+     * @requires PHP 8
+     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(UniqueDummy::class);
@@ -34,6 +35,23 @@ class UniqueTest extends TestCase
         [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
+
+        [$dConstraint] = $metadata->properties['d']->getConstraints();
+        self::assertSame('intval', $dConstraint->normalizer);
+    }
+
+    public function testInvalidNormalizerThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
+        new Unique(['normalizer' => 'Unknown Callable']);
+    }
+
+    public function testInvalidNormalizerObjectThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
+        new Unique(['normalizer' => new \stdClass()]);
     }
 }
 
@@ -47,4 +65,7 @@ class UniqueDummy
 
     #[Unique(groups: ['my_group'], payload: 'some attached data')]
     private $c;
+
+    #[Unique(normalizer: 'intval')]
+    private $d;
 }

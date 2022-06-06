@@ -18,13 +18,13 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/polyfill-php80": "^1.16",
-        "symfony/security-core": "^4.4|^5.0"
+        "symfony/security-core": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "^4.4|^5.0"
+        "symfony/http-foundation": "^5.3|^6.0"
     },
     "conflict": {
-        "symfony/http-foundation": "<4.4"
+        "symfony/http-foundation": "<5.3"
     },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."

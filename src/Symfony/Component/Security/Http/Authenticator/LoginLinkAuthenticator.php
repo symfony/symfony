@@ -28,7 +28,6 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- * @experimental in 5.2
  */
 final class LoginLinkAuthenticator extends AbstractAuthenticator implements InteractiveAuthenticatorInterface
 {

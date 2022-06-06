@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Component\Lock\Exception\InvalidArgumentException;
-use Symfony\Component\Lock\Key;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PostgreSqlStore;
 
@@ -21,10 +20,12 @@ use Symfony\Component\Lock\Store\PostgreSqlStore;
  *
  * @requires extension pdo_pgsql
  * @group integration
+ * @group legacy
  */
 class PostgreSqlDbalStoreTest extends AbstractStoreTest
 {
     use BlockingStoreTestTrait;
+    use ExpectDeprecationTrait;
     use SharedLockStoreTestTrait;
 
     /**
@@ -36,15 +37,8 @@ class PostgreSqlDbalStoreTest extends AbstractStoreTest
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
+        $this->expectDeprecation('Since symfony/lock 5.4: Usage of a DBAL Connection with "Symfony\Component\Lock\Store\PostgreSqlStore" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore" instead.');
+
         return new PostgreSqlStore('pgsql://postgres:password@'.getenv('POSTGRES_HOST'));
-    }
-
-    public function testInvalidDriver()
-    {
-        $store = new PostgreSqlStore('sqlite:///foo.db');
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The adapter "Symfony\Component\Lock\Store\PostgreSqlStore" does not support');
-        $store->exists(new Key('foo'));
     }
 }

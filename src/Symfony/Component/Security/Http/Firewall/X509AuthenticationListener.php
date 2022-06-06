@@ -18,10 +18,14 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', X509AuthenticationListener::class);
+
 /**
  * X509 authentication listener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class X509AuthenticationListener extends AbstractPreAuthenticatedListener
 {

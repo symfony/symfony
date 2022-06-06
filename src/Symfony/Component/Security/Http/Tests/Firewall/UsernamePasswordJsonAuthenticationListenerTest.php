@@ -33,6 +33,8 @@ use Symfony\Component\Translation\Translator;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @group legacy
  */
 class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 {
@@ -77,7 +79,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
     {
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertEquals('ok', $event->getResponse()->getContent());
@@ -88,7 +90,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->createListener();
         $request = new Request([], [], [], [], [], [], '{"username": "dunglas", "password": "foo"}');
         $request->setRequestFormat('json-ld');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertEquals('ok', $event->getResponse()->getContent());
@@ -98,7 +100,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
     {
         $this->createListener([], false, true, false);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertSame(['error' => 'An authentication exception occurred.'], json_decode($event->getResponse()->getContent(), true));
@@ -114,7 +116,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->listener->setTranslator($translator);
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertSame(['error' => 'foo'], json_decode($event->getResponse()->getContent(), true));
@@ -124,7 +126,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
     {
         $this->createListener(['username_path' => 'user.login', 'password_path' => 'user.pwd']);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"user": {"login": "dunglas", "pwd": "foo"}}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertEquals('ok', $event->getResponse()->getContent());
@@ -137,7 +139,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->createListener();
         $request = new Request();
         $request->setRequestFormat('json');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
     }
@@ -148,7 +150,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->expectExceptionMessage('The key "username" must be provided');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"usr": "dunglas", "password": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
     }
@@ -159,7 +161,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->expectExceptionMessage('The key "password" must be provided');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "pass": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
     }
@@ -170,7 +172,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->expectExceptionMessage('The key "username" must be a string.');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": 1, "password": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
     }
@@ -181,7 +183,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->expectExceptionMessage('The key "password" must be a string.');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": 1}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
     }
@@ -191,7 +193,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->createListener();
         $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": 1}', $username));
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertSame('ko', $event->getResponse()->getContent());
@@ -201,7 +203,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
     {
         $this->createListener(['check_path' => '/'], true, false);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json']);
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
         $event->setResponse(new Response('original'));
 
         ($this->listener)($event);
@@ -212,7 +214,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
     {
         $this->createListener();
         $request = new Request([], [], [], [], [], [], '{"username": "dunglas", "password": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
         $event->setResponse(new Response('original'));
 
         ($this->listener)($event);
@@ -223,7 +225,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
     {
         $this->createListener(['check_path' => '/']);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertSame('ok', $event->getResponse()->getContent());
@@ -234,7 +236,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
         $this->configurePreviousSession($request);
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         ($this->listener)($event);
         $this->assertEquals('ok', $event->getResponse()->getContent());
@@ -245,7 +247,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
         $this->configurePreviousSession($request);
-        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MAIN_REQUEST);
 
         $sessionStrategy = $this->createMock(SessionAuthenticationStrategyInterface::class);
         $sessionStrategy->expects($this->once())

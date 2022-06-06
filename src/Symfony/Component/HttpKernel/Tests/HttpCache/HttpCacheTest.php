@@ -156,7 +156,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('store');
     }
 
-    public function testRespondsWith304OnlyIfIfNoneMatchAndIfModifiedSinceBothMatch()
+    public function testRespondsWith304WhenIfNoneMatchAndIfModifiedSinceBothMatch()
     {
         $time = \DateTime::createFromFormat('U', time());
 
@@ -172,7 +172,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $t = \DateTime::createFromFormat('U', time() - 3600);
         $this->request('GET', '/', ['HTTP_IF_NONE_MATCH' => '12345', 'HTTP_IF_MODIFIED_SINCE' => $t->format(\DATE_RFC2822)]);
         $this->assertHttpKernelIsCalled();
-        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertEquals(304, $this->response->getStatusCode());
 
         // only Last-Modified matches
         $this->request('GET', '/', ['HTTP_IF_NONE_MATCH' => '1234', 'HTTP_IF_MODIFIED_SINCE' => $time->format(\DATE_RFC2822)]);
@@ -1209,7 +1209,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $responses = [
             [
                 'status' => 200,
-                'body' => 'I am a long-lived master response, but I embed a short-lived resource: <esi:include src="/foo" />',
+                'body' => 'I am a long-lived main response, but I embed a short-lived resource: <esi:include src="/foo" />',
                 'headers' => [
                     'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
@@ -1267,7 +1267,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $responses = [
             [
                 'status' => 200,
-                'body' => 'I am the master response and use expiration caching, but I embed another resource: <esi:include src="/foo" />',
+                'body' => 'I am the main response and use expiration caching, but I embed another resource: <esi:include src="/foo" />',
                 'headers' => [
                     'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
@@ -1511,7 +1511,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $request->server->set('REMOTE_ADDR', '10.0.0.1');
 
         // Main request
-        $cache->handle($request, HttpKernelInterface::MASTER_REQUEST);
+        $cache->handle($request, HttpKernelInterface::MAIN_REQUEST);
 
         // Main request was now modified by HttpCache
         // The surrogate will ask for the request using $this->cache->getRequest()
@@ -1734,7 +1734,7 @@ class TestKernel implements HttpKernelInterface
         $this->terminateCalled = true;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
     }
 }

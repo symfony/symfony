@@ -39,7 +39,7 @@ class BinaryUtil
     // https://tools.ietf.org/html/rfc4122#section-4.1.4
     // 0x01b21dd213814000 is the number of 100-ns intervals between the
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
-    private const TIME_OFFSET_INT = 0x01b21dd213814000;
+    private const TIME_OFFSET_INT = 0x01B21DD213814000;
     private const TIME_OFFSET_BIN = "\x01\xb2\x1d\xd2\x13\x81\x40\x00";
     private const TIME_OFFSET_COM1 = "\xfe\x4d\xe2\x2d\xec\x7e\xbf\xff";
     private const TIME_OFFSET_COM2 = "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00";
@@ -119,10 +119,10 @@ class BinaryUtil
     /**
      * @param string $time Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 in hexadecimal
      */
-    public static function timeToFloat(string $time): float
+    public static function hexToDateTime(string $time): \DateTimeImmutable
     {
         if (\PHP_INT_SIZE >= 8) {
-            $time = hexdec($time) - self::TIME_OFFSET_INT;
+            $time = (string) (hexdec($time) - self::TIME_OFFSET_INT);
         } else {
             $time = str_pad(hex2bin($time), 8, "\0", \STR_PAD_LEFT);
 
@@ -136,6 +136,40 @@ class BinaryUtil
             }
         }
 
-        return $time / 10000000;
+        if (9 > \strlen($time)) {
+            $time = '-' === $time[0] ? '-'.str_pad(substr($time, 1), 8, '0', \STR_PAD_LEFT) : str_pad($time, 8, '0', \STR_PAD_LEFT);
+        }
+
+        return \DateTimeImmutable::createFromFormat('U.u?', substr_replace($time, '.', -7, 0));
+    }
+
+    /**
+     * @return string Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 in hexadecimal
+     */
+    public static function dateTimeToHex(\DateTimeInterface $time): string
+    {
+        if (\PHP_INT_SIZE >= 8) {
+            if (-self::TIME_OFFSET_INT > $time = (int) $time->format('Uu0')) {
+                throw new \InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
+            }
+
+            return str_pad(dechex(self::TIME_OFFSET_INT + $time), 16, '0', \STR_PAD_LEFT);
+        }
+
+        $time = $time->format('Uu0');
+        $negative = '-' === $time[0];
+        if ($negative && self::TIME_OFFSET_INT < $time = substr($time, 1)) {
+            throw new \InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
+        }
+        $time = self::fromBase($time, self::BASE10);
+        $time = str_pad($time, 8, "\0", \STR_PAD_LEFT);
+
+        if ($negative) {
+            $time = self::add($time, self::TIME_OFFSET_COM1) ^ "\xff\xff\xff\xff\xff\xff\xff\xff";
+        } else {
+            $time = self::add($time, self::TIME_OFFSET_BIN);
+        }
+
+        return bin2hex($time);
     }
 }

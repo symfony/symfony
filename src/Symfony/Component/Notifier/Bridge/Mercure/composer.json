@@ -1,0 +1,32 @@
+{
+    "name": "symfony/mercure-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Mercure Notifier Bridge",
+    "keywords": ["mercure", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathias Arlaud",
+            "email": "mathias.arlaud@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "ext-json": "*",
+        "symfony/mercure": "^0.5.2|^0.6",
+        "symfony/notifier": "^5.3|^6.0",
+        "symfony/service-contracts": "^1.10|^2|^3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mercure\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

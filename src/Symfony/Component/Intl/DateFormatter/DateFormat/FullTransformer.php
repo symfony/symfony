@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
  * @author Igor Wiedler <igor@wiedler.ch>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 class FullTransformer
 {
@@ -118,7 +120,7 @@ class FullTransformer
      *
      * @return int|false The corresponding Unix timestamp
      *
-     * @throws \InvalidArgumentException When the value can not be matched with pattern
+     * @throws \InvalidArgumentException When the value cannot be matched with pattern
      */
     public function parse(\DateTime $dateTime, string $value)
     {

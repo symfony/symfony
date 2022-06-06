@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sinch;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Iliya Miroslavov Iliev <i.miroslavov@gmail.com>
- *
- * @experimental in 5.2
  */
 final class SinchTransport extends AbstractTransport
 {
@@ -56,7 +54,7 @@ final class SinchTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $endpoint = sprintf('https://%s/xms/v1/%s/batches', $this->getEndpoint(), $this->accountSid);

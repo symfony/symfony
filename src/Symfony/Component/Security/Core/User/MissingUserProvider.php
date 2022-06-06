@@ -37,6 +37,11 @@ class MissingUserProvider implements UserProviderInterface
         throw new \BadMethodCallException();
     }
 
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        throw new \BadMethodCallException();
+    }
+
     /**
      * {@inheritdoc}
      */

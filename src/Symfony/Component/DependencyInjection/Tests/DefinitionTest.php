@@ -303,7 +303,7 @@ class DefinitionTest extends TestCase
     public function testReplaceArgumentShouldCheckBounds()
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('The index "1" is not in the range [0, 0].');
+        $this->expectExceptionMessage('The index "1" is not in the range [0, 0] of the arguments of class "stdClass".');
         $def = new Definition('stdClass');
 
         $def->addArgument('foo');
@@ -313,7 +313,7 @@ class DefinitionTest extends TestCase
     public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('Cannot replace arguments if none have been configured yet.');
+        $this->expectExceptionMessage('Cannot replace arguments for class "stdClass" if none have been configured yet.');
         $def = new Definition('stdClass');
         $def->replaceArgument(0, 'bar');
     }

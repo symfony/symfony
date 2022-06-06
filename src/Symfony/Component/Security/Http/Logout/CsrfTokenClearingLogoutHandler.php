@@ -15,9 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
+use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListener;
+
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', CsrfTokenClearingLogoutHandler::class, CsrfTokenClearingLogoutListener::class);
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+ *
+ * @deprecated since Symfony 5.4, use {@link CsrfTokenClearingLogoutListener} instead
  */
 class CsrfTokenClearingLogoutHandler implements LogoutHandlerInterface
 {

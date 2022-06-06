@@ -22,6 +22,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', GuardAuthenticatorHandler::class);
+
 /**
  * A utility class that does much of the *work* during the guard authentication process.
  *
@@ -31,6 +33,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @author Ryan Weaver <ryan@knpuniversity.com>
  *
  * @final
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class GuardAuthenticatorHandler
 {

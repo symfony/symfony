@@ -210,7 +210,7 @@ class ProgressBarTest extends TestCase
 
         // max in construct, explicit format before
         $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start();
         $bar->advance(10);
         $bar->finish();
@@ -220,7 +220,7 @@ class ProgressBarTest extends TestCase
 
         // max in start, explicit format before
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start(10);
         $bar->advance(10);
         $bar->finish();
@@ -812,7 +812,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
-            "\x1B[1A\x1B[1G\x1B[2K".
+            "\x1B[1G\x1B[2K\x1B[1A\x1B[1G\x1B[2K".
             $this->generateOutput("============================\nfoobar"),
             stream_get_contents($output->getStream())
         );
@@ -881,7 +881,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     public function testSetFormat()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start();
         rewind($output->getStream());
         $this->assertEquals(
@@ -890,7 +890,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
 
         $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start();
         rewind($output->getStream());
         $this->assertEquals(
@@ -983,7 +983,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     {
         $count = substr_count($expected, "\n");
 
-        return ($count ? sprintf("\x1B[%dA\x1B[1G\x1b[2K", $count) : "\x1B[1G\x1B[2K").$expected;
+        return ($count ? str_repeat("\x1B[1G\x1b[2K\x1B[1A", $count) : '')."\x1B[1G\x1B[2K".$expected;
     }
 
     public function testBarWidthWithMultilineFormat()
@@ -1092,6 +1092,35 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ' 0/2 [>---------------------------]   0%'.
             $this->generateOutput(' 1/2 [==============>-------------]  50%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testMultiLineFormatIsFullyCleared()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar->setFormat("%current%/%max%\n%message%\nFoo");
+
+        $bar->setMessage('1234567890');
+        $bar->start();
+        $bar->display();
+
+        $bar->setMessage('ABC');
+        $bar->advance();
+        $bar->display();
+
+        $bar->setMessage('A');
+        $bar->advance();
+        $bar->display();
+
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            "0/3\n1234567890\nFoo".
+            $this->generateOutput("1/3\nABC\nFoo").
+            $this->generateOutput("2/3\nA\nFoo").
+            $this->generateOutput("3/3\nA\nFoo"),
             stream_get_contents($output->getStream())
         );
     }

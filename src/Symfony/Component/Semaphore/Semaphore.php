@@ -23,8 +23,6 @@ use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 /**
  * Semaphore is the default implementation of the SemaphoreInterface.
  *
- * @experimental in 5.2
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
@@ -48,10 +46,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

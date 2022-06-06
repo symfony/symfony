@@ -11,6 +11,8 @@
             <xsd:element name="access-decision-manager" type="access_decision_manager" minOccurs="0" maxOccurs="1" />
             <xsd:element name="encoders" type="encoders" minOccurs="0" maxOccurs="1" />
             <xsd:element name="encoder" type="encoder" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="password_hashers" type="password_hashers" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="password_hasher" type="password_hasher" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="providers" type="providers" minOccurs="0" maxOccurs="1" />
             <xsd:element name="provider" type="provider" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="firewalls" type="firewalls" minOccurs="0" maxOccurs="1" />
@@ -29,6 +31,12 @@
     <xsd:complexType name="encoders">
         <xsd:sequence>
             <xsd:element name="encoder" type="encoder" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="password_hashers">
+        <xsd:sequence>
+            <xsd:element name="password_hasher" type="password_hasher" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
 
@@ -55,6 +63,7 @@
     <xsd:complexType name="access_decision_manager">
         <xsd:attribute name="strategy" type="access_decision_manager_strategy" />
         <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="strategy-service" type="xsd:string" />
         <xsd:attribute name="allow-if-all-abstain" type="xsd:boolean" />
         <xsd:attribute name="allow-if-equal-granted-denied" type="xsd:boolean" />
     </xsd:complexType>
@@ -69,6 +78,23 @@
     </xsd:simpleType>
 
     <xsd:complexType name="encoder">
+        <xsd:sequence>
+            <xsd:element name="migrate-from" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="class" type="xsd:string" use="required" />
+        <xsd:attribute name="algorithm" type="xsd:string" />
+        <xsd:attribute name="hash-algorithm" type="xsd:string" />
+        <xsd:attribute name="key-length" type="xsd:string" />
+        <xsd:attribute name="ignore-case" type="xsd:boolean" />
+        <xsd:attribute name="encode-as-base64" type="xsd:boolean" />
+        <xsd:attribute name="iterations" type="xsd:string" />
+        <xsd:attribute name="cost" type="xsd:integer" />
+        <xsd:attribute name="memory-cost" type="xsd:string" />
+        <xsd:attribute name="time-cost" type="xsd:string" />
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="password_hasher">
         <xsd:sequence>
             <xsd:element name="migrate-from" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
@@ -111,7 +137,8 @@
     </xsd:complexType>
 
     <xsd:complexType name="user">
-        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="identifier" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="roles" type="xsd:string" />
     </xsd:complexType>
@@ -146,6 +173,7 @@
             <xsd:element name="remember-me" type="remember_me" minOccurs="0" maxOccurs="1" />
             <xsd:element name="remote-user" type="remote_user" minOccurs="0" maxOccurs="1" />
             <xsd:element name="x509" type="x509" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="required-badge" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <!-- allow factories to use dynamic elements -->
             <xsd:any processContents="lax" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
@@ -307,9 +335,12 @@
     </xsd:complexType>
 
     <xsd:complexType name="remember_me">
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="user-provider" type="xsd:string" />
-        </xsd:choice>
+        <xsd:sequence minOccurs="0">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="user-provider" type="xsd:string" />
+            </xsd:choice>
+            <xsd:element name="token-provider" type="remember_me_token_provider" />
+        </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="lifetime" type="xsd:integer" />
         <xsd:attribute name="path" type="xsd:string" />
@@ -320,9 +351,22 @@
         <xsd:attribute name="secret" type="xsd:string" use="required" />
         <xsd:attribute name="service" type="xsd:string" />
         <xsd:attribute name="token-provider" type="xsd:string" />
+        <xsd:attribute name="token-verifier" type="xsd:string" />
         <xsd:attribute name="catch-exceptions" type="xsd:boolean" />
         <xsd:attribute name="secure" type="remember_me_secure" />
         <xsd:attribute name="samesite" type="remember_me_samesite" />
+    </xsd:complexType>
+
+    <xsd:complexType name="remember_me_token_provider">
+        <xsd:sequence>
+            <xsd:element name="doctrine" type="remember_me_token_provider_doctrine" />
+        </xsd:sequence>
+        <xsd:attribute name="service" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="remember_me_token_provider_doctrine">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="connection" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:simpleType name="remember_me_secure">

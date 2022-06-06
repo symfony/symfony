@@ -53,16 +53,16 @@ class InstantiatorTest extends TestCase
         $expected = [
             "\0".__NAMESPACE__."\Bar\0priv" => 123,
             "\0".__NAMESPACE__."\Foo\0priv" => 234,
+            'dyn' => 345,
         ];
 
-        $actual = (array) Instantiator::instantiate(Bar::class, ['priv' => 123], [Foo::class => ['priv' => 234]]);
+        $actual = (array) Instantiator::instantiate(Bar::class, ['dyn' => 345, 'priv' => 123], [Foo::class => ['priv' => 234]]);
         ksort($actual);
 
         $this->assertSame($expected, $actual);
 
-        $e = Instantiator::instantiate('Exception', ['foo' => 123, 'trace' => [234]]);
+        $e = Instantiator::instantiate('Exception', ['trace' => [234]]);
 
-        $this->assertSame(123, $e->foo);
         $this->assertSame([234], $e->getTrace());
     }
 }
@@ -72,6 +72,7 @@ class Foo
     private $priv;
 }
 
+#[\AllowDynamicProperties]
 class Bar extends Foo
 {
     private $priv;

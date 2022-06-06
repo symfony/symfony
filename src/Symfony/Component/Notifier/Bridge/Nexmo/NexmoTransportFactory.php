@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Nexmo;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -20,7 +19,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.2
+ * @deprecated since Symfony 5.4, use the Vonage bridge instead.
  */
 final class NexmoTransportFactory extends AbstractTransportFactory
 {
@@ -37,12 +36,7 @@ final class NexmoTransportFactory extends AbstractTransportFactory
 
         $apiKey = $this->getUser($dsn);
         $apiSecret = $this->getPassword($dsn);
-        $from = $dsn->getOption('from');
-
-        if (!$from) {
-            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
-        }
-
+        $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

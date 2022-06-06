@@ -17,8 +17,6 @@ use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button\KeyboardButto
  * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
  *
  * @see https://core.telegram.org/bots/api#replykeyboardmarkup
- *
- * @experimental in 5.2
  */
 final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
 {
@@ -28,7 +26,7 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
     }
 
     /**
-     * @param array|KeyboardButton[] $buttons
+     * @param KeyboardButton[] $buttons
      *
      * @return $this
      */
@@ -43,6 +41,9 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function resizeKeyboard(bool $bool): self
     {
         $this->options['resize_keyboard'] = $bool;
@@ -50,6 +51,9 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function oneTimeKeyboard(bool $bool): self
     {
         $this->options['one_time_keyboard'] = $bool;
@@ -57,6 +61,9 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function selective(bool $bool): self
     {
         $this->options['selective'] = $bool;

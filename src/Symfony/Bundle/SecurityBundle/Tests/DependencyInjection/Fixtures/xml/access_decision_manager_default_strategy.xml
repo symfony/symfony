@@ -7,10 +7,10 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <config>
+    <config enable-authenticator-manager="true">
         <provider name="default">
             <memory>
-                <user name="foo" password="foo" roles="ROLE_USER" />
+                <user identifier="foo" password="foo" roles="ROLE_USER" />
             </memory>
         </provider>
 

@@ -51,4 +51,3 @@ Aliases
 
 - Service: `service_1`
 - Public: yes
-

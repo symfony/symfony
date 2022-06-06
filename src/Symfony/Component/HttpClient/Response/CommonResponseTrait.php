@@ -127,10 +127,7 @@ trait CommonResponseTrait
         return $stream;
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -152,8 +149,8 @@ trait CommonResponseTrait
         }
 
         try {
-            if (($response->initializer)($response)) {
-                foreach (self::stream([$response]) as $chunk) {
+            if (($response->initializer)($response, -0.0)) {
+                foreach (self::stream([$response], -0.0) as $chunk) {
                     if ($chunk->isFirst()) {
                         break;
                     }

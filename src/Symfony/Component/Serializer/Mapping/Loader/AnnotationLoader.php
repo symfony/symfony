@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
@@ -19,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
@@ -31,11 +33,12 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 class AnnotationLoader implements LoaderInterface
 {
     private const KNOWN_ANNOTATIONS = [
-        DiscriminatorMap::class => true,
-        Groups::class => true,
-        Ignore::class => true,
-        MaxDepth::class => true,
-        SerializedName::class => true,
+        DiscriminatorMap::class,
+        Groups::class,
+        Ignore::class,
+        MaxDepth::class,
+        SerializedName::class,
+        Context::class,
     ];
 
     private $reader;
@@ -83,6 +86,8 @@ class AnnotationLoader implements LoaderInterface
                         $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName());
                     } elseif ($annotation instanceof Ignore) {
                         $attributesMetadata[$property->name]->setIgnore(true);
+                    } elseif ($annotation instanceof Context) {
+                        $this->setAttributeContextsForGroups($annotation, $attributesMetadata[$property->name]);
                     }
 
                     $loaded = true;
@@ -130,6 +135,12 @@ class AnnotationLoader implements LoaderInterface
                     $attributeMetadata->setSerializedName($annotation->getSerializedName());
                 } elseif ($annotation instanceof Ignore) {
                     $attributeMetadata->setIgnore(true);
+                } elseif ($annotation instanceof Context) {
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('Context on "%s::%s()" cannot be added. Context can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    }
+
+                    $this->setAttributeContextsForGroups($annotation, $attributeMetadata);
                 }
 
                 $loaded = true;
@@ -146,7 +157,7 @@ class AnnotationLoader implements LoaderInterface
     {
         if (\PHP_VERSION_ID >= 80000) {
             foreach ($reflector->getAttributes() as $attribute) {
-                if (self::KNOWN_ANNOTATIONS[$attribute->getName()] ?? false) {
+                if ($this->isKnownAttribute($attribute->getName())) {
                     yield $attribute->newInstance();
                 }
             }
@@ -165,5 +176,32 @@ class AnnotationLoader implements LoaderInterface
         if ($reflector instanceof \ReflectionProperty) {
             yield from $this->reader->getPropertyAnnotations($reflector);
         }
+    }
+
+    private function setAttributeContextsForGroups(Context $annotation, AttributeMetadataInterface $attributeMetadata): void
+    {
+        if ($annotation->getContext()) {
+            $attributeMetadata->setNormalizationContextForGroups($annotation->getContext(), $annotation->getGroups());
+            $attributeMetadata->setDenormalizationContextForGroups($annotation->getContext(), $annotation->getGroups());
+        }
+
+        if ($annotation->getNormalizationContext()) {
+            $attributeMetadata->setNormalizationContextForGroups($annotation->getNormalizationContext(), $annotation->getGroups());
+        }
+
+        if ($annotation->getDenormalizationContext()) {
+            $attributeMetadata->setDenormalizationContextForGroups($annotation->getDenormalizationContext(), $annotation->getGroups());
+        }
+    }
+
+    private function isKnownAttribute(string $attributeName): bool
+    {
+        foreach (self::KNOWN_ANNOTATIONS as $knownAnnotation) {
+            if (is_a($attributeName, $knownAnnotation, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

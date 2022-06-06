@@ -21,22 +21,32 @@
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
-        "symfony/event-dispatcher-contracts": "^2",
-        "symfony/http-client-contracts": "^2",
-        "symfony/messenger": "^4.4 || ^5.0"
+        "symfony/event-dispatcher-contracts": "^2|^3",
+        "symfony/http-client-contracts": "^2|^3",
+        "symfony/messenger": "^4.4|^5.0|^6.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.4",
-        "symfony/firebase-notifier": "<5.2",
-        "symfony/free-mobile-notifier": "<5.2",
-        "symfony/mattermost-notifier": "<5.2",
-        "symfony/nexmo-notifier": "<5.2",
-        "symfony/ovh-cloud-notifier": "<5.2",
-        "symfony/rocket-chat-notifier": "<5.2",
-        "symfony/sinch-notifier": "<5.2",
-        "symfony/slack-notifier": "<5.2",
-        "symfony/telegram-notifier": "<5.2",
-        "symfony/twilio-notifier": "<5.2"
+        "symfony/discord-notifier": "<5.3",
+        "symfony/esendex-notifier": "<5.3",
+        "symfony/firebase-notifier": "<5.3",
+        "symfony/free-mobile-notifier": "<5.3",
+        "symfony/google-chat-notifier": "<5.3",
+        "symfony/infobip-notifier": "<5.3",
+        "symfony/linked-in-notifier": "<5.3",
+        "symfony/mattermost-notifier": "<5.3",
+        "symfony/mobyt-notifier": "<5.3",
+        "symfony/nexmo-notifier": "<5.3",
+        "symfony/ovh-cloud-notifier": "<5.3",
+        "symfony/rocket-chat-notifier": "<5.3",
+        "symfony/sendinblue-notifier": "<5.3",
+        "symfony/sinch-notifier": "<5.3",
+        "symfony/slack-notifier": "<5.3",
+        "symfony/sms77-notifier": "<5.3",
+        "symfony/smsapi-notifier": "<5.3",
+        "symfony/telegram-notifier": "<5.3",
+        "symfony/twilio-notifier": "<5.3",
+        "symfony/zulip-notifier": "<5.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\": "" },

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use LDAP\Connection as LDAPConnection;
 use Symfony\Component\Ldap\Adapter\AbstractConnection;
 use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\ConnectionException;
@@ -28,11 +29,17 @@ class Connection extends AbstractConnection
     private const LDAP_INVALID_CREDENTIALS = 0x31;
     private const LDAP_TIMEOUT = 0x55;
     private const LDAP_ALREADY_EXISTS = 0x44;
+    private const PRECONNECT_OPTIONS = [
+        ConnectionOptions::DEBUG_LEVEL,
+        ConnectionOptions::X_TLS_CACERTDIR,
+        ConnectionOptions::X_TLS_CACERTFILE,
+        ConnectionOptions::X_TLS_REQUIRE_CERT,
+    ];
 
     /** @var bool */
     private $bound = false;
 
-    /** @var resource */
+    /** @var resource|LDAPConnection */
     private $connection;
 
     /**
@@ -89,9 +96,7 @@ class Connection extends AbstractConnection
     }
 
     /**
-     * Returns a link resource.
-     *
-     * @return resource
+     * @return resource|LDAPConnection
      *
      * @internal
      */
@@ -148,10 +153,18 @@ class Connection extends AbstractConnection
             return;
         }
 
+        foreach ($this->config['options'] as $name => $value) {
+            if (\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {
+                $this->setOption($name, $value);
+            }
+        }
+
         $this->connection = ldap_connect($this->config['connection_string']);
 
         foreach ($this->config['options'] as $name => $value) {
-            $this->setOption($name, $value);
+            if (!\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {
+                $this->setOption($name, $value);
+            }
         }
 
         if (false === $this->connection) {
@@ -165,7 +178,7 @@ class Connection extends AbstractConnection
 
     private function disconnect()
     {
-        if ($this->connection && \is_resource($this->connection)) {
+        if ($this->connection) {
             ldap_unbind($this->connection);
         }
 

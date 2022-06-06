@@ -31,7 +31,7 @@ trait ReferenceSetArgumentTrait
     }
 
     /**
-     * @return Reference[] The values in the set
+     * @return Reference[]
      */
     public function getValues()
     {

@@ -222,7 +222,7 @@ class Cookie
     /**
      * Gets the name of the cookie.
      *
-     * @return string The cookie name
+     * @return string
      */
     public function getName()
     {
@@ -232,7 +232,7 @@ class Cookie
     /**
      * Gets the value of the cookie.
      *
-     * @return string The cookie value
+     * @return string
      */
     public function getValue()
     {
@@ -242,7 +242,7 @@ class Cookie
     /**
      * Gets the raw value of the cookie.
      *
-     * @return string The cookie value
+     * @return string
      */
     public function getRawValue()
     {
@@ -252,7 +252,7 @@ class Cookie
     /**
      * Gets the expires time of the cookie.
      *
-     * @return string|null The cookie expires time
+     * @return string|null
      */
     public function getExpiresTime()
     {
@@ -262,7 +262,7 @@ class Cookie
     /**
      * Gets the path of the cookie.
      *
-     * @return string The cookie path
+     * @return string
      */
     public function getPath()
     {
@@ -272,7 +272,7 @@ class Cookie
     /**
      * Gets the domain of the cookie.
      *
-     * @return string The cookie domain
+     * @return string
      */
     public function getDomain()
     {
@@ -282,7 +282,7 @@ class Cookie
     /**
      * Returns the secure flag of the cookie.
      *
-     * @return bool The cookie secure flag
+     * @return bool
      */
     public function isSecure()
     {
@@ -292,7 +292,7 @@ class Cookie
     /**
      * Returns the httponly flag of the cookie.
      *
-     * @return bool The cookie httponly flag
+     * @return bool
      */
     public function isHttpOnly()
     {
@@ -302,7 +302,7 @@ class Cookie
     /**
      * Returns true if the cookie has expired.
      *
-     * @return bool true if the cookie has expired, false otherwise
+     * @return bool
      */
     public function isExpired()
     {
@@ -311,8 +311,6 @@ class Cookie
 
     /**
      * Gets the samesite attribute of the cookie.
-     *
-     * @return string|null The cookie samesite attribute
      */
     public function getSameSite(): ?string
     {

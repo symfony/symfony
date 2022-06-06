@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
+
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', PlaintextPasswordEncoder::class, PlaintextPasswordHasher::class);
 
 /**
  * PlaintextPasswordEncoder does not do any encoding but is useful in testing environments.
@@ -19,46 +21,18 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  * As this encoder is not cryptographically secure, usage of it in production environments is discouraged.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use {@link PlaintextPasswordHasher} instead
  */
 class PlaintextPasswordEncoder extends BasePasswordEncoder
 {
-    private $ignorePasswordCase;
+    use LegacyEncoderTrait;
 
     /**
      * @param bool $ignorePasswordCase Compare password case-insensitive
      */
     public function __construct(bool $ignorePasswordCase = false)
     {
-        $this->ignorePasswordCase = $ignorePasswordCase;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function encodePassword(string $raw, ?string $salt)
-    {
-        if ($this->isPasswordTooLong($raw)) {
-            throw new BadCredentialsException('Invalid password.');
-        }
-
-        return $this->mergePasswordAndSalt($raw, $salt);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isPasswordValid(string $encoded, string $raw, ?string $salt)
-    {
-        if ($this->isPasswordTooLong($raw)) {
-            return false;
-        }
-
-        $pass2 = $this->mergePasswordAndSalt($raw, $salt);
-
-        if (!$this->ignorePasswordCase) {
-            return $this->comparePasswords($encoded, $pass2);
-        }
-
-        return $this->comparePasswords(strtolower($encoded), strtolower($pass2));
+        $this->hasher = new PlaintextPasswordHasher($ignorePasswordCase);
     }
 }

@@ -11,7 +11,12 @@
 
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 
 /**
@@ -26,17 +31,30 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public const SESSION_NAMESPACE = '_csrf';
 
-    private $session;
+    private $requestStack;
     private $namespace;
+    /**
+     * To be removed in Symfony 6.0.
+     */
+    private $session;
 
     /**
-     * Initializes the storage with a Session object and a session namespace.
+     * Initializes the storage with a RequestStack object and a session namespace.
      *
-     * @param string $namespace The namespace under which the token is stored in the session
+     * @param RequestStack $requestStack
+     * @param string       $namespace    The namespace under which the token is stored in the requestStack
      */
-    public function __construct(SessionInterface $session, string $namespace = self::SESSION_NAMESPACE)
+    public function __construct(/* RequestStack*/ $requestStack, string $namespace = self::SESSION_NAMESPACE)
     {
-        $this->session = $session;
+        if ($requestStack instanceof SessionInterface) {
+            trigger_deprecation('symfony/security-csrf', '5.3', 'Passing a "%s" to "%s" is deprecated, use a "%s" instead.', SessionInterface::class, __CLASS__, RequestStack::class);
+            $request = new Request();
+            $request->setSession($requestStack);
+
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+        }
+        $this->requestStack = $requestStack;
         $this->namespace = $namespace;
     }
 
@@ -45,15 +63,16 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public function getToken(string $tokenId)
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        if (!$this->session->has($this->namespace.'/'.$tokenId)) {
+        if (!$session->has($this->namespace.'/'.$tokenId)) {
             throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
         }
 
-        return (string) $this->session->get($this->namespace.'/'.$tokenId);
+        return (string) $session->get($this->namespace.'/'.$tokenId);
     }
 
     /**
@@ -61,11 +80,12 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public function setToken(string $tokenId, string $token)
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        $this->session->set($this->namespace.'/'.$tokenId, $token);
+        $session->set($this->namespace.'/'.$tokenId, $token);
     }
 
     /**
@@ -73,11 +93,12 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public function hasToken(string $tokenId)
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        return $this->session->has($this->namespace.'/'.$tokenId);
+        return $session->has($this->namespace.'/'.$tokenId);
     }
 
     /**
@@ -85,11 +106,12 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public function removeToken(string $tokenId)
     {
-        if (!$this->session->isStarted()) {
-            $this->session->start();
+        $session = $this->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
-        return $this->session->remove($this->namespace.'/'.$tokenId);
+        return $session->remove($this->namespace.'/'.$tokenId);
     }
 
     /**
@@ -97,10 +119,22 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public function clear()
     {
-        foreach (array_keys($this->session->all()) as $key) {
+        $session = $this->getSession();
+        foreach (array_keys($session->all()) as $key) {
             if (str_starts_with($key, $this->namespace.'/')) {
-                $this->session->remove($key);
+                $session->remove($key);
             }
+        }
+    }
+
+    private function getSession(): SessionInterface
+    {
+        try {
+            return $this->session ?? $this->requestStack->getSession();
+        } catch (SessionNotFoundException $e) {
+            trigger_deprecation('symfony/security-csrf', '5.3', 'Using the "%s" without a session has no effect and is deprecated. It will throw a "%s" in Symfony 6.0', __CLASS__, SessionNotFoundException::class);
+
+            return $this->session ?? $this->session = new Session(new MockArraySessionStorage());
         }
     }
 }

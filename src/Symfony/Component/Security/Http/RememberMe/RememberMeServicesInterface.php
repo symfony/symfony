@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" interface is deprecated, use "%s" instead.', RememberMeServicesInterface::class, RememberMeHandlerInterface::class);
+
 /**
  * Interface that needs to be implemented by classes which provide remember-me
  * capabilities.
@@ -26,6 +28,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @method logout(Request $request, Response $response, TokenInterface $token)
+ *
+ * @deprecated since Symfony 5.4, use {@see RememberMeHandlerInterface} instead
  */
 interface RememberMeServicesInterface
 {

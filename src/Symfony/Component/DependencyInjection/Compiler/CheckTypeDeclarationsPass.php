@@ -210,6 +210,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         $class = null;
 
         if ($value instanceof Definition) {
+            if ($value->getFactory()) {
+                return;
+            }
+
             $class = $value->getClass();
 
             if ($class && isset(self::BUILTIN_TYPES[strtolower($class)])) {

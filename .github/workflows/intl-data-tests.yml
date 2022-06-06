@@ -12,6 +12,10 @@ defaults:
   run:
     shell: bash
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
 jobs:
   tests:
     name: Tests
@@ -20,6 +24,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Install system dependencies
+        run: |
+          echo "::group::apt-get update"
+          sudo apt-get update
+          echo "::endgroup::"
+
+          echo "::group::install tools & libraries"
+          sudo apt-get install icu-devtools
+          echo "::endgroup::"
 
       - name: Define the ICU version
         run: |
@@ -50,7 +64,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Report the ICU version
-        run: icu-config --version && php -i | grep 'ICU version'
+        run: uconv -V && php -i | grep 'ICU version'
 
       - name: Run intl-data tests
         run: ./phpunit --group intl-data -v

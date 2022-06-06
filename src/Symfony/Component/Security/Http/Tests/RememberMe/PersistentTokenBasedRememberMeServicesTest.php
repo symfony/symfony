@@ -23,11 +23,14 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
+/**
+ * @group legacy
+ */
 class PersistentTokenBasedRememberMeServicesTest extends TestCase
 {
     public static function setUpBeforeClass(): void
@@ -155,7 +158,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
      */
     public function testAutoLogin(bool $hashTokenValue)
     {
-        $user = new User('foouser', null, ['ROLE_FOO']);
+        $user = new InMemoryUser('foouser', null, ['ROLE_FOO']);
 
         $userProvider = $this->getProvider();
         $userProvider->createUser($user);
@@ -170,7 +173,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken(User::class, 'foouser', 'fooseries', $tokenValue, new \DateTime()))
+            ->willReturn(new PersistentToken(InMemoryUser::class, 'foouser', 'fooseries', $tokenValue, new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -267,7 +270,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $response = new Response();
 
-        $account = new User('foo', null);
+        $account = new InMemoryUser('foo', null);
         $token = $this->createMock(TokenInterface::class);
         $token
             ->expects($this->any())

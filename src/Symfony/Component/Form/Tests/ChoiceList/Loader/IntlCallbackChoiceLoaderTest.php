@@ -68,11 +68,19 @@ class IntlCallbackChoiceLoaderTest extends TestCase
         $this->assertInstanceOf(ChoiceListInterface::class, self::$loader->loadChoiceList(self::$value));
     }
 
-    public function testLoadChoiceListOnlyOnce()
+    public function testLoadChoicesOnlyOnce()
     {
-        $loadedChoiceList = self::$loader->loadChoiceList(self::$value);
+        $calls = 0;
+        $loader = new IntlCallbackChoiceLoader(function () use (&$calls) {
+            ++$calls;
 
-        $this->assertSame($loadedChoiceList, self::$loader->loadChoiceList(self::$value));
+            return self::$choices;
+        });
+
+        $loadedChoiceList = $loader->loadChoiceList(self::$value);
+
+        $this->assertNotSame($loadedChoiceList, $loader->loadChoiceList(self::$value));
+        $this->assertSame(1, $calls);
     }
 
     public function testLoadChoicesForValuesLoadsChoiceListOnFirstCall()

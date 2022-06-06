@@ -13,27 +13,30 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class ArrayDenormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @var ArrayDenormalizer
      */
     private $denormalizer;
 
     /**
-     * @var MockObject&SerializerInterface
+     * @var MockObject&ContextAwareDenormalizerInterface
      */
     private $serializer;
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock(Serializer::class);
+        $this->serializer = $this->createMock(ContextAwareDenormalizerInterface::class);
         $this->denormalizer = new ArrayDenormalizer();
-        $this->denormalizer->setSerializer($this->serializer);
+        $this->denormalizer->setDenormalizer($this->serializer);
     }
 
     public function testDenormalize()
@@ -66,11 +69,51 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
+    public function testDenormalizeLegacy()
+    {
+        $serializer = $this->createMock(Serializer::class);
+
+        $serializer->expects($this->exactly(2))
+            ->method('denormalize')
+            ->withConsecutive(
+                [['foo' => 'one', 'bar' => 'two']],
+                [['foo' => 'three', 'bar' => 'four']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ArrayDummy('one', 'two'),
+                new ArrayDummy('three', 'four')
+            );
+
+        $denormalizer = new ArrayDenormalizer();
+
+        $this->expectDeprecation('Since symfony/serializer 5.3: Calling "%s" is deprecated. Please call setDenormalizer() instead.');
+        $denormalizer->setSerializer($serializer);
+
+        $result = $denormalizer->denormalize(
+            [
+                ['foo' => 'one', 'bar' => 'two'],
+                ['foo' => 'three', 'bar' => 'four'],
+            ],
+            __NAMESPACE__.'\ArrayDummy[]'
+        );
+
+        $this->assertEquals(
+            [
+                new ArrayDummy('one', 'two'),
+                new ArrayDummy('three', 'four'),
+            ],
+            $result
+        );
+    }
+
     public function testSupportsValidArray()
     {
         $this->serializer->expects($this->once())
             ->method('supportsDenormalization')
-            ->with($this->anything(), ArrayDummy::class, $this->anything())
+            ->with($this->anything(), ArrayDummy::class, 'json', ['con' => 'text'])
             ->willReturn(true);
 
         $this->assertTrue(
@@ -79,7 +122,9 @@ class ArrayDenormalizerTest extends TestCase
                     ['foo' => 'one', 'bar' => 'two'],
                     ['foo' => 'three', 'bar' => 'four'],
                 ],
-                __NAMESPACE__.'\ArrayDummy[]'
+                __NAMESPACE__.'\ArrayDummy[]',
+                'json',
+                ['con' => 'text']
             )
         );
     }

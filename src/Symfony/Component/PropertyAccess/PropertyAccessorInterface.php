@@ -73,7 +73,7 @@ interface PropertyAccessorInterface
      * @param object|array                 $objectOrArray The object or array to traverse
      * @param string|PropertyPathInterface $propertyPath  The property path to read
      *
-     * @return mixed The value at the end of the property path
+     * @return mixed
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      * @throws Exception\AccessException          If a property/index does not exist or is not public
@@ -91,7 +91,7 @@ interface PropertyAccessorInterface
      * @param object|array                 $objectOrArray The object or array to check
      * @param string|PropertyPathInterface $propertyPath  The property path to check
      *
-     * @return bool Whether the value can be set
+     * @return bool
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
@@ -106,7 +106,7 @@ interface PropertyAccessorInterface
      * @param object|array                 $objectOrArray The object or array to check
      * @param string|PropertyPathInterface $propertyPath  The property path to check
      *
-     * @return bool Whether the property path can be read
+     * @return bool
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */

@@ -36,6 +36,7 @@ use Symfony\Component\HttpKernel\RebootableInterface;
 class CacheClearCommand extends Command
 {
     protected static $defaultName = 'cache:clear';
+    protected static $defaultDescription = 'Clear the cache';
 
     private $cacheClearer;
     private $filesystem;
@@ -58,9 +59,9 @@ class CacheClearCommand extends Command
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ])
-            ->setDescription('Clear the cache')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command clears the application cache for a given environment
+The <info>%command.name%</info> command clears and warms up the application cache for a given environment
 and debug mode:
 
   <info>php %command.full_name% --env=dev</info>

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use LDAP\Connection as LDAPConnection;
+use LDAP\Result;
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
@@ -27,7 +29,7 @@ class Query extends AbstractQuery
     /** @var Connection */
     protected $connection;
 
-    /** @var resource[] */
+    /** @var resource[]|Result[] */
     private $results;
 
     /** @var array */
@@ -156,23 +158,19 @@ class Query extends AbstractQuery
      * Returns an LDAP search resource. If this query resulted in multiple searches, only the first
      * page will be returned.
      *
-     * @return resource
+     * @return resource|Result|null
      *
      * @internal
      */
     public function getResource(int $idx = 0)
     {
-        if (null === $this->results || $idx >= \count($this->results)) {
-            return null;
-        }
-
-        return $this->results[$idx];
+        return $this->results[$idx] ?? null;
     }
 
     /**
      * Returns all LDAP search resources.
      *
-     * @return resource[]
+     * @return resource[]|Result[]
      *
      * @internal
      */
@@ -215,7 +213,7 @@ class Query extends AbstractQuery
     /**
      * Sets LDAP pagination controls.
      *
-     * @param resource $con
+     * @param resource|LDAPConnection $con
      */
     private function controlPagedResult($con, int $pageSize, bool $critical, string $cookie): bool
     {
@@ -239,8 +237,8 @@ class Query extends AbstractQuery
     /**
      * Retrieve LDAP pagination cookie.
      *
-     * @param resource $con
-     * @param resource $result
+     * @param resource|LDAPConnection $con
+     * @param resource|Result         $result
      */
     private function controlPagedResultResponse($con, $result, string $cookie = ''): string
     {
@@ -257,11 +255,11 @@ class Query extends AbstractQuery
     /**
      * Calls actual LDAP search function with the prepared options and parameters.
      *
-     * @param resource $con
+     * @param resource|LDAPConnection $con
      *
-     * @return resource
+     * @return resource|Result|false
      */
-    private function callSearchFunction($con, string $func, int $sizeLimit)
+    private function callSearchFunction($con, callable $func, int $sizeLimit)
     {
         if (\PHP_VERSION_ID < 70300) {
             return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref']);

@@ -174,6 +174,43 @@ class YamlFileLoaderTest extends TestCase
         }
     }
 
+    public function testLoadWithEnvironment()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'dev');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on dev',
+            'root_parameter' => 'value when on dev',
+        ], $container->getParameterBag()->all());
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'test');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on test',
+            'root_parameter' => 'value when on test',
+        ], $container->getParameterBag()->all());
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'prod');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on prod',
+            'root_parameter' => 'value when on prod',
+        ], $container->getParameterBag()->all());
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'other');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'default value',
+            'root_parameter' => 'default value',
+        ], $container->getParameterBag()->all());
+    }
+
     public function testLoadServices()
     {
         $container = new ContainerBuilder();
@@ -320,7 +357,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('null_config.yml');
         $container->compile();
 
-        $this->assertSame([null], $container->getParameter('project.configs'));
+        $this->assertSame([[]], $container->getParameter('project.configs'));
     }
 
     public function testSupports()
@@ -1062,5 +1099,14 @@ class YamlFileLoaderTest extends TestCase
             'inner' => $expected,
         ];
         $this->assertEquals($expected, $container->get('stack_e'));
+    }
+
+    public function testWhenEnv()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'some-env');
+        $loader->load('when-env.yaml');
+
+        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class DiscordTransportFactoryTest extends TransportFactoryTestCase
@@ -42,6 +42,10 @@ final class DiscordTransportFactoryTest extends TransportFactoryTestCase
     public function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['discord://host.test?webhook_id=testWebhookId'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
+    {
         yield 'missing option: webhook_id' => ['discord://token@host'];
     }
 

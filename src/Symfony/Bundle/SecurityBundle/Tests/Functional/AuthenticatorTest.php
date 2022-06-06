@@ -14,9 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class AuthenticatorTest extends AbstractWebTestCase
 {
     /**
+     * @group legacy
+     *
      * @dataProvider provideEmails
      */
-    public function testGlobalUserProvider($email)
+    public function testLegacyGlobalUserProvider($email)
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'implicit_user_provider.yml']);
 
@@ -86,5 +88,18 @@ class AuthenticatorTest extends AbstractWebTestCase
     {
         yield ['jane@example.org', 'main'];
         yield ['john@example.org', 'custom'];
+    }
+
+    public function testMultipleFirewalls()
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'multiple_firewalls.yml']);
+
+        $client->request('POST', '/firewall1/login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'test',
+        ]);
+
+        $client->request('GET', '/firewall2/profile');
+        $this->assertResponseRedirects('http://localhost/login');
     }
 }

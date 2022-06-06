@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 abstract class AbstractTransportFactory implements TransportFactoryInterface
 {

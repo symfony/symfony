@@ -14,21 +14,26 @@ namespace Symfony\Component\Notifier\Bridge\Slack;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackBlockInterface;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 final class SlackOptions implements MessageOptionsInterface
 {
+    private const MAX_BLOCKS = 50;
+
     private $options;
 
     public function __construct(array $options = [])
     {
         $this->options = $options;
+
+        if (\count($this->options['blocks'] ?? []) > self::MAX_BLOCKS) {
+            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+        }
     }
 
     public static function fromNotification(Notification $notification): self
@@ -99,6 +104,10 @@ final class SlackOptions implements MessageOptionsInterface
      */
     public function block(SlackBlockInterface $block): self
     {
+        if (\count($this->options['blocks'] ?? []) >= self::MAX_BLOCKS) {
+            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+        }
+
         $this->options['blocks'][] = $block->toArray();
 
         return $this;
@@ -180,6 +189,16 @@ final class SlackOptions implements MessageOptionsInterface
     public function username(string $username): self
     {
         $this->options['username'] = $username;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function threadTs(string $threadTs): self
+    {
+        $this->options['thread_ts'] = $threadTs;
 
         return $this;
     }

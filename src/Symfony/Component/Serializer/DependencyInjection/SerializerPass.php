@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,6 +34,10 @@ class SerializerPass implements CompilerPassInterface
 
     public function __construct(string $serializerService = 'serializer', string $normalizerTag = 'serializer.normalizer', string $encoderTag = 'serializer.encoder')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/serializer', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->serializerService = $serializerService;
         $this->normalizerTag = $normalizerTag;
         $this->encoderTag = $encoderTag;
@@ -56,5 +61,17 @@ class SerializerPass implements CompilerPassInterface
         }
 
         $serializerDefinition->replaceArgument(1, $encoders);
+
+        if (!$container->hasParameter('serializer.default_context')) {
+            return;
+        }
+
+        $defaultContext = $container->getParameter('serializer.default_context');
+        foreach (array_keys(array_merge($container->findTaggedServiceIds($this->normalizerTag), $container->findTaggedServiceIds($this->encoderTag))) as $service) {
+            $definition = $container->getDefinition($service);
+            $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
+        }
+
+        $container->getParameterBag()->remove('serializer.default_context');
     }
 }

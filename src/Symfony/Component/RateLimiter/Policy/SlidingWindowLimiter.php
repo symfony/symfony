@@ -30,8 +30,6 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  * That means our sliding window hit count is (75% * 8) + 3 = 9.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @experimental in 5.2
  */
 final class SlidingWindowLimiter implements LimiterInterface
 {

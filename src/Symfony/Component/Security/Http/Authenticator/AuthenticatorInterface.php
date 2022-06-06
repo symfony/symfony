@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 /**
@@ -24,14 +25,16 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @method TokenInterface createToken(Passport $passport, string $firewallName) Creates a token for the given user.
+ *                                                                              If you don't care about which token class is used, you can skip this method by extending
+ *                                                                              the AbstractAuthenticator class from your authenticator.
  */
 interface AuthenticatorInterface
 {
     /**
      * Does the authenticator support the given Request?
      *
-     * If this returns false, the authenticator will be skipped.
+     * If this returns true, authenticate() will be called. If false, the authenticator will be skipped.
      *
      * Returning null means authenticate() can be called lazily when accessing the token storage.
      */
@@ -46,11 +49,13 @@ interface AuthenticatorInterface
      * presented password and the CSRF token value.
      *
      * You may throw any AuthenticationException in this method in case of error (e.g.
-     * a UsernameNotFoundException when the user cannot be found).
+     * a UserNotFoundException when the user cannot be found).
      *
      * @throws AuthenticationException
+     *
+     * @return Passport
      */
-    public function authenticate(Request $request): PassportInterface;
+    public function authenticate(Request $request); /*: Passport;*/
 
     /**
      * Create an authenticated token for the given user.
@@ -62,6 +67,8 @@ interface AuthenticatorInterface
      * @see AbstractAuthenticator
      *
      * @param PassportInterface $passport The passport returned from authenticate()
+     *
+     * @deprecated since Symfony 5.4, use {@link createToken()} instead
      */
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface;
 

@@ -1,0 +1,51 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Notifier\Bridge\AllMySms\Tests;
+
+use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+
+final class AllMySmsTransportFactoryTest extends TransportFactoryTestCase
+{
+    /**
+     * @return AllMySmsTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
+    {
+        return new AllMySmsTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'allmysms://host.test',
+            'allmysms://login:apiKey@host.test',
+        ];
+
+        yield [
+            'allmysms://host.test?from=TEST',
+            'allmysms://login:apiKey@host.test?from=TEST',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'allmysms://login:apiKey@default'];
+        yield [false, 'somethingElse://login:apiKey@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://login:apiKey@default'];
+    }
+}

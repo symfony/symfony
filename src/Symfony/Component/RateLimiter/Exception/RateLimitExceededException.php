@@ -15,8 +15,6 @@ use Symfony\Component\RateLimiter\RateLimit;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @experimental in 5.2
  */
 class RateLimitExceededException extends \RuntimeException
 {

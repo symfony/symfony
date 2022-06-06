@@ -32,6 +32,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
     private static $vulcainStarted = false;
 
+    public function testTimeoutOnDestruct()
+    {
+        if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {
+            $this->markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
+        }
+
+        parent::testTimeoutOnDestruct();
+    }
+
     public function testAcceptHeader()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -351,5 +360,87 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             $this->assertCount(0, $clientState->handlesActivity);
             $this->assertCount(0, $clientState->openHandles);
         }
+    }
+
+    public function testDebugInfoOnDestruct()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $traceInfo = [];
+        $client->request('GET', 'http://localhost:8057', ['on_progress' => function (int $dlNow, int $dlSize, array $info) use (&$traceInfo) {
+            $traceInfo = $info;
+        }]);
+
+        $this->assertNotEmpty($traceInfo['debug']);
+    }
+
+    public function testFixContentLength()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+            'headers' => ['Content-Length: 4'],
+        ]);
+
+        $body = $response->toArray();
+
+        $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $body);
+    }
+
+    public function testDropContentRelatedHeadersWhenFollowingRequestIsUsingGet()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/302', [
+            'body' => 'foo',
+            'headers' => ['Content-Length: 3'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testNegativeTimeout()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->assertSame(200, $client->request('GET', 'http://localhost:8057', [
+            'timeout' => -1,
+        ])->getStatusCode());
+    }
+
+    public function testRedirectAfterPost()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/302/relative', [
+            'body' => '',
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsStringIgnoringCase("\r\nContent-Length: 0", $response->getInfo('debug'));
+    }
+
+    public function testEmptyPut()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('PUT', 'http://localhost:8057/post', [
+            'headers' => ['Content-Length' => '0'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
+    }
+
+    public function testNullBody()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $client->request('POST', 'http://localhost:8057/post', [
+            'body' => null,
+        ]);
+
+        $this->expectNotToPerformAssertions();
     }
 }

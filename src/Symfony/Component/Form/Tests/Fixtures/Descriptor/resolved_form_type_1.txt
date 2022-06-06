@@ -2,44 +2,46 @@
 Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
 ==============================================================================
 
- --------------------------- -------------------- ------------------------------ ----------------------- 
-  Options                     Overridden options   Parent options                 Extension options      
- --------------------------- -------------------- ------------------------------ ----------------------- 
-  choice_attr                 FormType             FormType                       FormTypeCsrfExtension  
-  choice_filter              -------------------- ------------------------------ ----------------------- 
-  choice_label                compound             action                         csrf_field_name        
-  choice_loader               data_class           allow_file_upload              csrf_message           
-  choice_name                 empty_data           attr                           csrf_protection        
-  choice_translation_domain   error_bubbling       attr_translation_parameters    csrf_token_id          
-  choice_value                invalid_message      auto_initialize                csrf_token_manager     
-  choices                     trim                 block_name                                            
-  expanded                                         block_prefix                                          
-  group_by                                         by_reference                                          
-  multiple                                         data                                                  
-  placeholder                                      disabled                                              
-  preferred_choices                                getter                                                
-                                                   help                                                  
-                                                   help_attr                                             
-                                                   help_html                                             
-                                                   help_translation_parameters                           
-                                                   inherit_data                                          
-                                                   invalid_message_parameters                            
-                                                   is_empty_callback                                     
-                                                   label                                                 
-                                                   label_attr                                            
-                                                   label_format                                          
-                                                   label_html                                            
-                                                   label_translation_parameters                          
-                                                   mapped                                                
-                                                   method                                                
-                                                   post_max_size_message                                 
-                                                   property_path                                         
-                                                   required                                              
-                                                   row_attr                                              
-                                                   setter                                                
-                                                   translation_domain                                    
-                                                   upload_max_size_message                               
- --------------------------- -------------------- ------------------------------ ----------------------- 
+ ------------------------------- -------------------- ------------------------------ ----------------------- 
+  Options                         Overridden options   Parent options                 Extension options      
+ ------------------------------- -------------------- ------------------------------ ----------------------- 
+  choice_attr                     FormType             FormType                       FormTypeCsrfExtension  
+  choice_filter                  -------------------- ------------------------------ ----------------------- 
+  choice_label                    compound             action                         csrf_field_name        
+  choice_loader                   data_class           allow_file_upload              csrf_message           
+  choice_name                     empty_data           attr                           csrf_protection        
+  choice_translation_domain       error_bubbling       attr_translation_parameters    csrf_token_id          
+  choice_translation_parameters   invalid_message      auto_initialize                csrf_token_manager     
+  choice_value                    trim                 block_name                                            
+  choices                                              block_prefix                                          
+  expanded                                             by_reference                                          
+  group_by                                             data                                                  
+  multiple                                             disabled                                              
+  placeholder                                          form_attr                                             
+  preferred_choices                                    getter                                                
+                                                       help                                                  
+                                                       help_attr                                             
+                                                       help_html                                             
+                                                       help_translation_parameters                           
+                                                       inherit_data                                          
+                                                       invalid_message_parameters                            
+                                                       is_empty_callback                                     
+                                                       label                                                 
+                                                       label_attr                                            
+                                                       label_format                                          
+                                                       label_html                                            
+                                                       label_translation_parameters                          
+                                                       mapped                                                
+                                                       method                                                
+                                                       post_max_size_message                                 
+                                                       priority                                              
+                                                       property_path                                         
+                                                       required                                              
+                                                       row_attr                                              
+                                                       setter                                                
+                                                       translation_domain                                    
+                                                       upload_max_size_message                               
+ ------------------------------- -------------------- ------------------------------ ----------------------- 
 
 Parent types
 ------------

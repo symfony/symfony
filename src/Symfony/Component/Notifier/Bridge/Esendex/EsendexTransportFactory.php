@@ -11,15 +11,11 @@
 
 namespace Symfony\Component\Notifier\Bridge\Esendex;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
-/**
- * @experimental in 5.2
- */
 final class EsendexTransportFactory extends AbstractTransportFactory
 {
     /**
@@ -33,23 +29,14 @@ final class EsendexTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'esendex', $this->getSupportedSchemes());
         }
 
-        $token = $this->getUser($dsn).':'.$this->getPassword($dsn);
-        $accountReference = $dsn->getOption('accountreference');
-
-        if (!$accountReference) {
-            throw new IncompleteDsnException('Missing accountreference.', $dsn->getOriginalDsn());
-        }
-
-        $from = $dsn->getOption('from');
-
-        if (!$from) {
-            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
-        }
-
+        $email = $this->getUser($dsn);
+        $password = $this->getPassword($dsn);
+        $accountReference = $dsn->getRequiredOption('accountreference');
+        $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new EsendexTransport($token, $accountReference, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new EsendexTransport($email, $password, $accountReference, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

@@ -16,7 +16,9 @@ if (true) {
     {
         public function log($level, $message, array $context = []): void
         {
-            echo 'LOG: ', $message, "\n";
+            if (0 !== strpos($message, 'Deprecated: ')) {
+                echo 'LOG: ', $message, "\n";
+            }
         }
     }
 }
@@ -34,5 +36,5 @@ Exception {%S
   #message: "foo"
   #code: 0
   #file: "%s"
-  #line: 25
+  #line: 27
 }

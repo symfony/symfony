@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
+use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
+use Symfony\Component\Lock\Store\DoctrineDbalStore;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Lock\Store\MemcachedStore;
@@ -63,7 +67,7 @@ class StoreFactoryTest extends TestCase
         if (\extension_loaded('sysvsem')) {
             yield ['semaphore', SemaphoreStore::class];
         }
-        if (class_exists(\Memcached::class) && class_exists(AbstractAdapter::class)) {
+        if (class_exists(AbstractAdapter::class) && MemcachedAdapter::isSupported()) {
             yield ['memcached://server.com', MemcachedStore::class];
             yield ['memcached:?host[localhost]&host[localhost:12345]', MemcachedStore::class];
         }
@@ -82,18 +86,20 @@ class StoreFactoryTest extends TestCase
             yield ['pgsql+advisory:host=localhost;dbname=test;', PostgreSqlStore::class];
             yield ['oci:host=localhost;dbname=test;', PdoStore::class];
             yield ['sqlsrv:server=localhost;Database=test', PdoStore::class];
-            yield ['mysql://server.com/test', PdoStore::class];
-            yield ['mysql2://server.com/test', PdoStore::class];
-            yield ['pgsql://server.com/test', PdoStore::class];
-            yield ['pgsql+advisory://server.com/test', PostgreSqlStore::class];
-            yield ['postgres://server.com/test', PdoStore::class];
-            yield ['postgres+advisory://server.com/test', PostgreSqlStore::class];
-            yield ['postgresql://server.com/test', PdoStore::class];
-            yield ['postgresql+advisory://server.com/test', PostgreSqlStore::class];
-            yield ['sqlite:///tmp/test', PdoStore::class];
-            yield ['sqlite3:///tmp/test', PdoStore::class];
-            yield ['oci:///server.com/test', PdoStore::class];
-            yield ['mssql:///server.com/test', PdoStore::class];
+        }
+        if (class_exists(Connection::class)) {
+            yield ['mysql://server.com/test', DoctrineDbalStore::class];
+            yield ['mysql2://server.com/test', DoctrineDbalStore::class];
+            yield ['pgsql://server.com/test', DoctrineDbalStore::class];
+            yield ['postgres://server.com/test', DoctrineDbalStore::class];
+            yield ['postgresql://server.com/test', DoctrineDbalStore::class];
+            yield ['sqlite:///tmp/test', DoctrineDbalStore::class];
+            yield ['sqlite3:///tmp/test', DoctrineDbalStore::class];
+            yield ['oci8://server.com/test', DoctrineDbalStore::class];
+            yield ['mssql://server.com/test', DoctrineDbalStore::class];
+            yield ['pgsql+advisory://server.com/test', DoctrineDbalPostgreSqlStore::class];
+            yield ['postgres+advisory://server.com/test', DoctrineDbalPostgreSqlStore::class];
+            yield ['postgresql+advisory://server.com/test', DoctrineDbalPostgreSqlStore::class];
         }
 
         yield ['in-memory', InMemoryStore::class];

@@ -11,25 +11,59 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
 
+use Symfony\Component\Security\Http\EventListener\CheckRememberMeConditionsListener;
+
 /**
  * Adds support for remember me to this authenticator.
  *
- * Remember me cookie will be set if *all* of the following are met:
- *  A) This badge is present in the Passport
- *  B) The remember_me key under your firewall is configured
- *  C) The "remember me" functionality is activated. This is usually
- *      done by having a _remember_me checkbox in your form, but
- *      can be configured by the "always_remember_me" and "remember_me_parameter"
- *      parameters under the "remember_me" firewall key
- *  D) The authentication process returns a success Response object
+ * The presence of this badge doesn't create the remember-me cookie. The actual
+ * cookie is only created if this badge is enabled. By default, this is done
+ * by the {@see CheckRememberMeConditionsListener} if all conditions are met.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.2
  */
 class RememberMeBadge implements BadgeInterface
 {
+    private $enabled = false;
+
+    /**
+     * Enables remember-me cookie creation.
+     *
+     * In most cases, {@see CheckRememberMeConditionsListener} enables this
+     * automatically if always_remember_me is true or the remember_me_parameter
+     * exists in the request.
+     *
+     * @return $this
+     */
+    public function enable(): self
+    {
+        $this->enabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Disables remember-me cookie creation.
+     *
+     * The default is disabled, this can be called to suppress creation
+     * after it was enabled.
+     *
+     * @return $this
+     */
+    public function disable(): self
+    {
+        $this->enabled = false;
+
+        return $this;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
     public function isResolved(): bool
     {
         return true; // remember me does not need to be explicitly resolved

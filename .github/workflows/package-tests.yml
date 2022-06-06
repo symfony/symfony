@@ -1,0 +1,100 @@
+name: Package
+
+on:
+  pull_request:
+    paths:
+      - src/**
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: Ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Fetch branch from where the PR started
+        run: git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+
+      - name: Find packages
+        id: find-packages
+        run: echo "::set-output name=packages::$(php .github/get-modified-packages.php $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | jq -R -s -c 'split("\n")[:-1]') $(git diff --name-only origin/${{ github.base_ref }} HEAD | grep src/ | jq -R -s -c 'split("\n")[:-1]'))"
+
+      - name: Verify meta files are correct
+        run: |
+          ok=0
+
+          _file_exist() {
+            if [ ! -f "${1}" ]; then
+              echo "File ${1} does not exist"
+              return 1
+            fi
+          }
+
+          _file_not_exist() {
+            if [ -f "${1}" ]; then
+              echo "File ${1} should not be here"
+              return 1
+            fi
+          }
+
+          _correct_license_file() {
+            FIRST_LINE="Copyright (c) $(date +"%Y") Fabien Potencier"
+            PACKAGE_FIRST_LINE=$(head -1 ${1})
+            if [[ "$FIRST_LINE" != "$PACKAGE_FIRST_LINE" ]]; then
+              echo "First line of the license file is wrong. Maybe it is the wrong year?"
+              return 1
+            fi
+
+            TEMPLATE=$(tail -n +2 LICENSE)
+            PACKAGE_LICENSE=$(tail -n +2 ${1})
+            if [[ "$TEMPLATE" != "$PACKAGE_LICENSE" ]]; then
+              echo "Wrong content in license file"
+              return 1
+            fi
+          }
+
+          json='${{ steps.find-packages.outputs.packages }}'
+          for package in $(echo "${json}" | jq -r '.[] | @base64'); do
+              _jq() {
+                echo ${package} | base64 --decode | jq -r ${1}
+              }
+
+              DIR=$(_jq '.directory')
+              NAME=$(_jq '.name')
+              echo "::group::$NAME"
+              TYPE=$(_jq '.type')
+              localExit=0
+
+              if [ $TYPE != 'contract' ] && [ $TYPE != 'contracts' ]; then
+                _file_exist $DIR/.gitattributes || localExit=1
+              fi
+              _file_exist $DIR/.gitignore || localExit=1
+              _file_exist $DIR/CHANGELOG.md || localExit=1
+              _file_exist $DIR/LICENSE || localExit=1
+              if [ $TYPE != 'contract' ]; then
+                _file_exist $DIR/phpunit.xml.dist || localExit=1
+              fi
+              _file_exist $DIR/README.md || localExit=1
+              _file_not_exist $DIR/phpunit.xml || localExit=1
+
+              if [ $(_jq '.new') == true ]; then
+                echo "Verifying new package"
+                _correct_license_file $DIR/LICENSE || localExit=1
+
+                if [ $TYPE != 'component_bridge' ]; then
+                  if [ ! $(cat composer.json | jq -e ".replace.\"$NAME\"|test(\"self.version\")") ]; then
+                    echo "Composer.json's replace section needs to contain $NAME"
+                    localExit=1
+                  fi
+                fi
+              fi
+
+              ok=$(( $localExit || $ok ))
+              echo ::endgroup::
+              if [ $localExit -ne 0 ]; then
+                echo "::error::$NAME failed"
+              fi
+          done
+
+          exit $ok

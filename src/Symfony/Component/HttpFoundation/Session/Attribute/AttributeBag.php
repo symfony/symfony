@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpFoundation\Session\Attribute;
 
 /**
  * This class relates to session attribute storage.
+ *
+ * @implements \IteratorAggregate<string, mixed>
  */
 class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Countable
 {
@@ -129,8 +131,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * Returns an iterator for attributes.
      *
-     * @return \ArrayIterator An \ArrayIterator instance
+     * @return \ArrayIterator<string, mixed>
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->attributes);
@@ -139,8 +142,9 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * Returns the number of attributes.
      *
-     * @return int The number of attributes
+     * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return \count($this->attributes);

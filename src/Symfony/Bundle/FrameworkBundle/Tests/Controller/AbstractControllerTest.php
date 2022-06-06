@@ -22,6 +22,8 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -42,7 +44,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\Link;
@@ -135,8 +137,8 @@ class AbstractControllerTest extends TestCase
 
     public function testGetUser()
     {
-        $user = new User('user', 'pass');
-        $token = new UsernamePasswordToken($user, 'pass', 'default', ['ROLE_USER']);
+        $user = new InMemoryUser('user', 'pass');
+        $token = new UsernamePasswordToken($user, 'default', ['ROLE_USER']);
 
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage($token));
@@ -144,6 +146,9 @@ class AbstractControllerTest extends TestCase
         $this->assertSame($controller->getUser(), $user);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetUserAnonymousUserConvertedToNull()
     {
         $token = new AnonymousToken('default', 'anon.');
@@ -410,6 +415,52 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
+    public function testRenderFormNew()
+    {
+        $formView = new FormView();
+
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('createView')->willReturn($formView);
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->renderForm('foo', ['bar' => $form]);
+
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testRenderFormSubmittedAndInvalid()
+    {
+        $formView = new FormView();
+
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('createView')->willReturn($formView);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(false);
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->renderForm('foo', ['bar' => $form]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame('bar', $response->getContent());
+    }
+
     public function testStreamTwig()
     {
         $twig = $this->createMock(Environment::class);
@@ -449,8 +500,14 @@ class AbstractControllerTest extends TestCase
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
 
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $container = new Container();
         $container->set('session', $session);
+        $container->set('request_stack', $requestStack);
 
         $controller = $this->createController();
         $controller->setContainer($container);
@@ -547,6 +604,9 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetDoctrine()
     {
         $doctrine = $this->createMock(ManagerRegistry::class);

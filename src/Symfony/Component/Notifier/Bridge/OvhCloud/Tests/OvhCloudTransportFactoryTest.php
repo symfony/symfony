@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
@@ -31,15 +31,20 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
             'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName',
             'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName',
         ];
+
+        yield [
+            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName&sender=sender',
+            'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName&sender=sender',
+        ];
     }
 
     public function supportsProvider(): iterable
     {
-        yield [true, 'ovhcloud://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
-        yield [false, 'somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
+        yield [true, 'ovhcloud://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
+        yield [false, 'somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: consumer_key' => ['ovhcloud://key:secret@default?service_name=serviceName'];
         yield 'missing option: service_name' => ['ovhcloud://key:secret@default?consumer_key=consumerKey'];
@@ -47,8 +52,9 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield ['somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
+        yield ['somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
         yield ['somethingElse://key:secret@default?service_name=serviceName'];
         yield ['somethingElse://key:secret@default?consumer_key=consumerKey'];
+        yield ['somethingElse://key:secret@default?sender=sender'];
     }
 }

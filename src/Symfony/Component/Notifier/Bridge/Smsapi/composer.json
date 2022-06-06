@@ -1,6 +1,6 @@
 {
     "name": "symfony/smsapi-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Smsapi Notifier Bridge",
     "keywords": ["sms", "smsapi", "notifier"],
     "homepage": "https://mvpdoers.com",
@@ -17,8 +17,8 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/http-client": "^4.3|^5.0",
-        "symfony/notifier": "~5.2.2"
+        "symfony/http-client": "^4.3|^5.0|^6.0",
+        "symfony/notifier": "^5.3|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Smsapi\\": "" },

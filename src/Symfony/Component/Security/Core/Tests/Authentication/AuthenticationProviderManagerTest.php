@@ -23,7 +23,11 @@ use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
+/**
+ * @group legacy
+ */
 class AuthenticationProviderManagerTest extends TestCase
 {
     public function testAuthenticateWithoutProviders()
@@ -90,9 +94,12 @@ class AuthenticationProviderManagerTest extends TestCase
 
     public function testAuthenticateWhenOneReturnsAuthenticationExceptionButNotAll()
     {
+        $expected = $this->createMock(TokenInterface::class);
+        $expected->expects($this->any())->method('getUser')->willReturn(new InMemoryUser('wouter', null));
+
         $manager = new AuthenticationProviderManager([
             $this->getAuthenticationProvider(true, null, AuthenticationException::class),
-            $this->getAuthenticationProvider(true, $expected = $this->createMock(TokenInterface::class)),
+            $this->getAuthenticationProvider(true, $expected),
         ]);
 
         $token = $manager->authenticate($this->createMock(TokenInterface::class));
@@ -106,8 +113,10 @@ class AuthenticationProviderManagerTest extends TestCase
             ->expects($this->never())
             ->method('supports')
         ;
+        $expected = $this->createMock(TokenInterface::class);
+        $expected->expects($this->any())->method('getUser')->willReturn(new InMemoryUser('wouter', null));
         $manager = new AuthenticationProviderManager([
-            $this->getAuthenticationProvider(true, $expected = $this->createMock(TokenInterface::class)),
+            $this->getAuthenticationProvider(true, $expected),
             $second,
         ]);
 

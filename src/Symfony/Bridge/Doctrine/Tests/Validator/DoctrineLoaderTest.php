@@ -11,11 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator;
 
+use Doctrine\ORM\Mapping\Column;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEnum;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderNestedEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderNoAutoMappingEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderParentEntity;
@@ -147,6 +149,32 @@ class DoctrineLoaderTest extends TestCase
         $noAutoMappingConstraints = $noAutoMappingMetadata[0]->getConstraints();
         $this->assertCount(0, $noAutoMappingConstraints);
         $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testExtractEnum()
+    {
+        if (!property_exists(Column::class, 'enumType')) {
+            $this->markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
+        }
+
+        $validator = Validation::createValidatorBuilder()
+            ->addMethodMapping('loadValidatorMetadata')
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
+            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
+            ->getValidator()
+        ;
+
+        $classMetadata = $validator->getMetadataFor(new DoctrineLoaderEnum());
+
+        $enumStringMetadata = $classMetadata->getPropertyMetadata('enumString');
+        $this->assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
+
+        $enumStringMetadata = $classMetadata->getPropertyMetadata('enumInt');
+        $this->assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
     }
 
     public function testFieldMappingsConfiguration()

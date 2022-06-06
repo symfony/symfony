@@ -1,6 +1,6 @@
 {
     "name": "symfony/rocket-chat-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony RocketChat Notifier Bridge",
     "keywords": ["rocketchat", "notifier"],
     "homepage": "https://symfony.com",
@@ -17,8 +17,8 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/http-client": "^4.3|^5.0",
-        "symfony/notifier": "~5.2.2"
+        "symfony/http-client": "^4.3|^5.0|^6.0",
+        "symfony/notifier": "^5.3|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\RocketChat\\": "" },

@@ -352,8 +352,6 @@ class MongoDbStore implements PersistingStoreInterface
      * Retrieves an unique token for the given key namespaced to this store.
      *
      * @param Key lock state container
-     *
-     * @return string token
      */
     private function getUniqueToken(Key $key): string
     {

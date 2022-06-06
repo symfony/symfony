@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `github` format & autodetection to render errors as annotations when
+   running the XLIFF linter command in a Github Actions environment.
+ * Translation providers are not experimental anymore
+
+5.3
+---
+
+ * Add `translation:pull` and `translation:push` commands to manage translations with third-party providers
+ * Add `TranslatorBagInterface::getCatalogues` method
+ * Add support to load XLIFF string in `XliffFileLoader`
+
 5.2.0
 -----
 

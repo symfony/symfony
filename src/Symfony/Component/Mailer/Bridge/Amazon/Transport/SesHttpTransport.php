@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
 use Symfony\Component\Mime\Message;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -76,6 +76,11 @@ class SesHttpTransport extends AbstractHttpTransport
             && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')
         ) {
             $request['body']['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
+        }
+
+        if ($message->getOriginalMessage() instanceof Message
+            && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
+            $request['body']['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), $request);

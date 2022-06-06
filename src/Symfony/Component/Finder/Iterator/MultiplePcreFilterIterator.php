@@ -15,6 +15,11 @@ namespace Symfony\Component\Finder\Iterator;
  * MultiplePcreFilterIterator filters files using patterns (regexps, globs or strings).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @template-covariant TKey
+ * @template-covariant TValue
+ *
+ * @extends \FilterIterator<TKey, TValue>
  */
 abstract class MultiplePcreFilterIterator extends \FilterIterator
 {
@@ -79,7 +84,13 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      */
     protected function isRegex(string $str)
     {
-        if (preg_match('/^(.{3,}?)[imsxuADU]*$/', $str, $m)) {
+        $availableModifiers = 'imsxuADU';
+
+        if (\PHP_VERSION_ID >= 80200) {
+            $availableModifiers .= 'n';
+        }
+
+        if (preg_match('/^(.{3,}?)['.$availableModifiers.']*$/', $str, $m)) {
             $start = substr($m[1], 0, 1);
             $end = substr($m[1], -1);
 

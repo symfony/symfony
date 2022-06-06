@@ -17,14 +17,14 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/dom-crawler": "^4.4|^5.0",
+        "symfony/dom-crawler": "^4.4|^5.0|^6.0",
         "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
-        "symfony/css-selector": "^4.4|^5.0",
-        "symfony/http-client": "^4.4|^5.0",
-        "symfony/mime": "^4.4|^5.0",
-        "symfony/process": "^4.4|^5.0"
+        "symfony/css-selector": "^4.4|^5.0|^6.0",
+        "symfony/http-client": "^4.4|^5.0|^6.0",
+        "symfony/mime": "^4.4|^5.0|^6.0",
+        "symfony/process": "^4.4|^5.0|^6.0"
     },
     "suggest": {
         "symfony/process": ""

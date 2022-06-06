@@ -16,6 +16,7 @@ use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFieldName;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFilter;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLabel;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceTranslationParameters;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceValue;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\GroupBy;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\PreferredChoice;
@@ -111,6 +112,18 @@ final class ChoiceList
     public static function attr($formType, $attr, $vary = null): ChoiceAttr
     {
         return new ChoiceAttr($formType, $attr, $vary);
+    }
+
+    /**
+     * Decorates a "choice_translation_parameters" option to make it cacheable.
+     *
+     * @param FormTypeInterface|FormTypeExtensionInterface $formType              A form type or type extension configuring a cacheable choice list
+     * @param callable|array                               $translationParameters Any pseudo callable or array to create translation parameters from a choice
+     * @param mixed|null                                   $vary                  Dynamic data used to compute a unique hash when caching the option
+     */
+    public static function translationParameters($formType, $translationParameters, $vary = null): ChoiceTranslationParameters
+    {
+        return new ChoiceTranslationParameters($formType, $translationParameters, $vary);
     }
 
     /**

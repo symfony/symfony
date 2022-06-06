@@ -11,13 +11,14 @@
 
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
@@ -61,6 +62,10 @@ class UniqueEntityValidator extends ConstraintValidator
 
         if (null === $entity) {
             return;
+        }
+
+        if (!\is_object($entity)) {
+            throw new UnexpectedValueException($entity, 'object');
         }
 
         if ($constraint->em) {
@@ -134,7 +139,18 @@ class UniqueEntityValidator extends ConstraintValidator
             $repository = $em->getRepository(\get_class($entity));
         }
 
-        $result = $repository->{$constraint->repositoryMethod}($criteria);
+        $arguments = [$criteria];
+
+        /* If the default repository method is used, it is always enough to retrieve at most two entities because:
+         * - No entity returned, the current entity is definitely unique.
+         * - More than one entity returned, the current entity cannot be unique.
+         * - One entity returned the uniqueness depends on the current entity.
+         */
+        if ('findBy' === $constraint->repositoryMethod) {
+            $arguments = [$criteria, null, 2];
+        }
+
+        $result = $repository->{$constraint->repositoryMethod}(...$arguments);
 
         if ($result instanceof \IteratorAggregate) {
             $result = $result->getIterator();
@@ -177,7 +193,7 @@ class UniqueEntityValidator extends ConstraintValidator
             ->addViolation();
     }
 
-    private function formatWithIdentifiers(EntityManagerInterface $em, ClassMetadata $class, $value)
+    private function formatWithIdentifiers(ObjectManager $em, ClassMetadata $class, $value)
     {
         if (!\is_object($value) || $value instanceof \DateTimeInterface) {
             return $this->formatValue($value, self::PRETTY_DATE);

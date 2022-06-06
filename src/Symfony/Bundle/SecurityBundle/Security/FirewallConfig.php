@@ -26,10 +26,10 @@ final class FirewallConfig
     private $entryPoint;
     private $accessDeniedHandler;
     private $accessDeniedUrl;
-    private $listeners;
+    private $authenticators;
     private $switchUser;
 
-    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = [], array $switchUser = null)
+    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $authenticators = [], array $switchUser = null)
     {
         $this->name = $name;
         $this->userChecker = $userChecker;
@@ -41,7 +41,7 @@ final class FirewallConfig
         $this->entryPoint = $entryPoint;
         $this->accessDeniedHandler = $accessDeniedHandler;
         $this->accessDeniedUrl = $accessDeniedUrl;
-        $this->listeners = $listeners;
+        $this->authenticators = $authenticators;
         $this->switchUser = $switchUser;
     }
 
@@ -64,9 +64,14 @@ final class FirewallConfig
         return $this->securityEnabled;
     }
 
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public function allowsAnonymous(): bool
     {
-        return \in_array('anonymous', $this->listeners, true);
+        trigger_deprecation('symfony/security-bundle', '5.4', 'The "%s()" method is deprecated.', __METHOD__);
+
+        return \in_array('anonymous', $this->authenticators, true);
     }
 
     public function isStateless(): bool
@@ -107,9 +112,19 @@ final class FirewallConfig
         return $this->accessDeniedUrl;
     }
 
+    /**
+     * @deprecated since Symfony 5.4, use {@see getAuthenticators()} instead
+     */
     public function getListeners(): array
     {
-        return $this->listeners;
+        trigger_deprecation('symfony/security-bundle', '5.4', 'Method "%s()" is deprecated, use "%s::getAuthenticators()" instead.', __METHOD__, __CLASS__);
+
+        return $this->getAuthenticators();
+    }
+
+    public function getAuthenticators(): array
+    {
+        return $this->authenticators;
     }
 
     public function getSwitchUser(): ?array

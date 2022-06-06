@@ -20,9 +20,15 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Sequentially extends Composite
 {
     public $constraints = [];
+
+    public function __construct($constraints = null, array $groups = null, $payload = null)
+    {
+        parent::__construct($constraints ?? [], $groups, $payload);
+    }
 
     public function getDefaultOption()
     {

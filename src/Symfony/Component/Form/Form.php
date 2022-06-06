@@ -66,6 +66,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormInterface>
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
@@ -82,7 +84,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * A map of FormInterface instances.
      *
-     * @var FormInterface[]|OrderedHashMap
+     * @var OrderedHashMap<string, FormInterface>
      */
     private $children;
 
@@ -544,7 +546,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $submittedData = null;
                 $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
             }
-        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->hasOption('multiple')) {
+        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->getOption('multiple', false)) {
             $submittedData = null;
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }
@@ -820,8 +822,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * {@inheritdoc}
-     *
-     * @return $this
      */
     public function clearErrors(bool $deep = false): self
     {
@@ -965,6 +965,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($name)
     {
         return $this->has($name);
@@ -975,10 +976,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child
      *
-     * @return FormInterface The child form
+     * @return FormInterface
      *
      * @throws OutOfBoundsException if the named child does not exist
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name)
     {
         return $this->get($name);
@@ -997,6 +999,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @see self::add()
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($name, $child)
     {
         $this->add($child);
@@ -1011,6 +1014,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($name)
     {
         $this->remove($name);
@@ -1019,8 +1023,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the iterator for this group.
      *
-     * @return \Traversable<FormInterface>
+     * @return \Traversable<string, FormInterface>
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->children;
@@ -1029,8 +1034,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the number of form children (implements the \Countable interface).
      *
-     * @return int The number of embedded form children
+     * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return \count($this->children);
@@ -1059,9 +1065,36 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $view->children[$name] = $child->createView($view);
         }
 
+        $this->sort($view->children);
+
         $type->finishView($view, $this, $options);
 
         return $view;
+    }
+
+    /**
+     * Sorts view fields based on their priority value.
+     */
+    private function sort(array &$children): void
+    {
+        $c = [];
+        $i = 0;
+        $needsSorting = false;
+        foreach ($children as $name => $child) {
+            $c[$name] = ['p' => $child->vars['priority'] ?? 0, 'i' => $i++];
+
+            if (0 !== $c[$name]['p']) {
+                $needsSorting = true;
+            }
+        }
+
+        if (!$needsSorting) {
+            return;
+        }
+
+        uksort($children, static function ($a, $b) use ($c): int {
+            return [$c[$b]['p'], $c[$a]['i']] <=> [$c[$a]['p'], $c[$b]['i']];
+        });
     }
 
     /**

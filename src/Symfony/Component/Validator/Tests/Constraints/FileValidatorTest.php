@@ -185,6 +185,9 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function provideMaxSizeNotExceededTests()
     {
         return [
+            // 0 has no effect
+            [100, 0],
+
             // limit in bytes
             [1000, 1000],
             [1000000, 1000000],
@@ -521,6 +524,15 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         }
 
         return $tests;
+    }
+
+    public function testNegativeMaxSize()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('"-1" is not a valid maximum size.');
+
+        $file = new File();
+        $file->maxSize = -1;
     }
 
     abstract protected function getFile($filename);

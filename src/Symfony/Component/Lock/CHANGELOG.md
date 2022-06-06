@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Add `DoctrineDbalStore` identical to `PdoStore` for `Doctrine\DBAL\Connection` or DBAL url
+* Deprecate usage of `PdoStore` with `Doctrine\DBAL\Connection` or DBAL url
+* Add `DoctrineDbalPostgreSqlStore` identical to `PdoPostgreSqlStore` for `Doctrine\DBAL\Connection` or DBAL url
+* Deprecate usage of `PdoPostgreSqlStore` with `Doctrine\DBAL\Connection` or DBAL url
+
 5.2.0
 -----
 

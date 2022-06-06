@@ -20,7 +20,9 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +50,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 
 /**
- * Provides common features needed in controllers.
+ * Provides shortcuts for HTTP-related features in controllers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -60,7 +62,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected $container;
 
     /**
-     * @internal
      * @required
      */
     public function setContainer(ContainerInterface $container): ?ContainerInterface
@@ -74,7 +75,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Gets a container parameter by its name.
      *
-     * @return array|bool|float|int|string|null
+     * @return array|bool|float|int|string|\UnitEnum|null
      */
     protected function getParameter(string $name)
     {
@@ -95,21 +96,25 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'session' => '?'.SessionInterface::class,
             'security.authorization_checker' => '?'.AuthorizationCheckerInterface::class,
             'twig' => '?'.Environment::class,
-            'doctrine' => '?'.ManagerRegistry::class,
+            'doctrine' => '?'.ManagerRegistry::class, // to be removed in 6.0
             'form.factory' => '?'.FormFactoryInterface::class,
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
-            'message_bus' => '?'.MessageBusInterface::class,
-            'messenger.default_bus' => '?'.MessageBusInterface::class,
+            'message_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
+            'messenger.default_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
         ];
     }
 
     /**
      * Returns true if the service id is defined.
+     *
+     * @deprecated since Symfony 5.4, use method or constructor injection in your controller instead
      */
     protected function has(string $id): bool
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, use method or constructor injection in your controller instead.', __METHOD__);
+
         return $this->container->has($id);
     }
 
@@ -117,9 +122,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * Gets a container service by its id.
      *
      * @return object The service
+     *
+     * @deprecated since Symfony 5.4, use method or constructor injection in your controller instead
      */
     protected function get(string $id): object
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, use method or constructor injection in your controller instead.', __METHOD__);
+
         return $this->container->get($id);
     }
 
@@ -199,11 +208,11 @@ abstract class AbstractController implements ServiceSubscriberInterface
      */
     protected function addFlash(string $type, $message): void
     {
-        if (!$this->container->has('session')) {
-            throw new \LogicException('You can not use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".');
+        try {
+            $this->container->get('request_stack')->getSession()->getFlashBag()->add($type, $message);
+        } catch (SessionNotFoundException $e) {
+            throw new \LogicException('You cannot use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".', 0, $e);
         }
-
-        $this->container->get('session')->getFlashBag()->add($type, $message);
     }
 
     /**
@@ -243,7 +252,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function renderView(string $view, array $parameters = []): string
     {
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+            throw new \LogicException('You cannot use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
         }
 
         return $this->container->get('twig')->render($view, $parameters);
@@ -266,12 +275,42 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
+     * Renders a view and sets the appropriate status code when a form is listed in parameters.
+     *
+     * If an invalid form is found in the list of parameters, a 422 status code is returned.
+     */
+    protected function renderForm(string $view, array $parameters = [], Response $response = null): Response
+    {
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        foreach ($parameters as $k => $v) {
+            if ($v instanceof FormView) {
+                throw new \LogicException(sprintf('Passing a FormView to "%s::renderForm()" is not supported, pass directly the form instead for parameter "%s".', get_debug_type($this), $k));
+            }
+
+            if (!$v instanceof FormInterface) {
+                continue;
+            }
+
+            $parameters[$k] = $v->createView();
+
+            if (200 === $response->getStatusCode() && $v->isSubmitted() && !$v->isValid()) {
+                $response->setStatusCode(422);
+            }
+        }
+
+        return $this->render($view, $parameters, $response);
+    }
+
+    /**
      * Streams a view.
      */
     protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
     {
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "stream" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+            throw new \LogicException('You cannot use the "stream" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
         }
 
         $twig = $this->container->get('twig');
@@ -313,7 +352,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function createAccessDeniedException(string $message = 'Access Denied.', \Throwable $previous = null): AccessDeniedException
     {
         if (!class_exists(AccessDeniedException::class)) {
-            throw new \LogicException('You can not use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require symfony/security-bundle".');
+            throw new \LogicException('You cannot use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require symfony/security-bundle".');
         }
 
         return new AccessDeniedException($message, $previous);
@@ -339,9 +378,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * Shortcut to return the Doctrine Registry service.
      *
      * @throws \LogicException If DoctrineBundle is not available
+     *
+     * @deprecated since Symfony 5.4, inject an instance of ManagerRegistry in your controller instead
      */
     protected function getDoctrine(): ManagerRegistry
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, inject an instance of ManagerRegistry in your controller instead.', __METHOD__);
+
         if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');
         }
@@ -352,7 +395,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return UserInterface|object|null
+     * @return UserInterface|null
      *
      * @throws \LogicException If SecurityBundle is not available
      *
@@ -368,6 +411,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             return null;
         }
 
+        // @deprecated since 5.4, $user will always be a UserInterface instance
         if (!\is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
             return null;
@@ -395,9 +439,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * Dispatches a message to the bus.
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     *
+     * @deprecated since Symfony 5.4, inject an instance of MessageBusInterface in your controller instead
      */
     protected function dispatchMessage(object $message, array $stamps = []): Envelope
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, inject an instance of MessageBusInterface in your controller instead.', __METHOD__);
+
         if (!$this->container->has('messenger.default_bus')) {
             $message = class_exists(Envelope::class) ? 'You need to define the "messenger.default_bus" configuration option.' : 'Try running "composer require symfony/messenger".';
             throw new \LogicException('The message bus is not enabled in your application. '.$message);
@@ -414,7 +462,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function addLink(Request $request, LinkInterface $link): void
     {
         if (!class_exists(AddLinkHeaderListener::class)) {
-            throw new \LogicException('You can not use the "addLink" method if the WebLink component is not available. Try running "composer require symfony/web-link".');
+            throw new \LogicException('You cannot use the "addLink" method if the WebLink component is not available. Try running "composer require symfony/web-link".');
         }
 
         if (null === $linkProvider = $request->attributes->get('_links')) {

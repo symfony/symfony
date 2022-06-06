@@ -21,8 +21,6 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.2
  */
 final class TokenBucketLimiter implements LimiterInterface
 {
@@ -88,10 +86,10 @@ final class TokenBucketLimiter implements LimiterInterface
 
                 // at $now + $waitDuration all tokens will be reserved for this process,
                 // so no tokens are left for other processes.
-                $bucket->setTokens(0);
-                $bucket->setTimer($now + $waitDuration);
+                $bucket->setTokens($availableTokens - $tokens);
+                $bucket->setTimer($now);
 
-                $reservation = new Reservation($bucket->getTimer(), new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
             }
 
             $this->storage->save($bucket);

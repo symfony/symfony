@@ -18,6 +18,9 @@ class AttributeController
     public function action(#[Foo('bar')] string $baz) {
     }
 
-    public function invalidAction(#[Foo('bar'), Foo('bar')] string $baz) {
+    public function multiAttributeArg(#[Foo('bar'), Undefined('bar')] string $baz) {
+    }
+
+    public function issue41478(#[Foo('bar')] string $baz, string $bat) {
     }
 }

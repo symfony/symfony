@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\String\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -36,11 +45,13 @@ abstract class AbstractAsciiTestCase extends TestCase
 
     /**
      * @dataProvider provideBytesAt
-     *
-     * @requires extension intl 66.2
      */
     public function testBytesAt(array $expected, string $string, int $offset, int $form = null)
     {
+        if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
+            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+        }
+
         $instance = static::createFromString($string);
         $instance = $form ? $instance->normalize($form) : $instance;
 
@@ -159,11 +170,13 @@ abstract class AbstractAsciiTestCase extends TestCase
 
     /**
      * @dataProvider provideLength
-     *
-     * @requires extension intl 66.2
      */
     public function testLength(int $length, string $string)
     {
+        if (2 !== grapheme_strlen('च्छे') && 'अनुच्छेद' === $string) {
+            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+        }
+
         $instance = static::createFromString($string);
 
         $this->assertSame($length, $instance->length());
@@ -729,6 +742,15 @@ abstract class AbstractAsciiTestCase extends TestCase
         ];
     }
 
+    public function testTrimPrefix()
+    {
+        $str = static::createFromString('abc.def');
+
+        $this->assertEquals(static::createFromString('def'), $str->trimPrefix('abc.'));
+        $this->assertEquals(static::createFromString('def'), $str->trimPrefix(['abc.', 'def']));
+        $this->assertEquals(static::createFromString('def'), $str->ignoreCase()->trimPrefix('ABC.'));
+    }
+
     /**
      * @dataProvider provideTrimStart
      */
@@ -738,6 +760,15 @@ abstract class AbstractAsciiTestCase extends TestCase
         $result = null !== $chars ? $result->trimStart($chars) : $result->trimStart();
 
         $this->assertEquals(static::createFromString($expected), $result);
+    }
+
+    public function testTrimSuffix()
+    {
+        $str = static::createFromString('abc.def');
+
+        $this->assertEquals(static::createFromString('abc'), $str->trimSuffix('.def'));
+        $this->assertEquals(static::createFromString('abc'), $str->trimSuffix(['.def', 'abc']));
+        $this->assertEquals(static::createFromString('abc'), $str->ignoreCase()->trimSuffix('.DEF'));
     }
 
     public static function provideTrimStart()

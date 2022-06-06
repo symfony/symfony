@@ -26,6 +26,10 @@ class AddEventAliasesPass implements CompilerPassInterface
 
     public function __construct(array $eventAliases, string $eventAliasesParameter = 'event_dispatcher.event_aliases')
     {
+        if (1 < \func_num_args()) {
+            trigger_deprecation('symfony/event-dispatcher', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->eventAliases = $eventAliases;
         $this->eventAliasesParameter = $eventAliasesParameter;
     }

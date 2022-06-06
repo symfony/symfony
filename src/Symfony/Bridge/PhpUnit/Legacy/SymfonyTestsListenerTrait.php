@@ -123,7 +123,7 @@ class SymfonyTestsListenerTrait
         $suiteName = $suite->getName();
 
         foreach ($suite->tests() as $test) {
-            if (!($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
+            if (!$test instanceof TestCase) {
                 continue;
             }
             if (null === Test::getPreserveGlobalStateSettings(\get_class($test), $test->getName(false))) {
@@ -158,7 +158,7 @@ class SymfonyTestsListenerTrait
             $testSuites = [$suite];
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
-                    if ($test instanceof \PHPUnit_Framework_TestSuite || $test instanceof TestSuite) {
+                    if ($test instanceof TestSuite) {
                         if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
                             continue;
@@ -178,11 +178,11 @@ class SymfonyTestsListenerTrait
             $skipped = [];
             while ($s = array_shift($suites)) {
                 foreach ($s->tests() as $test) {
-                    if ($test instanceof \PHPUnit_Framework_TestSuite || $test instanceof TestSuite) {
+                    if ($test instanceof TestSuite) {
                         $suites[] = $test;
                         continue;
                     }
-                    if (($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)
+                    if ($test instanceof TestCase
                         && isset($this->wasSkipped[\get_class($test)][$test->getName()])
                     ) {
                         $skipped[] = $test;
@@ -202,7 +202,7 @@ class SymfonyTestsListenerTrait
 
     public function startTest($test)
     {
-        if (-2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
+        if (-2 < $this->state && $test instanceof TestCase) {
             // This event is triggered before the test is re-run in isolation
             if ($this->willBeIsolated($test)) {
                 $this->runsInSeparateProcess = tempnam(sys_get_temp_dir(), 'deprec');
@@ -283,7 +283,7 @@ class SymfonyTestsListenerTrait
             unlink($this->runsInSeparateProcess);
             putenv('SYMFONY_DEPRECATIONS_SERIALIZE');
             foreach ($deprecations ? unserialize($deprecations) : [] as $deprecation) {
-                $error = serialize(['deprecation' => $deprecation[1], 'class' => $className, 'method' => $test->getName(false), 'triggering_file' => isset($deprecation[2]) ? $deprecation[2] : null, 'files_stack' => isset($deprecation[3]) ? $deprecation[3] : []]);
+                $error = serialize(['deprecation' => $deprecation[1], 'class' => $className, 'method' => $test->getName(false), 'triggering_file' => $deprecation[2] ?? null, 'files_stack' => $deprecation[3] ?? []]);
                 if ($deprecation[0]) {
                     // unsilenced on purpose
                     trigger_error($error, \E_USER_DEPRECATED);
@@ -315,7 +315,7 @@ class SymfonyTestsListenerTrait
             self::$expectedDeprecations = self::$gatheredDeprecations = [];
             self::$previousErrorHandler = null;
         }
-        if (!$this->runsInSeparateProcess && -2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
+        if (!$this->runsInSeparateProcess && -2 < $this->state && $test instanceof TestCase) {
             if (\in_array('time-sensitive', $groups, true)) {
                 ClockMock::withClockMock(false);
             }

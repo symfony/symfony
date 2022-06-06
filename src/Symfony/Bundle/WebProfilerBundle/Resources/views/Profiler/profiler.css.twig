@@ -10,16 +10,28 @@
     --page-background: #f9f9f9;
     --color-text: #222;
     --color-muted: #999;
+    --color-link: #218BC3;
     /* when updating any of these colors, do the same in toolbar.css.twig */
     --color-success: #4f805d;
     --color-warning: #a46a1f;
     --color-error: #b0413e;
+    --badge-background: #f5f5f5;
+    --badge-color: #666;
+    --badge-warning-background: #FEF3C7;
+    --badge-warning-color: #B45309;
+    --badge-danger-background: #FEE2E2;
+    --badge-danger-color: #B91C1C;
     --tab-background: #fff;
     --tab-color: #444;
     --tab-active-background: #666;
     --tab-active-color: #fafafa;
     --tab-disabled-background: #f5f5f5;
     --tab-disabled-color: #999;
+    --log-filter-button-background: #fff;
+    --log-filter-button-border: #999;
+    --log-filter-button-color: #555;
+    --log-filter-active-num-color: #2563EB;
+    --log-timestamp-color: #555;
     --metric-value-background: #fff;
     --metric-value-color: inherit;
     --metric-unit-color: #999;
@@ -39,6 +51,7 @@
     --highlight-default: #222222;
     --highlight-keyword: #a71d5d;
     --highlight-string: #183691;
+    --highlight-selected-line: rgba(255, 255, 153, 0.5);
     --base-0: #fff;
     --base-1: #f5f5f5;
     --base-2: #e0e0e0;
@@ -54,13 +67,25 @@
     --page-background: #36393e;
     --color-text: #e0e0e0;
     --color-muted: #777;
+    --color-link: #93C5FD;
     --color-error: #d43934;
+    --badge-background: #555;
+    --badge-color: #ddd;
+    --badge-warning-background: #B45309;
+    --badge-warning-color: #FEF3C7;
+    --badge-danger-background: #B91C1C;
+    --badge-danger-color: #FEE2E2;
     --tab-background: #555;
     --tab-color: #ccc;
     --tab-active-background: #888;
     --tab-active-color: #fafafa;
     --tab-disabled-background: var(--page-background);
     --tab-disabled-color: #777;
+    --log-filter-button-background: #555;
+    --log-filter-button-border: #999;
+    --log-filter-button-color: #ccc;
+    --log-filter-active-num-color: #93C5FD;
+    --log-timestamp-color: #ccc;
     --metric-value-background: #555;
     --metric-value-color: inherit;
     --metric-unit-color: #999;
@@ -80,6 +105,7 @@
     --highlight-default: var(--base-6);
     --highlight-keyword: #ff413c;
     --highlight-string: #70a6fd;
+    --highlight-selected-line: rgba(14, 14, 14, 0.5);
     --base-0: #2e3136;
     --base-1: #444;
     --base-2: #666;
@@ -139,7 +165,7 @@ p {
 }
 
 a {
-    color: #218BC3;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -204,7 +230,7 @@ button {
 }
 .btn-link {
     border-color: transparent;
-    color: #218BC3;
+    color: var(--color-link);
     text-decoration: none;
     background-color: transparent;
     outline: none;
@@ -1011,12 +1037,193 @@ tr.status-warning td {
 
 {# Logger panel
    ========================================================================= #}
+.badge {
+    background: var(--badge-background);
+    border-radius: 4px;
+    color: var(--badge-color);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 1px 4px;
+}
+.badge-warning {
+    background: var(--badge-warning-background);
+    color: var(--badge-warning-color);
+}
+
+.log-filters {
+    display: flex;
+}
+.log-filters .log-filter {
+    position: relative;
+}
+.log-filters .log-filter + .log-filter {
+    margin-left: 15px;
+}
+.log-filters .log-filter summary {
+    align-items: center;
+    background: var(--log-filter-button-background);
+    border-radius: 2px;
+    border: 1px solid var(--log-filter-button-border);
+    color: var(--log-filter-button-color);
+    cursor: pointer;
+    display: flex;
+    padding: 5px 8px;
+}
+.log-filters .log-filter summary .icon {
+    height: 18px;
+    width: 18px;
+    margin: 0 7px 0 0;
+}
+.log-filters .log-filter summary svg {
+    height: 18px;
+    width: 18px;
+    opacity: 0.7;
+}
+.log-filters .log-filter summary .filter-active-num {
+    color: var(--log-filter-active-num-color);
+    font-weight: bold;
+    padding: 0 1px;
+}
+.log-filter .tab-navigation {
+    margin-bottom: 0;
+}
+.log-filter .tab-navigation li:first-child {
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+.log-filter .tab-navigation li:last-child {
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+.log-filter .tab-navigation li {
+    border-color: var(--log-filter-button-border);
+    padding: 0;
+}
+.log-filter .tab-navigation li + li {
+    margin-left: -5px;
+}
+.log-filter .tab-navigation li .badge {
+    font-size: 13px;
+    padding: 0 6px;
+}
+.log-filter .tab-navigation li input {
+    display: none;
+}
+.log-filter .tab-navigation li label {
+    align-items: center;
+    cursor: pointer;
+    padding: 5px 10px;
+    display: inline-flex;
+    font-size: 14px;
+}
+
+.log-filters .log-filter .log-filter-content {
+    background: var(--base-0);
+    border: 1px solid var(--table-border);
+    border-radius: 2px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    position: absolute;
+    left: 0;
+    top: 36px;
+    max-width: 400px;
+    min-width: 200px;
+    z-index: 9999;
+}
+.log-filters .log-filter .log-filter-content .log-filter-option {
+    align-items: center;
+    display: flex;
+}
+.log-filter .filter-select-all-or-none {
+    margin-bottom: 10px;
+}
+.log-filter .filter-select-all-or-none button + button {
+    margin-left: 15px;
+}
+.log-filters .log-filter .log-filter-content .log-filter-option + .log-filter-option {
+    margin: 7px 0 0;
+}
+.log-filters .log-filter .log-filter-content .log-filter-option label {
+    cursor: pointer;
+    flex: 1;
+    padding-left: 10px;
+}
+
 table.logs .metadata {
     display: block;
     font-size: 12px;
 }
 .theme-dark tr.status-error td,
 .theme-dark tr.status-warning td { border-bottom: unset; border-top: unset; }
+
+table.logs .log-timestamp {
+    color: var(--log-timestamp-color);
+}
+table.logs .log-metadata {
+    margin: 8px 0 0;
+}
+table.logs .log-metadata > span {
+    display: inline-block;
+}
+table.logs .log-metadata > span + span {
+    margin-left: 10px;
+}
+table.logs .log-metadata .log-channel {
+    color: var(--base-1);
+    font-size: 13px;
+    font-weight: bold;
+}
+table.logs .log-metadata .log-num-occurrences {
+    color: var(--color-muted);
+    font-size: 13px;
+}
+.log-type-badge {
+    display: inline-block;
+    font-family: var(--font-sans-serif);
+    margin-top: 5px;
+}
+.log-type-badge.badge-deprecation {
+    background: var(--badge-warning-background);
+    color: var(--badge-warning-color);
+}
+.log-type-badge.badge-error {
+    background: var(--badge-danger-background);
+    color: var(--badge-danger-color);
+}
+.log-type-badge.badge-silenced {
+    background: #EDE9FE;
+    color: #6D28D9;
+}
+.theme-dark .log-type-badge.badge-silenced {
+    background: #5B21B6;
+    color: #EDE9FE;
+}
+
+tr.log-status-warning {
+    border-left: 4px solid #F59E0B;
+}
+tr.log-status-error {
+    border-left: 4px solid #EF4444;
+}
+tr.log-status-silenced {
+    border-left: 4px solid #A78BFA;
+}
+
+.container-compilation-logs {
+    background: var(--table-background);
+    border: 1px solid var(--base-2);
+    margin-top: 30px;
+    padding: 15px;
+}
+.container-compilation-logs summary {
+    cursor: pointer;
+}
+.container-compilation-logs summary h4 {
+    margin: 0 0 5px;
+}
+.container-compilation-logs summary p {
+    margin: 0;
+}
 
 {# Doctrine panel
    ========================================================================= #}
@@ -1091,15 +1298,15 @@ table.logs .metadata {
     padding: 0;
 }
 #collector-content .sf-validator .trace li.selected {
-    background: rgba(255, 255, 153, 0.5);
+    background: var(--highlight-selected-line);
 }
 
 {# Messenger panel
    ========================================================================= #}
 
 #collector-content .message-bus .trace {
-    border: 1px solid #DDD;
-    background: #FFF;
+    border: var(--border);
+    background: var(--base-0);
     padding: 10px;
     margin: 0.5em 0;
     overflow: auto;
@@ -1112,7 +1319,7 @@ table.logs .metadata {
     padding: 0;
 }
 #collector-content .message-bus .trace li.selected {
-    background: rgba(255, 255, 153, 0.5);
+    background: var(--highlight-selected-line);
 }
 
 {# Dump panel

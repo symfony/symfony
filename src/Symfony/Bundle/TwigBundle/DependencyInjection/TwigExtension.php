@@ -11,15 +11,19 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\AbstractRendererEngine;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Service\ResetInterface;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -34,22 +38,32 @@ class TwigExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
+        if (!class_exists(InstalledVersions::class)) {
+            trigger_deprecation('symfony/twig-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.1 or later.');
+        }
+
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
 
-        if (class_exists(\Symfony\Component\Form\Form::class)) {
+        if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'], true)) {
             $loader->load('form.php');
+
+            if (is_subclass_of(AbstractRendererEngine::class, ResetInterface::class)) {
+                $container->getDefinition('twig.form.engine')->addTag('kernel.reset', [
+                    'method' => 'reset',
+                ]);
+            }
         }
 
-        if (class_exists(Application::class)) {
+        if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'], true)) {
             $loader->load('console.php');
         }
 
-        if (class_exists(Mailer::class)) {
+        if ($container::willBeAvailable('symfony/mailer', Mailer::class, ['symfony/twig-bundle'], true)) {
             $loader->load('mailer.php');
         }
 
-        if (!class_exists(Translator::class)) {
+        if (!$container::willBeAvailable('symfony/translation', Translator::class, ['symfony/twig-bundle'], true)) {
             $container->removeDefinition('twig.translation.extractor');
         }
 

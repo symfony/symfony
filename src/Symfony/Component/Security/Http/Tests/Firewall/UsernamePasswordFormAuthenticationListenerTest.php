@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
@@ -32,12 +33,15 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
+/**
+ * @group legacy
+ */
 class UsernamePasswordFormAuthenticationListenerTest extends TestCase
 {
     /**
      * @dataProvider getUsernameForLength
      */
-    public function testHandleWhenUsernameLength($username, $ok)
+    public function testHandleWhenUsernameLength(string $username, bool $ok)
     {
         $request = Request::create('/login_check', 'POST', ['_username' => $username, '_password' => 'symfony']);
         $request->setSession($this->createMock(SessionInterface::class));
@@ -78,16 +82,14 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ['require_previous_session' => false]
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     /**
      * @dataProvider postOnlyDataProvider
      */
-    public function testHandleNonStringUsernameWithArray($postOnly)
+    public function testHandleNonStringUsernameWithArray(bool $postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "array" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => []]);
         $request->setSession($this->createMock(SessionInterface::class));
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -100,17 +102,19 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_username" must be a string, "array" given.');
+
         $listener($event);
     }
 
     /**
      * @dataProvider postOnlyDataProvider
      */
-    public function testHandleNonStringUsernameWithInt($postOnly)
+    public function testHandleNonStringUsernameWithInt(bool $postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "int" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => 42]);
         $request->setSession($this->createMock(SessionInterface::class));
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -123,17 +127,19 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_username" must be a string, "int" given.');
+
         $listener($event);
     }
 
     /**
      * @dataProvider postOnlyDataProvider
      */
-    public function testHandleNonStringUsernameWithObject($postOnly)
+    public function testHandleNonStringUsernameWithObject(bool $postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "stdClass" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => new \stdClass()]);
         $request->setSession($this->createMock(SessionInterface::class));
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -146,14 +152,18 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_username" must be a string, "stdClass" given.');
+
         $listener($event);
     }
 
     /**
      * @dataProvider postOnlyDataProvider
      */
-    public function testHandleNonStringUsernameWith__toString($postOnly)
+    public function testHandleNonStringUsernameWithToString(bool $postOnly)
     {
         $usernameClass = $this->createMock(DummyUserClass::class);
         $usernameClass
@@ -173,7 +183,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $listener($event);
     }
 
@@ -197,11 +207,67 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $listener($event);
     }
 
-    public function postOnlyDataProvider()
+    /**
+     * @dataProvider provideInvalidCsrfTokens
+     */
+    public function testInvalidCsrfToken($invalidToken)
+    {
+        $formBody = ['_username' => 'fabien', '_password' => 'symfony'];
+        if (null !== $invalidToken) {
+            $formBody['_csrf_token'] = $invalidToken;
+        }
+
+        $request = Request::create('/login_check', 'POST', $formBody);
+        $request->setSession($this->createMock(SessionInterface::class));
+
+        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpUtils
+            ->method('checkRequestPath')
+            ->willReturn(true)
+        ;
+        $httpUtils
+            ->method('createRedirectResponse')
+            ->willReturn(new RedirectResponse('/hello'))
+        ;
+
+        $failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $failureHandler
+            ->expects($this->once())
+            ->method('onAuthenticationFailure')
+            ->willReturn(new Response())
+        ;
+
+        $authenticationManager = $this->createMock(AuthenticationProviderManager::class);
+        $authenticationManager
+            ->expects($this->never())
+            ->method('authenticate')
+        ;
+
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('isTokenValid')->willReturn(false);
+
+        $listener = new UsernamePasswordFormAuthenticationListener(
+            $this->createMock(TokenStorageInterface::class),
+            $authenticationManager,
+            $this->createMock(SessionAuthenticationStrategyInterface::class),
+            $httpUtils,
+            'TheProviderKey',
+            new DefaultAuthenticationSuccessHandler($httpUtils),
+            $failureHandler,
+            ['require_previous_session' => false],
+            null,
+            null,
+            $csrfTokenManager
+        );
+
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+    }
+
+    public function postOnlyDataProvider(): array
     {
         return [
             [true],
@@ -209,11 +275,20 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         ];
     }
 
-    public function getUsernameForLength()
+    public function getUsernameForLength(): array
     {
         return [
             [str_repeat('x', Security::MAX_USERNAME_LENGTH + 1), false],
             [str_repeat('x', Security::MAX_USERNAME_LENGTH - 1), true],
+        ];
+    }
+
+    public function provideInvalidCsrfTokens(): array
+    {
+        return [
+            ['invalid'],
+            [['in' => 'valid']],
+            [null],
         ];
     }
 }

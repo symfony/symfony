@@ -28,6 +28,8 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', GuardAuthenticationListener::class);
+
 /**
  * Authentication listener for the "guard" system.
  *
@@ -35,6 +37,8 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  *
  * @final
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class GuardAuthenticationListener extends AbstractListener
 {
@@ -47,8 +51,8 @@ class GuardAuthenticationListener extends AbstractListener
     private $hideUserNotFoundExceptions;
 
     /**
-     * @param string                            $providerKey         The provider (i.e. firewall) key
-     * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
+     * @param string                                      $providerKey         The provider (i.e. firewall) key
+     * @param iterable<array-key, AuthenticatorInterface> $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      */
     public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null, bool $hideUserNotFoundExceptions = true)
     {

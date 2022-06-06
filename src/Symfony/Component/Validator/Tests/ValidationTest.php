@@ -30,7 +30,29 @@ class ValidationTest extends TestCase
     public function testCreateCallableInvalid()
     {
         $validator = Validation::createCallable(new Email());
-        $this->expectException(ValidationFailedException::class);
-        $validator('test');
+        try {
+            $validator('test');
+            $this->fail('No ValidationFailedException thrown');
+        } catch (ValidationFailedException $e) {
+            $this->assertEquals('test', $e->getValue());
+
+            $violations = $e->getViolations();
+            $this->assertCount(1, $violations);
+            $this->assertEquals('This value is not a valid email address.', $violations->get(0)->getMessage());
+        }
+    }
+
+    public function testCreateIsValidCallableValid()
+    {
+        $validator = Validation::createIsValidCallable(new Email());
+        $this->assertTrue($validator('test@example.com'));
+    }
+
+    public function testCreateIsValidCallableInvalid()
+    {
+        $validator = Validation::createIsValidCallable(new Email());
+        $this->assertFalse($validator('test', $violations));
+        $this->assertCount(1, $violations);
+        $this->assertEquals('This value is not a valid email address.', $violations->get(0)->getMessage());
     }
 }

@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class AboutCommand extends Command
 {
     protected static $defaultName = 'about';
+    protected static $defaultDescription = 'Display information about the current project';
 
     /**
      * {@inheritdoc}
@@ -37,15 +38,12 @@ class AboutCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Display information about the current project')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command displays information about the current Symfony project.
 
 The <info>PHP</info> section displays important configuration that could affect your application. The values might
 be different between web and CLI.
-
-The <info>Environment</info> section displays the current environment variables managed by Symfony Dotenv. It will not
-be shown if no variables were found. The values might be different between web and CLI.
 EOT
             )
         ;

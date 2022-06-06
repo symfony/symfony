@@ -47,7 +47,7 @@ class FileResource implements SelfCheckingResourceInterface
     }
 
     /**
-     * @return string The canonicalized, absolute path to the resource
+     * Returns the canonicalized, absolute path to the resource.
      */
     public function getResource(): string
     {

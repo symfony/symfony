@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
 class ApiAuthenticator extends AbstractAuthenticator
@@ -37,7 +37,7 @@ class ApiAuthenticator extends AbstractAuthenticator
         return $request->headers->has('X-USER-EMAIL');
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         $email = $request->headers->get('X-USER-EMAIL');
         if (false === strpos($email, '@')) {
@@ -46,7 +46,7 @@ class ApiAuthenticator extends AbstractAuthenticator
 
         $userLoader = null;
         if ($this->selfLoadingUser) {
-            $userLoader = function ($username) { return new User($username, 'test', ['ROLE_USER']); };
+            $userLoader = function ($username) { return new InMemoryUser($username, 'test', ['ROLE_USER']); };
         }
 
         return new SelfValidatingPassport(new UserBadge($email, $userLoader));

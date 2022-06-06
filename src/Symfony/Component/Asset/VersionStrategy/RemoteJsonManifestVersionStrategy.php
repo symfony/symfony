@@ -13,6 +13,8 @@ namespace Symfony\Component\Asset\VersionStrategy;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+trigger_deprecation('symfony/asset', '5.3', 'The "%s" class is deprecated, use "%s" instead.', RemoteJsonManifestVersionStrategy::class, JsonManifestVersionStrategy::class);
+
 /**
  * Reads the versioned path of an asset from a remote JSON manifest file.
  *
@@ -23,6 +25,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *     }
  *
  * You could then ask for the version of "main.js" or "css/styles.css".
+ *
+ * @deprecated since Symfony 5.3, use JsonManifestVersionStrategy instead.
  */
 class RemoteJsonManifestVersionStrategy implements VersionStrategyInterface
 {

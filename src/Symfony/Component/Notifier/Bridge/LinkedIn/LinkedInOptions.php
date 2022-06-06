@@ -20,8 +20,6 @@ use Symfony\Component\Notifier\Notification\Notification;
 
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
- *
- * @experimental in 5.2
  */
 final class LinkedInOptions implements MessageOptionsInterface
 {
@@ -57,6 +55,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $options;
     }
 
+    /**
+     * @return $this
+     */
     public function contentCertificationRecord(string $contentCertificationRecord): self
     {
         $this->options['contentCertificationRecord'] = $contentCertificationRecord;
@@ -64,6 +65,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function firstPublishedAt(int $firstPublishedAt): self
     {
         $this->options['firstPublishedAt'] = $firstPublishedAt;
@@ -71,6 +75,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function lifecycleState(LifecycleStateShare $lifecycleStateOption): self
     {
         $this->options['lifecycleState'] = $lifecycleStateOption->lifecycleState();
@@ -78,6 +85,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function origin(string $origin): self
     {
         $this->options['origin'] = $origin;
@@ -85,6 +95,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function ugcOrigin(string $ugcOrigin): self
     {
         $this->options['ugcOrigin'] = $ugcOrigin;
@@ -92,6 +105,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function versionTag(string $versionTag): self
     {
         $this->options['versionTag'] = $versionTag;
@@ -99,6 +115,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function specificContent(ShareContentShare $specificContent): self
     {
         $this->options['specificContent']['com.linkedin.ugc.ShareContent'] = $specificContent->toArray();
@@ -106,6 +125,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function author(AuthorShare $authorOption): self
     {
         $this->options['author'] = $authorOption->author();
@@ -113,6 +135,9 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function visibility(VisibilityShare $visibilityOption): self
     {
         $this->options['visibility'] = $visibilityOption->toArray();

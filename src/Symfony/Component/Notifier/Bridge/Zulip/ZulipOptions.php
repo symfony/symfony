@@ -15,8 +15,6 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Mohammad Emran Hasan <phpfour@gmail.com>
- *
- * @experimental in 5.2
  */
 final class ZulipOptions implements MessageOptionsInterface
 {
@@ -45,6 +43,9 @@ final class ZulipOptions implements MessageOptionsInterface
         return $this->recipient;
     }
 
+    /**
+     * @return $this
+     */
     public function topic(string $topic): self
     {
         $this->topic = $topic;

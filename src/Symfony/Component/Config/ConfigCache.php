@@ -49,7 +49,7 @@ class ConfigCache extends ResourceCheckerConfigCache
      * This implementation always returns true when debug is off and the
      * cache file exists.
      *
-     * @return bool true if the cache is fresh, false otherwise
+     * @return bool
      */
     public function isFresh()
     {

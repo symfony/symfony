@@ -13,6 +13,8 @@ namespace Symfony\Component\Security\Guard\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', GuardTokenInterface::class);
+
 /**
  * A marker interface that both guard tokens implement.
  *
@@ -21,6 +23,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * interface.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 interface GuardTokenInterface extends TokenInterface
 {

@@ -20,7 +20,7 @@
         "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
-        "symfony/var-dumper": "^4.4.9|^5.0.9"
+        "symfony/var-dumper": "^4.4.9|^5.0.9|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\VarExporter\\": "" },

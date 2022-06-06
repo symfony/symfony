@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord;
 
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -23,8 +24,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Mathieu Piot <math.piot@gmail.com>
- *
- * @experimental in 5.2
  */
 final class DiscordTransport extends AbstractTransport
 {
@@ -60,7 +59,7 @@ final class DiscordTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
         $messageOptions = $message->getOptions();
@@ -69,7 +68,7 @@ final class DiscordTransport extends AbstractTransport
         $content = $message->getSubject();
 
         if (mb_strlen($content, 'UTF-8') > self::SUBJECT_LIMIT) {
-            throw new LogicException(sprintf('The subject length of a Discord message must not exceed %d characters.', self::SUBJECT_LIMIT));
+            throw new LengthException(sprintf('The subject length of a Discord message must not exceed %d characters.', self::SUBJECT_LIMIT));
         }
 
         $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);

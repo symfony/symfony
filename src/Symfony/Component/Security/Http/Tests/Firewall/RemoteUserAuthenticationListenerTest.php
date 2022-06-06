@@ -18,6 +18,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener;
 
+/**
+ * @group legacy
+ */
 class RemoteUserAuthenticationListenerTest extends TestCase
 {
     public function testGetPreAuthenticatedData()

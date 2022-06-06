@@ -17,8 +17,6 @@ use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button\InlineKeyboar
  * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
  *
  * @see https://core.telegram.org/bots/api#inlinekeyboardmarkup
- *
- * @experimental in 5.2
  */
 final class InlineKeyboardMarkup extends AbstractTelegramReplyMarkup
 {
@@ -28,7 +26,9 @@ final class InlineKeyboardMarkup extends AbstractTelegramReplyMarkup
     }
 
     /**
-     * @param array|InlineKeyboardButton[] $buttons
+     * @param InlineKeyboardButton[] $buttons
+     *
+     * @return $this
      */
     public function inlineKeyboard(array $buttons): self
     {

@@ -12,10 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\DefaultsConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\InstanceofConfigurator;
-use Symfony\Component\DependencyInjection\Reference;
 
 trait BindTrait
 {
@@ -34,9 +32,6 @@ trait BindTrait
     final public function bind(string $nameOrFqcn, $valueOrRef): self
     {
         $valueOrRef = static::processValue($valueOrRef, true);
-        if (!preg_match('/^(?:(?:array|bool|float|int|string|iterable)[ \t]*+)?\$/', $nameOrFqcn) && !$valueOrRef instanceof Reference) {
-            throw new InvalidArgumentException(sprintf('Invalid binding for service "%s": named arguments must start with a "$", and FQCN must map to references. Neither applies to binding "%s".', $this->id, $nameOrFqcn));
-        }
         $bindings = $this->definition->getBindings();
         $type = $this instanceof DefaultsConfigurator ? BoundArgument::DEFAULTS_BINDING : ($this instanceof InstanceofConfigurator ? BoundArgument::INSTANCEOF_BINDING : BoundArgument::SERVICE_BINDING);
         $bindings[$nameOrFqcn] = new BoundArgument($valueOrRef, true, $type, $this->path ?? null);

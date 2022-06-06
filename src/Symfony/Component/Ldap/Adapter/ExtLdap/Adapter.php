@@ -72,7 +72,7 @@ class Adapter implements AdapterInterface
         $value = ldap_escape($subject, $ignore, $flags);
 
         // Per RFC 4514, leading/trailing spaces should be encoded in DNs, as well as carriage returns.
-        if ((int) $flags & \LDAP_ESCAPE_DN) {
+        if ($flags & \LDAP_ESCAPE_DN) {
             if (!empty($value) && ' ' === $value[0]) {
                 $value = '\\20'.substr($value, 1);
             }

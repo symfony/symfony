@@ -29,7 +29,7 @@ interface LoaderInterface
      * @param string $locale   A locale
      * @param string $domain   The domain
      *
-     * @return MessageCatalogue A MessageCatalogue instance
+     * @return MessageCatalogue
      *
      * @throws NotFoundResourceException when the resource cannot be found
      * @throws InvalidResourceException  when the resource cannot be loaded

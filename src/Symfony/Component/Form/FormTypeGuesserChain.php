@@ -25,17 +25,20 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      */
     public function __construct(iterable $guessers)
     {
+        $tmpGuessers = [];
         foreach ($guessers as $guesser) {
             if (!$guesser instanceof FormTypeGuesserInterface) {
                 throw new UnexpectedTypeException($guesser, FormTypeGuesserInterface::class);
             }
 
             if ($guesser instanceof self) {
-                $this->guessers = array_merge($this->guessers, $guesser->guessers);
+                $tmpGuessers[] = $guesser->guessers;
             } else {
-                $this->guessers[] = $guesser;
+                $tmpGuessers[] = [$guesser];
             }
         }
+
+        $this->guessers = array_merge([], ...$tmpGuessers);
     }
 
     /**

@@ -13,7 +13,8 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SecurityTest extends AbstractWebTestCase
@@ -25,27 +26,13 @@ class SecurityTest extends AbstractWebTestCase
         $container = $kernel->getContainer();
 
         // put a token into the storage so the final calls can function
-        $user = new User('foo', 'pass');
-        $token = new UsernamePasswordToken($user, '', 'provider', ['ROLE_USER']);
-        $container->get('security.token_storage')->setToken($token);
+        $user = new InMemoryUser('foo', 'pass');
+        $token = new UsernamePasswordToken($user, 'provider', ['ROLE_USER']);
+        $container->get('functional.test.security.token_storage')->setToken($token);
 
         $security = $container->get('functional_test.security.helper');
         $this->assertTrue($security->isGranted('ROLE_USER'));
         $this->assertSame($token, $security->getToken());
-    }
-
-    public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
-    {
-        return [
-            [
-                new User('user1', 'test', ['ROLE_ADMIN']),
-                new User('user1', 'test', ['ROLE_USER']),
-            ],
-            [
-                new UserWithoutEquatable('user1', 'test', ['ROLE_ADMIN']),
-                new UserWithoutEquatable('user1', 'test', ['ROLE_USER']),
-            ],
-        ];
     }
 
     /**
@@ -76,9 +63,72 @@ class SecurityTest extends AbstractWebTestCase
         $client->request('GET', '/admin');
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
+
+    /**
+     * @dataProvider userWillBeMarkedAsChangedIfRolesHasChangedProvider
+     * @group legacy
+     */
+    public function testLegacyUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole)
+    {
+        $client = $this->createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'legacy_config.yml']);
+        $client->disableReboot();
+
+        /** @var ArrayUserProvider $userProvider */
+        $userProvider = static::$kernel->getContainer()->get('security.user.provider.array');
+        $userProvider->addUser($userWithAdminRole);
+
+        $client->request('POST', '/login', [
+            '_username' => 'user1',
+            '_password' => 'test',
+        ]);
+
+        // user1 has ROLE_ADMIN and can visit secure page
+        $client->request('GET', '/admin');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        // updating user provider with same user but revoked ROLE_ADMIN from user1
+        $userProvider->setUser('user1', $userWithoutAdminRole);
+
+        // user1 has lost ROLE_ADMIN and MUST be redirected away from secure page
+        $client->request('GET', '/admin');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyServiceIsFunctional()
+    {
+        $kernel = self::createKernel(['test_case' => 'SecurityHelper', 'root_config' => 'legacy_config.yml']);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        // put a token into the storage so the final calls can function
+        $user = new InMemoryUser('foo', 'pass');
+        $token = new UsernamePasswordToken($user, 'provider', ['ROLE_USER']);
+        $container->get('functional.test.security.token_storage')->setToken($token);
+
+        $security = $container->get('functional_test.security.helper');
+        $this->assertTrue($security->isGranted('ROLE_USER'));
+        $this->assertSame($token, $security->getToken());
+    }
+
+    public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
+    {
+        return [
+            [
+                new InMemoryUser('user1', 'test', ['ROLE_ADMIN']),
+                new InMemoryUser('user1', 'test', ['ROLE_USER']),
+            ],
+            [
+                new UserWithoutEquatable('user1', 'test', ['ROLE_ADMIN']),
+                new UserWithoutEquatable('user1', 'test', ['ROLE_USER']),
+            ],
+        ];
+    }
 }
 
-final class UserWithoutEquatable implements UserInterface
+final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface
 {
     private $username;
     private $password;
@@ -105,13 +155,13 @@ final class UserWithoutEquatable implements UserInterface
 
     public function __toString()
     {
-        return $this->getUsername();
+        return $this->getUserIdentifier();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }
@@ -119,7 +169,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -127,15 +177,20 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getSalt()
+    public function getSalt(): string
     {
-        return null;
+        return '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUsername()
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function getUserIdentifier(): string
     {
         return $this->username;
     }
@@ -143,7 +198,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonExpired()
+    public function isAccountNonExpired(): bool
     {
         return $this->accountNonExpired;
     }
@@ -151,7 +206,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonLocked()
+    public function isAccountNonLocked(): bool
     {
         return $this->accountNonLocked;
     }
@@ -159,7 +214,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isCredentialsNonExpired()
+    public function isCredentialsNonExpired(): bool
     {
         return $this->credentialsNonExpired;
     }
@@ -167,7 +222,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->enabled;
     }
@@ -175,7 +230,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }

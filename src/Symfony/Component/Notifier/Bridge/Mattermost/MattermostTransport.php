@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mattermost;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Emanuele Panzeri <thepanz@gmail.com>
- *
- * @experimental in 5.2
  */
 final class MattermostTransport extends AbstractTransport
 {
@@ -32,7 +30,7 @@ final class MattermostTransport extends AbstractTransport
     private $channel;
     private $path;
 
-    public function __construct(string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, string $path = null)
+    public function __construct(string $token, string $channel, string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->channel = $channel;
@@ -57,7 +55,7 @@ final class MattermostTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
@@ -94,7 +92,7 @@ final class MattermostTransport extends AbstractTransport
         return $sentMessage;
     }
 
-    protected function getEndpoint(): ?string
+    protected function getEndpoint(): string
     {
         return rtrim($this->host.($this->port ? ':'.$this->port : '').($this->path ?? ''), '/');
     }

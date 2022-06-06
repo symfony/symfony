@@ -21,7 +21,7 @@ class StringStorage extends Storage
     /**
      * Returns the content of the template.
      *
-     * @return string The template content
+     * @return string
      */
     public function getContent()
     {

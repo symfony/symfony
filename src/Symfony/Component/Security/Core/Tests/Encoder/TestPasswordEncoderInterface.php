@@ -13,6 +13,9 @@ namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
+/**
+ * @group legacy
+ */
 interface TestPasswordEncoderInterface extends PasswordEncoderInterface
 {
     public function needsRehash(string $encoded): bool;

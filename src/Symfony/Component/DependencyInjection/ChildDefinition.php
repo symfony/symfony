@@ -61,7 +61,7 @@ class ChildDefinition extends Definition
      *
      * @param int|string $index
      *
-     * @return mixed The argument value
+     * @return mixed
      *
      * @throws OutOfBoundsException When the argument does not exist
      */

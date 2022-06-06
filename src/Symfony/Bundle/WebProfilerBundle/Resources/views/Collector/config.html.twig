@@ -116,14 +116,14 @@
             <span class="label">Symfony version</span>
         </div>
 
-        {% if 'n/a' != collector.env %}
+        {% if 'n/a' is not same as(collector.env) %}
             <div class="metric">
                 <span class="value">{{ collector.env }}</span>
                 <span class="label">Environment</span>
             </div>
         {% endif %}
 
-        {% if 'n/a' != collector.debug %}
+        {% if 'n/a' is not same as(collector.debug) %}
             <div class="metric">
                 <span class="value">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
                 <span class="label">Debug</span>

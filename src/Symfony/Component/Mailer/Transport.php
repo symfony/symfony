@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Mailer;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
@@ -32,37 +34,57 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport\Transports;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Konstantin Myakshin <molodchick@gmail.com>
+ *
+ * @final since Symfony 5.4
  */
 class Transport
 {
     private const FACTORY_CLASSES = [
-        SesTransportFactory::class,
         GmailTransportFactory::class,
-        MandrillTransportFactory::class,
         MailgunTransportFactory::class,
+        MailjetTransportFactory::class,
+        MandrillTransportFactory::class,
+        OhMySmtpTransportFactory::class,
         PostmarkTransportFactory::class,
         SendgridTransportFactory::class,
-        MailjetTransportFactory::class,
         SendinblueTransportFactory::class,
+        SesTransportFactory::class,
     ];
 
     private $factories;
 
-    public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
+    /**
+     * @param EventDispatcherInterface|null $dispatcher
+     * @param HttpClientInterface|null      $client
+     * @param LoggerInterface|null          $logger
+     */
+    public static function fromDsn(string $dsn/*, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null*/): TransportInterface
     {
+        $dispatcher = 2 <= \func_num_args() ? func_get_arg(1) : null;
+        $client = 3 <= \func_num_args() ? func_get_arg(2) : null;
+        $logger = 4 <= \func_num_args() ? func_get_arg(3) : null;
+
         $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client, $logger)));
 
         return $factory->fromString($dsn);
     }
 
-    public static function fromDsns(array $dsns, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
+    /**
+     * @param EventDispatcherInterface|null $dispatcher
+     * @param HttpClientInterface|null      $client
+     * @param LoggerInterface|null          $logger
+     */
+    public static function fromDsns(array $dsns/*, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null*/): TransportInterface
     {
+        $dispatcher = 2 <= \func_num_args() ? func_get_arg(1) : null;
+        $client = 3 <= \func_num_args() ? func_get_arg(2) : null;
+        $logger = 4 <= \func_num_args() ? func_get_arg(3) : null;
+
         $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client, $logger)));
 
         return $factory->fromStrings($dsns);
@@ -154,8 +176,19 @@ class Transport
         throw new UnsupportedSchemeException($dsn);
     }
 
-    public static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable
+    /**
+     * @param EventDispatcherInterface|null $dispatcher
+     * @param HttpClientInterface|null      $client
+     * @param LoggerInterface|null          $logger
+     *
+     * @return \Traversable<int, TransportFactoryInterface>
+     */
+    public static function getDefaultFactories(/*EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null*/): iterable
     {
+        $dispatcher = 1 <= \func_num_args() ? func_get_arg(0) : null;
+        $client = 2 <= \func_num_args() ? func_get_arg(1) : null;
+        $logger = 3 <= \func_num_args() ? func_get_arg(2) : null;
+
         foreach (self::FACTORY_CLASSES as $factoryClass) {
             if (class_exists($factoryClass)) {
                 yield new $factoryClass($dispatcher, $client, $logger);

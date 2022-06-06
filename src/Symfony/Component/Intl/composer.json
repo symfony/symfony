@@ -25,18 +25,16 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/polyfill-intl-icu": "~1.0",
+        "symfony/deprecation-contracts": "^2.1|^3",
         "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
-        "symfony/filesystem": "^4.4|^5.0"
-    },
-    "suggest": {
-        "ext-intl": "to use the component with locales other than \"en\""
+        "symfony/filesystem": "^4.4|^5.0|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Intl\\": "" },
         "classmap": [ "Resources/stubs" ],
+        "files": [ "Resources/functions.php" ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

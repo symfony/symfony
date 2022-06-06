@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
@@ -30,8 +30,6 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
-
-    protected static $supportedFeatureSetVersion = 404;
 
     protected function getExtensions()
     {

@@ -18,8 +18,6 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  * Interface for the Notifier system.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 interface NotifierInterface
 {

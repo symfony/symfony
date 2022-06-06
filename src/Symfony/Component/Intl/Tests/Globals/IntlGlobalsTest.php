@@ -13,6 +13,9 @@ namespace Symfony\Component\Intl\Tests\Globals;
 
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
+/**
+ * @group legacy
+ */
 class IntlGlobalsTest extends AbstractIntlGlobalsTest
 {
     protected function getIntlErrorName($errorCode)

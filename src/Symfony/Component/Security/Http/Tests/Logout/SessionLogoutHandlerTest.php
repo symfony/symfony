@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Logout\SessionLogoutHandler;
 
+/**
+ * @group legacy
+ */
 class SessionLogoutHandlerTest extends TestCase
 {
     public function testLogout()

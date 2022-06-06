@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\FreeMobile;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Antoine Makdessi <amakdessi@me.com>
- *
- * @experimental in 5.2
  */
 final class FreeMobileTransport extends AbstractTransport
 {
@@ -56,13 +54,13 @@ final class FreeMobileTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$this->supports($message)) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given) and configured with your phone number.', __CLASS__, SmsMessage::class, \get_class($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
-            'json' => [
+            'query' => [
                 'user' => $this->login,
                 'pass' => $this->password,
                 'msg' => $message->getSubject(),

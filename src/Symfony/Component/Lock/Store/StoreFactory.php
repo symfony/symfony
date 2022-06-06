@@ -52,8 +52,10 @@ class StoreFactory
                 return new MongoDbStore($connection);
 
             case $connection instanceof \PDO:
-            case $connection instanceof Connection:
                 return new PdoStore($connection);
+
+            case $connection instanceof Connection:
+                return new DoctrineDbalStore($connection);
 
             case $connection instanceof \Zookeeper:
                 return new ZookeeperStore($connection);
@@ -84,22 +86,30 @@ class StoreFactory
                 return new MongoDbStore($connection);
 
             case str_starts_with($connection, 'mssql://'):
-            case str_starts_with($connection, 'mysql:'):
+            case str_starts_with($connection, 'mysql://'):
             case str_starts_with($connection, 'mysql2://'):
-            case str_starts_with($connection, 'oci:'):
             case str_starts_with($connection, 'oci8://'):
             case str_starts_with($connection, 'pdo_oci://'):
-            case str_starts_with($connection, 'pgsql:'):
+            case str_starts_with($connection, 'pgsql://'):
             case str_starts_with($connection, 'postgres://'):
             case str_starts_with($connection, 'postgresql://'):
+            case str_starts_with($connection, 'sqlite://'):
+            case str_starts_with($connection, 'sqlite3://'):
+                return new DoctrineDbalStore($connection);
+
+            case str_starts_with($connection, 'mysql:'):
+            case str_starts_with($connection, 'oci:'):
+            case str_starts_with($connection, 'pgsql:'):
             case str_starts_with($connection, 'sqlsrv:'):
             case str_starts_with($connection, 'sqlite:'):
-            case str_starts_with($connection, 'sqlite3://'):
                 return new PdoStore($connection);
 
-            case str_starts_with($connection, 'pgsql+advisory:'):
+            case str_starts_with($connection, 'pgsql+advisory://'):
             case str_starts_with($connection, 'postgres+advisory://'):
             case str_starts_with($connection, 'postgresql+advisory://'):
+                return new DoctrineDbalPostgreSqlStore($connection);
+
+            case str_starts_with($connection, 'pgsql+advisory:'):
                 return new PostgreSqlStore(preg_replace('/^([^:+]+)\+advisory/', '$1', $connection));
 
             case str_starts_with($connection, 'zookeeper://'):

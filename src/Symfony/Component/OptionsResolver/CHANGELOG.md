@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add prototype definition for nested options
+
 5.1.0
 -----
 

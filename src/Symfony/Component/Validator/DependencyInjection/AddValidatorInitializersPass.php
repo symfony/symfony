@@ -26,6 +26,10 @@ class AddValidatorInitializersPass implements CompilerPassInterface
 
     public function __construct(string $builderService = 'validator.builder', string $initializerTag = 'validator.initializer')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/validator', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->builderService = $builderService;
         $this->initializerTag = $initializerTag;
     }

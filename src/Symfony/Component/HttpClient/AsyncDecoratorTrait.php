@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpClient;
 
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
@@ -24,12 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  */
 trait AsyncDecoratorTrait
 {
-    private $client;
-
-    public function __construct(HttpClientInterface $client = null)
-    {
-        $this->client = $client ?? HttpClient::create();
-    }
+    use DecoratorTrait;
 
     /**
      * {@inheritdoc}

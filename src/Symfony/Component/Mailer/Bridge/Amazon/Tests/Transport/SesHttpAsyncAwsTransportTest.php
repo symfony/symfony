@@ -52,6 +52,22 @@ class SesHttpAsyncAwsTransportTest extends TestCase
                 new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com:99']))),
                 'ses+https://ACCESS_KEY@example.com:99',
             ],
+            [
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'sessionToken' => 'SESSION_TOKEN']))),
+                'ses+https://ACCESS_KEY@us-east-1',
+            ],
+            [
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'region' => 'us-west-1', 'sessionToken' => 'SESSION_TOKEN']))),
+                'ses+https://ACCESS_KEY@us-west-1',
+            ],
+            [
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com', 'sessionToken' => 'SESSION_TOKEN']))),
+                'ses+https://ACCESS_KEY@example.com',
+            ],
+            [
+                new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => 'ACCESS_KEY', 'accessKeySecret' => 'SECRET_KEY', 'endpoint' => 'https://example.com:99', 'sessionToken' => 'SESSION_TOKEN']))),
+                'ses+https://ACCESS_KEY@example.com:99',
+            ],
         ];
     }
 
@@ -69,6 +85,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
             $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+            $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -86,6 +103,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             ->text('Hello There!');
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
+        $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
 
         $message = $transport->send($mail);
 

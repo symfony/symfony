@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase
@@ -39,7 +39,7 @@ final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://login:pass@default?phone=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: phone' => ['freemobile://login:pass@default'];
     }

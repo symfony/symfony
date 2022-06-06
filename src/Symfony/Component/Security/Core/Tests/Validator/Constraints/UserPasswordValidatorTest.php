@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class UserPasswordValidatorTest extends ConstraintValidatorTestCase
+abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 {
     private const PASSWORD = 's3Cr3t';
     private const SALT = '^S4lt$';
@@ -35,26 +35,26 @@ class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     protected $tokenStorage;
 
     /**
-     * @var PasswordEncoderInterface
+     * @var PasswordHasherInterface
      */
-    protected $encoder;
+    protected $hasher;
 
     /**
-     * @var EncoderFactoryInterface
+     * @var PasswordHasherFactoryInterface
      */
-    protected $encoderFactory;
+    protected $hasherFactory;
 
     protected function createValidator()
     {
-        return new UserPasswordValidator($this->tokenStorage, $this->encoderFactory);
+        return new UserPasswordValidator($this->tokenStorage, $this->hasherFactory);
     }
 
     protected function setUp(): void
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);
-        $this->encoder = $this->createMock(PasswordEncoderInterface::class);
-        $this->encoderFactory = $this->createEncoderFactory($this->encoder);
+        $this->hasher = $this->createMock(PasswordHasherInterface::class);
+        $this->hasherFactory = $this->createHasherFactory($this->hasher);
 
         parent::setUp();
     }
@@ -64,7 +64,7 @@ class UserPasswordValidatorTest extends ConstraintValidatorTestCase
      */
     public function testPasswordIsValid(UserPassword $constraint)
     {
-        $this->encoder->expects($this->once())
+        $this->hasher->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(true);
@@ -79,7 +79,7 @@ class UserPasswordValidatorTest extends ConstraintValidatorTestCase
      */
     public function testPasswordIsNotValid(UserPassword $constraint)
     {
-        $this->encoder->expects($this->once())
+        $this->hasher->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(false);
@@ -153,14 +153,14 @@ class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         return $mock;
     }
 
-    protected function createEncoderFactory($encoder = null)
+    protected function createHasherFactory($hasher = null)
     {
-        $mock = $this->createMock(EncoderFactoryInterface::class);
+        $mock = $this->createMock(PasswordHasherFactoryInterface::class);
 
         $mock
             ->expects($this->any())
-            ->method('getEncoder')
-            ->willReturn($encoder)
+            ->method('getPasswordHasher')
+            ->willReturn($hasher)
         ;
 
         return $mock;

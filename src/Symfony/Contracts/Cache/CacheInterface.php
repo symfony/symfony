@@ -38,7 +38,7 @@ interface CacheInterface
      *                                              See https://en.wikipedia.org/wiki/Cache_stampede#Probabilistic_early_expiration
      * @param array                      &$metadata The metadata of the cached item {@see ItemInterface::getMetadata()}
      *
-     * @return mixed The value corresponding to the provided key
+     * @return mixed
      *
      * @throws InvalidArgumentException When $key is not valid or when $beta is negative
      */

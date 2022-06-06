@@ -13,13 +13,17 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedForInvalidDefaultMethodClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IntTagClass;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
@@ -145,12 +149,15 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $definition->addTag('my_custom_tag', ['priority' => 100]);
         $definition->addTag('my_custom_tag', []);
 
+        $container->register('service3', IntTagClass::class)->addTag('my_custom_tag');
+
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
         $expected = [
             'bar_tab_class_with_defaultmethod' => new TypedReference('service2', BarTagClass::class),
             'service1' => new TypedReference('service1', FooTagClass::class),
+            '10' => new TypedReference('service3', IntTagClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));
@@ -184,6 +191,38 @@ class PriorityTaggedServiceTraitTest extends TestCase
         yield ['getMethodShouldBePublicInsteadPrivate', null, sprintf('Method "%s::getMethodShouldBePublicInsteadPrivate()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
         yield ['getMethodShouldBePublicInsteadPrivate', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedItemAttributes()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service1', FooTagClass::class)->addTag('my_custom_tag');
+        $container->register('service2', HelloNamedService::class)
+            ->setAutoconfigured(true)
+            ->setInstanceofConditionals([
+                HelloNamedService::class => (new ChildDefinition(''))->addTag('my_custom_tag'),
+                \stdClass::class => (new ChildDefinition(''))->addTag('my_custom_tag2'),
+            ]);
+        $container->register('service3', HelloNamedService2::class)
+            ->setAutoconfigured(true)
+            ->addTag('my_custom_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+        $expected = [
+            'service3' => new TypedReference('service3', HelloNamedService2::class),
+            'hello' => new TypedReference('service2', HelloNamedService::class),
+            'service1' => new TypedReference('service1', FooTagClass::class),
+        ];
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+    }
 }
 
 class PriorityTaggedServiceTraitImplementation
@@ -194,4 +233,14 @@ class PriorityTaggedServiceTraitImplementation
     {
         return $this->findAndSortTaggedServices($tagName, $container);
     }
+}
+
+#[AsTaggedItem(index: 'hello', priority: 1)]
+class HelloNamedService extends \stdClass
+{
+}
+
+#[AsTaggedItem(priority: 2)]
+class HelloNamedService2
+{
 }

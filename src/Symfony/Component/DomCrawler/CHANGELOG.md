@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `Crawler::innerText` method.
+
+5.3
+---
+
+ * The `parents()` method is deprecated. Use `ancestors()` instead.
+ * Marked the `containsOption()`, `availableOptionValues()`, and `disableValidation()` methods of the
+   `ChoiceFormField` class as internal
+
 5.1.0
 -----
 

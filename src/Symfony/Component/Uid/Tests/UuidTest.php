@@ -60,7 +60,7 @@ class UuidTest extends TestCase
 
         $uuid = new UuidV1(self::A_UUID_V1);
 
-        $this->assertSame(1583245966.746458, $uuid->getTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '1583245966.746458'), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
@@ -95,7 +95,7 @@ class UuidTest extends TestCase
 
         $uuid = new UuidV6(substr_replace(self::A_UUID_V1, '6', 14, 1));
 
-        $this->assertSame(85916308548.27832, $uuid->getTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '85916308548.278321'), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
@@ -205,18 +205,128 @@ class UuidTest extends TestCase
         $this->assertSame('00000000-0000-0000-0000-000000000000', (string) new NilUuid());
     }
 
+    public function testFromBinary()
+    {
+        $this->assertEquals(
+            Uuid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
+            Uuid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08")
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidBinaryFormat
+     */
+    public function testFromBinaryInvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Uuid::fromBinary($ulid);
+    }
+
+    public function provideInvalidBinaryFormat()
+    {
+        return [
+            ['01EW2RYKDCT2SAK454KBR2QG08'],
+            ['1BVXue8CnY8ogucrHX3TeF'],
+            ['0177058f-4dac-d0b2-a990-a49af02bc008'],
+        ];
+    }
+
+    public function testFromBase58()
+    {
+        $this->assertEquals(
+            UuidV1::fromString('94fSqj9oxGtsNbkfQNntwx'),
+            UuidV1::fromBase58('94fSqj9oxGtsNbkfQNntwx')
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidBase58Format
+     */
+    public function testFromBase58InvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Uuid::fromBase58($ulid);
+    }
+
+    public function provideInvalidBase58Format()
+    {
+        return [
+            ["\x41\x4C\x08\x92\x57\x1B\x11\xEB\xBF\x70\x93\xF9\xB0\x82\x2C\x57"],
+            ['219G494NRV27NVYW4KZ6R84B2Q'],
+            ['414c0892-571b-11eb-bf70-93f9b0822c57'],
+        ];
+    }
+
+    public function testFromBase32()
+    {
+        $this->assertEquals(
+            UuidV5::fromString('2VN0S74HBDBB0AQRXAHFVG35KK'),
+            UuidV5::fromBase32('2VN0S74HBDBB0AQRXAHFVG35KK')
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidBase32Format
+     */
+    public function testFromBase32InvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Uuid::fromBase32($ulid);
+    }
+
+    public function provideInvalidBase32Format()
+    {
+        return [
+            ["\x5B\xA8\x32\x72\x45\x6D\x5A\xC0\xAB\xE3\xAA\x8B\xF7\x01\x96\x73"],
+            ['CKTRYycTes6WAqSQJsTDaz'],
+            ['5ba83272-456d-5ac0-abe3-aa8bf7019673'],
+        ];
+    }
+
+    public function testFromRfc4122()
+    {
+        $this->assertEquals(
+            UuidV6::fromString('1eb571b4-14c0-6893-bf70-2d4c83cf755a'),
+            UuidV6::fromRfc4122('1eb571b4-14c0-6893-bf70-2d4c83cf755a')
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidRfc4122Format
+     */
+    public function testFromRfc4122InvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Uuid::fromRfc4122($ulid);
+    }
+
+    public function provideInvalidRfc4122Format()
+    {
+        return [
+            ["\x1E\xB5\x71\xB4\x14\xC0\x68\x93\xBF\x70\x2D\x4C\x83\xCF\x75\x5A"],
+            ['0YPNRV8560D29VYW1D9J1WYXAT'],
+            ['4nwTLZ2TdMtTVDE5AwVjaR'],
+        ];
+    }
+
     public function testFromStringOnExtendedClassReturnsStatic()
     {
         $this->assertInstanceOf(CustomUuid::class, CustomUuid::fromString(self::A_UUID_V4));
     }
 
-    public function testGetTime()
+    public function testGetDateTime()
     {
-        $this->assertSame(103072857660.6847, ((new UuidV1('ffffffff-ffff-1fff-a456-426655440000'))->getTime()));
-        $this->assertSame(0.0000001, ((new UuidV1('13814001-1dd2-11b2-a456-426655440000'))->getTime()));
-        $this->assertSame(0.0, (new UuidV1('13814000-1dd2-11b2-a456-426655440000'))->getTime());
-        $this->assertSame(-0.0000001, (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getTime());
-        $this->assertSame(-12219292800.0, ((new UuidV1('00000000-0000-1000-a456-426655440000'))->getTime()));
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '103072857660.684697'), ((new UuidV1('ffffffff-ffff-1fff-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.000001'), ((new UuidV1('1381400a-1dd2-11b2-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814001-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814000-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), ((new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(new \DateTimeImmutable('@-12219292800'), ((new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime()));
     }
 
     public function testFromStringBase58Padding()

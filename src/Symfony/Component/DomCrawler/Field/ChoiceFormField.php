@@ -176,7 +176,7 @@ class ChoiceFormField extends FormField
     /**
      * Returns the type of the choice field (radio, select, or checkbox).
      *
-     * @return string The type
+     * @return string
      */
     public function getType()
     {
@@ -186,7 +186,7 @@ class ChoiceFormField extends FormField
     /**
      * Returns true if the field accepts multiple values.
      *
-     * @return bool true if the field accepts multiple values, false otherwise
+     * @return bool
      */
     public function isMultiple()
     {
@@ -268,6 +268,8 @@ class ChoiceFormField extends FormField
     /**
      * Checks whether given value is in the existing options.
      *
+     * @internal since Symfony 5.3
+     *
      * @return bool
      */
     public function containsOption(string $optionValue, array $options)
@@ -288,6 +290,8 @@ class ChoiceFormField extends FormField
     /**
      * Returns list of available field options.
      *
+     * @internal since Symfony 5.3
+     *
      * @return array
      */
     public function availableOptionValues()
@@ -304,7 +308,9 @@ class ChoiceFormField extends FormField
     /**
      * Disables the internal validation of the field.
      *
-     * @return self
+     * @internal since Symfony 5.3
+     *
+     * @return $this
      */
     public function disableValidation()
     {

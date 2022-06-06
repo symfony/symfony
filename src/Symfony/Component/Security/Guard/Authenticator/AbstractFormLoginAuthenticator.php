@@ -21,6 +21,8 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
  * A base class to make form login authentication easier!
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
 {

@@ -170,7 +170,7 @@ class PropertyPathBuilder
     /**
      * Returns the length of the current path.
      *
-     * @return int The path length
+     * @return int
      */
     public function getLength()
     {
@@ -180,7 +180,7 @@ class PropertyPathBuilder
     /**
      * Returns the current property path.
      *
-     * @return PropertyPathInterface|null The constructed property path
+     * @return PropertyPathInterface|null
      */
     public function getPropertyPath()
     {
@@ -192,7 +192,7 @@ class PropertyPathBuilder
     /**
      * Returns the current property path as string.
      *
-     * @return string The property path as string
+     * @return string
      */
     public function __toString()
     {

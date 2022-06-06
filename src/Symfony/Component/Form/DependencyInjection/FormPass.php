@@ -38,6 +38,10 @@ class FormPass implements CompilerPassInterface
 
     public function __construct(string $formExtensionService = 'form.extension', string $formTypeTag = 'form.type', string $formTypeExtensionTag = 'form.type_extension', string $formTypeGuesserTag = 'form.type_guesser', string $formDebugCommandService = 'console.command.form_debug')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/http-kernel', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->formExtensionService = $formExtensionService;
         $this->formTypeTag = $formTypeTag;
         $this->formTypeExtensionTag = $formTypeExtensionTag;

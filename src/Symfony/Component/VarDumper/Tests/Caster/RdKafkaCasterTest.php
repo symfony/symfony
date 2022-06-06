@@ -77,9 +77,7 @@ EODUMP;
 
         $expectedDump = <<<EODUMP
 RdKafka\Producer {
-  -error_cb: null
-  -dr_cb: null
-  out_q_len: %d
+%Aout_q_len: %d
   orig_broker_id: 1001
   orig_broker_name: "$this->broker/1001"
   brokers: RdKafka\Metadata\Collection {
@@ -146,10 +144,7 @@ EODUMP;
 
         $expectedDump = <<<EODUMP
 RdKafka\KafkaConsumer {
-  -error_cb: null
-  -rebalance_cb: null
-  -dr_msg_cb: null
-  subscription: array:1 [
+%Asubscription: array:1 [
     0 => "test-topic"
   ]
   assignment: []

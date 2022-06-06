@@ -17,7 +17,6 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @internal
- * @experimental in 5.2
  */
 final class TokenBucket implements LimiterStateInterface
 {
@@ -79,7 +78,7 @@ final class TokenBucket implements LimiterStateInterface
 
     public function getAvailableTokens(float $now): int
     {
-        $elapsed = $now - $this->timer;
+        $elapsed = max(0, $now - $this->timer);
 
         return min($this->burstSize, $this->tokens + $this->rate->calculateNewTokensDuringInterval($elapsed));
     }
@@ -89,9 +88,35 @@ final class TokenBucket implements LimiterStateInterface
         return $this->rate->calculateTimeForTokens($this->burstSize);
     }
 
-    /**
-     * @internal
-     */
+    public function __serialize(): array
+    {
+        return [
+            pack('N', $this->burstSize).$this->id => $this->tokens,
+            (string) $this->rate => $this->timer,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        // BC layer for old objects serialized via __sleep
+        if (5 === \count($data)) {
+            $data = array_values($data);
+            $this->id = $data[0];
+            $this->tokens = $data[1];
+            $this->timer = $data[2];
+            $this->burstSize = $data[3];
+            $this->rate = Rate::fromString($data[4]);
+
+            return;
+        }
+
+        [$this->tokens, $this->timer] = array_values($data);
+        [$pack, $rate] = array_keys($data);
+        $this->rate = Rate::fromString($rate);
+        $this->burstSize = unpack('Na', $pack)['a'];
+        $this->id = substr($pack, 4);
+    }
+
     public function __sleep(): array
     {
         $this->stringRate = (string) $this->rate;
@@ -99,16 +124,11 @@ final class TokenBucket implements LimiterStateInterface
         return ['id', 'tokens', 'timer', 'burstSize', 'stringRate'];
     }
 
-    /**
-     * @internal
-     */
     public function __wakeup(): void
     {
-        if (!\is_string($this->stringRate)) {
-            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        if (\is_string($rate = $this->stringRate ?? null)) {
+            $this->rate = Rate::fromString($rate);
+            unset($this->stringRate);
         }
-
-        $this->rate = Rate::fromString($this->stringRate);
-        unset($this->stringRate);
     }
 }

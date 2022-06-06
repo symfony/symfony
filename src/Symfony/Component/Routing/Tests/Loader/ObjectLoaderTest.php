@@ -20,14 +20,14 @@ class ObjectLoaderTest extends TestCase
 {
     public function testLoadCallsServiceAndReturnsCollection()
     {
-        $loader = new TestObjectLoader();
+        $loader = new TestObjectLoader('some-env');
 
         // create a basic collection that will be returned
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
         $loader->loaderMap = [
-            'my_route_provider_service' => new TestObjectLoaderRouteService($collection),
+            'my_route_provider_service' => new TestObjectLoaderRouteService($collection, 'some-env'),
         ];
 
         $actualRoutes = $loader->load(
@@ -103,7 +103,7 @@ class TestObjectLoader extends ObjectLoader
         return 'service';
     }
 
-    protected function getObject(string $id)
+    protected function getObject(string $id): object
     {
         return $this->loaderMap[$id] ?? null;
     }
@@ -112,14 +112,20 @@ class TestObjectLoader extends ObjectLoader
 class TestObjectLoaderRouteService
 {
     private $collection;
+    private $env;
 
-    public function __construct($collection)
+    public function __construct($collection, string $env = null)
     {
         $this->collection = $collection;
+        $this->env = $env;
     }
 
-    public function loadRoutes()
+    public function loadRoutes(TestObjectLoader $loader, string $env = null)
     {
+        if ($this->env !== $env) {
+            throw new \InvalidArgumentException(sprintf('Expected env "%s", "%s" given.', $this->env, $env));
+        }
+
         return $this->collection;
     }
 }

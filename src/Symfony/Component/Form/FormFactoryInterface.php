@@ -28,7 +28,7 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
-     * @return FormInterface The form named after the type
+     * @return FormInterface
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -41,7 +41,7 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
-     * @return FormInterface The form
+     * @return FormInterface
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -56,7 +56,7 @@ interface FormFactoryInterface
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
      *
-     * @return FormInterface The form named after the property
+     * @return FormInterface
      *
      * @throws InvalidOptionsException if any given option is not applicable to the form type
      */
@@ -67,7 +67,7 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
-     * @return FormBuilderInterface The form builder
+     * @return FormBuilderInterface
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -78,7 +78,7 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
-     * @return FormBuilderInterface The form builder
+     * @return FormBuilderInterface
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -94,7 +94,7 @@ interface FormFactoryInterface
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
      *
-     * @return FormBuilderInterface The form builder named after the property
+     * @return FormBuilderInterface
      *
      * @throws InvalidOptionsException if any given option is not applicable to the form type
      */

@@ -13,15 +13,12 @@ namespace Symfony\Component\Security\Core\User;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @method void upgradePassword(PasswordAuthenticatedUserInterface|UserInterface $user, string $newHashedPassword) Upgrades the hashed password of a user, typically for using a better hash algorithm.
+ *                                                                                                                 This method should persist the new password in the user storage and update the $user object accordingly.
+ *                                                                                                                 Because you don't want your users not being able to log in, this method should be opportunistic:
+ *                                                                                                                 it's fine if it does nothing or if it fails without throwing any exception.
  */
 interface PasswordUpgraderInterface
 {
-    /**
-     * Upgrades the encoded password of a user, typically for using a better hash algorithm.
-     *
-     * This method should persist the new password in the user storage and update the $user object accordingly.
-     * Because you don't want your users not being able to log in, this method should be opportunistic:
-     * it's fine if it does nothing or if it fails without throwing any exception.
-     */
-    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void;
 }

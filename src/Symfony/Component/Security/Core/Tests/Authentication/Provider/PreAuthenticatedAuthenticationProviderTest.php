@@ -18,10 +18,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+/**
+ * @group legacy
+ */
 class PreAuthenticatedAuthenticationProviderTest extends TestCase
 {
     public function testSupports()
@@ -120,10 +123,10 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getProvider($user = null, $userChecker = null)
     {
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
         if (null !== $user) {
             $userProvider->expects($this->once())
-                         ->method('loadUserByUsername')
+                         ->method('loadUserByIdentifier')
                          ->willReturn($user)
             ;
         }

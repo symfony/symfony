@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-abstract class Voter implements VoterInterface
+abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
     /**
      * {@inheritdoc}
@@ -60,12 +60,32 @@ abstract class Voter implements VoterInterface
     }
 
     /**
+     * Return false if your voter doesn't support the given attribute. Symfony will cache
+     * that decision and won't call your voter again for that attribute.
+     */
+    public function supportsAttribute(string $attribute): bool
+    {
+        return true;
+    }
+
+    /**
+     * Return false if your voter doesn't support the given subject type. Symfony will cache
+     * that decision and won't call your voter again for that subject type.
+     *
+     * @param string $subjectType The type of the subject inferred by `get_class()` or `get_debug_type()`
+     */
+    public function supportsType(string $subjectType): bool
+    {
+        return true;
+    }
+
+    /**
      * Determines if the attribute and subject are supported by this voter.
      *
      * @param string $attribute An attribute
      * @param mixed  $subject   The subject to secure, e.g. an object the user wants to access or any other PHP type
      *
-     * @return bool True if the attribute and subject are supported, false otherwise
+     * @return bool
      */
     abstract protected function supports(string $attribute, $subject);
 

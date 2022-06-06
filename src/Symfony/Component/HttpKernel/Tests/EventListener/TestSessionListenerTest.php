@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener;
-use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -29,6 +28,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * Tests SessionListener.
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+ * @group legacy
  */
 class TestSessionListenerTest extends TestCase
 {
@@ -51,7 +51,7 @@ class TestSessionListenerTest extends TestCase
              ->willReturn($this->session);
     }
 
-    public function testShouldSaveMasterRequestSession()
+    public function testShouldSaveMainRequestSession()
     {
         $this->sessionHasBeenStarted();
         $this->sessionMustBeSaved();
@@ -72,7 +72,7 @@ class TestSessionListenerTest extends TestCase
 
         @ini_set('session.cookie_lifetime', 0);
 
-        $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
+        $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST);
         $cookies = $response->headers->getCookies();
 
         $this->assertEquals(0, reset($cookies)->getExpiresTime());
@@ -86,7 +86,7 @@ class TestSessionListenerTest extends TestCase
         $this->sessionHasBeenStarted();
         $this->sessionIsEmpty();
 
-        $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
+        $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST);
 
         $this->assertSame([], $response->headers->getCookies());
     }
@@ -99,10 +99,11 @@ class TestSessionListenerTest extends TestCase
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $request->setSession($this->getSession());
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
 
-        $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
+        $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST);
 
         $this->assertNotEmpty($response->headers->getCookies());
     }
@@ -118,12 +119,13 @@ class TestSessionListenerTest extends TestCase
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $request->setSession($this->getSession());
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
 
         $response = new Response('', 200, ['Set-Cookie' => $existing]);
 
-        $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
+        $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
 
         $this->assertSame($expected, $response->headers->all()['set-cookie']);
     }
@@ -148,14 +150,14 @@ class TestSessionListenerTest extends TestCase
     public function testDoesNotThrowIfRequestDoesNotHaveASession()
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, new Response());
 
         $this->listener->onKernelResponse($event);
 
         $this->assertTrue(true);
     }
 
-    private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, Response $response = null)
+    private function filterResponse(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, Response $response = null)
     {
         $request->setSession($this->session);
         $response = $response ?? new Response();

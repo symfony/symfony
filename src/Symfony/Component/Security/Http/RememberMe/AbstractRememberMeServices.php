@@ -20,16 +20,20 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', AbstractRememberMeServices::class, AbstractRememberMeHandler::class);
+
 /**
  * Base class implementing the RememberMeServicesInterface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use {@see AbstractRememberMeHandler} instead
  */
 abstract class AbstractRememberMeServices implements RememberMeServicesInterface, LogoutHandlerInterface
 {
@@ -40,6 +44,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         'secure' => false,
         'httponly' => true,
         'samesite' => null,
+        'path' => null,
+        'domain' => null,
     ];
     private $firewallName;
     private $secret;
@@ -128,7 +134,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             $this->loginFail($request, $e);
 
             throw $e;
-        } catch (UsernameNotFoundException $e) {
+        } catch (UserNotFoundException $e) {
             if (null !== $this->logger) {
                 $this->logger->info('User for remember-me cookie not found.', ['exception' => $e]);
             }

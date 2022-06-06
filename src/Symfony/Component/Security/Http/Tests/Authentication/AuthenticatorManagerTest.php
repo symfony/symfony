@@ -12,16 +12,21 @@
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -43,8 +48,9 @@ class AuthenticatorManagerTest extends TestCase
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->eventDispatcher = new EventDispatcher();
         $this->request = new Request();
-        $this->user = new User('wouter', null);
+        $this->user = new InMemoryUser('wouter', null);
         $this->token = $this->createMock(TokenInterface::class);
+        $this->token->expects($this->any())->method('getUser')->willReturn($this->user);
         $this->response = $this->createMock(Response::class);
     }
 
@@ -103,7 +109,7 @@ class AuthenticatorManagerTest extends TestCase
                 $listenerCalled = true;
             }
         });
-        $matchingAuthenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+        $matchingAuthenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
 
@@ -133,6 +139,37 @@ class AuthenticatorManagerTest extends TestCase
         $manager->authenticateRequest($this->request);
     }
 
+    public function testRequiredBadgeMissing()
+    {
+        $authenticator = $this->createAuthenticator();
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter')));
+
+        $authenticator->expects($this->once())->method('onAuthenticationFailure')->with($this->anything(), $this->callback(function ($exception) {
+            return 'Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "'.CsrfTokenBadge::class.'".' === $exception->getMessage();
+        }));
+
+        $manager = $this->createManager([$authenticator], 'main', true, [CsrfTokenBadge::class]);
+        $manager->authenticateRequest($this->request);
+    }
+
+    public function testAllRequiredBadgesPresent()
+    {
+        $authenticator = $this->createAuthenticator();
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $csrfBadge = new CsrfTokenBadge('csrfid', 'csrftoken');
+        $csrfBadge->markResolved();
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter'), [$csrfBadge]));
+        $authenticator->expects($this->any())->method('createToken')->willReturn(new UsernamePasswordToken($this->user, 'main'));
+
+        $authenticator->expects($this->once())->method('onAuthenticationSuccess');
+
+        $manager = $this->createManager([$authenticator], 'main', true, [CsrfTokenBadge::class]);
+        $manager->authenticateRequest($this->request);
+    }
+
     /**
      * @dataProvider provideEraseCredentialsData
      */
@@ -143,7 +180,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
 
-        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $this->token->expects($eraseCredentials ? $this->once() : $this->never())->method('eraseCredentials');
 
@@ -164,9 +201,10 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
 
-        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $modifiedToken = $this->createMock(TokenInterface::class);
+        $modifiedToken->expects($this->any())->method('getUser')->willReturn($this->user);
         $listenerCalled = false;
         $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
             $event->setAuthenticatedToken($modifiedToken);
@@ -183,7 +221,7 @@ class AuthenticatorManagerTest extends TestCase
     public function testAuthenticateUser()
     {
         $authenticator = $this->createAuthenticator();
-        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
         $authenticator->expects($this->any())->method('onAuthenticationSuccess')->willReturn($this->response);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
@@ -195,10 +233,11 @@ class AuthenticatorManagerTest extends TestCase
     public function testAuthenticateUserCanModifyTokenFromEvent()
     {
         $authenticator = $this->createAuthenticator();
-        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
         $authenticator->expects($this->any())->method('onAuthenticationSuccess')->willReturn($this->response);
 
         $modifiedToken = $this->createMock(TokenInterface::class);
+        $modifiedToken->expects($this->any())->method('getUser')->willReturn($this->user);
         $listenerCalled = false;
         $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
             $event->setAuthenticatedToken($modifiedToken);
@@ -213,6 +252,27 @@ class AuthenticatorManagerTest extends TestCase
     }
 
     public function testInteractiveAuthenticator()
+    {
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
+        $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
+
+        $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
+
+        $authenticator->expects($this->any())
+            ->method('onAuthenticationSuccess')
+            ->with($this->anything(), $this->token, 'main')
+            ->willReturn($this->response);
+
+        $manager = $this->createManager([$authenticator]);
+        $response = $manager->authenticateRequest($this->request);
+        $this->assertSame($this->response, $response);
+    }
+
+    public function testLegacyInteractiveAuthenticator()
     {
         $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
         $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
@@ -235,8 +295,8 @@ class AuthenticatorManagerTest extends TestCase
 
     public function testAuthenticateRequestHidesInvalidUserExceptions()
     {
-        $invalidUserException = new UsernameNotFoundException();
-        $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
+        $invalidUserException = new UserNotFoundException();
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
         $authenticator->expects($this->any())->method('authenticate')->willThrowException($invalidUserException);
@@ -253,16 +313,61 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->response, $response);
     }
 
+    public function testLogsUseTheDecoratedAuthenticatorWhenItIsTraceable()
+    {
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
+        $authenticator->expects($this->any())->method('isInteractive')->willReturn(true);
+        $this->request->attributes->set('_security_authenticators', [new TraceableAuthenticator($authenticator)]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
+        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
+
+        $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
+
+        $authenticator->expects($this->any())
+            ->method('onAuthenticationSuccess')
+            ->with($this->anything(), $this->token, 'main')
+            ->willReturn($this->response);
+
+        $authenticator->expects($this->any())
+            ->method('onAuthenticationSuccess')
+            ->with($this->anything(), $this->token, 'main')
+            ->willReturn($this->response);
+
+        $logger = new class() extends AbstractLogger {
+            public $logContexts = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                if ($context['authenticator'] ?? false) {
+                    $this->logContexts[] = $context;
+                }
+            }
+        };
+
+        $manager = $this->createManager([$authenticator], 'main', true, [], $logger);
+        $response = $manager->authenticateRequest($this->request);
+        $this->assertSame($this->response, $response);
+        $this->assertStringContainsString('Mock_TestInteractiveAuthenticator', $logger->logContexts[0]['authenticator']);
+    }
+
     private function createAuthenticator($supports = true)
     {
-        $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
         $authenticator->expects($this->any())->method('supports')->willReturn($supports);
 
         return $authenticator;
     }
 
-    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true)
+    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [], LoggerInterface $logger = null)
     {
-        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, null, $eraseCredentials);
+        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, $logger, $eraseCredentials, true, $requiredBadges);
+    }
+}
+
+abstract class TestInteractiveAuthenticator implements InteractiveAuthenticatorInterface
+{
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    {
     }
 }

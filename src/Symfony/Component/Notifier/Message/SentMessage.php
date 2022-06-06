@@ -13,8 +13,6 @@ namespace Symfony\Component\Notifier\Message;
 
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
- *
- * @experimental in 5.2
  */
 final class SentMessage
 {

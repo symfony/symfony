@@ -21,11 +21,12 @@ use Symfony\Component\Notifier\Message\SentMessage;
  * Uses several Transports using a round robin algorithm.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 class RoundRobinTransport implements TransportInterface
 {
+    /**
+     * @var \SplObjectStorage<TransportInterface, float>
+     */
     private $deadTransports;
     private $transports = [];
     private $retryPeriod;

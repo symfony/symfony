@@ -52,7 +52,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', $limit)
             ->setInvalidValue('')
             ->setPlural($limit)
-            ->setCode(Length::TOO_SHORT_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 
@@ -264,7 +264,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Length::TOO_SHORT_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 
@@ -283,7 +283,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Length::TOO_SHORT_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 
@@ -305,7 +305,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Length::TOO_LONG_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 

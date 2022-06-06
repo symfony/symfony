@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -52,7 +53,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[] The classes names
+     * @return string[]
      */
     public function getMappedClasses()
     {
@@ -68,7 +69,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param \SimpleXMLElement $nodes The XML nodes
      *
-     * @return array The Constraint instances
+     * @return Constraint[]
      */
     protected function parseConstraints(\SimpleXMLElement $nodes)
     {
@@ -102,7 +103,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param \SimpleXMLElement $nodes The XML nodes
      *
-     * @return array The values
+     * @return array
      */
     protected function parseValues(\SimpleXMLElement $nodes)
     {
@@ -136,7 +137,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param \SimpleXMLElement $nodes The XML nodes
      *
-     * @return array The options
+     * @return array
      */
     protected function parseOptions(\SimpleXMLElement $nodes)
     {
@@ -167,7 +168,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads the XML class descriptions from the given file.
      *
-     * @return \SimpleXMLElement The class descriptions
+     * @return \SimpleXMLElement
      *
      * @throws MappingException If the file could not be loaded
      */

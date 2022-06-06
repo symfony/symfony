@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Notifier\Bridge\Nexmo;
 
-use Symfony\Component\Notifier\Exception\LogicException;
+trigger_deprecation('symfony/nexmo-notifier', '5.4', 'The "symfony/nexmo-notifier" package is deprecated, use "symfony/vonage-notifier" instead.');
+
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -24,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.2
+ * @deprecated since Symfony 5.4, use the Vonage bridge instead.
  */
 final class NexmoTransport extends AbstractTransport
 {
@@ -56,7 +58,7 @@ final class NexmoTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/sms/json', [

@@ -244,6 +244,8 @@ class Workflow implements WorkflowInterface
             $this->announce($subject, $transition, $marking, $context);
         }
 
+        $marking->setContext($context);
+
         return $marking;
     }
 

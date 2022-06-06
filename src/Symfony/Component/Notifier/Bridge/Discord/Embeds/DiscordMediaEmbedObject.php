@@ -13,11 +13,12 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
 /**
  * @author Karoly Gossler <connor@connor.hu>
- *
- * @experimental in 5.2
  */
 class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
 {
+    /**
+     * @return $this
+     */
     public function url(string $url): self
     {
         $this->options['url'] = $url;
@@ -25,6 +26,9 @@ class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function proxyUrl(string $proxyUrl): self
     {
         $this->options['proxy_url'] = $proxyUrl;
@@ -32,6 +36,9 @@ class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function height(int $height): self
     {
         $this->options['height'] = $height;
@@ -39,6 +46,9 @@ class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function width(int $width): self
     {
         $this->options['width'] = $width;

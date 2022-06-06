@@ -29,6 +29,8 @@ final class AuthenticationEvents
      * authenticated by any of the providers.
      *
      * @Event("Symfony\Component\Security\Core\Event\AuthenticationFailureEvent")
+     *
+     * @deprecated since Symfony 5.4, use {@see Event\LoginFailureEvent} instead
      */
     public const AUTHENTICATION_FAILURE = 'security.authentication.failure';
 

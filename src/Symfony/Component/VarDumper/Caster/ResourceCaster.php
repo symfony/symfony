@@ -24,10 +24,8 @@ class ResourceCaster
 {
     /**
      * @param \CurlHandle|resource $h
-     *
-     * @return array
      */
-    public static function castCurl($h, array $a, Stub $stub, bool $isNested)
+    public static function castCurl($h, array $a, Stub $stub, bool $isNested): array
     {
         return curl_getinfo($h);
     }

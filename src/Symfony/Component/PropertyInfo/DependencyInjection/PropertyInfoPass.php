@@ -34,6 +34,10 @@ class PropertyInfoPass implements CompilerPassInterface
 
     public function __construct(string $propertyInfoService = 'property_info', string $listExtractorTag = 'property_info.list_extractor', string $typeExtractorTag = 'property_info.type_extractor', string $descriptionExtractorTag = 'property_info.description_extractor', string $accessExtractorTag = 'property_info.access_extractor', string $initializableExtractorTag = 'property_info.initializable_extractor')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/property-info', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->propertyInfoService = $propertyInfoService;
         $this->listExtractorTag = $listExtractorTag;
         $this->typeExtractorTag = $typeExtractorTag;

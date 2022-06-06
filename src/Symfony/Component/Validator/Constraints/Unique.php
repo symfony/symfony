@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * @Annotation
@@ -29,15 +30,22 @@ class Unique extends Constraint
     ];
 
     public $message = 'This collection should contain only unique elements.';
+    public $normalizer;
 
     public function __construct(
         array $options = null,
         string $message = null,
+        callable $normalizer = null,
         array $groups = null,
         $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
+        $this->normalizer = $normalizer ?? $this->normalizer;
+
+        if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+        }
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -19,7 +20,6 @@ use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -124,7 +124,10 @@ class MandrillApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
-                $payload['message']['tags'] = explode(',', $header->getValue());
+                $payload['message']['tags'] = array_merge(
+                    $payload['message']['tags'] ?? [],
+                    explode(',', $header->getValue())
+                );
 
                 continue;
             }
@@ -135,7 +138,7 @@ class MandrillApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['message']['headers'][$name] = $header->getBodyAsString();
+            $payload['message']['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $payload;

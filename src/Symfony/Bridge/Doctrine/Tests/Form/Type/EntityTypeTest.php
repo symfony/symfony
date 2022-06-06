@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity;
@@ -62,8 +62,6 @@ class EntityTypeTest extends BaseTypeTest
      * @var MockObject&ManagerRegistry
      */
     private $emRegistry;
-
-    protected static $supportedFeatureSetVersion = 404;
 
     protected function setUp(): void
     {
@@ -1780,5 +1778,33 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertEquals($collection, $form->getNormData());
         $this->assertEquals($collection, $form->getData());
+    }
+
+    public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->add('entity_two', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'choice_value' => function ($choice) {
+                    return $choice ? $choice->name : '';
+                },
+            ])
+            ->createView()
+        ;
+
+        $this->assertSame('1', $view['entity_one']->vars['choices'][1]->value);
+        $this->assertSame('2', $view['entity_one']->vars['choices'][2]->value);
+
+        $this->assertSame('Foo', $view['entity_two']->vars['choices']['Foo']->value);
+        $this->assertSame('Bar', $view['entity_two']->vars['choices']['Bar']->value);
     }
 }

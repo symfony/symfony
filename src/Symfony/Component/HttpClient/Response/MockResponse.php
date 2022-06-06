@@ -41,7 +41,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     /**
      * @param string|string[]|iterable $body The response body as a string or an iterable of strings,
      *                                       yielding an empty string simulates an idle timeout,
-     *                                       exceptions are turned to TransportException
+     *                                       throwing an exception yields an ErrorChunk
      *
      * @see ResponseInterface::getInfo() for possible info, e.g. "response_headers"
      */
@@ -105,7 +105,11 @@ class MockResponse implements ResponseInterface, StreamableInterface
     {
         $this->info['canceled'] = true;
         $this->info['error'] = 'Response has been canceled.';
-        $this->body = null;
+        try {
+            $this->body = null;
+        } catch (TransportException $e) {
+            // ignore errors when canceling
+        }
     }
 
     /**
@@ -136,6 +140,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->info['http_method'] = $method;
         $response->info['http_code'] = 0;
         $response->info['user_data'] = $options['user_data'] ?? null;
+        $response->info['max_duration'] = $options['max_duration'] ?? null;
         $response->info['url'] = $url;
 
         if ($mock instanceof self) {
@@ -204,6 +209,9 @@ class MockResponse implements ResponseInterface, StreamableInterface
                     $multi->handlesActivity[$id][] = null;
                     $multi->handlesActivity[$id][] = $e;
                 }
+            } elseif ($chunk instanceof \Throwable) {
+                $multi->handlesActivity[$id][] = null;
+                $multi->handlesActivity[$id][] = $chunk;
             } else {
                 // Data or timeout chunk
                 $multi->handlesActivity[$id][] = $chunk;
@@ -278,8 +286,13 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->info = [
             'start_time' => $response->info['start_time'],
             'user_data' => $response->info['user_data'],
+            'max_duration' => $response->info['max_duration'],
             'http_code' => $response->info['http_code'],
         ] + $info + $response->info;
+
+        if (null !== $response->info['error']) {
+            throw new TransportException($response->info['error']);
+        }
 
         if (!isset($response->info['total_time'])) {
             $response->info['total_time'] = microtime(true) - $response->info['start_time'];
@@ -292,16 +305,20 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $body = $mock instanceof self ? $mock->body : $mock->getContent(false);
 
         if (!\is_string($body)) {
-            foreach ($body as $chunk) {
-                if ('' === $chunk = (string) $chunk) {
-                    // simulate an idle timeout
-                    $response->body[] = new ErrorChunk($offset, sprintf('Idle timeout reached for "%s".', $response->info['url']));
-                } else {
-                    $response->body[] = $chunk;
-                    $offset += \strlen($chunk);
-                    // "notify" download progress
-                    $onProgress($offset, $dlSize, $response->info);
+            try {
+                foreach ($body as $chunk) {
+                    if ('' === $chunk = (string) $chunk) {
+                        // simulate an idle timeout
+                        $response->body[] = new ErrorChunk($offset, sprintf('Idle timeout reached for "%s".', $response->info['url']));
+                    } else {
+                        $response->body[] = $chunk;
+                        $offset += \strlen($chunk);
+                        // "notify" download progress
+                        $onProgress($offset, $dlSize, $response->info);
+                    }
                 }
+            } catch (\Throwable $e) {
+                $response->body[] = $e;
             }
         } elseif ('' !== $body) {
             $response->body[] = $body;

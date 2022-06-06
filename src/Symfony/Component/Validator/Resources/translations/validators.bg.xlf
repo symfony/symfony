@@ -390,6 +390,18 @@
                 <source>This value should be a valid expression.</source>
                 <target>Стойността трябва да бъде валиден израз.</target>
             </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Стойността не е валиден CSS цвят.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Стойността не е валидна CIDR нотация.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Стойността на мрежовата маска трябва да бъде между {{ min }} и {{ max }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

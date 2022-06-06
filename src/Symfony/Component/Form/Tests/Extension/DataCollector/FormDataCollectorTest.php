@@ -11,18 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
-use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
-use Symfony\Component\Form\Extension\DataCollector\FormDataExtractorInterface;
+use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistry;
@@ -32,29 +29,14 @@ use Symfony\Component\Form\ResolvedFormTypeFactory;
 class FormDataCollectorTest extends TestCase
 {
     /**
-     * @var MockObject&FormDataExtractorInterface
-     */
-    private $dataExtractor;
-
-    /**
      * @var FormDataCollector
      */
     private $dataCollector;
 
     /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
-
-    /**
      * @var FormFactory
      */
     private $factory;
-
-    /**
-     * @var PropertyPathMapper
-     */
-    private $dataMapper;
 
     /**
      * @var Form
@@ -78,13 +60,10 @@ class FormDataCollectorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dataExtractor = $this->createMock(FormDataExtractorInterface::class);
-        $this->dataCollector = new FormDataCollector($this->dataExtractor);
-        $this->dispatcher = new EventDispatcher();
+        $this->dataCollector = new FormDataCollector(new FormDataExtractor());
         $this->factory = new FormFactory(new FormRegistry([new CoreExtension()], new ResolvedFormTypeFactory()));
-        $this->dataMapper = new DataMapper();
         $this->form = $this->createForm('name');
-        $this->childForm = $this->createForm('child');
+        $this->childForm = $this->createChildForm('child');
         $this->view = new FormView();
         $this->childView = new FormView();
     }
@@ -93,62 +72,51 @@ class FormDataCollectorTest extends TestCase
     {
         $this->form->add($this->childForm);
 
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractConfiguration')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['config' => 'foo'],
-                ['config' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractDefaultData')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['default_data' => 'foo'],
-                ['default_data' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractSubmittedData')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['submitted_data' => 'foo'],
-                ['submitted_data' => 'bar']
-            );
-
         $this->dataCollector->collectConfiguration($this->form);
         $this->dataCollector->collectDefaultData($this->form);
         $this->dataCollector->collectSubmittedData($this->form);
         $this->dataCollector->buildPreliminaryFormTree($this->form);
 
         $childFormData = [
-             'config' => 'bar',
-             'default_data' => 'bar',
-             'submitted_data' => 'bar',
-             'children' => [],
+            'id' => 'name_child',
+            'name' => 'child',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->childForm->getConfig()->getOptions(),
+            'default_data' => [
+                'norm' => null,
+                'view' => '',
+            ],
+            'submitted_data' => [
+                'norm' => null,
+                'view' => '',
+            ],
+            'errors' => [],
+            'children' => [],
          ];
 
         $formData = [
-             'config' => 'foo',
-             'default_data' => 'foo',
-             'submitted_data' => 'foo',
+            'id' => 'name',
+            'name' => 'name',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->form->getConfig()->getOptions(),
+            'default_data' => [
+                'norm' => null,
+            ],
+            'submitted_data' => [
+                'norm' => null,
+            ],
+            'errors' => [],
              'has_children_error' => false,
              'children' => [
                  'child' => $childFormData,
              ],
          ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -165,27 +133,21 @@ class FormDataCollectorTest extends TestCase
         $form1 = $this->createForm('form1');
         $form2 = $this->createForm('form2');
 
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractConfiguration')
-            ->withConsecutive(
-                [$form1],
-                [$form2]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['config' => 'foo'],
-                ['config' => 'bar']
-            );
-
         $this->dataCollector->collectConfiguration($form1);
         $this->dataCollector->collectConfiguration($form2);
         $this->dataCollector->buildPreliminaryFormTree($form1);
 
         $form1Data = [
-            'config' => 'foo',
+            'id' => 'form1',
+            'name' => 'form1',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $form1->getConfig()->getOptions(),
             'children' => [],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'form1' => $form1Data,
             ],
@@ -198,11 +160,16 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->buildPreliminaryFormTree($form2);
 
         $form2Data = [
-            'config' => 'bar',
+            'id' => 'form2',
+            'name' => 'form2',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $form2->getConfig()->getOptions(),
             'children' => [],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'form1' => $form1Data,
                 'form2' => $form2Data,
@@ -217,25 +184,20 @@ class FormDataCollectorTest extends TestCase
 
     public function testBuildSamePreliminaryFormTreeMultipleTimes()
     {
-        $this->dataExtractor
-            ->method('extractConfiguration')
-            ->with($this->form)
-            ->willReturn(['config' => 'foo']);
-
-        $this->dataExtractor
-            ->method('extractDefaultData')
-            ->with($this->form)
-            ->willReturn(['default_data' => 'foo']);
-
         $this->dataCollector->collectConfiguration($this->form);
         $this->dataCollector->buildPreliminaryFormTree($this->form);
 
         $formData = [
-            'config' => 'foo',
+            'id' => 'name',
+            'name' => 'name',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->form->getConfig()->getOptions(),
             'children' => [],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -249,12 +211,20 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->buildPreliminaryFormTree($this->form);
 
         $formData = [
-            'config' => 'foo',
-            'default_data' => 'foo',
+            'id' => 'name',
+            'name' => 'name',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->form->getConfig()->getOptions(),
+            'default_data' => [
+                'norm' => null,
+            ],
+            'submitted_data' => [],
             'children' => [],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -273,7 +243,7 @@ class FormDataCollectorTest extends TestCase
             'children' => [],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -289,50 +259,6 @@ class FormDataCollectorTest extends TestCase
         $this->form->add($this->childForm);
         $this->view->children['child'] = $this->childView;
 
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractConfiguration')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['config' => 'foo'],
-                ['config' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractDefaultData')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['default_data' => 'foo'],
-                ['default_data' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractSubmittedData')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['submitted_data' => 'foo'],
-                ['submitted_data' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractViewVariables')
-            ->withConsecutive(
-                [$this->view],
-                [$this->childView]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['view_vars' => 'foo'],
-                ['view_vars' => 'bar']
-            );
-
         $this->dataCollector->collectConfiguration($this->form);
         $this->dataCollector->collectDefaultData($this->form);
         $this->dataCollector->collectSubmittedData($this->form);
@@ -340,25 +266,53 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->buildFinalFormTree($this->form, $this->view);
 
         $childFormData = [
-            'view_vars' => 'bar',
-            'config' => 'bar',
-            'default_data' => 'bar',
-            'submitted_data' => 'bar',
+            'id' => 'name_child',
+            'name' => 'child',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->childForm->getConfig()->getOptions(),
+            'default_data' => [
+                'norm' => null,
+                'view' => '',
+            ],
+            'submitted_data' => [
+                'norm' => null,
+                'view' => '',
+            ],
+            'errors' => [],
+            'view_vars' => [
+                'attr' => [],
+                'value' => null,
+            ],
             'children' => [],
         ];
 
         $formData = [
-            'view_vars' => 'foo',
-            'config' => 'foo',
-            'default_data' => 'foo',
-            'submitted_data' => 'foo',
+            'id' => 'name',
+            'name' => 'name',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->form->getConfig()->getOptions(),
+            'default_data' => [
+                'norm' => null,
+            ],
+            'submitted_data' => [
+                'norm' => null,
+            ],
+            'errors' => [],
+            'view_vars' => [
+                'attr' => [],
+                'value' => null,
+            ],
             'has_children_error' => false,
             'children' => [
                 'child' => $childFormData,
             ],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -372,9 +326,11 @@ class FormDataCollectorTest extends TestCase
 
     public function testSerializeWithFormAddedMultipleTimes()
     {
+        $this->expectNotToPerformAssertions();
+
         $form1 = $this->createForm('form1');
         $form2 = $this->createForm('form2');
-        $child1 = $this->createForm('child1');
+        $child1 = $this->createChildForm('child1');
 
         $form1View = new FormView();
         $form2View = new FormView();
@@ -388,66 +344,6 @@ class FormDataCollectorTest extends TestCase
 
         $form1View->children['child1'] = $child1View;
         $form2View->children['child1'] = $child1View;
-
-        $this->dataExtractor->expects($this->exactly(4))
-            ->method('extractConfiguration')
-            ->withConsecutive(
-                [$form1],
-                [$child1],
-                [$form2],
-                [$child1]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['config' => 'foo'],
-                ['config' => 'bar'],
-                ['config' => 'foo'],
-                ['config' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(4))
-            ->method('extractDefaultData')
-            ->withConsecutive(
-                [$form1],
-                [$child1],
-                [$form2],
-                [$child1]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['default_data' => 'foo'],
-                ['default_data' => 'bar'],
-                ['default_data' => 'foo'],
-                ['default_data' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(4))
-            ->method('extractSubmittedData')
-            ->withConsecutive(
-                [$form1],
-                [$child1],
-                [$form2],
-                [$child1]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['submitted_data' => 'foo'],
-                ['submitted_data' => 'bar'],
-                ['submitted_data' => 'foo'],
-                ['submitted_data' => 'bar']
-            );
-
-        $this->dataExtractor->expects($this->exactly(4))
-            ->method('extractViewVariables')
-            ->withConsecutive(
-                [$form1View],
-                [$child1View],
-                [$form2View],
-                [$child1View]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['view_vars' => 'foo'],
-                ['view_vars' => $child1View->vars],
-                ['view_vars' => 'foo'],
-                ['view_vars' => $child1View->vars]
-            );
 
         $this->dataCollector->collectConfiguration($form1);
         $this->dataCollector->collectDefaultData($form1);
@@ -466,8 +362,8 @@ class FormDataCollectorTest extends TestCase
 
     public function testFinalFormReliesOnFormViewStructure()
     {
-        $this->form->add($child1 = $this->createForm('first'));
-        $this->form->add($child2 = $this->createForm('second'));
+        $this->form->add($child1 = $this->createChildForm('first'));
+        $this->form->add($child2 = $this->createChildForm('second'));
 
         $this->view->children['second'] = $this->childView;
 
@@ -488,7 +384,7 @@ class FormDataCollectorTest extends TestCase
             ],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -509,7 +405,7 @@ class FormDataCollectorTest extends TestCase
             ],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -528,17 +424,6 @@ class FormDataCollectorTest extends TestCase
 
         $this->view->children['child'] = $this->childView;
 
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractConfiguration')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['config' => 'foo'],
-                ['config' => 'bar']
-            );
-
         // explicitly call collectConfiguration(), since $this->childForm is not
         // contained in the form tree
         $this->dataCollector->collectConfiguration($this->form);
@@ -551,13 +436,18 @@ class FormDataCollectorTest extends TestCase
         ];
 
         $formData = [
-            'config' => 'foo',
+            'id' => 'name',
+            'name' => 'name',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->form->getConfig()->getOptions(),
             'children' => [
                 'child' => $childFormData,
             ],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -578,17 +468,6 @@ class FormDataCollectorTest extends TestCase
         // but associate the two
         $this->dataCollector->associateFormWithView($this->childForm, $this->childView);
 
-        $this->dataExtractor->expects($this->exactly(2))
-            ->method('extractConfiguration')
-            ->withConsecutive(
-                [$this->form],
-                [$this->childForm]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['config' => 'foo'],
-                ['config' => 'bar']
-            );
-
         // explicitly call collectConfiguration(), since $this->childForm is not
         // contained in the form tree
         $this->dataCollector->collectConfiguration($this->form);
@@ -596,18 +475,28 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->buildFinalFormTree($this->form, $this->view);
 
         $childFormData = [
-            'config' => 'bar',
+            'id' => 'child',
+            'name' => 'child',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->childForm->getConfig()->getOptions(),
             'children' => [],
         ];
 
         $formData = [
-            'config' => 'foo',
+            'id' => 'name',
+            'name' => 'name',
+            'type_class' => FormType::class,
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => $this->form->getConfig()->getOptions(),
             'children' => [
                 'child' => $childFormData,
             ],
         ];
 
-        $this->assertSame([
+        $this->assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -622,28 +511,15 @@ class FormDataCollectorTest extends TestCase
     public function testCollectSubmittedDataCountsErrors()
     {
         $form1 = $this->createForm('form1');
-        $childForm1 = $this->createForm('child1');
+        $childForm1 = $this->createChildForm('child1');
         $form2 = $this->createForm('form2');
 
         $form1->add($childForm1);
-        $this->dataExtractor
-             ->method('extractConfiguration')
-             ->willReturn([]);
-        $this->dataExtractor
-             ->method('extractDefaultData')
-             ->willReturn([]);
-        $this->dataExtractor->expects($this->exactly(3))
-            ->method('extractSubmittedData')
-            ->withConsecutive(
-                [$form1],
-                [$childForm1],
-                [$form2]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['errors' => ['foo']],
-                ['errors' => ['bar', 'bam']],
-                ['errors' => ['baz']]
-            );
+
+        $form1->addError(new FormError('foo'));
+        $childForm1->addError(new FormError('bar'));
+        $childForm1->addError(new FormError('bam'));
+        $form2->addError(new FormError('baz'));
 
         $this->dataCollector->collectSubmittedData($form1);
 
@@ -658,38 +534,17 @@ class FormDataCollectorTest extends TestCase
 
     public function testCollectSubmittedDataExpandedFormsErrors()
     {
-        $child1Form = $this->createForm('child1');
-        $child11Form = $this->createForm('child11');
-        $child2Form = $this->createForm('child2');
-        $child21Form = $this->createForm('child21');
+        $child1Form = $this->createChildForm('child1', true);
+        $child11Form = $this->createChildForm('child11');
+        $child2Form = $this->createChildForm('child2', true);
+        $child21Form = $this->createChildForm('child21');
 
         $child1Form->add($child11Form);
         $child2Form->add($child21Form);
         $this->form->add($child1Form);
         $this->form->add($child2Form);
 
-        $this->dataExtractor
-            ->method('extractConfiguration')
-            ->willReturn([]);
-        $this->dataExtractor
-            ->method('extractDefaultData')
-            ->willReturn([]);
-        $this->dataExtractor->expects($this->exactly(5))
-            ->method('extractSubmittedData')
-            ->withConsecutive(
-                [$this->form],
-                [$child1Form],
-                [$child11Form],
-                [$child2Form],
-                [$child21Form]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['errors' => []],
-                ['errors' => []],
-                ['errors' => ['foo']],
-                ['errors' => []],
-                ['errors' => []]
-            );
+        $child11Form->addError(new FormError('foo'));
 
         $this->dataCollector->collectSubmittedData($this->form);
         $this->dataCollector->buildPreliminaryFormTree($this->form);
@@ -712,19 +567,11 @@ class FormDataCollectorTest extends TestCase
     {
         $form = $this->createForm('my_form');
 
-        $this->dataExtractor->expects($this->any())
-            ->method('extractConfiguration')
-            ->willReturn([]);
-        $this->dataExtractor->expects($this->any())
-            ->method('extractDefaultData')
-            ->willReturn([]);
-        $this->dataExtractor->expects($this->any())
-            ->method('extractSubmittedData')
-            ->with($form)
-            ->willReturn(['errors' => ['baz']]);
-
         $this->dataCollector->buildPreliminaryFormTree($form);
         $this->dataCollector->collectSubmittedData($form);
+
+        $this->assertGreaterThan(0, \count($this->dataCollector->getData()['forms']));
+        $this->assertGreaterThan(0, \count($this->dataCollector->getData()['forms_by_hash']));
 
         $this->dataCollector->reset();
 
@@ -753,47 +600,45 @@ class FormDataCollectorTest extends TestCase
             ])
             ->getForm()
         ;
-        $this->dataExtractor->expects($extractConfiguration = $this->exactly(4))
-            ->method('extractConfiguration')
-            ->willReturn([])
-        ;
-        $this->dataExtractor->expects($extractDefaultData = $this->exactly(4))
-            ->method('extractDefaultData')
-            ->willReturnCallback(static function (FormInterface $form) {
-                // this simulate the call in extractDefaultData() method
-                // where (if defaultDataSet is false) it fires *_SET_DATA
-                // events, adding the form related to the configured data
-                $form->getNormData();
-
-                return [];
-            })
-        ;
-        $this->dataExtractor->expects($this->exactly(4))
-            ->method('extractSubmittedData')
-            ->willReturn([])
-        ;
 
         $this->dataCollector->collectConfiguration($form);
-        $this->assertSame(2, $extractConfiguration->getInvocationCount(), 'only "root" and "items" forms were collected, the "items" children do not exist yet.');
+        $this->dataCollector->buildPreliminaryFormTree($form);
+        $data = $this->dataCollector->getData();
+        $this->assertCount(2, $data['forms_by_hash'], 'only "root" and "items" forms were collected, the "items" children do not exist yet.');
+
+        foreach ($data['forms_by_hash'] as $formData) {
+            $this->assertArrayNotHasKey('default_data', $formData);
+        }
 
         $this->dataCollector->collectDefaultData($form);
-        $this->assertSame(3, $extractConfiguration->getInvocationCount(), 'extracted missing configuration of the "items" children ["0" => foo].');
-        $this->assertSame(3, $extractDefaultData->getInvocationCount());
+        $this->dataCollector->buildPreliminaryFormTree($form);
+        $data = $this->dataCollector->getData();
+        $this->assertCount(3, $data['forms_by_hash'], 'extracted missing configuration of the "items" children ["0" => foo].');
         $this->assertSame(['foo'], $form->get('items')->getData());
+
+        foreach ($data['forms_by_hash'] as $formData) {
+            $this->assertArrayHasKey('default_data', $formData);
+        }
 
         $form->submit(['items' => ['foo', 'bar']]);
         $this->dataCollector->collectSubmittedData($form);
-        $this->assertSame(4, $extractConfiguration->getInvocationCount(), 'extracted missing configuration of the "items" children ["1" => bar].');
-        $this->assertSame(4, $extractDefaultData->getInvocationCount(), 'extracted missing default data of the "items" children ["1" => bar].');
+        $this->dataCollector->buildPreliminaryFormTree($form);
+        $data = $this->dataCollector->getData();
+        $this->assertCount(4, $data['forms_by_hash'], 'extracted missing configuration of the "items" children ["1" => bar].');
         $this->assertSame(['foo', 'bar'], $form->get('items')->getData());
+
+        foreach ($data['forms_by_hash'] as $formData) {
+            $this->assertArrayHasKey('default_data', $formData);
+        }
     }
 
-    private function createForm($name)
+    private function createForm(string $name): FormInterface
     {
-        $builder = new FormBuilder($name, null, $this->dispatcher, $this->factory);
-        $builder->setCompound(true);
-        $builder->setDataMapper($this->dataMapper);
+        return $this->factory->createNamedBuilder($name)->getForm();
+    }
 
-        return $builder->getForm();
+    private function createChildForm(string $name, bool $compound = false): FormInterface
+    {
+        return $this->factory->createNamedBuilder($name, FormType::class, null, ['auto_initialize' => false, 'compound' => $compound])->getForm();
     }
 }

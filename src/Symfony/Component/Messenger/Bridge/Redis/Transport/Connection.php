@@ -52,13 +52,16 @@ class Connection
     private $autoSetup;
     private $maxEntries;
     private $redeliverTimeout;
-    private $nextClaim = 0;
+    private $nextClaim = 0.0;
     private $claimInterval;
     private $deleteAfterAck;
     private $deleteAfterReject;
     private $couldHavePendingMessages = true;
 
-    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
+    /**
+     * @param \Redis|\RedisCluster|null $redis
+     */
+    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -73,29 +76,19 @@ class Connection
             $auth = null;
         }
 
-        $initializer = static function ($redis) use ($host, $port, $auth, $serializer, $dbIndex) {
-            $redis->connect($host, $port);
-            $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
-
-            if (null !== $auth && !$redis->auth($auth)) {
-                throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
-            }
-
-            if ($dbIndex && !$redis->select($dbIndex)) {
-                throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
-            }
-
-            return true;
-        };
-
-        if (null === $redis) {
-            $redis = new \Redis();
-        }
-
-        if ($configuration['lazy'] ?? self::DEFAULT_OPTIONS['lazy']) {
-            $redis = new RedisProxy($redis, $initializer);
+        $lazy = $configuration['lazy'] ?? self::DEFAULT_OPTIONS['lazy'];
+        if (\is_array($host) || $redis instanceof \RedisCluster) {
+            $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
+            $initializer = static function ($redis) use ($hosts, $auth, $serializer) {
+                return self::initializeRedisCluster($redis, $hosts, $auth, $serializer);
+            };
+            $redis = $lazy ? new RedisClusterProxy($redis, $initializer) : $initializer($redis);
         } else {
-            $initializer($redis);
+            $redis = $redis ?? new \Redis();
+            $initializer = static function ($redis) use ($host, $port, $auth, $serializer, $dbIndex) {
+                return self::initializeRedis($redis, $host, $port, $auth, $serializer, $dbIndex);
+            };
+            $redis = $lazy ? new RedisProxy($redis, $initializer) : $initializer($redis);
         }
 
         $this->connection = $redis;
@@ -115,23 +108,66 @@ class Connection
         $this->deleteAfterAck = $configuration['delete_after_ack'] ?? self::DEFAULT_OPTIONS['delete_after_ack'];
         $this->deleteAfterReject = $configuration['delete_after_reject'] ?? self::DEFAULT_OPTIONS['delete_after_reject'];
         $this->redeliverTimeout = ($configuration['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']) * 1000;
-        $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
+        $this->claimInterval = ($configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval']) / 1000;
     }
 
-    public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
+    /**
+     * @param string|string[]|null $auth
+     */
+    private static function initializeRedis(\Redis $redis, string $host, int $port, $auth, int $serializer, int $dbIndex): \Redis
     {
-        $url = $dsn;
+        $redis->connect($host, $port);
+        $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
 
-        if (preg_match('#^redis:///([^:@])+$#', $dsn)) {
-            $url = str_replace('redis:', 'file:', $dsn);
+        if (null !== $auth && !$redis->auth($auth)) {
+            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
 
-        if (false === $parsedUrl = parse_url($url)) {
-            throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
+        if ($dbIndex && !$redis->select($dbIndex)) {
+            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $dsnOptions);
-            $redisOptions = array_merge($redisOptions, $dsnOptions);
+
+        return $redis;
+    }
+
+    /**
+     * @param string|string[]|null $auth
+     */
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, $auth, int $serializer): \RedisCluster
+    {
+        if (null === $redis) {
+            $redis = new \RedisCluster(null, $hosts, 0.0, 0.0, false, $auth);
+        }
+
+        $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
+
+        return $redis;
+    }
+
+    /**
+     * @param \Redis|\RedisCluster|null $redis
+     */
+    public static function fromDsn(string $dsn, array $redisOptions = [], $redis = null): self
+    {
+        if (false === strpos($dsn, ',')) {
+            $parsedUrl = self::parseDsn($dsn, $redisOptions);
+        } else {
+            $dsns = explode(',', $dsn);
+            $parsedUrls = array_map(function ($dsn) use (&$redisOptions) {
+                return self::parseDsn($dsn, $redisOptions);
+            }, $dsns);
+
+            // Merge all the URLs, the last one overrides the previous ones
+            $parsedUrl = array_merge(...$parsedUrls);
+
+            // Regroup all the hosts in an array interpretable by RedisCluster
+            $parsedUrl['host'] = array_map(function ($parsedUrl, $dsn) {
+                if (!isset($parsedUrl['host'])) {
+                    throw new InvalidArgumentException(sprintf('Missing host in DSN part "%s", it must be defined when using Redis Cluster.', $dsn));
+                }
+
+                return $parsedUrl['host'].':'.($parsedUrl['port'] ?? 6379);
+            }, $parsedUrls, $dsns);
         }
 
         self::validateOptions($redisOptions);
@@ -152,6 +188,8 @@ class Connection
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
             $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
+        } else {
+            trigger_deprecation('symfony/redis-messenger', '5.4', 'Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
         }
 
         $deleteAfterReject = null;
@@ -166,8 +204,9 @@ class Connection
             unset($redisOptions['dbindex']);
         }
 
-        $tls = false;
+        $tls = 'rediss' === $parsedUrl['scheme'];
         if (\array_key_exists('tls', $redisOptions)) {
+            trigger_deprecation('symfony/redis-messenger', '5.3', 'Providing "tls" parameter is deprecated, use "rediss://" DSN scheme instead');
             $tls = filter_var($redisOptions['tls'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['tls']);
         }
@@ -199,10 +238,13 @@ class Connection
         ];
 
         if (isset($parsedUrl['host'])) {
+            $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
+            $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
             $connectionCredentials = [
                 'host' => $parsedUrl['host'] ?? '127.0.0.1',
                 'port' => $parsedUrl['port'] ?? 6379,
-                'auth' => $redisOptions['auth'] ?? $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+                // See: https://github.com/phpredis/phpredis/#auth
+                'auth' => $redisOptions['auth'] ?? (null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user)),
             ];
 
             $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
@@ -221,6 +263,26 @@ class Connection
         }
 
         return new self($configuration, $connectionCredentials, $redisOptions, $redis);
+    }
+
+    private static function parseDsn(string $dsn, array &$redisOptions): array
+    {
+        $url = $dsn;
+        $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
+
+        if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
+            $url = str_replace($scheme.':', 'file:', $dsn);
+        }
+
+        if (false === $parsedUrl = parse_url($url)) {
+            throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
+        }
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $dsnOptions);
+            $redisOptions = array_merge($redisOptions, $dsnOptions);
+        }
+
+        return $parsedUrl;
     }
 
     private static function validateOptions(array $options): void
@@ -272,7 +334,7 @@ class Connection
             }
         }
 
-        $this->nextClaim = $this->getCurrentTimeInMilliseconds() + $this->claimInterval;
+        $this->nextClaim = microtime(true) + $this->claimInterval;
     }
 
     public function get(): ?array
@@ -280,36 +342,34 @@ class Connection
         if ($this->autoSetup) {
             $this->setup();
         }
+        $now = microtime();
+        $now = substr($now, 11).substr($now, 2, 3);
 
-        try {
-            $queuedMessageCount = $this->connection->zcount($this->queue, 0, $this->getCurrentTimeInMilliseconds());
-        } catch (\RedisException $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
+        $queuedMessageCount = $this->rawCommand('ZCOUNT', 0, $now);
 
-        if ($queuedMessageCount) {
-            for ($i = 0; $i < $queuedMessageCount; ++$i) {
-                try {
-                    $queuedMessages = $this->connection->zpopmin($this->queue, 1);
-                } catch (\RedisException $e) {
-                    throw new TransportException($e->getMessage(), 0, $e);
-                }
-
-                foreach ($queuedMessages as $queuedMessage => $time) {
-                    $queuedMessage = json_decode($queuedMessage, true);
-                    // if a futured placed message is actually popped because of a race condition with
-                    // another running message consumer, the message is readded to the queue by add function
-                    // else its just added stream and will be available for all stream consumers
-                    $this->add(
-                        $queuedMessage['body'],
-                        $queuedMessage['headers'],
-                        $time - $this->getCurrentTimeInMilliseconds()
-                    );
-                }
+        while ($queuedMessageCount--) {
+            if (!$message = $this->rawCommand('ZPOPMIN', 1)) {
+                break;
             }
+
+            [$queuedMessage, $expiry] = $message;
+
+            if (\strlen($expiry) === \strlen($now) ? $expiry > $now : \strlen($expiry) < \strlen($now)) {
+                // if a future-placed message is popped because of a race condition with
+                // another running consumer, the message is readded to the queue
+
+                if (!$this->rawCommand('ZADD', 'NX', $expiry, $queuedMessage)) {
+                    throw new TransportException('Could not add a message to the redis stream.');
+                }
+
+                break;
+            }
+
+            $decodedQueuedMessage = json_decode($queuedMessage, true);
+            $this->add(\array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage, $decodedQueuedMessage['headers'] ?? [], 0);
         }
 
-        if (!$this->couldHavePendingMessages && $this->nextClaim <= $this->getCurrentTimeInMilliseconds()) {
+        if (!$this->couldHavePendingMessages && $this->nextClaim <= microtime(true)) {
             $this->claimOldPendingMessages();
         }
 
@@ -346,12 +406,9 @@ class Connection
         }
 
         foreach ($messages[$this->stream] ?? [] as $key => $message) {
-            $redisEnvelope = json_decode($message['message'], true);
-
             return [
                 'id' => $key,
-                'body' => $redisEnvelope['body'],
-                'headers' => $redisEnvelope['headers'],
+                'data' => $message,
             ];
         }
 
@@ -403,7 +460,7 @@ class Connection
         }
 
         try {
-            if ($delayInMs > 0) { // the delay could be smaller 0 in a queued message
+            if ($delayInMs > 0) { // the delay is <= 0 for queued messages
                 $message = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -415,8 +472,18 @@ class Connection
                     throw new TransportException(json_last_error_msg());
                 }
 
-                $score = (int) ($this->getCurrentTimeInMilliseconds() + $delayInMs);
-                $added = $this->connection->zadd($this->queue, ['NX'], $score, $message);
+                $now = explode(' ', microtime(), 2);
+                $now[0] = str_pad($delayInMs + substr($now[0], 2, 3), 3, '0', \STR_PAD_LEFT);
+                if (3 < \strlen($now[0])) {
+                    $now[1] += substr($now[0], 0, -3);
+                    $now[0] = substr($now[0], -3);
+
+                    if (\is_float($now[1])) {
+                        throw new TransportException("Message delay is too big: {$delayInMs}ms.");
+                    }
+                }
+
+                $added = $this->rawCommand('ZADD', 'NX', $now[1].$now[0], $message);
             } else {
                 $message = json_encode([
                     'body' => $body,
@@ -469,7 +536,7 @@ class Connection
                 // support for Redis extension version 4.x
                 || (\is_string($groups) && substr_count($groups, '"name"'))
             ) {
-                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject can not be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
+                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject cannot be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
             }
         }
 
@@ -496,6 +563,31 @@ class Connection
         if (!$unlink) {
             $this->connection->del($this->stream, $this->queue);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    private function rawCommand(string $command, ...$arguments)
+    {
+        try {
+            if ($this->connection instanceof \RedisCluster || $this->connection instanceof RedisClusterProxy) {
+                $result = $this->connection->rawCommand($this->queue, $command, $this->queue, ...$arguments);
+            } else {
+                $result = $this->connection->rawCommand($command, $this->queue, ...$arguments);
+            }
+        } catch (\RedisException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (false === $result) {
+            if ($error = $this->connection->getLastError() ?: null) {
+                $this->connection->clearLastError();
+            }
+            throw new TransportException($error ?? sprintf('Could not run "%s" on Redis queue.', $command));
+        }
+
+        return $result;
     }
 }
 

@@ -27,6 +27,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener;
 
+/**
+ * @group legacy
+ */
 class BasicAuthenticationListenerTest extends TestCase
 {
     public function testHandleWithValidUsernameAndPasswordServerParameters()
@@ -65,7 +68,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenAuthenticationFails()
@@ -103,7 +106,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $authenticationEntryPoint
         );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener($event);
 
@@ -127,7 +130,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWithASimilarAuthenticatedToken()
@@ -156,7 +159,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testItRequiresProviderKey()
@@ -208,7 +211,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $authenticationEntryPoint
         );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener($event);
 

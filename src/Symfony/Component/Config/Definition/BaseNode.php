@@ -147,7 +147,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Returns info message.
      *
-     * @return string|null The info text
+     * @return string|null
      */
     public function getInfo()
     {
@@ -167,7 +167,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Retrieves the example configuration for this node.
      *
-     * @return string|array|null The example
+     * @return string|array|null
      */
     public function getExample()
     {
@@ -415,7 +415,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param mixed $value
      *
-     * @return mixed The normalized array value
+     * @return mixed
      */
     protected function preNormalize($value)
     {
@@ -487,7 +487,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param mixed $value The value to normalize
      *
-     * @return mixed The normalized value
+     * @return mixed
      */
     abstract protected function normalizeValue($value);
 
@@ -497,7 +497,7 @@ abstract class BaseNode implements NodeInterface
      * @param mixed $leftSide
      * @param mixed $rightSide
      *
-     * @return mixed The merged value
+     * @return mixed
      */
     abstract protected function mergeValues($leftSide, $rightSide);
 
@@ -506,7 +506,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param mixed $value The value to finalize
      *
-     * @return mixed The finalized value
+     * @return mixed
      */
     abstract protected function finalizeValue($value);
 

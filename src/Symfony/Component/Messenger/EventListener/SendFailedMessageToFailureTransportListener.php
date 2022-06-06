@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\EventListener;
 
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -25,18 +27,34 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
  */
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {
-    private $failureSender;
+    private $failureSenders;
     private $logger;
 
-    public function __construct(SenderInterface $failureSender, LoggerInterface $logger = null)
+    /**
+     * @param ContainerInterface $failureSenders
+     */
+    public function __construct($failureSenders, LoggerInterface $logger = null)
     {
-        $this->failureSender = $failureSender;
+        if (!$failureSenders instanceof ContainerInterface) {
+            trigger_deprecation('symfony/messenger', '5.3', 'Passing a SenderInterface value as 1st argument to "%s()" is deprecated, pass a ServiceLocator instead.', __METHOD__);
+        }
+
+        $this->failureSenders = $failureSenders;
         $this->logger = $logger;
     }
 
     public function onMessageFailed(WorkerMessageFailedEvent $event)
     {
         if ($event->willRetry()) {
+            return;
+        }
+
+        if (!$this->hasFailureTransports($event)) {
+            return;
+        }
+
+        $failureSender = $this->getFailureSender($event->getReceiverName());
+        if (null === $failureSender) {
             return;
         }
 
@@ -56,11 +74,11 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         if (null !== $this->logger) {
             $this->logger->info('Rejected message {class} will be sent to the failure transport {transport}.', [
                 'class' => \get_class($envelope->getMessage()),
-                'transport' => \get_class($this->failureSender),
+                'transport' => \get_class($failureSender),
             ]);
         }
 
-        $this->failureSender->send($envelope);
+        $failureSender->send($envelope);
     }
 
     public static function getSubscribedEvents()
@@ -68,5 +86,19 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         return [
             WorkerMessageFailedEvent::class => ['onMessageFailed', -100],
         ];
+    }
+
+    private function getFailureSender(string $receiverName): SenderInterface
+    {
+        if ($this->failureSenders instanceof SenderInterface) {
+            return $this->failureSenders;
+        }
+
+        return $this->failureSenders->get($receiverName);
+    }
+
+    private function hasFailureTransports(WorkerMessageFailedEvent $event): bool
+    {
+        return ($this->failureSenders instanceof ContainerInterface && $this->failureSenders->has($event->getReceiverName())) || $this->failureSenders instanceof SenderInterface;
     }
 }

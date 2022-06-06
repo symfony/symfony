@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Notifier\Channel\ChannelInterface;
 use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Channel\ChannelPolicyInterface;
+use Symfony\Component\Notifier\Channel\SmsChannel;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\NoRecipient;
@@ -22,8 +23,6 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 final class Notifier implements NotifierInterface
 {
@@ -89,6 +88,10 @@ final class Notifier implements NotifierInterface
 
             if (null === $channel = $this->getChannel($channelName)) {
                 throw new LogicException(sprintf('The "%s" channel does not exist.', $channelName));
+            }
+
+            if ($channel instanceof SmsChannel && $recipient instanceof NoRecipient) {
+                throw new LogicException(sprintf('The "%s" channel needs a Recipient.', $channelName));
             }
 
             if (!$channel->supports($notification, $recipient)) {

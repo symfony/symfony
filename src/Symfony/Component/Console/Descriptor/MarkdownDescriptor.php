@@ -69,6 +69,9 @@ class MarkdownDescriptor extends Descriptor
     protected function describeInputOption(InputOption $option, array $options = [])
     {
         $name = '--'.$option->getName();
+        if ($option->isNegatable()) {
+            $name .= '|--no-'.$option->getName();
+        }
         if ($option->getShortcut()) {
             $name .= '|-'.str_replace('|', '|-', $option->getShortcut()).'';
         }
@@ -79,6 +82,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Accept value: '.($option->acceptValue() ? 'yes' : 'no')."\n"
             .'* Is value required: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'* Is multiple: '.($option->isArray() ? 'yes' : 'no')."\n"
+            .'* Is negatable: '.($option->isNegatable() ? 'yes' : 'no')."\n"
             .'* Default: `'.str_replace("\n", '', var_export($option->getDefault(), true)).'`'
         );
     }
@@ -118,11 +122,25 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeCommand(Command $command, array $options = [])
     {
+        if ($options['short'] ?? false) {
+            $this->write(
+                '`'.$command->getName()."`\n"
+                .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
+                .($command->getDescription() ? $command->getDescription()."\n\n" : '')
+                .'### Usage'."\n\n"
+                .array_reduce($command->getAliases(), function ($carry, $usage) {
+                    return $carry.'* `'.$usage.'`'."\n";
+                })
+            );
+
+            return;
+        }
+
         $command->mergeApplicationDefinition(false);
 
         $this->write(
             '`'.$command->getName()."`\n"
-            .str_repeat('-', Helper::strlen($command->getName()) + 2)."\n\n"
+            .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
             .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
@@ -151,7 +169,7 @@ class MarkdownDescriptor extends Descriptor
         $description = new ApplicationDescription($application, $describedNamespace);
         $title = $this->getApplicationTitle($application);
 
-        $this->write($title."\n".str_repeat('=', Helper::strlen($title)));
+        $this->write($title."\n".str_repeat('=', Helper::width($title)));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
@@ -167,7 +185,7 @@ class MarkdownDescriptor extends Descriptor
 
         foreach ($description->getCommands() as $command) {
             $this->write("\n\n");
-            if (null !== $describeCommand = $this->describeCommand($command)) {
+            if (null !== $describeCommand = $this->describeCommand($command, $options)) {
                 $this->write($describeCommand);
             }
         }

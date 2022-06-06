@@ -18,10 +18,8 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
- *
- * @experimental in 5.2
  */
-class LinkedInTransportFactory extends AbstractTransportFactory
+final class LinkedInTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {

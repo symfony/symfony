@@ -13,11 +13,11 @@ namespace Symfony\Component\Notifier\Bridge\Firebase\Notification;
 
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseOptions;
 
-/**
- * @experimental in 5.2
- */
 final class WebNotification extends FirebaseOptions
 {
+    /**
+     * @return $this
+     */
     public function icon(string $icon): self
     {
         $this->options['icon'] = $icon;
@@ -25,6 +25,9 @@ final class WebNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function clickAction(string $clickAction): self
     {
         $this->options['click_action'] = $clickAction;

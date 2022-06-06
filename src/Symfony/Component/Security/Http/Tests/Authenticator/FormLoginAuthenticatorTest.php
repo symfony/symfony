@@ -156,6 +156,27 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertEquals('s$cr$t', $badge->getAndErasePlaintextPassword());
     }
 
+    /**
+     * @dataProvider provideContentTypes()
+     */
+    public function testSupportsFormOnly(string $contentType, bool $shouldSupport)
+    {
+        $request = new Request();
+        $request->headers->set('CONTENT_TYPE', $contentType);
+        $request->server->set('REQUEST_URI', '/login_check');
+        $request->setMethod('POST');
+
+        $this->setUpAuthenticator(['form_only' => true]);
+
+        $this->assertSame($shouldSupport, $this->authenticator->supports($request));
+    }
+
+    public function provideContentTypes()
+    {
+        yield ['application/json', false];
+        yield ['application/x-www-form-urlencoded', true];
+    }
+
     private function setUpAuthenticator(array $options = [])
     {
         $this->authenticator = new FormLoginAuthenticator(new HttpUtils(), $this->userProvider, $this->successHandler, $this->failureHandler, $options);

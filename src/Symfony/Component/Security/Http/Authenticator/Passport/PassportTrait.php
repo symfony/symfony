@@ -11,21 +11,22 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
+
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" trait is deprecated, you must extend from "%s" instead.', PassportTrait::class, Passport::class);
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @deprecated since Symfony 5.4, use {@see Passport} instead
  */
 trait PassportTrait
 {
-    /**
-     * @var BadgeInterface[]
-     */
     private $badges = [];
 
+    /**
+     * @return $this
+     */
     public function addBadge(BadgeInterface $badge): PassportInterface
     {
         $this->badges[\get_class($badge)] = $badge;
@@ -43,12 +44,11 @@ trait PassportTrait
         return $this->badges[$badgeFqcn] ?? null;
     }
 
-    public function checkIfCompletelyResolved(): void
+    /**
+     * @return array<class-string<BadgeInterface>, BadgeInterface>
+     */
+    public function getBadges(): array
     {
-        foreach ($this->badges as $badge) {
-            if (!$badge->isResolved()) {
-                throw new BadCredentialsException(sprintf('Authentication failed security badge "%s" is not resolved, did you forget to register the correct listeners?', \get_class($badge)));
-            }
-        }
+        return $this->badges;
     }
 }

@@ -332,6 +332,8 @@ class PdoSessionHandlerTest extends TestCase
     public function provideUrlDsnPairs()
     {
         yield ['mysql://localhost/test', 'mysql:host=localhost;dbname=test;'];
+        yield ['mysql://localhost/test?charset=utf8mb4', 'mysql:charset=utf8mb4;host=localhost;dbname=test;'];
+        yield ['mysql://localhost/test?unix_socket=socket.sock&charset=utf8mb4', 'mysql:charset=utf8mb4;unix_socket=socket.sock;dbname=test;'];
         yield ['mysql://localhost:56/test', 'mysql:host=localhost;port=56;dbname=test;'];
         yield ['mysql2://root:pwd@localhost/test', 'mysql:host=localhost;dbname=test;', 'root', 'pwd'];
         yield ['postgres://localhost/test', 'pgsql:host=localhost;dbname=test;'];

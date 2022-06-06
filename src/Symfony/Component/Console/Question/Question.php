@@ -105,13 +105,13 @@ class Question
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
-        $this->hidden = (bool) $hidden;
+        $this->hidden = $hidden;
 
         return $this;
     }
 
     /**
-     * In case the response can not be hidden, whether to fallback on non-hidden question or not.
+     * In case the response cannot be hidden, whether to fallback on non-hidden question or not.
      *
      * @return bool
      */
@@ -121,13 +121,13 @@ class Question
     }
 
     /**
-     * Sets whether to fallback on non-hidden question if the response can not be hidden.
+     * Sets whether to fallback on non-hidden question if the response cannot be hidden.
      *
      * @return $this
      */
     public function setHiddenFallback(bool $fallback)
     {
-        $this->hiddenFallback = (bool) $fallback;
+        $this->hiddenFallback = $fallback;
 
         return $this;
     }
@@ -230,11 +230,8 @@ class Question
      */
     public function setMaxAttempts(?int $attempts)
     {
-        if (null !== $attempts) {
-            $attempts = (int) $attempts;
-            if ($attempts < 1) {
-                throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
-            }
+        if (null !== $attempts && $attempts < 1) {
+            throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
         }
 
         $this->attempts = $attempts;

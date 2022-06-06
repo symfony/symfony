@@ -18,13 +18,11 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
- *
- * @experimental in 5.2
  */
 final class GoogleChatTransportFactory extends AbstractTransportFactory
 {
     /**
-     * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?threadKey=<thread>
+     * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?thread_key=<thread>
      *
      * @return GoogleChatTransport
      */
@@ -39,11 +37,11 @@ final class GoogleChatTransportFactory extends AbstractTransportFactory
         $space = explode('/', $dsn->getPath())[1];
         $accessKey = $this->getUser($dsn);
         $accessToken = $this->getPassword($dsn);
-        $threadKey = $dsn->getOption('threadKey');
+        $threadKey = $dsn->getOption('thread_key');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new GoogleChatTransport($space, $accessKey, $accessToken, $this->client, $this->dispatcher))->setThreadKey($threadKey)->setHost($host)->setPort($port);
+        return (new GoogleChatTransport($space, $accessKey, $accessToken, $threadKey, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

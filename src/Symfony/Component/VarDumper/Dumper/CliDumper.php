@@ -139,10 +139,19 @@ class CliDumper extends AbstractDumper
 
             case 'integer':
                 $style = 'num';
+
+                if (isset($this->styles['integer'])) {
+                    $style = 'integer';
+                }
+
                 break;
 
             case 'double':
                 $style = 'num';
+
+                if (isset($this->styles['float'])) {
+                    $style = 'float';
+                }
 
                 switch (true) {
                     case \INF === $value:  $value = 'INF'; break;
@@ -426,7 +435,7 @@ class CliDumper extends AbstractDumper
      * @param string $value The value being styled
      * @param array  $attr  Optional context information
      *
-     * @return string The value with style decoration
+     * @return string
      */
     protected function style(string $style, string $value, array $attr = [])
     {
@@ -502,7 +511,7 @@ class CliDumper extends AbstractDumper
     }
 
     /**
-     * @return bool Tells if the current output stream supports ANSI colors or not
+     * @return bool
      */
     protected function supportsColors()
     {

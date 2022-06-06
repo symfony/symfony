@@ -22,8 +22,6 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.2
  */
 final class LoginThrottlingListener implements EventSubscriberInterface
 {
@@ -43,7 +41,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
             return;
         }
 
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
         $request->attributes->set(Security::LAST_USERNAME, $passport->getBadge(UserBadge::class)->getUserIdentifier());
 
         $limit = $this->limiter->consume($request);

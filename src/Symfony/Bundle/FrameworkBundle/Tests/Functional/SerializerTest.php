@@ -20,7 +20,7 @@ class SerializerTest extends AbstractWebTestCase
     {
         static::bootKernel(['test_case' => 'Serializer']);
 
-        $result = static::$container->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
+        $result = static::getContainer()->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
 
         $bar1 = new Bar();
         $bar1->id = 1;

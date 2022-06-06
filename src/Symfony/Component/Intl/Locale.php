@@ -43,8 +43,6 @@ final class Locale extends \Locale
     /**
      * Returns the default fallback locale.
      *
-     * @return string|null The default fallback locale
-     *
      * @see setDefaultFallback()
      * @see getFallback()
      */

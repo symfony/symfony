@@ -13,8 +13,6 @@ namespace Symfony\Component\RateLimiter;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.2
  */
 final class Reservation
 {

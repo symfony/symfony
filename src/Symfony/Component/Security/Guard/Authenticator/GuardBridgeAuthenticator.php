@@ -15,7 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -31,13 +32,15 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', GuardBridgeAuthenticator::class);
+
 /**
  * This authenticator is used to bridge Guard authenticators with
  * the Symfony Authenticator system.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @internal
+ * @deprecated since Symfony 5.3
  */
 class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
@@ -76,6 +79,10 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
             $user = $this->getUser($credentials);
         }
 
+        if ($this->guard instanceof PasswordAuthenticatedInterface && !$user instanceof PasswordAuthenticatedUserInterface) {
+            trigger_deprecation('symfony/security-guard', '5.3', 'Not implementing the "%s" interface in class "%s" while using password-based guard authenticators is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user));
+        }
+
         $passport = new Passport($user, new CustomCredentials([$this->guard, 'checkCredentials'], $credentials));
         if ($this->userProvider instanceof PasswordUpgraderInterface && $this->guard instanceof PasswordAuthenticatedInterface && (null !== $password = $this->guard->getPassword($credentials))) {
             $passport->addBadge(new PasswordUpgradeBadge($password, $this->userProvider));
@@ -88,12 +95,17 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
         return $passport;
     }
 
+    public function getGuardAuthenticator(): GuardAuthenticatorInterface
+    {
+        return $this->guard;
+    }
+
     private function getUser($credentials): UserInterface
     {
         $user = $this->guard->getUser($credentials, $this->userProvider);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($this->guard)));
+            throw new UserNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($this->guard)));
         }
 
         if (!$user instanceof UserInterface) {
@@ -109,6 +121,11 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
             throw new \LogicException(sprintf('"%s" does not support non-user passports.', __CLASS__));
         }
 
+        return $this->guard->createAuthenticatedToken($passport->getUser(), $firewallName);
+    }
+
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    {
         return $this->guard->createAuthenticatedToken($passport->getUser(), $firewallName);
     }
 

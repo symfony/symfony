@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @deprecated since Symfony 5.4, use {@link Passport} instead
  */
 interface UserPassportInterface extends PassportInterface
 {

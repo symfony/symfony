@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -171,7 +172,7 @@ class FileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
-        $prototype = new Definition();
+        $prototype = (new Definition())->setAutoconfigured(true);
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
 
         $this->assertTrue($container->has(Bar::class));
@@ -191,16 +192,20 @@ class FileLoaderTest extends TestCase
         $this->assertSame(Foo::class, (string) $alias);
         $this->assertFalse($alias->isPublic());
         $this->assertTrue($alias->isPrivate());
+
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
+        }
     }
 
     public function testMissingParentClass()
     {
         $container = new ContainerBuilder();
         $container->setParameter('bad_classes_dir', 'BadClasses');
-        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), 'test');
 
         $loader->registerClasses(
-            (new Definition())->setPublic(false),
+            (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\\',
             'Prototype/%bad_classes_dir%/*'
         );
@@ -266,6 +271,27 @@ class FileLoaderTest extends TestCase
         yield ['Prototype/*/AnotherSub/'];
         yield ['Prototype/*/AnotherSub/*'];
         yield ['Prototype/OtherDir/AnotherSub/DeeperBaz.php'];
+    }
+
+    /**
+     * @requires PHP 8
+     *
+     * @testWith ["prod", true]
+     *           ["dev", true]
+     *           ["bar", false]
+     *           [null, true]
+     */
+    public function testRegisterClassesWithWhenEnv(?string $env, bool $expected)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), $env);
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/{Foo.php}'
+        );
+
+        $this->assertSame($expected, $container->has(Foo::class));
     }
 }
 

@@ -32,6 +32,8 @@ use Symfony\Component\Intl\Locale\Locale;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 abstract class Collator
 {

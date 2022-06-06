@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
@@ -26,6 +26,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
+/**
+ * @group legacy
+ */
 class GuardBridgeAuthenticatorTest extends TestCase
 {
     private $guardAuthenticator;
@@ -77,7 +80,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
             ->with($request)
             ->willReturn($credentials);
 
-        $user = new User('test', null, ['ROLE_USER']);
+        $user = new InMemoryUser('test', null, ['ROLE_USER']);
         $this->guardAuthenticator->expects($this->once())
             ->method('getUser')
             ->with($credentials, $this->userProvider)
@@ -97,7 +100,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
 
     public function testAuthenticateNoUser()
     {
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
 
         $request = new Request();
 
@@ -145,7 +148,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
 
     public function testCreateAuthenticatedToken()
     {
-        $user = new User('test', null, ['ROLE_USER']);
+        $user = new InMemoryUser('test', null, ['ROLE_USER']);
 
         $token = new PostAuthenticationGuardToken($user, 'main', ['ROLE_USER']);
         $this->guardAuthenticator->expects($this->once())
@@ -159,7 +162,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
     public function testHandleSuccess()
     {
         $request = new Request();
-        $token = new PostAuthenticationGuardToken(new User('test', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
+        $token = new PostAuthenticationGuardToken(new InMemoryUser('test', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
 
         $response = new Response();
         $this->guardAuthenticator->expects($this->once())

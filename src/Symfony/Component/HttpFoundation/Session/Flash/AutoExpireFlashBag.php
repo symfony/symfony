@@ -78,7 +78,7 @@ class AutoExpireFlashBag implements FlashBagInterface
      */
     public function peekAll()
     {
-        return \array_key_exists('display', $this->flashes) ? (array) $this->flashes['display'] : [];
+        return \array_key_exists('display', $this->flashes) ? $this->flashes['display'] : [];
     }
 
     /**

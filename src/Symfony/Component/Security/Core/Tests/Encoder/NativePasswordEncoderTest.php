@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
+ * @group legacy
  */
 class NativePasswordEncoderTest extends TestCase
 {

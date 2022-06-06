@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -9,10 +18,10 @@ use Symfony\Component\Routing\Route;
 
 class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTest
 {
-    protected function setUp(): void
+    protected function setUp(string $env = null): void
     {
         $reader = new AnnotationReader();
-        $this->loader = new class($reader) extends AnnotationClassLoader {
+        $this->loader = new class($reader, $env) extends AnnotationClassLoader {
             protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
             {
             }

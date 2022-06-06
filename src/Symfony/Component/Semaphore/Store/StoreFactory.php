@@ -20,8 +20,6 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
 /**
  * StoreFactory create stores and connections.
  *
- * @experimental in 5.2
- *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */

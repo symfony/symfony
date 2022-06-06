@@ -30,6 +30,10 @@ trait CompiledUrlMatcherTrait
     private $staticRoutes = [];
     private $regexpList = [];
     private $dynamicRoutes = [];
+
+    /**
+     * @var callable|null
+     */
     private $checkCondition;
 
     public function match(string $pathinfo): array

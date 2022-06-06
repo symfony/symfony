@@ -40,7 +40,7 @@ class XmlDumper extends Dumper
     /**
      * Dumps the service container as an XML string.
      *
-     * @return string An xml string representing of the service container
+     * @return string
      */
     public function dump(array $options = [])
     {
@@ -143,7 +143,7 @@ class XmlDumper extends Dumper
                     $tag->appendChild($this->document->createTextNode($name));
                 }
                 foreach ($attributes as $key => $value) {
-                    $tag->setAttribute($key, $value);
+                    $tag->setAttribute($key, $value ?? '');
                 }
                 $service->appendChild($tag);
             }
@@ -268,7 +268,7 @@ class XmlDumper extends Dumper
 
     private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key')
     {
-        $withKeys = array_keys($parameters) !== range(0, \count($parameters) - 1);
+        $withKeys = !array_is_list($parameters);
         foreach ($parameters as $key => $value) {
             $element = $this->document->createElement($type);
             if ($withKeys) {

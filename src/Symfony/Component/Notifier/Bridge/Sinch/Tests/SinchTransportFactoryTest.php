@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Sinch\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SinchTransportFactoryTest extends TransportFactoryTestCase
@@ -39,7 +39,7 @@ final class SinchTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://accountSid:authToken@default?from=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['sinch://accountSid:authToken@default'];
     }

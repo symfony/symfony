@@ -58,6 +58,20 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('attachment; filename="my file.txt"', $header->getBodyAsString());
     }
 
+    public function testFormDataResultsInQuotedString()
+    {
+        $header = new ParameterizedHeader('Content-Disposition', 'form-data');
+        $header->setParameters(['filename' => 'file.txt']);
+        $this->assertEquals('form-data; filename="file.txt"', $header->getBodyAsString());
+    }
+
+    public function testFormDataUtf8()
+    {
+        $header = new ParameterizedHeader('Content-Disposition', 'form-data');
+        $header->setParameters(['filename' => "déjà%\"\n\r.txt"]);
+        $this->assertEquals('form-data; filename="déjà%%22%0A%0D.txt"', $header->getBodyAsString());
+    }
+
     public function testLongParamsAreBrokenIntoMultipleAttributeStrings()
     {
         /* -- RFC 2231, 3.

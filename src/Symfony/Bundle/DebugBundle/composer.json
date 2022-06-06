@@ -1,7 +1,7 @@
 {
     "name": "symfony/debug-bundle",
     "type": "symfony-bundle",
-    "description": "Provides a tight integration of the Symfony Debug component into the Symfony full-stack framework",
+    "description": "Provides a tight integration of the Symfony VarDumper component and the ServerLogCommand from MonologBridge into the Symfony full-stack framework",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -18,15 +18,15 @@
     "require": {
         "php": ">=7.2.5",
         "ext-xml": "*",
-        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0|^6.0",
         "symfony/polyfill-php80": "^1.16",
-        "symfony/twig-bridge": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0"
+        "symfony/twig-bridge": "^4.4|^5.0|^6.0",
+        "symfony/var-dumper": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
-        "symfony/config": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/web-profiler-bundle": "^4.4|^5.0"
+        "symfony/config": "^4.4|^5.0|^6.0",
+        "symfony/dependency-injection": "^4.4|^5.0|^6.0",
+        "symfony/web-profiler-bundle": "^4.4|^5.0|^6.0"
     },
     "conflict": {
         "symfony/config": "<4.4",

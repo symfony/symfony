@@ -13,7 +13,6 @@ namespace Symfony\Bundle\DebugBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
  * DebugExtension configuration structure.
@@ -51,21 +50,13 @@ class Configuration implements ConfigurationInterface
                     ->example('php://stderr, or tcp://%env(VAR_DUMPER_SERVER)% when using the "server:dump" command')
                     ->defaultNull()
                 ->end()
-            ->end()
-        ;
-
-        if (method_exists(HtmlDumper::class, 'setTheme')) {
-            $rootNode
-                ->children()
-                    ->enumNode('theme')
-                        ->info('Changes the color of the dump() output when rendered directly on the templating. "dark" (default) or "light"')
-                        ->example('dark')
-                        ->values(['dark', 'light'])
-                        ->defaultValue('dark')
-                    ->end()
+                ->enumNode('theme')
+                    ->info('Changes the color of the dump() output when rendered directly on the templating. "dark" (default) or "light"')
+                    ->example('dark')
+                    ->values(['dark', 'light'])
+                    ->defaultValue('dark')
                 ->end()
             ;
-        }
 
         return $treeBuilder;
     }

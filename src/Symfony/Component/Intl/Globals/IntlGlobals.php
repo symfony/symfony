@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Intl\Globals;
 
+use Symfony\Polyfill\Intl\Icu\Icu;
+
 /**
  * Provides fake static versions of the global functions in the intl extension.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 abstract class IntlGlobals
 {
@@ -61,6 +65,12 @@ abstract class IntlGlobals
      */
     public static function isFailure(int $errorCode): bool
     {
+        if (class_exists(Icu::class)) {
+            return Icu::isFailure($errorCode);
+        }
+
+        trigger_deprecation('symfony/intl', '5.3', 'Polyfills are deprecated, try running "composer require symfony/polyfill-intl-icu ^1.21" instead.');
+
         return isset(self::ERROR_CODES[$errorCode])
             && $errorCode > self::U_ZERO_ERROR;
     }
@@ -74,6 +84,12 @@ abstract class IntlGlobals
      */
     public static function getErrorCode()
     {
+        if (class_exists(Icu::class)) {
+            return Icu::getErrorCode();
+        }
+
+        trigger_deprecation('symfony/intl', '5.3', 'Polyfills are deprecated, try running "composer require symfony/polyfill-intl-icu ^1.21" instead.');
+
         return self::$errorCode;
     }
 
@@ -84,6 +100,12 @@ abstract class IntlGlobals
      */
     public static function getErrorMessage(): string
     {
+        if (class_exists(Icu::class)) {
+            return Icu::getErrorMessage();
+        }
+
+        trigger_deprecation('symfony/intl', '5.3', 'Polyfills are deprecated, try running "composer require symfony/polyfill-intl-icu ^1.21" instead.');
+
         return self::$errorMessage;
     }
 
@@ -94,6 +116,12 @@ abstract class IntlGlobals
      */
     public static function getErrorName(int $code): string
     {
+        if (class_exists(Icu::class)) {
+            return Icu::getErrorName($code);
+        }
+
+        trigger_deprecation('symfony/intl', '5.3', 'Polyfills are deprecated, try running "composer require symfony/polyfill-intl-icu ^1.21" instead.');
+
         return self::ERROR_CODES[$code] ?? '[BOGUS UErrorCode]';
     }
 
@@ -107,6 +135,10 @@ abstract class IntlGlobals
      */
     public static function setError(int $code, string $message = '')
     {
+        if (class_exists(Icu::class)) {
+            return Icu::setError($code, $message);
+        }
+
         if (!isset(self::ERROR_CODES[$code])) {
             throw new \InvalidArgumentException(sprintf('No such error code: "%s".', $code));
         }

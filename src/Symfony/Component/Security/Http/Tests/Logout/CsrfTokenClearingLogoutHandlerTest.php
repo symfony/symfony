@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Logout;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -20,16 +21,29 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Http\Logout\CsrfTokenClearingLogoutHandler;
 
+/**
+ * @group legacy
+ */
 class CsrfTokenClearingLogoutHandlerTest extends TestCase
 {
     private $session;
+    private $requestStack;
     private $csrfTokenStorage;
     private $csrfTokenClearingLogoutHandler;
 
     protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
-        $this->csrfTokenStorage = new SessionTokenStorage($this->session, 'foo');
+
+        // BC for symfony/security-core < 5.3
+        if (method_exists(SessionTokenStorage::class, 'getSession')) {
+            $request = new Request();
+            $request->setSession($this->session);
+            $this->requestStack = new RequestStack();
+            $this->requestStack->push($request);
+        }
+
+        $this->csrfTokenStorage = new SessionTokenStorage($this->requestStack ?? $this->session, 'foo');
         $this->csrfTokenStorage->setToken('foo', 'bar');
         $this->csrfTokenStorage->setToken('foobar', 'baz');
         $this->csrfTokenClearingLogoutHandler = new CsrfTokenClearingLogoutHandler($this->csrfTokenStorage);
@@ -51,7 +65,7 @@ class CsrfTokenClearingLogoutHandlerTest extends TestCase
 
     public function testCsrfTokenCookieWithDifferentNamespaceIsNotRemoved()
     {
-        $barNamespaceCsrfSessionStorage = new SessionTokenStorage($this->session, 'bar');
+        $barNamespaceCsrfSessionStorage = new SessionTokenStorage($this->requestStack ?? $this->session, 'bar');
         $barNamespaceCsrfSessionStorage->setToken('foo', 'bar');
         $barNamespaceCsrfSessionStorage->setToken('foobar', 'baz');
 

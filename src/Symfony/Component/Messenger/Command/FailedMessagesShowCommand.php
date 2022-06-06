@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
     protected static $defaultName = 'messenger:failed:show';
+    protected static $defaultDescription = 'Show one or more messages from the failure transport';
 
     /**
      * {@inheritdoc}
@@ -38,8 +39,9 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::OPTIONAL, 'Specific message id to show'),
                 new InputOption('max', null, InputOption::VALUE_REQUIRED, 'Maximum number of messages to list', 50),
+                new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
             ])
-            ->setDescription('Show one or more messages from the failure transport')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows message that are pending in the failure transport.
 
@@ -60,26 +62,36 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        $receiver = $this->getReceiver();
+        $failureTransportName = $input->getOption('transport');
+        if (self::DEFAULT_TRANSPORT_OPTION === $failureTransportName) {
+            $this->printWarningAvailableFailureTransports($io, $this->getGlobalFailureReceiverName());
+        }
+        if ('' === $failureTransportName || null === $failureTransportName) {
+            $failureTransportName = $this->interactiveChooseFailureTransport($io);
+        }
+        $failureTransportName = self::DEFAULT_TRANSPORT_OPTION === $failureTransportName ? $this->getGlobalFailureReceiverName() : $failureTransportName;
+
+        $receiver = $this->getReceiver($failureTransportName);
+
         $this->printPendingMessagesMessage($receiver, $io);
 
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support listing or showing specific messages.', $this->getReceiverName()));
+            throw new RuntimeException(sprintf('The "%s" receiver does not support listing or showing specific messages.', $failureTransportName));
         }
 
         if (null === $id = $input->getArgument('id')) {
-            $this->listMessages($io, $input->getOption('max'));
+            $this->listMessages($failureTransportName, $io, $input->getOption('max'));
         } else {
-            $this->showMessage($id, $io);
+            $this->showMessage($failureTransportName, $id, $io);
         }
 
         return 0;
     }
 
-    private function listMessages(SymfonyStyle $io, int $max)
+    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max)
     {
         /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver();
+        $receiver = $this->getReceiver($failedTransportName);
         $envelopes = $receiver->all($max);
 
         $rows = [];
@@ -118,13 +130,13 @@ EOF
             $io->comment(sprintf('Showing first %d messages.', $max));
         }
 
-        $io->comment('Run <comment>messenger:failed:show {id} -vv</comment> to see message details.');
+        $io->comment(sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
     }
 
-    private function showMessage(string $id, SymfonyStyle $io)
+    private function showMessage(?string $failedTransportName, string $id, SymfonyStyle $io)
     {
         /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver();
+        $receiver = $this->getReceiver($failedTransportName);
         $envelope = $receiver->find($id);
         if (null === $envelope) {
             throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
@@ -134,8 +146,8 @@ EOF
 
         $io->writeln([
             '',
-            sprintf(' Run <comment>messenger:failed:retry %s</comment> to retry this message.', $id),
-            sprintf(' Run <comment>messenger:failed:remove %s</comment> to delete it.', $id),
+            sprintf(' Run <comment>messenger:failed:retry %s --transport=%s</comment> to retry this message.', $id, $failedTransportName),
+            sprintf(' Run <comment>messenger:failed:remove %s --transport=%s</comment> to delete it.', $id, $failedTransportName),
         ]);
     }
 }

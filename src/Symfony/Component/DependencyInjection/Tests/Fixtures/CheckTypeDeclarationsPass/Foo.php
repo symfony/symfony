@@ -23,4 +23,9 @@ class Foo
     {
         return [];
     }
+
+    public static function createStdClass(): \stdClass
+    {
+        return new \stdClass();
+    }
 }

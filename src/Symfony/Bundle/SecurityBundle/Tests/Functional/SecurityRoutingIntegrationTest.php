@@ -120,29 +120,161 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertAllowed($allowedClient, '/protected-via-expression');
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testInvalidIpsInAccessControl(array $options)
+    public function testInvalidIpsInAccessControl()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
 
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml'] + $options);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
         $client->request('GET', '/unprotected_resource');
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testPublicHomepage(array $options)
+    public function testPublicHomepage()
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml'] + $options);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
         $client->request('GET', '/en/');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
         $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::$container->get('session')->getUsageIndex());
+        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
+    }
+
+    /**
+     * @dataProvider provideLegacyClientOptions
+     * @group legacy
+     */
+    public function testLegacyRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
+    {
+        $client = $this->createClient($options);
+        $client->request('GET', '/protected_resource');
+
+        $this->assertRedirect($client->getResponse(), '/login');
+    }
+
+    /**
+     * @dataProvider provideLegacyClientOptions
+     * @group legacy
+     */
+    public function testLegacyRoutingErrorIsExposedWhenNotProtected(array $options)
+    {
+        $client = $this->createClient($options);
+        $client->request('GET', '/unprotected_resource');
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
+    }
+
+    /**
+     * @dataProvider provideLegacyClientOptions
+     * @group legacy
+     */
+    public function testLegacyRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
+    {
+        $client = $this->createClient($options);
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+
+        $client->request('GET', '/highly_protected_resource');
+
+        $this->assertNotEquals(404, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideLegacyClientOptions
+     */
+    public function testLegacySecurityConfigurationForSingleIPAddress(array $options)
+    {
+        $allowedClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
+
+        $this->ensureKernelShutdown();
+
+        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.20.10']);
+
+        $this->assertAllowed($allowedClient, '/secured-by-one-ip');
+        $this->assertRestricted($barredClient, '/secured-by-one-ip');
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideLegacyClientOptions
+     */
+    public function testLegacySecurityConfigurationForMultipleIPAddresses(array $options)
+    {
+        $allowedClientA = $this->createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
+
+        $this->ensureKernelShutdown();
+
+        $allowedClientB = $this->createClient($options, ['REMOTE_ADDR' => '2.2.2.2']);
+
+        $this->ensureKernelShutdown();
+
+        $allowedClientC = $this->createClient($options, ['REMOTE_ADDR' => '203.0.113.0']);
+
+        $this->ensureKernelShutdown();
+
+        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '192.168.1.1']);
+
+        $this->assertAllowed($allowedClientA, '/secured-by-two-ips');
+        $this->assertAllowed($allowedClientB, '/secured-by-two-ips');
+
+        $this->assertRestricted($allowedClientA, '/secured-by-one-real-ip');
+        $this->assertRestricted($allowedClientA, '/secured-by-one-real-ipv6');
+        $this->assertAllowed($allowedClientC, '/secured-by-one-real-ip-with-mask');
+
+        $this->assertRestricted($barredClient, '/secured-by-two-ips');
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideLegacyConfigs
+     */
+    public function testLegacySecurityConfigurationForExpression(array $options)
+    {
+        $allowedClient = $this->createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);
+        $this->assertAllowed($allowedClient, '/protected-via-expression');
+        $this->ensureKernelShutdown();
+
+        $barredClient = $this->createClient($options, []);
+        $this->assertRestricted($barredClient, '/protected-via-expression');
+        $this->ensureKernelShutdown();
+
+        $allowedClient = $this->createClient($options, []);
+
+        $allowedClient->request('GET', '/protected-via-expression');
+        $form = $allowedClient->followRedirect()->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $allowedClient->submit($form);
+        $this->assertRedirect($allowedClient->getResponse(), '/protected-via-expression');
+        $this->assertAllowed($allowedClient, '/protected-via-expression');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyInvalidIpsInAccessControl()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
+
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml', 'enable_authenticator_manager' => false]);
+        $client->request('GET', '/unprotected_resource');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyPublicHomepage()
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']);
+        $client->request('GET', '/en/');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
+        $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
+        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
     private function assertAllowed($client, $path)
@@ -159,13 +291,23 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
     public function provideClientOptions()
     {
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
+    }
+
+    public function provideLegacyClientOptions()
+    {
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
     }
 
     public function provideConfigs()
+    {
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];
+    }
+
+    public function provideLegacyConfigs()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml']];

@@ -30,7 +30,7 @@ class RedisTransportFactory implements TransportFactoryInterface
 
     public function supports(string $dsn, array $options): bool
     {
-        return 0 === strpos($dsn, 'redis://');
+        return 0 === strpos($dsn, 'redis://') || 0 === strpos($dsn, 'rediss://');
     }
 }
 

@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Այս արժեքը արժեթղթերի նույնականացման միջազգային համարը վավեր չէ(ISIN)։</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Այս արժեքը պետք է լինի վավեր արտահայտություն:</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

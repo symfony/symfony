@@ -37,6 +37,16 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
+    public function testProcessAcceptsServiceLocatorWithoutClass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('container.service_locator');
+
+        $this->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testProcessDetectsFactoryWithoutClass()
     {
         $container = new ContainerBuilder();

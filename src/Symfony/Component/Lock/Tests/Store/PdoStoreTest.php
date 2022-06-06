@@ -20,6 +20,7 @@ use Symfony\Component\Lock\Store\PdoStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension pdo_sqlite
+ * @group integration
  */
 class PdoStoreTest extends AbstractStoreTest
 {
@@ -84,7 +85,6 @@ class PdoStoreTest extends AbstractStoreTest
 
         try {
             $store = new PdoStore($dsn);
-            $store->createTable();
 
             $store->save($key);
             $this->assertTrue($store->exists($key));
@@ -98,10 +98,7 @@ class PdoStoreTest extends AbstractStoreTest
     public function provideDsn()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
         yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
         yield ['sqlite::memory:'];
     }
 }

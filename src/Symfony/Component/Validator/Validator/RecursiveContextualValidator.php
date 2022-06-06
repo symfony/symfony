@@ -273,7 +273,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @param string|GroupSequence|array<string|GroupSequence> $groups The groups to normalize
      *
-     * @return array<string|GroupSequence> A group array
+     * @return array<string|GroupSequence>
      */
     protected function normalizeGroups($groups)
     {

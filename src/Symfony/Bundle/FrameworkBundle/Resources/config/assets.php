@@ -30,8 +30,8 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('assets.packages', Packages::class)
             ->args([
-                service('assets.empty_package'),
-                [],
+                service('assets._default_package'),
+                tagged_iterator('assets.package', 'package'),
             ])
 
         ->alias(Packages::class, 'assets.packages')
@@ -40,6 +40,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('assets.empty_version_strategy'),
             ])
+
+        ->alias('assets._default_package', 'assets.empty_package')
 
         ->set('assets.context', RequestStackContext::class)
             ->args([
@@ -77,10 +79,13 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('manifest path'),
+                service('http_client')->nullOnInvalid(),
+                false,
             ])
 
         ->set('assets.remote_json_manifest_version_strategy', RemoteJsonManifestVersionStrategy::class)
             ->abstract()
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "assets.json_manifest_version_strategy" instead.')
             ->args([
                 abstract_arg('manifest url'),
                 service('http_client'),

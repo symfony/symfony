@@ -36,13 +36,15 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', UsernamePasswordJsonAuthenticationListener::class);
+
 /**
  * UsernamePasswordJsonAuthenticationListener is a stateless implementation of
  * an authentication via a JSON document composed of a username and a password.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class UsernamePasswordJsonAuthenticationListener extends AbstractListener
 {
@@ -151,7 +153,8 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
     private function onSuccess(Request $request, TokenInterface $token): ?Response
     {
         if (null !== $this->logger) {
-            $this->logger->info('User has been authenticated successfully.', ['username' => $token->getUsername()]);
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
+            $this->logger->info('User has been authenticated successfully.', ['username' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()]);
         }
 
         $this->migrateSession($request, $token);

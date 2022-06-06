@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailjet\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class MailjetSmtpTransport extends EsmtpTransport
 {

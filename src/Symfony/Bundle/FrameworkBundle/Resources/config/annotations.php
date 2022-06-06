@@ -13,13 +13,13 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -32,14 +32,14 @@ return static function (ContainerConfigurator $container) {
         ->set('annotations.dummy_registry', AnnotationRegistry::class)
             ->call('registerUniqueLoader', ['class_exists'])
 
-        ->set('annotations.cached_reader', CachedReader::class)
+        ->set('annotations.cached_reader', PsrCachedReader::class)
             ->args([
                 service('annotations.reader'),
-                inline_service(DoctrineProvider::class)->args([
-                    inline_service(ArrayAdapter::class),
-                ]),
+                inline_service(ArrayAdapter::class),
                 abstract_arg('Debug-Flag'),
             ])
+            ->tag('annotations.cached_reader')
+            ->tag('container.do_not_inline')
 
         ->set('annotations.filesystem_cache_adapter', FilesystemAdapter::class)
             ->args([
@@ -49,9 +49,11 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('annotations.filesystem_cache', DoctrineProvider::class)
+            ->factory([DoctrineProvider::class, 'wrap'])
             ->args([
                 service('annotations.filesystem_cache_adapter'),
             ])
+            ->deprecate('symfony/framework-bundle', '5.4', '"%service_id% is deprecated"')
 
         ->set('annotations.cache_warmer', AnnotationsCacheWarmer::class)
             ->args([
@@ -67,12 +69,14 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.cache_dir').'/annotations.php',
                 service('cache.annotations'),
             ])
+            ->tag('container.hot_path')
 
         ->set('annotations.cache', DoctrineProvider::class)
+            ->factory([DoctrineProvider::class, 'wrap'])
             ->args([
                 service('annotations.cache_adapter'),
             ])
-            ->tag('container.hot_path')
+            ->deprecate('symfony/framework-bundle', '5.4', '"%service_id% is deprecated"')
 
         ->alias('annotation_reader', 'annotations.reader')
         ->alias(Reader::class, 'annotation_reader');

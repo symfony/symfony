@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\GoogleChat\Tests;
 
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
@@ -33,8 +33,8 @@ final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
-            'googlechat://chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg',
-            'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg',
+            'googlechat://chat.googleapis.com/AAAAA_YYYYY?thread_key=abcdefg',
+            'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?thread_key=abcdefg',
         ];
     }
 
@@ -46,7 +46,7 @@ final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
 
     public function incompleteDsnProvider(): iterable
     {
-        yield 'missing credentials' => ['googlechat://chat.googleapis.com/AAAAA_YYYYY'];
+        yield 'missing credentials' => ['googlechat://chat.googleapis.com/v1/spaces/AAAAA_YYYYY/messages'];
     }
 
     public function unsupportedSchemeProvider(): iterable

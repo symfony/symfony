@@ -44,6 +44,9 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/?a=2&b=b', '.?a=2'];
         yield ['http://example.com/?a=3&b=b', '.', ['a' => 3]];
         yield ['http://example.com/?a=3&b=b', '.?a=0', ['a' => 3]];
+        yield ['http://example.com/', 'http://example.com/', ['a' => null]];
+        yield ['http://example.com/?b=', 'http://example.com/', ['b' => '']];
+        yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
     }
 
     /**
@@ -160,6 +163,8 @@ class HttpClientTraitTest extends TestCase
         yield [[null, null, 'bar', '?a%5Bb%5Bc%5D=d', null], 'bar?a[b[c]=d', []];
         yield [[null, null, 'bar', '?a%5Bb%5D%5Bc%5D=dd', null], 'bar?a[b][c]=d&e[f]=g', ['a' => ['b' => ['c' => 'dd']], 'e[f]' => null]];
         yield [[null, null, 'bar', '?a=b&a%5Bb%20c%5D=d&e%3Df=%E2%9C%93', null], 'bar?a=b', ['a' => ['b c' => 'd'], 'e=f' => '✓']];
+        // IDNA 2008 compliance
+        yield [['https:', '//xn--fuball-cta.test', null, null, null], 'https://fußball.test'];
     }
 
     /**

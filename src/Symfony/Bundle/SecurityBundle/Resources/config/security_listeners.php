@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider;
-use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
-use Symfony\Component\Security\Core\Authentication\Provider\LdapBindAuthenticationProvider;
-use Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider;
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler;
@@ -27,45 +23,31 @@ use Symfony\Component\Security\Http\EventListener\CookieClearingLogoutListener;
 use Symfony\Component\Security\Http\EventListener\DefaultLogoutListener;
 use Symfony\Component\Security\Http\EventListener\SessionLogoutListener;
 use Symfony\Component\Security\Http\Firewall\AccessListener;
-use Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener;
-use Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener;
 use Symfony\Component\Security\Http\Firewall\ChannelListener;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
-use Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
-use Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener;
-use Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener;
-use Symfony\Component\Security\Http\Firewall\X509AuthenticationListener;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('security.authentication.listener.anonymous', AnonymousAuthenticationListener::class)
-            ->args([
-                service('security.untracked_token_storage'),
-                abstract_arg('Key'),
-                service('logger')->nullOnInvalid(),
-                service('security.authentication.manager'),
-            ])
-            ->tag('monolog.logger', ['channel' => 'security'])
 
-        ->set('security.authentication.provider.anonymous', AnonymousAuthenticationProvider::class)
-            ->args([abstract_arg('Key')])
+        ->set('security.authentication.basic_entry_point', BasicAuthenticationEntryPoint::class)
+            ->deprecate('symfony/security-bundle', '5.4', 'The "%service_id%" service is deprecated, the logic is contained in the authenticators.')
 
         ->set('security.authentication.retry_entry_point', RetryAuthenticationEntryPoint::class)
+            ->deprecate('symfony/security-bundle', '5.4', 'The "%service_id%" service is deprecated, the logic is integrated directly in "security.channel_listener".')
             ->args([
                 inline_service('int')->factory([service('router.request_context'), 'getHttpPort']),
                 inline_service('int')->factory([service('router.request_context'), 'getHttpsPort']),
             ])
 
-        ->set('security.authentication.basic_entry_point', BasicAuthenticationEntryPoint::class)
-
         ->set('security.channel_listener', ChannelListener::class)
             ->args([
                 service('security.access_map'),
-                service('security.authentication.retry_entry_point'),
                 service('logger')->nullOnInvalid(),
+                inline_service('int')->factory([service('router.request_context'), 'getHttpPort']),
+                inline_service('int')->factory([service('router.request_context'), 'getHttpsPort']),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 
@@ -139,6 +121,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.http_utils'),
                 [], // Options
+                service('logger')->nullOnInvalid(),
             ])
 
         ->set('security.authentication.custom_failure_handler', CustomAuthenticationFailureHandler::class)
@@ -157,93 +140,6 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
-
-        ->set('security.authentication.listener.form', UsernamePasswordFormAuthenticationListener::class)
-            ->parent('security.authentication.listener.abstract')
-            ->abstract()
-
-        ->set('security.authentication.listener.x509', X509AuthenticationListener::class)
-            ->abstract()
-            ->args([
-                service('security.token_storage'),
-                service('security.authentication.manager'),
-                abstract_arg('Provider-shared Key'),
-                abstract_arg('x509 user'),
-                abstract_arg('x509 credentials'),
-                service('logger')->nullOnInvalid(),
-                service('event_dispatcher')->nullOnInvalid(),
-            ])
-            ->tag('monolog.logger', ['channel' => 'security'])
-
-        ->set('security.authentication.listener.json', UsernamePasswordJsonAuthenticationListener::class)
-            ->abstract()
-            ->args([
-                service('security.token_storage'),
-                service('security.authentication.manager'),
-                service('security.http_utils'),
-                abstract_arg('Provider-shared Key'),
-                abstract_arg('Failure handler'),
-                abstract_arg('Success Handler'),
-                [], // Options
-                service('logger')->nullOnInvalid(),
-                service('event_dispatcher')->nullOnInvalid(),
-                service('property_accessor')->nullOnInvalid(),
-            ])
-            ->call('setTranslator', [service('translator')->ignoreOnInvalid()])
-            ->tag('monolog.logger', ['channel' => 'security'])
-
-        ->set('security.authentication.listener.remote_user', RemoteUserAuthenticationListener::class)
-            ->abstract()
-            ->args([
-                service('security.token_storage'),
-                service('security.authentication.manager'),
-                abstract_arg('Provider-shared Key'),
-                abstract_arg('REMOTE_USER server env var'),
-                service('logger')->nullOnInvalid(),
-                service('event_dispatcher')->nullOnInvalid(),
-            ])
-            ->tag('monolog.logger', ['channel' => 'security'])
-
-        ->set('security.authentication.listener.basic', BasicAuthenticationListener::class)
-            ->abstract()
-            ->args([
-                service('security.token_storage'),
-                service('security.authentication.manager'),
-                abstract_arg('Provider-shared Key'),
-                abstract_arg('Entry Point'),
-                service('logger')->nullOnInvalid(),
-            ])
-            ->tag('monolog.logger', ['channel' => 'security'])
-
-        ->set('security.authentication.provider.dao', DaoAuthenticationProvider::class)
-            ->abstract()
-            ->args([
-                abstract_arg('User Provider'),
-                abstract_arg('User Checker'),
-                abstract_arg('Provider-shared Key'),
-                service('security.encoder_factory'),
-                param('security.authentication.hide_user_not_found'),
-            ])
-
-        ->set('security.authentication.provider.ldap_bind', LdapBindAuthenticationProvider::class)
-            ->abstract()
-            ->args([
-                abstract_arg('User Provider'),
-                abstract_arg('UserChecker'),
-                abstract_arg('Provider-shared Key'),
-                abstract_arg('LDAP'),
-                abstract_arg('Base DN'),
-                param('security.authentication.hide_user_not_found'),
-                abstract_arg('search dn'),
-                abstract_arg('search password'),
-            ])
-
-        ->set('security.authentication.provider.pre_authenticated', PreAuthenticatedAuthenticationProvider::class)
-            ->abstract()
-            ->args([
-                abstract_arg('User Provider'),
-                abstract_arg('UserChecker'),
-            ])
 
         ->set('security.exception_listener', ExceptionListener::class)
             ->abstract()

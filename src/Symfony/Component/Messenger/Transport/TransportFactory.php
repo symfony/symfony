@@ -22,7 +22,7 @@ class TransportFactory implements TransportFactoryInterface
     private $factories;
 
     /**
-     * @param iterable|TransportFactoryInterface[] $factories
+     * @param iterable<mixed, TransportFactoryInterface> $factories
      */
     public function __construct(iterable $factories)
     {
@@ -43,7 +43,7 @@ class TransportFactory implements TransportFactoryInterface
             $packageSuggestion = ' Run "composer require symfony/amqp-messenger" to install AMQP transport.';
         } elseif (0 === strpos($dsn, 'doctrine://')) {
             $packageSuggestion = ' Run "composer require symfony/doctrine-messenger" to install Doctrine transport.';
-        } elseif (0 === strpos($dsn, 'redis://')) {
+        } elseif (0 === strpos($dsn, 'redis://') || 0 === strpos($dsn, 'rediss://')) {
             $packageSuggestion = ' Run "composer require symfony/redis-messenger" to install Redis transport.';
         } elseif (0 === strpos($dsn, 'sqs://') || preg_match('#^https://sqs\.[\w\-]+\.amazonaws\.com/.+#', $dsn)) {
             $packageSuggestion = ' Run "composer require symfony/amazon-sqs-messenger" to install Amazon SQS transport.';

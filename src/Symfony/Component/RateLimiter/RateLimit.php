@@ -15,8 +15,6 @@ use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 
 /**
  * @author Valentin Silvestre <vsilvestre.pro@gmail.com>
- *
- * @experimental in 5.2
  */
 class RateLimit
 {
@@ -39,6 +37,8 @@ class RateLimit
     }
 
     /**
+     * @return $this
+     *
      * @throws RateLimitExceededException if not accepted
      */
     public function ensureAccepted(): self
@@ -67,11 +67,11 @@ class RateLimit
 
     public function wait(): void
     {
-        $delta = $this->retryAfter->getTimestamp() - time();
+        $delta = $this->retryAfter->format('U.u') - microtime(true);
         if ($delta <= 0) {
             return;
         }
 
-        sleep($delta);
+        usleep((int) ($delta * 1e6));
     }
 }

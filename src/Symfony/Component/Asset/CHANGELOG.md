@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * deprecated `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead.
+
 5.1.0
 -----
 

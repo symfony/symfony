@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 /**
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
  * behavior of PHP.
+ *
+ * @group legacy
  */
 abstract class AbstractNumberFormatterTest extends TestCase
 {
@@ -664,12 +666,12 @@ abstract class AbstractNumberFormatterTest extends TestCase
         return [
             ['prefix1', false, '->parse() does not parse a number with a string prefix.', 0],
             ['prefix1', false, '->parse() does not parse a number with a string prefix.', 0, false],
-            ['1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3],
-            ['1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3, false],
+            ['1.4suffix', 1.4, '->parse() parses a number with a string suffix.', 3],
+            ['1.4suffix', 1.4, '->parse() parses a number with a string suffix.', 3, false],
             ['1,234.4suffix', 1234.4, '->parse() parses a number with a string suffix.', 7],
             ['1,234.4suffix', 1.0, '->parse() parses a number with a string suffix.', 1, false],
-            ['-.4suffix', (float) -0.4, '->parse() parses a negative dot float with suffix.', 3],
-            ['-.4suffix', (float) -0.4, '->parse() parses a negative dot float with suffix.', 3, false],
+            ['-.4suffix', -0.4, '->parse() parses a negative dot float with suffix.', 3],
+            ['-.4suffix', -0.4, '->parse() parses a negative dot float with suffix.', 3, false],
             [',4', false, '->parse() does not parse when invalid grouping used.', 0],
             [',4', false, '->parse() does not parse when invalid grouping used.', 0, false],
             ['123,4', false, '->parse() does not parse when invalid grouping used.', 0],

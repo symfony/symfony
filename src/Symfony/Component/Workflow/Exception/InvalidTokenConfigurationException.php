@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Workflow\Exception;
 
+trigger_deprecation('symfony/workflow', '5.3', 'The "%s" class is deprecated.', InvalidTokenConfigurationException::class);
+
 /**
  * Thrown by GuardListener when there is no token set, but guards are placed on a transition.
  *
  * @author Matt Johnson <matj1985@gmail.com>
+ *
+ * @deprecated since Symfony 5.3
  */
 class InvalidTokenConfigurationException extends LogicException
 {

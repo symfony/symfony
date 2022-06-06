@@ -39,7 +39,7 @@ class UriSigner
      * The given URI is signed by adding the query string parameter
      * which value depends on the URI and the secret.
      *
-     * @return string The signed URI
+     * @return string
      */
     public function sign(string $uri)
     {
@@ -59,7 +59,7 @@ class UriSigner
     /**
      * Checks that a URI contains the correct hash.
      *
-     * @return bool True if the URI is signed correctly, false otherwise
+     * @return bool
      */
     public function check(string $uri)
     {

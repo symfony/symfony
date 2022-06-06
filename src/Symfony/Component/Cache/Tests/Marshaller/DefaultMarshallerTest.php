@@ -109,4 +109,15 @@ class DefaultMarshallerTest extends TestCase
             restore_error_handler();
         }
     }
+
+    public function testSerializeDebug()
+    {
+        $marshaller = new DefaultMarshaller(false, true);
+        $values = [
+            'a' => function () {},
+        ];
+
+        $this->expectException(\ValueError::class);
+        $marshaller->marshall($values, $failed);
+    }
 }

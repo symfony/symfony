@@ -1,0 +1,9 @@
+imports:
+    - { resource: ./legacy_localized_routes.yml }
+
+security:
+    firewalls:
+        default:
+            form_login:
+                use_forward: true
+                failure_forward: true

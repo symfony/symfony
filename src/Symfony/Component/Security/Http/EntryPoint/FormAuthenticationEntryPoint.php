@@ -14,12 +14,17 @@ namespace Symfony\Component\Security\Http\EntryPoint;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\HttpUtils;
+
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use the new security system with "%s" instead.', FormAuthenticationEntryPoint::class, FormLoginAuthenticator::class);
 
 /**
  * FormAuthenticationEntryPoint starts an authentication via a login form.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.4
  */
 class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {

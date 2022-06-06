@@ -25,6 +25,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class FormType extends BaseType
 {
@@ -96,6 +97,16 @@ class FormType extends BaseType
             }
 
             $helpTranslationParameters = array_merge($view->parent->vars['help_translation_parameters'], $helpTranslationParameters);
+
+            $rootFormAttrOption = $form->getRoot()->getConfig()->getOption('form_attr');
+            if ($options['form_attr'] || $rootFormAttrOption) {
+                $view->vars['attr']['form'] = \is_string($rootFormAttrOption) ? $rootFormAttrOption : $form->getRoot()->getName();
+                if (empty($view->vars['attr']['form'])) {
+                    throw new LogicException('"form_attr" option must be a string identifier on root form when it has no id.');
+                }
+            }
+        } elseif (\is_string($options['form_attr'])) {
+            $view->vars['id'] = $options['form_attr'];
         }
 
         $formConfig = $form->getConfig();
@@ -210,17 +221,19 @@ class FormType extends BaseType
             'is_empty_callback' => null,
             'getter' => null,
             'setter' => null,
+            'form_attr' => false,
         ]);
 
         $resolver->setAllowedTypes('label_attr', 'array');
         $resolver->setAllowedTypes('action', 'string');
         $resolver->setAllowedTypes('upload_max_size_message', ['callable']);
-        $resolver->setAllowedTypes('help', ['string', 'null']);
+        $resolver->setAllowedTypes('help', ['string', 'null', TranslatableMessage::class]);
         $resolver->setAllowedTypes('help_attr', 'array');
         $resolver->setAllowedTypes('help_html', 'bool');
         $resolver->setAllowedTypes('is_empty_callback', ['null', 'callable']);
         $resolver->setAllowedTypes('getter', ['null', 'callable']);
         $resolver->setAllowedTypes('setter', ['null', 'callable']);
+        $resolver->setAllowedTypes('form_attr', ['bool', 'string']);
 
         $resolver->setInfo('getter', 'A callable that accepts two arguments (the view data and the current form field) and must return a value.');
         $resolver->setInfo('setter', 'A callable that accepts three arguments (a reference to the view data, the submitted value and the current form field).');

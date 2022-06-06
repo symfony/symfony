@@ -42,8 +42,12 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         if (null === $lockPath) {
             $lockPath = sys_get_temp_dir();
         }
-        if (!is_dir($lockPath) || !is_writable($lockPath)) {
-            throw new InvalidArgumentException(sprintf('The directory "%s" is not writable.', $lockPath));
+        if (!is_dir($lockPath)) {
+            if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
+                throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
+            }
+        } elseif (!is_writable($lockPath)) {
+            throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
         }
 
         $this->lockPath = $lockPath;
@@ -102,15 +106,18 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 
             // Silence error reporting
             set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-            if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-                if ($handle = fopen($fileName, 'x')) {
-                    chmod($fileName, 0666);
-                } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-                    usleep(100); // Give some time for chmod() to complete
-                    $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
+            try {
+                if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                    if ($handle = fopen($fileName, 'x')) {
+                        chmod($fileName, 0666);
+                    } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                        usleep(100); // Give some time for chmod() to complete
+                        $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
+                    }
                 }
+            } finally {
+                restore_error_handler();
             }
-            restore_error_handler();
         }
 
         if (!$handle) {

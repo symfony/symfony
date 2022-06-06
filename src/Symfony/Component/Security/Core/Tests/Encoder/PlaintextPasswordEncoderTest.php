@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+/**
+ * @group legacy
+ */
 class PlaintextPasswordEncoderTest extends TestCase
 {
     public function testIsPasswordValid()

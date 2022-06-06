@@ -50,7 +50,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * Returns the decorated factory.
      *
-     * @return ChoiceListFactoryInterface The decorated factory
+     * @return ChoiceListFactoryInterface
      */
     public function getDecoratedFactory()
     {
@@ -147,11 +147,13 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      * @param mixed $index
      * @param mixed $groupBy
      * @param mixed $attr
+     * @param mixed $labelTranslationParameters
      *
      * @return ChoiceListView
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
     {
+        $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];
         $accessor = $this->propertyAccessor;
 
         if (\is_string($label)) {
@@ -214,6 +216,24 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+        if (\is_string($labelTranslationParameters)) {
+            $labelTranslationParameters = new PropertyPath($labelTranslationParameters);
+        }
+
+        if ($labelTranslationParameters instanceof PropertyPath) {
+            $labelTranslationParameters = static function ($choice) use ($accessor, $labelTranslationParameters) {
+                return $accessor->getValue($choice, $labelTranslationParameters);
+            };
+        }
+
+        return $this->decoratedFactory->createView(
+            $list,
+            $preferredChoices,
+            $label,
+            $index,
+            $groupBy,
+            $attr,
+            $labelTranslationParameters
+        );
     }
 }

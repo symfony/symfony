@@ -57,7 +57,7 @@ class NotFoundActivationStrategy extends ErrorLevelActivationStrategy implements
             && isset($record['context']['exception'])
             && $record['context']['exception'] instanceof HttpException
             && 404 == $record['context']['exception']->getStatusCode()
-            && ($request = $this->requestStack->getMasterRequest())
+            && ($request = $this->requestStack->getMainRequest())
         ) {
             return !preg_match($this->exclude, $request->getPathInfo());
         }

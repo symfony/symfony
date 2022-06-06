@@ -13,8 +13,6 @@ namespace Symfony\Component\Notifier\Recipient;
 
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
- *
- * @experimental in 5.2
  */
 interface EmailRecipientInterface extends RecipientInterface
 {

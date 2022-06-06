@@ -2,7 +2,7 @@
 
 return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o = \Symfony\Component\VarExporter\Internal\Registry::unserialize([], [
-        'C:50:"Symfony\\Component\\VarExporter\\Tests\\MySerializable":3:{123}',
+        'C:59:"Symfony\\Component\\VarExporter\\Tests\\Fixtures\\MySerializable":3:{123}',
     ]),
     null,
     [],

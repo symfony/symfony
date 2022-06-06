@@ -35,12 +35,8 @@ class JsonBundleReader implements BundleReaderInterface
             throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
-        if (!file_exists($fileName)) {
-            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
-        }
-
         if (!is_file($fileName)) {
-            throw new RuntimeException(sprintf('The resource bundle "%s" is not a file.', $fileName));
+            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
         $data = json_decode(file_get_contents($fileName), true);

@@ -100,6 +100,26 @@ class SessionTest extends AbstractWebTestCase
     }
 
     /**
+     * @group legacy
+     * @dataProvider getConfigs
+     */
+    public function testSessionServiceTriggerDeprecation($config, $insulate)
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.3: The "session" service and "SessionInterface" alias are deprecated, use "$requestStack->getSession()" instead.');
+
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        if ($insulate) {
+            $client->insulate();
+        }
+
+        // trigger deprecation
+        $crawler = $client->request('GET', '/deprecated_session/trigger');
+
+        // check response
+        $this->assertStringContainsString('done', $crawler->text());
+    }
+
+    /**
      * See if two separate insulated clients can run without
      * polluting each other's session data.
      *

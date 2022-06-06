@@ -5,6 +5,13 @@ namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
 abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnTypeParentInterface
 {
     /**
+     * @return void
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * No return declared here
      */
     public function returnTypeGrandParent()

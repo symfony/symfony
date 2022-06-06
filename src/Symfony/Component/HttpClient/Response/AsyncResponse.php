@@ -57,13 +57,13 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         }
         $this->response = $client->request($method, $url, ['buffer' => false] + $options);
         $this->passthru = $passthru;
-        $this->initializer = static function (self $response) {
+        $this->initializer = static function (self $response, float $timeout = null) {
             if (null === $response->shouldBuffer) {
                 return false;
             }
 
             while (true) {
-                foreach (self::stream([$response]) as $chunk) {
+                foreach (self::stream([$response], $timeout) as $chunk) {
                     if ($chunk->isTimeout() && $response->passthru) {
                         foreach (self::passthru($response->client, $response, new ErrorChunk($response->offset, new TransportException($chunk->getError()))) as $chunk) {
                             if ($chunk->isFirst()) {
@@ -84,6 +84,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         };
         if (\array_key_exists('user_data', $options)) {
             $this->info['user_data'] = $options['user_data'];
+        }
+        if (\array_key_exists('max_duration', $options)) {
+            $this->info['max_duration'] = $options['max_duration'];
         }
     }
 
@@ -179,6 +182,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
 
         if ($this->initializer && null === $this->getInfo('error')) {
             try {
+                self::initialize($this, -0.0);
                 $this->getHeaders(true);
             } catch (HttpExceptionInterface $httpException) {
                 // no-op
@@ -246,7 +250,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                 }
             }
 
-            if (!$client) {
+            if (!$client || !$wrappedResponses) {
                 return;
             }
 
@@ -310,6 +314,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         }
     }
 
+    /**
+     * @param \SplObjectStorage<ResponseInterface, AsyncResponse>|null $asyncMap
+     */
     private static function passthru(HttpClientInterface $client, self $r, ChunkInterface $chunk, \SplObjectStorage $asyncMap = null): \Generator
     {
         $r->stream = null;
@@ -331,6 +338,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         yield from self::passthruStream($response, $r, null, $asyncMap);
     }
 
+    /**
+     * @param \SplObjectStorage<ResponseInterface, AsyncResponse>|null $asyncMap
+     */
     private static function passthruStream(ResponseInterface $response, self $r, ?ChunkInterface $chunk, ?\SplObjectStorage $asyncMap): \Generator
     {
         while (true) {

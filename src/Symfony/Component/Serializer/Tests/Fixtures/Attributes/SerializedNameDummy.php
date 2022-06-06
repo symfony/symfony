@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  */
 class SerializedNameDummy
 {
-    #[SerializedName("baz")]
+    #[SerializedName('baz')]
     public $foo;
 
     public $bar;
@@ -30,7 +30,7 @@ class SerializedNameDummy
      */
     public $child;
 
-    #[SerializedName("qux")]
+    #[SerializedName('qux')]
     public function getBar()
     {
         return $this->bar;

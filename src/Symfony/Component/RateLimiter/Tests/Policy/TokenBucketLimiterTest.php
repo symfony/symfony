@@ -17,6 +17,7 @@ use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Policy\Rate;
 use Symfony\Component\RateLimiter\Policy\TokenBucket;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 
@@ -34,6 +35,7 @@ class TokenBucketLimiterTest extends TestCase
         ClockMock::register(TokenBucketLimiter::class);
         ClockMock::register(InMemoryStorage::class);
         ClockMock::register(TokenBucket::class);
+        ClockMock::register(RateLimit::class);
     }
 
     public function testReserve()
@@ -89,6 +91,20 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(10, $rateLimit->getLimit());
     }
 
+    public function testWaitIntervalOnConsumeOverLimit()
+    {
+        $limiter = $this->createLimiter();
+
+        // initial consume
+        $limiter->consume(8);
+        // consumer over the limit
+        $rateLimit = $limiter->consume(4);
+
+        $start = microtime(true);
+        $rateLimit->wait(); // wait 1 second
+        $this->assertEqualsWithDelta($start + 1, microtime(true), 1);
+    }
+
     public function testWrongWindowFromCache()
     {
         $this->storage->save(new DummyWindow());
@@ -96,6 +112,20 @@ class TokenBucketLimiterTest extends TestCase
         $rateLimit = $limiter->consume();
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(9, $rateLimit->getRemainingTokens());
+    }
+
+    public function testBucketResilientToTimeShifting()
+    {
+        $serverOneClock = microtime(true) - 1;
+        $serverTwoClock = microtime(true) + 1;
+
+        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverTwoClock);
+        $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
+        $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
+
+        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverOneClock);
+        $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
+        $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
     }
 
     private function createLimiter($initialTokens = 10, Rate $rate = null)

@@ -1,0 +1,35 @@
+{
+    "name": "symfony/crowdin-translation-provider",
+    "type": "symfony-translation-bridge",
+    "description": "Symfony Crowdin Translation Provider Bridge",
+    "keywords": ["crowdin", "translation", "provider"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrii Bodnar",
+            "homepage": "https://github.com/andrii-bodnar"
+        },
+        {
+            "name": "Mathieu Santostefano",
+            "homepage": "https://github.com/welcomattic"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/config": "^5.3|^6.0",
+        "symfony/http-client": "^5.3|^6.0",
+        "symfony/translation": "^5.3|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Crowdin\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

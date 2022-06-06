@@ -22,6 +22,7 @@ final class AmqpStamp implements NonSendableStampInterface
     private $routingKey;
     private $flags;
     private $attributes;
+    private $isRetryAttempt = false;
 
     public function __construct(string $routingKey = null, int $flags = \AMQP_NOPARAM, array $attributes = [])
     {
@@ -45,7 +46,7 @@ final class AmqpStamp implements NonSendableStampInterface
         return $this->attributes;
     }
 
-    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null): self
+    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $retryRoutingKey = null): self
     {
         $attr = $previousStamp->attributes ?? [];
 
@@ -61,8 +62,21 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['expiration'] = $attr['expiration'] ?? $amqpEnvelope->getExpiration();
         $attr['type'] = $attr['type'] ?? $amqpEnvelope->getType();
         $attr['reply_to'] = $attr['reply_to'] ?? $amqpEnvelope->getReplyTo();
+        $attr['correlation_id'] = $attr['correlation_id'] ?? $amqpEnvelope->getCorrelationId();
 
-        return new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr);
+        if (null === $retryRoutingKey) {
+            $stamp = new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr);
+        } else {
+            $stamp = new self($retryRoutingKey, $previousStamp->flags ?? \AMQP_NOPARAM, $attr);
+            $stamp->isRetryAttempt = true;
+        }
+
+        return $stamp;
+    }
+
+    public function isRetryAttempt(): bool
+    {
+        return $this->isRetryAttempt;
     }
 
     public static function createWithAttributes(array $attributes, self $previousStamp = null): self

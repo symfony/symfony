@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * ResponseCacheStrategy knows how to compute the Response cache HTTP header
  * based on the different response cache headers.
  *
- * This implementation changes the master response TTL to the smallest TTL received
+ * This implementation changes the main response TTL to the smallest TTL received
  * or force validation if one of the surrogates has validation cache strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>

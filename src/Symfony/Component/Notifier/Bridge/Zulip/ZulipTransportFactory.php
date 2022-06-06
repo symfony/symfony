@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Zulip;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -19,10 +18,8 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Mohammad Emran Hasan <phpfour@gmail.com>
- *
- * @experimental in 5.2
  */
-class ZulipTransportFactory extends AbstractTransportFactory
+final class ZulipTransportFactory extends AbstractTransportFactory
 {
     /**
      * @return ZulipTransport
@@ -37,12 +34,7 @@ class ZulipTransportFactory extends AbstractTransportFactory
 
         $email = $this->getUser($dsn);
         $token = $this->getPassword($dsn);
-        $channel = $dsn->getOption('channel');
-
-        if (!$channel) {
-            throw new IncompleteDsnException('Missing channel.', $dsn->getOriginalDsn());
-        }
-
+        $channel = $dsn->getRequiredOption('channel');
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 

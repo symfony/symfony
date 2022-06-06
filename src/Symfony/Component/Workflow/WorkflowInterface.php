@@ -23,7 +23,7 @@ interface WorkflowInterface
     /**
      * Returns the object's Marking.
      *
-     * @return Marking The Marking
+     * @return Marking
      *
      * @throws LogicException
      */
@@ -32,7 +32,7 @@ interface WorkflowInterface
     /**
      * Returns true if the transition is enabled.
      *
-     * @return bool true if the transition is enabled
+     * @return bool
      */
     public function can(object $subject, string $transitionName);
 
@@ -44,7 +44,7 @@ interface WorkflowInterface
     /**
      * Fire a transition.
      *
-     * @return Marking The new Marking
+     * @return Marking
      *
      * @throws LogicException If the transition is not applicable
      */
@@ -53,7 +53,7 @@ interface WorkflowInterface
     /**
      * Returns all enabled transitions.
      *
-     * @return Transition[] All enabled transitions
+     * @return Transition[]
      */
     public function getEnabledTransitions(object $subject);
 

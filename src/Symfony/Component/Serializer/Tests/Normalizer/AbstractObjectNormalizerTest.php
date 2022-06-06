@@ -61,6 +61,20 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []));
     }
 
+    public function testDenormalizeWithExtraAttribute()
+    {
+        $this->expectException(ExtraAttributesException::class);
+        $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo" is unknown).');
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new AbstractObjectNormalizerDummy($factory);
+        $normalizer->denormalize(
+            ['fooFoo' => 'foo'],
+            Dummy::class,
+            'any',
+            ['allow_extra_attributes' => false]
+        );
+    }
+
     public function testDenormalizeWithExtraAttributes()
     {
         $this->expectException(ExtraAttributesException::class);
@@ -605,12 +619,8 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
 
 class NotSerializable
 {
-    public function __sleep()
+    public function __sleep(): array
     {
-        if (class_exists(\Error::class)) {
-            throw new \Error('not serializable');
-        }
-
-        throw new \Exception('not serializable');
+        throw new \Error('not serializable');
     }
 }

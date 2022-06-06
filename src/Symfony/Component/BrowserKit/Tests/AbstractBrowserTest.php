@@ -62,6 +62,17 @@ class AbstractBrowserTest extends TestCase
         $this->assertFalse($client->getServerParameter('HTTP_X_REQUESTED_WITH', false));
     }
 
+    public function testJsonRequest()
+    {
+        $client = $this->getBrowser();
+        $client->jsonRequest('GET', 'http://example.com/', ['param' => 1], [], true);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['CONTENT_TYPE']);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['HTTP_ACCEPT']);
+        $this->assertFalse($client->getServerParameter('CONTENT_TYPE', false));
+        $this->assertFalse($client->getServerParameter('HTTP_ACCEPT', false));
+        $this->assertSame('{"param":1}', $client->getRequest()->getContent());
+    }
+
     public function testGetRequestWithIpAsHttpHost()
     {
         $client = $this->getBrowser();

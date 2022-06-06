@@ -72,7 +72,7 @@ class Definition
     /**
      * Returns all changes tracked for the Definition object.
      *
-     * @return array An array of changes for this Definition
+     * @return array
      */
     public function getChanges()
     {
@@ -146,7 +146,7 @@ class Definition
         if (null === $id) {
             $this->decoratedService = null;
         } else {
-            $this->decoratedService = [$id, $renamedId, (int) $priority];
+            $this->decoratedService = [$id, $renamedId, $priority];
 
             if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                 $this->decoratedService[] = $invalidBehavior;
@@ -183,7 +183,7 @@ class Definition
     /**
      * Gets the service class.
      *
-     * @return string|null The service class
+     * @return string|null
      */
     public function getClass()
     {
@@ -265,15 +265,15 @@ class Definition
     public function replaceArgument($index, $argument)
     {
         if (0 === \count($this->arguments)) {
-            throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
+            throw new OutOfBoundsException(sprintf('Cannot replace arguments for class "%s" if none have been configured yet.', $this->class));
         }
 
         if (\is_int($index) && ($index < 0 || $index > \count($this->arguments) - 1)) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, \count($this->arguments) - 1));
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d] of the arguments of class "%s".', $index, \count($this->arguments) - 1, $this->class));
         }
 
         if (!\array_key_exists($index, $this->arguments)) {
-            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
+            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
         }
 
         $this->arguments[$index] = $argument;
@@ -299,7 +299,7 @@ class Definition
     /**
      * Gets the arguments to pass to the service constructor/factory method.
      *
-     * @return array The array of arguments
+     * @return array
      */
     public function getArguments()
     {
@@ -311,14 +311,14 @@ class Definition
      *
      * @param int|string $index
      *
-     * @return mixed The argument value
+     * @return mixed
      *
      * @throws OutOfBoundsException When the argument does not exist
      */
     public function getArgument($index)
     {
         if (!\array_key_exists($index, $this->arguments)) {
-            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
+            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
         }
 
         return $this->arguments[$index];
@@ -395,7 +395,7 @@ class Definition
     /**
      * Gets the methods to call after service initialization.
      *
-     * @return array An array of method calls
+     * @return array
      */
     public function getMethodCalls()
     {
@@ -463,7 +463,7 @@ class Definition
     /**
      * Returns all tags.
      *
-     * @return array An array of tags
+     * @return array
      */
     public function getTags()
     {
@@ -473,7 +473,7 @@ class Definition
     /**
      * Gets a tag by name.
      *
-     * @return array An array of attributes
+     * @return array
      */
     public function getTag(string $name)
     {
@@ -543,7 +543,7 @@ class Definition
     /**
      * Gets the file to require before creating the service.
      *
-     * @return string|null The full pathname to include
+     * @return string|null
      */
     public function getFile()
     {
@@ -812,7 +812,7 @@ class Definition
     /**
      * Gets the configurator to call after the service is fully initialized.
      *
-     * @return callable|array|null
+     * @return string|array|null
      */
     public function getConfigurator()
     {
@@ -846,7 +846,7 @@ class Definition
     /**
      * Gets bindings.
      *
-     * @return array|BoundArgument[]
+     * @return BoundArgument[]
      */
     public function getBindings()
     {

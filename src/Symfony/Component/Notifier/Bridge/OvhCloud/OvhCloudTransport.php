@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\OvhCloud;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Thomas Ferney <thomas.ferney@gmail.com>
- *
- * @experimental in 5.2
  */
 final class OvhCloudTransport extends AbstractTransport
 {
@@ -34,6 +32,7 @@ final class OvhCloudTransport extends AbstractTransport
     private $applicationSecret;
     private $consumerKey;
     private $serviceName;
+    private $sender;
 
     public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -47,7 +46,21 @@ final class OvhCloudTransport extends AbstractTransport
 
     public function __toString(): string
     {
+        if (null !== $this->sender) {
+            return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s&sender=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName, $this->sender);
+        }
+
         return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName);
+    }
+
+    /**
+     * @return $this
+     */
+    public function setSender(?string $sender): self
+    {
+        $this->sender = $sender;
+
+        return $this;
     }
 
     public function supports(MessageInterface $message): bool
@@ -58,7 +71,7 @@ final class OvhCloudTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $endpoint = sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
@@ -71,8 +84,13 @@ final class OvhCloudTransport extends AbstractTransport
             'receivers' => [$message->getPhone()],
             'noStopClause' => false,
             'priority' => 'medium',
-            'senderForResponse' => true,
         ];
+
+        if ($this->sender) {
+            $content['sender'] = $this->sender;
+        } else {
+            $content['senderForResponse'] = true;
+        }
 
         $now = time() + $this->calculateTimeDelta();
         $headers['X-Ovh-Application'] = $this->applicationKey;

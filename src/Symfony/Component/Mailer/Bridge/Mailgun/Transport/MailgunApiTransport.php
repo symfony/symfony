@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -20,7 +21,6 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -137,9 +137,9 @@ class MailgunApiTransport extends AbstractApiTransport
             // Check if it is a valid prefix or header name according to Mailgun API
             $prefix = substr($name, 0, 2);
             if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
-                $headerName = $name;
+                $headerName = $header->getName();
             } else {
-                $headerName = 'h:'.$name;
+                $headerName = 'h:'.$header->getName();
             }
 
             $payload[$headerName] = $header->getBodyAsString();

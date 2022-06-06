@@ -34,7 +34,7 @@ abstract class Helper implements HelperInterface
     /**
      * Gets the default charset.
      *
-     * @return string The default charset
+     * @return string
      */
     public function getCharset()
     {

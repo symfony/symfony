@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 final class SlackTransportFactory extends AbstractTransportFactory
 {

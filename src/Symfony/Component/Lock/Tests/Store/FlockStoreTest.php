@@ -33,10 +33,10 @@ class FlockStoreTest extends AbstractStoreTest
         return new FlockStore();
     }
 
-    public function testConstructWhenRepositoryDoesNotExist()
+    public function testConstructWhenRepositoryCannotBeCreated()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The directory "/a/b/c/d/e" is not writable.');
+        $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
         }
@@ -47,12 +47,20 @@ class FlockStoreTest extends AbstractStoreTest
     public function testConstructWhenRepositoryIsNotWriteable()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The directory "/" is not writable.');
+        $this->expectExceptionMessage('The FlockStore directory "/" is not writable.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
         }
 
         new FlockStore('/');
+    }
+
+    public function testConstructWithSubdir()
+    {
+        new FlockStore($dir = (sys_get_temp_dir().'/sf-flock'));
+        $this->assertDirectoryExists($dir);
+        // cleanup
+        @rmdir($dir);
     }
 
     public function testSaveSanitizeName()

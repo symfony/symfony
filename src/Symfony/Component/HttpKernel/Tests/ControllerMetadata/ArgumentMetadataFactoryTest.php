@@ -15,7 +15,6 @@ use Fake\ImportedAndFake;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
-use Symfony\Component\HttpKernel\Exception\InvalidMetadataException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AttributeController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
@@ -108,6 +107,17 @@ class ArgumentMetadataFactoryTest extends TestCase
         ], $arguments);
     }
 
+    public function testNamedClosure()
+    {
+        $arguments = $this->factory->createArgumentMetadata(\Closure::fromCallable([$this, 'signature1']));
+
+        $this->assertEquals([
+            new ArgumentMetadata('foo', self::class, false, false, null),
+            new ArgumentMetadata('bar', 'array', false, false, null),
+            new ArgumentMetadata('baz', 'callable', false, false, null),
+        ], $arguments);
+    }
+
     public function testNullableTypesSignature()
     {
         $arguments = $this->factory->createArgumentMetadata([new NullableController(), 'action']);
@@ -128,18 +138,29 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'action']);
 
         $this->assertEquals([
-            new ArgumentMetadata('baz', 'string', false, false, null, false, new Foo('bar')),
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
         ], $arguments);
     }
 
     /**
      * @requires PHP 8
      */
-    public function testAttributeSignatureError()
+    public function testMultipleAttributes()
     {
-        $this->expectException(InvalidMetadataException::class);
+        $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg']);
+        $this->assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
+    }
 
-        $this->factory->createArgumentMetadata([new AttributeController(), 'invalidAction']);
+    /**
+     * @requires PHP 8
+     */
+    public function testIssue41478()
+    {
+        $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'issue41478']);
+        $this->assertEquals([
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
+            new ArgumentMetadata('bat', 'string', false, false, null, false, []),
+        ], $arguments);
     }
 
     private function signature1(self $foo, array $bar, callable $baz)

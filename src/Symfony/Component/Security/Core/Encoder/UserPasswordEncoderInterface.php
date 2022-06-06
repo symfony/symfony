@@ -11,24 +11,29 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" interface is deprecated, use "%s" instead.', UserPasswordEncoderInterface::class, UserPasswordHasherInterface::class);
 
 /**
  * UserPasswordEncoderInterface is the interface for the password encoder service.
  *
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
+ *
+ * @deprecated since Symfony 5.3, use {@link UserPasswordHasherInterface} instead
  */
 interface UserPasswordEncoderInterface
 {
     /**
      * Encodes the plain password.
      *
-     * @return string The encoded password
+     * @return string
      */
     public function encodePassword(UserInterface $user, string $plainPassword);
 
     /**
-     * @return bool true if the password is valid, false otherwise
+     * @return bool
      */
     public function isPasswordValid(UserInterface $user, string $raw);
 

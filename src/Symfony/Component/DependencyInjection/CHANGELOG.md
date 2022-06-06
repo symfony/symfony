@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+5.4
+---
+ * Add `$defaultIndexMethod` and `$defaultPriorityMethod` to `TaggedIterator` and `TaggedLocator` attributes
+ * Add `service_closure()` to the PHP-DSL
+ * Add support for autoconfigurable attributes on methods, properties and parameters
+ * Make auto-aliases private by default
+ * Add support for autowiring union and intersection types
+
+5.3
+---
+
+ * Add `ServicesConfigurator::remove()` in the PHP-DSL
+ * Add `%env(not:...)%` processor to negate boolean values
+ * Add support for loading autoconfiguration rules via the `#[Autoconfigure]` and `#[AutoconfigureTag]` attributes on PHP 8
+ * Add `#[AsTaggedItem]` attribute for defining the index and priority of classes found in tagged iterators/locators
+ * Add autoconfigurable attributes
+ * Add support for autowiring tagged iterators and locators via attributes on PHP 8
+ * Add support for per-env configuration in XML and Yaml loaders
+ * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
+ * Add support an integer return value for default_index_method
+ * Add `#[When(env: 'foo')]` to skip autoregistering a class when the env doesn't match
+ * Add `env()` and `EnvConfigurator` in the PHP-DSL
+ * Add support for `ConfigBuilder` in the `PhpFileLoader`
+ * Add `ContainerConfigurator::env()` to get the current environment
+ * Add `#[Target]` to tell how a dependency is used and hint named autowiring aliases
+
 5.2.0
 -----
 

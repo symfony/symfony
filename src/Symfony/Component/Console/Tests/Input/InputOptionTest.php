@@ -31,6 +31,20 @@ class InputOptionTest extends TestCase
         new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
     }
 
+    public function testBooleanWithRequired()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
+        new InputOption('foo', 'f', InputOption::VALUE_REQUIRED | InputOption::VALUE_NEGATABLE);
+    }
+
+    public function testBooleanWithOptional()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
+        new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_NEGATABLE);
+    }
+
     public function testShortcut()
     {
         $option = new InputOption('foo', 'f');
@@ -102,7 +116,7 @@ class InputOptionTest extends TestCase
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
         $this->assertTrue($option->isArray(), '->isArray() returns true if the option can be an array');
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
-        $this->assertFalse($option->isArray(), '->isArray() returns false if the option can not be an array');
+        $this->assertFalse($option->isArray(), '->isArray() returns false if the option cannot be an array');
     }
 
     public function testGetDescription()

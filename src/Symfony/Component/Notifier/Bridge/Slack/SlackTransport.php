@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -23,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 final class SlackTransport extends AbstractTransport
 {
@@ -35,6 +35,10 @@ final class SlackTransport extends AbstractTransport
 
     public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
+        if (!preg_match('/^xox(b-|p-|a-2)/', $accessToken)) {
+            throw new InvalidArgumentException('A valid Slack token needs to start with "xoxb-", "xoxp-" or "xoxa-2". See https://api.slack.com/authentication/token-types for further information.');
+        }
+
         $this->accessToken = $accessToken;
         $this->chatChannel = $channel;
         $this->client = $client;
@@ -62,7 +66,7 @@ final class SlackTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
         if ($message->getOptions() && !$message->getOptions() instanceof SlackOptions) {
@@ -98,7 +102,9 @@ final class SlackTransport extends AbstractTransport
 
         $result = $response->toArray(false);
         if (!$result['ok']) {
-            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $result['error']), $response);
+            $errors = isset($result['errors']) ? ' ('.implode('|', $result['errors']).')' : '';
+
+            throw new TransportException(sprintf('Unable to post the Slack message: "%s"%s.', $result['error'], $errors), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

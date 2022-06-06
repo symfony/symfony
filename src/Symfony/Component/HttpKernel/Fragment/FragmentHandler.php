@@ -63,10 +63,10 @@ class FragmentHandler
      *
      * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
      *
-     * @return string|null The Response content or null when the Response is streamed
+     * @return string|null
      *
      * @throws \InvalidArgumentException when the renderer does not exist
-     * @throws \LogicException           when no master request is being handled
+     * @throws \LogicException           when no main request is being handled
      */
     public function render($uri, string $renderer = 'inline', array $options = [])
     {

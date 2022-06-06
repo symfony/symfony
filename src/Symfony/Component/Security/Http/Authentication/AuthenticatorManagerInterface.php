@@ -18,8 +18,6 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 5.2
  */
 interface AuthenticatorManagerInterface
 {

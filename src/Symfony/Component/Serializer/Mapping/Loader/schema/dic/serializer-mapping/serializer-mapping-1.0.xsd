@@ -60,9 +60,12 @@
         Contains serialization groups and max depth for attributes. The name of the attribute should be given in the "name" option.
       ]]></xsd:documentation>
         </xsd:annotation>
-        <xsd:sequence minOccurs="0">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
-        </xsd:sequence>
+            <xsd:element name="context" type="context" maxOccurs="unbounded" />
+            <xsd:element name="normalization_context" type="context" maxOccurs="unbounded" />
+            <xsd:element name="denormalization_context" type="context" maxOccurs="unbounded" />
+        </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="max-depth">
             <xsd:simpleType>
@@ -79,6 +82,27 @@
             </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="ignore" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="context">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="group" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="entry" type="context-root-entry" maxOccurs="unbounded" />
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="context-root-entry" mixed="true">
+        <xsd:sequence minOccurs="0">
+            <xsd:element name="entry" type="context-entry" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="context-entry" mixed="true">
+        <xsd:sequence minOccurs="0">
+            <xsd:element name="entry" type="context-entry" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name" />
     </xsd:complexType>
 
 </xsd:schema>

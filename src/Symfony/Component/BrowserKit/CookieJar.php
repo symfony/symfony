@@ -33,7 +33,7 @@ class CookieJar
      * (this behavior ensures a BC behavior with previous versions of
      * Symfony).
      *
-     * @return Cookie|null A Cookie instance or null if the cookie does not exist
+     * @return Cookie|null
      */
     public function get(string $name, string $path = '/', string $domain = null)
     {
@@ -141,7 +141,7 @@ class CookieJar
     /**
      * Returns not yet expired cookies.
      *
-     * @return Cookie[] An array of cookies
+     * @return Cookie[]
      */
     public function all()
     {
@@ -162,7 +162,7 @@ class CookieJar
     /**
      * Returns not yet expired cookie values for the given URI.
      *
-     * @return array An array of cookie values
+     * @return array
      */
     public function allValues(string $uri, bool $returnsRawValue = false)
     {
@@ -199,7 +199,7 @@ class CookieJar
     /**
      * Returns not yet expired raw cookie values for the given URI.
      *
-     * @return array An array of cookie values
+     * @return array
      */
     public function allRawValues(string $uri)
     {

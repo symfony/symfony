@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token\Storage;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -24,13 +25,13 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceSubscriberInterface
 {
     private $storage;
-    private $sessionLocator;
+    private $container;
     private $enableUsageTracking = false;
 
-    public function __construct(TokenStorageInterface $storage, ContainerInterface $sessionLocator)
+    public function __construct(TokenStorageInterface $storage, ContainerInterface $container)
     {
         $this->storage = $storage;
-        $this->sessionLocator = $sessionLocator;
+        $this->container = $container;
     }
 
     /**
@@ -38,9 +39,9 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
      */
     public function getToken(): ?TokenInterface
     {
-        if ($this->enableUsageTracking) {
+        if ($this->shouldTrackUsage()) {
             // increments the internal session usage index
-            $this->sessionLocator->get('session')->getMetadataBag();
+            $this->getSession()->getMetadataBag();
         }
 
         return $this->storage->getToken();
@@ -53,9 +54,9 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
     {
         $this->storage->setToken($token);
 
-        if ($token && $this->enableUsageTracking) {
+        if ($token && $this->shouldTrackUsage()) {
             // increments the internal session usage index
-            $this->sessionLocator->get('session')->getMetadataBag();
+            $this->getSession()->getMetadataBag();
         }
     }
 
@@ -72,7 +73,37 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
     public static function getSubscribedServices(): array
     {
         return [
-            'session' => SessionInterface::class,
+            'request_stack' => RequestStack::class,
         ];
+    }
+
+    private function getSession(): SessionInterface
+    {
+        // BC for symfony/security-bundle < 5.3
+        if ($this->container->has('session')) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Injecting the "session" in "%s" is deprecated, inject the "request_stack" instead.', __CLASS__);
+
+            return $this->container->get('session');
+        }
+
+        return $this->container->get('request_stack')->getSession();
+    }
+
+    private function shouldTrackUsage(): bool
+    {
+        if (!$this->enableUsageTracking) {
+            return false;
+        }
+
+        // BC for symfony/security-bundle < 5.3
+        if ($this->container->has('session')) {
+            return true;
+        }
+
+        if (!$this->container->get('request_stack')->getMainRequest()) {
+            return false;
+        }
+
+        return true;
     }
 }

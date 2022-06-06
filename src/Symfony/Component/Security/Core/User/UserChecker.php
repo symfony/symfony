@@ -11,59 +11,19 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\AccountExpiredException;
-use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
-use Symfony\Component\Security\Core\Exception\DisabledException;
-use Symfony\Component\Security\Core\Exception\LockedException;
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', UserChecker::class, InMemoryUserChecker::class);
 
-/**
- * UserChecker checks the user account flags.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
-class UserChecker implements UserCheckerInterface
-{
+class_exists(InMemoryUserChecker::class);
+
+if (false) {
     /**
-     * {@inheritdoc}
+     * UserChecker checks the user account flags.
+     *
+     * @author Fabien Potencier <fabien@symfony.com>
+     *
+     * @deprecated since Symfony 5.3, use {@link InMemoryUserChecker} instead
      */
-    public function checkPreAuth(UserInterface $user)
+    class UserChecker
     {
-        if (!$user instanceof User) {
-            return;
-        }
-
-        if (!$user->isAccountNonLocked()) {
-            $ex = new LockedException('User account is locked.');
-            $ex->setUser($user);
-            throw $ex;
-        }
-
-        if (!$user->isEnabled()) {
-            $ex = new DisabledException('User account is disabled.');
-            $ex->setUser($user);
-            throw $ex;
-        }
-
-        if (!$user->isAccountNonExpired()) {
-            $ex = new AccountExpiredException('User account has expired.');
-            $ex->setUser($user);
-            throw $ex;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkPostAuth(UserInterface $user)
-    {
-        if (!$user instanceof User) {
-            return;
-        }
-
-        if (!$user->isCredentialsNonExpired()) {
-            $ex = new CredentialsExpiredException('User credentials have expired.');
-            $ex->setUser($user);
-            throw $ex;
-        }
     }
 }

@@ -16,6 +16,8 @@ use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -1826,14 +1828,26 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => [$obj1, $obj2, $obj3, $obj4],
             'choice_label' => 'label',
             'choice_value' => 'value',
+            'choice_attr' => [
+                ['attr1' => 'value1'],
+                ['attr2' => 'value2'],
+                ['attr3' => 'value3'],
+                ['attr4' => 'value4'],
+            ],
+            'choice_translation_parameters' => [
+                ['%placeholder1%' => 'value1'],
+                ['%placeholder2%' => 'value2'],
+                ['%placeholder3%' => 'value3'],
+                ['%placeholder4%' => 'value4'],
+            ],
         ])
             ->createView();
 
         $this->assertEquals([
-            new ChoiceView($obj1, 'a', 'A'),
-            new ChoiceView($obj2, 'b', 'B'),
-            new ChoiceView($obj3, 'c', 'C'),
-            new ChoiceView($obj4, 'd', 'D'),
+            new ChoiceView($obj1, 'a', 'A', ['attr1' => 'value1'], ['%placeholder1%' => 'value1']),
+            new ChoiceView($obj2, 'b', 'B', ['attr2' => 'value2'], ['%placeholder2%' => 'value2']),
+            new ChoiceView($obj3, 'c', 'C', ['attr3' => 'value3'], ['%placeholder3%' => 'value3']),
+            new ChoiceView($obj4, 'd', 'D', ['attr4' => 'value4'], ['%placeholder4%' => 'value4']),
         ], $view->vars['choices']);
     }
 
@@ -1942,7 +1956,12 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
-        $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        $this->assertInstanceOf(TransformationFailedException::class, $form->getTransformationFailure());
+        if (!$multiple && !$expanded) {
+            $this->assertEquals('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+        } else {
+            $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        }
     }
 
     public function invalidNestedValueTestMatrix()
@@ -2251,5 +2270,33 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->expectDeprecation('Since symfony/form 5.1: Not defining a third parameter "callable|null $filter" in "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromChoices()" is deprecated.');
 
         new ChoiceType(new DeprecatedChoiceListFactory());
+    }
+
+    public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
+    {
+        $choiceLoader = new CallbackChoiceLoader(function () {
+            return [1, 2, 3];
+        });
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('choice_one', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+            ])
+            ->add('choice_two', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+                'choice_value' => function ($choice) {
+                    return $choice ? (string) $choice * 10 : '';
+                },
+            ])
+            ->createView()
+        ;
+
+        $this->assertSame('1', $view['choice_one']->vars['choices'][0]->value);
+        $this->assertSame('2', $view['choice_one']->vars['choices'][1]->value);
+        $this->assertSame('3', $view['choice_one']->vars['choices'][2]->value);
+
+        $this->assertSame('10', $view['choice_two']->vars['choices'][0]->value);
+        $this->assertSame('20', $view['choice_two']->vars['choices'][1]->value);
+        $this->assertSame('30', $view['choice_two']->vars['choices'][2]->value);
     }
 }

@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
@@ -81,5 +83,51 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
                 ],
             ]);
         });
+    }
+
+    public function testRateLimiterWithLockFactory()
+    {
+        try {
+            $this->createContainerFromClosure(function (ContainerBuilder $container) {
+                $container->loadFromExtension('framework', [
+                    'lock' => false,
+                    'rate_limiter' => [
+                        'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
+                    ],
+                ]);
+            });
+
+            $this->fail('No LogicException thrown');
+        } catch (LogicException $e) {
+            $this->assertEquals('Rate limiter "with_lock" requires the Lock component to be installed and configured.', $e->getMessage());
+        }
+
+        $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'lock' => true,
+                'rate_limiter' => [
+                    'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
+                ],
+            ]);
+        });
+
+        $withLock = $container->getDefinition('limiter.with_lock');
+        $this->assertEquals('lock.factory', (string) $withLock->getArgument(2));
+    }
+
+    public function testRateLimiterLockFactory()
+    {
+        $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => null],
+                ],
+            ]);
+        });
+
+        $this->expectException(OutOfBoundsException::class);
+        $this->expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
+
+        $container->getDefinition('limiter.without_lock')->getArgument(2);
     }
 }

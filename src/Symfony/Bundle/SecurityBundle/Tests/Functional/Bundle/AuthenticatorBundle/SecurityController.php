@@ -23,6 +23,6 @@ class SecurityController extends AbstractController
 
     public function profileAction()
     {
-        return new Response('Welcome '.$this->getUser()->getUsername().'!');
+        return new Response('Welcome '.$this->getUser()->getUserIdentifier().'!');
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @final
  */
-class LdapUser implements UserInterface, EquatableInterface
+class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     private $entry;
     private $username;
@@ -75,6 +76,13 @@ class LdapUser implements UserInterface, EquatableInterface
      */
     public function getUsername(): string
     {
+        trigger_deprecation('symfony/ldap', '5.3', 'Method "%s()" is deprecated and will be removed in 6.0, use getUserIdentifier() instead.', __METHOD__);
+
+        return $this->username;
+    }
+
+    public function getUserIdentifier(): string
+    {
         return $this->username;
     }
 
@@ -113,7 +121,7 @@ class LdapUser implements UserInterface, EquatableInterface
             return false;
         }
 
-        if ($this->getUsername() !== $user->getUsername()) {
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
             return false;
         }
 

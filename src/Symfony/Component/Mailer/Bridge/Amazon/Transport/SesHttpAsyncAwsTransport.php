@@ -15,12 +15,12 @@ use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\Ses\Input\SendEmailRequest;
 use AsyncAws\Ses\SesClient;
 use AsyncAws\Ses\ValueObject\Destination;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Message;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -82,6 +82,10 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
         if (($message->getOriginalMessage() instanceof Message)
             && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
             $request['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
+        }
+        if (($message->getOriginalMessage() instanceof Message)
+            && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
+            $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
         }
 
         return new SendEmailRequest($request);

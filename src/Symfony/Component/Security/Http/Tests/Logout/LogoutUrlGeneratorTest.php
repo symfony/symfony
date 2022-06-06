@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 /**
@@ -57,12 +58,15 @@ class LogoutUrlGeneratorTest extends TestCase
 
     public function testGuessFromToken()
     {
-        $this->tokenStorage->setToken(new UsernamePasswordToken('user', 'password', 'secured_area'));
+        $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('user', 'password'), 'secured_area'));
         $this->generator->registerListener('secured_area', '/logout', null, null);
 
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGuessFromAnonymousTokenThrowsException()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -90,7 +94,7 @@ class LogoutUrlGeneratorTest extends TestCase
 
     public function testGuessFromTokenWithoutFirewallNameFallbacksToCurrentFirewall()
     {
-        $this->tokenStorage->setToken(new UsernamePasswordToken('username', 'password', 'provider'));
+        $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('username', 'password'), 'provider'));
         $this->generator->registerListener('secured_area', '/logout', null, null);
         $this->generator->setCurrentFirewall('secured_area');
 

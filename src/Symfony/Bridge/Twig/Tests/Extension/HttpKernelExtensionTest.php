@@ -14,11 +14,14 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
+use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
+use Symfony\Component\HttpKernel\Fragment\FragmentUriGenerator;
+use Symfony\Component\HttpKernel\UriSigner;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
@@ -51,6 +54,37 @@ class HttpKernelExtensionTest extends TestCase
         $this->expectExceptionMessage('The "inline" renderer does not exist.');
 
         $renderer->render('/foo');
+    }
+
+    public function testGenerateFragmentUri()
+    {
+        if (!class_exists(FragmentUriGenerator::class)) {
+            $this->markTestSkipped('HttpKernel 5.3+ is required');
+        }
+
+        $requestStack = new RequestStack();
+        $requestStack->push(Request::create('/'));
+
+        $fragmentHandler = new FragmentHandler($requestStack);
+        $fragmentUriGenerator = new FragmentUriGenerator('/_fragment', new UriSigner('s3cr3t'), $requestStack);
+
+        $kernelRuntime = new HttpKernelRuntime($fragmentHandler, $fragmentUriGenerator);
+
+        $loader = new ArrayLoader([
+            'index' => sprintf(<<<TWIG
+{{ fragment_uri(controller("%s::templateAction", {template: "foo.html.twig"})) }}
+TWIG
+            , TemplateController::class), ]);
+        $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
+        $twig->addExtension(new HttpKernelExtension());
+
+        $loader = $this->createMock(RuntimeLoaderInterface::class);
+        $loader->expects($this->any())->method('load')->willReturnMap([
+            [HttpKernelRuntime::class, $kernelRuntime],
+        ]);
+        $twig->addRuntimeLoader($loader);
+
+        $this->assertSame('/_fragment?_hash=PP8%2FeEbn1pr27I9wmag%2FM6jYGVwUZ0l2h0vhh2OJ6CI%3D&amp;_path=template%3Dfoo.html.twig%26_format%3Dhtml%26_locale%3Den%26_controller%3DSymfonyBundleFrameworkBundleControllerTemplateController%253A%253AtemplateAction', $twig->render('index'));
     }
 
     protected function getFragmentHandler($return)

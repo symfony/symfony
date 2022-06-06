@@ -14,6 +14,9 @@ namespace Symfony\Component\Security\Http\EntryPoint;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Firewall\ChannelListener;
+
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" directly (and optionally configure the HTTP(s) ports there).', RetryAuthenticationEntryPoint::class, ChannelListener::class);
 
 /**
  * RetryAuthenticationEntryPoint redirects URL based on the configured scheme.
@@ -21,6 +24,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * This entry point is not intended to work with HTTP post requests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.4
  */
 class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {

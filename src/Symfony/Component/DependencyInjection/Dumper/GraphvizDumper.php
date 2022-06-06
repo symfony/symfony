@@ -54,7 +54,7 @@ class GraphvizDumper extends Dumper
      *  * node.definition: The default options for services that are defined via service definition instances
      *  * node.missing: The default options for missing services
      *
-     * @return string The dot representation of the service container
+     * @return string
      */
     public function dump(array $options = [])
     {
@@ -130,23 +130,22 @@ class GraphvizDumper extends Dumper
                     $lazyEdge = $lazy || $this->container->getDefinition((string) $argument)->isLazy();
                 }
 
-                $edges[] = ['name' => $name, 'required' => $required, 'to' => $argument, 'lazy' => $lazyEdge];
+                $edges[] = [['name' => $name, 'required' => $required, 'to' => $argument, 'lazy' => $lazyEdge]];
             } elseif ($argument instanceof ArgumentInterface) {
-                $edges = array_merge($edges, $this->findEdges($id, $argument->getValues(), $required, $name, true));
+                $edges[] = $this->findEdges($id, $argument->getValues(), $required, $name, true);
             } elseif ($argument instanceof Definition) {
-                $edges = array_merge($edges,
-                    $this->findEdges($id, $argument->getArguments(), $required, ''),
-                    $this->findEdges($id, $argument->getProperties(), false, '')
-                );
+                $edges[] = $this->findEdges($id, $argument->getArguments(), $required, '');
+                $edges[] = $this->findEdges($id, $argument->getProperties(), false, '');
+
                 foreach ($argument->getMethodCalls() as $call) {
-                    $edges = array_merge($edges, $this->findEdges($id, $call[1], false, $call[0].'()'));
+                    $edges[] = $this->findEdges($id, $call[1], false, $call[0].'()');
                 }
             } elseif (\is_array($argument)) {
-                $edges = array_merge($edges, $this->findEdges($id, $argument, $required, $name, $lazy));
+                $edges[] = $this->findEdges($id, $argument, $required, $name, $lazy);
             }
         }
 
-        return $edges;
+        return array_merge([], ...$edges);
     }
 
     private function findNodes(): array

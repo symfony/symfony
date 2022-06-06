@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.5
+---
+
+ *  Add `SubscribedService` attribute, deprecate current `ServiceSubscriberTrait` usage
+
+2.4
+---
+
+ * Add `HttpClientInterface::withOptions()`
+ * Add `TranslatorInterface::getLocale()`
+
 2.3.0
 -----
 

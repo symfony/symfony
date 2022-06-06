@@ -23,6 +23,14 @@
             </framework:package>
             <framework:package name="json_manifest_strategy" json-manifest-path="/path/to/manifest.json" />
             <framework:package name="remote_manifest" json-manifest-path="https://cdn.example.com/manifest.json" />
+            <framework:package name="var_manifest" json-manifest-path="%var_json_manifest_path%" />
+            <framework:package name="env_manifest" json-manifest-path="%env(env_manifest)%" />
+            <framework:package name="strict_manifest_strategy" json-manifest-path="/path/to/manifest.json" strict-mode="true" />
         </framework:assets>
     </framework:config>
+
+    <parameters>
+        <parameter key="var_json_manifest_path">https://cdn.example.com/manifest.json</parameter>
+        <parameter key="env(env_manifest)">https://cdn.example.com/manifest.json</parameter>
+    </parameters>
 </container>

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class EsendexTransportFactoryTest extends TransportFactoryTestCase
@@ -40,6 +40,13 @@ final class EsendexTransportFactoryTest extends TransportFactoryTestCase
     }
 
     public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing credentials' => ['esendex://host?accountreference=ACCOUNTREFERENCE&from=FROM'];
+        yield 'missing email' => ['esendex://:password@host?accountreference=ACCOUNTREFERENCE&from=FROM'];
+        yield 'missing password' => ['esendex://email:@host?accountreference=ACCOUNTREFERENCE&from=FROM'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['esendex://email:password@host?accountreference=ACCOUNTREFERENCE'];
         yield 'missing option: accountreference' => ['esendex://email:password@host?from=FROM'];

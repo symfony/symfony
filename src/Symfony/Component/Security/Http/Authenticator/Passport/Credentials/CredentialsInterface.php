@@ -18,8 +18,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  * credential check of an authenticator.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.2
  */
 interface CredentialsInterface extends BadgeInterface
 {

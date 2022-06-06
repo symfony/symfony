@@ -123,7 +123,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
             $file = 'compress.zlib://'.$file;
         }
 
-        return $this->createProfileFromData($token, unserialize(file_get_contents($file)));
+        if (!$data = unserialize(file_get_contents($file))) {
+            return null;
+        }
+
+        return $this->createProfileFromData($token, $data);
     }
 
     /**
@@ -200,7 +204,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * Gets filename to store data, associated to the token.
      *
-     * @return string The profile filename
+     * @return string
      */
     protected function getFilename(string $token)
     {
@@ -214,7 +218,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * Gets the index filename.
      *
-     * @return string The index filename
+     * @return string
      */
     protected function getIndexFilename()
     {
@@ -228,7 +232,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @param resource $file The file resource, with the pointer placed at the end of the line to read
      *
-     * @return mixed A string representing the line or null if beginning of file is reached
+     * @return mixed
      */
     protected function readLineFromFile($file)
     {
@@ -295,7 +299,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $file = 'compress.zlib://'.$file;
             }
 
-            $profile->addChild($this->createProfileFromData($token, unserialize(file_get_contents($file)), $profile));
+            if (!$childData = unserialize(file_get_contents($file))) {
+                continue;
+            }
+
+            $profile->addChild($this->createProfileFromData($token, $childData, $profile));
         }
 
         return $profile;

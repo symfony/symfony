@@ -13,8 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
 /**
  * @author Karoly Gossler <connor@connor.hu>
- *
- * @experimental in 5.2
  */
 abstract class AbstractDiscordEmbedObject implements DiscordEmbedObjectInterface
 {

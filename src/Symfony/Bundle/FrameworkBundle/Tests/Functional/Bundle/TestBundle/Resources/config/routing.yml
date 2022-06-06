@@ -22,6 +22,10 @@ injected_flashbag_session_setflash:
     path:     injected_flashbag/session_setflash/{message}
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\InjectedFlashbagSessionController::setFlashAction}
 
+deprecated_session_setflash:
+    path:     /deprecated_session/trigger
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\DeprecatedSessionController::triggerAction}
+
 session_showflash:
     path:     /session_showflash
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::showFlashAction }
@@ -52,6 +56,10 @@ fragment_home:
 fragment_inlined:
     path:     /fragment_inlined
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController::inlinedAction }
+
+fragment_uri:
+    path:     /fragment_uri
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController::fragmentUriAction }
 
 array_controller:
     path:     /array_controller

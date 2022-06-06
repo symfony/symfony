@@ -152,7 +152,7 @@ class DnsMock
             $records = [];
 
             foreach (self::$hosts[$hostname] as $record) {
-                if (isset(self::$dnsTypes[$record['type']]) && (self::$dnsTypes[$record['type']] & $type)) {
+                if ((self::$dnsTypes[$record['type']] ?? 0) & $type) {
                     $records[] = array_merge(['host' => $hostname, 'class' => 'IN', 'ttl' => 1, 'type' => $record['type']], $record);
                 }
             }
@@ -163,7 +163,7 @@ class DnsMock
 
     public static function register($class)
     {
-        $self = \get_called_class();
+        $self = static::class;
 
         $mockedNs = [substr($class, 0, strrpos($class, '\\'))];
         if (0 < strpos($class, '\\Tests\\')) {

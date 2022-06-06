@@ -11,8 +11,8 @@ SLACK_DSN=slack://TOKEN@default?channel=CHANNEL
 ```
 
 where:
-- `TOKEN` is your Bot User OAuth Access Token (they begin with `xoxb-`)
-- `CHANNEL` is a channel, private group, or IM channel to send message to, it can be an encoded ID, or a name.
+ - `TOKEN` is your Bot User OAuth Access Token (they begin with `xoxb-`)
+ - `CHANNEL` is a channel, private group, or IM channel to send message to, it can be an encoded ID, or a name.
 
 valid DSN's are:
 ```

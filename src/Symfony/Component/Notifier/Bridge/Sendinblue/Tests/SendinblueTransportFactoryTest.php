@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
@@ -42,6 +42,10 @@ final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
     public function incompleteDsnProvider(): iterable
     {
         yield 'missing api_key' => ['sendinblue://default?sender=0611223344'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
+    {
         yield 'missing option: sender' => ['sendinblue://apiKey@host.test'];
     }
 

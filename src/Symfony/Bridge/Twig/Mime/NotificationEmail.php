@@ -44,7 +44,7 @@ class NotificationEmail extends TemplatedEmail
     {
         $missingPackages = [];
         if (!class_exists(CssInlinerExtension::class)) {
-            $missingPackages['twig/cssinliner-extra'] = ' CSS Inliner';
+            $missingPackages['twig/cssinliner-extra'] = 'CSS Inliner';
         }
 
         if (!class_exists(InkyExtension::class)) {
@@ -64,10 +64,20 @@ class NotificationEmail extends TemplatedEmail
     public static function asPublicEmail(Headers $headers = null, AbstractPart $body = null): self
     {
         $email = new static($headers, $body);
-        $email->context['importance'] = null;
-        $email->context['footer_text'] = null;
+        $email->markAsPublic();
 
         return $email;
+    }
+
+    /**
+     * @return $this
+     */
+    public function markAsPublic(): self
+    {
+        $this->context['importance'] = null;
+        $this->context['footer_text'] = null;
+
+        return $this;
     }
 
     /**

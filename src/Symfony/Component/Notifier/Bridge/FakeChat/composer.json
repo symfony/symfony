@@ -1,0 +1,37 @@
+{
+    "name": "symfony/fake-chat-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Fake Chat (as email or log during development) Notifier Bridge.",
+    "keywords": ["chat", "development", "email", "notifier", "symfony"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oskar Stark",
+            "homepage": "https://github.com/OskarStark"
+        },
+        {
+            "name": "Antoine Makdessi",
+            "email": "amakdessi@me.com",
+            "homepage": "http://antoine.makdessi.free.fr"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/http-client": "^4.4|^5.2|^6.0",
+        "symfony/notifier": "^5.3|^6.0",
+        "symfony/event-dispatcher-contracts": "^2|^3",
+        "symfony/mailer": "^5.2|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\FakeChat\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

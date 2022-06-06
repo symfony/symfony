@@ -56,6 +56,7 @@ class BazClass
 
 class BarUserClass
 {
+    public $foo;
     public $bar;
 
     public function __construct(BarClass $bar)
@@ -142,6 +143,8 @@ class FactoryChecker
 
 class FoobarCircular
 {
+    public $foo;
+
     public function __construct(FooCircular $foo)
     {
         $this->foo = $foo;
@@ -150,6 +153,8 @@ class FoobarCircular
 
 class FooCircular
 {
+    public $bar;
+
     public function __construct(BarCircular $bar)
     {
         $this->bar = $bar;
@@ -158,6 +163,8 @@ class FooCircular
 
 class BarCircular
 {
+    public $foobar;
+
     public function addFoobar(FoobarCircular $foobar)
     {
         $this->foobar = $foobar;

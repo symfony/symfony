@@ -29,12 +29,18 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         return \array_key_exists($offset, $this->array);
     }
 
+    /**
+     * @param mixed $offset
+     *
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->array[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (null === $offset) {
             $this->array[] = $value;
@@ -43,7 +49,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }
@@ -73,7 +79,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         $this->array = $data;
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->__unserialize((array) unserialize((string) $serialized));
     }

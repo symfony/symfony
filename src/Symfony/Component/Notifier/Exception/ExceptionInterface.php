@@ -15,8 +15,6 @@ namespace Symfony\Component\Notifier\Exception;
  * Exception interface for all exceptions thrown by the component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 interface ExceptionInterface extends \Throwable
 {

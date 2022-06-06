@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `AsMessageHandler` attribute for declaring message handlers on PHP 8.
+ * Add support for handling messages in batches with `BatchHandlerInterface` and corresponding trait
+ * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+ * Add support for resetting container services after each messenger message.
+ * Added `WorkerMetadata` class which allows you to access the configuration details of a worker, like `queueNames` and `transportNames` it consumes from.
+ * New method `getMetadata()` was added to `Worker` class which returns the `WorkerMetadata` object.
+ * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
+ * Add log when worker should stop.
+ * Add log when `SIGTERM` is received.
+
+5.3
+---
+
+ * Add the `RouterContextMiddleware` to restore the original router context when handling a message
+ * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
+ * Added `queues` option to `Worker` to only fetch messages from a specific queue from a receiver implementing `QueueReceiverInterface`.
+
 5.2.0
 -----
 

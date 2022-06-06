@@ -11,14 +11,17 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -64,7 +67,7 @@ class SendgridApiTransport extends AbstractApiTransport
 
                 throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).sprintf(' (code %d).', $statusCode), $response);
             } catch (DecodingExceptionInterface $e) {
-                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response, 0, $e);
             }
         }
 
@@ -111,7 +114,8 @@ class SendgridApiTransport extends AbstractApiTransport
             $payload['reply_to'] = $emails[0];
         }
 
-        $payload['personalizations'][] = $personalization;
+        $customArguments = [];
+        $categories = [];
 
         // these headers can't be overwritten according to Sendgrid docs
         // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
@@ -121,8 +125,27 @@ class SendgridApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['headers'][$name] = $header->getBodyAsString();
+            if ($header instanceof TagHeader) {
+                if (10 === \count($categories)) {
+                    throw new TransportException(sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
+                }
+                $categories[] = mb_substr($header->getValue(), 0, 255);
+            } elseif ($header instanceof MetadataHeader) {
+                $customArguments[$header->getKey()] = $header->getValue();
+            } else {
+                $payload['headers'][$header->getName()] = $header->getBodyAsString();
+            }
         }
+
+        if (\count($categories) > 0) {
+            $payload['categories'] = $categories;
+        }
+
+        if (\count($customArguments) > 0) {
+            $personalization['custom_args'] = $customArguments;
+        }
+
+        $payload['personalizations'][] = $personalization;
 
         return $payload;
     }

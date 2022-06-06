@@ -120,7 +120,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      *
      * @param string $pathinfo The path info to be parsed
      *
-     * @return array An array of parameters
+     * @return array
      *
      * @throws NoConfigurationException  If no routing configuration could be found
      * @throws ResourceNotFoundException If the resource could not be found
@@ -205,7 +205,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      * in matchers that do not have access to the matched Route instance
      * (like the PHP and Apache matcher dumpers).
      *
-     * @return array An array of parameters
+     * @return array
      */
     protected function getAttributes(Route $route, string $name, array $attributes)
     {
@@ -237,7 +237,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     /**
      * Get merged default parameters.
      *
-     * @return array Merged default parameters
+     * @return array
      */
     protected function mergeDefaults(array $params, array $defaults)
     {

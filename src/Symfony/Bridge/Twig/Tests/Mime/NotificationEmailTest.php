@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Tests\Mime;
 
 use PHPUnit\Framework\TestCase;
@@ -85,11 +94,34 @@ class NotificationEmailTest extends TestCase
             'a' => 'b',
             'footer_text' => null,
         ], $email->getContext());
+
+        $email = (new NotificationEmail())
+            ->markAsPublic()
+            ->markdown('Foo')
+            ->action('Bar', 'http://example.com/')
+            ->context(['a' => 'b'])
+        ;
+
+        $this->assertEquals([
+            'importance' => null,
+            'content' => 'Foo',
+            'exception' => false,
+            'action_text' => 'Bar',
+            'action_url' => 'http://example.com/',
+            'markdown' => true,
+            'raw' => false,
+            'a' => 'b',
+            'footer_text' => null,
+        ], $email->getContext());
     }
 
     public function testPublicMailSubject()
     {
         $email = NotificationEmail::asPublicEmail()->from('me@example.com')->subject('Foo');
+        $headers = $email->getPreparedHeaders();
+        $this->assertSame('Foo', $headers->get('Subject')->getValue());
+
+        $email = (new NotificationEmail())->markAsPublic()->from('me@example.com')->subject('Foo');
         $headers = $email->getPreparedHeaders();
         $this->assertSame('Foo', $headers->get('Subject')->getValue());
     }

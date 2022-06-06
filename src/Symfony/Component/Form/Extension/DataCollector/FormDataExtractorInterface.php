@@ -24,28 +24,28 @@ interface FormDataExtractorInterface
     /**
      * Extracts the configuration data of a form.
      *
-     * @return array Information about the form's configuration
+     * @return array
      */
     public function extractConfiguration(FormInterface $form);
 
     /**
      * Extracts the default data of a form.
      *
-     * @return array Information about the form's default data
+     * @return array
      */
     public function extractDefaultData(FormInterface $form);
 
     /**
      * Extracts the submitted data of a form.
      *
-     * @return array Information about the form's submitted data
+     * @return array
      */
     public function extractSubmittedData(FormInterface $form);
 
     /**
      * Extracts the view variables of a form.
      *
-     * @return array Information about the view's variables
+     * @return array
      */
     public function extractViewVariables(FormView $view);
 }

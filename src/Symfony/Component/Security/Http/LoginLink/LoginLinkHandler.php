@@ -12,9 +12,12 @@
 namespace Symfony\Component\Security\Http\LoginLink;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
+use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
+use Symfony\Component\Security\Core\Signature\SignatureHasher;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
@@ -22,101 +25,89 @@ use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkExceptio
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- * @experimental in 5.2
  */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {
     private $urlGenerator;
     private $userProvider;
-    private $propertyAccessor;
-    private $signatureProperties;
-    private $secret;
     private $options;
-    private $expiredStorage;
+    private $signatureHashUtil;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, array $options, ?ExpiredLoginLinkStorage $expiredStorage)
+    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHashUtil, array $options)
     {
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;
-        $this->propertyAccessor = $propertyAccessor;
-        $this->signatureProperties = $signatureProperties;
-        $this->secret = $secret;
+        $this->signatureHashUtil = $signatureHashUtil;
         $this->options = array_merge([
             'route_name' => null,
             'lifetime' => 600,
-            'max_uses' => null,
         ], $options);
-        $this->expiredStorage = $expiredStorage;
     }
 
-    public function createLoginLink(UserInterface $user): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
     {
-        $expiresAt = new \DateTimeImmutable(sprintf('+%d seconds', $this->options['lifetime']));
+        $expires = time() + $this->options['lifetime'];
+        $expiresAt = new \DateTimeImmutable('@'.$expires);
 
-        $expires = $expiresAt->format('U');
         $parameters = [
-            'user' => $user->getUsername(),
+            // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
+            'user' => method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),
             'expires' => $expires,
-            'hash' => $this->computeSignatureHash($user, $expires),
+            'hash' => $this->signatureHashUtil->computeSignatureHash($user, $expires),
         ];
 
-        $url = $this->urlGenerator->generate(
-            $this->options['route_name'],
-            $parameters,
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        if ($request) {
+            $currentRequestContext = $this->urlGenerator->getContext();
+            $this->urlGenerator->setContext(
+                (new RequestContext())
+                    ->fromRequest($request)
+                    ->setParameter('_locale', $request->getLocale())
+            );
+        }
+
+        try {
+            $url = $this->urlGenerator->generate(
+                $this->options['route_name'],
+                $parameters,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        } finally {
+            if ($request) {
+                $this->urlGenerator->setContext($currentRequestContext);
+            }
+        }
 
         return new LoginLinkDetails($url, $expiresAt);
     }
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $username = $request->get('user');
+        $userIdentifier = $request->get('user');
 
         try {
-            $user = $this->userProvider->loadUserByUsername($username);
-        } catch (UsernameNotFoundException $exception) {
+            // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+            if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
+                $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+            } else {
+                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+                $user = $this->userProvider->loadUserByUsername($userIdentifier);
+            }
+        } catch (UserNotFoundException $exception) {
             throw new InvalidLoginLinkException('User not found.', 0, $exception);
         }
 
         $hash = $request->get('hash');
         $expires = $request->get('expires');
-        if (false === hash_equals($hash, $this->computeSignatureHash($user, $expires))) {
-            throw new InvalidLoginLinkException('Invalid or expired signature.');
-        }
 
-        if ($expires < time()) {
-            throw new ExpiredLoginLinkException('Login link has expired.');
-        }
-
-        if ($this->expiredStorage && $this->options['max_uses']) {
-            $hash = $request->get('hash');
-            if ($this->expiredStorage->countUsages($hash) >= $this->options['max_uses']) {
-                throw new ExpiredLoginLinkException(sprintf('Login link can only be used "%d" times.', $this->options['max_uses']));
-            }
-
-            $this->expiredStorage->incrementUsages($hash);
+        try {
+            $this->signatureHashUtil->verifySignatureHash($user, $expires, $hash);
+        } catch (ExpiredSignatureException $e) {
+            throw new ExpiredLoginLinkException(ucfirst(str_ireplace('signature', 'login link', $e->getMessage())), 0, $e);
+        } catch (InvalidSignatureException $e) {
+            throw new InvalidLoginLinkException(ucfirst(str_ireplace('signature', 'login link', $e->getMessage())), 0, $e);
         }
 
         return $user;
-    }
-
-    private function computeSignatureHash(UserInterface $user, int $expires): string
-    {
-        $signatureFields = [base64_encode($user->getUsername()), $expires];
-
-        foreach ($this->signatureProperties as $property) {
-            $value = $this->propertyAccessor->getValue($user, $property) ?? '';
-            if ($value instanceof \DateTimeInterface) {
-                $value = $value->format('c');
-            }
-
-            if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-                throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, \get_class($user), get_debug_type($value)));
-            }
-            $signatureFields[] = base64_encode($value);
-        }
-
-        return base64_encode(hash_hmac('sha256', implode(':', $signatureFields), $this->secret));
     }
 }

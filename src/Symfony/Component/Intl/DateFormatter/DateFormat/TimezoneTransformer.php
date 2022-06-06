@@ -19,6 +19,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
  * @author Igor Wiedler <igor@wiedler.ch>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 class TimezoneTransformer extends Transformer
 {
@@ -95,7 +97,7 @@ class TimezoneTransformer extends Transformer
      * @see https://php.net/timezones.others
      *
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
-     * @throws \InvalidArgumentException When the value can not be matched with pattern
+     * @throws \InvalidArgumentException When the value cannot be matched with pattern
      */
     public static function getEtcTimeZoneId(string $formattedTimeZone): string
     {

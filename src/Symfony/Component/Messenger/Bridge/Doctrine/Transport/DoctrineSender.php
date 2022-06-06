@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -48,7 +47,7 @@ class DoctrineSender implements SenderInterface
 
         try {
             $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 

@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support of PHP backed enumerations
+ * Add support for serializing empty array as object
+ * Return empty collections as `ArrayObject` from `Serializer::normalize()` when `PRESERVE_EMPTY_OBJECTS` is set
+ * Add support for collecting type errors during denormalization
+ * Add missing arguments in `MissingConstructorArgumentsException`
+
+5.3
+---
+
+ * Add the ability to provide (de)normalization context using metadata (e.g. `@Symfony\Component\Serializer\Annotation\Context`)
+ * Deprecate `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
+ * Add normalization formats to `UidNormalizer`
+ * Add `CsvEncoder::END_OF_LINE` context option
+ * Deprecate creating instances of the annotation classes by passing an array of parameters, use named arguments instead
+
 5.2.0
 -----
 

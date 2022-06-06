@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\JsonException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
@@ -95,5 +105,15 @@ class MockResponseTest extends TestCase
             'responseHeaders' => [],
             'message' => 'JSON content was expected to decode to an array, "int" returned for "https://example.com/file.json".',
         ];
+    }
+
+    public function testErrorIsTakenIntoAccountInInitialization()
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('ccc error');
+
+        MockResponse::fromRequest('GET', 'https://symfony.com', [], new MockResponse('', [
+            'error' => 'ccc error',
+        ]))->getStatusCode();
     }
 }

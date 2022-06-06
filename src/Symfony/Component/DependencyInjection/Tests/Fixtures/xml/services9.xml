@@ -11,6 +11,7 @@
       <tag name="foo" foo="foo"/>
       <tag name="foo" bar="bar" baz="baz"/>
       <tag name="bar" baz="baz">foo</tag>
+      <tag name="nullable" bar="bar" baz=""/>
       <argument>foo</argument>
       <argument type="service" id="foo.baz"/>
       <argument type="collection">

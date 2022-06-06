@@ -22,7 +22,6 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.2
  */
 class UserProviderListener
 {
@@ -46,6 +45,13 @@ class UserProviderListener
             return;
         }
 
-        $badge->setUserLoader([$this->userProvider, 'loadUserByUsername']);
+        // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
+            $badge->setUserLoader([$this->userProvider, 'loadUserByIdentifier']);
+        } else {
+            trigger_deprecation('symfony/security-http', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+            $badge->setUserLoader([$this->userProvider, 'loadUserByUsername']);
+        }
     }
 }

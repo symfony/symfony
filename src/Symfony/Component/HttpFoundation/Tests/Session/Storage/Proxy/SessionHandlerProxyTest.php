@@ -103,17 +103,21 @@ class SessionHandlerProxyTest extends TestCase
     public function testWrite()
     {
         $this->mock->expects($this->once())
-            ->method('write');
+            ->method('write')
+            ->willReturn(true)
+        ;
 
-        $this->proxy->write('id', 'data');
+        $this->assertTrue($this->proxy->write('id', 'data'));
     }
 
     public function testDestroy()
     {
         $this->mock->expects($this->once())
-            ->method('destroy');
+            ->method('destroy')
+            ->willReturn(true)
+        ;
 
-        $this->proxy->destroy('id');
+        $this->assertTrue($this->proxy->destroy('id'));
     }
 
     public function testGc()
@@ -149,7 +153,9 @@ class SessionHandlerProxyTest extends TestCase
         $proxy->updateTimestamp('id', 'data');
 
         $this->mock->expects($this->once())
-            ->method('write');
+            ->method('write')
+            ->willReturn(true)
+        ;
 
         $this->proxy->updateTimestamp('id', 'data');
     }

@@ -16,8 +16,6 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
- *
- * @experimental in 5.2
  */
 class Recipient implements EmailRecipientInterface, SmsRecipientInterface
 {

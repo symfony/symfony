@@ -386,6 +386,14 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Ang halagang ito ay hindi wastong International Securities Identification Number (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Ang halagang ito ay dapat wastong ekspresyon.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Ang halagang ito ay hindi wastong kulay ng CSS.</target>
+            </trans-unit>
         </body>
     </file>
  </xliff>

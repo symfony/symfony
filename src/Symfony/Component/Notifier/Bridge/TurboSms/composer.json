@@ -1,0 +1,34 @@
+{
+    "name": "symfony/turbo-sms-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony TurboSms Notifier Bridge",
+    "keywords": ["sms", "TurboSms", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Artem Henvald",
+            "email": "genvaldartem@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "ext-json": "*",
+        "symfony/http-client": "^5.3|^6.0",
+        "symfony/notifier": "^5.3|^6.0",
+        "symfony/polyfill-mbstring": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\TurboSms\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

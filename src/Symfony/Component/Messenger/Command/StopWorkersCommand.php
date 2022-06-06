@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 class StopWorkersCommand extends Command
 {
     protected static $defaultName = 'messenger:stop-workers';
+    protected static $defaultDescription = 'Stop workers after their current message';
 
     private $restartSignalCachePool;
 
@@ -42,7 +43,7 @@ class StopWorkersCommand extends Command
     {
         $this
             ->setDefinition([])
-            ->setDescription('Stop workers after their current message')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 

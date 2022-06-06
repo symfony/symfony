@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `SentMessageEvent` and `FailedMessageEvent`
+ * Add `push` channel
+
+5.3
+---
+
+ * The component is not marked as `@experimental` anymore
+ * [BC BREAK] Change signature of `Dsn::__construct()` method from:
+   `public function __construct(string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [], ?string $path = null)`
+   to:
+   `public function __construct(string $dsn)`
+ * [BC BREAK] Remove `Dsn::fromString()` method
+ * [BC BREAK] Changed the return type of `AbstractTransportFactory::getEndpoint()` from `?string` to `string`
+ * Added `DSN::getRequiredOption` method which throws a new `MissingRequiredOptionException`.
+
 5.2.0
 -----
 

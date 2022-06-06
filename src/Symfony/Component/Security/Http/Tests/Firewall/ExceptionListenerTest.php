@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -170,6 +171,18 @@ class ExceptionListenerTest extends TestCase
         $this->assertEquals(403, $event->getThrowable()->getStatusCode());
     }
 
+    public function testUnregister()
+    {
+        $listener = $this->createExceptionListener();
+        $dispatcher = new EventDispatcher();
+
+        $listener->register($dispatcher);
+        $this->assertNotEmpty($dispatcher->getListeners());
+
+        $listener->unregister($dispatcher);
+        $this->assertEmpty($dispatcher->getListeners());
+    }
+
     public function getAccessDeniedExceptionProvider()
     {
         return [
@@ -203,7 +216,7 @@ class ExceptionListenerTest extends TestCase
             $kernel = $this->createMock(HttpKernelInterface::class);
         }
 
-        return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
+        return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }
 
     private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)

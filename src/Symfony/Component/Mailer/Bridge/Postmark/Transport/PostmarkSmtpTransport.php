@@ -11,21 +11,24 @@
 
 namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Kevin Verschaeve
  */
 class PostmarkSmtpTransport extends EsmtpTransport
 {
+    private $messageStream;
+
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('smtp.postmarkapp.com', 587, false, $dispatcher, $logger);
@@ -51,6 +54,10 @@ class PostmarkSmtpTransport extends EsmtpTransport
 
         foreach ($headers->all() as $name => $header) {
             if ($header instanceof TagHeader) {
+                if ($headers->has('X-PM-Tag')) {
+                    throw new TransportException('Postmark only allows a single tag per email.');
+                }
+
                 $headers->addTextHeader('X-PM-Tag', $header->getValue());
                 $headers->remove($name);
             }
@@ -60,5 +67,19 @@ class PostmarkSmtpTransport extends EsmtpTransport
                 $headers->remove($name);
             }
         }
+
+        if (null !== $this->messageStream && !$message->getHeaders()->has('X-PM-Message-Stream')) {
+            $headers->addTextHeader('X-PM-Message-Stream', $this->messageStream);
+        }
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMessageStream(string $messageStream): self
+    {
+        $this->messageStream = $messageStream;
+
+        return $this;
     }
 }

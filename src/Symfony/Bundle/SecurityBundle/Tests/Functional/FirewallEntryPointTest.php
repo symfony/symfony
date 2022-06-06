@@ -15,9 +15,25 @@ use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBund
 
 class FirewallEntryPointTest extends AbstractWebTestCase
 {
+    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
+    {
+        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml']);
+
+        $client->request('GET', '/secure/resource');
+
+        $this->assertEquals(
+            EntryPointStub::RESPONSE_TEXT,
+            $client->getResponse()->getContent(),
+            "Custom entry point wasn't started"
+        );
+    }
+
+    /**
+     * @group legacy
+     */
     public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()
     {
-        $client = $this->createClient(['test_case' => 'FirewallEntryPoint']);
+        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'legacy_config.yml']);
 
         $client->request('GET', '/secure/resource', [], [], [
             'PHP_AUTH_USER' => 'unknown',
@@ -32,11 +48,11 @@ class FirewallEntryPointTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider provideSecuritySystems
+     * @group legacy
      */
-    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials(array $options)
+    public function testLegacyItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
     {
-        $client = $this->createClient($options + ['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml']);
+        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'legacy_config_form_login.yml']);
 
         $client->request('GET', '/secure/resource');
 

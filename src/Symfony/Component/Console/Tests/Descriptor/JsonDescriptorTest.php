@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\Descriptor;
 
 use Symfony\Component\Console\Descriptor\JsonDescriptor;
-use Symfony\Component\Console\Output\BufferedOutput;
 
 class JsonDescriptorTest extends AbstractDescriptorTest
 {
@@ -26,10 +25,21 @@ class JsonDescriptorTest extends AbstractDescriptorTest
         return 'json';
     }
 
-    protected function assertDescription($expectedDescription, $describedObject, array $options = [])
+    protected function normalizeOutput($output)
     {
-        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $this->getDescriptor()->describe($output, $describedObject, $options + ['raw_output' => true]);
-        $this->assertEquals(json_decode(trim($expectedDescription), true), json_decode(trim(str_replace(\PHP_EOL, "\n", $output->fetch())), true));
+        return array_map([$this, 'normalizeOutputRecursively'], json_decode($output, true));
+    }
+
+    private function normalizeOutputRecursively($output)
+    {
+        if (\is_array($output)) {
+            return array_map([$this, 'normalizeOutputRecursively'], $output);
+        }
+
+        if (null === $output) {
+            return null;
+        }
+
+        return parent::normalizeOutput($output);
     }
 }

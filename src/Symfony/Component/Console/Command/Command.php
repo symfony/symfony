@@ -12,6 +12,9 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -32,11 +35,17 @@ class Command
     // see https://tldp.org/LDP/abs/html/exitcodes.html
     public const SUCCESS = 0;
     public const FAILURE = 1;
+    public const INVALID = 2;
 
     /**
      * @var string|null The default command name
      */
     protected static $defaultName;
+
+    /**
+     * @var string|null The default command description
+     */
+    protected static $defaultDescription;
 
     private $application;
     private $name;
@@ -54,14 +63,32 @@ class Command
     private $helperSet;
 
     /**
-     * @return string|null The default command name or null when no default name is set
+     * @return string|null
      */
     public static function getDefaultName()
     {
         $class = static::class;
+
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
+            return $attribute[0]->newInstance()->name;
+        }
+
         $r = new \ReflectionProperty($class, 'defaultName');
 
         return $class === $r->class ? static::$defaultName : null;
+    }
+
+    public static function getDefaultDescription(): ?string
+    {
+        $class = static::class;
+
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
+            return $attribute[0]->newInstance()->description;
+        }
+
+        $r = new \ReflectionProperty($class, 'defaultDescription');
+
+        return $class === $r->class ? static::$defaultDescription : null;
     }
 
     /**
@@ -73,8 +100,23 @@ class Command
     {
         $this->definition = new InputDefinition();
 
-        if (null !== $name || null !== $name = static::getDefaultName()) {
+        if (null === $name && null !== $name = static::getDefaultName()) {
+            $aliases = explode('|', $name);
+
+            if ('' === $name = array_shift($aliases)) {
+                $this->setHidden(true);
+                $name = array_shift($aliases);
+            }
+
+            $this->setAliases($aliases);
+        }
+
+        if (null !== $name) {
             $this->setName($name);
+        }
+
+        if ('' === $this->description) {
+            $this->setDescription(static::getDefaultDescription() ?? '');
         }
 
         $this->configure();
@@ -110,7 +152,7 @@ class Command
     /**
      * Gets the helper set.
      *
-     * @return HelperSet|null A HelperSet instance
+     * @return HelperSet|null
      */
     public function getHelperSet()
     {
@@ -120,7 +162,7 @@ class Command
     /**
      * Gets the application instance for this command.
      *
-     * @return Application|null An Application instance
+     * @return Application|null
      */
     public function getApplication()
     {
@@ -130,7 +172,7 @@ class Command
     /**
      * Checks whether the command is enabled or not in the current environment.
      *
-     * Override this to check for x or y and return false if the command can not
+     * Override this to check for x or y and return false if the command cannot
      * run properly under the current conditions.
      *
      * @return bool
@@ -264,6 +306,13 @@ class Command
     }
 
     /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+    }
+
+    /**
      * Sets the code to execute when running this command.
      *
      * If this method is used, it overrides the code defined
@@ -304,6 +353,8 @@ class Command
      * This method is not part of public API and should not be used directly.
      *
      * @param bool $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
+     *
+     * @internal
      */
     public function mergeApplicationDefinition(bool $mergeArgs = true)
     {
@@ -346,7 +397,7 @@ class Command
     /**
      * Gets the InputDefinition attached to this Command.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     public function getDefinition()
     {
@@ -361,7 +412,7 @@ class Command
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     public function getNativeDefinition()
     {
@@ -497,7 +548,7 @@ class Command
     /**
      * Returns the description for the command.
      *
-     * @return string The description for the command
+     * @return string
      */
     public function getDescription()
     {
@@ -519,7 +570,7 @@ class Command
     /**
      * Returns the help for the command.
      *
-     * @return string The help for the command
+     * @return string
      */
     public function getHelp()
     {
@@ -530,7 +581,7 @@ class Command
      * Returns the processed help for the command replacing the %command.name% and
      * %command.full_name% patterns with the real values dynamically.
      *
-     * @return string The processed help for the command
+     * @return string
      */
     public function getProcessedHelp()
     {
@@ -560,11 +611,14 @@ class Command
      */
     public function setAliases(iterable $aliases)
     {
+        $list = [];
+
         foreach ($aliases as $alias) {
             $this->validateName($alias);
+            $list[] = $alias;
         }
 
-        $this->aliases = $aliases;
+        $this->aliases = \is_array($aliases) ? $aliases : $list;
 
         return $this;
     }
@@ -572,7 +626,7 @@ class Command
     /**
      * Returns the aliases for the command.
      *
-     * @return array An array of aliases for the command
+     * @return array
      */
     public function getAliases()
     {
@@ -584,7 +638,7 @@ class Command
      *
      * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
      *
-     * @return string The synopsis
+     * @return string
      */
     public function getSynopsis(bool $short = false)
     {
@@ -626,7 +680,7 @@ class Command
     /**
      * Gets a helper instance by name.
      *
-     * @return mixed The helper value
+     * @return mixed
      *
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined

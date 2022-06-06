@@ -17,6 +17,8 @@ namespace Symfony\Component\Filesystem\Tests\Fixtures\MockStream;
  */
 class MockStream
 {
+    public $context;
+
     /**
      * Opens file or URL.
      *
@@ -34,8 +36,6 @@ class MockStream
     /**
      * @param string $path  The file path or URL to stat
      * @param int    $flags Holds additional flags set by the streams API
-     *
-     * @return array File stats
      */
     public function url_stat(string $path, int $flags): array
     {

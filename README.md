@@ -2,10 +2,9 @@
     <img src="https://symfony.com/logos/symfony_black_02.svg">
 </a></p>
 
-[Symfony][1] is a **PHP framework** for web and console applications and a set of reusable
-**PHP components**. Symfony is used by thousands of web applications (including
-BlaBlaCar.com and Spotify.com) and most of the [popular PHP projects][2] (including
-Drupal and Magento).
+[Symfony][1] is a **PHP framework** for web and console applications and a set
+of reusable **PHP components**. Symfony is used by thousands of web
+applications and most of the [popular PHP projects][2].
 
 Installation
 ------------
@@ -14,6 +13,17 @@ Installation
 * Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
   Support" (LTS) versions and has a [release process][6] that is predictable and
   business-friendly.
+
+Sponsor
+-------
+
+Symfony 5.4 is [backed][27] by [Private Packagist][28].
+
+Private Packagist is a fast, reliable, and secure Composer repository for your
+private packages. It mirrors all your open-source dependencies for better
+availability and monitors them for security vulnerabilities.
+
+Help Symfony by [sponsoring][29] its development!
 
 Documentation
 -------------
@@ -47,8 +57,8 @@ If you discover a security vulnerability within Symfony, please follow our
 About Us
 --------
 
-Symfony development is sponsored by [SensioLabs][21], led by the
-[Symfony Core Team][22] and supported by [Symfony contributors][19].
+Symfony development is led by the [Symfony Core Team][22]
+and supported by [Symfony contributors][19].
 
 [1]: https://symfony.com
 [2]: https://symfony.com/projects
@@ -70,9 +80,11 @@ Symfony development is sponsored by [SensioLabs][21], led by the
 [18]: https://symfony.com/doc/current/contributing/documentation/index.html
 [19]: https://symfony.com/contributors
 [20]: https://symfony.com/security
-[21]: https://sensiolabs.com
 [22]: https://symfony.com/doc/current/contributing/code/core_team.html
 [23]: https://github.com/symfony/symfony-demo
 [24]: https://symfony.com/coc
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
+[27]: https://symfony.com/backers
+[28]: https://packagist.com/
+[29]: https://symfony.com/sponsor

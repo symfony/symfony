@@ -18,11 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
 
+/**
+ * @group legacy
+ */
 class TokenBasedRememberMeServicesTest extends TestCase
 {
     public function testAutoLoginReturnsNullWhenNoCookie()
@@ -61,7 +64,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
 
-        $user = new User('foouser', 'foopass');
+        $user = new InMemoryUser('foouser', 'foopass');
         $userProvider->createUser($user);
 
         $this->assertNull($service->autoLogin($request));
@@ -75,7 +78,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() - 1, 'foopass'));
 
-        $user = new User('foouser', 'foopass');
+        $user = new InMemoryUser('foouser', 'foopass');
         $userProvider->createUser($user);
 
         $this->assertNull($service->autoLogin($request));
@@ -90,12 +93,12 @@ class TokenBasedRememberMeServicesTest extends TestCase
     public function testAutoLogin($username)
     {
         $userProvider = $this->getProvider();
-        $user = new User($username, 'foopass', ['ROLE_FOO']);
+        $user = new InMemoryUser($username, 'foopass', ['ROLE_FOO']);
         $userProvider->createUser($user);
 
         $service = $this->getService($userProvider, ['name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600]);
         $request = new Request();
-        $request->cookies->set('foo', $this->getCookie(User::class, $username, time() + 3600, 'foopass'));
+        $request->cookies->set('foo', $this->getCookie(InMemoryUser::class, $username, time() + 3600, 'foopass'));
 
         $returnedToken = $service->autoLogin($request);
 
@@ -169,7 +172,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $response = new Response();
 
-        $user = new User('foouser', 'foopass');
+        $user = new InMemoryUser('foouser', 'foopass');
         $token = $this->createMock(TokenInterface::class);
         $token
             ->expects($this->atLeastOnce())

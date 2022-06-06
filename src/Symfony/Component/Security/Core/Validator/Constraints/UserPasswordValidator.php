@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Validator\Constraints;
 
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -22,12 +26,19 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class UserPasswordValidator extends ConstraintValidator
 {
     private $tokenStorage;
-    private $encoderFactory;
+    private $hasherFactory;
 
-    public function __construct(TokenStorageInterface $tokenStorage, EncoderFactoryInterface $encoderFactory)
+    /**
+     * @param PasswordHasherFactoryInterface $hasherFactory
+     */
+    public function __construct(TokenStorageInterface $tokenStorage, $hasherFactory)
     {
+        if ($hasherFactory instanceof EncoderFactoryInterface) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', EncoderFactoryInterface::class, __CLASS__, PasswordHasherFactoryInterface::class);
+        }
+
         $this->tokenStorage = $tokenStorage;
-        $this->encoderFactory = $encoderFactory;
+        $this->hasherFactory = $hasherFactory;
     }
 
     /**
@@ -55,9 +66,18 @@ class UserPasswordValidator extends ConstraintValidator
             throw new ConstraintDefinitionException('The User object must implement the UserInterface interface.');
         }
 
-        $encoder = $this->encoderFactory->getEncoder($user);
+        if (!$user instanceof PasswordAuthenticatedUserInterface) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Using the "%s" validation constraint without implementing the "%s" interface is deprecated, the "%s" class should implement it.', UserPassword::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user));
+        }
 
-        if (null === $user->getPassword() || !$encoder->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
+        $salt = $user->getSalt();
+        if ($salt && !$user instanceof LegacyPasswordAuthenticatedUserInterface) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
+        }
+
+        $hasher = $this->hasherFactory instanceof EncoderFactoryInterface ? $this->hasherFactory->getEncoder($user) : $this->hasherFactory->getPasswordHasher($user);
+
+        if (null === $user->getPassword() || !($hasher instanceof PasswordEncoderInterface ? $hasher->isPasswordValid($user->getPassword(), $password, $user->getSalt()) : $hasher->verify($user->getPassword(), $password, $user->getSalt()))) {
             $this->context->addViolation($constraint->message);
         }
     }

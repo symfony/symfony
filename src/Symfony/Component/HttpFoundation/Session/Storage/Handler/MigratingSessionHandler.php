@@ -22,7 +22,14 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
+    /**
+     * @var \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface
+     */
     private $currentHandler;
+
+    /**
+     * @var \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface
+     */
     private $writeOnlyHandler;
 
     public function __construct(\SessionHandlerInterface $currentHandler, \SessionHandlerInterface $writeOnlyHandler)

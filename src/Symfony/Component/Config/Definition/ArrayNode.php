@@ -141,6 +141,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
+     * Returns true when extra keys should be ignored without an exception.
+     */
+    public function shouldIgnoreExtraKeys(): bool
+    {
+        return $this->ignoreExtraKeys;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setName(string $name)
@@ -323,7 +331,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Remaps multiple singular values to a single plural value.
      *
-     * @return array The remapped values
+     * @return array
      */
     protected function remapXml(array $value)
     {

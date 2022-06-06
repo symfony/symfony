@@ -7,7 +7,7 @@
 
     <framework:config>
         <framework:serializer enabled="true" />
-        <framework:messenger>
+        <framework:messenger reset-on-message="true">
             <framework:serializer default-serializer="messenger.transport.symfony_serializer" />
             <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage">
                 <framework:sender service="amqp" />

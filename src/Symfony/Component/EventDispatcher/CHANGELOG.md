@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Allow `#[AsEventListener]` attribute on methods
+
+5.3
+---
+
+ * Add `#[AsEventListener]` attribute for declaring listeners on PHP 8
+
 5.1.0
 -----
 

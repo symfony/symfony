@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
@@ -66,9 +67,17 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('validator.expression', ExpressionValidator::class)
+            ->args([service('validator.expression_language')->nullOnInvalid()])
             ->tag('validator.constraint_validator', [
                 'alias' => 'validator.expression',
             ])
+
+        ->set('validator.expression_language', ExpressionLanguage::class)
+            ->args([service('cache.validator_expression_language')->nullOnInvalid()])
+
+        ->set('cache.validator_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
 
         ->set('validator.email', EmailValidator::class)
             ->args([

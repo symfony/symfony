@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures\Attribute;
 use Symfony\Component\HttpKernel\Attribute\ArgumentInterface;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-class Foo implements ArgumentInterface
+class Foo
 {
     private $foo;
 

@@ -15,13 +15,17 @@ use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
 {
@@ -83,6 +87,7 @@ class ConfigurationTest extends TestCase
             'base_urls' => [],
             'packages' => [],
             'json_manifest_path' => null,
+            'strict_mode' => false,
         ];
 
         $this->assertEquals($defaultConfig, $config['assets']);
@@ -366,6 +371,9 @@ class ConfigurationTest extends TestCase
             'http_method_override' => true,
             'ide' => null,
             'default_locale' => 'en',
+            'enabled_locales' => [],
+            'set_locale_from_accept_language' => false,
+            'set_content_language_from_locale' => false,
             'secret' => 's3cr3t',
             'trusted_hosts' => [],
             'trusted_headers' => [
@@ -395,8 +403,10 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'only_exceptions' => false,
                 'only_master_requests' => false,
+                'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
+                'collect_parameter' => null,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -415,6 +425,7 @@ class ConfigurationTest extends TestCase
                     'parse_html' => false,
                     'localizable_html_attributes' => [],
                 ],
+                'providers' => [],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -437,11 +448,13 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'serializer' => [
+                'default_context' => [],
                 'enabled' => !class_exists(FullStack::class),
                 'enable_annotations' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
             ],
             'property_access' => [
+                'enabled' => true,
                 'magic_call' => false,
                 'magic_get' => true,
                 'magic_set' => true,
@@ -462,6 +475,7 @@ class ConfigurationTest extends TestCase
             'session' => [
                 'enabled' => false,
                 'storage_id' => 'session.storage.native',
+                'storage_factory_id' => null,
                 'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
                 'cookie_samesite' => null,
@@ -482,15 +496,17 @@ class ConfigurationTest extends TestCase
                 'base_urls' => [],
                 'packages' => [],
                 'json_manifest_path' => null,
+                'strict_mode' => false,
             ],
             'cache' => [
                 'pools' => [],
                 'app' => 'cache.adapter.filesystem',
                 'system' => 'cache.adapter.system',
-                'directory' => '%kernel.cache_dir%/pools',
+                'directory' => '%kernel.cache_dir%/pools/app',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
-                'default_pdo_provider' => class_exists(Connection::class) ? 'database_connection' : null,
+                'default_doctrine_dbal_provider' => 'database_connection',
+                'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null,
                 'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
             'workflows' => [
@@ -526,6 +542,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'reset_on_message' => null,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
@@ -560,9 +577,16 @@ class ConfigurationTest extends TestCase
                 'private_headers' => [],
             ],
             'rate_limiter' => [
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
                 'limiters' => [],
             ],
+            'uid' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
+                'default_uuid_version' => 6,
+                'name_based_uuid_version' => 5,
+                'time_based_uuid_version' => 6,
+            ],
+            'exceptions' => [],
         ];
     }
 }

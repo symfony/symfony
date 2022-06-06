@@ -68,7 +68,7 @@ class CachePoolsTest extends AbstractWebTestCase
     private function doTestCachePools($options, $adapterClass)
     {
         static::bootKernel($options);
-        $container = static::$container;
+        $container = static::getContainer();
 
         $pool1 = $container->get('cache.pool1');
         $this->assertInstanceOf($adapterClass, $pool1);
@@ -121,7 +121,7 @@ class CachePoolsTest extends AbstractWebTestCase
     private function skipIfRedisUnavailable()
     {
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }

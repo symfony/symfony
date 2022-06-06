@@ -87,14 +87,14 @@ abstract class FileDumper implements DumperInterface
     /**
      * Transforms a domain of a message catalogue to its string representation.
      *
-     * @return string representation
+     * @return string
      */
     abstract public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = []);
 
     /**
      * Gets the file extension of the dumper.
      *
-     * @return string file extension
+     * @return string
      */
     abstract protected function getExtension();
 

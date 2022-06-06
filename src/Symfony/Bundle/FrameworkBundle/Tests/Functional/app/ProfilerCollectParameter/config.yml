@@ -1,0 +1,8 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    profiler:
+        enabled: true
+        collect: false
+        collect_parameter: profile

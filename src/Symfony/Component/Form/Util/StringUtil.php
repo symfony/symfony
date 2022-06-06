@@ -31,7 +31,7 @@ class StringUtil
      */
     public static function trim(string $string)
     {
-        if (null !== $result = @preg_replace('/^[\pZ\pC]+|[\pZ\pC]+$/u', '', $string)) {
+        if (null !== $result = @preg_replace('/^[\pZ\p{Cc}\p{Cf}]+|[\pZ\p{Cc}\p{Cf}]+$/u', '', $string)) {
             return $result;
         }
 
@@ -43,7 +43,7 @@ class StringUtil
      *
      * @param string $fqcn The fully-qualified class name
      *
-     * @return string|null The block prefix or null if not a valid FQCN
+     * @return string|null
      */
     public static function fqcnToBlockPrefix(string $fqcn)
     {

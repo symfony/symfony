@@ -27,7 +27,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(TokenGeneratorInterface::class, 'security.csrf.token_generator')
 
         ->set('security.csrf.token_storage', SessionTokenStorage::class)
-            ->args([service('session')])
+            ->args([service('request_stack')])
 
         ->alias(TokenStorageInterface::class, 'security.csrf.token_storage')
 

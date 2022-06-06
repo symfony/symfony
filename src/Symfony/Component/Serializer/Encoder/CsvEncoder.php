@@ -31,15 +31,18 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
     public const AS_COLLECTION_KEY = 'as_collection';
     public const NO_HEADERS_KEY = 'no_headers';
+    public const END_OF_LINE = 'csv_end_of_line';
     public const OUTPUT_UTF8_BOM_KEY = 'output_utf8_bom';
 
     private const UTF8_BOM = "\xEF\xBB\xBF";
 
-    private $formulasStartCharacters = ['=', '-', '+', '@'];
+    private const FORMULAS_START_CHARACTERS = ['=', '-', '+', '@', "\t", "\r"];
+
     private $defaultContext = [
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
         self::ESCAPE_CHAR_KEY => '',
+        self::END_OF_LINE => "\n",
         self::ESCAPE_FORMULAS_KEY => false,
         self::HEADERS_KEY => [],
         self::KEY_SEPARATOR_KEY => '.',
@@ -91,14 +94,21 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         unset($value);
 
         $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
+        $endOfLine = $context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE];
 
         if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
             fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
+            if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
+                fwrite($handle, $endOfLine);
+            }
         }
 
         $headers = array_fill_keys($headers, '');
         foreach ($data as $row) {
             fputcsv($handle, array_replace($headers, $row), $delimiter, $enclosure, $escapeChar);
+            if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
+                fwrite($handle, $endOfLine);
+            }
         }
 
         rewind($handle);
@@ -219,8 +229,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             if (is_iterable($value)) {
                 $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator, $escapeFormulas);
             } else {
-                if ($escapeFormulas && \in_array(substr((string) $value, 0, 1), $this->formulasStartCharacters, true)) {
-                    $result[$parentKey.$key] = "\t".$value;
+                if ($escapeFormulas && \in_array(substr((string) $value, 0, 1), self::FORMULAS_START_CHARACTERS, true)) {
+                    $result[$parentKey.$key] = "'".$value;
                 } else {
                     // Ensures an actual value is used when dealing with true and false
                     $result[$parentKey.$key] = false === $value ? 0 : (true === $value ? 1 : $value);

@@ -31,6 +31,10 @@ class DecoratorServicePass extends AbstractRecursivePass
 
     public function __construct(?string $innerId = '.inner')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/dependency-injection', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->innerId = $innerId;
     }
 
@@ -46,6 +50,10 @@ class DecoratorServicePass extends AbstractRecursivePass
             $definitions->insert([$id, $definition], [$decorated[2], --$order]);
         }
         $decoratingDefinitions = [];
+
+        $tagsToKeep = $container->hasParameter('container.behavior_describing_tags')
+            ? $container->getParameter('container.behavior_describing_tags')
+            : ['container.do_not_inline', 'container.service_locator', 'container.service_subscriber'];
 
         foreach ($definitions as [$id, $definition]) {
             $decoratedService = $definition->getDecoratedService();
@@ -69,13 +77,11 @@ class DecoratorServicePass extends AbstractRecursivePass
             if ($container->hasAlias($inner)) {
                 $alias = $container->getAlias($inner);
                 $public = $alias->isPublic();
-                $private = $alias->isPrivate();
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
                 $decoratedDefinition = $container->findDefinition($alias);
             } elseif ($container->hasDefinition($inner)) {
                 $decoratedDefinition = $container->getDefinition($inner);
                 $public = $decoratedDefinition->isPublic();
-                $private = $decoratedDefinition->isPrivate();
                 $decoratedDefinition->setPublic(false);
                 $container->setDefinition($renamedId, $decoratedDefinition);
                 $decoratingDefinitions[$inner] = $decoratedDefinition;
@@ -84,7 +90,6 @@ class DecoratorServicePass extends AbstractRecursivePass
                 continue;
             } elseif (ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {
                 $public = $definition->isPublic();
-                $private = $definition->isPrivate();
                 $decoratedDefinition = null;
             } else {
                 throw new ServiceNotFoundException($inner, $id);
@@ -100,8 +105,8 @@ class DecoratorServicePass extends AbstractRecursivePass
                 $decoratingTags = $decoratingDefinition->getTags();
                 $resetTags = [];
 
-                // container.service_locator and container.service_subscriber have special logic and they must not be transferred out to decorators
-                foreach (['container.service_locator', 'container.service_subscriber'] as $containerTag) {
+                // Behavior-describing tags must not be transferred out to decorators
+                foreach ($tagsToKeep as $containerTag) {
                     if (isset($decoratingTags[$containerTag])) {
                         $resetTags[$containerTag] = $decoratingTags[$containerTag];
                         unset($decoratingTags[$containerTag]);

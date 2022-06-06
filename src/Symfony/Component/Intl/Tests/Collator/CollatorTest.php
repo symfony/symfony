@@ -16,6 +16,9 @@ use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
+/**
+ * @group legacy
+ */
 class CollatorTest extends AbstractCollatorTest
 {
     public function testConstructorWithUnsupportedLocale()

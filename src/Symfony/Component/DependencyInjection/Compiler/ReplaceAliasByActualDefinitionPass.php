@@ -25,6 +25,19 @@ use Symfony\Component\DependencyInjection\Reference;
 class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
 {
     private $replacements;
+    private $autoAliasServicePass;
+
+    /**
+     * @internal to be removed in Symfony 6.0
+     *
+     * @return $this
+     */
+    public function setAutoAliasServicePass(AutoAliasServicePass $autoAliasServicePass): self
+    {
+        $this->autoAliasServicePass = $autoAliasServicePass;
+
+        return $this;
+    }
 
     /**
      * Process the Container to replace aliases with service definitions.
@@ -36,15 +49,25 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
         // First collect all alias targets that need to be replaced
         $seenAliasTargets = [];
         $replacements = [];
+
+        $privateAliases = $this->autoAliasServicePass ? $this->autoAliasServicePass->getPrivateAliases() : [];
+        foreach ($privateAliases as $target) {
+            $target->setDeprecated('symfony/dependency-injection', '5.4', 'Accessing the "%alias_id%" service directly from the container is deprecated, use dependency injection instead.');
+        }
+
         foreach ($container->getAliases() as $definitionId => $target) {
             $targetId = (string) $target;
             // Special case: leave this target alone
             if ('service_container' === $targetId) {
                 continue;
             }
-            // Check if target needs to be replaces
+            // Check if target needs to be replaced
             if (isset($replacements[$targetId])) {
                 $container->setAlias($definitionId, $replacements[$targetId])->setPublic($target->isPublic());
+
+                if ($target->isDeprecated()) {
+                    $container->getAlias($definitionId)->setDeprecated(...array_values($target->getDeprecation('%alias_id%')));
+                }
             }
             // No need to process the same target twice
             if (isset($seenAliasTargets[$targetId])) {
@@ -69,6 +92,10 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
             $container->setDefinition($definitionId, $definition);
             $container->removeDefinition($targetId);
             $replacements[$targetId] = $definitionId;
+
+            if ($target->isPublic() && $target->isDeprecated()) {
+                $definition->addTag('container.private', $target->getDeprecation('%service_id%'));
+            }
         }
         $this->replacements = $replacements;
 

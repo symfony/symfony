@@ -17,6 +17,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * A form group bundling multiple forms in a hierarchical structure.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @extends \ArrayAccess<string, FormInterface>
+ * @extends \Traversable<string, FormInterface>
  */
 interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 {
@@ -36,7 +39,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the parent form.
      *
-     * @return self|null The parent form or null if there is none
+     * @return self|null
      */
     public function getParent();
 
@@ -94,8 +97,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @param bool $flatten Whether to flatten the list of errors in case
      *                      $deep is set to true
      *
-     * @return FormErrorIterator An iterator over the {@link FormError}
-     *                           instances that where added to this form
+     * @return FormErrorIterator
      */
     public function getErrors(bool $deep = false, bool $flatten = true);
 
@@ -172,14 +174,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the form's configuration.
      *
-     * @return FormConfigInterface The configuration instance
+     * @return FormConfigInterface
      */
     public function getConfig();
 
     /**
      * Returns whether the form is submitted.
      *
-     * @return bool true if the form is submitted, false otherwise
+     * @return bool
      */
     public function isSubmitted();
 
@@ -188,14 +190,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * Only root forms are allowed to have an empty name.
      *
-     * @return string The name of the form
+     * @return string
      */
     public function getName();
 
     /**
      * Returns the property path that the form is mapped to.
      *
-     * @return PropertyPathInterface|null The property path instance
+     * @return PropertyPathInterface|null
      */
     public function getPropertyPath();
 
@@ -261,7 +263,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the data transformation failure, if any, during submission.
      *
-     * @return Exception\TransformationFailedException|null The transformation failure or null
+     * @return Exception\TransformationFailedException|null
      */
     public function getTransformationFailure();
 
@@ -308,7 +310,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the root of the form tree.
      *
-     * @return self The root of the tree, may be the instance itself
+     * @return self
      */
     public function getRoot();
 
@@ -320,7 +322,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function isRoot();
 
     /**
-     * @return FormView The view
+     * @return FormView
      */
     public function createView(FormView $parent = null);
 }

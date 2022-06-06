@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 
@@ -28,7 +29,7 @@ class SessionHandlerFactoryTest extends TestCase
     /**
      * @dataProvider provideConnectionDSN
      */
-    public function testCreateHandler(string $connectionDSN, string $expectedPath, string $expectedHandlerType)
+    public function testCreateFileHandler(string $connectionDSN, string $expectedPath, string $expectedHandlerType)
     {
         $handler = SessionHandlerFactory::createHandler($connectionDSN);
 
@@ -44,5 +45,33 @@ class SessionHandlerFactoryTest extends TestCase
             'native file handler using save_path from php.ini' => ['connectionDSN' => 'file://', 'expectedPath' => ini_get('session.save_path'), 'expectedHandlerType' => StrictSessionHandler::class],
             'native file handler using provided save_path' => ['connectionDSN' => 'file://'.$base.'/session/storage', 'expectedPath' => $base.'/session/storage', 'expectedHandlerType' => StrictSessionHandler::class],
         ];
+    }
+
+    /**
+     * @requires extension redis
+     */
+    public function testCreateRedisHandlerFromConnectionObject()
+    {
+        $handler = SessionHandlerFactory::createHandler($this->createMock(\Redis::class));
+        $this->assertInstanceOf(RedisSessionHandler::class, $handler);
+    }
+
+    /**
+     * @requires extension redis
+     */
+    public function testCreateRedisHandlerFromDsn()
+    {
+        $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar');
+        $this->assertInstanceOf(RedisSessionHandler::class, $handler);
+
+        $reflection = new \ReflectionObject($handler);
+
+        $prefixProperty = $reflection->getProperty('prefix');
+        $prefixProperty->setAccessible(true);
+        $this->assertSame('foo', $prefixProperty->getValue($handler));
+
+        $ttlProperty = $reflection->getProperty('ttl');
+        $ttlProperty->setAccessible(true);
+        $this->assertSame('3600', $ttlProperty->getValue($handler));
     }
 }

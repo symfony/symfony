@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -23,8 +24,8 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists(\Predis\Client::class)) {
-            throw new SkippedTestSuiteError('The Predis\Client class is required.');
+        if (!class_exists(\RedisSentinel::class)) {
+            throw new SkippedTestSuiteError('The RedisSentinel class is required.');
         }
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
             throw new SkippedTestSuiteError('REDIS_SENTINEL_HOSTS env var is not defined.');
@@ -42,5 +43,14 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
         $this->expectExceptionMessage('Cannot use both "redis_cluster" and "redis_sentinel" at the same time:');
         $dsn = 'redis:?host[redis1]&host[redis2]&host[redis3]&redis_cluster=1&redis_sentinel=mymaster';
         RedisAdapter::createConnection($dsn);
+    }
+
+    public function testExceptionMessageWhenFailingToRetrieveMasterInformation()
+    {
+        $hosts = getenv('REDIS_SENTINEL_HOSTS');
+        $firstHost = explode(' ', $hosts)[0];
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Failed to retrieve master information from master name "invalid-masterset-name" and address "'.$firstHost.'".');
+        AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => 'invalid-masterset-name']);
     }
 }

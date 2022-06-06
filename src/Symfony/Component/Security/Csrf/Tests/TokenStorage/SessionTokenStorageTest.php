@@ -12,6 +12,9 @@
 namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
@@ -22,6 +25,8 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
  */
 class SessionTokenStorageTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private const SESSION_NAMESPACE = 'foobar';
 
     /**
@@ -37,7 +42,11 @@ class SessionTokenStorageTest extends TestCase
     protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
-        $this->storage = new SessionTokenStorage($this->session, self::SESSION_NAMESPACE);
+        $request = new Request();
+        $request->setSession($this->session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $this->storage = new SessionTokenStorage($requestStack, self::SESSION_NAMESPACE);
     }
 
     public function testStoreTokenInNotStartedSessionStartsTheSession()
@@ -152,5 +161,51 @@ class SessionTokenStorageTest extends TestCase
 
         $this->assertTrue($this->session->has('foo'));
         $this->assertSame('baz', $this->session->get('foo'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMockSessionIsCreatedWhenMissing()
+    {
+        $this->expectDeprecation('Since symfony/security-csrf 5.3: Using the "Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage" without a session has no effect and is deprecated. It will throw a "Symfony\Component\HttpFoundation\Exception\SessionNotFoundException" in Symfony 6.0');
+
+        $this->storage->setToken('token_id', 'TOKEN');
+
+        $requestStack = new RequestStack();
+        $storage = new SessionTokenStorage($requestStack, self::SESSION_NAMESPACE);
+
+        $this->assertFalse($storage->hasToken('foo'));
+        $storage->setToken('foo', 'bar');
+        $this->assertTrue($storage->hasToken('foo'));
+        $this->assertSame('bar', $storage->getToken('foo'));
+
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack->push($request);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMockSessionIsReusedEvenWhenRequestHasSession()
+    {
+        $this->expectDeprecation('Since symfony/security-csrf 5.3: Using the "Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage" without a session has no effect and is deprecated. It will throw a "Symfony\Component\HttpFoundation\Exception\SessionNotFoundException" in Symfony 6.0');
+
+        $this->storage->setToken('token_id', 'TOKEN');
+
+        $requestStack = new RequestStack();
+        $storage = new SessionTokenStorage($requestStack, self::SESSION_NAMESPACE);
+
+        $storage->setToken('foo', 'bar');
+        $this->assertSame('bar', $storage->getToken('foo'));
+
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack->push($request);
+
+        $this->assertSame('bar', $storage->getToken('foo'));
     }
 }

@@ -17,8 +17,6 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Karoly Gossler <connor@connor.hu>
- *
- * @experimental in 5.2
  */
 final class DiscordOptions implements MessageOptionsInterface
 {
@@ -39,6 +37,9 @@ final class DiscordOptions implements MessageOptionsInterface
         return '';
     }
 
+    /**
+     * @return $this
+     */
     public function username(string $username): self
     {
         $this->options['username'] = $username;
@@ -46,6 +47,9 @@ final class DiscordOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function avatarUrl(string $avatarUrl): self
     {
         $this->options['avatar_url'] = $avatarUrl;
@@ -53,6 +57,9 @@ final class DiscordOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function tts(bool $tts): self
     {
         $this->options['tts'] = $tts;
@@ -60,6 +67,9 @@ final class DiscordOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function addEmbed(DiscordEmbedInterface $embed): self
     {
         if (!isset($this->options['embeds'])) {

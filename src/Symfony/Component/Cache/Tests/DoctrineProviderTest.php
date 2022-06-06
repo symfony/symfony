@@ -16,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
 
+/**
+ * @group legacy
+ */
 class DoctrineProviderTest extends TestCase
 {
     public function testProvider()

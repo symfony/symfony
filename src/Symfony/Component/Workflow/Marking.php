@@ -19,6 +19,7 @@ namespace Symfony\Component\Workflow;
 class Marking
 {
     private $places = [];
+    private $context = null;
 
     /**
      * @param int[] $representation Keys are the place name and values should be 1
@@ -48,5 +49,21 @@ class Marking
     public function getPlaces()
     {
         return $this->places;
+    }
+
+    /**
+     * @internal
+     */
+    public function setContext(array $context): void
+    {
+        $this->context = $context;
+    }
+
+    /**
+     * Returns the context after the subject has transitioned.
+     */
+    public function getContext(): ?array
+    {
+        return $this->context;
     }
 }

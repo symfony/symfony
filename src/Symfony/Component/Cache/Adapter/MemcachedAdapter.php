@@ -25,7 +25,6 @@ class MemcachedAdapter extends AbstractAdapter
     /**
      * We are replacing characters that are illegal in Memcached keys with reserved characters from
      * {@see \Symfony\Contracts\Cache\ItemInterface::RESERVED_CHARACTERS} that are legal in Memcached.
-This conversation was marked as resolved by lstrojny
      * Note: don’t use {@see \Symfony\Component\Cache\Adapter\AbstractAdapter::NS_SEPARATOR}.
      */
     private const RESERVED_MEMCACHED = " \n\r\t\v\f\0";
@@ -57,7 +56,7 @@ This conversation was marked as resolved by lstrojny
     public function __construct(\Memcached $client, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
-            throw new CacheException('Memcached >= 2.2.0 is required.');
+            throw new CacheException('Memcached '.(\PHP_VERSION_ID >= 80100 ? '> 3.1.5' : '>= 2.2.0').' is required.');
         }
         if ('Memcached' === \get_class($client)) {
             $opt = $client->getOption(\Memcached::OPT_SERIALIZER);
@@ -77,7 +76,7 @@ This conversation was marked as resolved by lstrojny
 
     public static function isSupported()
     {
-        return \extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
+        return \extension_loaded('memcached') && version_compare(phpversion('memcached'), \PHP_VERSION_ID >= 80100 ? '3.1.6' : '2.2.0', '>=');
     }
 
     /**
@@ -90,7 +89,6 @@ This conversation was marked as resolved by lstrojny
      * - [['localhost', 11211, 33]]
      *
      * @param array[]|string|string[] $servers An array of servers, a DSN, or an array of DSNs
-     * @param array                   $options An array of options
      *
      * @return \Memcached
      *
@@ -104,7 +102,7 @@ This conversation was marked as resolved by lstrojny
             throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, "%s" given.', get_debug_type($servers)));
         }
         if (!static::isSupported()) {
-            throw new CacheException('Memcached >= 2.2.0 is required.');
+            throw new CacheException('Memcached '.(\PHP_VERSION_ID >= 80100 ? '> 3.1.5' : '>= 2.2.0').' is required.');
         }
         set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
         try {
@@ -118,7 +116,7 @@ This conversation was marked as resolved by lstrojny
                 if (\is_array($dsn)) {
                     continue;
                 }
-                if (0 !== strpos($dsn, 'memcached:')) {
+                if (!str_starts_with($dsn, 'memcached:')) {
                     throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: "%s" does not start with "memcached:".', $dsn));
                 }
                 $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
@@ -195,10 +193,11 @@ This conversation was marked as resolved by lstrojny
                 if ('HASH' === $name || 'SERIALIZER' === $name || 'DISTRIBUTION' === $name) {
                     $value = \constant('Memcached::'.$name.'_'.strtoupper($value));
                 }
-                $opt = \constant('Memcached::OPT_'.$name);
-
                 unset($options[$name]);
-                $options[$opt] = $value;
+
+                if (\defined('Memcached::OPT_'.$name)) {
+                    $options[\constant('Memcached::OPT_'.$name)] = $value;
+                }
             }
             $client->setOptions($options);
 
@@ -267,7 +266,7 @@ This conversation was marked as resolved by lstrojny
     protected function doFetch(array $ids)
     {
         try {
-            $encodedIds = array_map('self::encodeKey', $ids);
+            $encodedIds = array_map([__CLASS__, 'encodeKey'], $ids);
 
             $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
 
@@ -296,7 +295,7 @@ This conversation was marked as resolved by lstrojny
     protected function doDelete(array $ids)
     {
         $ok = true;
-        $encodedIds = array_map('self::encodeKey', $ids);
+        $encodedIds = array_map([__CLASS__, 'encodeKey'], $ids);
         foreach ($this->checkResultCode($this->getClient()->deleteMulti($encodedIds)) as $result) {
             if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
                 $ok = false;

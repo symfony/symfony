@@ -13,8 +13,10 @@ namespace Symfony\Component\PropertyAccess;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @extends \SeekableIterator<int, string>
  */
-interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
+interface PropertyPathIteratorInterface extends \SeekableIterator
 {
     /**
      * Returns whether the current element in the property path is an array

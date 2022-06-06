@@ -24,7 +24,7 @@ class MessageBus implements MessageBusInterface
     private $middlewareAggregate;
 
     /**
-     * @param MiddlewareInterface[]|iterable $middlewareHandlers
+     * @param iterable<mixed, MiddlewareInterface> $middlewareHandlers
      */
     public function __construct(iterable $middlewareHandlers = [])
     {

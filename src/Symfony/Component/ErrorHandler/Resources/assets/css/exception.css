@@ -124,7 +124,7 @@ tr.status-error td, tr.status-warning td { border-bottom: 1px solid var(--base-2
 .status-warning .colored { color: #A46A1F; }
 .status-error .colored  { color: var(--color-error); }
 
-.sf-toggle { cursor: pointer; }
+.sf-toggle { cursor: pointer; position: relative; }
 .sf-toggle-content { -moz-transition: display .25s ease; -webkit-transition: display .25s ease; transition: display .25s ease; }
 .sf-toggle-content.sf-toggle-hidden { display: none; }
 .sf-toggle-content.sf-toggle-visible { display: block; }
@@ -225,8 +225,10 @@ header .container { display: flex; justify-content: space-between; }
 .trace-line + .trace-line { border-top: var(--border); }
 .trace-line:hover { background: var(--base-1); }
 .trace-line a { color: var(--base-6); }
-.trace-line .icon { opacity: .4; position: absolute; left: 10px; top: 11px; }
+.trace-line .icon { opacity: .4; position: absolute; left: 10px; }
 .trace-line .icon svg { fill: var(--base-5); height: 16px; width: 16px; }
+.trace-line .icon.icon-copy { left: auto; top: auto; padding-left: 5px; display: none }
+.trace-line:hover .icon.icon-copy:not(.hidden) { display: inline-block }
 .trace-line-header { padding-left: 36px; padding-right: 10px; }
 
 .trace-file-path, .trace-file-path a { color: var(--base-6); font-size: 13px; }

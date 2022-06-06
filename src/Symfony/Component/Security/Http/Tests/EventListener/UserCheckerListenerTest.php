@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
@@ -35,7 +35,7 @@ class UserCheckerListenerTest extends TestCase
     {
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->listener = new UserCheckerListener($this->userChecker);
-        $this->user = new User('test', null);
+        $this->user = new InMemoryUser('test', null);
     }
 
     public function testPreAuth()
@@ -45,6 +45,9 @@ class UserCheckerListenerTest extends TestCase
         $this->listener->preCheckCredentials($this->createCheckPassportEvent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testPreAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
@@ -66,11 +69,14 @@ class UserCheckerListenerTest extends TestCase
         $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', [])));
     }
 
+    /**
+     * @group legacy
+     */
     public function testPostAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPostAuth');
 
-        $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PreAuthenticatedToken('nobody', null, 'main')));
+        $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PreAuthenticatedToken('nobody', 'main')));
     }
 
     private function createCheckPassportEvent($passport = null)

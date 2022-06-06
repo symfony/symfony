@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
+use AsyncAws\Sqs\ValueObject\MessageSystemAttributeValue;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * A SQS connection.
- *
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @internal
@@ -45,6 +46,7 @@ class Connection
         'queue_name' => 'messages',
         'account' => null,
         'sslmode' => null,
+        'debug' => null,
     ];
 
     private $configuration;
@@ -64,10 +66,7 @@ class Connection
         $this->queueUrl = $queueUrl;
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -99,8 +98,9 @@ class Connection
      * * visibility_timeout: amount of seconds the message won't be visible
      * * sslmode: Can be "disable" to use http for a custom endpoint
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
+     * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
      */
-    public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null): self
+    public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null, LoggerInterface $logger = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The given Amazon SQS DSN "%s" is invalid.', $dsn));
@@ -129,7 +129,7 @@ class Connection
             'wait_time' => (int) $options['wait_time'],
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => $options['visibility_timeout'],
-            'auto_setup' => (bool) $options['auto_setup'],
+            'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOLEAN),
             'queue_name' => (string) $options['queue_name'],
         ];
 
@@ -138,6 +138,9 @@ class Connection
             'accessKeyId' => urldecode($parsedUrl['user'] ?? '') ?: $options['access_key'] ?? self::DEFAULT_OPTIONS['access_key'],
             'accessKeySecret' => urldecode($parsedUrl['pass'] ?? '') ?: $options['secret_key'] ?? self::DEFAULT_OPTIONS['secret_key'],
         ];
+        if (isset($options['debug'])) {
+            $clientConfiguration['debug'] = $options['debug'];
+        }
         unset($query['region']);
 
         if ('default' !== ($parsedUrl['host'] ?? 'default')) {
@@ -166,7 +169,7 @@ class Connection
             $queueUrl = 'https://'.$parsedUrl['host'].$parsedUrl['path'];
         }
 
-        return new self($configuration, new SqsClient($clientConfiguration, null, $client), $queueUrl);
+        return new self($configuration, new SqsClient($clientConfiguration, null, $client, $logger), $queueUrl);
     }
 
     public function get(): ?array
@@ -183,7 +186,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getNextMessages(): \Generator
     {
@@ -192,7 +195,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getPendingMessages(): \Generator
     {
@@ -202,7 +205,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getNewMessages(): \Generator
     {
@@ -268,7 +271,7 @@ class Connection
         }
 
         if (null !== $this->configuration['account']) {
-            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exists (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
+            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
         }
 
         $parameters = ['QueueName' => $this->configuration['queue_name']];
@@ -284,7 +287,7 @@ class Connection
         // Blocking call to wait for the queue to be created
         $exists->wait();
         if (!$exists->isSuccess()) {
-            throw new TransportException(sprintf('Failed to crate the Amazon SQS queue "%s".', $this->configuration['queue_name']));
+            throw new TransportException(sprintf('Failed to create the Amazon SQS queue "%s".', $this->configuration['queue_name']));
         }
         $this->queueUrl = null;
     }
@@ -309,7 +312,7 @@ class Connection
         return (int) ($attributes[QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES] ?? 0);
     }
 
-    public function send(string $body, array $headers, int $delay = 0, string $messageGroupId = null, string $messageDeduplicationId = null): void
+    public function send(string $body, array $headers, int $delay = 0, string $messageGroupId = null, string $messageDeduplicationId = null, string $xrayTraceId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();
@@ -320,6 +323,7 @@ class Connection
             'MessageBody' => $body,
             'DelaySeconds' => $delay,
             'MessageAttributes' => [],
+            'MessageSystemAttributes' => [],
         ];
 
         $specialHeaders = [];
@@ -340,6 +344,13 @@ class Connection
             $parameters['MessageAttributes'][self::MESSAGE_ATTRIBUTE_NAME] = new MessageAttributeValue([
                 'DataType' => 'String',
                 'StringValue' => json_encode($specialHeaders),
+            ]);
+        }
+
+        if (null !== $xrayTraceId) {
+            $parameters['MessageSystemAttributes'][MessageSystemAttributeName::AWSTRACE_HEADER] = new MessageSystemAttributeValue([
+                'DataType' => 'String',
+                'StringValue' => $xrayTraceId,
             ]);
         }
 

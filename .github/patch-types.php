@@ -30,9 +30,15 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/Prototype/BadClasses/MissingParent.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/'):
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
-        case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Dummy.php'):
-        case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/ParentDummy.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Answer.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Number.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Suit.php'):
+        case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/'):
+        case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Php81Dummy.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Runtime/Internal/ComposerPlugin.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Serializer/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/Serializer/Tests/Normalizer/Features/ObjectOuter.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/NestedAttribute/Entity.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/NotLoadableClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/ReflectionIntersectionTypeFixture.php'):
             continue 2;

@@ -8,8 +8,8 @@ services:
     cache.test_redis_connection:
         public: false
         class: Redis
-        calls:
-            - [connect, ['%env(REDIS_HOST)%']]
+        factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
+        arguments: ['redis://%env(REDIS_HOST)%']
 
     cache.app:
         parent: cache.adapter.redis

@@ -18,22 +18,17 @@
     "require": {
         "php": ">=7.2.5",
         "egulias/email-validator": "^2.1.10|^3",
+        "psr/event-dispatcher": "^1",
         "psr/log": "^1|^2|^3",
-        "symfony/event-dispatcher": "^4.4|^5.0",
-        "symfony/mime": "^5.2.6",
+        "symfony/deprecation-contracts": "^2.1|^3",
+        "symfony/event-dispatcher": "^4.4|^5.0|^6.0",
+        "symfony/mime": "^5.2.6|^6.0",
         "symfony/polyfill-php80": "^1.16",
-        "symfony/service-contracts": "^1.1|^2"
+        "symfony/service-contracts": "^1.1|^2|^3"
     },
     "require-dev": {
-        "symfony/amazon-mailer": "^4.4|^5.0",
-        "symfony/google-mailer": "^4.4|^5.0",
-        "symfony/http-client-contracts": "^1.1|^2",
-        "symfony/mailjet-mailer": "^4.4|^5.0",
-        "symfony/mailgun-mailer": "^4.4|^5.0",
-        "symfony/mailchimp-mailer": "^4.4|^5.0",
-        "symfony/messenger": "^4.4|^5.0",
-        "symfony/postmark-mailer": "^4.4|^5.0",
-        "symfony/sendgrid-mailer": "^4.4|^5.0"
+        "symfony/http-client-contracts": "^1.1|^2|^3",
+        "symfony/messenger": "^4.4|^5.0|^6.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.4"

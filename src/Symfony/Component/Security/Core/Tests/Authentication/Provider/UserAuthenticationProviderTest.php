@@ -21,10 +21,14 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @group legacy
+ */
 class UserAuthenticationProviderTest extends TestCase
 {
     public function testSupports()
@@ -46,11 +50,11 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenUsernameIsNotFound()
     {
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->willThrowException(new UsernameNotFoundException())
+                 ->willThrowException(new UserNotFoundException())
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -62,7 +66,7 @@ class UserAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->willThrowException(new UsernameNotFoundException())
+                 ->willThrowException(new UserNotFoundException())
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -212,7 +216,7 @@ class UserAuthenticationProviderTest extends TestCase
         ;
 
         $originalToken = $this->createMock(TokenInterface::class);
-        $token = new SwitchUserToken($this->createMock(UserInterface::class), 'foo', 'key', [], $originalToken);
+        $token = new SwitchUserToken(new InMemoryUser('wouter', null), 'foo', 'key', [], $originalToken);
         $token->setAttributes(['foo' => 'bar']);
 
         $authToken = $provider->authenticate($token);

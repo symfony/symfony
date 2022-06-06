@@ -74,6 +74,8 @@ class TranslatorTest extends TestCase
     }
 
     /**
+     * @requires extension intl
+     *
      * @dataProvider getTransChoiceTests
      */
     public function testTransChoiceWithDefaultLocale($expected, $id, $number)

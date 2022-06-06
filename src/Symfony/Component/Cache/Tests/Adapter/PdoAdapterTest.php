@@ -20,8 +20,6 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 class PdoAdapterTest extends AdapterTestCase
 {
-    use PdoPruneableTrait;
-
     protected static $dbFile;
 
     public static function setUpBeforeClass(): void
@@ -94,10 +92,22 @@ class PdoAdapterTest extends AdapterTestCase
     public function provideDsn()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
         yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
         yield ['sqlite::memory:'];
+    }
+
+    protected function isPruned(PdoAdapter $cache, string $name): bool
+    {
+        $o = new \ReflectionObject($cache);
+
+        $getPdoConn = $o->getMethod('getConnection');
+        $getPdoConn->setAccessible(true);
+
+        /** @var \PDOStatement $select */
+        $select = $getPdoConn->invoke($cache)->prepare('SELECT 1 FROM cache_items WHERE item_id LIKE :id');
+        $select->bindValue(':id', sprintf('%%%s', $name));
+        $select->execute();
+
+        return 1 !== (int) $select->fetch(\PDO::FETCH_COLUMN);
     }
 }

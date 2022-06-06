@@ -34,10 +34,10 @@ final class Preloader
             $classes[] = sprintf("\$classes[] = %s;\n", var_export($item, true));
         }
 
-        file_put_contents($file, sprintf("\n\$classes = [];\n%sPreloader::preload(\$classes);\n", implode('', $classes)), \FILE_APPEND);
+        file_put_contents($file, sprintf("\n\$classes = [];\n%s\$preloaded = Preloader::preload(\$classes, \$preloaded);\n", implode('', $classes)), \FILE_APPEND);
     }
 
-    public static function preload(array $classes): void
+    public static function preload(array $classes, array $preloaded = []): array
     {
         set_error_handler(function ($t, $m, $f, $l) {
             if (error_reporting() & $t) {
@@ -50,7 +50,6 @@ final class Preloader
         });
 
         $prev = [];
-        $preloaded = [];
 
         try {
             while ($prev !== $classes) {
@@ -65,6 +64,8 @@ final class Preloader
         } finally {
             restore_error_handler();
         }
+
+        return $preloaded;
     }
 
     private static function doPreload(string $class, array &$preloaded): void
@@ -76,6 +77,10 @@ final class Preloader
         $preloaded[$class] = true;
 
         try {
+            if (!class_exists($class) && !interface_exists($class, false) && !trait_exists($class, false)) {
+                return;
+            }
+
             $r = new \ReflectionClass($class);
 
             if ($r->isInternal()) {

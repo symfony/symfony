@@ -26,7 +26,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return int|null A timestamp
+     * @return int|null
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
@@ -48,7 +48,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @param string $value A timestamp
      *
-     * @return \DateTime|null A \DateTime object
+     * @return \DateTime|null
      *
      * @throws TransformationFailedException If the given value is not a timestamp
      *                                       or if the given timestamp is invalid

@@ -74,6 +74,9 @@ class HelperSetTest extends TestCase
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetCommand()
     {
         $cmd_01 = new Command('foo');
@@ -89,6 +92,9 @@ class HelperSetTest extends TestCase
         $this->assertEquals($cmd_02, $helperset->getCommand(), '->setCommand() overwrites stored command with consecutive calls');
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetCommand()
     {
         $cmd = new Command('foo');

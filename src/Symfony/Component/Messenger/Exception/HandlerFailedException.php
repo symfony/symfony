@@ -25,10 +25,13 @@ class HandlerFailedException extends RuntimeException
     {
         $firstFailure = current($exceptions);
 
+        $message = sprintf('Handling "%s" failed: ', \get_class($envelope->getMessage()));
+
         parent::__construct(
-            1 === \count($exceptions)
+            $message.(1 === \count($exceptions)
                 ? $firstFailure->getMessage()
-                : sprintf('%d handlers failed. First failure is: "%s"', \count($exceptions), $firstFailure->getMessage()),
+                : sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
+            ),
             (int) $firstFailure->getCode(),
             $firstFailure
         );

@@ -2,7 +2,7 @@
     "name": "symfony/uid",
     "type": "library",
     "description": "Provides an object-oriented API to generate and represent UIDs",
-    "keywords": ["uid", "uuid"],
+    "keywords": ["uid", "uuid", "ulid"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -22,6 +22,9 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/polyfill-uuid": "^1.15"
+    },
+    "require-dev": {
+        "symfony/console": "^4.4|^5.0|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Uid\\": "" },

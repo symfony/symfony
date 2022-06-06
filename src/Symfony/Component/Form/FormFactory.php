@@ -66,7 +66,7 @@ class FormFactory implements FormFactoryInterface
 
         $type = $this->registry->getType($type);
 
-        $builder = $type->createBuilder($this, (string) $name, $options);
+        $builder = $type->createBuilder($this, $name, $options);
 
         // Explicitly call buildForm() in order to be able to override either
         // createBuilder() or buildForm() in the resolved form type

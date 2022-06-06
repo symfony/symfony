@@ -19,6 +19,8 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  * intl functions with a specific version of ICU.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @group legacy
  */
 class IntlGlobalsTest extends AbstractIntlGlobalsTest
 {

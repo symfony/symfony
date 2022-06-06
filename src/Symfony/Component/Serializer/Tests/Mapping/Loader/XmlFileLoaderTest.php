@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -28,10 +29,13 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class XmlFileLoaderTest extends TestCase
 {
+    use ContextMappingTestTrait;
+
     /**
      * @var XmlFileLoader
      */
     private $loader;
+
     /**
      * @var ClassMetadata
      */
@@ -103,5 +107,11 @@ class XmlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+        $this->assertFalse($attributesMetadata['notIgnored']->isIgnored());
+    }
+
+    protected function getLoaderForContextMapping(): LoaderInterface
+    {
+        return $this->loader;
     }
 }

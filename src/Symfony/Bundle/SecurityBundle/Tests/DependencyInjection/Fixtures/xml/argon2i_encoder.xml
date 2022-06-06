@@ -9,7 +9,7 @@
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
     <imports>
-        <import resource="container1.xml"/>
+        <import resource="legacy_encoders.xml"/>
     </imports>
 
     <sec:config>

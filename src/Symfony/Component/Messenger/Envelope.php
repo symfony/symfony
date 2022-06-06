@@ -20,6 +20,9 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 final class Envelope
 {
+    /**
+     * @var array<string, list<StampInterface>>
+     */
     private $stamps = [];
     private $message;
 

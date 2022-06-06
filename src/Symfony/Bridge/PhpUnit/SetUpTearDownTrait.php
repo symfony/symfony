@@ -13,12 +13,14 @@ namespace Symfony\Bridge\PhpUnit;
 
 use PHPUnit\Framework\TestCase;
 
+trigger_deprecation('symfony/phpunit-bridge', '5.3', 'The "%s" trait is deprecated, use original methods with "void" return typehint.', SetUpTearDownTrait::class);
+
 // A trait to provide forward compatibility with newest PHPUnit versions
 $r = new \ReflectionClass(TestCase::class);
-if (\PHP_VERSION_ID < 70000 || !$r->getMethod('setUp')->hasReturnType()) {
+if (!$r->getMethod('setUp')->hasReturnType()) {
     trait SetUpTearDownTrait
     {
-        use Legacy\SetUpTearDownTraitForV5;
+        use Legacy\SetUpTearDownTraitForV7;
     }
 } else {
     trait SetUpTearDownTrait

@@ -25,8 +25,6 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 class EmailChannel implements ChannelInterface
 {
@@ -59,7 +57,7 @@ class EmailChannel implements ChannelInterface
         if ($email instanceof Email) {
             if (!$email->getFrom()) {
                 if (null === $this->from) {
-                    throw new LogicException(sprintf('To send the "%s" notification by email, you should either configure a global "from" or set it in the "asEmailMessage()" method.', get_debug_type($notification)));
+                    throw new LogicException(sprintf('To send the "%s" notification by email, you should either configure a global "from" header, set a sender in the global "envelope" of the mailer configuration or set a "from" header in the "asEmailMessage()" method.', get_debug_type($notification)));
                 }
 
                 $email->from($this->from);

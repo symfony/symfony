@@ -40,10 +40,11 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';
+        $this->defaultLifetime = $defaultLifetime;
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s").', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }
-        $this->createCacheItem = \Closure::bind(
+        self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
@@ -68,10 +69,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
             null,
             CacheItem::class
         );
-        $getId = \Closure::fromCallable([$this, 'getId']);
-        $tagPrefix = self::TAGS_PREFIX;
-        $this->mergeByLifetime = \Closure::bind(
-            static function ($deferred, &$expiredIds) use ($getId, $tagPrefix, $defaultLifetime) {
+        self::$mergeByLifetime ?? self::$mergeByLifetime = \Closure::bind(
+            static function ($deferred, &$expiredIds, $getId, $tagPrefix, $defaultLifetime) {
                 $byLifetime = [];
                 $now = microtime(true);
                 $expiredIds = [];
@@ -80,7 +79,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                     $key = (string) $key;
                     if (null === $item->expiry) {
                         $ttl = 0 < $defaultLifetime ? $defaultLifetime : 0;
-                    } elseif (0 === $item->expiry) {
+                    } elseif (!$item->expiry) {
                         $ttl = 0;
                     } elseif (0 >= $ttl = (int) (0.1 + $item->expiry - $now)) {
                         $expiredIds[] = $getId($key);
@@ -137,7 +136,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      *
      * @param array $ids An array of identifiers that should be removed from the pool
      *
-     * @return bool True if the items were successfully removed, false otherwise
+     * @return bool
      */
     abstract protected function doDelete(array $ids);
 
@@ -152,8 +151,6 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      * Invalidates cached items using tags.
      *
      * @param string[] $tagIds An array of tags to invalidate, key is tag and value is tag id
-     *
-     * @return bool True on success
      */
     abstract protected function doInvalidate(array $tagIds): bool;
 
@@ -175,13 +172,17 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     public function commit(): bool
     {
         $ok = true;
-        $byLifetime = $this->mergeByLifetime;
-        $byLifetime = $byLifetime($this->deferred, $expiredIds);
+        $byLifetime = (self::$mergeByLifetime)($this->deferred, $expiredIds, \Closure::fromCallable([$this, 'getId']), self::TAGS_PREFIX, $this->defaultLifetime);
         $retry = $this->deferred = [];
 
         if ($expiredIds) {
             // Tags are not cleaned up in this case, however that is done on invalidateTags().
-            $this->doDelete($expiredIds);
+            try {
+                $this->doDelete($expiredIds);
+            } catch (\Exception $e) {
+                $ok = false;
+                CacheItem::log($this->logger, 'Failed to delete expired items: '.$e->getMessage(), ['exception' => $e, 'cache-adapter' => get_debug_type($this)]);
+            }
         }
         foreach ($byLifetime as $lifetime => $values) {
             try {
@@ -295,8 +296,12 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
             $tagIds[] = $this->getId(self::TAGS_PREFIX.$tag);
         }
 
-        if ($this->doInvalidate($tagIds)) {
-            return true;
+        try {
+            if ($this->doInvalidate($tagIds)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            CacheItem::log($this->logger, 'Failed to invalidate tags: '.$e->getMessage(), ['exception' => $e, 'cache-adapter' => get_debug_type($this)]);
         }
 
         return false;

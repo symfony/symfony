@@ -91,7 +91,7 @@ class ScopingHttpClientTest extends TestCase
 
     public function testForBaseUri()
     {
-        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(), 'http://example.com/foo');
+        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'http://example.com/foo');
 
         $response = $client->request('GET', '/bar');
         $this->assertSame('http://example.com/foo', implode('', $response->getRequestOptions()['base_uri']));

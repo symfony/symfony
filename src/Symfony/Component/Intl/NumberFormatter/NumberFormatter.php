@@ -39,6 +39,8 @@ use Symfony\Component\Intl\Locale\Locale;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 abstract class NumberFormatter
 {
@@ -306,7 +308,7 @@ abstract class NumberFormatter
      *
      * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
      *
-     * @return string The formatted currency value
+     * @return string
      *
      * @see https://php.net/numberformatter.formatcurrency
      * @see https://en.wikipedia.org/wiki/ISO_4217#Active_codes
@@ -343,7 +345,7 @@ abstract class NumberFormatter
      * @param int       $type  Type of the formatting, one of the format type constants.
      *                         Only type NumberFormatter::TYPE_DEFAULT is currently supported.
      *
-     * @return bool|string The formatted value or false on error
+     * @return bool|string
      *
      * @see https://php.net/numberformatter.format
      *

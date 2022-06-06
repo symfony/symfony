@@ -12,12 +12,11 @@
 namespace Symfony\Component\Semaphore;
 
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
+use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 
 /**
  * SemaphoreInterface defines an interface to manipulate the status of a semaphore.
- *
- * @experimental in 5.2
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -27,9 +26,7 @@ interface SemaphoreInterface
     /**
      * Acquires the semaphore. If the semaphore has reached its limit.
      *
-     * @return bool whether or not the semaphore had been acquired
-     *
-     * @throws SemaphoreAcquiringException If the semaphore can not be acquired
+     * @throws SemaphoreAcquiringException If the semaphore cannot be acquired
      */
     public function acquire(): bool;
 
@@ -48,7 +45,7 @@ interface SemaphoreInterface
     /**
      * Release the semaphore.
      *
-     * @throws SemaphoreReleasingException If the semaphore can not be released
+     * @throws SemaphoreReleasingException If the semaphore cannot be released
      */
     public function release();
 

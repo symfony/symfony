@@ -37,4 +37,9 @@ class BaseUser
     {
         return $this->username;
     }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
 }

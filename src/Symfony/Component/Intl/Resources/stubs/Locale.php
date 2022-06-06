@@ -10,14 +10,30 @@
  */
 
 use Symfony\Component\Intl\Locale\Locale as IntlLocale;
+use Symfony\Polyfill\Intl\Icu\Locale as LocalePolyfill;
 
-/**
- * Stub implementation for the Locale class of the intl extension.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @see IntlLocale
- */
-class Locale extends IntlLocale
-{
+if (!class_exists(LocalePolyfill::class)) {
+    trigger_deprecation('symfony/intl', '5.3', 'Polyfills are deprecated, try running "composer require symfony/polyfill-intl-icu ^1.21" instead.');
+
+    /**
+     * Stub implementation for the Locale class of the intl extension.
+     *
+     * @author Bernhard Schussek <bschussek@gmail.com>
+     *
+     * @see IntlLocale
+     */
+    class Locale extends IntlLocale
+    {
+    }
+} else {
+    /**
+     * Stub implementation for the Locale class of the intl extension.
+     *
+     * @author Bernhard Schussek <bschussek@gmail.com>
+     *
+     * @see IntlLocale
+     */
+    class Locale extends LocalePolyfill
+    {
+    }
 }

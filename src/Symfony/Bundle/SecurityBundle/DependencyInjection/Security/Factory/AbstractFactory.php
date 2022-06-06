@@ -99,7 +99,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * Subclasses must return the id of a service which implements the
      * AuthenticationProviderInterface.
      *
-     * @return string never null, the id of the authentication provider
+     * @return string
      */
     abstract protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId);
 

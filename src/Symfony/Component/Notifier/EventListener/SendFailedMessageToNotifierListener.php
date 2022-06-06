@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -20,8 +21,6 @@ use Symfony\Component\Notifier\Notifier;
  * Sends a rejected message to the notifier.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {

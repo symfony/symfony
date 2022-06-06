@@ -32,7 +32,7 @@ class EntityType extends DoctrineType
                 $queryBuilder = $queryBuilder($options['em']->getRepository($options['class']));
 
                 if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
-                    throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
+                    throw new UnexpectedTypeException($queryBuilder, QueryBuilder::class);
                 }
             }
 
@@ -40,7 +40,7 @@ class EntityType extends DoctrineType
         };
 
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
-        $resolver->setAllowedTypes('query_builder', ['null', 'callable', 'Doctrine\ORM\QueryBuilder']);
+        $resolver->setAllowedTypes('query_builder', ['null', 'callable', QueryBuilder::class]);
     }
 
     /**

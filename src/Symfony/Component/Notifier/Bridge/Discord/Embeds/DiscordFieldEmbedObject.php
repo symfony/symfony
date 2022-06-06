@@ -13,11 +13,12 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
 /**
  * @author Karoly Gossler <connor@connor.hu>
- *
- * @experimental in 5.2
  */
 final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
 {
+    /**
+     * @return $this
+     */
     public function name(string $name): self
     {
         $this->options['name'] = $name;
@@ -25,6 +26,9 @@ final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function value(string $value): self
     {
         $this->options['value'] = $value;
@@ -32,6 +36,9 @@ final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function inline(bool $inline): self
     {
         $this->options['inline'] = $inline;

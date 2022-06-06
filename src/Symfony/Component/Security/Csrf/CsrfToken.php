@@ -30,7 +30,7 @@ class CsrfToken
     /**
      * Returns the ID of the CSRF token.
      *
-     * @return string The token ID
+     * @return string
      */
     public function getId()
     {
@@ -40,7 +40,7 @@ class CsrfToken
     /**
      * Returns the value of the CSRF token.
      *
-     * @return string The token value
+     * @return string
      */
     public function getValue()
     {
@@ -50,7 +50,7 @@ class CsrfToken
     /**
      * Returns the value of the CSRF token.
      *
-     * @return string The token value
+     * @return string
      */
     public function __toString()
     {

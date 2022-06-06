@@ -44,7 +44,7 @@ class RememberMeToken extends AbstractToken
         $this->secret = $secret;
 
         $this->setUser($user);
-        parent::setAuthenticated(true);
+        parent::setAuthenticated(true, false);
     }
 
     /**
@@ -56,7 +56,7 @@ class RememberMeToken extends AbstractToken
             throw new \LogicException('You cannot set this token to authenticated after creation.');
         }
 
-        parent::setAuthenticated(false);
+        parent::setAuthenticated(false, false);
     }
 
     /**
@@ -64,12 +64,12 @@ class RememberMeToken extends AbstractToken
      *
      * @return string The provider secret
      *
-     * @deprecated since 5.2, use getFirewallName() instead
+     * @deprecated since Symfony 5.2, use getFirewallName() instead
      */
     public function getProviderKey()
     {
         if (1 !== \func_num_args() || true !== func_get_arg(0)) {
-            trigger_deprecation('symfony/security-core', '5.2', 'Method "%s" is deprecated, use "getFirewallName()" instead.', __METHOD__);
+            trigger_deprecation('symfony/security-core', '5.2', 'Method "%s()" is deprecated, use "getFirewallName()" instead.', __METHOD__);
         }
 
         return $this->firewallName;
@@ -81,8 +81,6 @@ class RememberMeToken extends AbstractToken
     }
 
     /**
-     * Returns the secret.
-     *
      * @return string
      */
     public function getSecret()
@@ -95,6 +93,8 @@ class RememberMeToken extends AbstractToken
      */
     public function getCredentials()
     {
+        trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
+
         return '';
     }
 

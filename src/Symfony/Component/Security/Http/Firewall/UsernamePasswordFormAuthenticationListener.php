@@ -29,11 +29,15 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', UsernamePasswordFormAuthenticationListener::class);
+
 /**
  * UsernamePasswordFormAuthenticationListener is the default implementation of
  * an authentication via a simple form composed of a username and a password.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener
 {
@@ -72,7 +76,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         if (null !== $this->csrfTokenManager) {
             $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
 
-            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $csrfToken))) {
+            if (!\is_string($csrfToken) || false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $csrfToken))) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }

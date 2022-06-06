@@ -55,6 +55,14 @@ class KernelTest extends TestCase
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
     }
 
+    public function testEmptyEnv()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
+
+        new KernelForTest('', false);
+    }
+
     public function testClone()
     {
         $env = 'test_env';
@@ -190,7 +198,7 @@ class KernelTest extends TestCase
 
     public function testHandleCallsHandleOnHttpKernel()
     {
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
         $request = new Request();
 
@@ -212,7 +220,7 @@ class KernelTest extends TestCase
 
     public function testHandleBootsTheKernel()
     {
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
         $request = new Request();
 
@@ -508,17 +516,20 @@ EOF
                 $container->setParameter('test.extension-registered', true);
             }
 
-            public function getNamespace()
+            public function getNamespace(): string
             {
                 return '';
             }
 
+            /**
+             * @return string|false
+             */
             public function getXsdValidationBasePath()
             {
                 return false;
             }
 
-            public function getAlias()
+            public function getAlias(): string
             {
                 return 'test-extension';
             }
@@ -678,7 +689,7 @@ class TestKernel implements HttpKernelInterface
         $this->terminateCalled = true;
     }
 
-    public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true): Response
+    public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
     }
 

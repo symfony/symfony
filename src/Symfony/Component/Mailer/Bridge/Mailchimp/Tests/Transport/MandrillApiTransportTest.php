@@ -148,6 +148,7 @@ class MandrillApiTransportTest extends TestCase
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('password-reset,user'));
+        $email->getHeaders()->add(new TagHeader('another'));
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
@@ -158,6 +159,6 @@ class MandrillApiTransportTest extends TestCase
         $this->assertArrayHasKey('message', $payload);
         $this->assertArrayNotHasKey('headers', $payload['message']);
         $this->assertArrayHasKey('tags', $payload['message']);
-        $this->assertSame(['password-reset', 'user'], $payload['message']['tags']);
+        $this->assertSame(['password-reset', 'user', 'another'], $payload['message']['tags']);
     }
 }

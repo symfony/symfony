@@ -25,8 +25,30 @@ final class Validation
      * Creates a callable chain of constraints.
      *
      * @param Constraint|ValidatorInterface|null $constraintOrValidator
+     *
+     * @return callable($value)
      */
     public static function createCallable($constraintOrValidator = null, Constraint ...$constraints): callable
+    {
+        $validator = self::createIsValidCallable($constraintOrValidator, ...$constraints);
+
+        return static function ($value) use ($validator) {
+            if (!$validator($value, $violations)) {
+                throw new ValidationFailedException($value, $violations);
+            }
+
+            return $value;
+        };
+    }
+
+    /**
+     * Creates a callable that returns true/false instead of throwing validation exceptions.
+     *
+     * @param Constraint|ValidatorInterface|null $constraintOrValidator
+     *
+     * @return callable($value, &$violations = null): bool
+     */
+    public static function createIsValidCallable($constraintOrValidator = null, Constraint ...$constraints): callable
     {
         $validator = $constraintOrValidator;
 
@@ -39,13 +61,10 @@ final class Validation
 
         $validator = $validator ?? self::createValidator();
 
-        return static function ($value) use ($constraints, $validator) {
+        return static function ($value, &$violations = null) use ($constraints, $validator) {
             $violations = $validator->validate($value, $constraints);
-            if (0 !== $violations->count()) {
-                throw new ValidationFailedException($value, $violations);
-            }
 
-            return $value;
+            return 0 === $violations->count();
         };
     }
 

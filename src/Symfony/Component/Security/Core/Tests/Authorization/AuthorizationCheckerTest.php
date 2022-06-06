@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthorizationCheckerTest extends TestCase
 {
@@ -29,17 +30,20 @@ class AuthorizationCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
         $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $this->tokenStorage = new TokenStorage();
 
         $this->authorizationChecker = new AuthorizationChecker(
             $this->tokenStorage,
-            $this->authenticationManager,
-            $this->accessDecisionManager
+            $this->accessDecisionManager,
+            false,
+            false
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testVoteAuthenticatesTokenIfNecessary()
     {
         $token = new UsernamePasswordToken('username', 'password', 'provider');
@@ -47,7 +51,9 @@ class AuthorizationCheckerTest extends TestCase
 
         $newToken = new UsernamePasswordToken('username', 'password', 'provider');
 
-        $this->authenticationManager
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $this->authorizationChecker = new AuthorizationChecker($this->tokenStorage, $authenticationManager, $this->accessDecisionManager, false, false);
+        $authenticationManager
             ->expects($this->once())
             ->method('authenticate')
             ->with($this->equalTo($token))
@@ -71,15 +77,21 @@ class AuthorizationCheckerTest extends TestCase
         $this->assertSame($newToken, $this->tokenStorage->getToken());
     }
 
-    public function testVoteWithoutAuthenticationToken()
+    /**
+     * @group legacy
+     */
+    public function testLegacyVoteWithoutAuthenticationToken()
     {
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
+
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
-        $this->authorizationChecker->isGranted('ROLE_FOO');
+
+        $authorizationChecker->isGranted('ROLE_FOO');
     }
 
-    public function testVoteWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse()
+    public function testVoteWithoutAuthenticationToken()
     {
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->authenticationManager, $this->accessDecisionManager, false, false);
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager, false, false);
 
         $this->accessDecisionManager
             ->expects($this->once())
@@ -95,7 +107,7 @@ class AuthorizationCheckerTest extends TestCase
      */
     public function testIsGranted($decide)
     {
-        $token = new UsernamePasswordToken('username', 'password', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
         $this->accessDecisionManager
             ->expects($this->once())
@@ -114,7 +126,7 @@ class AuthorizationCheckerTest extends TestCase
     {
         $attribute = new \stdClass();
 
-        $token = new UsernamePasswordToken('username', 'password', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
         $this->accessDecisionManager
             ->expects($this->once())

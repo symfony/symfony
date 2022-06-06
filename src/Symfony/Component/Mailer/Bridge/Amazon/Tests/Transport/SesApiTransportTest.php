@@ -70,6 +70,7 @@ class SesApiTransportTest extends TestCase
             $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['Source']);
             $this->assertSame('Hello There!', $content['Message_Body_Text_Data']);
             $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
+            $this->assertSame('aws-source-arn', $content['FromEmailAddressIdentityArn']);
 
             $xml = '<SendEmailResponse xmlns="https://email.amazonaws.com/doc/2010-03-31/">
   <SendEmailResult>
@@ -92,6 +93,7 @@ class SesApiTransportTest extends TestCase
             ->text('Hello There!');
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
+        $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
 
         $message = $transport->send($mail);
 
@@ -137,6 +139,7 @@ class SesApiTransportTest extends TestCase
              ->attach('attached data');
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
+        $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
 
         $message = $transport->send($mail);
 

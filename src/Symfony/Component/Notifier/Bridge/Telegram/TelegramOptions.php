@@ -16,8 +16,6 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
- *
- * @experimental in 5.2
  */
 final class TelegramOptions implements MessageOptionsInterface
 {
@@ -45,6 +43,9 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this->options['chat_id'] ?? null;
     }
 
+    /**
+     * @return $this
+     */
     public function chatId(string $id): self
     {
         $this->options['chat_id'] = $id;
@@ -52,6 +53,9 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function parseMode(string $mode): self
     {
         $this->options['parse_mode'] = $mode;
@@ -59,6 +63,9 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function disableWebPagePreview(bool $bool): self
     {
         $this->options['disable_web_page_preview'] = $bool;
@@ -66,6 +73,9 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function disableNotification(bool $bool): self
     {
         $this->options['disable_notification'] = $bool;
@@ -73,6 +83,9 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function replyTo(int $messageId): self
     {
         $this->options['reply_to_message_id'] = $messageId;
@@ -80,6 +93,9 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function replyMarkup(AbstractTelegramReplyMarkup $markup): self
     {
         $this->options['reply_markup'] = $markup->toArray();

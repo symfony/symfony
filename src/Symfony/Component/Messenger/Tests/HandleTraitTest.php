@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -82,7 +91,9 @@ class TestQueryBus
 
     public function __construct(?MessageBusInterface $messageBus)
     {
-        $this->messageBus = $messageBus;
+        if ($messageBus) {
+            $this->messageBus = $messageBus;
+        }
     }
 
     public function query($query): string

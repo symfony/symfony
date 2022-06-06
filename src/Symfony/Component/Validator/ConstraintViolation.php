@@ -70,7 +70,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * Converts the violation into a string for debugging purposes.
      *
-     * @return string The violation as string
+     * @return string
      */
     public function __toString()
     {
@@ -154,7 +154,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * Returns the constraint whose validation caused the violation.
      *
-     * @return Constraint|null The constraint or null if it is not known
+     * @return Constraint|null
      */
     public function getConstraint()
     {

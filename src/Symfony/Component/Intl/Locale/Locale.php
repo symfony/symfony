@@ -23,6 +23,8 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 abstract class Locale
 {
@@ -46,7 +48,7 @@ abstract class Locale
      *
      * @param string $header The string containing the "Accept-Language" header value
      *
-     * @return string The corresponding locale code
+     * @return string
      *
      * @see https://php.net/locale.acceptfromhttp
      *
@@ -91,7 +93,7 @@ abstract class Locale
      *
      * @param array $subtags A keyed array where the keys identify the particular locale code subtag
      *
-     * @return string The corresponding locale code
+     * @return string
      *
      * @see https://php.net/locale.composelocale
      *
@@ -108,7 +110,7 @@ abstract class Locale
      * @param string $langtag The language tag to check
      * @param string $locale  The language range to check against
      *
-     * @return string The corresponding locale code
+     * @return string
      *
      * @see https://php.net/locale.filtermatches
      *
@@ -124,7 +126,7 @@ abstract class Locale
      *
      * @param string $locale The locale to extract the variants from
      *
-     * @return array The locale variants
+     * @return array
      *
      * @see https://php.net/locale.getallvariants
      *
@@ -136,9 +138,9 @@ abstract class Locale
     }
 
     /**
-     * Returns the default locale.
+     * Returns the default locale, which is always "en".
      *
-     * @return string The default locale code. Always returns 'en'
+     * @return string
      *
      * @see https://php.net/locale.getdefault
      */
@@ -153,7 +155,7 @@ abstract class Locale
      * @param string $locale   The locale code to return the display language from
      * @param string $inLocale Optional format locale code to use to display the language name
      *
-     * @return string The localized language display name
+     * @return string
      *
      * @see https://php.net/locale.getdisplaylanguage
      *
@@ -170,7 +172,7 @@ abstract class Locale
      * @param string $locale   The locale code to return the display locale name from
      * @param string $inLocale Optional format locale code to use to display the locale name
      *
-     * @return string The localized locale display name
+     * @return string
      *
      * @see https://php.net/locale.getdisplayname
      *
@@ -187,7 +189,7 @@ abstract class Locale
      * @param string $locale   The locale code to return the display region from
      * @param string $inLocale Optional format locale code to use to display the region name
      *
-     * @return string The localized region display name
+     * @return string
      *
      * @see https://php.net/locale.getdisplayregion
      *
@@ -204,7 +206,7 @@ abstract class Locale
      * @param string $locale   The locale code to return the display script from
      * @param string $inLocale Optional format locale code to use to display the script name
      *
-     * @return string The localized script display name
+     * @return string
      *
      * @see https://php.net/locale.getdisplayscript
      *
@@ -221,7 +223,7 @@ abstract class Locale
      * @param string $locale   The locale code to return the display variant from
      * @param string $inLocale Optional format locale code to use to display the variant name
      *
-     * @return string The localized variant display name
+     * @return string
      *
      * @see https://php.net/locale.getdisplayvariant
      *
@@ -237,7 +239,7 @@ abstract class Locale
      *
      * @param string $locale The locale code to extract the keywords from
      *
-     * @return array Associative array with the extracted variants
+     * @return array
      *
      * @see https://php.net/locale.getkeywords
      *
@@ -253,7 +255,7 @@ abstract class Locale
      *
      * @param string $locale The locale code to extract the language code from
      *
-     * @return string|null The extracted language code or null in case of error
+     * @return string|null
      *
      * @see https://php.net/locale.getprimarylanguage
      *
@@ -269,7 +271,7 @@ abstract class Locale
      *
      * @param string $locale The locale code to extract the region code from
      *
-     * @return string|null The extracted region code or null if not present
+     * @return string|null
      *
      * @see https://php.net/locale.getregion
      *
@@ -285,7 +287,7 @@ abstract class Locale
      *
      * @param string $locale The locale code to extract the script code from
      *
-     * @return string|null The extracted script code or null if not present
+     * @return string|null
      *
      * @see https://php.net/locale.getscript
      *
@@ -318,7 +320,7 @@ abstract class Locale
      *
      * @param string $locale The locale code to extract the subtag array from
      *
-     * @return array Associative array with the extracted subtags
+     * @return array
      *
      * @see https://php.net/locale.parselocale
      *
@@ -332,7 +334,7 @@ abstract class Locale
     /**
      * Not supported. Sets the default runtime locale.
      *
-     * @return bool true on success or false on failure
+     * @return bool
      *
      * @see https://php.net/locale.setdefault
      *

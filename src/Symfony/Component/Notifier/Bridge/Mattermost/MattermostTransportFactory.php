@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mattermost;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -19,8 +18,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Emanuele Panzeri <thepanz@gmail.com>
- *
- * @experimental in 5.2
  */
 final class MattermostTransportFactory extends AbstractTransportFactory
 {
@@ -34,16 +31,11 @@ final class MattermostTransportFactory extends AbstractTransportFactory
 
         $path = $dsn->getPath();
         $token = $this->getUser($dsn);
-        $channel = $dsn->getOption('channel');
-
-        if (!$channel) {
-            throw new IncompleteDsnException('Missing channel.', $dsn->getOriginalDsn());
-        }
-
+        $channel = $dsn->getRequiredOption('channel');
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new MattermostTransport($token, $channel, $this->client, $this->dispatcher, $path))->setHost($host)->setPort($port);
+        return (new MattermostTransport($token, $channel, $path, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

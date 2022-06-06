@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @internal
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
@@ -48,6 +48,11 @@ class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactory
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         throw new InvalidConfigurationException(sprintf('The authenticator manager no longer has "anonymous" security. Please remove this option under the "%s" firewall'.($config['lazy'] ? ' and add "lazy: true"' : '').'.', $firewallName));
+    }
+
+    public function getPriority()
+    {
+        return -60;
     }
 
     public function getPosition()

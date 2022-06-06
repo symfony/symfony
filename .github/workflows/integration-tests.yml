@@ -8,6 +8,10 @@ defaults:
   run:
     shell: bash
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
 jobs:
 
   tests:
@@ -39,7 +43,7 @@ jobs:
       redis:
         image: redis:6.0.0
         ports:
-          - 6379:6379
+          - 16379:6379
       redis-cluster:
         image: grokzen/redis-cluster:5.0.4
         ports:
@@ -87,7 +91,7 @@ jobs:
       zookeeper:
         image: wurstmeister/zookeeper:3.4.6
       kafka:
-        image: wurstmeister/kafka:2.12-2.4.1
+        image: wurstmeister/kafka:2.12-2.0.1
         ports:
           - 9092:9092
         env:
@@ -104,11 +108,16 @@ jobs:
       - name: Install system dependencies
         run: |
           echo "::group::apt-get update"
+          sudo wget -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | sudo apt-key add -
+          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2004 focal focal/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
           sudo apt-get update
           echo "::endgroup::"
 
           echo "::group::install tools & libraries"
-          sudo apt-get install librdkafka-dev
+          sudo apt-get install librdkafka-dev redis-server libcouchbase-dev
+          sudo -- sh -c 'echo unixsocket /var/run/redis/redis-server.sock >> /etc/redis/redis.conf'
+          sudo -- sh -c 'echo unixsocketperm 777 >> /etc/redis/redis.conf'
+          sudo service redis-server restart
           echo "::endgroup::"
 
       - name: Configure Couchbase
@@ -122,7 +131,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "json,couchbase,memcached,mongodb,redis,rdkafka,xsl,ldap"
+          extensions: "json,couchbase-3.2.2,memcached,mongodb-1.10.0,redis-5.3.4,rdkafka,xsl,ldap"
           ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           tools: pecl
@@ -146,7 +155,7 @@ jobs:
           echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
 
           echo "::group::composer update"
-          composer require --dev --no-update mongodb/mongodb:@stable
+          composer require --dev --no-update mongodb/mongodb:"1.9.1@dev|^1.9.1@stable"
           composer update --no-progress --ansi
           echo "::endgroup::"
 
@@ -157,7 +166,7 @@ jobs:
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
-          REDIS_HOST: localhost
+          REDIS_HOST: 'localhost:16379'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel
@@ -165,10 +174,6 @@ jobs:
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
-          MEMCACHED_HOST: localhost
-          LDAP_HOST: localhost
-          LDAP_PORT: 3389
-          MONGODB_HOST: localhost
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
 
@@ -180,3 +185,13 @@ jobs:
       #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.0-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
+
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-translation-files
+        with:
+          paths: src/**/Resources/translations/*.xlf
+
+      - name: Check Translation Status
+        if: steps.changed-translation-files.outputs.changed == 'true'
+        run: |
+          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v

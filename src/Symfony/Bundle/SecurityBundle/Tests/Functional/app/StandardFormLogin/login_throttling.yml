@@ -1,12 +1,14 @@
 imports:
-    - { resource: ./config.yml }
+    - { resource: ./base_config.yml }
 
 framework:
     lock: ~
     rate_limiter: ~
 
 security:
+    enable_authenticator_manager: true
     firewalls:
         default:
             login_throttling:
                 max_attempts: 1
+                interval: '8 minutes'

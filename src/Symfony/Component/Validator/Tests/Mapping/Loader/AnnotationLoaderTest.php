@@ -14,12 +14,19 @@ namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
@@ -59,19 +66,32 @@ class AnnotationLoaderTest extends TestCase
         $expected->setGroupSequence(['Foo', 'Entity']);
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Callback(['Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback']));
+        $expected->addConstraint(new Sequentially([
+            new Expression('this.getFirstName() != null'),
+        ]));
         $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
         $expected->addPropertyConstraint('firstName', new All([new NotNull(), new Range(['min' => 3])]));
         $expected->addPropertyConstraint('firstName', new All(['constraints' => [new NotNull(), new Range(['min' => 3])]]));
-        $expected->addPropertyConstraint('firstName', new Collection(['fields' => [
+        $expected->addPropertyConstraint('firstName', new Collection([
             'foo' => [new NotNull(), new Range(['min' => 3])],
             'bar' => new Range(['min' => 5]),
-        ]]));
+            'baz' => new Required([new Email()]),
+            'qux' => new Optional([new NotBlank()]),
+        ], null, null, true));
         $expected->addPropertyConstraint('firstName', new Choice([
             'message' => 'Must be one of %choices%',
             'choices' => ['A', 'B'],
+        ]));
+        $expected->addPropertyConstraint('firstName', new AtLeastOneOf([
+            new NotNull(),
+            new Range(['min' => 3]),
+        ], null, null, 'foo', null, false));
+        $expected->addPropertyConstraint('firstName', new Sequentially([
+            new NotBlank(),
+            new Range(['min' => 5]),
         ]));
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());
@@ -135,19 +155,32 @@ class AnnotationLoaderTest extends TestCase
         $expected->setGroupSequence(['Foo', 'Entity']);
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Callback(['Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback']));
+        $expected->addConstraint(new Sequentially([
+            new Expression('this.getFirstName() != null'),
+        ]));
         $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
         $expected->addPropertyConstraint('firstName', new All([new NotNull(), new Range(['min' => 3])]));
         $expected->addPropertyConstraint('firstName', new All(['constraints' => [new NotNull(), new Range(['min' => 3])]]));
-        $expected->addPropertyConstraint('firstName', new Collection(['fields' => [
+        $expected->addPropertyConstraint('firstName', new Collection([
             'foo' => [new NotNull(), new Range(['min' => 3])],
             'bar' => new Range(['min' => 5]),
-        ]]));
+            'baz' => new Required([new Email()]),
+            'qux' => new Optional([new NotBlank()]),
+        ], null, null, true));
         $expected->addPropertyConstraint('firstName', new Choice([
             'message' => 'Must be one of %choices%',
             'choices' => ['A', 'B'],
+        ]));
+        $expected->addPropertyConstraint('firstName', new AtLeastOneOf([
+            new NotNull(),
+            new Range(['min' => 3]),
+        ], null, null, 'foo', null, false));
+        $expected->addPropertyConstraint('firstName', new Sequentially([
+            new NotBlank(),
+            new Range(['min' => 5]),
         ]));
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());
@@ -184,6 +217,10 @@ class AnnotationLoaderTest extends TestCase
 
         if (\PHP_VERSION_ID >= 80000) {
             yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
+        }
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield 'nested_attributes' => ['Symfony\Component\Validator\Tests\Fixtures\NestedAttribute'];
         }
     }
 }

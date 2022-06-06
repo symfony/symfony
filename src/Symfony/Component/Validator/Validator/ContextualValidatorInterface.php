@@ -74,7 +74,7 @@ interface ContextualValidatorInterface
      * Returns the violations that have been generated so far in the context
      * of the validator.
      *
-     * @return ConstraintViolationListInterface The constraint violations
+     * @return ConstraintViolationListInterface
      */
     public function getViolations();
 }

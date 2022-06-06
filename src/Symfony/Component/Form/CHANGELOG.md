@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate calling `FormErrorIterator::children()` if the current element is not iterable.
+ * Allow to pass `TranslatableMessage` objects to the `help` option
+ * Add the `EnumType`
+
+5.3
+---
+
+ * Changed `$forms` parameter type of the `DataMapperInterface::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$forms` parameter type of the `DataMapperInterface::mapFormsToData()` method from `iterable` to `\Traversable`.
+ * Deprecated passing an array as the second argument of the `DataMapper::mapDataToForms()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the first argument of the `DataMapper::mapFormsToData()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the second argument of the `CheckboxListMapper::mapDataToForms()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the first argument of the `CheckboxListMapper::mapFormsToData()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the second argument of the `RadioListMapper::mapDataToForms()` method, pass `\Traversable` instead.
+ * Deprecated passing an array as the first argument of the `RadioListMapper::mapFormsToData()` method, pass `\Traversable` instead.
+ * Added a `choice_translation_parameters` option to `ChoiceType`
+ * Add `UuidType` and `UlidType`
+ * Dependency on `symfony/intl` was removed. Install `symfony/intl` if you are using `LocaleType`, `CountryType`, `CurrencyType`, `LanguageType` or `TimezoneType`.
+ * Add `priority` option to `BaseType` and sorting view fields
+
 5.2.0
 -----
 

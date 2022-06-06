@@ -187,6 +187,26 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
+    public function testFailurePathFromRequestWithInvalidUrl()
+    {
+        $options = ['failure_path_parameter' => '_my_failure_path'];
+
+        $this->request->expects($this->once())
+            ->method('get')->with('_my_failure_path')
+            ->willReturn('some_route_name');
+
+        $this->logger->expects($this->exactly(2))
+            ->method('debug')
+            ->withConsecutive(
+                ['Ignoring query parameter "_my_failure_path": not a valid URL.'],
+                ['Authentication failure, redirect triggered.', ['failure_path' => '/login']]
+            );
+
+        $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
+
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+    }
+
     private function getRequest()
     {
         $request = $this->createMock(Request::class);

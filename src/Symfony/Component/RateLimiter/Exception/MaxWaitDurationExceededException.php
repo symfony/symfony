@@ -15,8 +15,6 @@ use Symfony\Component\RateLimiter\RateLimit;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.2
  */
 class MaxWaitDurationExceededException extends \RuntimeException
 {

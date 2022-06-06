@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
+class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 {
     private $serializer;
     private $connection;
@@ -41,7 +41,15 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
      */
     public function get(): iterable
     {
-        foreach ($this->connection->getQueueNames() as $queueName) {
+        yield from $this->getFromQueues($this->connection->getQueueNames());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFromQueues(array $queueNames): iterable
+    {
+        foreach ($queueNames as $queueName) {
             yield from $this->getEnvelope($queueName);
         }
     }

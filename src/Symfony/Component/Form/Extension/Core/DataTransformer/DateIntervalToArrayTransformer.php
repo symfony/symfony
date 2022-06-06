@@ -57,7 +57,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      *
      * @param \DateInterval $dateInterval Normalized date interval
      *
-     * @return array Interval array
+     * @return array
      *
      * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */
@@ -103,7 +103,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      *
      * @param array $value Interval array
      *
-     * @return \DateInterval|null Normalized date interval
+     * @return \DateInterval|null
      *
      * @throws UnexpectedTypeException       if the given value is not an array
      * @throws TransformationFailedException if the value could not be transformed

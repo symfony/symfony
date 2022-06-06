@@ -11,9 +11,9 @@ TWILIO_DSN=twilio://SID:TOKEN@default?from=FROM
 ```
 
 where:
-- `SID` is your Twillio ID
-- `TOKEN` is your Twilio token
-- `FROM` is your sender
+ - `SID` is your Twillio ID
+ - `TOKEN` is your Twilio token
+ - `FROM` is your sender
 
 Resources
 ---------

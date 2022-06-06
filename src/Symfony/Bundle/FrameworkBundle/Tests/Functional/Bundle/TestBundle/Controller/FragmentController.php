@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Twig\Environment;
 
 class FragmentController implements ContainerAwareInterface
@@ -44,6 +46,11 @@ class FragmentController implements ContainerAwareInterface
     public function forwardLocaleAction(Request $request)
     {
         return new Response($request->getLocale());
+    }
+
+    public function fragmentUriAction(Request $request, FragmentUriGeneratorInterface $fragmentUriGenerator)
+    {
+        return new Response($fragmentUriGenerator->generate(new ControllerReference(self::class.'::indexAction'), $request));
     }
 }
 

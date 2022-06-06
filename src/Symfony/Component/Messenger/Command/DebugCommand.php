@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,6 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DebugCommand extends Command
 {
     protected static $defaultName = 'debug:messenger';
+    protected static $defaultDescription = 'List messages you can dispatch using the message buses';
 
     private $mapping;
 
@@ -43,7 +46,7 @@ class DebugCommand extends Command
     {
         $this
             ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of "%s")', implode('", "', array_keys($this->mapping))))
-            ->setDescription('List messages you can dispatch using the message buses')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all messages that can be
 dispatched using the message buses:
@@ -136,5 +139,12 @@ EOF
         }
 
         return '';
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('bus')) {
+            $suggestions->suggestValues(array_keys($this->mapping));
+        }
     }
 }

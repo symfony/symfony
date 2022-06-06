@@ -24,6 +24,7 @@ use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticato
 
 /**
  * @author Jean Pasdeloup <jpasdeloup@sedona.fr>
+ * @group legacy
  */
 class FormLoginAuthenticatorTest extends TestCase
 {
@@ -109,6 +110,8 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     /**
      * @param mixed $defaultSuccessRedirectUrl
+     *
+     * @return $this
      */
     public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl): self
     {
@@ -119,6 +122,8 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     /**
      * @param mixed $loginUrl
+     *
+     * @return $this
      */
     public function setLoginUrl($loginUrl): self
     {

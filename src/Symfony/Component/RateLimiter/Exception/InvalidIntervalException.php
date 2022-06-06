@@ -13,8 +13,6 @@ namespace Symfony\Component\RateLimiter\Exception;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @experimental in 5.2
  */
 class InvalidIntervalException extends \LogicException
 {

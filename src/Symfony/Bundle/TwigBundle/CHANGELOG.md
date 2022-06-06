@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add support for the new `serialize` filter (from Twig Bridge)
+
 5.2.0
 -----
 
@@ -33,7 +38,7 @@ CHANGELOG
 4.1.0
 -----
 
- * added priority to Twig extensions 
+ * added priority to Twig extensions
  * deprecated relying on the default value (`false`) of the `twig.strict_variables` configuration option. The `%kernel.debug%` parameter will be the new default in 5.0
 
 4.0.0

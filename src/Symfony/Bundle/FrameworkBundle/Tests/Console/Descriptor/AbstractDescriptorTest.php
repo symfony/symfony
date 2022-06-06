@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -119,6 +120,10 @@ abstract class AbstractDescriptorTest extends TestCase
 
         foreach ($definitions as $key => $definition) {
             $definitionsWithArgs[str_replace('definition_', 'definition_arguments_', $key)] = $definition;
+        }
+
+        if (\PHP_VERSION_ID >= 80100) {
+            $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
         }
 
         return $this->getDescriptionTestData($definitionsWithArgs);
@@ -261,7 +266,7 @@ abstract class AbstractDescriptorTest extends TestCase
         }
     }
 
-    private function getDescriptionTestData(array $objects)
+    private function getDescriptionTestData(iterable $objects)
     {
         $data = [];
         foreach ($objects as $name => $object) {
@@ -328,7 +333,7 @@ abstract class AbstractDescriptorTest extends TestCase
             foreach ($variations as $suffix => $options) {
                 $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
-                $data[] = [$object, $description, $options, $file];
+                $data[] = [$object, $description, $options];
             }
         }
 

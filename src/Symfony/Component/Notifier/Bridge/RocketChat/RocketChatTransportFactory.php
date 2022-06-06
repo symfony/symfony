@@ -18,8 +18,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
- *
- * @experimental in 5.2
  */
 final class RocketChatTransportFactory extends AbstractTransportFactory
 {

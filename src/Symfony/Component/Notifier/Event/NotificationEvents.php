@@ -15,8 +15,6 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 class NotificationEvents
 {

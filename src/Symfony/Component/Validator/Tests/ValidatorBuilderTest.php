@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests;
 
-use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
@@ -100,11 +99,7 @@ class ValidatorBuilderTest extends TestCase
         $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
         $r->setAccessible(true);
 
-        if (class_exists(PsrCachedReader::class)) {
-            $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
-        } else {
-            $this->assertInstanceOf(CachedReader::class, $r->getValue($loaders[0]));
-        }
+        $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
     }
 
     public function testEnableAnnotationMappingWithDefaultDoctrineAnnotationReader()
@@ -119,11 +114,7 @@ class ValidatorBuilderTest extends TestCase
         $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
         $r->setAccessible(true);
 
-        if (class_exists(PsrCachedReader::class)) {
-            $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
-        } else {
-            $this->assertInstanceOf(CachedReader::class, $r->getValue($loaders[0]));
-        }
+        $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
     }
 
     /**

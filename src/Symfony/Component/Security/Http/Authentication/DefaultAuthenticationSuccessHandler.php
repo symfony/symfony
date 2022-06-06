@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -29,8 +30,9 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     use TargetPathTrait;
 
     protected $httpUtils;
+    protected $logger;
     protected $options;
-    /** @deprecated since 5.2, use $firewallName instead */
+    /** @deprecated since Symfony 5.2, use $firewallName instead */
     protected $providerKey;
     protected $firewallName;
     protected $defaultOptions = [
@@ -44,9 +46,10 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     /**
      * @param array $options Options for processing a successful authentication attempt
      */
-    public function __construct(HttpUtils $httpUtils, array $options = [])
+    public function __construct(HttpUtils $httpUtils, array $options = [], LoggerInterface $logger = null)
     {
         $this->httpUtils = $httpUtils;
+        $this->logger = $logger;
         $this->setOptions($options);
     }
 
@@ -61,7 +64,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     /**
      * Gets the options.
      *
-     * @return array An array of options
+     * @return array
      */
     public function getOptions()
     {
@@ -78,7 +81,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @return string
      *
-     * @deprecated since 5.2, use getFirewallName() instead
+     * @deprecated since Symfony 5.2, use getFirewallName() instead
      */
     public function getProviderKey()
     {
@@ -127,8 +130,14 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $this->options['default_target_path'];
         }
 
-        if ($targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter'])) {
+        $targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter']);
+
+        if (\is_string($targetUrl) && str_starts_with($targetUrl, '/')) {
             return $targetUrl;
+        }
+
+        if ($this->logger && $targetUrl) {
+            $this->logger->debug(sprintf('Ignoring query parameter "%s": not a valid URL.', $this->options['target_path_parameter']));
         }
 
         $firewallName = $this->getFirewallName();

@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
  * @author  Fabio B. Silva <fabio.bat.silva@gmail.com>
@@ -49,6 +50,14 @@ class DoctrineExtensionTest extends TestCase
             ->willReturnCallback(function ($name) {
                 return 'doctrine.orm.'.$name;
             });
+
+        $this->extension
+            ->method('getMappingObjectDefaultName')
+            ->willReturn('Entity');
+
+        $this->extension
+            ->method('getMappingResourceExtension')
+            ->willReturn('orm');
     }
 
     public function testFixManagersAutoMappingsWithTwoAutomappings()
@@ -171,6 +180,23 @@ class DoctrineExtensionTest extends TestCase
         ], $expectedEm2));
     }
 
+    public function testMappingTypeDetection()
+    {
+        $container = $this->createContainer();
+
+        $reflection = new \ReflectionClass(\get_class($this->extension));
+        $method = $reflection->getMethod('detectMappingType');
+        $method->setAccessible(true);
+
+        // The ordinary fixtures contain annotation
+        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
+        $this->assertSame($mappingType, 'annotation');
+
+        // In the attribute folder, attributes are used
+        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
+        $this->assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
+    }
+
     public function providerBasicDrivers()
     {
         return [
@@ -250,6 +276,75 @@ class DoctrineExtensionTest extends TestCase
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
 
+    public function providerBundles()
+    {
+        yield ['AnnotationsBundle', 'annotation', '/Entity'];
+        if (\PHP_VERSION_ID >= 80000) {
+            yield ['AttributesBundle', 'attribute', '/Entity'];
+        }
+        yield ['XmlBundle', 'xml', '/Resources/config/doctrine'];
+        yield ['PhpBundle', 'php', '/Resources/config/doctrine'];
+        yield ['YamlBundle', 'yml', '/Resources/config/doctrine'];
+
+        yield ['SrcXmlBundle', 'xml', '/Resources/config/doctrine'];
+
+        yield ['NewAnnotationsBundle', 'annotation', \DIRECTORY_SEPARATOR.'src/Entity'];
+        yield ['NewXmlBundle', 'xml', '/config/doctrine'];
+    }
+
+    /**
+     * @dataProvider providerBundles
+     */
+    public function testBundleAutoMapping(string $bundle, string $expectedType, string $dirSuffix)
+    {
+        $bundleDir = __DIR__.'/../Fixtures/Bundles/'.$bundle;
+        $bundleClassName = 'Fixtures\\Bundles\\'.$bundle.'\\'.$bundle;
+
+        if (is_dir($bundleDir.'/src')) {
+            require_once $bundleDir.'/src/'.$bundle.'.php';
+        } else {
+            require_once $bundleDir.'/'.$bundle.'.php';
+        }
+
+        /** @var BundleInterface $bundleClass */
+        $bundleClass = new $bundleClassName();
+
+        $mappingConfig = [
+            'dir' => false,
+            'type' => false,
+            'prefix' => false,
+            'mapping' => true,
+            'is_bundle' => true,
+        ];
+
+        $this->extension
+            ->method('getMappingResourceConfigDirectory')
+            ->willReturnCallback(function ($bundleDir) {
+                if (null !== $bundleDir && is_dir($bundleDir.'/config/doctrine')) {
+                    return 'config/doctrine';
+                }
+
+                return 'Resources/config/doctrine';
+            });
+
+        $container = $this->createContainer([], [$bundle => $bundleClassName]);
+
+        $reflection = new \ReflectionClass(\get_class($this->extension));
+        $method = $reflection->getMethod('getMappingDriverBundleConfigDefaults');
+        $method->setAccessible(true);
+
+        $this->assertSame(
+            [
+                'dir' => $bundleClass->getPath().$dirSuffix,
+                'type' => $expectedType,
+                'prefix' => $bundleClass->getNamespace().'\\Entity',
+                'mapping' => true,
+                'is_bundle' => true,
+            ],
+            $method->invoke($this->extension, $mappingConfig, new \ReflectionClass($bundleClass), $container, $bundleClass->getPath())
+        );
+    }
+
     protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
     {
         $method = new \ReflectionMethod($this->extension, 'loadObjectManagerCacheDriver');
@@ -259,10 +354,10 @@ class DoctrineExtensionTest extends TestCase
         $method->invokeArgs($this->extension, [$objectManager, $container, $cacheName]);
     }
 
-    protected function createContainer(array $data = []): ContainerBuilder
+    protected function createContainer(array $data = [], array $extraBundles = []): ContainerBuilder
     {
         return new ContainerBuilder(new ParameterBag(array_merge([
-            'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],
+            'kernel.bundles' => array_merge(['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'], $extraBundles),
             'kernel.cache_dir' => __DIR__,
             'kernel.build_dir' => __DIR__,
             'kernel.container_class' => 'kernel',

@@ -477,7 +477,7 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * @return array|bool|float|int|string|null
+     * @return array|bool|float|int|string|\UnitEnum|null
      */
     public function getParameter(string $name)
     {
@@ -562,7 +562,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
-require __DIR__.'/Container%s/ProjectServiceContainer.php';
+(require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
 
 $classes = [];
 $classes[] = 'Bar\FooClass';
@@ -579,7 +579,7 @@ $classes[] = 'Some\Sidekick2';
 $classes[] = 'Request';
 $classes[] = 'Symfony\Component\DependencyInjection\ContainerInterface';
 
-Preloader::preload($classes);
+$preloaded = Preloader::preload($classes);
 
     [ProjectServiceContainer.php] => <?php
 

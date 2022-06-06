@@ -1,0 +1,30 @@
+{
+    "name": "symfony/all-my-sms-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony AllMySms Notifier Bridge",
+    "keywords": ["sms", "allMySms", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Quentin Dequippe",
+            "email": "quentin@dequippe.tech"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/http-client": "^4.3|^5.0|^6.0",
+        "symfony/notifier": "^5.3|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\AllMySms\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

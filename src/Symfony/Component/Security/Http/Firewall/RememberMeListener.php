@@ -24,12 +24,16 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', RememberMeListener::class);
+
 /**
  * RememberMeListener implements authentication capabilities via a cookie.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @final
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class RememberMeListener extends AbstractListener
 {

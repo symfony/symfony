@@ -12,9 +12,12 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Psr6\CacheAdapter;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated Since Symfony 5.4, use Doctrine\Common\Cache\Psr6\CacheAdapter instead
  */
 class DoctrineAdapter extends AbstractAdapter
 {
@@ -22,6 +25,8 @@ class DoctrineAdapter extends AbstractAdapter
 
     public function __construct(CacheProvider $provider, string $namespace = '', int $defaultLifetime = 0)
     {
+        trigger_deprecation('symfony/cache', '5.4', '"%s" is deprecated, use "%s" instead.', __CLASS__, CacheAdapter::class);
+
         parent::__construct('', $defaultLifetime);
         $this->provider = $provider;
         $provider->setNamespace($namespace);

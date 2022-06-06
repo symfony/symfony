@@ -13,13 +13,12 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bridge\Doctrine\Test\TestRepositoryFactory;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
@@ -34,9 +33,11 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapperType;
+use Symfony\Bridge\Doctrine\Tests\TestRepositoryFactory;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -110,7 +111,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($repositoryMock)
         ;
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $classMetadata
             ->expects($this->any())
             ->method('hasField')
@@ -859,12 +860,42 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValueMustBeObject()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+        ]);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $this->validator->validate('foo', $constraint);
+    }
+
+    public function testValueCanBeNull()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+        ]);
+
+        $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
+    }
+
     public function resultWithEmptyIterator(): array
     {
         $entity = new SingleIntIdEntity(1, 'foo');
 
         return [
             [$entity, new class() implements \Iterator {
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function current()
                 {
                     return null;
@@ -875,19 +906,28 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                     return false;
                 }
 
-                public function next()
+                public function next(): void
                 {
                 }
 
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function key()
                 {
+                    return false;
                 }
 
-                public function rewind()
+                public function rewind(): void
                 {
                 }
             }],
             [$entity, new class() implements \Iterator {
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function current()
                 {
                     return false;
@@ -898,15 +938,20 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                     return false;
                 }
 
-                public function next()
+                public function next(): void
                 {
                 }
 
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function key()
                 {
+                    return false;
                 }
 
-                public function rewind()
+                public function rewind(): void
                 {
                 }
             }],

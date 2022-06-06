@@ -1,0 +1,17 @@
+imports:
+    - { resource: services30.yml }
+
+parameters:
+    root_parameter: 'default value'
+
+when@dev:
+    parameters:
+        root_parameter: 'value when on dev'
+
+when@test:
+    parameters:
+        root_parameter: 'value when on test'
+
+when@prod:
+    parameters:
+        root_parameter: 'value when on prod'

@@ -40,7 +40,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
      */
     public function testLoginFailureWithLocalizedFailurePath($locale, array $options)
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => ($options['enable_authenticator_manager'] ? '' : 'legacy_').'localized_form_failure_handler.yml'] + $options);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_form_failure_handler.yml'] + $options);
 
         $crawler = $client->request('GET', '/'.$locale.'/login');
         $form = $crawler->selectButton('login')->form();
@@ -73,11 +73,79 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
         $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
     }
 
+    /**
+     * @group legacy
+     * @dataProvider getLegacyLocalesAndClientConfig
+     */
+    public function testLegacyLoginLogoutProcedure($locale, array $options)
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin'] + $options);
+
+        $crawler = $client->request('GET', '/'.$locale.'/login');
+        $form = $crawler->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/'.$locale.'/profile');
+        $this->assertEquals('Profile', $client->followRedirect()->text());
+
+        $client->request('GET', '/'.$locale.'/logout');
+        $this->assertRedirect($client->getResponse(), '/'.$locale.'/');
+        $this->assertEquals('Homepage', $client->followRedirect()->text());
+    }
+
+    /**
+     * @group issue-32995
+     * @group legacy
+     * @dataProvider getLegacyLocalesAndClientConfig
+     */
+    public function testLegacyLoginFailureWithLocalizedFailurePath($locale, array $options)
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_localized_form_failure_handler.yml'] + $options);
+
+        $crawler = $client->request('GET', '/'.$locale.'/login');
+        $form = $crawler->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'foobar';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getLegacyLocalesAndClientConfig
+     */
+    public function testLegacyAccessRestrictedResource($locale, array $options)
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin'] + $options);
+
+        $client->request('GET', '/'.$locale.'/secure/');
+        $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getLegacyLocalesAndClientConfig
+     */
+    public function testLegacyAccessRestrictedResourceWithForward($locale, array $options)
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_localized_routes_with_forward.yml'] + $options);
+
+        $crawler = $client->request('GET', '/'.$locale.'/secure/');
+        $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
+    }
+
     public function getLocalesAndClientConfig()
     {
-        yield ['en', ['enable_authenticator_manager' => true, 'root_config' => 'localized_routes.yml']];
-        yield ['en', ['enable_authenticator_manager' => false, 'root_config' => 'legacy_localized_routes.yml']];
-        yield ['de', ['enable_authenticator_manager' => true, 'root_config' => 'localized_routes.yml']];
-        yield ['de', ['enable_authenticator_manager' => false, 'root_config' => 'legacy_localized_routes.yml']];
+        yield ['en', ['root_config' => 'localized_routes.yml']];
+        yield ['de', ['root_config' => 'localized_routes.yml']];
+    }
+
+    public function getLegacyLocalesAndClientConfig()
+    {
+        yield ['en', ['root_config' => 'legacy_localized_routes.yml']];
+        yield ['de', ['root_config' => 'legacy_localized_routes.yml']];
     }
 }

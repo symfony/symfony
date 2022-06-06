@@ -499,12 +499,55 @@ Symfony\Component\VarDumper\Cloner\Data Object
                     [p1] => 123
                     [p2] => Symfony\Component\VarDumper\Cloner\Stub Object
                         (
-                            [type] => 4
-                            [class] => stdClass
-                            [value] => 
+                            [type] => 1
+                            [class] => 
+                            [value] => Symfony\Component\VarDumper\Cloner\Stub Object
+                                (
+                                    [type] => 4
+                                    [class] => stdClass
+                                    [value] => 
+                                    [cut] => 0
+                                    [handle] => %i
+                                    [refCount] => 1
+                                    [position] => 0
+                                    [attr] => Array
+                                        (
+                                        )
+
+                                )
+
                             [cut] => 0
-                            [handle] => %i
-                            [refCount] => 0
+                            [handle] => 1
+                            [refCount] => 1
+                            [position] => 0
+                            [attr] => Array
+                                (
+                                )
+
+                        )
+
+                    [p3] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 1
+                            [class] => 
+                            [value] => Symfony\Component\VarDumper\Cloner\Stub Object
+                                (
+                                    [type] => 4
+                                    [class] => stdClass
+                                    [value] => 
+                                    [cut] => 0
+                                    [handle] => %i
+                                    [refCount] => 1
+                                    [position] => 0
+                                    [attr] => Array
+                                        (
+                                        )
+
+                                )
+
+                            [cut] => 0
+                            [handle] => 1
+                            [refCount] => 1
                             [position] => 0
                             [attr] => Array
                                 (

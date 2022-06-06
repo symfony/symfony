@@ -43,7 +43,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * Checks if a templating engine has been set.
      *
-     * @return bool true if the templating engine has been set, false otherwise
+     * @return bool
      */
     public function hasTemplating()
     {
@@ -62,12 +62,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     public function render($uri, Request $request, array $options = [])
     {
         if ($uri instanceof ControllerReference) {
-            if (null === $this->signer) {
-                throw new \LogicException('You must use a proper URI when using the Hinclude rendering strategy or set a URL signer.');
-            }
-
-            // we need to sign the absolute URI, but want to return the path only.
-            $uri = substr($this->signer->sign($this->generateFragmentUri($uri, $request, true)), \strlen($request->getSchemeAndHttpHost()));
+            $uri = (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request);
         }
 
         // We need to replace ampersands in the URI with the encoded form in order to return valid html/xml content.

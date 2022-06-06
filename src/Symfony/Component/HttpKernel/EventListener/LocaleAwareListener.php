@@ -29,7 +29,7 @@ class LocaleAwareListener implements EventSubscriberInterface
     private $requestStack;
 
     /**
-     * @param LocaleAwareInterface[] $localeAwareServices
+     * @param iterable<mixed, LocaleAwareInterface> $localeAwareServices
      */
     public function __construct(iterable $localeAwareServices, RequestStack $requestStack)
     {

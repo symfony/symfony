@@ -93,7 +93,7 @@ class UrlPackage extends Package
     /**
      * Returns the base URL for a path.
      *
-     * @return string The base URL
+     * @return string
      */
     public function getBaseUrl(string $path)
     {
@@ -110,7 +110,7 @@ class UrlPackage extends Package
      * Override this method to change the default distribution strategy.
      * This method should always return the same base URL index for a given path.
      *
-     * @return int The base URL index for the given path
+     * @return int
      */
     protected function chooseBaseUrl(string $path)
     {

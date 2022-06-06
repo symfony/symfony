@@ -48,8 +48,30 @@ class InMemoryFactory implements UserProviderFactoryInterface
             ->fixXmlConfig('user')
             ->children()
                 ->arrayNode('users')
-                    ->useAttributeAsKey('name')
+                    ->useAttributeAsKey('identifier')
                     ->normalizeKeys(false)
+                    ->beforeNormalization()
+                        ->always()
+                        ->then(function ($v) {
+                            $deprecation = false;
+                            foreach ($v as $i => $child) {
+                                if (!isset($child['name'])) {
+                                    continue;
+                                }
+
+                                $deprecation = true;
+
+                                $v[$i]['identifier'] = $child['name'];
+                                unset($v[$i]['name']);
+                            }
+
+                            if ($deprecation) {
+                                trigger_deprecation('symfony/security-bundle', '5.3', 'The "in_memory.user.name" option is deprecated, use "identifier" instead.');
+                            }
+
+                            return $v;
+                        })
+                    ->end()
                     ->prototype('array')
                         ->children()
                             ->scalarNode('password')->defaultNull()->end()

@@ -14,12 +14,16 @@ namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Tools\Setup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEnum;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -122,6 +126,18 @@ class DoctrineExtractorTest extends TestCase
         );
 
         $this->assertEquals($expectedTypes, $actualTypes);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testExtractEnum()
+    {
+        if (!property_exists(Column::class, 'enumType')) {
+            $this->markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
+        }
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString', []));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt', []));
     }
 
     public function typesProvider()

@@ -11,12 +11,17 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', EncoderFactoryInterface::class, PasswordHasherFactoryInterface::class);
 
 /**
  * EncoderFactoryInterface to support different encoders for different accounts.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.3, use {@link PasswordHasherFactoryInterface} instead
  */
 interface EncoderFactoryInterface
 {

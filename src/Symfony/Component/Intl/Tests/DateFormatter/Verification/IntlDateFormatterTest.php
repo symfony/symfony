@@ -61,7 +61,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 
-        if (!$formatter = new \IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern)) {
+        if (!$formatter = new \IntlDateFormatter($locale, $datetype ?? IntlDateFormatter::FULL, $timetype ?? IntlDateFormatter::FULL, $timezone, $calendar, $pattern)) {
             throw new \InvalidArgumentException(intl_get_error_message());
         }
 

@@ -139,6 +139,7 @@ class MetadataBag implements SessionBagInterface
     public function clear()
     {
         // nothing to do
+        return null;
     }
 
     /**
@@ -161,6 +162,6 @@ class MetadataBag implements SessionBagInterface
     {
         $timeStamp = time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;
-        $this->meta[self::LIFETIME] = $lifetime ?? ini_get('session.cookie_lifetime');
+        $this->meta[self::LIFETIME] = $lifetime ?? (int) ini_get('session.cookie_lifetime');
     }
 }

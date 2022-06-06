@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -35,6 +37,7 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 class ServerDumpCommand extends Command
 {
     protected static $defaultName = 'server:dump';
+    protected static $defaultDescription = 'Start a dump server that collects and displays dumps in a single place';
 
     private $server;
 
@@ -54,11 +57,9 @@ class ServerDumpCommand extends Command
 
     protected function configure()
     {
-        $availableFormats = implode(', ', array_keys($this->descriptors));
-
         $this
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format (%s)', $availableFormats), 'cli')
-            ->setDescription('Start a dump server that collects and displays dumps in a single place')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format (%s)', implode(', ', $this->getAvailableFormats())), 'cli')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> starts a dump server that collects and displays
 dumps in a single place for debugging you application:
@@ -97,5 +98,17 @@ EOF
         });
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues($this->getAvailableFormats());
+        }
+    }
+
+    private function getAvailableFormats(): array
+    {
+        return array_keys($this->descriptors);
     }
 }

@@ -14,7 +14,9 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
@@ -70,6 +72,7 @@ final class SlackOptionsTest extends TestCase
         yield [['unfurl_links' => true]];
         yield [['unfurl_media' => true]];
         yield [['username' => 'baz']];
+        yield [['thread_ts' => '1503435956.000247']];
     }
 
     /**
@@ -111,6 +114,7 @@ final class SlackOptionsTest extends TestCase
         yield ['unfurlLinks', 'unfurl_links', true];
         yield ['unfurlMedia', 'unfurl_media', true];
         yield ['username', 'username', 'baz'];
+        yield ['threadTs', 'thread_ts', '1503435956.000247'];
     }
 
     public function testSetBlock()
@@ -184,5 +188,43 @@ final class SlackOptionsTest extends TestCase
             ],
             (new Notification($subject))->emoji($emoji)->content($content),
         ];
+    }
+
+    public function testConstructWithMaximumBlocks()
+    {
+        $options = new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 49))]);
+
+        $this->assertCount(50, $options->toArray()['blocks']);
+    }
+
+    public function testConstructThrowsWithTooManyBlocks()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
+
+        new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 50))]);
+    }
+
+    public function testAddMaximumBlocks()
+    {
+        $options = new SlackOptions();
+        for ($i = 0; $i < 50; ++$i) {
+            $options->block(new SlackSectionBlock());
+        }
+
+        $this->assertCount(50, $options->toArray()['blocks']);
+    }
+
+    public function testThrowsWhenBlocksLimitReached()
+    {
+        $options = new SlackOptions();
+        for ($i = 0; $i < 50; ++$i) {
+            $options->block(new SlackSectionBlock());
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
+
+        $options->block(new SlackSectionBlock());
     }
 }

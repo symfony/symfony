@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentSer
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -45,6 +46,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NewInInitializer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
@@ -1210,6 +1212,24 @@ class PhpDumperTest extends TestCase
     /**
      * @requires PHP 8.1
      */
+    public function testNewInInitializer()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', NewInInitializer::class)
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->setArguments(['$bar' => 234]);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_new_in_initializer.php', $dumper->dump());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();
@@ -1218,16 +1238,37 @@ class PhpDumperTest extends TestCase
             ->setPublic(true)
             ->addArgument(FooUnitEnum::BAR);
 
+        $container->setParameter('unit_enum', FooUnitEnum::BAR);
+        $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        eval('?>'.$dumper->dump([
+        eval('?>'.$dumpedContainer = $dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_Enumeration',
         ]));
 
+        /** @var Container $container */
         $container = new \Symfony_DI_PhpDumper_Test_Enumeration();
 
         $this->assertSame(FooUnitEnum::BAR, $container->get('foo')->getBar());
+        $this->assertSame(FooUnitEnum::BAR, $container->getParameter('unit_enum'));
+        $this->assertSame([FooUnitEnum::BAR, FooUnitEnum::FOO], $container->getParameter('enum_array'));
+        $this->assertStringMatchesFormat(<<<'PHP'
+%A
+    private function getDynamicParameter(string $name)
+    {
+        switch ($name) {
+            case 'unit_enum': $value = \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR; break;
+            case 'enum_array': $value = [
+                0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
+                1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
+            ]; break;
+            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
+        }
+%A
+PHP
+            , $dumpedContainer
+        );
     }
 
     public function testUninitializedSyntheticReference()

@@ -198,6 +198,8 @@ class NativeRequestHandler implements RequestHandlerInterface
             return $data;
         }
 
+        // Remove extra key added by PHP 8.1.
+        unset($data['full_path']);
         $keys = array_keys($data);
         sort($keys);
 
@@ -226,7 +228,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * Sets empty uploaded files to NULL in the given uploaded files array.
      *
-     * @return mixed Returns the stripped upload data
+     * @return mixed
      */
     private static function stripEmptyFiles($data)
     {

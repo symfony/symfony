@@ -11,10 +11,16 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
+use Symfony\Component\PasswordHasher\Hasher\CheckPasswordLengthTrait;
+
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', BasePasswordEncoder::class, CheckPasswordLengthTrait::class);
+
 /**
  * BasePasswordEncoder is the base class for all password encoders.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use CheckPasswordLengthTrait instead
  */
 abstract class BasePasswordEncoder implements PasswordEncoderInterface
 {
@@ -54,7 +60,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
     /**
      * Merges a password and a salt.
      *
-     * @return string a merged password and salt
+     * @return string
      *
      * @throws \InvalidArgumentException
      */
@@ -77,7 +83,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      * This method implements a constant-time algorithm to compare passwords to
      * avoid (remote) timing attacks.
      *
-     * @return bool true if the two passwords are the same, false otherwise
+     * @return bool
      */
     protected function comparePasswords(string $password1, string $password2)
     {
@@ -87,7 +93,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
     /**
      * Checks if the password is too long.
      *
-     * @return bool true if the password is too long, false otherwise
+     * @return bool
      */
     protected function isPasswordTooLong(string $password)
     {

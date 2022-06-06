@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `TesterTrait::assertCommandIsSuccessful()` to test command
+ * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+
+5.3
+---
+
+ * Add `GithubActionReporter` to render annotations in a Github Action
+ * Add `InputOption::VALUE_NEGATABLE` flag to handle `--foo`/`--no-foo` options
+ * Add the `Command::$defaultDescription` static property and the `description` attribute
+   on the `console.command` tag to allow the `list` command to instantiate commands lazily
+ * Add option `--short` to the `list` command
+ * Add support for bright colors
+ * Add `#[AsCommand]` attribute for declaring commands on PHP 8
+ * Add `Helper::width()` and `Helper::length()`
+ * The `--ansi` and `--no-ansi` options now default to `null`.
+
 5.2.0
 -----
 

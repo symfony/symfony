@@ -62,6 +62,9 @@ class PhpDumper extends Dumper
      */
     public const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 
+    /**
+     * @var \SplObjectStorage<Definition, Variable>|null
+     */
     private $definitionVariables;
     private $referenceVariables;
     private $variableCount;
@@ -219,7 +222,7 @@ class PhpDumper extends Dumper
         }
 
         $code =
-            $this->startClass($options['class'], $baseClass).
+            $this->startClass($options['class'], $baseClass, $this->inlineFactories && $proxyClasses).
             $this->addServices($services).
             $this->addDeprecatedAliases().
             $this->addDefaultParametersMethod()
@@ -283,14 +286,15 @@ EOF;
 
             $code .= $this->endClass();
 
-            if ($this->inlineFactories) {
+            if ($this->inlineFactories && $proxyClasses) {
+                $files['proxy-classes.php'] = "<?php\n\n";
+
                 foreach ($proxyClasses as $c) {
-                    $code .= $c;
+                    $files['proxy-classes.php'] .= $c;
                 }
             }
 
             $files[$options['class'].'.php'] = $code;
-            $preloadedFiles[$options['class'].'.php'] = $options['class'].'.php';
             $hash = ucfirst(strtr(ContainerBuilder::hash($files), '._', 'xx'));
             $code = [];
 
@@ -310,7 +314,9 @@ EOF;
                 $autoloadFile = trim($this->export($autoloadFile), '()\\');
 
                 $preloadedFiles = array_reverse($preloadedFiles);
-                $preloadedFiles = implode("';\nrequire __DIR__.'/", $preloadedFiles);
+                if ('' !== $preloadedFiles = implode("';\nrequire __DIR__.'/", $preloadedFiles)) {
+                    $preloadedFiles = "require __DIR__.'/$preloadedFiles';\n";
+                }
 
                 $code[$options['class'].'.preload.php'] = <<<EOF
 <?php
@@ -325,8 +331,8 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require $autoloadFile;
-require __DIR__.'/$preloadedFiles';
-
+(require __DIR__.'/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
+$preloadedFiles
 \$classes = [];
 
 EOF;
@@ -335,14 +341,14 @@ EOF;
                     if (!$class || str_contains($class, '$') || \in_array($class, ['int', 'float', 'string', 'bool', 'resource', 'object', 'array', 'null', 'callable', 'iterable', 'mixed', 'void'], true)) {
                         continue;
                     }
-                    if (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || (new \ReflectionClass($class))->isUserDefined()) {
+                    if (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || ((new \ReflectionClass($class))->isUserDefined() && !\in_array($class, ['Attribute', 'JsonException', 'ReturnTypeWillChange', 'Stringable', 'UnhandledMatchError', 'ValueError'], true))) {
                         $code[$options['class'].'.preload.php'] .= sprintf("\$classes[] = '%s';\n", $class);
                     }
                 }
 
                 $code[$options['class'].'.preload.php'] .= <<<'EOF'
 
-Preloader::preload($classes);
+$preloaded = Preloader::preload($classes);
 
 EOF;
             }
@@ -739,8 +745,8 @@ EOF;
         $calls = '';
         foreach ($definition->getMethodCalls() as $k => $call) {
             $arguments = [];
-            foreach ($call[1] as $value) {
-                $arguments[] = $this->dumpValue($value);
+            foreach ($call[1] as $i => $value) {
+                $arguments[] = (\is_string($i) ? $i.': ' : '').$this->dumpValue($value);
             }
 
             $witherAssignation = '';
@@ -1132,8 +1138,8 @@ EOTXT
         }
 
         $arguments = [];
-        foreach ($definition->getArguments() as $value) {
-            $arguments[] = $this->dumpValue($value);
+        foreach ($definition->getArguments() as $i => $value) {
+            $arguments[] = (\is_string($i) ? $i.': ' : '').$this->dumpValue($value);
         }
 
         if (null !== $definition->getFactory()) {
@@ -1176,7 +1182,7 @@ EOTXT
         return $return.sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments)).$tail;
     }
 
-    private function startClass(string $class, string $baseClass): string
+    private function startClass(string $class, string $baseClass, bool $hasProxyClasses): string
     {
         $namespaceLine = !$this->asFiles && $this->namespace ? "\nnamespace {$this->namespace};\n" : '';
 
@@ -1236,7 +1242,7 @@ EOF;
         $code .= $this->addMethodMap();
         $code .= $this->asFiles && !$this->inlineFactories ? $this->addFileMap() : '';
         $code .= $this->addAliases();
-        $code .= $this->addInlineRequires();
+        $code .= $this->addInlineRequires($hasProxyClasses);
         $code .= <<<EOF
     }
 
@@ -1448,15 +1454,12 @@ EOF;
         return $code;
     }
 
-    private function addInlineRequires(): string
+    private function addInlineRequires(bool $hasProxyClasses): string
     {
-        if (!$this->hotPathTag || !$this->inlineRequires) {
-            return '';
-        }
-
         $lineage = [];
+        $hotPathServices = $this->hotPathTag && $this->inlineRequires ? $this->container->findTaggedServiceIds($this->hotPathTag) : [];
 
-        foreach ($this->container->findTaggedServiceIds($this->hotPathTag) as $id => $tags) {
+        foreach ($hotPathServices as $id => $tags) {
             $definition = $this->container->getDefinition($id);
 
             if ($this->getProxyDumper()->isProxyCandidate($definition)) {
@@ -1481,6 +1484,10 @@ EOF;
             }
         }
 
+        if ($hasProxyClasses) {
+            $code .= "\n            include_once __DIR__.'/proxy-classes.php';";
+        }
+
         return $code ? sprintf("\n        \$this->privates['service_container'] = function () {%s\n        };\n", $code) : '';
     }
 
@@ -1497,10 +1504,11 @@ EOF;
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
                 throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: "%s".', $resolvedKey));
             }
-            $export = $this->exportParameters([$value]);
+            $hasEnum = false;
+            $export = $this->exportParameters([$value], '', 12, $hasEnum);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
-            if (preg_match("/\\\$this->(?:getEnv\('(?:[-.\w]*+:)*+\w++'\)|targetDir\.'')/", $export[1])) {
+            if ($hasEnum || preg_match("/\\\$this->(?:getEnv\('(?:[-.\w]*+:)*+\w++'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%scase %s: $value = %s; break;', $export[0], $this->export($key), $export[1]);
             } else {
                 $php[] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
@@ -1511,7 +1519,7 @@ EOF;
         $code = <<<'EOF'
 
     /**
-     * @return array|bool|float|int|string|null
+     * @return array|bool|float|int|string|\UnitEnum|null
      */
     public function getParameter(string $name)
     {
@@ -1604,12 +1612,12 @@ EOF;
     /**
      * @throws InvalidArgumentException
      */
-    private function exportParameters(array $parameters, string $path = '', int $indent = 12): string
+    private function exportParameters(array $parameters, string $path = '', int $indent = 12, bool &$hasEnum = false): string
     {
         $php = [];
         foreach ($parameters as $key => $value) {
             if (\is_array($value)) {
-                $value = $this->exportParameters($value, $path.'/'.$key, $indent + 4);
+                $value = $this->exportParameters($value, $path.'/'.$key, $indent + 4, $hasEnum);
             } elseif ($value instanceof ArgumentInterface) {
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain special arguments. "%s" found in "%s".', get_debug_type($value), $path.'/'.$key));
             } elseif ($value instanceof Variable) {
@@ -1620,6 +1628,9 @@ EOF;
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain references to other services (reference to service "%s" found in "%s").', $value, $path.'/'.$key));
             } elseif ($value instanceof Expression) {
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain expressions. Expression "%s" found in "%s".', $value, $path.'/'.$key));
+            } elseif ($value instanceof \UnitEnum) {
+                $hasEnum = true;
+                $value = sprintf('\%s::%s', \get_class($value), $value->name);
             } else {
                 $value = $this->export($value);
             }
@@ -1751,7 +1762,7 @@ EOF;
 
                     $returnedType = '';
                     if ($value instanceof TypedReference) {
-                        $returnedType = sprintf(': %s\%s', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $value->getInvalidBehavior() ? '' : '?', $value->getType());
+                        $returnedType = sprintf(': %s\%s', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $value->getInvalidBehavior() ? '' : '?', str_replace(['|', '&'], ['|\\', '&\\'], $value->getType()));
                     }
 
                     $code = sprintf('return %s;', $code);

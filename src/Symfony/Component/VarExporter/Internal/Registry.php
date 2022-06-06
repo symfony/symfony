@@ -27,11 +27,11 @@ class Registry
     public static $cloneable = [];
     public static $instantiableWithoutConstructor = [];
 
+    public $classes = [];
+
     public function __construct(array $classes)
     {
-        foreach ($classes as $i => $class) {
-            $this->$i = $class;
-        }
+        $this->classes = $classes;
     }
 
     public static function unserialize($objects, $serializables)

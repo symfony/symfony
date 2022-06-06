@@ -28,7 +28,7 @@ class Reference
     }
 
     /**
-     * @return string The service identifier
+     * @return string
      */
     public function __toString()
     {

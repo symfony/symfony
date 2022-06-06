@@ -26,6 +26,10 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
 
     public function __construct(string $privateTagName = 'container.private')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/framework-bundle', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->privateTagName = $privateTagName;
     }
 

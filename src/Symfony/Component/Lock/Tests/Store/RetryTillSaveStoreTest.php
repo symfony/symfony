@@ -26,7 +26,7 @@ class RetryTillSaveStoreTest extends AbstractStoreTest
 
     public function getStore(): PersistingStoreInterface
     {
-        $redis = new \Predis\Client('tcp://'.getenv('REDIS_HOST').':6379');
+        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
         try {
             $redis->connect();
         } catch (\Exception $e) {

@@ -33,7 +33,7 @@ final class DelayStamp implements StampInterface
 
     public static function delayFor(\DateInterval $interval): self
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $end = $now->add($interval);
 
         return new self(($end->getTimestamp() - $now->getTimestamp()) * 1000);

@@ -28,6 +28,10 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
 
     public function __construct(string $tag = 'container.stack')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/dependency-injection', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->tag = $tag;
     }
 

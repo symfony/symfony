@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Monolog\Formatter\FormatterInterface;
 use Symfony\Bridge\Monolog\Command\ServerLogCommand;
+use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Twig\Extension\DumpExtension;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\EventListener\DumpListener;
@@ -127,9 +129,12 @@ return static function (ContainerConfigurator $container) {
                     'html' => inline_service(HtmlDescriptor::class)->args([service('var_dumper.html_dumper')]),
                 ],
             ])
-            ->tag('console.command', ['command' => 'server:dump'])
+            ->tag('console.command')
 
         ->set('monolog.command.server_log', ServerLogCommand::class)
-            ->tag('console.command', ['command' => 'server:log'])
     ;
+
+    if (class_exists(ConsoleFormatter::class) && interface_exists(FormatterInterface::class)) {
+        $container->services()->get('monolog.command.server_log')->tag('console.command');
+    }
 };

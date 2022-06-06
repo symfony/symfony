@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * Default implementation of {@link FormRendererEngineInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractRendererEngine implements FormRendererEngineInterface
+abstract class AbstractRendererEngine implements FormRendererEngineInterface, ResetInterface
 {
     /**
      * The variable in {@link FormView} used as cache key.
@@ -68,7 +70,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
 
         // Do not cast, as casting turns objects into arrays of properties
         $this->themes[$cacheKey] = \is_array($themes) ? $themes : [$themes];
-        $this->useDefaultThemes[$cacheKey] = (bool) $useDefaultThemes;
+        $this->useDefaultThemes[$cacheKey] = $useDefaultThemes;
 
         // Unset instead of resetting to an empty array, in order to allow
         // implementations (like TwigRendererEngine) to check whether $cacheKey
@@ -132,7 +134,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @see getResourceForBlock()
      *
-     * @return bool True if the resource could be loaded, false otherwise
+     * @return bool
      */
     abstract protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName);
 
@@ -192,5 +194,13 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
         $this->resourceHierarchyLevels[$cacheKey][$blockName] = false;
 
         return false;
+    }
+
+    public function reset(): void
+    {
+        $this->themes = [];
+        $this->useDefaultThemes = [];
+        $this->resources = [];
+        $this->resourceHierarchyLevels = [];
     }
 }

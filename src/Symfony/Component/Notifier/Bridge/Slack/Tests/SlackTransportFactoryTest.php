@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
@@ -31,17 +31,17 @@ final class SlackTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             'slack://host.test',
-            'slack://testUser@host.test',
+            'slack://xoxb-TestToken@host.test',
         ];
 
         yield 'with path' => [
             'slack://host.test?channel=testChannel',
-            'slack://testUser@host.test/?channel=testChannel',
+            'slack://xoxb-TestToken@host.test/?channel=testChannel',
         ];
 
         yield 'without path' => [
             'slack://host.test?channel=testChannel',
-            'slack://testUser@host.test?channel=testChannel',
+            'slack://xoxb-TestToken@host.test?channel=testChannel',
         ];
     }
 
@@ -52,13 +52,13 @@ final class SlackTransportFactoryTest extends TransportFactoryTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
 
-        $factory->create(Dsn::fromString('slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX'));
+        $factory->create(new Dsn('slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX'));
     }
 
     public function supportsProvider(): iterable
     {
-        yield [true, 'slack://host?channel=testChannel'];
-        yield [false, 'somethingElse://host?channel=testChannel'];
+        yield [true, 'slack://xoxb-TestToken@host?channel=testChannel'];
+        yield [false, 'somethingElse://xoxb-TestToken@host?channel=testChannel'];
     }
 
     public function incompleteDsnProvider(): iterable
@@ -68,6 +68,6 @@ final class SlackTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield ['somethingElse://host?channel=testChannel'];
+        yield ['somethingElse://xoxb-TestToken@host?channel=testChannel'];
     }
 }

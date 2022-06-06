@@ -4,6 +4,7 @@ $container->loadFromExtension('framework', [
     'serializer' => true,
     'messenger' => [
         'failure_transport' => 'failed',
+        'reset_on_message' =>  true,
         'serializer' => [
             'default_serializer' => 'messenger.transport.symfony_serializer',
         ],

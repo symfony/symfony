@@ -23,7 +23,7 @@ class ScalarNodeDefinition extends VariableNodeDefinition
     /**
      * Instantiate a Node.
      *
-     * @return ScalarNode The node
+     * @return ScalarNode
      */
     protected function instantiateNode()
     {

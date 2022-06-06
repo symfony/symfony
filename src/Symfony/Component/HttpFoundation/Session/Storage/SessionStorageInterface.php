@@ -24,7 +24,7 @@ interface SessionStorageInterface
     /**
      * Starts the session.
      *
-     * @return bool True if started
+     * @return bool
      *
      * @throws \RuntimeException if something goes wrong starting the session
      */
@@ -33,14 +33,14 @@ interface SessionStorageInterface
     /**
      * Checks if the session is started.
      *
-     * @return bool True if started, false otherwise
+     * @return bool
      */
     public function isStarted();
 
     /**
      * Returns the session ID.
      *
-     * @return string The session ID or empty
+     * @return string
      */
     public function getId();
 
@@ -52,7 +52,7 @@ interface SessionStorageInterface
     /**
      * Returns the session name.
      *
-     * @return string The session name
+     * @return string
      */
     public function getName();
 
@@ -86,7 +86,7 @@ interface SessionStorageInterface
      *                       to expire with browser session. Time is in seconds, and is
      *                       not a Unix timestamp.
      *
-     * @return bool True if session regenerated, false if error
+     * @return bool
      *
      * @throws \RuntimeException If an error occurs while regenerating this storage
      */

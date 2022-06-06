@@ -18,11 +18,15 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', TokenBasedRememberMeServices::class, SignatureRememberMeHandler::class);
+
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
  * remember-me capabilities without requiring a TokenProvider.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use {@see SignatureRememberMeHandler} instead
  */
 class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {
@@ -35,12 +39,20 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new AuthenticationException('The cookie is invalid.');
         }
 
-        [$class, $username, $expires, $hash] = $cookieParts;
-        if (false === $username = base64_decode($username, true)) {
-            throw new AuthenticationException('$username contains a character from outside the base64 alphabet.');
+        [$class, $userIdentifier, $expires, $hash] = $cookieParts;
+        if (false === $userIdentifier = base64_decode($userIdentifier, true)) {
+            throw new AuthenticationException('$userIdentifier contains a character from outside the base64 alphabet.');
         }
         try {
-            $user = $this->getUserProvider($class)->loadUserByUsername($username);
+            $userProvider = $this->getUserProvider($class);
+            // @deprecated since Symfony 5.3, change to $userProvider->loadUserByIdentifier() in 6.0
+            if (method_exists($userProvider, 'loadUserByIdentifier')) {
+                $user = $userProvider->loadUserByIdentifier($userIdentifier);
+            } else {
+                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($userProvider));
+
+                $user = $userProvider->loadUserByUsername($userIdentifier);
+            }
         } catch (\Exception $e) {
             if (!$e instanceof AuthenticationException) {
                 $e = new AuthenticationException($e->getMessage(), $e->getCode(), $e);
@@ -53,7 +65,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_debug_type($user)));
         }
 
-        if (true !== hash_equals($this->generateCookieHash($class, $username, $expires, $user->getPassword()), $hash)) {
+        if (true !== hash_equals($this->generateCookieHash($class, $userIdentifier, $expires, $user->getPassword()), $hash)) {
             throw new AuthenticationException('The cookie\'s hash is invalid.');
         }
 
@@ -71,7 +83,8 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     {
         $user = $token->getUser();
         $expires = time() + $this->options['lifetime'];
-        $value = $this->generateCookieValue(\get_class($user), $user->getUsername(), $expires, $user->getPassword());
+        // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
+        $value = $this->generateCookieValue(\get_class($user), method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), $expires, $user->getPassword());
 
         $response->headers->setCookie(
             new Cookie(
@@ -96,15 +109,15 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      *
      * @return string
      */
-    protected function generateCookieValue(string $class, string $username, int $expires, ?string $password)
+    protected function generateCookieValue(string $class, string $userIdentifier, int $expires, ?string $password)
     {
-        // $username is encoded because it might contain COOKIE_DELIMITER,
+        // $userIdentifier is encoded because it might contain COOKIE_DELIMITER,
         // we assume other values don't
         return $this->encodeCookie([
             $class,
-            base64_encode($username),
+            base64_encode($userIdentifier),
             $expires,
-            $this->generateCookieHash($class, $username, $expires, $password),
+            $this->generateCookieHash($class, $userIdentifier, $expires, $password),
         ]);
     }
 
@@ -116,8 +129,8 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      *
      * @return string
      */
-    protected function generateCookieHash(string $class, string $username, int $expires, ?string $password)
+    protected function generateCookieHash(string $class, string $userIdentifier, int $expires, ?string $password)
     {
-        return hash_hmac('sha256', $class.self::COOKIE_DELIMITER.$username.self::COOKIE_DELIMITER.$expires.self::COOKIE_DELIMITER.$password, $this->getSecret());
+        return hash_hmac('sha256', $class.self::COOKIE_DELIMITER.$userIdentifier.self::COOKIE_DELIMITER.$expires.self::COOKIE_DELIMITER.$password, $this->getSecret());
     }
 }

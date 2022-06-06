@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Infobip;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -24,8 +24,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jérémy Romey <jeremy@free-agent.fr>
- *
- * @experimental in 5.2
  */
 final class InfobipTransport extends AbstractTransport
 {
@@ -53,7 +51,7 @@ final class InfobipTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $endpoint = sprintf('https://%s/sms/2/text/advanced', $this->getEndpoint());
@@ -94,7 +92,7 @@ final class InfobipTransport extends AbstractTransport
         return new SentMessage($message, (string) $this);
     }
 
-    protected function getEndpoint(): ?string
+    protected function getEndpoint(): string
     {
         return $this->host.($this->port ? ':'.$this->port : '');
     }

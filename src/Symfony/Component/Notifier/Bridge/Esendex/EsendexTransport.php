@@ -13,8 +13,8 @@ namespace Symfony\Component\Notifier\Bridge\Esendex;
 
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\TransportException as HttpClientTransportException;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -23,20 +23,19 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * @experimental in 5.2
- */
 final class EsendexTransport extends AbstractTransport
 {
     protected const HOST = 'api.esendex.com';
 
-    private $token;
+    private $email;
+    private $password;
     private $accountReference;
     private $from;
 
-    public function __construct(string $token, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $email, string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
-        $this->token = $token;
+        $this->email = $email;
+        $this->password = $password;
         $this->accountReference = $accountReference;
         $this->from = $from;
 
@@ -56,7 +55,7 @@ final class EsendexTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $messageData = [
@@ -69,7 +68,10 @@ final class EsendexTransport extends AbstractTransport
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
-            'auth_basic' => $this->token,
+            'auth_basic' => sprintf('%s:%s', $this->email, $this->password),
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
             'json' => [
                 'accountreference' => $this->accountReference,
                 'messages' => [$messageData],
@@ -83,7 +85,15 @@ final class EsendexTransport extends AbstractTransport
         }
 
         if (200 === $statusCode) {
-            return new SentMessage($message, (string) $this);
+            $result = $response->toArray();
+            $sentMessage = new SentMessage($message, (string) $this);
+
+            $messageId = $result['batch']['messageheaders'][0]['id'] ?? null;
+            if ($messageId) {
+                $sentMessage->setMessageId($messageId);
+            }
+
+            return $sentMessage;
         }
 
         $message = sprintf('Unable to send the SMS: error %d.', $statusCode);

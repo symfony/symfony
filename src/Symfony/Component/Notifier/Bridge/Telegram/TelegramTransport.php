@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Telegram;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -27,8 +28,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 final class TelegramTransport extends AbstractTransport
 {
@@ -66,7 +65,7 @@ final class TelegramTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
         if ($message->getOptions() && !$message->getOptions() instanceof TelegramOptions) {
@@ -81,8 +80,9 @@ final class TelegramTransport extends AbstractTransport
 
         $options['text'] = $message->getSubject();
 
-        if (!isset($options['parse_mode'])) {
+        if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
+            $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!])/', '\\\\$1', $message->getSubject());
         }
 
         $response = $this->client->request('POST', $endpoint, [

@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
+
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -54,13 +57,26 @@ class PhpFileLoaderTest extends TestCase
         $this->assertStringEqualsFile($fixtures.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', $fixtures.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR), '%path%', $dumper->dump()));
     }
 
+    public function testConfigServiceClosure()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/services_closure_argument.php');
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile($fixtures.'/php/services_closure_argument_compiled.php', $dumper->dump());
+    }
+
     /**
      * @dataProvider provideConfig
      */
     public function testConfig($file)
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
-        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
         $loader->load($fixtures.'/config/'.$file.'.php');
 
         $container->compile();
@@ -81,6 +97,9 @@ class PhpFileLoaderTest extends TestCase
         yield ['php7'];
         yield ['anonymous'];
         yield ['lazy_fqcn'];
+        yield ['inline_binding'];
+        yield ['remove'];
+        yield ['config_builder'];
     }
 
     public function testAutoConfigureAndChildDefinition()
@@ -137,6 +156,15 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expected, $container->get('stack_d'));
     }
 
+    public function testEnvConfigurator()
+    {
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'), 'some-env');
+        $loader->load('env_configurator.php');
+
+        $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
+    }
+
     /**
      * @group legacy
      */
@@ -147,5 +175,29 @@ class PhpFileLoaderTest extends TestCase
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
         $loader->load($fixtures.'/config/deprecated_without_package_version.php');
+    }
+
+    public function testNestedBundleConfigNotAllowed()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^'.preg_quote('Could not resolve argument "Symfony\\Config\\AcmeConfig\\NestedConfig $config"', '/').'/');
+
+        $loader->load($fixtures.'/config/nested_bundle_config.php');
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testWhenEnv()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'dev', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load($fixtures.'/config/when_env.php');
     }
 }

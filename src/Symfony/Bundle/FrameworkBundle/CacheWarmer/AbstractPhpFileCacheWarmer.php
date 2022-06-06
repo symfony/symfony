@@ -49,7 +49,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         spl_autoload_register([ClassExistenceResource::class, 'throwOnRequiredClass']);
         try {
             if (!$this->doWarmUp($cacheDir, $arrayAdapter)) {
-                return;
+                return [];
             }
         } finally {
             spl_autoload_unregister([ClassExistenceResource::class, 'throwOnRequiredClass']);

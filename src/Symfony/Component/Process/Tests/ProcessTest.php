@@ -276,7 +276,7 @@ class ProcessTest extends TestCase
     public function testSetInputWhileRunningThrowsAnException()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Input can not be set while the process is running.');
+        $this->expectExceptionMessage('Input cannot be set while the process is running.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->start();
         try {
@@ -772,7 +772,8 @@ class ProcessTest extends TestCase
         $start = microtime(true);
         try {
             $process->start();
-            foreach ($process as $buffer);
+            foreach ($process as $buffer) {
+            }
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }
@@ -938,7 +939,7 @@ class ProcessTest extends TestCase
     public function testSignalProcessNotRunning()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Can not send signal on a non running process.');
+        $this->expectExceptionMessage('Cannot send signal on a non running process.');
         $process = $this->getProcess('foo');
         $process->signal(1); // SIGHUP
     }
@@ -1057,7 +1058,7 @@ class ProcessTest extends TestCase
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output can not be disabled while an idle timeout is set.');
+        $this->expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
         $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
         $process->disableOutput();
@@ -1066,7 +1067,7 @@ class ProcessTest extends TestCase
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('timeout can not be set while the output is disabled.');
+        $this->expectExceptionMessage('timeout cannot be set while the output is disabled.');
         $process = $this->getProcess('foo');
         $process->disableOutput();
         $process->setIdleTimeout(1);
@@ -1504,8 +1505,11 @@ class ProcessTest extends TestCase
 
     public function testEnvArgument()
     {
-        $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $cmd = '\\' === \DIRECTORY_SEPARATOR ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
+        $p = Process::fromShellCommandline($cmd);
+        $this->assertSame([], $p->getEnv());
+
+        $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $p = Process::fromShellCommandline($cmd, null, $env);
         $p->run(null, ['BAR' => 'baR', 'BAZ' => 'baZ']);
 
@@ -1520,6 +1524,18 @@ class ProcessTest extends TestCase
         $process->setTimeout(2);
         $process->wait();
         $this->assertFalse($process->isRunning());
+    }
+
+    public function testEnvCaseInsensitiveOnWindows()
+    {
+        $p = $this->getProcessForCode('print_r([$_SERVER[\'PATH\'] ?? 1, $_SERVER[\'Path\'] ?? 2]);', null, ['PATH' => 'bar/baz']);
+        $p->run(null, ['Path' => 'foo/bar']);
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->assertSame('Array ( [0] => 1 [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+        } else {
+            $this->assertSame('Array ( [0] => bar/baz [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+        }
     }
 
     /**

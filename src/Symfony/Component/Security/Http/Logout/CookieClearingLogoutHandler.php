@@ -14,11 +14,16 @@ namespace Symfony\Component\Security\Http\Logout;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\EventListener\CookieClearingLogoutListener;
+
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', CookieClearingLogoutHandler::class, CookieClearingLogoutListener::class);
 
 /**
  * This handler clears the passed cookies when a user logs out.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use {@link CookieClearingLogoutListener} instead
  */
 class CookieClearingLogoutHandler implements LogoutHandlerInterface
 {

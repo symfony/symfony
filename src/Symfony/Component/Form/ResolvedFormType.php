@@ -195,7 +195,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * Override this method if you want to customize the builder class.
      *
-     * @return FormBuilderInterface The new builder instance
+     * @return FormBuilderInterface
      */
     protected function newBuilder(string $name, ?string $dataClass, FormFactoryInterface $factory, array $options)
     {
@@ -215,7 +215,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * Override this method if you want to customize the view class.
      *
-     * @return FormView A new view instance
+     * @return FormView
      */
     protected function newView(FormView $parent = null)
     {

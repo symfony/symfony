@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -21,7 +22,6 @@ use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -166,7 +166,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
                 continue;
             }
-            $headersAndTags['headers'][$name] = $header->getBodyAsString();
+            $headersAndTags['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $headersAndTags;

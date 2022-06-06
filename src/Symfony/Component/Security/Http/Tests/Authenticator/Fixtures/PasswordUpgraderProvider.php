@@ -13,12 +13,10 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator\Fixtures;
 
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class PasswordUpgraderProvider extends InMemoryUserProvider implements PasswordUpgraderInterface
 {
-    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    public function upgradePassword($user, string $newHashedPassword): void
     {
     }
 }

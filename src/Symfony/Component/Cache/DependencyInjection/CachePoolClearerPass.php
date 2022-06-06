@@ -24,6 +24,10 @@ class CachePoolClearerPass implements CompilerPassInterface
 
     public function __construct(string $cachePoolClearerTag = 'cache.pool.clearer')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/cache', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->cachePoolClearerTag = $cachePoolClearerTag;
     }
 

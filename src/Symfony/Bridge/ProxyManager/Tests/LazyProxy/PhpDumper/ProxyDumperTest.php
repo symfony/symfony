@@ -185,8 +185,11 @@ EOPHP;
     }
 }
 
+#[\AllowDynamicProperties]
 final class DummyClass implements DummyInterface, SunnyInterface
 {
+    private $ref;
+
     public function dummy()
     {
         return $this;

@@ -59,7 +59,7 @@ abstract class ObjectLoader extends Loader
             throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s".', $method, get_debug_type($loaderObject), $resource));
         }
 
-        $routeCollection = $loaderObject->$method($this);
+        $routeCollection = $loaderObject->$method($this, $this->env);
 
         if (!$routeCollection instanceof RouteCollection) {
             $type = get_debug_type($routeCollection);

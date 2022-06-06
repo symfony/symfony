@@ -12,6 +12,10 @@ defaults:
   run:
     shell: bash
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
 jobs:
   lint:
     name: Lint
@@ -25,7 +29,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          php-version: "5.5"
+          php-version: "7.1"
 
       - name: Lint
-        run: find ./src/Symfony/Bridge/PhpUnit -name '*.php' | grep -v -e /Tests/ -e ForV6 -e ForV7 -e ForV8 -e ForV9 -e ConstraintLogicTrait | parallel -j 4 php -l {}
+        run: find ./src/Symfony/Bridge/PhpUnit -name '*.php' | grep -v -e /Tests/ -e ForV7 -e ForV8 -e ForV9 -e ConstraintLogicTrait | parallel -j 4 php -l {}

@@ -95,13 +95,13 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        if (!preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
-            throw new NotNormalizableValueException('The provided "data:" URI is not valid.');
+        if (null === $data || !preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
+            throw NotNormalizableValueException::createForUnexpectedDataType('The provided "data:" URI is not valid.', $data, ['string'], $context['deserialization_path'] ?? null, true);
         }
 
         try {
             switch ($type) {
-                case 'Symfony\Component\HttpFoundation\File\File':
+                case File::class:
                     if (!class_exists(File::class)) {
                         throw new InvalidArgumentException(sprintf('Cannot denormalize to a "%s" without the HttpFoundation component installed. Try running "composer require symfony/http-foundation".', File::class));
                     }
@@ -113,7 +113,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
                     return new \SplFileObject($data);
             }
         } catch (\RuntimeException $exception) {
-            throw new NotNormalizableValueException($exception->getMessage(), $exception->getCode(), $exception);
+            throw NotNormalizableValueException::createForUnexpectedDataType($exception->getMessage(), $data, ['string'], $context['deserialization_path'] ?? null, false, $exception->getCode(), $exception);
         }
 
         throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $type));

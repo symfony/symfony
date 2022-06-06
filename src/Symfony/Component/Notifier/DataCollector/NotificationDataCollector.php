@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\EventListener\NotificationLoggerListener;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 final class NotificationDataCollector extends DataCollector
 {
@@ -55,7 +53,7 @@ final class NotificationDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'notifier';
     }

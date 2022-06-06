@@ -5,13 +5,220 @@
     },
     "commands": [
         {
+            "name": "_complete",
+            "hidden": true,
+            "usage": [
+                "_complete [-s|--shell SHELL] [-i|--input INPUT] [-c|--current CURRENT] [-S|--symfony SYMFONY]"
+            ],
+            "description": "Internal command to provide shell completion suggestions",
+            "help": "Internal command to provide shell completion suggestions",
+            "definition": {
+                "arguments": [],
+                "options": {
+                    "symfony": {
+                        "name": "--symfony",
+                        "shortcut": "-S",
+                        "accept_value": true,
+                        "is_value_required": true,
+                        "is_multiple": false,
+                        "description": "The version of the completion script",
+                        "default": null
+                    },
+                    "help": {
+                        "name": "--help",
+                        "shortcut": "-h",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
+                        "default": false
+                    },
+                    "quiet": {
+                        "name": "--quiet",
+                        "shortcut": "-q",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
+                    "verbose": {
+                        "name": "--verbose",
+                        "shortcut": "-v|-vv|-vvv",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug",
+                        "default": false
+                    },
+                    "version": {
+                        "name": "--version",
+                        "shortcut": "-V",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display this application version",
+                        "default": false
+                    },
+                    "ansi": {
+                        "name": "--ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
+                    },
+                    "no-ansi": {
+                        "name": "--no-ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
+                    },
+                    "no-interaction": {
+                        "name": "--no-interaction",
+                        "shortcut": "-n",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "shell": {
+                        "name": "--shell",
+                        "shortcut": "-s",
+                        "accept_value": true,
+                        "is_value_required": true,
+                        "is_multiple": false,
+                        "description": "The shell type (\"bash\")",
+                        "default": null
+                    },
+                    "current": {
+                        "name": "--current",
+                        "shortcut": "-c",
+                        "accept_value": true,
+                        "is_value_required": true,
+                        "is_multiple": false,
+                        "description": "The index of the \"input\" array that the cursor is in (e.g. COMP_CWORD)",
+                        "default": false
+                    },
+                    "input": {
+                        "name": "--input",
+                        "shortcut": "-i",
+                        "accept_value": true,
+                        "is_value_required": true,
+                        "is_multiple": true,
+                        "description": "An array of input tokens (e.g. COMP_WORDS or argv)",
+                        "default": []
+                    }
+                }
+            }
+        },
+        {
+            "name": "completion",
+            "hidden": false,
+            "usage": [
+                "completion [--debug] [--] [<shell>]"
+            ],
+            "description": "Dump the shell completion script",
+            "help": "The <info>completion</> command dumps the shell completion script required\nto use shell autocompletion (currently only bash completion is supported).\n\n<comment>Static installation\n-------------------</>\n\nDump the script to a global completion file and restart your shell:\n\n    <info>%%PHP_SELF%% completion bash | sudo tee /etc/bash_completion.d/%%COMMAND_NAME%%</>\n\nOr dump the script to a local file and source it:\n\n    <info>%%PHP_SELF%% completion bash > completion.sh</>\n\n    <comment># source the file whenever you use the project</>\n    <info>source completion.sh</>\n\n    <comment># or add this line at the end of your \"~/.bashrc\" file:</>\n    <info>source /path/to/completion.sh</>\n\n<comment>Dynamic installation\n--------------------</>\n\nAdd this to the end of your shell configuration file (e.g. <info>\"~/.bashrc\"</>):\n\n    <info>eval \"$(%%PHP_SELF_FULL%% completion bash)\"</>",
+            "definition": {
+                "arguments": {
+                    "shell": {
+                        "name": "shell",
+                        "is_required": false,
+                        "is_array": false,
+                        "description": "The shell type (e.g. \"bash\"), the value of the \"$SHELL\" env var will be used if this is not given",
+                        "default": null
+                    }
+                },
+                "options": {
+                    "help": {
+                        "name": "--help",
+                        "shortcut": "-h",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
+                        "default": false
+                    },
+                    "quiet": {
+                        "name": "--quiet",
+                        "shortcut": "-q",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
+                    "verbose": {
+                        "name": "--verbose",
+                        "shortcut": "-v|-vv|-vvv",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug",
+                        "default": false
+                    },
+                    "version": {
+                        "name": "--version",
+                        "shortcut": "-V",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display this application version",
+                        "default": false
+                    },
+                    "ansi": {
+                        "name": "--ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
+                    },
+                    "no-ansi": {
+                        "name": "--no-ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
+                    },
+                    "no-interaction": {
+                        "name": "--no-interaction",
+                        "shortcut": "-n",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "debug": {
+                        "name": "--debug",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Tail the completion debug log",
+                        "default": false
+                    }
+                }
+            }
+        },
+        {
             "name": "help",
             "hidden": false,
             "usage": [
                 "help [--format FORMAT] [--raw] [--] [<command_name>]"
             ],
             "description": "Display help for a command",
-            "help": "The <info>help<\/info> command displays help for a given command:\n\n  <info>app\/console help list<\/info>\n\nYou can also output the help in other formats by using the <comment>--format<\/comment> option:\n\n  <info>app\/console help --format=xml list<\/info>\n\nTo display the list of available commands, please use the <info>list<\/info> command.",
+            "help": "The <info>help<\/info> command displays help for a given command:\n\n  <info>%%PHP_SELF%% help list<\/info>\n\nYou can also output the help in other formats by using the <comment>--format<\/comment> option:\n\n  <info>%%PHP_SELF%% help --format=xml list<\/info>\n\nTo display the list of available commands, please use the <info>list<\/info> command.",
             "definition": {
                 "arguments": {
                     "command_name": {
@@ -83,8 +290,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
-                        "default": false
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -92,8 +299,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
-                        "default": false
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -111,10 +318,10 @@
             "name": "list",
             "hidden": false,
             "usage": [
-                "list [--raw] [--format FORMAT] [--] [<namespace>]"
+                "list [--raw] [--format FORMAT] [--short] [--] [<namespace>]"
             ],
             "description": "List commands",
-            "help": "The <info>list<\/info> command lists all commands:\n\n  <info>app\/console list<\/info>\n\nYou can also display the commands for a specific namespace:\n\n  <info>app\/console list test<\/info>\n\nYou can also output the information in other formats by using the <comment>--format<\/comment> option:\n\n  <info>app\/console list --format=xml<\/info>\n\nIt's also possible to get raw list of commands (useful for embedding command runner):\n\n  <info>app\/console list --raw<\/info>",
+            "help": "The <info>list<\/info> command lists all commands:\n\n  <info>%%PHP_SELF%% list<\/info>\n\nYou can also display the commands for a specific namespace:\n\n  <info>%%PHP_SELF%% list test<\/info>\n\nYou can also output the information in other formats by using the <comment>--format<\/comment> option:\n\n  <info>%%PHP_SELF%% list --format=xml<\/info>\n\nIt's also possible to get raw list of commands (useful for embedding command runner):\n\n  <info>%%PHP_SELF%% list --raw<\/info>",
             "definition": {
                 "arguments": {
                     "namespace": {
@@ -186,8 +393,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
-                        "default": false
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -195,8 +402,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
-                        "default": false
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -205,6 +412,15 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "short": {
+                        "name": "--short",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "To skip describing commands' arguments",
                         "default": false
                     }
                 }
@@ -265,8 +481,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
-                        "default": false
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -274,8 +490,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
-                        "default": false
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -361,8 +577,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
-                        "default": false
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -370,8 +586,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
-                        "default": false
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -438,8 +654,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
-                        "default": false
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -447,8 +663,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
-                        "default": false
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -517,8 +733,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
-                        "default": false
+                        "description": "Force (or disable --no-ansi) ANSI output",
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -526,8 +742,8 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
-                        "default": false
+                        "description": "Negate the \"--ansi\" option",
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -546,8 +762,10 @@
         {
             "id": "_global",
             "commands": [
+                "_complete",
                 "alias1",
                 "alias2",
+                "completion",
                 "help",
                 "list"
             ]

@@ -68,17 +68,9 @@ final class Timezones extends ResourceBundle
      */
     public static function getRawOffset(string $timezone, int $timestamp = null): int
     {
-        if (null === $timestamp) {
-            $timestamp = time();
-        }
+        $dateTimeImmutable = new \DateTimeImmutable(date('Y-m-d H:i:s', $timestamp ?? time()), new \DateTimeZone($timezone));
 
-        $transitions = (new \DateTimeZone($timezone))->getTransitions($timestamp, $timestamp);
-
-        if (!isset($transitions[0]['offset'])) {
-            throw new RuntimeException('No timezone transitions available.');
-        }
-
-        return $transitions[0]['offset'];
+        return $dateTimeImmutable->getOffset();
     }
 
     public static function getGmtOffset(string $timezone, int $timestamp = null, string $displayLocale = null): string

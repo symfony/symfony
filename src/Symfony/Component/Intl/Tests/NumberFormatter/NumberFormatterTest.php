@@ -21,6 +21,8 @@ use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 /**
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
  * behavior of PHP.
+ *
+ * @group legacy
  */
 class NumberFormatterTest extends AbstractNumberFormatterTest
 {

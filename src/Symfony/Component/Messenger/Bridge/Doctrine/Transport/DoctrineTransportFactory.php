@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
-use Doctrine\DBAL\Driver\AbstractPostgreSQLDriver;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\Persistence\ConnectionRegistry;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -48,7 +48,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
             throw new TransportException(sprintf('Could not find Doctrine connection from Messenger DSN "%s".', $dsn), 0, $e);
         }
 
-        if ($useNotify && $driverConnection->getDriver() instanceof AbstractPostgreSQLDriver) {
+        if ($useNotify && $driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             $connection = new PostgreSqlConnection($configuration, $driverConnection);
         } else {
             $connection = new Connection($configuration, $driverConnection);

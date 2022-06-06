@@ -38,7 +38,7 @@ class FirewallListener extends Firewall
 
     public function configureLogoutUrlGenerator(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -49,7 +49,7 @@ class FirewallListener extends Firewall
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $this->logoutUrlGenerator->setCurrentFirewall(null);
         }
 

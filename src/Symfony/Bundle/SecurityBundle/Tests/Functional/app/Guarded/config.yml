@@ -5,7 +5,7 @@ framework:
     default_locale: en
     profiler: false
     session:
-        storage_id: session.storage.mock_file
+        storage_factory_id: session.storage.factory.mock_file
 
 services:
     logger: { class: Psr\Log\NullLogger }
@@ -14,8 +14,8 @@ services:
         tags: [controller.service_arguments]
 
 security:
-    encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
     providers:
         in_memory:

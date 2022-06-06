@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
@@ -76,13 +77,18 @@ class UlidTest extends TestCase
     /**
      * @group time-sensitive
      */
-    public function testGetTime()
+    public function testGetDateTime()
     {
         $time = microtime(false);
         $ulid = new Ulid();
         $time = substr($time, 11).substr($time, 1, 4);
 
-        $this->assertSame((float) $time, $ulid->getTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', $time), $ulid->getDateTime());
+
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new Ulid('000000000079KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.001'), (new Ulid('000000000179KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.654'), (new Ulid('7ZZZZZZZZY79KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.655'), (new Ulid('7ZZZZZZZZZ79KA1307SR9X4MV3'))->getDateTime());
     }
 
     public function testIsValid()
@@ -120,6 +126,114 @@ class UlidTest extends TestCase
         $this->assertGreaterThan(0, $c->compare($b));
     }
 
+    public function testFromBinary()
+    {
+        $this->assertEquals(
+            Ulid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
+            Ulid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08")
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidBinaryFormat
+     */
+    public function testFromBinaryInvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Ulid::fromBinary($ulid);
+    }
+
+    public function provideInvalidBinaryFormat()
+    {
+        return [
+            ['01EW2RYKDCT2SAK454KBR2QG08'],
+            ['1BVXue8CnY8ogucrHX3TeF'],
+            ['0177058f-4dac-d0b2-a990-a49af02bc008'],
+        ];
+    }
+
+    public function testFromBase58()
+    {
+        $this->assertEquals(
+            Ulid::fromString('1BVXue8CnY8ogucrHX3TeF'),
+            Ulid::fromBase58('1BVXue8CnY8ogucrHX3TeF')
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidBase58Format
+     */
+    public function testFromBase58InvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Ulid::fromBase58($ulid);
+    }
+
+    public function provideInvalidBase58Format()
+    {
+        return [
+            ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
+            ['01EW2RYKDCT2SAK454KBR2QG08'],
+            ['0177058f-4dac-d0b2-a990-a49af02bc008'],
+        ];
+    }
+
+    public function testFromBase32()
+    {
+        $this->assertEquals(
+            Ulid::fromString('01EW2RYKDCT2SAK454KBR2QG08'),
+            Ulid::fromBase32('01EW2RYKDCT2SAK454KBR2QG08')
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidBase32Format
+     */
+    public function testFromBase32InvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Ulid::fromBase32($ulid);
+    }
+
+    public function provideInvalidBase32Format()
+    {
+        return [
+            ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
+            ['1BVXue8CnY8ogucrHX3TeF'],
+            ['0177058f-4dac-d0b2-a990-a49af02bc008'],
+        ];
+    }
+
+    public function testFromRfc4122()
+    {
+        $this->assertEquals(
+            Ulid::fromString('0177058f-4dac-d0b2-a990-a49af02bc008'),
+            Ulid::fromRfc4122('0177058f-4dac-d0b2-a990-a49af02bc008')
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidRfc4122Format
+     */
+    public function testFromRfc4122InvalidFormat(string $ulid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Ulid::fromRfc4122($ulid);
+    }
+
+    public function provideInvalidRfc4122Format()
+    {
+        return [
+            ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
+            ['01EW2RYKDCT2SAK454KBR2QG08'],
+            ['1BVXue8CnY8ogucrHX3TeF'],
+        ];
+    }
+
     public function testFromStringOnExtendedClassReturnsStatic()
     {
         $this->assertInstanceOf(CustomUlid::class, CustomUlid::fromString((new CustomUlid())->toBinary()));
@@ -128,5 +242,23 @@ class UlidTest extends TestCase
     public function testFromStringBase58Padding()
     {
         $this->assertInstanceOf(Ulid::class, Ulid::fromString('111111111u9QRyVM94rdmZ'));
+    }
+
+    /**
+     * @testWith    ["00000000-0000-0000-0000-000000000000"]
+     *              ["1111111111111111111111"]
+     *              ["00000000000000000000000000"]
+     */
+    public function testNilUlid(string $ulid)
+    {
+        $ulid = Ulid::fromString($ulid);
+
+        $this->assertInstanceOf(NilUlid::class, $ulid);
+        $this->assertSame('00000000000000000000000000', (string) $ulid);
+    }
+
+    public function testNewNilUlid()
+    {
+        $this->assertSame('00000000000000000000000000', (string) new NilUlid());
     }
 }

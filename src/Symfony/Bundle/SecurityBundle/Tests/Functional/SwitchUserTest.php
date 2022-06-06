@@ -19,9 +19,22 @@ class SwitchUserTest extends AbstractWebTestCase
     /**
      * @dataProvider getTestParameters
      */
-    public function testSwitchUser($originalUser, $authenticatorManagerEnabled, $targetUser, $expectedUser, $expectedStatus)
+    public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus)
     {
-        $client = $this->createAuthenticatedClient($originalUser, ['enable_authenticator_manager' => $authenticatorManagerEnabled]);
+        $client = $this->createAuthenticatedClient($originalUser, ['root_config' => 'switchuser.yml']);
+
+        $client->request('GET', '/profile?_switch_user='.$targetUser);
+
+        $this->assertEquals($expectedStatus, $client->getResponse()->getStatusCode());
+        $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    /**
+     * @dataProvider getLegacyTestParameters
+     */
+    public function testLegacySwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus)
+    {
+        $client = $this->createAuthenticatedClient($originalUser, ['root_config' => 'legacy_switchuser.yml']);
 
         $client->request('GET', '/profile?_switch_user='.$targetUser);
 
@@ -75,14 +88,20 @@ class SwitchUserTest extends AbstractWebTestCase
     public function getTestParameters()
     {
         return [
-            'unauthorized_user_cannot_switch' => ['user_cannot_switch_1', true, 'user_cannot_switch_1', 'user_cannot_switch_1', 403],
-            'legacy_unauthorized_user_cannot_switch' => ['user_cannot_switch_1', false, 'user_cannot_switch_1', 'user_cannot_switch_1', 403],
-            'authorized_user_can_switch' => ['user_can_switch', true, 'user_cannot_switch_1', 'user_cannot_switch_1', 200],
-            'legacy_authorized_user_can_switch' => ['user_can_switch', false, 'user_cannot_switch_1', 'user_cannot_switch_1', 200],
-            'authorized_user_cannot_switch_to_non_existent' => ['user_can_switch', true, 'user_does_not_exist', 'user_can_switch', 403],
-            'legacy_authorized_user_cannot_switch_to_non_existent' => ['user_can_switch', false, 'user_does_not_exist', 'user_can_switch', 403],
-            'authorized_user_can_switch_to_himself' => ['user_can_switch', true, 'user_can_switch', 'user_can_switch', 200],
-            'legacy_authorized_user_can_switch_to_himself' => ['user_can_switch', false, 'user_can_switch', 'user_can_switch', 200],
+            'unauthorized_user_cannot_switch' => ['user_cannot_switch_1', 'user_cannot_switch_1', 'user_cannot_switch_1', 403],
+            'authorized_user_can_switch' => ['user_can_switch', 'user_cannot_switch_1', 'user_cannot_switch_1', 200],
+            'authorized_user_cannot_switch_to_non_existent' => ['user_can_switch', 'user_does_not_exist', 'user_can_switch', 403],
+            'authorized_user_can_switch_to_himself' => ['user_can_switch', 'user_can_switch', 'user_can_switch', 200],
+        ];
+    }
+
+    public function getLegacyTestParameters()
+    {
+        return [
+            'legacy_unauthorized_user_cannot_switch' => ['user_cannot_switch_1', 'user_cannot_switch_1', 'user_cannot_switch_1', 403],
+            'legacy_authorized_user_can_switch' => ['user_can_switch', 'user_cannot_switch_1', 'user_cannot_switch_1', 200],
+            'legacy_authorized_user_cannot_switch_to_non_existent' => ['user_can_switch', 'user_does_not_exist', 'user_can_switch', 403],
+            'legacy_authorized_user_can_switch_to_himself' => ['user_can_switch', 'user_can_switch', 'user_can_switch', 200],
         ];
     }
 

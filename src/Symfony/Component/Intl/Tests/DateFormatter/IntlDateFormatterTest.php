@@ -18,6 +18,9 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
+/**
+ * @group legacy
+ */
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
     public function testConstructor()

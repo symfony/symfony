@@ -501,6 +501,7 @@ class RequestTest extends TestCase
             ['xml', ['text/xml', 'application/xml', 'application/x-xml']],
             ['rdf', ['application/rdf+xml']],
             ['atom', ['application/atom+xml']],
+            ['form', ['application/x-www-form-urlencoded', 'multipart/form-data']],
         ];
     }
 
@@ -1287,11 +1288,6 @@ class RequestTest extends TestCase
     {
         $normalizedMethod = strtoupper($method);
 
-        $_POST = [];
-        $request = Request::createFromGlobals();
-        $this->assertNotInstanceOf(InputBag::class, $request->request);
-        $this->assertInstanceOf(ParameterBag::class, $request->request);
-
         $_GET['foo1'] = 'bar1';
         $_POST['foo2'] = 'bar2';
         $_COOKIE['foo3'] = 'bar3';
@@ -1640,8 +1636,15 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $this->assertFalse($request->hasSession());
+        $this->assertFalse($request->hasSession(true));
+
+        $request->setSessionFactory(function () {});
+        $this->assertTrue($request->hasSession());
+        $this->assertFalse($request->hasSession(true));
+
         $request->setSession(new Session(new MockArraySessionStorage()));
         $this->assertTrue($request->hasSession());
+        $this->assertTrue($request->hasSession(true));
     }
 
     public function testGetSession()
@@ -2253,7 +2256,10 @@ class RequestTest extends TestCase
         $request = new Request();
         $request->server->set('SERVER_PROTOCOL', $serverProtocol);
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $request->headers->set('Via', $via);
+
+        if (null !== $via) {
+            $request->headers->set('Via', $via);
+        }
 
         $this->assertSame($expected, $request->getProtocolVersion());
     }
@@ -2261,9 +2267,11 @@ class RequestTest extends TestCase
     public function protocolVersionProvider()
     {
         return [
-            'untrusted without via' => ['HTTP/2.0', false, '', 'HTTP/2.0'],
+            'untrusted with empty via' => ['HTTP/2.0', false, '', 'HTTP/2.0'],
+            'untrusted without via' => ['HTTP/2.0', false, null, 'HTTP/2.0'],
             'untrusted with via' => ['HTTP/2.0', false, '1.0 fred, 1.1 nowhere.com (Apache/1.1)', 'HTTP/2.0'],
-            'trusted without via' => ['HTTP/2.0', true, '', 'HTTP/2.0'],
+            'trusted with empty via' => ['HTTP/2.0', true, '', 'HTTP/2.0'],
+            'trusted without via' => ['HTTP/2.0', true, null, 'HTTP/2.0'],
             'trusted with via' => ['HTTP/2.0', true, '1.0 fred, 1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'],
             'trusted with via and protocol name' => ['HTTP/2.0', true, 'HTTP/1.0 fred, HTTP/1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'],
             'trusted with broken via' => ['HTTP/2.0', true, 'HTTP/1^0 foo', 'HTTP/2.0'],

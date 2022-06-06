@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -184,5 +184,57 @@ JSON;
 
         $this->assertEquals(1, $sentMessage->getMessageId());
         $this->assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
+    }
+
+    public function testSendWithMarkdownShouldEscapeSpecialCharacters()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $content = <<<JSON
+            {
+                "ok": true,
+                "result": {
+                    "message_id": 1,
+                    "from": {
+                        "id": 12345678,
+                        "first_name": "YourBot",
+                        "username": "YourBot"
+                    },
+                    "chat": {
+                        "id": 1234567890,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "JohnDoe",
+                        "type": "private"
+                    },
+                    "date": 1459958199,
+                    "text": "Hello from Bot!"
+                }
+            }
+JSON;
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content)
+        ;
+
+        $expectedBody = [
+            'chat_id' => 'testChannel',
+            'text' => 'I contain special characters \_ \* \[ \] \( \) \~ \` \> \# \+ \- \= \| \{ \} \. \! to send\.',
+            'parse_mode' => 'MarkdownV2',
+        ];
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+            $this->assertSame($expectedBody, json_decode($options['body'], true));
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+
+        $transport->send(new ChatMessage('I contain special characters _ * [ ] ( ) ~ ` > # + - = | { } . ! to send.'));
     }
 }

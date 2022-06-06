@@ -17,8 +17,6 @@ use Symfony\Component\Notifier\Message\MessageInterface;
  * Uses several Transports using a failover algorithm.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.2
  */
 class FailoverTransport extends RoundRobinTransport
 {

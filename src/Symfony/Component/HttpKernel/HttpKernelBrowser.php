@@ -25,8 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @method Request  getRequest()  A Request instance
- * @method Response getResponse() A Response instance
+ * @method Request  getRequest()
+ * @method Response getResponse()
  */
 class HttpKernelBrowser extends AbstractBrowser
 {
@@ -58,11 +58,11 @@ class HttpKernelBrowser extends AbstractBrowser
      *
      * @param Request $request
      *
-     * @return Response A Response instance
+     * @return Response
      */
-    protected function doRequest($request)
+    protected function doRequest(object $request)
     {
-        $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $this->catchExceptions);
+        $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($request, $response);
@@ -78,7 +78,7 @@ class HttpKernelBrowser extends AbstractBrowser
      *
      * @return string
      */
-    protected function getScript($request)
+    protected function getScript(object $request)
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);
@@ -130,7 +130,7 @@ EOF;
     /**
      * {@inheritdoc}
      *
-     * @return Request A Request instance
+     * @return Request
      */
     protected function filterRequest(DomRequest $request)
     {
@@ -157,7 +157,7 @@ EOF;
      *
      * @see UploadedFile
      *
-     * @return array An array with all uploaded files marked as already moved
+     * @return array
      */
     protected function filterFiles(array $files)
     {
@@ -192,11 +192,11 @@ EOF;
     /**
      * {@inheritdoc}
      *
-     * @param Request $request
+     * @param Response $response
      *
-     * @return DomResponse A DomResponse instance
+     * @return DomResponse
      */
-    protected function filterResponse($response)
+    protected function filterResponse(object $response)
     {
         // this is needed to support StreamedResponse
         ob_start();

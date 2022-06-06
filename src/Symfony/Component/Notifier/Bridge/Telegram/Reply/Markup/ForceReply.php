@@ -15,8 +15,6 @@ namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup;
  * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
  *
  * @see https://core.telegram.org/bots/api#forcereply
- *
- * @experimental in 5.2
  */
 final class ForceReply extends AbstractTelegramReplyMarkup
 {

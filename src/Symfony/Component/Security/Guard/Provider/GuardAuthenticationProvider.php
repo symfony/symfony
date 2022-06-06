@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Security\Guard\Provider;
 
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -27,34 +29,40 @@ use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', GuardAuthenticationProvider::class);
+
 /**
  * Responsible for accepting the PreAuthenticationGuardToken and calling
  * the correct authenticator to retrieve the authenticated token.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class GuardAuthenticationProvider implements AuthenticationProviderInterface
 {
-    /**
-     * @var AuthenticatorInterface[]
-     */
     private $guardAuthenticators;
     private $userProvider;
     private $providerKey;
     private $userChecker;
-    private $passwordEncoder;
+    private $passwordHasher;
 
     /**
-     * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
-     * @param string                            $providerKey         The provider (i.e. firewall) key
+     * @param iterable<array-key, AuthenticatorInterface> $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
+     * @param string                                      $providerKey         The provider (i.e. firewall) key
+     * @param UserPasswordHasherInterface                 $passwordHasher
      */
-    public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, UserPasswordEncoderInterface $passwordEncoder = null)
+    public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, $passwordHasher = null)
     {
         $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;
         $this->providerKey = $providerKey;
         $this->userChecker = $userChecker;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
+
+        if ($passwordHasher instanceof UserPasswordEncoderInterface) {
+            trigger_deprecation('symfony/security-core', '5.3', sprintf('Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', UserPasswordEncoderInterface::class, __CLASS__, UserPasswordHasherInterface::class));
+        }
     }
 
     /**
@@ -82,7 +90,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
             // this should never happen - but technically, the token is
             // authenticated... so it could just be returned
-            if ($token->isAuthenticated()) {
+            if ($token->isAuthenticated(false)) {
                 return $token;
             }
 
@@ -105,14 +113,19 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
 
         if (null === $user) {
-            $e = new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
-            $e->setUsername($token->getUsername());
+            $e = new UserNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
+            $e->setUserIdentifier(method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername());
 
             throw $e;
         }
 
         if (!$user instanceof UserInterface) {
             throw new \UnexpectedValueException(sprintf('The "%s::getUser()" method must return a UserInterface. You returned "%s".', get_debug_type($guardAuthenticator), get_debug_type($user)));
+        }
+
+        if ($guardAuthenticator instanceof PasswordAuthenticatedInterface && !$user instanceof PasswordAuthenticatedUserInterface) {
+            trigger_deprecation('symfony/security-guard', '5.3', 'Not implementing the "%s" interface in class "%s" while using password-based guard authenticators is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user));
         }
 
         $this->userChecker->checkPreAuth($user);
@@ -123,8 +136,13 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
             throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', get_debug_type($guardAuthenticator)));
         }
-        if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordEncoder && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && method_exists($this->passwordEncoder, 'needsRehash') && $this->passwordEncoder->needsRehash($user)) {
-            $this->userProvider->upgradePassword($user, $this->passwordEncoder->encodePassword($user, $password));
+        if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordHasher && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && $this->passwordHasher->needsRehash($user)) {
+            if ($this->passwordHasher instanceof UserPasswordEncoderInterface) {
+                // @deprecated since Symfony 5.3
+                $this->userProvider->upgradePassword($user, $this->passwordHasher->encodePassword($user, $password));
+            } else {
+                $this->userProvider->upgradePassword($user, $this->passwordHasher->hashPassword($user, $password));
+            }
         }
         $this->userChecker->checkPostAuth($user);
 

@@ -12,9 +12,12 @@
 namespace Symfony\Component\Notifier\Bridge\Nexmo\Tests;
 
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
+/**
+ * @group legacy
+ */
 final class NexmoTransportFactoryTest extends TransportFactoryTestCase
 {
     /**
@@ -39,7 +42,7 @@ final class NexmoTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://apiKey:apiSecret@default?from=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['nexmo://apiKey:apiSecret@default'];
     }

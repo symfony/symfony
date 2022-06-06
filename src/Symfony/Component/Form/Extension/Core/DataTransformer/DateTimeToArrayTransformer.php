@@ -45,7 +45,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return array Localized date
+     * @return array
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
@@ -100,7 +100,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param array $value Localized date
      *
-     * @return \DateTime|null Normalized date
+     * @return \DateTime|null
      *
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed

@@ -52,7 +52,7 @@ class InputArgumentTest extends TestCase
         $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
         $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-        $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument can not be an array');
+        $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument cannot be an array');
     }
 
     public function testGetDescription()
@@ -86,6 +86,14 @@ class InputArgumentTest extends TestCase
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
         $argument->setDefault('default');
+    }
+
+    public function testSetDefaultWithRequiredArrayArgument()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
+        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+        $argument->setDefault([]);
     }
 
     public function testSetDefaultWithArrayArgument()

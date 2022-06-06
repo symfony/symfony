@@ -13,8 +13,10 @@ namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -24,6 +26,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlGeneratorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testAbsoluteUrlWithPort80()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
@@ -104,28 +108,50 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/', $this->getGenerator($routes)->generate('test'));
     }
 
-    public function testRelativeUrlWithExtraParameters()
+    /**
+     * @dataProvider valuesProvider
+     */
+    public function testRelativeUrlWithExtraParameters(string $expectedQueryString, string $parameter, $value)
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $url = $this->getGenerator($routes)->generate('test', [$parameter => $value], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertEquals('/app.php/testing?foo=bar', $url);
+        $this->assertSame('/app.php/testing'.$expectedQueryString, $url);
     }
 
-    public function testAbsoluteUrlWithExtraParameters()
+    /**
+     * @dataProvider valuesProvider
+     */
+    public function testAbsoluteUrlWithExtraParameters(string $expectedQueryString, string $parameter, $value)
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->getGenerator($routes)->generate('test', [$parameter => $value], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
+        $this->assertSame('http://localhost/app.php/testing'.$expectedQueryString, $url);
     }
 
-    public function testUrlWithNullExtraParameters()
+    public function valuesProvider(): array
     {
-        $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['foo' => null], UrlGeneratorInterface::ABSOLUTE_URL);
+        $stdClass = new \stdClass();
+        $stdClass->baz = 'bar';
 
-        $this->assertEquals('http://localhost/app.php/testing', $url);
+        $nestedStdClass = new \stdClass();
+        $nestedStdClass->nested = $stdClass;
+
+        return [
+            'null' => ['', 'foo', null],
+            'string' => ['?foo=bar', 'foo', 'bar'],
+            'boolean-false' => ['?foo=0', 'foo', false],
+            'boolean-true' => ['?foo=1', 'foo', true],
+            'object implementing __toString()' => ['?foo=bar', 'foo', new StringableObject()],
+            'object implementing __toString() but has public property' => ['?foo%5Bfoo%5D=property', 'foo', new StringableObjectWithPublicProperty()],
+            'object implementing __toString() in nested array' => ['?foo%5Bbaz%5D=bar', 'foo', ['baz' => new StringableObject()]],
+            'object implementing __toString() in nested array but has public property' => ['?foo%5Bbaz%5D%5Bfoo%5D=property', 'foo', ['baz' => new StringableObjectWithPublicProperty()]],
+            'stdClass' => ['?foo%5Bbaz%5D=bar', 'foo', $stdClass],
+            'stdClass in nested stdClass' => ['?foo%5Bnested%5D%5Bbaz%5D=bar', 'foo', $nestedStdClass],
+            'non stringable object' => ['', 'foo', new NonStringableObject()],
+            'non stringable object but has public property' => ['?foo%5Bfoo%5D=property', 'foo', new NonStringableObjectWithPublicProperty()],
+        ];
     }
 
     public function testUrlWithExtraParametersFromGlobals()
@@ -471,6 +497,12 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/a./.a/a../..a/...', $this->getGenerator($routes)->generate('test'));
     }
 
+    public function testEncodingOfSlashInPath()
+    {
+        $routes = $this->getRoutes('test', new Route('/dir/{path}/dir2', [], ['path' => '.+']));
+        $this->assertSame('/app.php/dir/foo/bar%2Fbaz/dir2', $this->getGenerator($routes)->generate('test', ['path' => 'foo/bar%2Fbaz']));
+    }
+
     public function testAdjacentVariables()
     {
         $routes = $this->getRoutes('test', new Route('/{x}{y}{z}.{_format}', ['z' => 'default-z', '_format' => 'html'], ['y' => '\d+']));
@@ -715,6 +747,113 @@ class UrlGeneratorTest extends TestCase
         );
     }
 
+    public function testAliases()
+    {
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a');
+        $routes->addAlias('c', 'b');
+
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/foo', $generator->generate('b'));
+        $this->assertSame('/app.php/foo', $generator->generate('c'));
+    }
+
+    public function testAliasWhichTargetRouteDoesntExist()
+    {
+        $this->expectException(RouteNotFoundException::class);
+
+        $routes = new RouteCollection();
+        $routes->addAlias('d', 'non-existent');
+
+        $this->getGenerator($routes)->generate('d');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedAlias()
+    {
+        $this->expectDeprecation('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
+
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a')
+            ->setDeprecated('foo/bar', '1.0.0', '');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedAliasWithCustomMessage()
+    {
+        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a')
+            ->setDeprecated('foo/bar', '1.0.0', 'foo %alias_id%.');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
+    {
+        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a')
+            ->setDeprecated('foo/bar', '1.0.0', 'foo %alias_id%.');
+        $routes->addAlias('c', 'b');
+
+        $this->getGenerator($routes)->generate('c');
+    }
+
+    public function testCircularReferenceShouldThrowAnException()
+    {
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
+
+        $routes = new RouteCollection();
+        $routes->addAlias('a', 'b');
+        $routes->addAlias('b', 'a');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    public function testDeepCircularReferenceShouldThrowAnException()
+    {
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
+
+        $routes = new RouteCollection();
+        $routes->addAlias('a', 'b');
+        $routes->addAlias('b', 'c');
+        $routes->addAlias('c', 'b');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    public function testIndirectCircularReferenceShouldThrowAnException()
+    {
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "a", path: "a -> b -> c -> a".');
+
+        $routes = new RouteCollection();
+        $routes->addAlias('a', 'b');
+        $routes->addAlias('b', 'c');
+        $routes->addAlias('c', 'a');
+
+        $this->getGenerator($routes)->generate('a');
+    }
+
     /**
      * @dataProvider provideRelativePaths
      */
@@ -891,4 +1030,31 @@ class UrlGeneratorTest extends TestCase
 
         return $routes;
     }
+}
+
+class StringableObject
+{
+    public function __toString()
+    {
+        return 'bar';
+    }
+}
+
+class StringableObjectWithPublicProperty
+{
+    public $foo = 'property';
+
+    public function __toString()
+    {
+        return 'bar';
+    }
+}
+
+class NonStringableObject
+{
+}
+
+class NonStringableObjectWithPublicProperty
+{
+    public $foo = 'property';
 }

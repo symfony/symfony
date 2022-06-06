@@ -152,8 +152,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertEquals($choiceList, $loaded = $loader->loadChoiceList());
 
         // no further loads on subsequent calls
-
-        $this->assertSame($loaded, $loader->loadChoiceList());
+        $this->assertEquals($loaded, $loader->loadChoiceList());
     }
 
     public function testLoadValuesForChoices()
@@ -296,9 +295,9 @@ class DoctrineChoiceLoaderTest extends TestCase
     /**
      * @group legacy
      */
-    public function legacyTestLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
+    public function testLegacyLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
-        $this->expectDeprecation('Not defining explicitly the IdReader as value callback when query can be optimized has been deprecated in 5.1. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the choice_value instead.');
+        $this->expectDeprecation('Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.');
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,

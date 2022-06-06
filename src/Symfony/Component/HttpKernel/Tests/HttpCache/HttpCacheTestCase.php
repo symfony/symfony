@@ -131,7 +131,7 @@ class HttpCacheTestCase extends TestCase
         $this->request = Request::create($uri, $method, [], $cookies, [], $server);
         $this->request->headers->add($headers);
 
-        $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);
+        $this->response = $this->cache->handle($this->request, HttpKernelInterface::MAIN_REQUEST, $this->catch);
 
         $this->responses[] = $this->response;
     }

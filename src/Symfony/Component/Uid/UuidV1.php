@@ -14,13 +14,13 @@ namespace Symfony\Component\Uid;
 /**
  * A v1 UUID contains a 60-bit timestamp and 62 extra unique bits.
  *
- * @experimental in 5.2
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class UuidV1 extends Uuid
 {
     protected const TYPE = 1;
+
+    private static $clockSeq;
 
     public function __construct(string $uuid = null)
     {
@@ -31,18 +31,43 @@ class UuidV1 extends Uuid
         }
     }
 
-    /**
-     * @return float Seconds since the Unix epoch 1970-01-01 00:00:00
-     */
-    public function getTime(): float
+    public function getDateTime(): \DateTimeImmutable
     {
-        $time = '0'.substr($this->uid, 15, 3).substr($this->uid, 9, 4).substr($this->uid, 0, 8);
-
-        return BinaryUtil::timeToFloat($time);
+        return BinaryUtil::hexToDateTime('0'.substr($this->uid, 15, 3).substr($this->uid, 9, 4).substr($this->uid, 0, 8));
     }
 
     public function getNode(): string
     {
         return uuid_mac($this->uid);
+    }
+
+    public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
+    {
+        $uuid = !$time || !$node ? uuid_create(static::TYPE) : parent::NIL;
+
+        if ($time) {
+            if ($node) {
+                // use clock_seq from the node
+                $seq = substr($node->uid, 19, 4);
+            } else {
+                // generate a static random clock_seq to prevent any collisions with the real one
+                $seq = substr($uuid, 19, 4);
+
+                while (null === self::$clockSeq || $seq === self::$clockSeq) {
+                    self::$clockSeq = sprintf('%04x', random_int(0, 0x3FFF) | 0x8000);
+                }
+
+                $seq = self::$clockSeq;
+            }
+
+            $time = BinaryUtil::dateTimeToHex($time);
+            $uuid = substr($time, 8).'-'.substr($time, 4, 4).'-1'.substr($time, 1, 3).'-'.$seq.substr($uuid, 23);
+        }
+
+        if ($node) {
+            $uuid = substr($uuid, 0, 24).substr($node->uid, 24);
+        }
+
+        return $uuid;
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * deprecate passing a boolean as the second argument of `PropertyAccessor::__construct()`, expecting a combination of bitwise flags instead
+
 5.2.0
 -----
 

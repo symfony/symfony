@@ -48,6 +48,10 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, bool $authenticatorManagerEnabled = false)
     {
+        if (!$authenticatorManagerEnabled) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Setting the $authenticatorManagerEnabled argument of "%s" to "false" is deprecated, use the new authenticator system instead.', __METHOD__);
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
         $this->logoutUrlGenerator = $logoutUrlGenerator;
@@ -99,7 +103,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $impersonatorUser = null;
             if ($token instanceof SwitchUserToken) {
-                $impersonatorUser = $token->getOriginalToken()->getUsername();
+                $originalToken = $token->getOriginalToken();
+                // @deprecated since Symfony 5.3, change to $originalToken->getUserIdentifier() in 6.0
+                $impersonatorUser = method_exists($originalToken, 'getUserIdentifier') ? $originalToken->getUserIdentifier() : $originalToken->getUsername();
             }
 
             if (null !== $this->roleHierarchy) {
@@ -121,14 +127,15 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $this->data = [
                 'enabled' => true,
-                'authenticated' => $token->isAuthenticated(),
+                'authenticated' => method_exists($token, 'isAuthenticated') ? $token->isAuthenticated(false) : (bool) $token->getUser(),
                 'impersonated' => null !== $impersonatorUser,
                 'impersonator_user' => $impersonatorUser,
                 'impersonation_exit_path' => null,
                 'token' => $token,
                 'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
                 'logout_url' => $logoutUrl,
-                'user' => $token->getUsername(),
+                // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
+                'user' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
                 'roles' => $assignedRoles,
                 'inherited_roles' => array_unique($inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
@@ -177,7 +184,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             if (null !== $firewallConfig) {
                 $this->data['firewall'] = [
                     'name' => $firewallConfig->getName(),
-                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
+                    'allows_anonymous' => $this->authenticatorManagerEnabled ? false : $firewallConfig->allowsAnonymous(),
                     'request_matcher' => $firewallConfig->getRequestMatcher(),
                     'security_enabled' => $firewallConfig->isSecurityEnabled(),
                     'stateless' => $firewallConfig->isStateless(),
@@ -187,8 +194,14 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
                     'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
                     'user_checker' => $firewallConfig->getUserChecker(),
-                    'listeners' => $firewallConfig->getListeners(),
                 ];
+
+                // in 6.0, always fill `$this->data['authenticators'] only
+                if ($this->authenticatorManagerEnabled) {
+                    $this->data['firewall']['authenticators'] = $firewallConfig->getAuthenticators();
+                } else {
+                    $this->data['firewall']['listeners'] = $firewallConfig->getAuthenticators();
+                }
 
                 // generate exit impersonation path from current request
                 if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
@@ -208,6 +221,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         }
 
         $this->data['authenticator_manager_enabled'] = $this->authenticatorManagerEnabled;
+        $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
     }
 
     /**
@@ -225,20 +239,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Checks if security is enabled.
-     *
-     * @return bool true if security is enabled, false otherwise
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->data['enabled'];
     }
 
     /**
      * Gets the user.
-     *
-     * @return string The user
      */
-    public function getUser()
+    public function getUser(): string
     {
         return $this->data['user'];
     }
@@ -266,44 +276,31 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Checks if the data contains information about inherited roles. Still the inherited
      * roles can be an empty array.
-     *
-     * @return bool true if the profile was contains inherited role information
      */
-    public function supportsRoleHierarchy()
+    public function supportsRoleHierarchy(): bool
     {
         return $this->data['supports_role_hierarchy'];
     }
 
     /**
      * Checks if the user is authenticated or not.
-     *
-     * @return bool true if the user is authenticated, false otherwise
      */
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         return $this->data['authenticated'];
     }
 
-    /**
-     * @return bool
-     */
-    public function isImpersonated()
+    public function isImpersonated(): bool
     {
         return $this->data['impersonated'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getImpersonatorUser()
+    public function getImpersonatorUser(): ?string
     {
         return $this->data['impersonator_user'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getImpersonationExitPath()
+    public function getImpersonationExitPath(): ?string
     {
         return $this->data['impersonation_exit_path'];
     }
@@ -311,7 +308,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the class name of the security token.
      *
-     * @return string|Data|null The token
+     * @return string|Data|null
      */
     public function getTokenClass()
     {
@@ -320,20 +317,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Get the full security token class as Data object.
-     *
-     * @return Data|null
      */
-    public function getToken()
+    public function getToken(): ?Data
     {
         return $this->data['token'];
     }
 
     /**
      * Get the logout URL.
-     *
-     * @return string|null The logout URL
      */
-    public function getLogoutUrl()
+    public function getLogoutUrl(): ?string
     {
         return $this->data['logout_url'];
     }
@@ -350,10 +343,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Returns the strategy configured for the security voters.
-     *
-     * @return string
      */
-    public function getVoterStrategy()
+    public function getVoterStrategy(): string
     {
         return $this->data['voter_strategy'];
     }
@@ -387,9 +378,17 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
+     * @return array|Data
+     */
+    public function getAuthenticators()
+    {
+        return $this->data['authenticators'];
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'security';
     }

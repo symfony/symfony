@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,6 +27,7 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 class SetupTransportsCommand extends Command
 {
     protected static $defaultName = 'messenger:setup-transports';
+    protected static $defaultDescription = 'Prepare the required infrastructure for the transport';
 
     private $transportLocator;
     private $transportNames;
@@ -41,7 +44,7 @@ class SetupTransportsCommand extends Command
     {
         $this
             ->addArgument('transport', InputArgument::OPTIONAL, 'Name of the transport to setup', null)
-            ->setDescription('Prepare the required infrastructure for the transport')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command setups the transports:
 
@@ -79,5 +82,14 @@ EOF
         }
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('transport')) {
+            $suggestions->suggestValues($this->transportNames);
+
+            return;
+        }
     }
 }

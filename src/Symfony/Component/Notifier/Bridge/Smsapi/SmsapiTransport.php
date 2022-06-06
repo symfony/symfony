@@ -11,20 +11,19 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsapi;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Marcin Szepczynski <szepczynski@gmail.com>
- *
- * @experimental in 5.2
  */
 final class SmsapiTransport extends AbstractTransport
 {
@@ -54,7 +53,7 @@ final class SmsapiTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $endpoint = sprintf('https://%s/sms.do', $this->getEndpoint());
@@ -65,6 +64,7 @@ final class SmsapiTransport extends AbstractTransport
                 'to' => $message->getPhone(),
                 'message' => $message->getSubject(),
                 'format' => 'json',
+                'encoding' => 'utf-8',
             ],
         ]);
 
@@ -74,10 +74,14 @@ final class SmsapiTransport extends AbstractTransport
             throw new TransportException('Could not reach the remote Smsapi server.', $response, 0, $e);
         }
 
-        if (200 !== $statusCode) {
-            $error = $response->toArray(false);
+        try {
+            $content = $response->toArray(false);
+        } catch (DecodingExceptionInterface $e) {
+            throw new TransportException('Could not decode body to an array.', $response, 0, $e);
+        }
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['message']), $response);
+        if (isset($content['error']) || 200 !== $statusCode) {
+            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $response);
         }
 
         return new SentMessage($message, (string) $this);

@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn;
 use Symfony\Component\Notifier\Bridge\LinkedIn\Share\AuthorShare;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -24,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
- *
- * @experimental in 5.2
  *
  * @see https://docs.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/ugc-post-api#sharecontent
  */
@@ -62,7 +61,7 @@ final class LinkedInTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
         if ($message->getOptions() && !$message->getOptions() instanceof LinkedInOptions) {

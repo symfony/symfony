@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -30,7 +31,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
-    protected $controllers;
+    /**
+     * @var \SplObjectStorage<Request, callable>
+     */
+    private $controllers;
     private $sessionUsages = [];
     private $requestStack;
 
@@ -106,7 +110,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'session_metadata' => $sessionMetadata,
             'session_attributes' => $sessionAttributes,
             'session_usages' => array_values($this->sessionUsages),
-            'stateless_check' => $this->requestStack && $this->requestStack->getMasterRequest()->attributes->get('_stateless', false),
+            'stateless_check' => $this->requestStack && $this->requestStack->getMainRequest()->attributes->get('_stateless', false),
             'flashes' => $flashes,
             'path_info' => $request->getPathInfo(),
             'controller' => 'n/a',
@@ -159,7 +163,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     'method' => $request->getMethod(),
                     'controller' => $this->parseController($request->attributes->get('_controller')),
                     'status_code' => $statusCode,
-                    'status_text' => Response::$statusTexts[(int) $statusCode],
+                    'status_text' => Response::$statusTexts[$statusCode],
                 ]),
                 0, '/', null, $request->isSecure(), true, false, 'lax'
             ));
@@ -315,10 +319,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * Gets the route name.
      *
      * The _route request attributes is automatically set by the Router Matcher.
-     *
-     * @return string The route
      */
-    public function getRoute()
+    public function getRoute(): string
     {
         return $this->data['route'];
     }
@@ -332,10 +334,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * Gets the route parameters.
      *
      * The _route_params request attributes is automatically set by the RouterListener.
-     *
-     * @return array The parameters
      */
-    public function getRouteParams()
+    public function getRouteParams(): array
     {
         return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params']->getValue() : [];
     }
@@ -343,8 +343,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * Gets the parsed controller.
      *
-     * @return array|string The controller as a string or array of data
-     *                      with keys 'class', 'method', 'file' and 'line'
+     * @return array|string|Data The controller as a string or array of data
+     *                           with keys 'class', 'method', 'file' and 'line'
      */
     public function getController()
     {
@@ -354,8 +354,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * Gets the previous request attributes.
      *
-     * @return array|bool A legacy array of data from the previous redirection response
-     *                    or false otherwise
+     * @return array|Data|false A legacy array of data from the previous redirection response
+     *                          or false otherwise
      */
     public function getRedirect()
     {
@@ -374,7 +374,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -383,7 +383,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => 'onKernelController',
@@ -394,7 +394,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'request';
     }
@@ -431,13 +431,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     }
 
     /**
-     * Parse a controller.
-     *
      * @param string|object|array|null $controller The controller to parse
      *
      * @return array|string An array of controller data or a simple string
      */
-    protected function parseController($controller)
+    private function parseController($controller)
     {
         if (\is_string($controller) && str_contains($controller, '::')) {
             $controller = explode('::', $controller);

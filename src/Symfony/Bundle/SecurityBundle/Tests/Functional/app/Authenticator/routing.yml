@@ -18,3 +18,11 @@ security_main_profile:
 security_custom_profile:
     path:     /custom/user_profile
     defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\SecurityController::profileAction }
+
+firewall1_login:
+    path: /firewall1/login
+
+firewall2_profile:
+    path: /firewall2/profile
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ProfileController

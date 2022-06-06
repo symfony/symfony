@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventManager;
+use Doctrine\Common\EventSubscriber;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -34,6 +35,9 @@ class ContainerAwareEventManager extends EventManager
     private $methods = [];
     private $container;
 
+    /**
+     * @param list<string|EventSubscriber|array{string[], string|object}> $subscriberIds List of subscribers, subscriber ids, or [events, listener] tuples
+     */
     public function __construct(ContainerInterface $container, array $subscriberIds = [])
     {
         $this->container = $container;
@@ -113,6 +117,10 @@ class ContainerAwareEventManager extends EventManager
      */
     public function addEventListener($events, $listener)
     {
+        if (!$this->initializedSubscribers) {
+            $this->initializeSubscribers();
+        }
+
         $hash = $this->getHash($listener);
 
         foreach ((array) $events as $event) {
@@ -135,6 +143,10 @@ class ContainerAwareEventManager extends EventManager
      */
     public function removeEventListener($events, $listener)
     {
+        if (!$this->initializedSubscribers) {
+            $this->initializeSubscribers();
+        }
+
         $hash = $this->getHash($listener);
 
         foreach ((array) $events as $event) {
@@ -147,6 +159,24 @@ class ContainerAwareEventManager extends EventManager
                 unset($this->methods[$event][$hash]);
             }
         }
+    }
+
+    public function addEventSubscriber(EventSubscriber $subscriber): void
+    {
+        if (!$this->initializedSubscribers) {
+            $this->initializeSubscribers();
+        }
+
+        parent::addEventSubscriber($subscriber);
+    }
+
+    public function removeEventSubscriber(EventSubscriber $subscriber): void
+    {
+        if (!$this->initializedSubscribers) {
+            $this->initializeSubscribers();
+        }
+
+        parent::removeEventSubscriber($subscriber);
     }
 
     private function initializeListeners(string $eventName)
@@ -164,21 +194,15 @@ class ContainerAwareEventManager extends EventManager
     private function initializeSubscribers()
     {
         $this->initializedSubscribers = true;
-
-        $eventListeners = $this->listeners;
-        // reset eventListener to respect priority: EventSubscribers have a higher priority
-        $this->listeners = [];
-        foreach ($this->subscribers as $id => $subscriber) {
+        foreach ($this->subscribers as $subscriber) {
+            if (\is_array($subscriber)) {
+                $this->addEventListener(...$subscriber);
+                continue;
+            }
             if (\is_string($subscriber)) {
-                parent::addEventSubscriber($this->subscribers[$id] = $this->container->get($subscriber));
+                $subscriber = $this->container->get($subscriber);
             }
-        }
-        foreach ($eventListeners as $event => $listeners) {
-            if (!isset($this->listeners[$event])) {
-                $this->listeners[$event] = [];
-            }
-            unset($this->initialized[$event]);
-            $this->listeners[$event] += $listeners;
+            parent::addEventSubscriber($subscriber);
         }
         $this->subscribers = [];
     }

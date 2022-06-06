@@ -14,10 +14,11 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /** @Entity */
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /** @Id @Column(type="integer") */
     protected $id1;
@@ -48,6 +49,11 @@ class User implements UserInterface
     }
 
     public function getUsername(): string
+    {
+        return $this->name;
+    }
+
+    public function getUserIdentifier(): string
     {
         return $this->name;
     }

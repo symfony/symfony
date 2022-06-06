@@ -27,6 +27,10 @@ class AddAutoMappingConfigurationPass implements CompilerPassInterface
 
     public function __construct(string $validatorBuilderService = 'validator.builder', string $tag = 'validator.auto_mapper')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/validator', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->validatorBuilderService = $validatorBuilderService;
         $this->tag = $tag;
     }

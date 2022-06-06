@@ -1,5 +1,5 @@
 imports:
-    - { resource: ./base_config.yml }
+    - { resource: ./legacy_base_config.yml }
 
 security:
   firewalls:

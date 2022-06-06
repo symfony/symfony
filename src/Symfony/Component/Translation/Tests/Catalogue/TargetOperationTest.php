@@ -71,11 +71,44 @@ class TargetOperationTest extends AbstractOperationTest
     {
         $this->assertEquals(
             new MessageCatalogue('en', [
-                'messages+intl-icu' => ['a' => 'old_a'],
+                'messages' => ['a' => 'old_a'],
+                'messages+intl-icu' => ['a' => 'new_a'],
             ]),
             $this->createOperation(
                 new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),
                 new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a']])
+            )->getResult()
+        );
+
+        $this->assertEquals(
+            new MessageCatalogue('en', [
+                'messages+intl-icu' => ['a' => 'old_a'],
+            ]),
+            $this->createOperation(
+                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a']]),
+                new MessageCatalogue('en', ['messages' => ['a' => 'new_a']])
+            )->getResult()
+        );
+
+        $this->assertEquals(
+            new MessageCatalogue('en', [
+                'messages+intl-icu' => ['a' => 'old_a'],
+                'messages' => ['b' => 'new_b'],
+            ]),
+            $this->createOperation(
+                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a']]),
+                new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'b' => 'new_b']])
+            )->getResult()
+        );
+
+        $this->assertEquals(
+            new MessageCatalogue('en', [
+                'messages' => ['a' => 'old_a'],
+                'messages+intl-icu' => ['b' => 'new_b', 'a' => 'new_a'],
+            ]),
+            $this->createOperation(
+                new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),
+                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a', 'b' => 'new_b']])
             )->getResult()
         );
     }

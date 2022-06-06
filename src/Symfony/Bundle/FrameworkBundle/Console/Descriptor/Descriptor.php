@@ -155,6 +155,10 @@ abstract class Descriptor implements DescriptorInterface
      */
     protected function formatValue($value): string
     {
+        if ($value instanceof \UnitEnum) {
+            return ltrim(var_export($value, true), '\\');
+        }
+
         if (\is_object($value)) {
             return sprintf('object(%s)', \get_class($value));
         }
@@ -173,6 +177,20 @@ abstract class Descriptor implements DescriptorInterface
      */
     protected function formatParameter($value): string
     {
+        if ($value instanceof \UnitEnum) {
+            return ltrim(var_export($value, true), '\\');
+        }
+
+        // Recursively search for enum values, so we can replace it
+        // before json_encode (which will not display anything for \UnitEnum otherwise)
+        if (\is_array($value)) {
+            array_walk_recursive($value, static function (&$value) {
+                if ($value instanceof \UnitEnum) {
+                    $value = ltrim(var_export($value, true), '\\');
+                }
+            });
+        }
+
         if (\is_bool($value) || \is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);
 
@@ -252,7 +270,7 @@ abstract class Descriptor implements DescriptorInterface
     {
         $maxPriority = [];
         foreach ($services as $service => $tags) {
-            $maxPriority[$service] = 0;
+            $maxPriority[$service] = \PHP_INT_MIN;
             foreach ($tags as $tag) {
                 $currentPriority = $tag['priority'] ?? 0;
                 if ($maxPriority[$service] < $currentPriority) {

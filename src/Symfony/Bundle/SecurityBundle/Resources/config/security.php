@@ -34,6 +34,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -81,6 +82,8 @@ return static function (ContainerConfigurator $container) {
                 'security.authorization_checker' => service('security.authorization_checker'),
             ])])
         ->alias(Security::class, 'security.helper')
+        ->alias(LegacySecurity::class, 'security.helper')
+            ->deprecate('symfony/security-bundle', '6.2', 'The "%alias_id%" service alias is deprecated, use "'.Security::class.'" instead.')
 
         ->set('security.user_value_resolver', UserValueResolver::class)
             ->args([

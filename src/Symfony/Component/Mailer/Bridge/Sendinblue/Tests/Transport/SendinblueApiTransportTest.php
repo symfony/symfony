@@ -47,12 +47,16 @@ class SendinblueApiTransportTest extends TestCase
     {
         $params = ['param1' => 'foo', 'param2' => 'bar'];
         $json = json_encode(['"custom_header_1' => 'custom_value_1']);
+        $scheduledAt = (new \DateTime())
+            ->sub(new \DateInterval(sprintf('PT%dM', 5)))
+            ->format(\DateTimeInterface::ATOM);
 
         $email = new Email();
         $email->getHeaders()
             ->add(new MetadataHeader('custom', $json))
             ->add(new TagHeader('TagInHeaders'))
             ->addTextHeader('templateId', 1)
+            ->addTextHeader('scheduledAt', $scheduledAt)
             ->addParameterizedHeader('params', 'params', $params)
             ->addTextHeader('foo', 'bar')
         ;
@@ -70,6 +74,8 @@ class SendinblueApiTransportTest extends TestCase
         $this->assertEquals('TagInHeaders', current($payload['tags']));
         $this->assertArrayHasKey('templateId', $payload);
         $this->assertEquals(1, $payload['templateId']);
+        $this->assertArrayHasKey('scheduledAt', $payload);
+        $this->assertEquals($scheduledAt, $payload['scheduledAt']);
         $this->assertArrayHasKey('params', $payload);
         $this->assertEquals('foo', $payload['params']['param1']);
         $this->assertEquals('bar', $payload['params']['param2']);

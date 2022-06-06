@@ -18,6 +18,9 @@ With API, you can use custom headers.
 ```php
 $params = ['param1' => 'foo', 'param2' => 'bar'];
 $json = json_encode(['"custom_header_1' => 'custom_value_1']);
+$scheduledAt = (new \DateTime())
+   ->sub(new \DateInterval(sprintf('PT%dM', 5)))
+   ->format(\DateTimeInterface::ATOM);
 
 $email = new Email();
 $email
@@ -27,6 +30,7 @@ $email
     ->add(new TagHeader('TagInHeaders2'))
     ->addTextHeader('sender.ip', '1.2.3.4')
     ->addTextHeader('templateId', 1)
+    ->addTextHeader('scheduledAt', $scheduledAt)
     ->addParameterizedHeader('params', 'params', $params)
     ->addTextHeader('foo', 'bar')
 ;
@@ -34,12 +38,13 @@ $email
 
 This example allow you to set :
 
-*   templateId
-*   params
-*   tags
-*   headers
-    *   sender.ip
-    *   X-Mailin-Custom
+ * templateId
+ * scheduledAt
+ * params
+ * tags
+ * headers
+    * sender.ip
+    * X-Mailin-Custom
 
 For more informations, you can refer to [Sendinblue API documentation](https://developers.sendinblue.com/reference#sendtransacemail).
 

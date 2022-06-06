@@ -156,6 +156,11 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
                 continue;
             }
+            if ('scheduledat' === $name) {
+                $headersAndTags[$header->getName()] = $header->getValue();
+
+                continue;
+            }
             if ('params' === $name) {
                 $headersAndTags[$header->getName()] = $header->getParameters();
 

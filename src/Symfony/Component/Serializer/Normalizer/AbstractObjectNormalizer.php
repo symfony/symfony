@@ -565,7 +565,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return (float) $data;
                 }
 
-                if (Type::BUILTIN_TYPE_FALSE === $builtinType && false === $data) {
+                if ((Type::BUILTIN_TYPE_FALSE === $builtinType && false === $data) || (Type::BUILTIN_TYPE_TRUE === $builtinType && true === $data)) {
                     return $data;
                 }
 

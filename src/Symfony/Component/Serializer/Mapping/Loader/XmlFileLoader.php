@@ -72,7 +72,7 @@ class XmlFileLoader extends FileLoader
                 }
 
                 if (isset($attribute['ignore'])) {
-                    $attributeMetadata->setIgnore((bool) $attribute['ignore']);
+                    $attributeMetadata->setIgnore(XmlUtils::phpize($attribute['ignore']));
                 }
 
                 foreach ($attribute->context as $node) {

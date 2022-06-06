@@ -37,6 +37,7 @@
     <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy">
         <attribute name="ignored1" ignore="true" />
         <attribute name="ignored2" ignore="true" />
+        <attribute name="notIgnored" ignore="false" />
     </class>
 
     <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent">

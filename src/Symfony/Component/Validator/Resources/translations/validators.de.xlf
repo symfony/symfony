@@ -220,7 +220,7 @@
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>Nicht unterstützer Kartentyp oder ungültige Kartennummer.</target>
+                <target>Nicht unterstützter Kartentyp oder ungültige Kartennummer.</target>
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Dieser Wert ist kein gültiger BIC.</target>
+                <target>Dieser Wert ist keine gültige internationale Bankleitzahl (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>

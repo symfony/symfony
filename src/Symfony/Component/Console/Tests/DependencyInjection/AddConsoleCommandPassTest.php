@@ -153,6 +153,33 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(1 + $initCounter, DescribedCommand::$initCounter);
     }
 
+    public function testEscapesDefaultFromPhp()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('to-escape', EscapedDefaultsFromPhpCommand::class)
+            ->addTag('console.command')
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $commandLoader = $container->getDefinition('console.command_loader');
+        $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
+
+        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        $this->assertSame(['%%cmd%%' => 'to-escape', '%%cmdalias%%' => 'to-escape'], $commandLoader->getArgument(1));
+        $this->assertEquals([['to-escape' => new ServiceClosureArgument(new Reference('.to-escape.lazy'))]], $commandLocator->getArguments());
+        $this->assertSame([], $container->getParameter('console.command.ids'));
+
+        $command = $container->get('console.command_loader')->get('%%cmd%%');
+
+        $this->assertInstanceOf(LazyCommand::class, $command);
+        $this->assertSame('%cmd%', $command->getName());
+        $this->assertSame(['%cmdalias%'], $command->getAliases());
+        $this->assertSame('Creates a 80% discount', $command->getDescription());
+    }
+
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -284,6 +311,12 @@ class MyCommand extends Command
 class NamedCommand extends Command
 {
     protected static $defaultName = 'default';
+}
+
+class EscapedDefaultsFromPhpCommand extends Command
+{
+    protected static $defaultName = '%cmd%|%cmdalias%';
+    protected static $defaultDescription = 'Creates a 80% discount';
 }
 
 class DescribedCommand extends Command

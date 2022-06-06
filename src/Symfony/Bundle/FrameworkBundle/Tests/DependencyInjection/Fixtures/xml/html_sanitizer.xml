@@ -9,7 +9,7 @@
         <html-sanitizer>
             <sanitizer name="default"
                 allow-safe-elements="true"
-                allow-all-static-elements="true"
+                allow-static-elements="true"
                 force-https-urls="true"
                 allow-relative-links="true"
                 allow-relative-medias="true"

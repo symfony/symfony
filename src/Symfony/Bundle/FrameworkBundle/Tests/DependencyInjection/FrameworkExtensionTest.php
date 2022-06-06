@@ -2045,7 +2045,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(
             [
                 ['allowSafeElements', [], true],
-                ['allowAllStaticElements', [], true],
+                ['allowStaticElements', [], true],
                 ['allowElement', ['iframe', 'src'], true],
                 ['allowElement', ['custom-tag', ['data-attr', 'data-attr-1']], true],
                 ['allowElement', ['custom-tag-2', '*'], true],

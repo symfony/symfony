@@ -47,10 +47,10 @@ final class Transport
         MailgunTransportFactory::class,
         MailjetTransportFactory::class,
         MandrillTransportFactory::class,
+        OhMySmtpTransportFactory::class,
         PostmarkTransportFactory::class,
         SendgridTransportFactory::class,
         SendinblueTransportFactory::class,
-        OhMySmtpTransportFactory::class,
         SesTransportFactory::class,
     ];
 

@@ -2430,11 +2430,11 @@ class FrameworkExtension extends Extension
             MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
             MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
             MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
+            OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
             PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
             SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
             SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
             SesTransportFactory::class => 'mailer.transport_factory.amazon',
-            OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
         ];
 
         foreach ($classToServices as $class => $service) {
@@ -2682,8 +2682,8 @@ class FrameworkExtension extends Extension
                 $def->addMethodCall('allowSafeElements', [], true);
             }
 
-            if ($sanitizerConfig['allow_all_static_elements']) {
-                $def->addMethodCall('allowAllStaticElements', [], true);
+            if ($sanitizerConfig['allow_static_elements']) {
+                $def->addMethodCall('allowStaticElements', [], true);
             }
 
             // Configures elements

@@ -6,7 +6,7 @@ $container->loadFromExtension('framework', [
         'sanitizers' => [
             'default' => [
                 'allow_safe_elements' => true,
-                'allow_all_static_elements' => true,
+                'allow_static_elements' => true,
                 'allow_elements' => [
                     'iframe' => 'src',
                     'custom-tag' => ['data-attr', 'data-attr-1'],

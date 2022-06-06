@@ -845,7 +845,7 @@
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="allow-safe-elements" type="xsd:boolean" />
-        <xsd:attribute name="allow-all-static-elements" type="xsd:boolean" />
+        <xsd:attribute name="allow-static-elements" type="xsd:boolean" />
         <xsd:attribute name="force-https-urls" type="xsd:boolean" />
         <xsd:attribute name="allow-relative-links" type="xsd:boolean" />
         <xsd:attribute name="allow-relative-medias" type="xsd:boolean" />

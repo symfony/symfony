@@ -51,6 +51,7 @@
     --highlight-default: #222222;
     --highlight-keyword: #a71d5d;
     --highlight-string: #183691;
+    --highlight-selected-line: rgba(255, 255, 153, 0.5);
     --base-0: #fff;
     --base-1: #f5f5f5;
     --base-2: #e0e0e0;
@@ -104,6 +105,7 @@
     --highlight-default: var(--base-6);
     --highlight-keyword: #ff413c;
     --highlight-string: #70a6fd;
+    --highlight-selected-line: rgba(14, 14, 14, 0.5);
     --base-0: #2e3136;
     --base-1: #444;
     --base-2: #666;
@@ -1296,15 +1298,15 @@ tr.log-status-silenced {
     padding: 0;
 }
 #collector-content .sf-validator .trace li.selected {
-    background: rgba(255, 255, 153, 0.5);
+    background: var(--highlight-selected-line);
 }
 
 {# Messenger panel
    ========================================================================= #}
 
 #collector-content .message-bus .trace {
-    border: 1px solid #DDD;
-    background: #FFF;
+    border: var(--border);
+    background: var(--base-0);
     padding: 10px;
     margin: 0.5em 0;
     overflow: auto;
@@ -1317,7 +1319,7 @@ tr.log-status-silenced {
     padding: 0;
 }
 #collector-content .message-bus .trace li.selected {
-    background: rgba(255, 255, 153, 0.5);
+    background: var(--highlight-selected-line);
 }
 
 {# Dump panel

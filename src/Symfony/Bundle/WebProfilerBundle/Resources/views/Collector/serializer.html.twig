@@ -3,7 +3,7 @@
 {% import _self as helper %}
 
 {% block toolbar %}
-    {% if collector.handledCount > 0 or collector.calls|length %}
+    {% if collector.handledCount > 0 %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/serializer.svg') }}
             <span class="sf-toolbar-value">

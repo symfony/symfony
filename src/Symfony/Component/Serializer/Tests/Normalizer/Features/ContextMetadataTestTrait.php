@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -84,6 +85,17 @@ trait ContextMetadataTestTrait
             [ContextChildMetadataDummy::class],
         ];
     }
+
+    public function testContextDenormalizeWithNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, new PhpDocExtractor());
+        new Serializer([new DateTimeNormalizer(), $normalizer]);
+
+        /** @var ContextMetadataNamingDummy $dummy */
+        $dummy = $normalizer->denormalize(['created_at' => '28/07/2011'], ContextMetadataNamingDummy::class);
+        self::assertEquals('2011-07-28', $dummy->createdAt->format('Y-m-d'));
+    }
 }
 
 class ContextMetadataDummy
@@ -122,4 +134,14 @@ class ContextChildMetadataDummy
      * )
      */
     public $date;
+}
+
+class ContextMetadataNamingDummy
+{
+    /**
+     * @var \DateTime
+     *
+     * @Context({ DateTimeNormalizer::FORMAT_KEY = "d/m/Y" })
+     */
+    public $createdAt;
 }

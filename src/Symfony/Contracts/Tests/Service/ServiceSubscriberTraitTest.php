@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Comp
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
@@ -26,6 +27,8 @@ class ServiceSubscriberTraitTest extends TestCase
     public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
     {
         $expected = [
+            'service1' => Service1::class,
+            'service2' => '?'.Service2::class,
             TestService::class.'::aService' => Service2::class,
             TestService::class.'::nullableService' => '?'.Service2::class,
             new SubscribedService(TestService::class.'::withAttribute', Service2::class, true, new Required()),
@@ -68,6 +71,19 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertNull($service->setContainer($container));
         $this->assertSame([], $service::getSubscribedServices());
     }
+
+    public function testCanGetSubscribedServiceProperties()
+    {
+        $factories = ['service1' => fn () => new Service1(), 'somethingElse' => fn () => new Service2()];
+        $container = new class($factories) implements ServiceProviderInterface {
+            use ServiceLocatorTrait;
+        };
+        $service = new TestService();
+        $service->setContainer($container);
+
+        $this->assertInstanceOf(Service1::class, $service->service1);
+        $this->assertNull($service->service2);
+    }
 }
 
 class ParentTestService
@@ -85,6 +101,12 @@ class ParentTestService
 class TestService extends ParentTestService implements ServiceSubscriberInterface
 {
     use ServiceSubscriberTrait;
+
+    #[SubscribedService]
+    public Service1 $service1;
+
+    #[SubscribedService]
+    public ?Service2 $service2;
 
     #[SubscribedService]
     public function aService(): Service2

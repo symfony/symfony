@@ -11,6 +11,12 @@ class TestServiceSubscriberChild extends TestServiceSubscriberParent
     use TestServiceSubscriberTrait;
 
     #[SubscribedService]
+    private TestDefinition1 $testDefinition1;
+
+    #[SubscribedService]
+    private ?TestDefinition2 $testDefinition2;
+
+    #[SubscribedService]
     private function testDefinition2(): ?TestDefinition2
     {
         return $this->container->get(__METHOD__);

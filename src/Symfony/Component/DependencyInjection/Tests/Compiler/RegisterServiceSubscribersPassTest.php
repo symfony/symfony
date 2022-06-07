@@ -246,6 +246,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
             TestServiceSubscriberChild::class.'::testDefinition4' => new ServiceClosureArgument(new TypedReference(TestDefinition3::class, TestDefinition3::class)),
             TestServiceSubscriberParent::class.'::testDefinition1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class, TestDefinition1::class)),
             'custom_name' => new ServiceClosureArgument(new TypedReference(TestDefinition3::class, TestDefinition3::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'custom_name')),
+            'testDefinition1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class, TestDefinition1::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'testDefinition1')),
+            'testDefinition2' => new ServiceClosureArgument(new TypedReference(TestDefinition2::class, TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'testDefinition2')),
         ];
 
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));

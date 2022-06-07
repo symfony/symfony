@@ -99,7 +99,7 @@ class SecurityTest extends TestCase
 
         $container = $this->createContainer('security.firewall.map', $firewallMap);
 
-        $security = new \Symfony\Component\Security\Core\Security($container);
+        $security = new Security($container);
         $this->assertSame($expectedFirewallConfig, $security->getFirewallConfig($request));
     }
 

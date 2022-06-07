@@ -410,7 +410,7 @@ abstract class Client
 
         $status = $this->internalResponse->getStatusCode();
 
-        if ($status >= 300 && $status < 400) {
+        if (($status >= 300 && $status < 400) || $status === 201) {
             $this->redirect = $this->internalResponse->getHeader('Location');
         } else {
             $this->redirect = null;

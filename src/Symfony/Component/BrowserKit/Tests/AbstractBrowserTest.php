@@ -430,16 +430,16 @@ class AbstractBrowserTest extends TestCase
         $client->setNextResponse(new Response('', 201, ['Location' => 'http://www.example.com/redirected']));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
-        $this->assertSame('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->followRedirect() does not follow redirect if HTTP Code is not 30x');
+        $this->assertSame('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() automatically follows redirects if followRedirects is true');
 
         $client = $this->getBrowser();
-        $client->setNextResponse(new Response('', 201, ['Location' => 'http://www.example.com/redirected']));
+        $client->setNextResponse(new Response('', 400, ['Location' => 'http://www.example.com/redirected']));
         $client->followRedirects(false);
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         try {
             $client->followRedirect();
-            $this->fail('->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
+            $this->fail('->followRedirect() throws a \LogicException if the request did not respond with 30x or 201 HTTP Code');
         } catch (\Exception $e) {
             $this->assertInstanceOf(\LogicException::class, $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
         }

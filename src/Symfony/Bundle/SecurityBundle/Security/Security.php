@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security as LegacySecurity;
 
 /**
@@ -21,8 +22,13 @@ use Symfony\Component\Security\Core\Security as LegacySecurity;
  */
 class Security extends LegacySecurity
 {
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
         parent::__construct($container, false);
+    }
+
+    public function getFirewallConfig(Request $request): ?FirewallConfig
+    {
+        return $this->container->get('security.firewall.map')->getFirewallConfig($request);
     }
 }

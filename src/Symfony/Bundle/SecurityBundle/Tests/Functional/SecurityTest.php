@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -33,6 +35,8 @@ class SecurityTest extends AbstractWebTestCase
         $security = $container->get('functional_test.security.helper');
         $this->assertTrue($security->isGranted('ROLE_USER'));
         $this->assertSame($token, $security->getToken());
+        $this->assertInstanceOf(FirewallConfig::class, $firewallConfig = $security->getFirewallConfig(new Request()));
+        $this->assertSame('default', $firewallConfig->getName());
     }
 
     /**

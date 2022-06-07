@@ -118,6 +118,30 @@ class AddConsoleCommandPassTest extends TestCase
         ];
     }
 
+    public function testEscapesDefaultFromPhp()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('to-escape', EscapedDefaultsFromPhpCommand::class)
+            ->addTag('console.command')
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $commandLoader = $container->getDefinition('console.command_loader');
+        $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
+
+        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        $this->assertSame(['%%cmd%%' => 'to-escape'], $commandLoader->getArgument(1));
+        $this->assertEquals([['to-escape' => new ServiceClosureArgument(new TypedReference('to-escape', EscapedDefaultsFromPhpCommand::class))]], $commandLocator->getArguments());
+        $this->assertSame([], $container->getParameter('console.command.ids'));
+
+        $command = $container->get('console.command_loader')->get('%%cmd%%');
+
+        $this->assertSame('%cmd%', $command->getName());
+    }
+
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -249,4 +273,9 @@ class MyCommand extends Command
 class NamedCommand extends Command
 {
     protected static $defaultName = 'default';
+}
+
+class EscapedDefaultsFromPhpCommand extends Command
+{
+    protected static $defaultName = '%cmd%';
 }

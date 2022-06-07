@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add maximum username length enforcement of 4096 characters in `UserBadge`
+
 6.0
 ---
 

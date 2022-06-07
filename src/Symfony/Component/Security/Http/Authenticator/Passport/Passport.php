@@ -68,7 +68,7 @@ class Passport
      *
      * @return $this
      */
-    public function addBadge(BadgeInterface $badge): PassportInterface
+    public function addBadge(BadgeInterface $badge): static
     {
         $this->badges[\get_class($badge)] = $badge;
 

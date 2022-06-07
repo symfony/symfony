@@ -23,7 +23,6 @@ use PHPUnit\Util\Test;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 /**
@@ -61,7 +60,7 @@ class SymfonyTestsListenerTrait
             Blacklist::$blacklistedClassNames[__CLASS__] = 2;
         }
 
-        $enableDebugClassLoader = class_exists(DebugClassLoader::class) || class_exists(LegacyDebugClassLoader::class);
+        $enableDebugClassLoader = class_exists(DebugClassLoader::class);
 
         foreach ($mockedNamespaces as $type => $namespaces) {
             if (!\is_array($namespaces)) {
@@ -82,11 +81,7 @@ class SymfonyTestsListenerTrait
             }
         }
         if ($enableDebugClassLoader) {
-            if (class_exists(DebugClassLoader::class)) {
-                DebugClassLoader::enable();
-            } else {
-                LegacyDebugClassLoader::enable();
-            }
+            DebugClassLoader::enable();
         }
         if (self::$globallyEnabled) {
             $this->state = -2;

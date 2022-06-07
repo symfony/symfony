@@ -19,10 +19,10 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgraderProvider;
 
@@ -50,7 +50,7 @@ class FormLoginAuthenticatorTest extends TestCase
             $this->expectNotToPerformAssertions();
         } else {
             $this->expectException(BadCredentialsException::class);
-            $this->expectExceptionMessage('Invalid username.');
+            $this->expectExceptionMessage('Username too long.');
         }
 
         $request = Request::create('/login_check', 'POST', ['_username' => $username, '_password' => 's$cr$t']);
@@ -62,8 +62,8 @@ class FormLoginAuthenticatorTest extends TestCase
 
     public function provideUsernamesForLength()
     {
-        yield [str_repeat('x', AuthenticatorInterface::MAX_USERNAME_LENGTH + 1), false];
-        yield [str_repeat('x', AuthenticatorInterface::MAX_USERNAME_LENGTH - 1), true];
+        yield [str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1), false];
+        yield [str_repeat('x', UserBadge::MAX_USERNAME_LENGTH - 1), true];
     }
 
     /**

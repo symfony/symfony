@@ -132,10 +132,6 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $credentials['username'] = trim($credentials['username']);
 
-        if (\strlen($credentials['username']) > self::MAX_USERNAME_LENGTH) {
-            throw new BadCredentialsException('Invalid username.');
-        }
-
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['username']);
 
         return $credentials;

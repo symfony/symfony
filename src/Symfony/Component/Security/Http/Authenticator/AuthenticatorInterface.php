@@ -26,8 +26,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
  */
 interface AuthenticatorInterface
 {
-    public const MAX_USERNAME_LENGTH = 4096;
-
     /**
      * Does the authenticator support the given Request?
      *

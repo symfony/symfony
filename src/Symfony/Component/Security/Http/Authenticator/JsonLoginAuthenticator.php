@@ -149,10 +149,6 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             if (!\is_string($credentials['username'])) {
                 throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
             }
-
-            if (\strlen($credentials['username']) > self::MAX_USERNAME_LENGTH) {
-                throw new BadCredentialsException('Invalid username.');
-            }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
         }

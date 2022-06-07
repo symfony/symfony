@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2022-04-16T21:02:59Z
+
+What's the best way to make the low-deps check passing?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-04-16T21:19:49Z
+
+> What's the best way to make the low-deps check passing?
+
+By requiring `^6.2` in the composer.json (or skipping the test on lower versions).
+
+However, this does signal the design flaw of the current implementation (which is a flaw with the `Security` class as a whole, but highlighted more by this change): We now have a class in `Security\Core` that depends on a `FirewallMap` and `FirewallConfig` class from `SecurityBundle`, which depend on a `FirewallMap` from `Security\Http`. Imho, that sadly is a no go, so :-1: for the moment.
+
+Please note that this is purely a -1 for the implementation, I think the DX problem highlighted in the issue is worth fixing.
+
+@chalasr this is the second time we have a nice DX improvement that introduces lots of coupling through the `Security` helper class (ref https://github.com/symfony/symfony/pull/41274#issuecomment-1046967394). What do you think about deprecating this helper class in `Security\Core` and moving it completely to the SecurityBundle? That directly resolves coupling issues, and only reduces DX for standalone users (all methods in the class are little helpers to retrieve information more easily, none add missing functionality), which - to be honest - already suffer from a bad DX. And given the currently coupling to SecurityBundle service names in the class, I don't expect standalone users are using the class at the moment.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2022-04-16T21:31:56Z
+
+Having the `Security` class in the `SecurityBundle` makes more sense to me, I was dubitative when working on the feature.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-16T23:41:19Z
+
+Big 👍 for moving the helper to SecurityBundle.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-06-05T19:26:31Z
+
+The merge tool was a bit trigger happy closing this PR when #46094 got merged, reopening.
+
+@Kocal do you have time to rebash and finish this PR for 6.2, now the helper is moved to the security bundle?
+
+---------------------------------------------------------------------------
+
+by Kocal at 2022-06-05T20:53:45Z
+
+I'm glad that #46094 has been merged, nice work @chalasr :)
+
+@wouterj the PR has been rebased and modified in consequence.

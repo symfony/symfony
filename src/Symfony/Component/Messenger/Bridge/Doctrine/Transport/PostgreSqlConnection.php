@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
-use Doctrine\DBAL\Driver\PDO\Connection as DoctrinePdoConnection;
 use Doctrine\DBAL\Schema\Table;
 
 /**
@@ -73,8 +72,8 @@ final class PostgreSqlConnection extends Connection
         if (method_exists($this->driverConnection, 'getNativeConnection')) {
             $wrappedConnection = $this->driverConnection->getNativeConnection();
         } else {
-            $wrappedConnection = $this->driverConnection->getWrappedConnection();
-            if (!$wrappedConnection instanceof \PDO && $wrappedConnection instanceof DoctrinePdoConnection) {
+            $wrappedConnection = $this->driverConnection;
+            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
                 $wrappedConnection = $wrappedConnection->getWrappedConnection();
             }
         }

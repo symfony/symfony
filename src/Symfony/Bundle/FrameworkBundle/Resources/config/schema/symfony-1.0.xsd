@@ -292,7 +292,14 @@
             <xsd:element name="default-pdo-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="pool" type="cache_pool" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
-
+        <xsd:attribute name="app" type="xsd:string" />
+        <xsd:attribute name="system" type="xsd:string" />
+        <xsd:attribute name="directory" type="xsd:string" />
+        <xsd:attribute name="default-doctrine-provider" type="xsd:string" />
+        <xsd:attribute name="default-psr6-provider" type="xsd:string" />
+        <xsd:attribute name="default-redis-provider" type="xsd:string" />
+        <xsd:attribute name="default-memcached-provider" type="xsd:string" />
+        <xsd:attribute name="default-pdo-provider" type="xsd:string" />
         <xsd:attribute name="prefix-seed" type="xsd:string" />
     </xsd:complexType>
 

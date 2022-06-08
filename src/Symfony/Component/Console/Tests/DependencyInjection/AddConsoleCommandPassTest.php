@@ -314,10 +314,9 @@ class NamedCommand extends Command
 {
 }
 
+#[AsCommand(name: '%cmd%|%cmdalias%', description: 'Creates a 80% discount')]
 class EscapedDefaultsFromPhpCommand extends Command
 {
-    protected static $defaultName = '%cmd%|%cmdalias%';
-    protected static $defaultDescription = 'Creates a 80% discount';
 }
 
 #[AsCommand(name: '|cmdname|cmdalias', description: 'Just testing')]

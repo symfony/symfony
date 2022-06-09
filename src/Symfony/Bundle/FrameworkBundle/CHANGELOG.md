@@ -15,6 +15,7 @@ CHANGELOG
  * Add tag `routing.condition_service` to autoconfigure routing condition services
  * Automatically register kernel methods marked with the `Symfony\Component\Routing\Annotation\Route` attribute or annotation as controllers in `MicroKernelTrait`
  * Deprecate not setting the `http_method_override` config option. The default value will change to `false` in 7.0.
+ * Add `framework.profiler.collect_serializer_data` config option, set it to `true` to enable the serializer data collector and profiler panel
 
 6.0
 ---

@@ -103,6 +103,7 @@
         <xsd:attribute name="username" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="lifetime" type="xsd:string" />
+        <xsd:attribute name="collect-serializer-data" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="router">

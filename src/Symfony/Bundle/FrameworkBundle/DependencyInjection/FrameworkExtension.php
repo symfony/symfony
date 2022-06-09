@@ -826,7 +826,7 @@ class FrameworkExtension extends Extension
             $loader->load('notifier_debug.php');
         }
 
-        if ($this->serializerConfigEnabled) {
+        if ($this->serializerConfigEnabled && $config['collect_serializer_data']) {
             $loader->load('serializer_debug.php');
         }
 

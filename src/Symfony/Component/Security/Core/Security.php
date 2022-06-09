@@ -46,9 +46,7 @@ class Security implements AuthorizationCheckerInterface
     public const LAST_USERNAME = '_security.last_username';
 
     /**
-     * @deprecated since Symfony 6.2, use \Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface::MAX_USERNAME_LENGTH instead
-     *
-     *  In 7.0, move this constant to the NewSecurityHelper class and make it reference AuthenticatorInterface:MAX_USERNAME_LENGTH.
+     * @deprecated since Symfony 6.2, use \Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge::MAX_USERNAME_LENGTH instead
      */
     public const MAX_USERNAME_LENGTH = 4096;
 

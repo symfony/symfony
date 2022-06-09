@@ -120,7 +120,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
             ->willReturn(true);
 
         $platform = $this->createMock($platform);
-        $platform->method('getCreateTableSQL')
+        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')
@@ -165,7 +165,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
             ->willReturn(true);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method('getCreateTableSQL')
+        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->expects($this->atLeast(2))
@@ -202,7 +202,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
             ->willReturn(false);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method('getCreateTableSQL')
+        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-06T15:58:58Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-09T12:27:00Z
+
+> It looks like you unchecked the "Allow edits from maintainer" box
+
+side note: please squash when pushing the change - or allow us to push on your fork if you prefer we squash on our side :pray:
+
+---------------------------------------------------------------------------
+
+by paul-oms at 2022-06-09T14:49:03Z
+
+Thanks! That should cover it? :-)

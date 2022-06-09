@@ -4,6 +4,7 @@ CHANGELOG
 6.2
 ---
 
+ * Add `LazyGhostObjectTrait`
  * Add `Hydrator::hydrate()`
  * Preserve PHP references also when using `Hydrator::hydrate()` or `Instantiator::instantiate()`
  * Add support for hydrating from native (array) casts

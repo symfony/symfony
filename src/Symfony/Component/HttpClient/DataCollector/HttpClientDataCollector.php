@@ -197,7 +197,11 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             $dataArg[] = '--data '.escapeshellarg(json_encode($json, \JSON_PRETTY_PRINT));
         } elseif ($body = $trace['options']['body'] ?? null) {
             if (\is_string($body)) {
-                $dataArg[] = '--data '.escapeshellarg($body);
+                try {
+                    $dataArg[] = '--data '.escapeshellarg($body);
+                } catch (\ValueError $e) {
+                    return null;
+                }
             } elseif (\is_array($body)) {
                 $body = explode('&', self::normalizeBody($body));
                 foreach ($body as $value) {

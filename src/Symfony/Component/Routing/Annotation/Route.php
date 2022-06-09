@@ -30,9 +30,9 @@ class Route
     private array $schemes;
 
     /**
-     * @param string[]        $requirements
-     * @param string[]|string $methods
-     * @param string[]|string $schemes
+     * @param array<string|\Stringable> $requirements
+     * @param string[]|string           $methods
+     * @param string[]|string           $schemes
      */
     public function __construct(
         string|array $path = null,

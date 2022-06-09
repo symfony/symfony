@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\DataCollector;
 
+use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,8 @@ use Symfony\Component\VarDumper\Caster\ImgStub;
  */
 final class HttpClientDataCollector extends DataCollector implements LateDataCollectorInterface
 {
+    use HttpClientTrait;
+
     /**
      * @var TraceableHttpClient[]
      */
@@ -176,7 +179,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         }
 
         $debug = explode("\n", $trace['info']['debug']);
-        $url = $trace['url'];
+        $url = self::mergeQueryString($trace['url'], $trace['options']['query'] ?? [], true);
         $command = ['curl', '--compressed'];
 
         if (isset($trace['options']['resolve'])) {
@@ -194,10 +197,15 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             $dataArg[] = '--data '.escapeshellarg(json_encode($json, \JSON_PRETTY_PRINT));
         } elseif ($body = $trace['options']['body'] ?? null) {
             if (\is_string($body)) {
-                $dataArg[] = '--data '.escapeshellarg($body);
+                try {
+                    $dataArg[] = '--data '.escapeshellarg($body);
+                } catch (\ValueError $e) {
+                    return null;
+                }
             } elseif (\is_array($body)) {
-                foreach ($body as $key => $value) {
-                    $dataArg[] = '--data '.escapeshellarg("$key=$value");
+                $body = explode('&', self::normalizeBody($body));
+                foreach ($body as $value) {
+                    $dataArg[] = '--data '.escapeshellarg(urldecode($value));
                 }
             } else {
                 return null;

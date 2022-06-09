@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-09T12:53:29Z
+
+Do we want to enable this by default for new projects via a recipe? Can you please send a PR doing so if yes?

@@ -90,7 +90,19 @@ EOF
         $rows = [];
         $dump = new Dumper($output);
 
-        foreach ($this->getConstrainedPropertiesData($class) as $propertyName => $constraintsData) {
+        /** @var ClassMetadataInterface $classMetadata */
+        $classMetadata = $this->validator->getMetadataFor($class);
+
+        foreach ($this->getClassConstraintsData($classMetadata) as $data) {
+            $rows[] = [
+                '-',
+                $data['class'],
+                implode(', ', $data['groups']),
+                $dump($data['options']),
+            ];
+        }
+
+        foreach ($this->getConstrainedPropertiesData($classMetadata) as $propertyName => $constraintsData) {
             foreach ($constraintsData as $data) {
                 $rows[] = [
                     $propertyName,
@@ -121,12 +133,20 @@ EOF
         $table->render();
     }
 
-    private function getConstrainedPropertiesData(string $class): array
+    private function getClassConstraintsData(ClassMetadataInterface $classMetadata): iterable
+    {
+        foreach ($classMetadata->getConstraints() as $constraint) {
+            yield [
+                'class' => \get_class($constraint),
+                'groups' => $constraint->groups,
+                'options' => $this->getConstraintOptions($constraint),
+            ];
+        }
+    }
+
+    private function getConstrainedPropertiesData(ClassMetadataInterface $classMetadata): array
     {
         $data = [];
-
-        /** @var ClassMetadataInterface $classMetadata */
-        $classMetadata = $this->validator->getMetadataFor($class);
 
         foreach ($classMetadata->getConstrainedProperties() as $constrainedProperty) {
             $data[$constrainedProperty] = $this->getPropertyData($classMetadata, $constrainedProperty);

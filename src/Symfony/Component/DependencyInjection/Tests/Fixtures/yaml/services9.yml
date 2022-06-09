@@ -179,3 +179,13 @@ services:
             - container.preload: { class: 'Some\Sidekick1' }
             - container.preload: { class: 'Some\Sidekick2' }
         public: true
+    a_factory:
+        class: Bar
+    a_service:
+        class: Bar
+        factory: ['@a_factory', 'getBar']
+        public: true
+    b_service:
+        class: Bar
+        factory: ['@a_factory', 'getBar']
+        public: true

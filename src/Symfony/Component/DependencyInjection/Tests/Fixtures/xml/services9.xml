@@ -154,6 +154,13 @@
       <tag name="container.preload" class="Some\Sidekick1"/>
       <tag name="container.preload" class="Some\Sidekick2"/>
     </service>
+    <service id="a_factory" class="Bar"/>
+    <service id="a_service" class="Bar" public="true">
+      <factory service="a_factory" method="getBar"/>
+    </service>
+    <service id="b_service" class="Bar" public="true">
+      <factory service="a_factory" method="getBar"/>
+    </service>
     <service id="alias_for_foo" alias="foo" public="true"/>
     <service id="alias_for_alias" alias="foo" public="true"/>
   </services>

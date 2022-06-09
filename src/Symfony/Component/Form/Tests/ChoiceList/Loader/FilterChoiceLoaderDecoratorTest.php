@@ -47,6 +47,29 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         ]), $loader->loadChoiceList());
     }
 
+    public function testLoadChoiceListMixedWithGroupedAndNonGroupedChoices()
+    {
+        $filter = function ($choice) {
+            return 0 === $choice % 2;
+        };
+
+        $choices = array_merge(range(1, 9), ['grouped' => range(10, 40, 5)]);
+        $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader($choices), $filter);
+
+        $this->assertEquals(new ArrayChoiceList([
+            1 => 2,
+            3 => 4,
+            5 => 6,
+            7 => 8,
+            'grouped' => [
+                0 => 10,
+                2 => 20,
+                4 => 30,
+                6 => 40,
+            ],
+        ]), $loader->loadChoiceList());
+    }
+
     public function testLoadValuesForChoices()
     {
         $evenValues = [1 => '2', 3 => '4'];

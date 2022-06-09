@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Validator\Command\DebugCommand;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -37,6 +38,11 @@ class DebugCommandTest extends TestCase
             ->method('getMetadataFor')
             ->with(DummyClassOne::class)
             ->willReturn($classMetadata);
+
+        $classMetadata
+            ->expects($this->once())
+            ->method('getConstraints')
+            ->willReturn([new Expression('1 + 1 = 2')]);
 
         $classMetadata
             ->expects($this->once())
@@ -68,22 +74,28 @@ class DebugCommandTest extends TestCase
 Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 -----------------------------------------------------
 
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
-| Property      | Name                                             | Groups  | Options                                                    |
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
-| firstArgument | Symfony\Component\Validator\Constraints\NotBlank | Default | [                                                          |
-|               |                                                  |         |   "allowNull" => false,                                    |
-|               |                                                  |         |   "message" => "This value should not be blank.",          |
-|               |                                                  |         |   "normalizer" => null,                                    |
-|               |                                                  |         |   "payload" => null                                        |
-|               |                                                  |         | ]                                                          |
-| firstArgument | Symfony\Component\Validator\Constraints\Email    | Default | [                                                          |
-|               |                                                  |         |   "message" => "This value is not a valid email address.", |
-|               |                                                  |         |   "mode" => null,                                          |
-|               |                                                  |         |   "normalizer" => null,                                    |
-|               |                                                  |         |   "payload" => null                                        |
-|               |                                                  |         | ]                                                          |
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| Property      | Name                                               | Groups  | Options                                                    |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| -             | Symfony\Component\Validator\Constraints\Expression | Default | [                                                          |
+|               |                                                    |         |   "expression" => "1 + 1 = 2",                             |
+|               |                                                    |         |   "message" => "This value is not valid.",                 |
+|               |                                                    |         |   "payload" => null,                                       |
+|               |                                                    |         |   "values" => []                                           |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\NotBlank   | Default | [                                                          |
+|               |                                                    |         |   "allowNull" => false,                                    |
+|               |                                                    |         |   "message" => "This value should not be blank.",          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\Email      | Default | [                                                          |
+|               |                                                    |         |   "message" => "This value is not a valid email address.", |
+|               |                                                    |         |   "mode" => null,                                          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
 
 TXT
             , $tester->getDisplay(true)
@@ -109,6 +121,11 @@ TXT
             ]);
 
         $classMetadata
+            ->expects($this->exactly(2))
+            ->method('getConstraints')
+            ->willReturn([new Expression('1 + 1 = 2')]);
+
+        $classMetadata
             ->method('getPropertyMetadata')
             ->with('firstArgument')
             ->willReturn([
@@ -129,42 +146,54 @@ TXT
 Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 -----------------------------------------------------
 
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
-| Property      | Name                                             | Groups  | Options                                                    |
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
-| firstArgument | Symfony\Component\Validator\Constraints\NotBlank | Default | [                                                          |
-|               |                                                  |         |   "allowNull" => false,                                    |
-|               |                                                  |         |   "message" => "This value should not be blank.",          |
-|               |                                                  |         |   "normalizer" => null,                                    |
-|               |                                                  |         |   "payload" => null                                        |
-|               |                                                  |         | ]                                                          |
-| firstArgument | Symfony\Component\Validator\Constraints\Email    | Default | [                                                          |
-|               |                                                  |         |   "message" => "This value is not a valid email address.", |
-|               |                                                  |         |   "mode" => null,                                          |
-|               |                                                  |         |   "normalizer" => null,                                    |
-|               |                                                  |         |   "payload" => null                                        |
-|               |                                                  |         | ]                                                          |
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| Property      | Name                                               | Groups  | Options                                                    |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| -             | Symfony\Component\Validator\Constraints\Expression | Default | [                                                          |
+|               |                                                    |         |   "expression" => "1 + 1 = 2",                             |
+|               |                                                    |         |   "message" => "This value is not valid.",                 |
+|               |                                                    |         |   "payload" => null,                                       |
+|               |                                                    |         |   "values" => []                                           |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\NotBlank   | Default | [                                                          |
+|               |                                                    |         |   "allowNull" => false,                                    |
+|               |                                                    |         |   "message" => "This value should not be blank.",          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\Email      | Default | [                                                          |
+|               |                                                    |         |   "message" => "This value is not a valid email address.", |
+|               |                                                    |         |   "mode" => null,                                          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
 
 Symfony\Component\Validator\Tests\Dummy\DummyClassTwo
 -----------------------------------------------------
 
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
-| Property      | Name                                             | Groups  | Options                                                    |
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
-| firstArgument | Symfony\Component\Validator\Constraints\NotBlank | Default | [                                                          |
-|               |                                                  |         |   "allowNull" => false,                                    |
-|               |                                                  |         |   "message" => "This value should not be blank.",          |
-|               |                                                  |         |   "normalizer" => null,                                    |
-|               |                                                  |         |   "payload" => null                                        |
-|               |                                                  |         | ]                                                          |
-| firstArgument | Symfony\Component\Validator\Constraints\Email    | Default | [                                                          |
-|               |                                                  |         |   "message" => "This value is not a valid email address.", |
-|               |                                                  |         |   "mode" => null,                                          |
-|               |                                                  |         |   "normalizer" => null,                                    |
-|               |                                                  |         |   "payload" => null                                        |
-|               |                                                  |         | ]                                                          |
-+---------------+--------------------------------------------------+---------+------------------------------------------------------------+
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| Property      | Name                                               | Groups  | Options                                                    |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
+| -             | Symfony\Component\Validator\Constraints\Expression | Default | [                                                          |
+|               |                                                    |         |   "expression" => "1 + 1 = 2",                             |
+|               |                                                    |         |   "message" => "This value is not valid.",                 |
+|               |                                                    |         |   "payload" => null,                                       |
+|               |                                                    |         |   "values" => []                                           |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\NotBlank   | Default | [                                                          |
+|               |                                                    |         |   "allowNull" => false,                                    |
+|               |                                                    |         |   "message" => "This value should not be blank.",          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
+| firstArgument | Symfony\Component\Validator\Constraints\Email      | Default | [                                                          |
+|               |                                                    |         |   "message" => "This value is not a valid email address.", |
+|               |                                                    |         |   "mode" => null,                                          |
+|               |                                                    |         |   "normalizer" => null,                                    |
+|               |                                                    |         |   "payload" => null                                        |
+|               |                                                    |         | ]                                                          |
++---------------+----------------------------------------------------+---------+------------------------------------------------------------+
 
 TXT
             , $tester->getDisplay(true)

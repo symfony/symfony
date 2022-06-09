@@ -21,7 +21,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -85,8 +84,10 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             throw $e;
         }
 
+        $userBadge = new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...));
+
         $passport = new Passport(
-            new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...)),
+            $userBadge,
             new PasswordCredentials($credentials['password'])
         );
         if ($this->userProvider instanceof PasswordUpgraderInterface) {

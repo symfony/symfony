@@ -85,11 +85,8 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         }
 
         $userBadge = new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...));
+        $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']));
 
-        $passport = new Passport(
-            $userBadge,
-            new PasswordCredentials($credentials['password'])
-        );
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($credentials['password'], $this->userProvider));
         }

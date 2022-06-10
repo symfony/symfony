@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-06-09T13:02:23Z
+
+Can you add a test reproducing the issue as a regression test  (that's a case of using a service as factory) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-10T09:05:19Z
+
+> Can you add a test reproducing the issue
+
+done!

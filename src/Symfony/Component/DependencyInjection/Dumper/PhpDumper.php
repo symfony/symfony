@@ -1952,7 +1952,7 @@ EOF;
                 }
                 $code = $this->addNewInstance($definition, '', $id);
                 if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
-                    return sprintf('$this->%s[%s] ??= %s', $definition->isPublic() ? 'services' : 'privates', $this->doExport($id), $code);
+                    return sprintf('($this->%s[%s] ??= %s)', $definition->isPublic() ? 'services' : 'privates', $this->doExport($id), $code);
                 }
                 $code = "($code)";
             } else {

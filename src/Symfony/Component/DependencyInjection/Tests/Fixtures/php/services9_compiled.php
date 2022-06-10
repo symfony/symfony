@@ -27,6 +27,8 @@ class ProjectServiceContainer extends Container
         $this->methodMap = [
             'BAR' => 'getBARService',
             'BAR2' => 'getBAR2Service',
+            'a_service' => 'getAServiceService',
+            'b_service' => 'getBServiceService',
             'bar' => 'getBar3Service',
             'bar2' => 'getBar22Service',
             'baz' => 'getBazService',
@@ -70,6 +72,7 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
+            'a_factory' => true,
             'configurator_service' => true,
             'configurator_service_simple' => true,
             'decorated.pif-pouf' => true,
@@ -104,6 +107,26 @@ class ProjectServiceContainer extends Container
     protected function getBAR2Service()
     {
         return $this->services['BAR2'] = new \stdClass();
+    }
+
+    /**
+     * Gets the public 'a_service' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getAServiceService()
+    {
+        return $this->services['a_service'] = ($this->privates['a_factory'] ??= new \Bar())->getBar();
+    }
+
+    /**
+     * Gets the public 'b_service' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getBServiceService()
+    {
+        return $this->services['b_service'] = ($this->privates['a_factory'] ??= new \Bar())->getBar();
     }
 
     /**
@@ -401,7 +424,7 @@ class ProjectServiceContainer extends Container
     {
         return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
             yield 0 => ($this->services['foo'] ?? $this->getFooService());
-            yield 1 => $this->privates['tagged_iterator_foo'] ??= new \Bar();
+            yield 1 => ($this->privates['tagged_iterator_foo'] ??= new \Bar());
         }, 2));
     }
 

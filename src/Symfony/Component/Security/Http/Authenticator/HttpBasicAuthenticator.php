@@ -63,10 +63,9 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
         $username = $request->headers->get('PHP_AUTH_USER');
         $password = $request->headers->get('PHP_AUTH_PW', '');
 
-        $passport = new Passport(
-            new UserBadge($username, $this->userProvider->loadUserByIdentifier(...)),
-            new PasswordCredentials($password)
-        );
+        $userBadge = new UserBadge($username, $this->userProvider->loadUserByIdentifier(...));
+        $passport = new Passport($userBadge, new PasswordCredentials($password));
+
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($password, $this->userProvider));
         }

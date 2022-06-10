@@ -54,23 +54,21 @@ final class LoginLinkAuthenticator extends AbstractAuthenticator implements Inte
 
     public function authenticate(Request $request): Passport
     {
-        $username = $request->get('user');
-        if (!$username) {
+        if (!$username = $request->get('user')) {
             throw new InvalidLoginLinkAuthenticationException('Missing user from link.');
         }
 
-        return new SelfValidatingPassport(
-            new UserBadge($username, function () use ($request) {
-                try {
-                    $user = $this->loginLinkHandler->consumeLoginLink($request);
-                } catch (InvalidLoginLinkExceptionInterface $e) {
-                    throw new InvalidLoginLinkAuthenticationException('Login link could not be validated.', 0, $e);
-                }
+        $userBadge = new UserBadge($username, function () use ($request) {
+            try {
+                $user = $this->loginLinkHandler->consumeLoginLink($request);
+            } catch (InvalidLoginLinkExceptionInterface $e) {
+                throw new InvalidLoginLinkAuthenticationException('Login link could not be validated.', 0, $e);
+            }
 
-                return $user;
-            }),
-            [new RememberMeBadge()]
-        );
+            return $user;
+        });
+
+        return new SelfValidatingPassport($userBadge, [new RememberMeBadge()]);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

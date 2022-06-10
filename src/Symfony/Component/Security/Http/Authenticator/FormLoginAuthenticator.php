@@ -82,11 +82,9 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $credentials = $this->getCredentials($request);
 
-        $passport = new Passport(
-            new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...)),
-            new PasswordCredentials($credentials['password']),
-            [new RememberMeBadge()]
-        );
+        $userBadge = new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...));
+        $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']), [new RememberMeBadge()]);
+
         if ($this->options['enable_csrf']) {
             $passport->addBadge(new CsrfTokenBadge($this->options['csrf_token_id'], $credentials['csrf_token']));
         }

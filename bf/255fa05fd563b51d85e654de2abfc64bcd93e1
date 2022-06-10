@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-08T04:42:13Z
+
+Hey!
+
+I think @Korbeil has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2022-06-09T13:27:33Z
+
+With this, maybe my patch at https://github.com/symfony/symfony/pull/46453 is not necessary anymore?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2022-06-09T19:25:46Z
+
+Going to answer my own comment
+```php
+if (self::MUTATOR === $source && !$this->filterDocBlockParams($phpDocNode, $property)) {
+    return null;
+}
+```
+
+this guard can now indeed by removed, since you added more generic solution.
+
+---------------------------------------------------------------------------
+
+by simPod at 2022-06-10T06:48:26Z
+
+Indeed, cool

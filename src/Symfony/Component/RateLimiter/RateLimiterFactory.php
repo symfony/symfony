@@ -25,7 +25,7 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-final class RateLimiterFactory
+final class RateLimiterFactory implements RateLimiterFactoryInterface
 {
     private array $config;
     private StorageInterface $storage;

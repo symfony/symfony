@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+6.1
+---
+ * Switch to use an Interface for the `RateLimiterFactory`
 
 5.4
 ---

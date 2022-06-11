@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `NAME` constant to `UlidType` and `UuidType`
+
 6.0
 ---
 

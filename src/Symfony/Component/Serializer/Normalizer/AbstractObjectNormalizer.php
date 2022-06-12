@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -228,12 +229,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
             if (!isset($data[$mapping->getTypeProperty()])) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), false);
+                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], PropertyPath::append($context['deserialization_path'] ?? '', $mapping->getTypeProperty()), false);
             }
 
             $type = $data[$mapping->getTypeProperty()];
             if (null === ($mappedClass = $mapping->getClassForType($type))) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type "%s" is not a valid value.', $type), $type, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), true);
+                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type "%s" is not a valid value.', $type), $type, ['string'], PropertyPath::append($context['deserialization_path'] ?? '', $mapping->getTypeProperty()), true);
             }
 
             if ($mappedClass !== $class) {
@@ -398,8 +399,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
-        if ($extraAttributes) {
-            throw new ExtraAttributesException($extraAttributes);
+        if (!$extraAttributes) {
+            $extraAttributeException = new ExtraAttributesException(array_map(fn (string $extraAttribute) => PropertyPath::append($context['deserialization_path'] ?? '', $extraAttribute), $extraAttributes));
+            if (!isset($context['extra_attributes_exceptions'])) {
+                throw $extraAttributeException;
+            }
+            $context['extra_attributes_exceptions'][] = $extraAttributeException;
         }
 
         return $object;

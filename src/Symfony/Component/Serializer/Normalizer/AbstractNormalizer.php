@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -505,7 +506,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected function getAttributeDenormalizationContext(string $class, string $attribute, array $context): array
     {
-        $context['deserialization_path'] = ($context['deserialization_path'] ?? false) ? $context['deserialization_path'].'.'.$attribute : $attribute;
+        $context['deserialization_path'] = PropertyPath::append($context['deserialization_path'] ?? '', $attribute);
 
         if (null === $metadata = $this->getAttributeMetadata($class, $attribute)) {
             return $context;

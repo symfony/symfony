@@ -212,19 +212,27 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
         }
 
-        if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])) {
-            unset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]);
+        $notNormalizableExceptions = [];
+        if ($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS] ?? false) {
             $context['not_normalizable_value_exceptions'] = [];
-            $errors = &$context['not_normalizable_value_exceptions'];
-            $denormalized = $normalizer->denormalize($data, $type, $format, $context);
-            if ($errors) {
-                throw new PartialDenormalizationException($denormalized, $errors);
-            }
+            $notNormalizableExceptions = &$context['not_normalizable_value_exceptions'];
+        }
+        unset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]);
 
-            return $denormalized;
+        $extraAttributesExceptions = [];
+        if ($context[DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS] ?? false) {
+            $context['extra_attributes_exceptions'] = [];
+            $extraAttributesExceptions = &$context['extra_attributes_exceptions'];
+        }
+        unset($context[DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS]);
+
+        $denormalized = $normalizer->denormalize($data, $type, $format, $context);
+
+        if ($notNormalizableExceptions || $extraAttributesExceptions) {
+            throw new PartialDenormalizationException($denormalized, $notNormalizableExceptions, $extraAttributesExceptions);
         }
 
-        return $normalizer->denormalize($data, $type, $format, $context);
+        return $denormalized;
     }
 
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool

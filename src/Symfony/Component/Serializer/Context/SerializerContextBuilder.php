@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Context;
 
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
@@ -35,5 +36,10 @@ final class SerializerContextBuilder implements ContextBuilderInterface
     public function withCollectDenormalizationErrors(?bool $collectDenormalizationErrors): static
     {
         return $this->with(DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS, $collectDenormalizationErrors);
+    }
+
+    public function withCollectExtraAttributesErrors(?bool $collectExtraAttributesErrors): static
+    {
+        return $this->with(DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS, $collectExtraAttributesErrors);
     }
 }

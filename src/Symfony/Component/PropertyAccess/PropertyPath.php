@@ -203,4 +203,33 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
         return $this->isNullSafe[$index];
     }
+
+    /**
+     * Utility method for dealing with property paths.
+     * For more extensive functionality, use instances of this class.
+     *
+     * Appends a path to a given property path.
+     *
+     * If the base path is empty, the appended path will be returned unchanged.
+     * If the base path is not empty, and the appended path starts with a
+     * squared opening bracket ("["), the concatenation of the two paths is
+     * returned. Otherwise, the concatenation of the two paths is returned,
+     * separated by a dot (".").
+     */
+    public static function append(string $basePath, string $subPath): string
+    {
+        if ('' === $subPath) {
+            return $basePath;
+        }
+
+        if ('[' === $subPath[0]) {
+            return $basePath.$subPath;
+        }
+
+        if ('' === $basePath) {
+            return $subPath;
+        }
+
+        return $basePath.'.'.$subPath;
+    }
 }

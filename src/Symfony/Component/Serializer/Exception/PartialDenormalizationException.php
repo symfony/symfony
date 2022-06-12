@@ -16,13 +16,26 @@ namespace Symfony\Component\Serializer\Exception;
  */
 class PartialDenormalizationException extends UnexpectedValueException
 {
-    private $data;
-    private $errors;
+    private ?ExtraAttributesException $extraAttributesError = null;
 
-    public function __construct($data, array $errors)
+    public function __construct(
+        private mixed $data,
+        /**
+         * @var NotNormalizableValueException[]
+         */
+        private array $notNormalizableErrors,
+        array $extraAttributesErrors = []
+    )
     {
         $this->data = $data;
-        $this->errors = $errors;
+        $this->notNormalizableErrors = $notNormalizableErrors;
+        $extraAttributes = [];
+        foreach ($extraAttributesErrors as $error) {
+            $extraAttributes = \array_merge($extraAttributes, $error->getExtraAttributes());
+        }
+        if ($extraAttributes) {
+            $this->extraAttributesError = new ExtraAttributesException($extraAttributes);
+        }
     }
 
     public function getData()
@@ -30,8 +43,24 @@ class PartialDenormalizationException extends UnexpectedValueException
         return $this->data;
     }
 
+    /**
+     * @deprecated since Symfony 6.2, use getNotNormalizableValueErrors() instead.
+     */
     public function getErrors(): array
     {
-        return $this->errors;
+        return $this->getNotNormalizableValueErrors();
+    }
+
+    /**
+     * @return NotNormalizableValueException[]
+     */
+    public function getNotNormalizableValueErrors(): array
+    {
+        return $this->notNormalizableErrors;
+    }
+
+    public function getExtraAttributesError(): ?ExtraAttributesException
+    {
+        return $this->extraAttributesError;
     }
 }

@@ -100,6 +100,8 @@ Serializer
  * Deprecate calling `AttributeMetadata::setSerializedName()`, `ClassMetadata::setClassDiscriminatorMapping()` without arguments
  * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
  * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
+ * Change the signature of `PartialDenormalizationException::__construct($data, array $errors)` to `__construct(mixed $data, array $errors, array $extraAttributesErrors = [])`
+ * Deprecate `PartialDenormalizationException::getErrors()`, call `getNotNormalizableValueErrors()` instead
 
 Translation
 -----------

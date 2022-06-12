@@ -33,6 +33,7 @@ final class Php74Full
     public TestFoo $nestedObject;
     /** @var Php74Full[] */
     public $anotherCollection;
+    public TestFoo $nestedObject2;
 }
 
 

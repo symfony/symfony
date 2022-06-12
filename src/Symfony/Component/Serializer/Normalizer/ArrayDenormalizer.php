@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -47,7 +48,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {
             $subContext = $context;
-            $subContext['deserialization_path'] = ($context['deserialization_path'] ?? false) ? sprintf('%s[%s]', $context['deserialization_path'], $key) : "[$key]";
+            $subContext['deserialization_path'] = PropertyPath::append($context['deserialization_path'] ?? '', "[$key]");
 
             if (null !== $builtinType && !('is_'.$builtinType)($key)) {
                 throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, get_debug_type($key)), $key, [$builtinType], $subContext['deserialization_path'] ?? null, true);

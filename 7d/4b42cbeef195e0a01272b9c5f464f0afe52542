@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-06-03T15:51:29Z
+
+That's for 6.2.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-06-03T16:02:50Z
+
+> That's for 6.2.
+
+Kinda sad we need to wait 6 month for a phpdoc update, but I've updated my PR then to target 6.2 branch
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-06-06T20:48:51Z
+
+I have a psalm issue with the method:
+```
+    /**
+     * Associates a format with mime types.
+     *
+     * @param string|string[] $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
+     */
+    public function setFormat(?string $format, string|array $mimeTypes)
+    {
+        if (null === static::$formats) {
+            static::initializeFormats();
+        }
+
+        static::$formats[$format] = \is_array($mimeTypes) ? $mimeTypes : [$mimeTypes];
+    }
+```
+
+Seems like psalm is considering that when `$format` is null, the offset is 0. I tried and the offset is `''` which is a string.
+I opened a psalm issue about it https://github.com/vimeo/psalm/issues/8063
+
+Dunno if/how you want that I fix this for now @fabpot , I can use `$format ?? ''` as key for instance.
+(But maybe  setting a null format should be deprecated)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-06-10T07:46:10Z
+
+For the record the psalm failure is related to the psalm issue https://github.com/vimeo/psalm/issues/8063 which will be solved in the next psalm release.
+
+But isn't weird to accept `null` as format here @nicolas-grekas (since it's used as an array key):
+https://github.com/symfony/symfony/blob/89932de9f6d36ddb6d005983f3551b89f08fd0c8/src/Symfony/Component/HttpFoundation/Request.php#L1296-L1302
+
+Then the getter only accept `string`
+https://github.com/symfony/symfony/blob/89932de9f6d36ddb6d005983f3551b89f08fd0c8/src/Symfony/Component/HttpFoundation/Request.php#L1256
+or return `string`
+https://github.com/symfony/symfony/blob/89932de9f6d36ddb6d005983f3551b89f08fd0c8/src/Symfony/Component/HttpFoundation/Request.php#L1279-L1286
+
+So when you `set` with a null key, you have to `get` with `''`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-10T08:00:28Z
+
+I guess we accept null for historical reasons.

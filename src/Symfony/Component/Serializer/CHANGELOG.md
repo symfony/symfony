@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Throw `NotNormalizableValueException` instead of `InvalidArgumentException` in case of invalid data type in `ArrayDenormalizer`
+
 6.1
 ---
 

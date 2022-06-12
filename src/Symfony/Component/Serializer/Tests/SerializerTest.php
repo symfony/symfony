@@ -802,7 +802,8 @@ class SerializerTest extends TestCase
             "splFileInfo": null,
             "uuid": null,
             "array": null,
-            "collection": [
+            "collection": null,
+            "collection2": [
                 {
                     "string": "string"
                 },
@@ -948,9 +949,18 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'null',
                 'expectedTypes' => [
+                    'array',
+                ],
+                'path' => 'collection',
+                'useMessageForUser' => false,
+                'message' => 'Data expected to be an array, "null" given.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
                     'string',
                 ],
-                'path' => 'collection[1].string',
+                'path' => 'collection2[1].string',
                 'useMessageForUser' => false,
                 'message' => 'The type of the "string" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74Full" must be one of "string" ("null" given).',
             ],

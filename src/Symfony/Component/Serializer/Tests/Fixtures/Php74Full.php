@@ -27,6 +27,8 @@ final class Php74Full
     public array $array;
     /** @var Php74Full[] */
     public array $collection;
+    /** @var Php74Full[] */
+    public array $collection2;
     public Php74FullWithConstructor $php74FullWithConstructor;
     public DummyMessageInterface $dummyMessage;
     /** @var TestFoo[] $nestedArray */

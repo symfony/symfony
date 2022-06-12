@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -36,11 +37,12 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         if (null === $this->denormalizer) {
             throw new BadMethodCallException('Please set a denormalizer before calling denormalize()!');
         }
-        if (!\is_array($data)) {
-            throw new InvalidArgumentException('Data expected to be an array, '.get_debug_type($data).' given.');
-        }
         if (!str_ends_with($type, '[]')) {
             throw new InvalidArgumentException('Unsupported class: '.$type);
+        }
+
+        if (!\is_array($data)) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Data expected to be an array, "%s" given.', get_debug_type($data)), $data, [Type::BUILTIN_TYPE_ARRAY], $context['deserialization_path'] ?? '');
         }
 
         $type = substr($type, 0, -2);

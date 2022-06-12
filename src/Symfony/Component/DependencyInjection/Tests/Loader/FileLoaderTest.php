@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ExcludedDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
@@ -270,6 +271,19 @@ class FileLoaderTest extends TestCase
         );
 
         $this->assertSame($expected, $container->has(Foo::class));
+    }
+
+    public function testNotRegisterClassesWithExclude()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), 'prod');
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\\',
+            '{ExcludedDummy.php}'
+        );
+
+        $this->assertFalse($container->has(ExcludedDummy::class));
     }
 }
 

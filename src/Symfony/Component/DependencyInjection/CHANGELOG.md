@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add `#[Exclude]` attribute to tell class, method or function should not be registered as a service
+
 6.1
 ---
 

@@ -15,6 +15,7 @@ use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -99,6 +100,10 @@ class PhpFileLoader extends FileLoader
         $arguments = [];
         $configBuilders = [];
         $r = new \ReflectionFunction($callback);
+
+        if (!empty($r->getAttributes(Exclude::class))) {
+            return;
+        }
 
         $attribute = null;
         foreach ($r->getAttributes(When::class) as $attribute) {

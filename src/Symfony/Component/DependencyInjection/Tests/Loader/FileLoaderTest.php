@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\Mi
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub\DeeperBaz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\BarInterface;
@@ -153,7 +154,8 @@ class FileLoaderTest extends TestCase
         $this->assertTrue($container->has(Foo::class));
         $this->assertTrue($container->has(Baz::class));
         $this->assertFalse($container->has(Bar::class));
-        $this->assertFalse($container->has(DeeperBaz::class));
+        $this->assertTrue($container->has(DeeperBaz::class));
+        $this->assertTrue($container->getDefinition(DeeperBaz::class)->hasTag('container.excluded'));
     }
 
     public function testNestedRegisterClasses()
@@ -227,7 +229,7 @@ class FileLoaderTest extends TestCase
     /**
      * @dataProvider excludeTrailingSlashConsistencyProvider
      */
-    public function testExcludeTrailingSlashConsistency(string $exclude)
+    public function testExcludeTrailingSlashConsistency(string $exclude, string $excludedId)
     {
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
@@ -239,18 +241,19 @@ class FileLoaderTest extends TestCase
         );
 
         $this->assertTrue($container->has(Foo::class));
-        $this->assertFalse($container->has(DeeperBaz::class));
+        $this->assertTrue($container->has($excludedId));
+        $this->assertTrue($container->getDefinition($excludedId)->hasTag('container.excluded'));
     }
 
     public function excludeTrailingSlashConsistencyProvider(): iterable
     {
-        yield ['Prototype/OtherDir/AnotherSub/'];
-        yield ['Prototype/OtherDir/AnotherSub'];
-        yield ['Prototype/OtherDir/AnotherSub/*'];
-        yield ['Prototype/*/AnotherSub'];
-        yield ['Prototype/*/AnotherSub/'];
-        yield ['Prototype/*/AnotherSub/*'];
-        yield ['Prototype/OtherDir/AnotherSub/DeeperBaz.php'];
+        yield ['Prototype/OtherDir/AnotherSub/', AnotherSub::class];
+        yield ['Prototype/OtherDir/AnotherSub', AnotherSub::class];
+        yield ['Prototype/OtherDir/AnotherSub/*', DeeperBaz::class];
+        yield ['Prototype/*/AnotherSub', AnotherSub::class];
+        yield ['Prototype/*/AnotherSub/', AnotherSub::class];
+        yield ['Prototype/*/AnotherSub/*', DeeperBaz::class];
+        yield ['Prototype/OtherDir/AnotherSub/DeeperBaz.php', DeeperBaz::class];
     }
 
     /**

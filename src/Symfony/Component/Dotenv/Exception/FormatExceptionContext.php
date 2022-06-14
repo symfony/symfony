@@ -16,10 +16,10 @@ namespace Symfony\Component\Dotenv\Exception;
  */
 final class FormatExceptionContext
 {
-    private string $data;
-    private string $path;
-    private int $lineno;
-    private int $cursor;
+    private readonly string $data;
+    private readonly string $path;
+    private readonly int $lineno;
+    private readonly int $cursor;
 
     public function __construct(string $data, string $path, int $lineno, int $cursor)
     {

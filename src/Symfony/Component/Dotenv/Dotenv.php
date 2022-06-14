@@ -35,8 +35,8 @@ final class Dotenv
     private string $data;
     private int $end;
     private array $values = [];
-    private string $envKey;
-    private string $debugKey;
+    private readonly string $envKey;
+    private readonly string $debugKey;
     private array $prodEnvs = ['prod'];
     private bool $usePutenv = false;
 
@@ -46,9 +46,6 @@ final class Dotenv
         $this->debugKey = $debugKey;
     }
 
-    /**
-     * @return $this
-     */
     public function setProdEnvs(array $prodEnvs): static
     {
         $this->prodEnvs = $prodEnvs;
@@ -59,8 +56,6 @@ final class Dotenv
     /**
      * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
      *                        Beware that `putenv()` is not thread safe, that's why this setting defaults to false
-     *
-     * @return $this
      */
     public function usePutenv(bool $usePutenv = true): static
     {
@@ -178,10 +173,10 @@ final class Dotenv
     public function populate(array $values, bool $overrideExistingVars = false): void
     {
         $updateLoadedVars = false;
-        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
+        $loadedVars = array_flip(explode(',', (string) ($_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? '')));
 
         foreach ($values as $name => $value) {
-            $notHttpName = !str_starts_with($name, 'HTTP_');
+            $notHttpName = !str_starts_with((string) $name, 'HTTP_');
             if (isset($_SERVER[$name]) && $notHttpName && !isset($_ENV[$name])) {
                 $_ENV[$name] = $_SERVER[$name];
             }
@@ -304,7 +299,7 @@ final class Dotenv
             throw $this->createFormatException('Whitespace are not supported before the value');
         }
 
-        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
+        $loadedVars = array_flip(explode(',', (string) ($_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? '')));
         unset($loadedVars['']);
         $v = '';
 
@@ -410,7 +405,7 @@ final class Dotenv
         return $value;
     }
 
-    private function skipEmptyLines()
+    private function skipEmptyLines(): void
     {
         if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, 0, $this->cursor)) {
             $this->moveCursor($match[0]);
@@ -433,7 +428,7 @@ final class Dotenv
             )
         /x';
 
-        return preg_replace_callback($regex, function ($matches) use ($loadedVars) {
+        return preg_replace_callback($regex, function ($matches) use ($loadedVars): ?string {
             if ('\\' === $matches[1]) {
                 return substr($matches[0], 1);
             }
@@ -453,12 +448,7 @@ final class Dotenv
                 $process->inheritEnvironmentVariables();
             }
 
-            $env = [];
-            foreach ($this->values as $name => $value) {
-                if (isset($loadedVars[$name]) || (!isset($_ENV[$name]) && !(isset($_SERVER[$name]) && !str_starts_with($name, 'HTTP_')))) {
-                    $env[$name] = $value;
-                }
-            }
+            $env = array_filter($this->values, static fn($value, $name): bool => isset($loadedVars[$name]) || (!isset($_ENV[$name]) && !(isset($_SERVER[$name]) && !str_starts_with($name, 'HTTP_'))), ARRAY_FILTER_USE_BOTH);
             $process->setEnv($env);
 
             try {
@@ -488,7 +478,7 @@ final class Dotenv
             (?P<closing_brace>\})?             # optional closing brace
         /x';
 
-        $value = preg_replace_callback($regex, function ($matches) use ($loadedVars) {
+        return preg_replace_callback($regex, function ($matches) use ($loadedVars): ?string {
             // odd number of backslashes means the $ character is escaped
             if (1 === \strlen($matches['backslashes']) % 2) {
                 return substr($matches[0], 1);
@@ -535,11 +525,9 @@ final class Dotenv
 
             return $matches['backslashes'].$value;
         }, $value);
-
-        return $value;
     }
 
-    private function moveCursor(string $text)
+    private function moveCursor(string $text): void
     {
         $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");

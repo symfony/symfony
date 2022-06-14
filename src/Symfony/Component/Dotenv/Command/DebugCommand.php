@@ -36,8 +36,8 @@ final class DebugCommand extends Command
      */
     protected static $defaultDescription = 'Lists all dotenv files with variables and values';
 
-    private $kernelEnvironment;
-    private $projectDirectory;
+    private readonly string $kernelEnvironment;
+    private readonly string $projectDirectory;
 
     public function __construct(string $kernelEnvironment, string $projectDirectory)
     {
@@ -59,9 +59,7 @@ final class DebugCommand extends Command
         }
 
         $envFiles = $this->getEnvFiles();
-        $availableFiles = array_filter($envFiles, function (string $file) {
-            return is_file($this->getFilePath($file));
-        });
+        $availableFiles = array_filter($envFiles, fn (string $file): bool => is_file($this->getFilePath($file)));
 
         if (\in_array('.env.local.php', $availableFiles, true)) {
             $io->warning('Due to existing dump file (.env.local.php) all other dotenv files are skipped.');
@@ -72,11 +70,10 @@ final class DebugCommand extends Command
         }
 
         $io->section('Scanned Files (in descending priority)');
-        $io->listing(array_map(static function (string $envFile) use ($availableFiles) {
-            return \in_array($envFile, $availableFiles, true)
-                ? sprintf('<fg=green>✓</> %s', $envFile)
-                : sprintf('<fg=red>⨯</> %s', $envFile);
-        }, $envFiles));
+        $io->listing(array_map(static fn (string $envFile): string => \in_array($envFile, $availableFiles, true)
+            ? sprintf('<fg=green>✓</> %s', $envFile)
+            : sprintf('<fg=red>⨯</> %s', $envFile), $envFiles))
+        ;
 
         $io->section('Variables');
         $io->table(
@@ -89,6 +86,9 @@ final class DebugCommand extends Command
         return 0;
     }
 
+    /**
+     * @return array<int, mixed[]>
+     */
     private function getVariables(array $envFiles): array
     {
         $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
@@ -125,11 +125,7 @@ final class DebugCommand extends Command
             $files[] = '.env.local';
         }
 
-        if (!is_file($this->getFilePath('.env')) && is_file($this->getFilePath('.env.dist'))) {
-            $files[] = '.env.dist';
-        } else {
-            $files[] = '.env';
-        }
+        $files[] = !is_file($this->getFilePath('.env')) && is_file($this->getFilePath('.env.dist')) ? '.env.dist' : '.env';
 
         return $files;
     }

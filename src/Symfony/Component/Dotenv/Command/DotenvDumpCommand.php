@@ -29,8 +29,8 @@ use Symfony\Component\Dotenv\Dotenv;
 #[AsCommand(name: 'dotenv:dump', description: 'Compiles .env files to .env.local.php')]
 final class DotenvDumpCommand extends Command
 {
-    private string $projectDir;
-    private string|null $defaultEnv;
+    private readonly string $projectDir;
+    private readonly string|null $defaultEnv;
 
     public function __construct(string $projectDir, string $defaultEnv = null)
     {
@@ -43,7 +43,7 @@ final class DotenvDumpCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([

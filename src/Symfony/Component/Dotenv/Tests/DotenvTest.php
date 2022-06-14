@@ -21,7 +21,7 @@ class DotenvTest extends TestCase
     /**
      * @dataProvider getEnvDataWithFormatErrors
      */
-    public function testParseWithFormatError($data, $error)
+    public function testParseWithFormatError(string $data, $error)
     {
         $dotenv = new Dotenv();
 

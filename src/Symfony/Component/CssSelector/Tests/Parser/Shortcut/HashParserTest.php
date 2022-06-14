@@ -36,10 +36,15 @@ class HashParserTest extends TestCase
     {
         return [
             ['#testid', 'Hash[Element[*]#testid]'],
+            ['#test.id', 'Hash[Element[*]#test.id]'],
             ['testel#testid', 'Hash[Element[testel]#testid]'],
+            ['testel#test.id', 'Hash[Element[testel]#test.id]'],
             ['testns|#testid', 'Hash[Element[testns|*]#testid]'],
+            ['testns|#test.id', 'Hash[Element[testns|*]#test.id]'],
             ['testns|*#testid', 'Hash[Element[testns|*]#testid]'],
+            ['testns|*#test.id', 'Hash[Element[testns|*]#test.id]'],
             ['testns|testel#testid', 'Hash[Element[testns|testel]#testid]'],
+            ['testns|testel#test.id', 'Hash[Element[testns|testel]#test.id]'],
         ];
     }
 }

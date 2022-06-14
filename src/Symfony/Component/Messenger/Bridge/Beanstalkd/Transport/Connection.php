@@ -36,9 +36,9 @@ class Connection
     /**
      * Available options:
      *
-     * * tube_name: name of the tube
-     * * timeout: message reservation timeout (in seconds)
-     * * ttr: the message time to run before it is put back in the ready queue (in seconds)
+     *   * tube_name: name of the tube
+     *   * timeout: message reservation timeout (in seconds)
+     *   * ttr: the message time to run before it is put back in the ready queue (in seconds)
      */
     private array $configuration;
     private PheanstalkInterface $client;
@@ -104,10 +104,11 @@ class Connection
 
     /**
      * @param int $delay The delay in milliseconds
+     * @param int $priority The priority in Beanstalkd terms (0 .. 2^32 - 1)
      *
      * @return string The inserted id
      */
-    public function send(string $body, array $headers, int $delay = 0): string
+    public function send(string $body, array $headers, int $delay = 0, int $priority = PheanstalkInterface::DEFAULT_PRIORITY): string
     {
         $message = json_encode([
             'body' => $body,
@@ -121,7 +122,7 @@ class Connection
         try {
             $job = $this->client->useTube($this->tube)->put(
                 $message,
-                PheanstalkInterface::DEFAULT_PRIORITY,
+                $priority,
                 $delay / 1000,
                 $this->ttr
             );

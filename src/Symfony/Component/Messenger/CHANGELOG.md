@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add per-message priority for AMQP & Beanstalkd transports
+
 6.1
 ---
 

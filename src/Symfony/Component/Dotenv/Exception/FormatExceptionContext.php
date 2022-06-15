@@ -16,17 +16,8 @@ namespace Symfony\Component\Dotenv\Exception;
  */
 final class FormatExceptionContext
 {
-    private readonly string $data;
-    private readonly string $path;
-    private readonly int $lineno;
-    private readonly int $cursor;
-
-    public function __construct(string $data, string $path, int $lineno, int $cursor)
+    public function __construct(private string $data, private string $path, private int $lineno, private int $cursor)
     {
-        $this->data = $data;
-        $this->path = $path;
-        $this->lineno = $lineno;
-        $this->cursor = $cursor;
     }
 
     public function getPath(): string

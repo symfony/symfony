@@ -18,12 +18,8 @@ namespace Symfony\Component\Dotenv\Exception;
  */
 final class FormatException extends \LogicException implements ExceptionInterface
 {
-    private readonly FormatExceptionContext $context;
-
-    public function __construct(string $message, FormatExceptionContext $context, int $code = 0, \Throwable $previous = null)
+    public function __construct(string $message, private FormatExceptionContext $context, int $code = 0, \Throwable $previous = null)
     {
-        $this->context = $context;
-
         parent::__construct(sprintf("%s in \"%s\" at line %d.\n%s", $message, $context->getPath(), $context->getLineno(), $context->getDetails()), $code, $previous);
     }
 

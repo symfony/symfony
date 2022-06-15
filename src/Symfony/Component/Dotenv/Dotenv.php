@@ -35,17 +35,16 @@ final class Dotenv
     private string $data;
     private int $end;
     private array $values = [];
-    private readonly string $envKey;
-    private readonly string $debugKey;
     private array $prodEnvs = ['prod'];
     private bool $usePutenv = false;
 
-    public function __construct(string $envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
+    public function __construct(private string $envKey = 'APP_ENV', private string $debugKey = 'APP_DEBUG')
     {
-        $this->envKey = $envKey;
-        $this->debugKey = $debugKey;
     }
 
+    /**
+     * @return $this
+     */
     public function setProdEnvs(array $prodEnvs): static
     {
         $this->prodEnvs = $prodEnvs;
@@ -56,6 +55,8 @@ final class Dotenv
     /**
      * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
      *                        Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     *
+     * @return $this
      */
     public function usePutenv(bool $usePutenv = true): static
     {
@@ -173,7 +174,7 @@ final class Dotenv
     public function populate(array $values, bool $overrideExistingVars = false): void
     {
         $updateLoadedVars = false;
-        $loadedVars = array_flip(explode(',', (string) ($_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? '')));
+        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
 
         foreach ($values as $name => $value) {
             $notHttpName = !str_starts_with((string) $name, 'HTTP_');
@@ -299,7 +300,7 @@ final class Dotenv
             throw $this->createFormatException('Whitespace are not supported before the value');
         }
 
-        $loadedVars = array_flip(explode(',', (string) ($_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? '')));
+        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
         unset($loadedVars['']);
         $v = '';
 
@@ -405,7 +406,7 @@ final class Dotenv
         return $value;
     }
 
-    private function skipEmptyLines(): void
+    private function skipEmptyLines()
     {
         if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, 0, $this->cursor)) {
             $this->moveCursor($match[0]);
@@ -448,7 +449,12 @@ final class Dotenv
                 $process->inheritEnvironmentVariables();
             }
 
-            $env = array_filter($this->values, static fn($value, $name): bool => isset($loadedVars[$name]) || (!isset($_ENV[$name]) && !(isset($_SERVER[$name]) && !str_starts_with($name, 'HTTP_'))), ARRAY_FILTER_USE_BOTH);
+            $env = [];
+            foreach ($this->values as $name => $value) {
+                if (isset($loadedVars[$name]) || (!isset($_ENV[$name]) && !(isset($_SERVER[$name]) && !str_starts_with($name, 'HTTP_')))) {
+                    $env[$name] = $value;
+                }
+            }
             $process->setEnv($env);
 
             try {
@@ -527,7 +533,7 @@ final class Dotenv
         }, $value);
     }
 
-    private function moveCursor(string $text): void
+    private function moveCursor(string $text)
     {
         $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");

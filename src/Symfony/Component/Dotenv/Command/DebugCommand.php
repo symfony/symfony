@@ -36,14 +36,8 @@ final class DebugCommand extends Command
      */
     protected static $defaultDescription = 'Lists all dotenv files with variables and values';
 
-    private readonly string $kernelEnvironment;
-    private readonly string $projectDirectory;
-
-    public function __construct(string $kernelEnvironment, string $projectDirectory)
+    public function __construct(private string $kernelEnvironment, private string $projectDirectory)
     {
-        $this->kernelEnvironment = $kernelEnvironment;
-        $this->projectDirectory = $projectDirectory;
-
         parent::__construct();
     }
 

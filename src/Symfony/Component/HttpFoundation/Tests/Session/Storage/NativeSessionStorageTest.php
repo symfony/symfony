@@ -294,12 +294,31 @@ class NativeSessionStorageTest extends TestCase
         $this->assertEquals($storage->getBag('flashes'), $bag);
     }
 
-    public function testRegenerateInvalidSessionId()
+    public function testRegenerateInvalidSessionIdForNativeFileSessionHandler()
     {
         $_COOKIE[session_name()] = '&~[';
-        $started = (new NativeSessionStorage())->start();
+        session_id('&~[');
+        $storage = new NativeSessionStorage([], new NativeFileSessionHandler());
+        $started = $storage->start();
 
         $this->assertTrue($started);
         $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,}$/', session_id());
+        $storage->save();
+
+        $_COOKIE[session_name()] = '&~[';
+        session_id('&~[');
+        $storage = new NativeSessionStorage([], new SessionHandlerProxy(new NativeFileSessionHandler()));
+        $started = $storage->start();
+
+        $this->assertTrue($started);
+        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,}$/', session_id());
+        $storage->save();
+
+        $_COOKIE[session_name()] = '&~[';
+        session_id('&~[');
+        $storage = new NativeSessionStorage([], new NullSessionHandler());
+        $started = $storage->start();
+        $this->assertTrue($started);
+        $this->assertSame('&~[', session_id());
     }
 }

@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LokaliseProviderTest extends ProviderTestCase
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, bool $intlIcuEnabled): ProviderInterface
+    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, bool $intlIcuEnabled = false): ProviderInterface
     {
         return new LokaliseProvider($client, $loader, $logger, $defaultLocale, $endpoint, $intlIcuEnabled);
     }
@@ -39,7 +39,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->createProvider($this->getClient()->withOptions([
                 'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', false),
+            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com'),
             'lokalise://api.lokalise.com',
         ];
 
@@ -47,7 +47,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->createProvider($this->getClient()->withOptions([
                 'base_uri' => 'https://example.com',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com', false),
+            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com'),
             'lokalise://example.com',
         ];
 
@@ -55,7 +55,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->createProvider($this->getClient()->withOptions([
                 'base_uri' => 'https://example.com:99',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99', false),
+            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99'),
             'lokalise://example.com:99',
         ];
     }
@@ -287,7 +287,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', false);
+        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
         $translatorBag = $provider->read([$domain], [$locale]);
 
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
@@ -331,7 +331,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', false);
+        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
 
         $translatorBag = $provider->read($domains, $locales);
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
@@ -414,8 +414,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'api.lokalise.com',
-            false
+            'api.lokalise.com'
         );
 
         $provider->delete($translatorBag);

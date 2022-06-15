@@ -58,10 +58,12 @@ class JsonManifestVersionStrategyTest extends TestCase
     /**
      * @dataProvider provideMissingStrategies
      */
-    public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
+    public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy, bool $isLocal)
     {
-        $this->expectException(RuntimeException::class);
-        $strategy->getVersion('main.js');
+        if (!$isLocal) {
+            $this->expectException(RuntimeException::class);
+        }
+        $this->assertSame('main.js', $strategy->getVersion('main.js'));
     }
 
     /**
@@ -109,9 +111,9 @@ class JsonManifestVersionStrategyTest extends TestCase
             return new MockResponse('{}', ['http_code' => 404]);
         });
 
-        yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient)];
+        yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient), false];
 
-        yield [new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestPath)];
+        yield [new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestPath), true];
     }
 
     public function provideStrictStrategies()

@@ -7,6 +7,7 @@
 BlaBlaCar.com and Spotify.com) and most of the [popular PHP projects][2] (including
 Drupal and Magento).
 
+
 Installation
 ------------
 

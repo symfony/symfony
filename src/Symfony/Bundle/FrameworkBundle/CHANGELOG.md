@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+  `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+  `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+
 6.1
 ---
 

@@ -57,7 +57,7 @@ class DataTest extends TestCase
         $this->assertSame('foo', $data['message']);
         $this->assertSame('foo', $data[Caster::PREFIX_PROTECTED.'message']);
 
-        $this->assertStringMatchesFormat('Exception (count=%d)', (string) $data);
+        $this->assertSame('Exception (count=5)', (string) $data);
     }
 
     public function testArray()

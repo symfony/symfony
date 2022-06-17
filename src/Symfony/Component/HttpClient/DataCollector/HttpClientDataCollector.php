@@ -193,9 +193,15 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         $dataArg = [];
 
         if ($json = $trace['options']['json'] ?? null) {
-            $dataArg[] = '--data '.escapeshellarg(self::jsonEncode($json));
+            if (!$this->argMaxLengthIsSafe($payload = self::jsonEncode($json))) {
+                return null;
+            }
+            $dataArg[] = '--data '.escapeshellarg($payload);
         } elseif ($body = $trace['options']['body'] ?? null) {
             if (\is_string($body)) {
+                if (!$this->argMaxLengthIsSafe($body)) {
+                    return null;
+                }
                 try {
                     $dataArg[] = '--data '.escapeshellarg($body);
                 } catch (\ValueError) {
@@ -204,7 +210,10 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             } elseif (\is_array($body)) {
                 $body = explode('&', self::normalizeBody($body));
                 foreach ($body as $value) {
-                    $dataArg[] = '--data '.escapeshellarg(urldecode($value));
+                    if (!$this->argMaxLengthIsSafe($payload = urldecode($value))) {
+                        return null;
+                    }
+                    $dataArg[] = '--data '.escapeshellarg($payload);
                 }
             } else {
                 return null;
@@ -239,5 +248,15 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         }
 
         return implode(" \\\n  ", $command);
+    }
+
+    /**
+     * Let's be defensive : we authorize only size of 8kio on Windows for escapeshellarg() argument to avoid a fatal error
+     *
+     * @see https://github.com/php/php-src/blob/9458f5f2c8a8e3d6c65cc181747a5a75654b7c6e/ext/standard/exec.c#L397
+     */
+    private function argMaxLengthIsSafe(string $payload): bool
+    {
+        return \strlen($payload) < ('\\' === \DIRECTORY_SEPARATOR ? 8100 : 256000);
     }
 }

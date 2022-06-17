@@ -60,7 +60,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         // ArrayAdapter works in memory, we don't care about stampede protection
         if (\INF === $beta || !$item->isHit()) {
             $save = true;
-            $this->save($item->set($callback($item, $save)));
+            $item->set($callback($item, $save));
+            if ($save) {
+                $this->save($item);
+            }
         }
 
         return $item->get();

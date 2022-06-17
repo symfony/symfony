@@ -98,6 +98,31 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertSame(1, $cache->get('k2', function () { return 2; }));
     }
 
+    public function testDontSaveWhenAskedNotTo()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $v1 = $cache->get('some-key', function($item, &$save){
+           $save = false;
+           return 1;
+        });
+        $this->assertSame($v1, 1);
+
+        $v2 = $cache->get('some-key', function(){
+            return 2;
+        });
+        $this->assertSame($v2, 2, 'First value was cached and should not have been');
+
+        $v3 = $cache->get('some-key', function(){
+            $this->fail('Value should have come from cache');
+        });
+        $this->assertSame($v3, 2);
+    }
+
     public function testGetMetadata()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

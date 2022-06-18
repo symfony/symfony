@@ -196,6 +196,22 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient/Native%1$s',
         ];
+        yield 'GET with base uri' => [
+            [
+                'method' => 'GET',
+                'url' => '1',
+                'options' => [
+                    'base_uri' => 'http://localhost:8057/json/',
+                ],
+            ],
+            'curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttp://localhost:8057/json/1%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient/Native%1$s',
+        ];
         yield 'GET with resolve' => [
             [
                 'method' => 'GET',

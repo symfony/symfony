@@ -100,7 +100,7 @@ final class OhMySmtpApiTransportTest extends TestCase
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['Message' => 'i\'m a teapot', 'ErrorCode' => 418]), [
+            return new MockResponse(json_encode(['error' => 'i\'m a teapot']), [
                 'http_code' => 418,
                 'response_headers' => [
                     'content-type' => 'application/json',
@@ -117,7 +117,31 @@ final class OhMySmtpApiTransportTest extends TestCase
             ->text('Hello There!');
 
         $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        $this->expectExceptionMessage('Unable to send an email: {"error":"i\'m a teapot"}');
+        $transport->send($mail);
+    }
+
+    public function testSendThrowsForMultipleErrorResponses()
+    {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
+            return new MockResponse(json_encode(['errors' => ["to" => "undefined field" ]]), [
+                'http_code' => 418,
+                'response_headers' => [
+                    'content-type' => 'application/json',
+                ],
+            ]);
+        });
+        $transport = new OhMySmtpApiTransport('KEY', $client);
+        $transport->setPort(8984);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Unable to send an email: {"errors":{"to":"undefined field"}}');
         $transport->send($mail);
     }
 

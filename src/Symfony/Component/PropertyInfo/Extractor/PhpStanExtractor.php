@@ -99,6 +99,14 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
                 continue;
             }
 
+            if (
+                $tagDocNode->value instanceof ParamTagValueNode
+                && null === $prefix
+                && $tagDocNode->value->parameterName !== '$'.$property
+            ) {
+                continue;
+            }
+
             foreach ($this->phpStanTypeHelper->getTypes($tagDocNode->value, $nameScope) as $type) {
                 switch ($type->getClassName()) {
                     case 'self':
@@ -238,10 +246,6 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $tokens = new TokenIterator($this->lexer->tokenize($rawDocNode));
         $phpDocNode = $this->phpDocParser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
-
-        if (self::MUTATOR === $source && !$this->filterDocBlockParams($phpDocNode, $property)) {
-            return null;
-        }
 
         return [$phpDocNode, $source, $reflectionProperty->class];
     }

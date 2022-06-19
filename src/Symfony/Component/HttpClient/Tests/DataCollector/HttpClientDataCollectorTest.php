@@ -196,6 +196,22 @@ class HttpClientDataCollectorTest extends TestCase
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient/Native%1$s',
         ];
+        yield 'GET with base uri' => [
+            [
+                'method' => 'GET',
+                'url' => '1',
+                'options' => [
+                    'base_uri' => 'http://localhost:8057/json/',
+                ],
+            ],
+            'curl \\
+  --compressed \\
+  --request GET \\
+  --url %1$shttp://localhost:8057/json/1%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient/Native%1$s',
+        ];
         yield 'GET with resolve' => [
             [
                 'method' => 'GET',
@@ -307,6 +323,8 @@ class HttpClientDataCollectorTest extends TestCase
                         'json' => [
                             'foo' => [
                                 'bar' => 'baz',
+                                'qux' => [1.10, 1.0],
+                                'fred' => ['<foo>',"'bar'",'"baz"','&blong&'],
                             ],
                         ],
                     ],
@@ -317,14 +335,10 @@ class HttpClientDataCollectorTest extends TestCase
   --url %1$shttp://localhost:8057/json%1$s \\
   --header %1$sContent-Type: application/json%1$s \\
   --header %1$sAccept: */*%1$s \\
-  --header %1$sContent-Length: 21%1$s \\
+  --header %1$sContent-Length: 120%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient/Native%1$s \\
-  --data %1$s{
-    "foo": {
-        "bar": "baz"
-    }
-}%1$s',
+  --data %1$s{"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}%1$s',
             ];
         }
     }

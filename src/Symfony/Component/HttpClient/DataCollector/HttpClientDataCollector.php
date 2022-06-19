@@ -178,8 +178,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             return null;
         }
 
-        $debug = explode("\n", $trace['info']['debug']);
-        $url = self::mergeQueryString($trace['url'], $trace['options']['query'] ?? [], true);
+        $url = $trace['info']['original_url'] ?? $trace['info']['url'] ?? $trace['url'];
         $command = ['curl', '--compressed'];
 
         if (isset($trace['options']['resolve'])) {
@@ -194,12 +193,12 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         $dataArg = [];
 
         if ($json = $trace['options']['json'] ?? null) {
-            $dataArg[] = '--data '.escapeshellarg(json_encode($json, \JSON_PRETTY_PRINT));
+            $dataArg[] = '--data '.escapeshellarg(self::jsonEncode($json));
         } elseif ($body = $trace['options']['body'] ?? null) {
             if (\is_string($body)) {
                 try {
                     $dataArg[] = '--data '.escapeshellarg($body);
-                } catch (\ValueError $e) {
+                } catch (\ValueError) {
                     return null;
                 }
             } elseif (\is_array($body)) {
@@ -214,7 +213,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
         $dataArg = empty($dataArg) ? null : implode(' ', $dataArg);
 
-        foreach ($debug as $line) {
+        foreach (explode("\n", $trace['info']['debug']) as $line) {
             $line = substr($line, 0, -1);
 
             if (str_starts_with('< ', $line)) {

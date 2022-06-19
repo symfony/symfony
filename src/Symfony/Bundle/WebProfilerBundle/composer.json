@@ -19,7 +19,7 @@
         "php": ">=8.1",
         "symfony/config": "^5.4|^6.0",
         "symfony/framework-bundle": "^5.4|^6.0",
-        "symfony/http-kernel": "^5.4|^6.0",
+        "symfony/http-kernel": "^6.1",
         "symfony/routing": "^5.4|^6.0",
         "symfony/twig-bundle": "^5.4|^6.0",
         "twig/twig": "^2.13|^3.0.4"

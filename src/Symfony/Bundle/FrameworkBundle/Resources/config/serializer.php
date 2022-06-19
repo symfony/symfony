@@ -99,7 +99,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class)
             ->args([null, null])
-            ->tag('serializer.normalizer', ['priority' => -900])
+            ->tag('serializer.normalizer', ['priority' => -950])
 
         ->set('serializer.normalizer.problem', ProblemNormalizer::class)
             ->args([param('kernel.debug')])

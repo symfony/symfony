@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Tests\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class ConsumeMessagesCommandTest extends TestCase
@@ -116,15 +117,11 @@ class ConsumeMessagesCommandTest extends TestCase
     {
         $envelope = new Envelope(new \stdClass());
 
-        $receiver = $this->createMock(ReceiverInterface::class);
-        $receiver
-            ->expects($this->exactly(3))
-            ->method('get')
-            ->willReturnOnConsecutiveCalls(
-                [$envelope],
-                [/* idle */],
-                [$envelope, $envelope]
-            );
+        $receiver = new ResettableDummyReceiver([
+            [$envelope],
+            [/* idle */],
+            [$envelope, $envelope],
+        ]);
         $msgCount = 3;
 
         $receiverLocator = $this->createMock(ContainerInterface::class);
@@ -134,8 +131,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $bus = $this->createMock(RoutableMessageBus::class);
         $bus->expects($this->exactly($msgCount))->method('dispatch');
 
-        $servicesResetter = $this->createMock(ServicesResetter::class);
-        $servicesResetter->expects($this->exactly($shouldReset ? $msgCount : 0))->method('reset');
+        $servicesResetter = new ServicesResetter(new \ArrayIterator([$receiver]), ['reset']);
 
         $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, [], new ResetServicesListener($servicesResetter));
 
@@ -148,6 +144,7 @@ class ConsumeMessagesCommandTest extends TestCase
             '--limit' => $msgCount,
         ], $shouldReset ? [] : ['--no-reset' => null]));
 
+        $this->assertEquals($shouldReset, $receiver->hasBeenReset(), '$receiver->reset() should have been called');
         $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
     }

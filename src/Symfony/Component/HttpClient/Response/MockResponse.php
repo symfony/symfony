@@ -142,6 +142,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->info['user_data'] = $options['user_data'] ?? null;
         $response->info['max_duration'] = $options['max_duration'] ?? null;
         $response->info['url'] = $url;
+        $response->info['original_url'] = $url;
 
         if ($mock instanceof self) {
             $mock->requestOptions = $response->requestOptions;

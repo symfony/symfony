@@ -7,6 +7,36 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.1 (2022-06-09)
+
+ * bug #46570 [HttpClient][WebProfilerBundle] Catch errors when encoding body for c… (Phillip Look)
+ * bug #46583 [HttpClient] Copy as curl fixes (HypeMC)
+ * bug #46625 [FrameworkBundle] Disable Serializer data collect by default (chalasr)
+ * bug #46545 Fix getting class constraints on debug command (loic425)
+ * bug #46548 [Mime] Allow url as a path in the DataPart::fromPath (wkania)
+ * bug #46576 Fix choice filter error when loading mix of grouped and non-grouped choices (BreyndotEchse)
+ * bug #46594 [FrameworkBundle] Fix XML cache config (HeahDude)
+ * bug #46610 [Messenger] use the outermost wrapping DBAL connection (xabbuh)
+ * bug #46595 [Console] Escape  in command name & description from getDefaultName() (ogizanagi)
+ * bug #46608 [Console] Fix deprecation when description is null (HypeMC)
+ * bug #46586 [HttpKernel] Fix BackedEnumValueResolver already resolved enum value (janatjak)
+ * bug #46574 [Console] Escape  in command name & description from PHP (getDefault* methods) (ogizanagi)
+ * bug #46577 [Serializer] Fix ignore attribute in Xml files (alamirault)
+ * bug #46565 [WebProfilerBundle] Fix dark theme selected line highlight color & reuse css vars (ogizanagi)
+ * bug #46553 [WebProfilerBundle] normalizer and encoder can be undefined in template (kor3k)
+ * bug #46538 [FrameworkBundle][HtmlSanitizer] Fix calling `allowStaticElements` when setting `allow_all_static_elements: true` (norkunas)
+ * bug #46525 [Serializer] Get attributeContext after converting name (zenas1210)
+ * bug #46535 [Mime] Check that the path is a file in the DataPart::fromPath (wkania)
+ * bug #46543 [Cache] do not pass null to strlen() (xabbuh)
+ * bug #46523 [HttpFoundation] Revert "Send `Content-Length` when calling `Response::send()` and the content is a non-empty string" (nicolas-grekas)
+ * bug #46526 [Serializer] Added missing __call to TraceableEncoder (danielburger1337)
+ * bug #46527 [Serializer] Forget partially collected traces (mtarld)
+ * bug #46515 [PropertyInfo] Fix extracting int range type (norkunas)
+ * bug #46511 [Serializer] Added missing __call to TraceableNormalizer and TraceableSerializer (danielburger1337)
+ * bug #46478 [Contracts] remove static cache from `ServiceSubscriberTrait` (kbond)
+ * bug #46480 [FrameworkBundle][TwigBundle] Fix registering html-sanitizer services (nicolas-grekas)
+ * bug #46475 [MonologBridge] ensure that the $response property is initialized before being read (xabbuh)
+
 * 6.1.0 (2022-05-27)
 
  * bug #46453 [PropertyInfo] Fix resolution of partially docblock covered constructors (ostrolucky)

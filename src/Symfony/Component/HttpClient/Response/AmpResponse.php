@@ -80,6 +80,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         $info['http_method'] = $request->getMethod();
         $info['start_time'] = null;
         $info['redirect_url'] = null;
+        $info['original_url'] = $info['url'];
         $info['redirect_time'] = 0.0;
         $info['redirect_count'] = 0;
         $info['size_upload'] = 0.0;

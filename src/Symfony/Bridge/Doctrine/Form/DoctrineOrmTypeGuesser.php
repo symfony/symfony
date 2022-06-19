@@ -60,15 +60,12 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
         switch ($metadata->getTypeOfField($property)) {
             case self::$useDeprecatedConstants ? Type::TARRAY : Types::ARRAY:
-            // no break
             case self::$useDeprecatedConstants ? Type::SIMPLE_ARRAY : Types::SIMPLE_ARRAY:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CollectionType', [], Guess::MEDIUM_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::BOOLEAN : Types::BOOLEAN:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CheckboxType', [], Guess::HIGH_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE:
-            // no break
             case self::$useDeprecatedConstants ? Type::DATETIMETZ : Types::DATETIMETZ_MUTABLE:
-            // no break
             case 'vardatetime':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', [], Guess::HIGH_CONFIDENCE);
             case 'datetime_immutable':
@@ -89,9 +86,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             case self::$useDeprecatedConstants ? Type::FLOAT : Types::FLOAT:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\NumberType', [], Guess::MEDIUM_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::INTEGER : Types::INTEGER:
-            // no break
             case self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT:
-            // no break
             case self::$useDeprecatedConstants ? Type::SMALLINT : Types::SMALLINT:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\IntegerType', [], Guess::MEDIUM_CONFIDENCE);
             case self::$useDeprecatedConstants ? Type::STRING : Types::STRING:

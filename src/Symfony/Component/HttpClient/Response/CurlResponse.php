@@ -43,7 +43,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * @internal
      */
-    public function __construct(CurlClientState $multi, \CurlHandle|string $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null)
+    public function __construct(CurlClientState $multi, \CurlHandle|string $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null, int $curlVersion = null, string $originalUrl = null)
     {
         $this->multi = $multi;
 
@@ -69,6 +69,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['user_data'] = $options['user_data'] ?? null;
         $this->info['max_duration'] = $options['max_duration'] ?? null;
         $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
+        $this->info['original_url'] = $originalUrl ?? $this->info['url'] ?? curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL);
         $info = &$this->info;
         $headers = &$this->headers;
         $debugBuffer = $this->debugBuffer;

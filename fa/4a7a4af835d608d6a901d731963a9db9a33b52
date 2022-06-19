@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-18T04:31:52Z
+
+Hey!
+
+I think @sbelyshkin has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2022-06-19T10:45:41Z
+
+@jrjohnson  I don't know all the details of your case but from my perspective PSR-6 methods is the best choice for your scenario. `RedisAdapter::getItems()` can fetch all the objects with a single `MGET`, and then `commit()` will send all `saveDeffered()` `SET` operations in a pipeline. In this way you can reduce the round trip time.
+
+```php
+$hitsAndMisses = $this->cache->getItems($ids); // produces MGET id1, id2,... for Redis
+
+$hits = $misses = [];
+foreach($hitsAndMisses as $cacheItem) {
+    if ($cacheItem->isHit()) {
+       $hits[$cacheItem->getKey()] = $cacheItem->get();
+    } else {
+       $misses[$cacheItem->getKey()] = $cacheItem;
+    }
+}
+
+$hydrated = $this->hydrate(array_keys($misses)); //very expensive to do individually
+
+foreach($hydrated as $obj) {
+    $this->cache->saveDeffered($misses[$obj->id]->set($obj));
+}
+
+$this->cache->commit(); // sends all SET commands in a pipeline and reads a single response
+
+return array_values([...$hits, ...$hydrated]);
+```
+`get()` is obviously designed for dealing with single items.
+At the same time, I agree that the described behavior of `ArrayAdapter` looks unexpected, compared to the others.

@@ -201,7 +201,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     }
                 case Type::BUILTIN_TYPE_INT:
                 case Type::BUILTIN_TYPE_STRING:
-                    if ($enumType !== null) {
+                    if ($enumType) {
                         return [$enumType];
                     }
                     break;

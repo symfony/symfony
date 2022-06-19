@@ -60,7 +60,7 @@
 
         <service id="serializer.normalizer.json_serializable" class="Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer">
             <!-- Run before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-900" />
+            <tag name="serializer.normalizer" priority="-950" />
         </service>
 
         <service id="serializer.normalizer.problem" class="Symfony\Component\Serializer\Normalizer\ProblemNormalizer">

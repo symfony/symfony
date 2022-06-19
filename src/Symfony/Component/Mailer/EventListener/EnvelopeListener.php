@@ -51,7 +51,7 @@ class EnvelopeListener implements EventSubscriberInterface
             $message = $event->getMessage();
             if ($message instanceof Message) {
                 if (!$message->getHeaders()->has('Sender') && !$message->getHeaders()->has('From')) {
-                    $message->getHeaders()->addMailboxHeader('Sender', $this->sender->getAddress());
+                    $message->getHeaders()->addMailboxHeader('Sender', $this->sender);
                 }
             }
         }

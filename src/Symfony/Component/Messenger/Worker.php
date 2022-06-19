@@ -134,7 +134,6 @@ class Worker
 
         $this->flush(true);
         $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
-        $this->resetReceiverConnections();
     }
 
     private function handleMessage(Envelope $envelope, string $transportName): void
@@ -254,14 +253,5 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
-    }
-
-    private function resetReceiverConnections(): void
-    {
-        foreach ($this->receivers as $receiver) {
-            if ($receiver instanceof ResetInterface) {
-                $receiver->reset();
-            }
-        }
     }
 }

@@ -191,7 +191,7 @@ final class FormExtension extends AbstractExtension
  *
  * @see ChoiceView::isSelected()
  */
-function twig_is_selected_choice(ChoiceView $choice, string|array $selectedValue): bool
+function twig_is_selected_choice(ChoiceView $choice, string|array|null $selectedValue): bool
 {
     if (\is_array($selectedValue)) {
         return \in_array($choice->value, $selectedValue, true);

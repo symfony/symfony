@@ -135,15 +135,16 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         }
 
         if ($metadata->hasField($property)) {
-            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
-            if (null !== $enumClass = $metadata->getFieldMapping($property)['enumType'] ?? null) {
-                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass)];
-            }
-
             $typeOfField = $metadata->getTypeOfField($property);
 
             if (!$builtinType = $this->getPhpType($typeOfField)) {
                 return null;
+            }
+
+            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
+            $enumType = null;
+            if (null !== $enumClass = $metadata->getFieldMapping($property)['enumType'] ?? null) {
+                $enumType = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass);
             }
 
             switch ($builtinType) {
@@ -171,11 +172,23 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     switch ($typeOfField) {
                         case Types::ARRAY:
                         case 'json_array':
+                            // return null if $enumType is set, because we can't determine if collectionKeyType is string or int
+                            if ($enumType) {
+                                return null;
+                            }
+
                             return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
                         case Types::SIMPLE_ARRAY:
                             return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
                     }
+                    break;
+                case Type::BUILTIN_TYPE_INT:
+                case Type::BUILTIN_TYPE_STRING:
+                    if ($enumType) {
+                        return [$enumType];
+                    }
+                    break;
             }
 
             return [new Type($builtinType, $nullable)];

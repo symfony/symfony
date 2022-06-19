@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -22,6 +23,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
@@ -118,13 +120,48 @@ class WorkerTest extends TestCase
     {
         $resettableReceiver = new ResettableDummyReceiver([]);
 
-        $bus = $this->createMock(MessageBusInterface::class);
         $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ResetServicesListener(new ServicesResetter(new \ArrayIterator([$resettableReceiver]), ['reset'])));
 
+        $bus = $this->createMock(MessageBusInterface::class);
         $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
         $worker->stop();
         $worker->run();
         $this->assertTrue($resettableReceiver->hasBeenReset());
+    }
+
+    public function testWorkerResetsTransportsIfResetServicesListenerIsCalled()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $resettableReceiver = new ResettableDummyReceiver([[$envelope]]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ResetServicesListener(new ServicesResetter(new \ArrayIterator([$resettableReceiver]), ['reset'])));
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker->run();
+        $this->assertTrue($resettableReceiver->hasBeenReset());
+    }
+
+    public function testWorkerDoesNotResetTransportsIfResetServicesListenerIsNotCalled()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $resettableReceiver = new ResettableDummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker->run();
+        $this->assertFalse($resettableReceiver->hasBeenReset());
     }
 
     public function testWorkerDoesNotSendNullMessagesToTheBus()

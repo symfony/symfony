@@ -67,7 +67,7 @@ final class OhMySmtpApiTransport extends AbstractApiTransport
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $result['ErrorCode']), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false), $response);
         }
 
         $sentMessage->setMessageId($result['id']);

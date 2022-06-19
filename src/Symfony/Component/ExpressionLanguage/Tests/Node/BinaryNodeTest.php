@@ -173,7 +173,8 @@ class BinaryNodeTest extends AbstractNodeTest
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('this is not a regexp'));
 
-        $this->expectExceptionObject(new SyntaxError('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric or backslash'));
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
         $node->evaluate([], []);
     }
 
@@ -181,7 +182,8 @@ class BinaryNodeTest extends AbstractNodeTest
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new NameNode('regexp'));
 
-        $this->expectExceptionObject(new SyntaxError('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric or backslash'));
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
         $node->evaluate([], ['regexp' => 'this is not a regexp']);
     }
 
@@ -189,7 +191,8 @@ class BinaryNodeTest extends AbstractNodeTest
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('this is not a regexp'));
 
-        $this->expectExceptionObject(new SyntaxError('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric or backslash'));
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
         $compiler = new Compiler([]);
         $node->compile($compiler);
     }
@@ -198,7 +201,8 @@ class BinaryNodeTest extends AbstractNodeTest
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new NameNode('regexp'));
 
-        $this->expectExceptionObject(new SyntaxError('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric or backslash'));
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
         $compiler = new Compiler([]);
         $node->compile($compiler);
         eval('$regexp = "this is not a regexp"; '.$compiler->getSource().';');

@@ -20,6 +20,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -32,6 +33,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
@@ -751,6 +753,35 @@ class SerializerTest extends TestCase
         $this->assertEquals(new DummyUnionType(), $actual, 'Union type denormalization third case failed.');
     }
 
+    public function testUnionTypeDeserializableWithoutAllowedExtraAttributes()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        $actual = $serializer->deserialize('{ "v": { "a": 0 }}', DummyUnionWithAAndB::class, 'json', [
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ]);
+
+        $this->assertEquals(new DummyUnionWithAAndB(new DummyATypeForUnion()), $actual);
+
+        $actual = $serializer->deserialize('{ "v": { "b": 1 }}', DummyUnionWithAAndB::class, 'json', [
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ]);
+
+        $this->assertEquals(new DummyUnionWithAAndB(new DummyBTypeForUnion()), $actual);
+
+        $this->expectException(ExtraAttributesException::class);
+        $serializer->deserialize('{ "v": { "b": 1, "c": "i am not allowed" }}', DummyUnionWithAAndB::class, 'json', [
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ]);
+    }
+
     /**
      * @requires PHP 8.2
      */
@@ -1212,6 +1243,30 @@ class DummyUnionType
         $this->changed = $changed;
 
         return $this;
+    }
+}
+
+class DummyATypeForUnion
+{
+    public $a = 0;
+}
+
+class DummyBTypeForUnion
+{
+    public $b = 1;
+}
+
+class DummyUnionWithAAndB
+{
+    /** @var DummyATypeForUnion|DummyBTypeForUnion */
+    public $v;
+
+    /**
+     * @param DummyATypeForUnion|DummyBTypeForUnion $v
+     */
+    public function __construct($v)
+    {
+        $this->v = $v;
     }
 }
 

@@ -138,6 +138,9 @@ class DoctrineExtractorTest extends TestCase
         }
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString', []));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt', []));
+        $this->assertEquals(null, $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumStringArray', []));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class))], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumIntArray', []));
+        $this->assertEquals(null, $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
     }
 
     public function typesProvider()

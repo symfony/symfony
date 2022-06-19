@@ -182,6 +182,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                         case Types::SIMPLE_ARRAY:
                             return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
                     }
+                    break;
                 case Type::BUILTIN_TYPE_INT:
                 case Type::BUILTIN_TYPE_STRING:
                     if ($enumType) {

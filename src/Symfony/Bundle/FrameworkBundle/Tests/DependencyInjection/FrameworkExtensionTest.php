@@ -1378,7 +1378,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $tag = $definition->getTag('serializer.normalizer');
 
         $this->assertEquals(JsonSerializableNormalizer::class, $definition->getClass());
-        $this->assertEquals(-900, $tag[0]['priority']);
+        $this->assertEquals(-950, $tag[0]['priority']);
     }
 
     public function testObjectNormalizerRegistered()

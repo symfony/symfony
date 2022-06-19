@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2022-06-15T08:37:53Z
+
+Also I think the original fix is a bit awkward because it results in session data loss - see the fail test runs on https://www.drupal.org/project/drupal/issues/3285696.
+
+It's possible for a session handler to have it's own method for generating IDs - see [SessionIdInterface](https://www.php.net/manual/en/class.sessionidinterface.php) and there are no restrictions about the characters that can return. What is valid is determined by how the session is stored. The a-z A-Z 0-9 , (comma) and - (minus) and length restrictions only exist for PHP's built in file session storage.
+
+---------------------------------------------------------------------------
+
+by alexpott at 2022-06-15T10:09:03Z
+
+Slightly different approach prompted by @nicolas-grekas - targeting just the NativeFileSessionHandler or if somehow PHP's file session storage is being used.

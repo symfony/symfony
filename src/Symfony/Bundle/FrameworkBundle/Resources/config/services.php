@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\NativeClock;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
@@ -77,6 +80,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('event_dispatcher.dispatcher', ['name' => 'event_dispatcher'])
         ->alias(EventDispatcherInterfaceComponentAlias::class, 'event_dispatcher')
         ->alias(EventDispatcherInterface::class, 'event_dispatcher')
+        ->alias(PsrEventDispatcherInterface::class, 'event_dispatcher')
 
         ->set('http_kernel', HttpKernel::class)
             ->public()
@@ -222,6 +226,9 @@ return static function (ContainerConfigurator $container) {
         ->set('config_builder.warmer', ConfigBuilderCacheWarmer::class)
             ->args([service(KernelInterface::class), service('logger')->nullOnInvalid()])
             ->tag('kernel.cache_warmer')
+
+        ->set('clock', NativeClock::class)
+        ->alias(ClockInterface::class, 'clock')
 
         // register as abstract and excluded, aka not-autowirable types
         ->set(LoaderInterface::class)->abstract()->tag('container.excluded')

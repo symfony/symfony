@@ -94,9 +94,17 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
      */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
+        $doSave = true;
+        $callback = static function (CacheItem $item, bool &$save) use ($callback, &$doSave) {
+            $value = $callback($item, $save);
+            $doSave = $save;
+
+            return $value;
+        };
+
         $lastItem = null;
         $i = 0;
-        $wrap = function (CacheItem $item = null) use ($key, $callback, $beta, &$wrap, &$i, &$lastItem, &$metadata) {
+        $wrap = function (CacheItem $item = null, bool &$save = true) use ($key, $callback, $beta, &$wrap, &$i, &$doSave, &$lastItem, &$metadata) {
             $adapter = $this->adapters[$i];
             if (isset($this->adapters[++$i])) {
                 $callback = $wrap;
@@ -110,6 +118,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             if (null !== $item) {
                 (self::$syncItem)($lastItem = $lastItem ?? $item, $item, $this->defaultLifetime, $metadata);
             }
+            $save = $doSave;
 
             return $value;
         };

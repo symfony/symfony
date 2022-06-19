@@ -199,6 +199,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                         case self::$useDeprecatedConstants ? DBALType::SIMPLE_ARRAY : Types::SIMPLE_ARRAY:
                             return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), $enumType ?? new Type(Type::BUILTIN_TYPE_STRING))];
                     }
+                    break;
                 case Type::BUILTIN_TYPE_INT:
                 case Type::BUILTIN_TYPE_STRING:
                     if ($enumType) {

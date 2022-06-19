@@ -170,6 +170,10 @@ class Configuration
      */
     public function isBaselineDeprecation(Deprecation $deprecation)
     {
+        if ($deprecation->isLegacy()) {
+            return false;
+        }
+
         if ($deprecation->originatesFromAnObject()) {
             $location = $deprecation->originatingClass().'::'.$deprecation->originatingMethod();
         } else {

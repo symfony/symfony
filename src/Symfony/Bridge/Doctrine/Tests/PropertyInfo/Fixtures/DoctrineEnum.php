@@ -35,4 +35,19 @@ class DoctrineEnum
      * @Column(type="integer", enumType="Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt")
      */
     protected $enumInt;
+
+    /**
+     * @Column(type="array", enumType="Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString")
+     */
+    protected $enumStringArray;
+
+    /**
+     * @Column(type="simple_array", enumType="Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt")
+     */
+    protected $enumIntArray;
+
+    /**
+     * @Column(type="custom_foo", enumType="Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt")
+     */
+    protected $enumCustom;
 }

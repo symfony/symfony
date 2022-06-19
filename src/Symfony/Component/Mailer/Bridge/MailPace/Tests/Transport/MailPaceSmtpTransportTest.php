@@ -9,25 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Tests\Transport;
+namespace Symfony\Component\Mailer\Bridge\MailPace\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpSmtpTransport;
+use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceSmtpTransport;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
-/**
- * @group legacy
- */
-final class OhMySmtpSmtpTransportTest extends TestCase
+final class MailPaceSmtpTransportTest extends TestCase
 {
     public function testCustomHeader()
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
 
-        $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
+        $transport = new MailPaceSmtpTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailPaceSmtpTransport::class, 'addMailPaceHeaders');
         $method->invoke($transport, $email);
 
         $this->assertCount(1, $email->getHeaders()->toArray());
@@ -41,12 +38,12 @@ final class OhMySmtpSmtpTransportTest extends TestCase
         $email->getHeaders()->add(new TagHeader('password-reset'));
         $email->getHeaders()->add(new TagHeader('2nd-tag'));
 
-        $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
+        $transport = new MailPaceSmtpTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailPaceSmtpTransport::class, 'addMailPaceHeaders');
         $method->invoke($transport, $email);
 
         $this->assertCount(2, $email->getHeaders()->toArray());
         $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
-        $this->assertSame('X-OMS-Tags: password-reset, 2nd-tag', $email->getHeaders()->get('X-OMS-Tags')->toString());
+        $this->assertSame('X-MailPace-Tags: password-reset, 2nd-tag', $email->getHeaders()->get('X-MailPace-Tags')->toString());
     }
 }

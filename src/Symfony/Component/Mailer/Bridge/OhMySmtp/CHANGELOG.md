@@ -5,3 +5,8 @@ CHANGELOG
 ---
 
  * Add the bridge
+
+6.2
+---
+
+ * Deprecate the bridge

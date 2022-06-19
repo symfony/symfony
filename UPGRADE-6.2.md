@@ -8,6 +8,11 @@ FrameworkBundle
    `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
 
+Mailer
+--------
+
+* Deprecate the `OhMySMTP` transport, use `MailPace` instead
+
 Security
 --------
 

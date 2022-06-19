@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Transport;
+namespace Symfony\Component\Mailer\Bridge\MailPace\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -24,16 +24,12 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-trigger_deprecation('symfony/oh-my-smtp-mailer', '6.2', 'The "%s" class is deprecated, use "%s" instead.', OhMySmtpApiTransport::class, 'Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceApiTransport');
-
 /**
- * @author Paul Oms <support@ohmysmtp.com>
- *
- * @deprecated since Symfony 6.2, use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceApiTransport instead
+ * @author Paul Oms <support@mailpace.com>
  */
-final class OhMySmtpApiTransport extends AbstractApiTransport
+final class MailPaceApiTransport extends AbstractApiTransport
 {
-    private const HOST = 'app.ohmysmtp.com/api/v1';
+    private const HOST = 'app.mailpace.com/api/v1';
 
     private string $key;
 
@@ -46,7 +42,7 @@ final class OhMySmtpApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('ohmysmtp+api://%s', $this->getEndpoint());
+        return sprintf('mailpace+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -54,9 +50,9 @@ final class OhMySmtpApiTransport extends AbstractApiTransport
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/send', [
             'headers' => [
                 'Accept' => 'application/json',
-                'OhMySMTP-Server-Token' => $this->key,
+                'MailPace-Server-Token' => $this->key,
                 'Content-Type' => 'application/json',
-                'User-Agent' => 'OhMySMTP Symfony Mailer',
+                'User-Agent' => 'MailPace Symfony Mailer',
             ],
             'json' => $this->getPayload($email, $envelope),
         ]);
@@ -64,14 +60,14 @@ final class OhMySmtpApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+        } catch (DecodingExceptionInterface $e) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response, 0, $e);
         } catch (TransportExceptionInterface $e) {
-            throw new HttpTransportException('Could not reach the remote OhMySMTP endpoint.', $response, 0, $e);
+            throw new HttpTransportException('Could not reach the remote MailPace endpoint.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $result['ErrorCode']), $response);
         }
 
         $sentMessage->setMessageId($result['id']);

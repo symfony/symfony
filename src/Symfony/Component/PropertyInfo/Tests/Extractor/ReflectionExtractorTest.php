@@ -313,6 +313,7 @@ class ReflectionExtractorTest extends TestCase
     {
         yield ['nil', null];
         yield ['false', [new Type(Type::BUILTIN_TYPE_FALSE)]];
+        yield ['true', [new Type(Type::BUILTIN_TYPE_TRUE)]];
     }
 
     /**

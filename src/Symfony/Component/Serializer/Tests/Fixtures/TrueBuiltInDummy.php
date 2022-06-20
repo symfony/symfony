@@ -9,13 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
+namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-class Php82Dummy
+class TrueBuiltInDummy
 {
-    public null $nil = null;
-
-    public false $false = false;
-
     public true $true = true;
 }

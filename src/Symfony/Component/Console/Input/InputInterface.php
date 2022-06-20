@@ -112,7 +112,7 @@ interface InputInterface
      *
      * @return array<string|bool|int|float|array|null>
      */
-    public function getNonDefualtOptions(): array;
+    public function getNonDefaultOptions(): array;
 
     /**
      * Returns the option value for a given option name.

@@ -144,7 +144,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * {@inheritdoc}
      */
-    public function getNonDefualtOptions(): array
+    public function getNonDefaultOptions(): array
     {
         return $this->options;
     }

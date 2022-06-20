@@ -193,3 +193,23 @@ function closure(string|array|ReferenceConfigurator|Expression $callable): Inlin
         ->factory(['Closure', 'fromCallable'])
         ->args([$callable]);
 }
+
+if (interface_exists('Symfony\Contracts\HttpClient\HttpClientInterface')) {
+    /**
+     * Creates a reference to a scoped http client service.
+     */
+    function http_client_service(string $scopedHttpClientName): ReferenceConfigurator
+    {
+        return service(\sprintf('Symfony\Contracts\HttpClient\HttpClientInterface $%s', $scopedHttpClientName));
+    }
+}
+
+if (interface_exists('Symfony\Contracts\Cache\CacheInterface')) {
+    /**
+     * Creates a reference to a cache poll service.
+     */
+    function cache_servcie(string $cacheName): ReferenceConfigurator
+    {
+        return service(\sprintf('Symfony\Contracts\Cache\CacheInterface $%s', $cacheName));
+    }
+}

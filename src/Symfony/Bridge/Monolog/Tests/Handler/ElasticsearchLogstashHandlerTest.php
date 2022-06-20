@@ -84,7 +84,8 @@ EOBODY;
             return new MockResponse();
         };
 
-        $handler = new ElasticsearchLogstashHandlerWithHardCodedHostname('http://es:9200', 'log', new MockHttpClient($responseFactory), Logger::DEBUG, true, '8.0.0');
+        $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory), Logger::DEBUG, true, '8.0.0');
+        $handler->setFormatter($this->getDefaultFormatter());
 
         $record = [
             'message' => 'My info message',

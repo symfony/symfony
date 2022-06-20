@@ -13,7 +13,7 @@ if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
     if (\PHP_VERSION_ID < 70200) {
         putenv('SYMFONY_PHPUNIT_VERSION=7.5');
     } elseif (\PHP_VERSION_ID < 70300) {
-        putenv('SYMFONY_PHPUNIT_VERSION=8.5');
+        putenv('SYMFONY_PHPUNIT_VERSION=8.5.26');
     } else {
         putenv('SYMFONY_PHPUNIT_VERSION=9.5');
     }

@@ -28,7 +28,7 @@ class DumperTest extends TestCase
         '' => 'bar',
         'foo' => '#bar',
         'foo\'bar' => [],
-        'bar' => [1, 'foo'],
+        'bar' => [1, 'foo', ['a' => 'A']],
         'foobar' => [
             'foo' => 'bar',
             'bar' => [1, 'foo'],
@@ -64,6 +64,8 @@ foo: '#bar'
 bar:
        - 1
        - foo
+       -
+              a: A
 foobar:
        foo: bar
        bar:
@@ -107,7 +109,7 @@ EOF;
     public function testInlineLevel()
     {
         $expected = <<<'EOF'
-{ '': bar, foo: '#bar', "foo'bar": {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
+{ '': bar, foo: '#bar', "foo'bar": {  }, bar: [1, foo, { a: A }], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
         $this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
@@ -116,7 +118,7 @@ EOF;
 '': bar
 foo: '#bar'
 "foo'bar": {  }
-bar: [1, foo]
+bar: [1, foo, { a: A }]
 foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 
 EOF;
@@ -129,6 +131,7 @@ foo: '#bar'
 bar:
     - 1
     - foo
+    - { a: A }
 foobar:
     foo: bar
     bar: [1, foo]
@@ -144,6 +147,8 @@ foo: '#bar'
 bar:
     - 1
     - foo
+    -
+        a: A
 foobar:
     foo: bar
     bar:
@@ -163,6 +168,8 @@ foo: '#bar'
 bar:
     - 1
     - foo
+    -
+        a: A
 foobar:
     foo: bar
     bar:
@@ -379,8 +386,9 @@ YAML;
             new TaggedValue('user', [
                 'username' => 'jane',
             ]),
-            new TaggedValue('user', [
-                'username' => 'john',
+            new TaggedValue('names', [
+                'john',
+                'claire',
             ]),
         ];
 
@@ -389,8 +397,9 @@ YAML;
         $expected = <<<YAML
 - !user
   username: jane
-- !user
-  username: john
+- !names
+  - john
+  - claire
 
 YAML;
         $this->assertSame($expected, $yaml);
@@ -402,8 +411,9 @@ YAML;
             new TaggedValue('user', [
                 'username' => 'jane',
             ]),
-            new TaggedValue('user', [
-                'username' => 'john',
+            new TaggedValue('names', [
+                'john',
+                'claire',
             ]),
         ];
 
@@ -411,7 +421,7 @@ YAML;
 
         $expected = <<<YAML
 - !user { username: jane }
-- !user { username: john }
+- !names [john, claire]
 
 YAML;
         $this->assertSame($expected, $yaml);
@@ -423,8 +433,9 @@ YAML;
             'user1' => new TaggedValue('user', [
                 'username' => 'jane',
             ]),
-            'user2' => new TaggedValue('user', [
-                'username' => 'john',
+            'names1' => new TaggedValue('names', [
+                'john',
+                'claire',
             ]),
         ];
 
@@ -433,8 +444,9 @@ YAML;
         $expected = <<<YAML
 user1: !user
     username: jane
-user2: !user
-    username: john
+names1: !names
+    - john
+    - claire
 
 YAML;
         $this->assertSame($expected, $yaml);
@@ -446,8 +458,9 @@ YAML;
             'user1' => new TaggedValue('user', [
                 'username' => 'jane',
             ]),
-            'user2' => new TaggedValue('user', [
-                'username' => 'john',
+            'names1' => new TaggedValue('names', [
+                'john',
+                'claire',
             ]),
         ];
 
@@ -455,7 +468,7 @@ YAML;
 
         $expected = <<<YAML
 user1: !user { username: jane }
-user2: !user { username: john }
+names1: !names [john, claire]
 
 YAML;
         $this->assertSame($expected, $yaml);

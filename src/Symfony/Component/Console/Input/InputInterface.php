@@ -108,6 +108,13 @@ interface InputInterface
     public function getOptions(): array;
 
     /**
+     * Returns all the given options without adding any default values.
+     *
+     * @return array<string|bool|int|float|array|null>
+     */
+    public function getNonDefualtOptions(): array;
+
+    /**
      * Returns the option value for a given option name.
      *
      * @return mixed

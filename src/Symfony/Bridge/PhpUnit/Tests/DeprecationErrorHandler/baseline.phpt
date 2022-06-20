@@ -78,3 +78,4 @@ print "Cannot test baselineFile contents because it is generated in a shutdown f
 ?>
 --EXPECT--
 Cannot test baselineFile contents because it is generated in a shutdown function registered by another shutdown function.
+Legacy deprecation notices (1)

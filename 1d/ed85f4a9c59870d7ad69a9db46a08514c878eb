@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-06-17T07:56:26Z
+
+That's a new feature that should be part of 6.2. Merging #45981 in 4.4 was a mistake.
+I'm all for making 4.4 compatible with 8.2 because the code should work well with 8.2, but adding new features is a no-go for me.
+If one wants to use newer PHP features, they need to update to the latest Symfony version; I think it makes sense.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-06-17T08:00:14Z
+
+Thank you for the feedback @fabpot! I understand and agree your point of view on new PHP features. I'll do the necessary changes (if any) and rebase this to 6.2 :+1:

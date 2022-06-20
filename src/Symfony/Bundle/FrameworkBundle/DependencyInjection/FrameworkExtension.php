@@ -159,6 +159,7 @@ use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
+use Symfony\Component\Notifier\Bridge\SmsFactor\SmsFactorTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
@@ -2555,6 +2556,7 @@ class FrameworkExtension extends Extension
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
             SmsBiurasTransportFactory::class => 'notifier.transport_factory.sms-biuras',
             SmscTransportFactory::class => 'notifier.transport_factory.smsc',
+            SmsFactorTransportFactory::class => 'notifier.transport_factory.sms-factor',
             SpotHitTransportFactory::class => 'notifier.transport_factory.spot-hit',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',

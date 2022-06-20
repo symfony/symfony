@@ -51,6 +51,7 @@ use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
+use Symfony\Component\Notifier\Bridge\SmsFactor\SmsFactorTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
@@ -216,6 +217,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.smsc', SmscTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.sms-factor', SmsFactorTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

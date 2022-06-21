@@ -443,20 +443,20 @@ YAML;
     public function testDumpingTaggedValueTopLevelAssoc()
     {
         $data = new TaggedValue('user', ['name' => 'jane']);
+        $expected = <<<'YAML'
+!user
+name: jane
 
-        // @todo Fix the dumper, the output should not be ''.
-        $expected = '';
-        $yaml = $this->dumper->dump($data, 2);
-        $this->assertSame($expected, $yaml);
+YAML;
+        $this->assertSame($expected, $this->dumper->dump($data, 2));
     }
 
     public function testDumpingTaggedValueTopLevelMultiLine()
     {
         $data = new TaggedValue('text', "a\nb\n");
-
-        // @todo Fix the dumper, the output should not be ''.
-        $expected = '';
+        $expected = '!text "a\\nb\\n"';
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertEquals($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testDumpingTaggedValueSpecialCharsInTag()

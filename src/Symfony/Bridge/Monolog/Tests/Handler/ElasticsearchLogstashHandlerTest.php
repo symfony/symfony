@@ -87,15 +87,7 @@ EOBODY;
         $handler = new ElasticsearchLogstashHandler('http://es:9200', 'log', new MockHttpClient($responseFactory), Logger::DEBUG, true, '8.0.0');
         $handler->setFormatter($this->getDefaultFormatter());
 
-        $record = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => Logger::INFO,
-            'level_name' => Logger::getLevelName(Logger::INFO),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2020-01-01T00:00:00+01:00'),
-            'extra' => [],
-        ];
+        $record = RecordFactory::create(Logger::INFO, 'My info message', 'app', datetime: new \DateTimeImmutable('2020-01-01T00:00:00+01:00'));
 
         $handler->handle($record);
 

@@ -440,6 +440,28 @@ YAML;
         $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
+    public function testDumpingTaggedValueTopLevelAssoc()
+    {
+        $data = new TaggedValue('user', ['name' => 'jane']);
+
+        // @todo Fix the dumper, eliminate this exception.
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Symfony\Component\Yaml\Inline::isHash(): Argument #1 ($value) must be of type ArrayObject|stdClass|array, Symfony\Component\Yaml\Tag\TaggedValue given');
+
+        $this->dumper->dump($data, 2);
+    }
+
+    public function testDumpingTaggedValueTopLevelMultiLine()
+    {
+        $data = new TaggedValue('text', "a\nb\n");
+
+        // @todo Fix the dumper, eliminate this exception.
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Symfony\Component\Yaml\Inline::isHash(): Argument #1 ($value) must be of type ArrayObject|stdClass|array, Symfony\Component\Yaml\Tag\TaggedValue given');
+
+        $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+    }
+
     public function testDumpingTaggedValueSpecialCharsInTag()
     {
         // @todo Validate the tag name in the TaggedValue constructor.

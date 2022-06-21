@@ -130,12 +130,13 @@ class Dumper
             return false;
         }
 
-        $dumpObjectAsInlineMap = true;
-
-        if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \ArrayObject || $value instanceof \stdClass)) {
-            $dumpObjectAsInlineMap = empty((array) $value);
+        if (Yaml::DUMP_OBJECT_AS_MAP & $flags
+            && ($value instanceof \ArrayObject || $value instanceof \stdClass)
+            && !empty((array)$value)
+        ) {
+            return false;
         }
 
-        return $dumpObjectAsInlineMap;
+        return true;
     }
 }

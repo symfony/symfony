@@ -591,7 +591,7 @@ YAML;
         $data = [
             'foo' => new TaggedValue('bar', "foo\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz"),
         ];
-        $expected = "foo: !bar |\n".
+        $expected = "foo: !bar |-\n".
             "    foo\n".
             "    line with trailing spaces:\n".
             "      \n".
@@ -599,7 +599,7 @@ YAML;
             "    integer like line:\n".
             "    123456789\n".
             "    empty line:\n".
-            "    \n".
+            "\n".
             '    baz';
 
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
@@ -611,12 +611,12 @@ YAML;
         $data = [
             new TaggedValue('bar', "a\nb"),
         ];
-        $expected = "- !bar |\n    a\n    b";
+        $expected = "- !bar |-\n    a\n    b";
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
         // @todo Fix the parser, eliminate these exceptions.
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 3 (near "!bar |").');
+        $this->expectExceptionMessage('Unable to parse at line 3 (near "!bar |-").');
 
         $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
     }
@@ -626,14 +626,11 @@ YAML;
         $data = [
             'foo' => new TaggedValue('bar', "a\nb\n\n\n"),
         ];
-        $expected = "foo: !bar |\n    a\n    b\n    \n    \n    ";
+        $expected = "foo: !bar |+\n    a\n    b\n\n\n";
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
-        // @todo Fix the parser, the result should be identical to $data.
         $this->assertSameData(
-            [
-                'foo' => new TaggedValue('bar', "a\nb\n"),
-            ],
+            $data,
             $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -642,12 +639,12 @@ YAML;
         $data = [
             new TaggedValue('bar', "a\nb\n\n\n"),
         ];
-        $expected = "- !bar |\n    a\n    b\n    \n    \n    ";
+        $expected = "- !bar |+\n    a\n    b\n\n\n";
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
         // @todo Fix the parser, eliminate these exceptions.
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 6 (near "!bar |").');
+        $this->expectExceptionMessage('Unable to parse at line 6 (near "!bar |+").');
 
         $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
     }

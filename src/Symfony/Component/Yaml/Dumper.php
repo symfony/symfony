@@ -27,6 +27,11 @@ class Dumper
      */
     private int $indentation;
 
+    /**
+     * String of spaces with length equal to $this->indentation.
+     */
+    private string $indentStr;
+
     public function __construct(int $indentation = 4)
     {
         if ($indentation < 1) {
@@ -34,6 +39,7 @@ class Dumper
         }
 
         $this->indentation = $indentation;
+        $this->indentStr = \str_repeat(' ', $indentation);
     }
 
     /**
@@ -84,9 +90,7 @@ class Dumper
                 foreach (explode("\n", $value) as $row) {
                     $output .= "\n";
                     if ('' !== $row) {
-                        $output .= $prefix
-                            . str_repeat(' ', $this->indentation)
-                            . $row;
+                        $output .= $prefix . $this->indentStr . $row;
                     }
                 }
 

@@ -82,21 +82,22 @@ class Dumper
                     $blockChompingIndicator = '-';
                 }
 
-                $output .= sprintf('%s%s%s |%s%s',
-                    $prefix,
-                    $dumpAsMap ? Inline::dump($key, $flags).':' : '-',
-                    '',
-                    $blockIndentationIndicator,
-                    $blockChompingIndicator);
+                $output .= $prefix
+                    .($dumpAsMap ? Inline::dump($key, $flags).':' : '-')
+                    .' |'
+                    .$blockIndentationIndicator
+                    .$blockChompingIndicator
+                ;
 
                 foreach (explode("\n", $value) as $row) {
                     if ('' === $row) {
                         $output .= "\n";
                     } else {
-                        $output .= sprintf("\n%s%s%s",
-                            $prefix,
-                            str_repeat(' ', $this->indentation),
-                            $row);
+                        $output .= "\n"
+                            .$prefix
+                            .str_repeat(' ', $this->indentation)
+                            .$row
+                        ;
                     }
                 }
 
@@ -104,10 +105,11 @@ class Dumper
             }
 
             if ($value instanceof TaggedValue) {
-                $output .= sprintf('%s%s !%s',
-                    $prefix,
-                    $dumpAsMap ? Inline::dump($key, $flags) . ':' : '-',
-                    $value->getTag());
+                $output .= $prefix
+                    .($dumpAsMap ? Inline::dump($key, $flags).':' : '-')
+                    .' !'
+                    .$value->getTag()
+                ;
 
                     if (Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value->getValue()) && false !== strpos($value->getValue(), "\n") && false === strpos($value->getValue(), "\r\n")) {
                     // If the first line starts with a space character, the spec requires a blockIndicationIndicator
@@ -116,10 +118,11 @@ class Dumper
                     $output .= sprintf(' |%s', $blockIndentationIndicator);
 
                     foreach (explode("\n", $value->getValue()) as $row) {
-                        $output .= sprintf("\n%s%s%s",
-                            $prefix,
-                            str_repeat(' ', $this->indentation),
-                            $row);
+                        $output .= "\n"
+                            .$prefix
+                            .str_repeat(' ', $this->indentation)
+                            .$row
+                        ;
                     }
 
                     continue;
@@ -143,12 +146,16 @@ class Dumper
 
             $willBeInlined = $inline - 1 <= 0 || !\is_array($value) && $dumpObjectAsInlineMap || empty($value);
 
-            $output .= sprintf('%s%s%s%s',
-                $prefix,
-                $dumpAsMap ? Inline::dump($key, $flags).':' : '-',
-                $willBeInlined ? ' ' : "\n",
-                $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $flags)
-            ).($willBeInlined ? "\n" : '');
+            $output .= $prefix
+                .($dumpAsMap ? Inline::dump($key, $flags).':' : '-')
+                .($willBeInlined ? ' ' : "\n")
+                .$this->dump(
+                    $value,
+                    $inline - 1,
+                    $willBeInlined ? 0 : $indent + $this->indentation,
+                    $flags)
+                .($willBeInlined ? "\n" : '')
+            ;
         }
 
         return $output;

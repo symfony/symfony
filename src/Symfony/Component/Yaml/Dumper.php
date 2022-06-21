@@ -72,22 +72,18 @@ class Dumper
             $output .= $dumpAsMap ? Inline::dump($key, $flags).':' : '-';
 
                 if (Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value) && false !== strpos($value, "\n") && false === strpos($value, "\r")) {
+                $output .= ' |';
                 // If the first line starts with a space character, the spec requires a blockIndicationIndicator
                 // http://www.yaml.org/spec/1.2/spec.html#id2793979
-                    $blockIndentationIndicator = (' ' === substr($value, 0, 1)) ? (string) $this->indentation : '';
-
-                if (isset($value[-2]) && "\n" === $value[-2] && "\n" === $value[-1]) {
-                    $blockChompingIndicator = '+';
-                } elseif ("\n" === $value[-1]) {
-                    $blockChompingIndicator = '';
-                } else {
-                    $blockChompingIndicator = '-';
+                if (' ' === substr($value, 0, 1)) {
+                    $output .= $this->indentation;
                 }
 
-                $output .= ' |'
-                    .$blockIndentationIndicator
-                    .$blockChompingIndicator
-                ;
+                if (isset($value[-2]) && "\n" === $value[-2] && "\n" === $value[-1]) {
+                    $output .= '+';
+                } elseif ("\n" !== $value[-1]) {
+                    $output .= '-';
+                }
 
                 foreach (explode("\n", $value) as $row) {
                     if ('' === $row) {

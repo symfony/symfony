@@ -82,14 +82,11 @@ class Dumper
                 }
 
                 foreach (explode("\n", $value) as $row) {
-                    if ('' === $row) {
-                        $output .= "\n";
-                    } else {
-                        $output .= "\n"
-                            . $prefix
+                    $output .= "\n";
+                    if ('' !== $row) {
+                        $output .= $prefix
                             . str_repeat(' ', $this->indentation)
-                            . $row
-                        ;
+                            . $row;
                     }
                 }
 

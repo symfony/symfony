@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-20T18:38:05Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T19:36:38Z
+
+This fixes an existing failure so I guess this is already tested?
+
+---------------------------------------------------------------------------
+
+by Sajito at 2022-06-20T19:39:09Z
+
+I'm not quiet sure with the terminology. What would the non-regression test actually test? This PR is a fix for a failing test, so the test is already there.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-06-20T19:46:05Z
+
+Ok my bad. +1 on my side.

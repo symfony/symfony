@@ -68,6 +68,8 @@ class Dumper
             if ('' !== $output && "\n" !== $output[-1]) {
                 $output .= "\n";
             }
+            $output .= $prefix;
+            $output .= $dumpAsMap ? Inline::dump($key, $flags).':' : '-';
 
                 if (Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value) && false !== strpos($value, "\n") && false === strpos($value, "\r")) {
                 // If the first line starts with a space character, the spec requires a blockIndicationIndicator
@@ -82,9 +84,7 @@ class Dumper
                     $blockChompingIndicator = '-';
                 }
 
-                $output .= $prefix
-                    .($dumpAsMap ? Inline::dump($key, $flags).':' : '-')
-                    .' |'
+                $output .= ' |'
                     .$blockIndentationIndicator
                     .$blockChompingIndicator
                 ;
@@ -105,11 +105,7 @@ class Dumper
             }
 
             if ($value instanceof TaggedValue) {
-                $output .= $prefix
-                    .($dumpAsMap ? Inline::dump($key, $flags).':' : '-')
-                    .' !'
-                    .$value->getTag()
-                ;
+                $output .= ' !'.$value->getTag();
 
                     if (Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value->getValue()) && false !== strpos($value->getValue(), "\n") && false === strpos($value->getValue(), "\r\n")) {
                     // If the first line starts with a space character, the spec requires a blockIndicationIndicator
@@ -146,9 +142,7 @@ class Dumper
 
             $willBeInlined = $inline - 1 <= 0 || !\is_array($value) && $dumpObjectAsInlineMap || empty($value);
 
-            $output .= $prefix
-                .($dumpAsMap ? Inline::dump($key, $flags).':' : '-')
-                .($willBeInlined ? ' ' : "\n")
+            $output .= ($willBeInlined ? ' ' : "\n")
                 .$this->dump(
                     $value,
                     $inline - 1,

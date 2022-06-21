@@ -443,23 +443,20 @@ YAML;
     public function testDumpingTaggedValueTopLevelAssoc()
     {
         $data = new TaggedValue('user', ['name' => 'jane']);
+        $expected = <<<'YAML'
+!user
+name: jane
 
-        // @todo Fix the dumper, eliminate this exception.
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Symfony\Component\Yaml\Inline::isHash(): Argument #1 ($value) must be of type ArrayObject|stdClass|array, Symfony\Component\Yaml\Tag\TaggedValue given');
-
-        $this->dumper->dump($data, 2);
+YAML;
+        $this->assertSame($expected, $this->dumper->dump($data, 2));
     }
 
     public function testDumpingTaggedValueTopLevelMultiLine()
     {
         $data = new TaggedValue('text', "a\nb\n");
-
-        // @todo Fix the dumper, eliminate this exception.
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Symfony\Component\Yaml\Inline::isHash(): Argument #1 ($value) must be of type ArrayObject|stdClass|array, Symfony\Component\Yaml\Tag\TaggedValue given');
-
-        $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        $expected = '!text "a\\nb\\n"';
+        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertEquals($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testDumpingTaggedValueSpecialCharsInTag()

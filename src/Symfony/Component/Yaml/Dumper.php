@@ -54,8 +54,20 @@ class Dumper
     {
         $prefix = $indent ? str_repeat(' ', $indent) : '';
 
+        $tag = null;
+        if ($input instanceof TaggedValue) {
+            $tag = $input->getTag();
+            $input = $input->getValue();
+            if ($input instanceof TaggedValue) {
+                throw new \InvalidArgumentException('Nested tags are not supported.');
+            }
+        }
+
         if ($this->shouldDumpAsInline($inline, $input, $flags)) {
-            return $prefix.Inline::dump($input, $flags);
+            return $prefix
+                . ($tag !== null ? '!' . $tag . ' ' : '')
+                . Inline::dump($input, $flags)
+            ;
         }
 
         $dumpAsMap = Inline::isHash($input);
@@ -117,6 +129,10 @@ class Dumper
             ;
         }
 
+        if ($tag !== null) {
+            $output = '!' . $tag . "\n" . $output;
+        }
+
         return $output;
     }
 
@@ -126,7 +142,7 @@ class Dumper
             return true;
         }
 
-        if (\is_array($value) || $value instanceof TaggedValue) {
+        if (\is_array($value)) {
             return false;
         }
 

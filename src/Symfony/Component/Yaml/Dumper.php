@@ -59,13 +59,8 @@ class Dumper
     public function dump($input, int $inline = 0, int $indent = 0, int $flags = 0): string
     {
         $prefix = $indent ? str_repeat(' ', $indent) : '';
-        $dumpObjectAsInlineMap = true;
 
-        if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($input instanceof \ArrayObject || $input instanceof \stdClass)) {
-            $dumpObjectAsInlineMap = empty((array) $input);
-        }
-
-        if ($inline <= 0 || (!\is_array($input) && !$input instanceof TaggedValue && $dumpObjectAsInlineMap) || empty($input)) {
+        if ($this->shouldDumpAsInline($inline, $input, $flags)) {
             return $prefix.Inline::dump($input, $flags);
         }
 
@@ -113,13 +108,7 @@ class Dumper
                 continue;
             }
 
-            $dumpObjectAsInlineMap = true;
-
-            if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \ArrayObject || $value instanceof \stdClass)) {
-                $dumpObjectAsInlineMap = empty((array) $value);
-            }
-
-            $willBeInlined = $inline - 1 <= 0 || !\is_array($value) && $dumpObjectAsInlineMap || empty($value);
+            $willBeInlined = $this->shouldDumpAsInline($inline - 1, $value, $flags);
 
             $output .= ($willBeInlined ? ' ' : "\n")
                 .$this->dump(
@@ -134,5 +123,16 @@ class Dumper
         }
 
         return $output;
+    }
+
+    private function shouldDumpAsInline(int $inline, $value, int $flags): bool
+    {
+        $dumpObjectAsInlineMap = true;
+
+        if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \ArrayObject || $value instanceof \stdClass)) {
+            $dumpObjectAsInlineMap = empty((array) $value);
+        }
+
+        return $inline <= 0 || (!\is_array($value) && !$value instanceof TaggedValue && $dumpObjectAsInlineMap) || empty($value);
     }
 }

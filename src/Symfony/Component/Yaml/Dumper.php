@@ -122,12 +122,16 @@ class Dumper
 
     private function shouldDumpAsInline(int $inline, $value, int $flags): bool
     {
+        if ($inline <= 0 || empty($value)) {
+            return true;
+        }
+
         $dumpObjectAsInlineMap = true;
 
         if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \ArrayObject || $value instanceof \stdClass)) {
             $dumpObjectAsInlineMap = empty((array) $value);
         }
 
-        return $inline <= 0 || (!\is_array($value) && !$value instanceof TaggedValue && $dumpObjectAsInlineMap) || empty($value);
+        return !\is_array($value) && !$value instanceof TaggedValue && $dumpObjectAsInlineMap;
     }
 }

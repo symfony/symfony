@@ -696,7 +696,11 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services13.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
     }
 
-    public function testNonSharedLazyDefinitionReferences()
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function testNonSharedLazyDefinitionReferences(bool $asGhostObject)
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setShared(false)->setLazy(true);
@@ -704,9 +708,9 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
+        $dumper->setProxyDumper(new \DummyProxyDumper($asGhostObject));
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy'.($asGhostObject ? '_ghost' : '').'.php', $dumper->dump());
     }
 
     public function testNonSharedDuplicates()
@@ -769,7 +773,11 @@ class PhpDumperTest extends TestCase
         $dumper->dump();
     }
 
-    public function testDedupLazyProxy()
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function testDedupLazyProxy(bool $asGhostObject)
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setLazy(true)->setPublic(true);
@@ -777,9 +785,9 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
+        $dumper->setProxyDumper(new \DummyProxyDumper($asGhostObject));
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy_proxy.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy'.($asGhostObject ? '_ghost' : '_proxy').'.php', $dumper->dump());
     }
 
     public function testLazyArgumentProvideGenerator()

@@ -21,7 +21,6 @@ class ProjectServiceContainer extends Container
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
-            'foo' => 'getFooService',
         ];
 
         $this->aliases = [];
@@ -35,6 +34,13 @@ class ProjectServiceContainer extends Container
     public function isCompiled(): bool
     {
         return true;
+    }
+
+    public function getRemovedIds(): array
+    {
+        return [
+            'foo' => true,
+        ];
     }
 
     protected function createProxy($class, \Closure $factory)
@@ -56,23 +62,23 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService($lazyLoad = true)
+    protected function getBarService()
     {
-        // lazy factory for stdClass
-
-        return new \stdClass();
+        return $this->services['bar'] = $lazyLoad;
     }
 
     /**
-     * Gets the public 'foo' shared service.
+     * Gets the private 'foo' service.
      *
      * @return \stdClass
      */
     protected function getFooService($lazyLoad = true)
     {
+        $this->factories['service_container']['foo'] ??= $this->getFooService(...);
+
         // lazy factory for stdClass
 
-        return new \stdClass();
+        return $lazyLoad;
     }
 }
 

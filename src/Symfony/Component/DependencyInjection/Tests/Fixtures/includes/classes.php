@@ -84,8 +84,15 @@ class MethodCallClass
 
 class DummyProxyDumper implements ProxyDumper
 {
-    public function isProxyCandidate(Definition $definition): bool
+    public function __construct(
+        private bool $asGhostObject = false,
+    ) {
+    }
+
+    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): bool
     {
+        $asGhostObject = $this->asGhostObject;
+
         return $definition->isLazy();
     }
 

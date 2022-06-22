@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-06-21T12:54:17Z
+
+The same PR should be submitted to https://github.com/symfony/polyfill which is the new location of that code for Symfony 5+

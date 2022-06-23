@@ -18,7 +18,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('html_sanitizer.config.default', HtmlSanitizerConfig::class)
-            ->call('allowSafeElements')
+            ->call('allowSafeElements', [], true)
 
         ->set('html_sanitizer.sanitizer.default', HtmlSanitizer::class)
             ->args([service('html_sanitizer.config.default')])

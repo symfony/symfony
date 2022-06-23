@@ -4,7 +4,7 @@ $container->loadFromExtension('framework', [
     'http_method_override' => false,
     'html_sanitizer' => [
         'sanitizers' => [
-            'default' => [
+            'custom' => [
                 'allow_safe_elements' => true,
                 'allow_static_elements' => true,
                 'allow_elements' => [

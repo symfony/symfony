@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentSer
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -105,7 +106,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return array|bool|string|int|float|\UnitEnum|null
      *
-     * @throws InvalidArgumentException if the parameter is not defined
+     * @throws ParameterNotFoundException if the parameter is not defined
      */
     public function getParameter(string $name)
     {

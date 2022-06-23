@@ -225,6 +225,7 @@ class UserAuthenticationProviderTest extends TestCase
         $this->assertSame($originalToken, $authToken->getOriginalToken());
         $this->assertSame($user, $authToken->getUser());
         $this->assertContains('ROLE_FOO', $authToken->getRoleNames());
+        $this->assertContains('ROLE_PREVIOUS_ADMIN', $authToken->getRoleNames());
         $this->assertEquals('foo', $authToken->getCredentials());
         $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }

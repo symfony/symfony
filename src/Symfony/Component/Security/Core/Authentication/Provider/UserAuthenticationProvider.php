@@ -94,7 +94,10 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
         }
 
         if ($token instanceof SwitchUserToken) {
-            $authenticatedToken = new SwitchUserToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles(), $token->getOriginalToken());
+            $roles = $user->getRoles();
+            $roles[] = 'ROLE_PREVIOUS_ADMIN';
+
+            $authenticatedToken = new SwitchUserToken($user, $token->getCredentials(), $this->providerKey, $roles, $token->getOriginalToken());
         } else {
             $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
         }

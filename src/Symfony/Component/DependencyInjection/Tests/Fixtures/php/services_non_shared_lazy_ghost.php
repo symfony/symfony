@@ -64,7 +64,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        return $this->services['bar'] = $lazyLoad;
+        return $this->services['bar'] = new \stdClass((isset($this->factories['service_container']['foo']) ? $this->factories['service_container']['foo']() : $this->getFooService()));
     }
 
     /**
@@ -76,10 +76,17 @@ class ProjectServiceContainer extends Container
     {
         $this->factories['service_container']['foo'] ??= $this->getFooService(...);
 
-        // lazy factory for stdClass
+        if (true === $lazyLoad) {
+            return $this->createProxy('stdClass_5a8a5eb', function () {
+                return \stdClass_5a8a5eb::createLazyGhostObject($this->getFooService(...));
+            });
+        }
 
         return $lazyLoad;
     }
 }
 
-// proxy code for stdClass
+class stdClass_5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyGhostObjectInterface
+{
+    use \Symfony\Component\VarExporter\LazyGhostObjectTrait;
+}

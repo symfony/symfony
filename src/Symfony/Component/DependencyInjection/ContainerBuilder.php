@@ -39,6 +39,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\LazyServiceInstantiator;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -86,7 +87,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private Compiler $compiler;
     private bool $trackResources;
-    private ?InstantiatorInterface $proxyInstantiator = null;
+    private InstantiatorInterface $proxyInstantiator;
     private ExpressionLanguage $expressionLanguage;
 
     /**
@@ -994,7 +995,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
 
-        if (true === $tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator) || $proxy instanceof RealServiceInstantiator) {
+        if (true === $tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator ??= new LazyServiceInstantiator()) || $proxy instanceof RealServiceInstantiator) {
             $proxy = $proxy->instantiateProxy(
                 $this,
                 $definition,

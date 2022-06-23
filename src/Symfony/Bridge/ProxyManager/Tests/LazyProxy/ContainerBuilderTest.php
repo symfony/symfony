@@ -16,7 +16,6 @@ require_once __DIR__.'/Fixtures/includes/foo.php';
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use ProxyManagerBridgeFooClass;
-use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -31,10 +30,8 @@ class ContainerBuilderTest extends TestCase
     {
         $builder = new ContainerBuilder();
 
-        $builder->setProxyInstantiator(new RuntimeInstantiator());
-
         $builder->register('foo1', ProxyManagerBridgeFooClass::class)->setFile(__DIR__.'/Fixtures/includes/foo.php')->setPublic(true);
-        $builder->getDefinition('foo1')->setLazy(true);
+        $builder->getDefinition('foo1')->setLazy(true)->addTag('proxy', ['interface' => ProxyManagerBridgeFooClass::class]);
 
         $builder->compile();
 

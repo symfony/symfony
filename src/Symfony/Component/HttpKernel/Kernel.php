@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
-use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -683,9 +681,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if ($this instanceof CompilerPassInterface) {
             $container->addCompilerPass($this, PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         }
-        if (class_exists(\ProxyManager\Configuration::class) && class_exists(RuntimeInstantiator::class)) {
-            $container->setProxyInstantiator(new RuntimeInstantiator());
-        }
 
         return $container;
     }
@@ -700,10 +695,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     {
         // cache the container
         $dumper = new PhpDumper($container);
-
-        if (class_exists(\ProxyManager\Configuration::class) && class_exists(ProxyDumper::class)) {
-            $dumper->setProxyDumper(new ProxyDumper());
-        }
 
         $content = $dumper->dump([
             'class' => $class,

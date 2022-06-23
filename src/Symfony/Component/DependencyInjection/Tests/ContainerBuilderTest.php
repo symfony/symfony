@@ -38,6 +38,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -369,9 +370,13 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(\Bar\FooClass::class, $builder->get('foo2'), '->createService() replaces parameters in the file provided by the service definition');
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateProxyWithRealServiceInstantiator()
     {
         $builder = new ContainerBuilder();
+        $builder->setProxyInstantiator(new RealServiceInstantiator());
 
         $builder->register('foo1', 'Bar\FooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
         $builder->getDefinition('foo1')->setLazy(true);

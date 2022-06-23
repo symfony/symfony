@@ -14,12 +14,16 @@ namespace Symfony\Component\DependencyInjection\LazyProxy\Instantiator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
+trigger_deprecation('symfony/dependency-injection', '6.2', 'The "%s" class is deprecated, use "%s" instead.', RealServiceInstantiator::class, LazyServiceInstantiator::class);
+
 /**
  * {@inheritdoc}
  *
  * Noop proxy instantiator - produces the real service instead of a proxy instance.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @deprecated since Symfony 6.2, use LazyServiceInstantiator instead.
  */
 class RealServiceInstantiator implements InstantiatorInterface
 {

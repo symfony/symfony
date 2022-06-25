@@ -1036,23 +1036,12 @@ class Parser
      *
      * @throws ParseException on a PCRE internal error
      *
-     * @see preg_last_error()
-     *
      * @internal
      */
     public static function preg_match(string $pattern, string $subject, array &$matches = null, int $flags = 0, int $offset = 0): int
     {
         if (false === $ret = preg_match($pattern, $subject, $matches, $flags, $offset)) {
-            $error = match (preg_last_error()) {
-                \PREG_INTERNAL_ERROR => 'Internal PCRE error.',
-                \PREG_BACKTRACK_LIMIT_ERROR => 'pcre.backtrack_limit reached.',
-                \PREG_RECURSION_LIMIT_ERROR => 'pcre.recursion_limit reached.',
-                \PREG_BAD_UTF8_ERROR => 'Malformed UTF-8 data.',
-                \PREG_BAD_UTF8_OFFSET_ERROR => 'Offset doesn\'t correspond to the begin of a valid UTF-8 code point.',
-                default => 'Error.',
-            };
-
-            throw new ParseException($error);
+            throw new ParseException(preg_last_error_msg());
         }
 
         return $ret;

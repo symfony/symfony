@@ -2050,16 +2050,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('html_sanitizer');
 
         // html_sanitizer service
-        $this->assertTrue($container->hasAlias('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
-        $this->assertSame('html_sanitizer.sanitizer.default', (string) $container->getAlias('html_sanitizer'));
-        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.default')->getClass());
-        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.default')->getArguments());
-        $this->assertSame('html_sanitizer.config.default', (string) $args[0]);
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.custom')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.custom')->getArguments());
+        $this->assertSame('html_sanitizer.config.custom', (string) $args[0]);
 
         // config
-        $this->assertTrue($container->hasDefinition('html_sanitizer.config.default'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
-        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.default')->getClass());
-        $this->assertCount(23, $calls = $container->getDefinition('html_sanitizer.config.default')->getMethodCalls());
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config.custom'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.custom')->getClass());
+        $this->assertCount(23, $calls = $container->getDefinition('html_sanitizer.config.custom')->getMethodCalls());
         $this->assertSame(
             [
                 ['allowSafeElements', [], true],
@@ -2102,6 +2100,30 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // Named alias
         $this->assertSame('html_sanitizer.sanitizer.all.sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class.' $allSanitizer'));
+        $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
+    }
+
+    public function testHtmlSanitizerDefaultConfig()
+    {
+        $container = $this->createContainerFromFile('html_sanitizer_default_config');
+
+        // html_sanitizer service
+        $this->assertTrue($container->hasAlias('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads default_config');
+        $this->assertSame('html_sanitizer.sanitizer.default', (string) $container->getAlias('html_sanitizer'));
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.default')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.default')->getArguments());
+        $this->assertSame('html_sanitizer.config.default', (string) $args[0]);
+
+        // config
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config.default'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.default')->getClass());
+        $this->assertCount(1, $calls = $container->getDefinition('html_sanitizer.config.default')->getMethodCalls());
+        $this->assertSame(
+            ['allowSafeElements', [], true],
+            $calls[0]
+        );
+
+        // Named alias
         $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
 
         // Default alias

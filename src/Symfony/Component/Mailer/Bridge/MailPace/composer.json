@@ -1,5 +1,5 @@
 {
-    "name": "symfony/mailpace-mailer",
+    "name": "symfony/mail-pace-mailer",
     "type": "symfony-mailer-bridge",
     "description": "Symfony MailPace Mailer Bridge",
     "keywords": [],

@@ -1,0 +1,37 @@
+{
+    "name": "symfony/mailpace-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony MailPace Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        },
+        {
+            "name": "Paul Oms",
+            "homepage": "https://mailpace.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "psr/event-dispatcher": "^1",
+        "symfony/mailer": "^5.4|^6.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\MailPace\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

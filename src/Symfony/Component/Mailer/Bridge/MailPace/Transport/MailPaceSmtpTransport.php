@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Transport;
+namespace Symfony\Component\Mailer\Bridge\MailPace\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -20,18 +20,14 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
-trigger_deprecation('symfony/oh-my-smtp-mailer', '6.2', 'The "%s" class is deprecated, use "%s" instead.', OhMySmtpSmtpTransport::class, 'Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceSmtpTransport');
-
 /**
- * @author Paul Oms <support@ohmysmtp.com>
- *
- * @deprecated since Symfony 6.2, use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceSmtpTransport instead
+ * @author Paul Oms <support@mailpace.com>
  */
-final class OhMySmtpSmtpTransport extends EsmtpTransport
+final class MailPaceSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.ohmysmtp.com', 587, false, $dispatcher, $logger);
+        parent::__construct('smtp.mailpace.com', 587, false, $dispatcher, $logger);
 
         $this->setUsername($id);
         $this->setPassword($id);
@@ -40,24 +36,24 @@ final class OhMySmtpSmtpTransport extends EsmtpTransport
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Message) {
-            $this->addOhMySmtpHeaders($message);
+            $this->addMailPaceHeaders($message);
         }
 
         return parent::send($message, $envelope);
     }
 
-    private function addOhMySmtpHeaders(Message $message): void
+    private function addMailPaceHeaders(Message $message): void
     {
         $headers = $message->getHeaders();
 
         foreach ($headers->all() as $name => $header) {
             if ($header instanceof TagHeader) {
-                if (null != $headers->get('X-OMS-Tags')) {
-                    $existing = $headers->get('X-OMS-Tags')->getBody();
-                    $headers->remove('X-OMS-Tags');
-                    $headers->addTextHeader('X-OMS-Tags', $existing.', '.$header->getValue());
+                if (null != $headers->get('X-MailPace-Tags')) {
+                    $existing = $headers->get('X-MailPace-Tags')->getBody();
+                    $headers->remove('X-MailPace-Tags');
+                    $headers->addTextHeader('X-MailPace-Tags', $existing.', '.$header->getValue());
                 } else {
-                    $headers->addTextHeader('X-OMS-Tags', $header->getValue());
+                    $headers->addTextHeader('X-MailPace-Tags', $header->getValue());
                 }
                 $headers->remove($name);
             }

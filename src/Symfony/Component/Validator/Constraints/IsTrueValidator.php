@@ -29,15 +29,13 @@ class IsTrueValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, IsTrue::class);
         }
 
-        if (null === $value) {
+        if (null === $value || true === $value || 1 === $value || '1' === $value) {
             return;
         }
 
-        if (true !== $value && 1 !== $value && '1' !== $value) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(IsTrue::NOT_TRUE_ERROR)
-                ->addViolation();
-        }
+        $this->context->buildViolation($constraint->message)
+            ->setParameter('{{ value }}', $this->formatValue($value))
+            ->setCode(IsTrue::NOT_TRUE_ERROR)
+            ->addViolation();
     }
 }

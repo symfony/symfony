@@ -26,7 +26,7 @@
         "symfony/error-handler": "^6.1",
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
-        "symfony/http-kernel": "^6.1",
+        "symfony/http-kernel": "^6.2",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",

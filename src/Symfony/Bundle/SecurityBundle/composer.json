@@ -38,7 +38,7 @@
         "symfony/dom-crawler": "^5.4|^6.0",
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/form": "^5.4|^6.0",
-        "symfony/framework-bundle": "^5.4|^6.0",
+        "symfony/framework-bundle": "^6.2",
         "symfony/ldap": "^5.4|^6.0",
         "symfony/process": "^5.4|^6.0",
         "symfony/rate-limiter": "^5.4|^6.0",
@@ -53,7 +53,7 @@
     "conflict": {
         "symfony/browser-kit": "<5.4",
         "symfony/console": "<5.4",
-        "symfony/framework-bundle": "<5.4",
+        "symfony/framework-bundle": "<6.2",
         "symfony/ldap": "<5.4",
         "symfony/twig-bundle": "<5.4"
     },

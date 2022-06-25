@@ -54,13 +54,18 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     protected $resolver;
     protected $requestStack;
     private ArgumentResolverInterface $argumentResolver;
+    private bool $catchThrowable;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null, bool $catchThrowable = false)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?? new RequestStack();
         $this->argumentResolver = $argumentResolver ?? new ArgumentResolver();
+        $this->catchThrowable = $catchThrowable;
+        if (!$catchThrowable) {
+            trigger_deprecation('symfony/http-kernel', '6.2', 'Starting from 7.0, "%s::handle()" will catch \Throwable exceptions and convert them to HttpFoundation responses. Pass $catchThrowable=true to adapt to this behavior now.', self::class);
+        }
     }
 
     /**
@@ -72,7 +77,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         try {
             return $this->handleRaw($request, $type);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            if (!$this->catchThrowable && !$e instanceof \Exception) {
+                throw $e;
+            }
+
             if ($e instanceof RequestExceptionInterface) {
                 $e = new BadRequestHttpException($e->getMessage(), $e);
             }
@@ -205,7 +214,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Handles a throwable by trying to convert it to a Response.
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
@@ -237,7 +246,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         try {
             return $this->filterResponse($response, $request, $type);
-        } catch (\Exception) {
+        } catch (\Throwable $e) {
+            if (!$this->catchThrowable && !$e instanceof \Exception) {
+                throw $e;
+            }
+
             return $response;
         }
     }

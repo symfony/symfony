@@ -14,6 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Functional;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\FrameworkBundle\Test\ExceptionSubscriber;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -50,13 +51,20 @@ class WebProfilerBundleKernel extends Kernel
 
     protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
     {
-        $containerBuilder->loadFromExtension('framework', [
+        $config = [
             'http_method_override' => false,
             'secret' => 'foo-secret',
             'profiler' => ['only_exceptions' => false],
             'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
             'router' => ['utf8' => true],
-        ]);
+        ];
+
+        // If Symfony >= 6.2
+        if (class_exists(ExceptionSubscriber::class)) {
+            $config['catch_all_throwables'] = true;
+        }
+
+        $containerBuilder->loadFromExtension('framework', $config);
 
         $containerBuilder->loadFromExtension('web_profiler', [
             'toolbar' => true,

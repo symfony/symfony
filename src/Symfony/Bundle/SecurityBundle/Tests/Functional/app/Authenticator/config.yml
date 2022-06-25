@@ -7,6 +7,7 @@ framework:
     profiler: false
     session:
         storage_factory_id: session.storage.factory.mock_file
+    catch_all_throwables: true
 
 services:
     logger: { class: Psr\Log\NullLogger }

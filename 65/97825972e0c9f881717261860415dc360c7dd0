@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-04-11T14:39:42Z
+
+A deprecation for which there is no way to opt-in for the new behavior is bad: it does not help migrating and will annoy people seeing it without being able to get rid of it.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-04-11T14:43:13Z
+
+Hm. You are very correct. Thank you. Do you have a suggestion on how to make an opt-in?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-04-11T14:48:06Z
+
+Well, you would need some kind of configuration parameter that can turn on the catching of errors.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-04-23T10:02:35Z
+
+Thank you for the review. I've update the PR with a way to opt-in to the new behaviour. I've also added some tests.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-04-24T09:13:42Z
+
+Psalm and Fabbot are both false negatives. It seams like the 8.2 test fails for unrelated reasons.
+
+PHPUnit 8.1 low-deps fails because of this PR. Any suggestions how I could fix them?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-04-24T19:02:34Z
+
+Thank you very much for bringing this topic up again. I like how you allow to opt-in to the new behavior.
+
+> PHPUnit 8.1 low-deps fails because of this PR. Any suggestions how I could fix them?
+
+The lazy fix would be to add conflict rules to the composer.json files of SecurityBundle and WebProfilerBundle, for FrameworkBundle < 6.1. The alterantive would be to make the test setup for the bundles more complex by setting/removing that option conditionally and I'm not sure that's worth it.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-04-24T19:35:48Z
+
+Thank you for the feedback. I've updated the PR.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-05-01T08:04:50Z
+
+The PR is rebased and updated.
+
+status: Waiting for review
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-05-29T11:19:30Z
+
+The PR is updated for 6.2. Fabbot is a false negative and the PHP 8.2 test fail is unrelated.
+
+I would be happy to get another review on this. I believe it is ready to merge
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-05-29T11:33:20Z
+
+Thank you for the review. I've applied the changes.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-06-16T08:24:14Z
+
+I've applied all changes and the CI is green
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-06-16T18:16:04Z
+
+I've applied the suggested changes. I've rebased the PR and the tests are green.
+
+Could I get a final round of reviews?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-06-16T19:32:26Z
+
+It would be nice to have this default to `true` with the 6.2 recipe for new projects (and smooth upgrade with `composer recipes:update`).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-06-25T07:27:02Z
+
+I've rebased the PR and squashed the commits.
+
+The CI failures are not related to this PR. Could I ask you to review this PR again to decide if it is good enough to merge.

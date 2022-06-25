@@ -122,6 +122,7 @@ use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
+use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
@@ -2519,6 +2520,7 @@ class FrameworkExtension extends Extension
             AllMySmsTransportFactory::class => 'notifier.transport_factory.all-my-sms',
             AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazon-sns',
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
+            ContactEveryoneTransportFactory::class => 'notifier.transport_factory.contact-everyone',
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',
             EngagespotTransportFactory::class => 'notifier.transport_factory.engagespot',
             EsendexTransportFactory::class => 'notifier.transport_factory.esendex',

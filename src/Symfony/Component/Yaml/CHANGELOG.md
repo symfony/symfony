@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support for `!php/enum` and `!php/enum *->value`
+
 6.1
 ---
 

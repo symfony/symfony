@@ -208,7 +208,6 @@ class Worker
             if (null !== $this->logger) {
                 $message = $envelope->getMessage();
                 $context = [
-                    'message' => $message,
                     'class' => \get_class($message),
                 ];
                 $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);

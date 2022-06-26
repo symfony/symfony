@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2022-06-24T13:16:03Z
+
+I know @dbu, @Tobion and @aschempp know a lot about caching and the `HttpCache` – do you agree we should handle it this way?
+
+Alternatively, we could assume the TTL to be zero, which is what `abs(null)` effectively evaluates to.

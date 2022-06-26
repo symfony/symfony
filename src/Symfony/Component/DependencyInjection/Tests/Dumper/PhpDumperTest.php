@@ -832,7 +832,7 @@ class PhpDumperTest extends TestCase
             switch (++$i) {
                 case 0:
                     $this->assertEquals('k1', $k);
-                    $this->assertInstanceOf(\stdCLass::class, $v);
+                    $this->assertInstanceOf(\stdClass::class, $v);
                     break;
                 case 1:
                     $this->assertEquals('k2', $k);

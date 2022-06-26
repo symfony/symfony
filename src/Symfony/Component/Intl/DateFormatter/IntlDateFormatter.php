@@ -244,7 +244,7 @@ abstract class IntlDateFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function formatObject(object $object, $format = null, string $locale = null)
+    public static function formatObject(object $object, $format = null, string $locale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }

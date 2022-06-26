@@ -56,7 +56,6 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
         $message = $envelope->getMessage();
         $context = [
-            'message' => $message,
             'class' => \get_class($message),
         ];
 

@@ -53,7 +53,6 @@ class HandleMessageMiddleware implements MiddlewareInterface
         $message = $envelope->getMessage();
 
         $context = [
-            'message' => $message,
             'class' => \get_class($message),
         ];
 

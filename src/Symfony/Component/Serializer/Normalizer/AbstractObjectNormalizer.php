@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -434,6 +435,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param Type[] $types
      *
      * @throws NotNormalizableValueException
+     * @throws ExtraAttributesException
+     * @throws MissingConstructorArgumentsException
      * @throws LogicException
      */
     private function validateAndDenormalize(array $types, string $currentClass, string $attribute, mixed $data, ?string $format, array $context): mixed
@@ -441,6 +444,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $expectedTypes = [];
         $isUnionType = \count($types) > 1;
         $extraAttributesException = null;
+        $missingConstructorArgumentException = null;
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return null;
@@ -582,11 +586,21 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
 
                 $extraAttributesException ??= $e;
+            } catch (MissingConstructorArgumentsException $e) {
+                if (!$isUnionType) {
+                    throw $e;
+                }
+
+                $missingConstructorArgumentException ??= $e;
             }
         }
 
         if ($extraAttributesException) {
             throw $extraAttributesException;
+        }
+
+        if ($missingConstructorArgumentException) {
+            throw $missingConstructorArgumentException;
         }
 
         if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {

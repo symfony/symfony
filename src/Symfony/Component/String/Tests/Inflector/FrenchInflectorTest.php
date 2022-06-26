@@ -31,6 +31,7 @@ class FrenchInflectorTest extends TestCase
             ['héros', 'héros'],
             ['nez', 'nez'],
             ['rictus', 'rictus'],
+            ['sans', 'sans'],
             ['souris', 'souris'],
             ['tas', 'tas'],
             ['toux', 'toux'],

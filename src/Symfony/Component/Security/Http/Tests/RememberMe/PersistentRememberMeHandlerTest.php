@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
+use Symfony\Component\Security\Core\Authentication\RememberMe\TokenVerifierInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -100,6 +101,42 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->assertSame($rememberParts[2], $cookieParts[2]); // expire
         $this->assertNotSame($rememberParts[3], $cookieParts[3]); // value
         $this->assertSame(explode(':', $rememberParts[3])[0], explode(':', $cookieParts[3])[0]); // series
+    }
+
+    public function testConsumeRememberMeCookieValidByValidatorWithoutUpdate()
+    {
+        $verifier = $this->createMock(TokenVerifierInterface::class);
+        $handler = new PersistentRememberMeHandler($this->tokenProvider, 'secret', $this->userProvider, $this->requestStack, [], null, $verifier);
+
+        $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTime('30 seconds'));
+
+        $this->tokenProvider->expects($this->any())
+            ->method('loadTokenBySeries')
+            ->with('series1')
+            ->willReturn($persistentToken)
+        ;
+
+        $verifier->expects($this->any())
+            ->method('verifyToken')
+            ->with($persistentToken, 'oldTokenValue')
+            ->willReturn(true)
+        ;
+
+        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'series1:oldTokenValue');
+        $handler->consumeRememberMeCookie($rememberMeDetails);
+
+        // assert that the cookie has been updated with a new base64 encoded token value
+        $this->assertTrue($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
+
+        /** @var Cookie $cookie */
+        $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
+
+        $cookieParts = explode(':', base64_decode($cookie->getValue()), 4);
+
+        $this->assertSame(InMemoryUser::class, $cookieParts[0]); // class
+        $this->assertSame(base64_encode('wouter'), $cookieParts[1]); // identifier
+        $this->assertSame('360', $cookieParts[2]); // expire
+        $this->assertSame('series1:tokenvalue', $cookieParts[3]); // value
     }
 
     public function testConsumeRememberMeCookieInvalidToken()

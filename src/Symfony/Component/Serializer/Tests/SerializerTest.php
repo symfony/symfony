@@ -764,20 +764,26 @@ class SerializerTest extends TestCase
             ['json' => new JsonEncoder()]
         );
 
-        $actual = $serializer->deserialize('{ "v": { "a": 0 }}', DummyUnionWithAAndB::class, 'json', [
+        $actual = $serializer->deserialize('{ "v": { "a": 0 }}', DummyUnionWithAAndCAndB::class, 'json', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
         ]);
 
-        $this->assertEquals(new DummyUnionWithAAndB(new DummyATypeForUnion()), $actual);
+        $this->assertEquals(new DummyUnionWithAAndCAndB(new DummyATypeForUnion()), $actual);
 
-        $actual = $serializer->deserialize('{ "v": { "b": 1 }}', DummyUnionWithAAndB::class, 'json', [
+        $actual = $serializer->deserialize('{ "v": { "b": 1 }}', DummyUnionWithAAndCAndB::class, 'json', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
         ]);
 
-        $this->assertEquals(new DummyUnionWithAAndB(new DummyBTypeForUnion()), $actual);
+        $this->assertEquals(new DummyUnionWithAAndCAndB(new DummyBTypeForUnion()), $actual);
+
+        $actual = $serializer->deserialize('{ "v": { "c": 3 }}', DummyUnionWithAAndCAndB::class, 'json', [
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ]);
+
+        $this->assertEquals(new DummyUnionWithAAndCAndB(new DummyCTypeForUnion(3)), $actual);
 
         $this->expectException(ExtraAttributesException::class);
-        $serializer->deserialize('{ "v": { "b": 1, "c": "i am not allowed" }}', DummyUnionWithAAndB::class, 'json', [
+        $serializer->deserialize('{ "v": { "b": 1, "d": "i am not allowed" }}', DummyUnionWithAAndCAndB::class, 'json', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
         ]);
     }
@@ -1262,13 +1268,23 @@ class DummyBTypeForUnion
     public $b = 1;
 }
 
-class DummyUnionWithAAndB
+class DummyCTypeForUnion
 {
-    /** @var DummyATypeForUnion|DummyBTypeForUnion */
+    public $c = 2;
+
+    public function __construct($c)
+    {
+        $this->c = $c;
+    }
+}
+
+class DummyUnionWithAAndCAndB
+{
+    /** @var DummyATypeForUnion|DummyCTypeForUnion|DummyBTypeForUnion */
     public $v;
 
     /**
-     * @param DummyATypeForUnion|DummyBTypeForUnion $v
+     * @param DummyATypeForUnion|DummyCTypeForUnion|DummyBTypeForUnion $v
      */
     public function __construct($v)
     {

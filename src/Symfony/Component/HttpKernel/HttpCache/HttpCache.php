@@ -718,7 +718,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $timeout = $this->options['stale_while_revalidate'];
         }
 
-        return abs($entry->getTtl()) < $timeout;
+        return abs($entry->getTtl() ?? 0) < $timeout;
     }
 
     /**

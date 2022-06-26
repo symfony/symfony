@@ -7,6 +7,28 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.43 (2022-06-26)
+
+ * bug #46765 [Serializer] Fix denormalization union types with constructor (Gwemox)
+ * bug #46769 [HttpKernel] Fix a PHP 8.1 deprecation notice in HttpCache (mpdude)
+ * bug #46747 Fix global state pollution between tests run with ApplicationTester (Seldaek)
+ * bug #46730 [Intl] Fix the IntlDateFormatter::formatObject signature (damienalexandre)
+ * bug #46668 [FrameworkBundle] Lower JsonSerializableNormalizer priority (aprat84)
+ * bug #46678 [HttpFoundation] Update "[Session] Overwrite invalid session id" to only validate when files session storage is used (alexpott)
+ * bug #45861 [Serializer] Try all possible denormalization route with union types when ALLOW_EXTRA_ATTRIBUTES=false (T-bond)
+ * bug #46676 [DoctrineBridge] Extend type guessing on enum fields (Gigino Chianese)
+ * bug #46699 [Cache] Respect $save option in all adapters (jrjohnson)
+ * bug #46697 [HttpKernel] Disable session tracking while collecting profiler data (nicolas-grekas)
+ * bug #46684 [MonologBridge] Fixed support of elasticsearch 7.+ in ElasticsearchLogstashHandler (lyrixx)
+ * bug #46368 [Mailer] Fix for missing sender name in case with usage of the EnvelopeListener (bobahvas)
+ * bug #46548 [Mime] Allow url as a path in the DataPart::fromPath (wkania)
+ * bug #46594 [FrameworkBundle] Fix XML cache config (HeahDude)
+ * bug #46595 [Console] Escape  in command name & description from getDefaultName() (ogizanagi)
+ * bug #46565 [WebProfilerBundle] Fix dark theme selected line highlight color & reuse css vars (ogizanagi)
+ * bug #46535 [Mime] Check that the path is a file in the DataPart::fromPath (wkania)
+ * bug #46543 [Cache] do not pass null to strlen() (xabbuh)
+ * bug #46478 [Contracts] remove static cache from `ServiceSubscriberTrait` (kbond)
+
 * 4.4.42 (2022-05-27)
 
  * bug #46448 [DependencyInjection] Fix "proxy" tag: resolve its parameters and pass it to child definitions (nicolas-grekas)

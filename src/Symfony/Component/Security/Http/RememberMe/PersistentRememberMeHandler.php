@@ -75,6 +75,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 
         if ($this->tokenVerifier) {
             $isTokenValid = $this->tokenVerifier->verifyToken($persistentToken, $tokenValue);
+            $tokenValue = $persistentToken->getTokenValue();
         } else {
             $isTokenValid = hash_equals($persistentToken->getTokenValue(), $tokenValue);
         }

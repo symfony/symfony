@@ -740,7 +740,7 @@ class UrlGeneratorTest extends TestCase
             ['author' => 'bernhard', 'article' => 'forms-are-great'], UrlGeneratorInterface::RELATIVE_PATH)
         );
         $this->assertSame('https://example.com/app.php/bernhard/blog', $generator->generate('scheme',
-                ['author' => 'bernhard'], UrlGeneratorInterface::RELATIVE_PATH)
+            ['author' => 'bernhard'], UrlGeneratorInterface::RELATIVE_PATH)
         );
         $this->assertSame('../../about', $generator->generate('unrelated',
             [], UrlGeneratorInterface::RELATIVE_PATH)

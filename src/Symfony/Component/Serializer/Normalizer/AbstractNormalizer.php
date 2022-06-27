@@ -259,7 +259,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     {
         $groups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? [];
 
-        return is_scalar($groups) ? (array) $groups : $groups;
+        return \is_scalar($groups) ? (array) $groups : $groups;
     }
 
     /**

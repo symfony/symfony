@@ -34,7 +34,7 @@ class SessionHandlerFactoryTest extends TestCase
         $handler = SessionHandlerFactory::createHandler($connectionDSN);
 
         $this->assertInstanceOf($expectedHandlerType, $handler);
-        $this->assertEquals($expectedPath, ini_get('session.save_path'));
+        $this->assertEquals($expectedPath, \ini_get('session.save_path'));
     }
 
     public function provideConnectionDSN(): array
@@ -42,7 +42,7 @@ class SessionHandlerFactoryTest extends TestCase
         $base = sys_get_temp_dir();
 
         return [
-            'native file handler using save_path from php.ini' => ['connectionDSN' => 'file://', 'expectedPath' => ini_get('session.save_path'), 'expectedHandlerType' => StrictSessionHandler::class],
+            'native file handler using save_path from php.ini' => ['connectionDSN' => 'file://', 'expectedPath' => \ini_get('session.save_path'), 'expectedHandlerType' => StrictSessionHandler::class],
             'native file handler using provided save_path' => ['connectionDSN' => 'file://'.$base.'/session/storage', 'expectedPath' => $base.'/session/storage', 'expectedHandlerType' => StrictSessionHandler::class],
         ];
     }

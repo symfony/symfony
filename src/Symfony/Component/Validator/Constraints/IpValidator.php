@@ -37,7 +37,7 @@ class IpValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -49,48 +49,48 @@ class IpValidator extends ConstraintValidator
 
         switch ($constraint->version) {
             case Ip::V4:
-               $flag = \FILTER_FLAG_IPV4;
-               break;
+                $flag = \FILTER_FLAG_IPV4;
+                break;
 
             case Ip::V6:
-               $flag = \FILTER_FLAG_IPV6;
-               break;
+                $flag = \FILTER_FLAG_IPV6;
+                break;
 
             case Ip::V4_NO_PRIV:
-               $flag = \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE;
-               break;
+                $flag = \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE;
+                break;
 
             case Ip::V6_NO_PRIV:
-               $flag = \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE;
-               break;
+                $flag = \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE;
+                break;
 
             case Ip::ALL_NO_PRIV:
-               $flag = \FILTER_FLAG_NO_PRIV_RANGE;
-               break;
+                $flag = \FILTER_FLAG_NO_PRIV_RANGE;
+                break;
 
             case Ip::V4_NO_RES:
-               $flag = \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_RES_RANGE;
-               break;
+                $flag = \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_RES_RANGE;
+                break;
 
             case Ip::V6_NO_RES:
-               $flag = \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_RES_RANGE;
-               break;
+                $flag = \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_RES_RANGE;
+                break;
 
             case Ip::ALL_NO_RES:
-               $flag = \FILTER_FLAG_NO_RES_RANGE;
-               break;
+                $flag = \FILTER_FLAG_NO_RES_RANGE;
+                break;
 
             case Ip::V4_ONLY_PUBLIC:
-               $flag = \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE;
-               break;
+                $flag = \FILTER_FLAG_IPV4 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE;
+                break;
 
             case Ip::V6_ONLY_PUBLIC:
-               $flag = \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE;
-               break;
+                $flag = \FILTER_FLAG_IPV6 | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE;
+                break;
 
             case Ip::ALL_ONLY_PUBLIC:
-               $flag = \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE;
-               break;
+                $flag = \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE;
+                break;
 
             default:
                 $flag = 0;

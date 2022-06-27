@@ -159,8 +159,8 @@ class SendFailedMessageForRetryListenerTest extends TestCase
     {
         $exception = new \Exception('no!');
         $stamps = array_merge(
-          array_fill(0, 15, new DelayStamp(1)),
-          array_fill(0, 3, new RedeliveryStamp(1))
+            array_fill(0, 15, new DelayStamp(1)),
+            array_fill(0, 3, new RedeliveryStamp(1))
         );
         $envelope = new Envelope(new \stdClass(), $stamps);
 

@@ -36,7 +36,7 @@ class FilterChoiceLoaderDecorator extends AbstractChoiceLoader
         }
 
         foreach ($structuredValues as $group => $values) {
-            if (is_array($values)) {
+            if (\is_array($values)) {
                 if ($values && $filtered = array_filter($list->getChoicesForValues($values), $this->filter)) {
                     $choices[$group] = $filtered;
                 }

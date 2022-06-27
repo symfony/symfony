@@ -194,7 +194,7 @@ class ChoiceType extends AbstractType
                 if (\count($unknownValues) > 0) {
                     $form = $event->getForm();
 
-                    $clientDataAsString = is_scalar($form->getViewData()) ? (string) $form->getViewData() : (\is_array($form->getViewData()) ? implode('", "', array_keys($unknownValues)) : \gettype($form->getViewData()));
+                    $clientDataAsString = \is_scalar($form->getViewData()) ? (string) $form->getViewData() : (\is_array($form->getViewData()) ? implode('", "', array_keys($unknownValues)) : \gettype($form->getViewData()));
 
                     if (null !== $this->translator) {
                         $message = $this->translator->trans($messageTemplate, ['{{ value }}' => $clientDataAsString], 'validators');

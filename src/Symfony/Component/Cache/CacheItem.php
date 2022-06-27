@@ -182,7 +182,7 @@ final class CacheItem implements ItemInterface
         } else {
             $replace = [];
             foreach ($context as $k => $v) {
-                if (is_scalar($v)) {
+                if (\is_scalar($v)) {
                     $replace['{'.$k.'}'] = $v;
                 }
             }

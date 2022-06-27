@@ -43,7 +43,7 @@ final class SocketStream extends AbstractStream
 
     public function getTimeout(): float
     {
-        return $this->timeout ?? (float) ini_get('default_socket_timeout');
+        return $this->timeout ?? (float) \ini_get('default_socket_timeout');
     }
 
     /**

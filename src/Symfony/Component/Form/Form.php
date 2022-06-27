@@ -356,7 +356,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         // Treat data as strings unless a transformer exists
-        if (is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
+        if (\is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
             $modelData = (string) $modelData;
         }
 
@@ -539,7 +539,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // and radio buttons with empty values.
         if (false === $submittedData) {
             $submittedData = null;
-        } elseif (is_scalar($submittedData)) {
+        } elseif (\is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
         } elseif ($this->config->getRequestHandler()->isFileUpload($submittedData)) {
             if (!$this->config->getOption('allow_file_upload')) {
@@ -1154,7 +1154,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // compound forms is passed to the data mapper and thus should
         // not be converted to a string before.
         if (!($transformers = $this->config->getViewTransformers()) && !$this->config->getCompound()) {
-            return null === $value || is_scalar($value) ? (string) $value : $value;
+            return null === $value || \is_scalar($value) ? (string) $value : $value;
         }
 
         try {

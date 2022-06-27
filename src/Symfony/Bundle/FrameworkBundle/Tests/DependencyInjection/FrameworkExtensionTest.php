@@ -1182,7 +1182,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testFileLinkFormat()
     {
-        if (ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
+        if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
             $this->markTestSkipped('A custom file_link_format is defined.');
         }
 

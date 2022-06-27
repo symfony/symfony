@@ -171,7 +171,7 @@ class FormValidator extends ConstraintValidator
             // child.
             // See also https://github.com/symfony/symfony/issues/4359
             if ($childrenSynchronized) {
-                $clientDataAsString = is_scalar($form->getViewData())
+                $clientDataAsString = \is_scalar($form->getViewData())
                     ? (string) $form->getViewData()
                     : get_debug_type($form->getViewData());
 

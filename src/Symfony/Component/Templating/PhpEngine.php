@@ -303,7 +303,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
         // If we deal with a scalar value, we can cache the result to increase
         // the performance when the same value is escaped multiple times (e.g. loops)
-        if (is_scalar($value)) {
+        if (\is_scalar($value)) {
             if (!isset(self::$escaperCache[$context][$value])) {
                 self::$escaperCache[$context][$value] = $this->getEscaper($context)($value);
             }

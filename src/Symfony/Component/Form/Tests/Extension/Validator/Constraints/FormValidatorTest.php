@@ -309,9 +309,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                    function ($data) { return $data; },
-                    function () { throw new TransformationFailedException(); }
-                ))
+                function ($data) { return $data; },
+                function () { throw new TransformationFailedException(); }
+            ))
             ->getForm();
 
         // Launch transformer

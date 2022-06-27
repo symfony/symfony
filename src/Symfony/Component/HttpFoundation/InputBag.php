@@ -29,13 +29,13 @@ final class InputBag extends ParameterBag
      */
     public function get(string $key, $default = null)
     {
-        if (null !== $default && !is_scalar($default) && !(\is_object($default) && method_exists($default, '__toString'))) {
+        if (null !== $default && !\is_scalar($default) && !(\is_object($default) && method_exists($default, '__toString'))) {
             trigger_deprecation('symfony/http-foundation', '5.1', 'Passing a non-scalar value as 2nd argument to "%s()" is deprecated, pass a scalar or null instead.', __METHOD__);
         }
 
         $value = parent::get($key, $this);
 
-        if (null !== $value && $this !== $value && !is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (null !== $value && $this !== $value && !\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             trigger_deprecation('symfony/http-foundation', '5.1', 'Retrieving a non-string value from "%s()" is deprecated, and will throw a "%s" exception in Symfony 6.0, use "%s::all($key)" instead.', __METHOD__, BadRequestException::class, __CLASS__);
         }
 
@@ -76,7 +76,7 @@ final class InputBag extends ParameterBag
      */
     public function set(string $key, $value)
     {
-        if (null !== $value && !is_scalar($value) && !\is_array($value) && !method_exists($value, '__toString')) {
+        if (null !== $value && !\is_scalar($value) && !\is_array($value) && !method_exists($value, '__toString')) {
             trigger_deprecation('symfony/http-foundation', '5.1', 'Passing "%s" as a 2nd Argument to "%s()" is deprecated, pass a scalar, array, or null instead.', get_debug_type($value), __METHOD__);
         }
 

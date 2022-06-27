@@ -661,7 +661,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testAssertQuietEval()
     {
-        if ('-1' === ini_get('zend.assertions')) {
+        if ('-1' === \ini_get('zend.assertions')) {
             $this->markTestSkipped('zend.assertions is forcibly disabled');
         }
 

@@ -139,7 +139,7 @@ abstract class AbstractCrawlerTest extends TestCase
     public function testAddHtmlContentCharsetGbk()
     {
         $crawler = $this->createCrawler();
-        //gbk encode of <html><p>中文</p></html>
+        // gbk encode of <html><p>中文</p></html>
         $crawler->addHtmlContent($this->getDoctype().base64_decode('PGh0bWw+PHA+1tDOxDwvcD48L2h0bWw+'), 'gbk');
 
         $this->assertEquals('中文', $crawler->filterXPath('//p')->text());

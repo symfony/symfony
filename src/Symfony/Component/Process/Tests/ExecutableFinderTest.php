@@ -37,7 +37,7 @@ class ExecutableFinderTest extends TestCase
 
     public function testFind()
     {
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
@@ -51,7 +51,7 @@ class ExecutableFinderTest extends TestCase
 
     public function testFindWithDefault()
     {
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
@@ -67,7 +67,7 @@ class ExecutableFinderTest extends TestCase
 
     public function testFindWithNullAsDefault()
     {
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
@@ -82,7 +82,7 @@ class ExecutableFinderTest extends TestCase
 
     public function testFindWithExtraDirs()
     {
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
@@ -105,7 +105,7 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot run test on windows');
         }
 
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
@@ -122,7 +122,7 @@ class ExecutableFinderTest extends TestCase
      */
     public function testFindProcessInOpenBasedir()
     {
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -140,7 +140,7 @@ class ExecutableFinderTest extends TestCase
 
     public function testFindBatchExecutableOnWindows()
     {
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
         if ('\\' !== \DIRECTORY_SEPARATOR) {

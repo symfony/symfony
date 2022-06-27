@@ -66,14 +66,14 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
         $phpunitConfigFilename = $phpunitConfigFilename ?: $getPhpUnitConfig('phpunit.xml');
 
         if ($phpunitConfigFilename) {
-            $phpunitConfig = new DomDocument();
+            $phpunitConfig = new DOMDocument();
             $phpunitConfig->load($phpunitConfigFilename);
         } else {
             $phpunitConfig = false;
         }
     }
     if (false !== $phpunitConfig) {
-        $var = new DOMXpath($phpunitConfig);
+        $var = new DOMXPath($phpunitConfig);
         foreach ($var->query('//php/server[@name="'.$name.'"]') as $var) {
             return $var->getAttribute('value');
         }

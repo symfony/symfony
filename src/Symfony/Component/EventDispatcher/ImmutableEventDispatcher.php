@@ -30,11 +30,11 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
      *
      * @param string|null $eventName
      */
-    public function dispatch($event/*, string $eventName = null*/)
+    public function dispatch($event/*, string $eventName = null */)
     {
         $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
 
-        if (is_scalar($event)) {
+        if (\is_scalar($event)) {
             // deprecated
             $swap = $event;
             $event = $eventName ?? new Event();

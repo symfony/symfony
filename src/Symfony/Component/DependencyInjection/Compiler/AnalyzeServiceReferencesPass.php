@@ -120,7 +120,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
                     $value,
                     $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
                     true
-               );
+                );
             }
 
             return $value;

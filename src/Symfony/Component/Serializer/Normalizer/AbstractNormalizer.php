@@ -342,7 +342,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         $tmpGroups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? null;
-        $groups = (\is_array($tmpGroups) || is_scalar($tmpGroups)) ? (array) $tmpGroups : false;
+        $groups = (\is_array($tmpGroups) || \is_scalar($tmpGroups)) ? (array) $tmpGroups : false;
         if (false === $groups && $allowExtraAttributes) {
             return false;
         }

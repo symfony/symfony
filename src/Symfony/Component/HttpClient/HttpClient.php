@@ -30,7 +30,7 @@ final class HttpClient
     public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
     {
         if (\extension_loaded('curl')) {
-            if ('\\' !== \DIRECTORY_SEPARATOR || isset($defaultOptions['cafile']) || isset($defaultOptions['capath']) || ini_get('curl.cainfo') || ini_get('openssl.cafile') || ini_get('openssl.capath')) {
+            if ('\\' !== \DIRECTORY_SEPARATOR || isset($defaultOptions['cafile']) || isset($defaultOptions['capath']) || \ini_get('curl.cainfo') || \ini_get('openssl.cafile') || \ini_get('openssl.capath')) {
                 return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
             }
 

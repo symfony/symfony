@@ -131,7 +131,7 @@ ReflectionParameter {
   typeHint: "Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass"
 }
 EOTXT
-                , $var
+            , $var
         );
     }
 

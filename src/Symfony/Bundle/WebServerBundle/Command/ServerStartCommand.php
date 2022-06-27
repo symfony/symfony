@@ -154,7 +154,7 @@ EOF
                     $message = sprintf('Server listening on all interfaces, port %s -- see http://%s', $config->getPort(), $displayAddress);
                 }
                 $io->success($message);
-                if (ini_get('xdebug.profiler_enable_trigger')) {
+                if (\ini_get('xdebug.profiler_enable_trigger')) {
                     $io->comment('Xdebug profiler trigger enabled.');
                 }
             }

@@ -834,7 +834,7 @@ class PropertyAccessorTest extends TestCase
     {
         $object = new TestSingularAndPluralProps();
 
-        $this->propertyAccessor->isWritable($object, 'email'); //cache access info
+        $this->propertyAccessor->isWritable($object, 'email'); // cache access info
         $this->propertyAccessor->setValue($object, 'email', 'test@email.com');
 
         self::assertEquals('test@email.com', $object->getEmail());
@@ -845,7 +845,7 @@ class PropertyAccessorTest extends TestCase
     {
         $object = new TestSingularAndPluralProps();
 
-        $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
+        $this->propertyAccessor->isWritable($object, 'emails'); // cache access info
         $this->propertyAccessor->setValue($object, 'emails', ['test@email.com']);
 
         $this->assertEquals(['test@email.com'], $object->getEmails());
@@ -856,7 +856,7 @@ class PropertyAccessorTest extends TestCase
     {
         $object = new TestPluralAdderRemoverAndSetter();
 
-        $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
+        $this->propertyAccessor->isWritable($object, 'emails'); // cache access info
         $this->propertyAccessor->setValue($object, 'emails', ['test@email.com']);
 
         $this->assertEquals(['test@email.com'], $object->getEmails());
@@ -866,7 +866,7 @@ class PropertyAccessorTest extends TestCase
     {
         $object = new TestPluralAdderRemoverAndSetterSameSingularAndPlural();
 
-        $this->propertyAccessor->isWritable($object, 'aircraft'); //cache access info
+        $this->propertyAccessor->isWritable($object, 'aircraft'); // cache access info
         $this->propertyAccessor->setValue($object, 'aircraft', ['aeroplane']);
 
         $this->assertEquals(['aeroplane'], $object->getAircraft());

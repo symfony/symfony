@@ -57,6 +57,6 @@ Or find all files in a bundle:
   <info>php %command.full_name% @AcmeDemoBundle</info>
 
 EOF
-            );
+        );
     }
 }

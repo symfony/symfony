@@ -100,7 +100,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         $dom = $this->createDomDocument($context);
 
-        if (null !== $data && !is_scalar($data)) {
+        if (null !== $data && !\is_scalar($data)) {
             $root = $dom->createElement($xmlRootNodeName);
             $dom->appendChild($root);
             $this->buildXml($root, $data, $format, $context, $xmlRootNodeName);
@@ -412,9 +412,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         if (\is_array($data) || ($data instanceof \Traversable && (null === $this->serializer || !$this->serializer->supportsNormalization($data, $format)))) {
             foreach ($data as $key => $data) {
-                //Ah this is the magic @ attribute types.
+                // Ah this is the magic @ attribute types.
                 if (str_starts_with($key, '@') && $this->isElementNameValid($attributeName = substr($key, 1))) {
-                    if (!is_scalar($data)) {
+                    if (!\is_scalar($data)) {
                         $data = $this->serializer->normalize($data, $format, $context);
                     }
                     $parentNode->setAttribute($attributeName, $data);
@@ -454,7 +454,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             }
 
             $data = $this->serializer->normalize($data, $format, $context);
-            if (null !== $data && !is_scalar($data)) {
+            if (null !== $data && !\is_scalar($data)) {
                 return $this->buildXml($parentNode, $data, $format, $context, $xmlRootNodeName);
             }
 
@@ -479,7 +479,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     private function appendNode(\DOMNode $parentNode, $data, string $format, array $context, string $nodeName, string $key = null): bool
     {
-        $dom = $parentNode instanceof \DomDocument ? $parentNode : $parentNode->ownerDocument;
+        $dom = $parentNode instanceof \DOMDocument ? $parentNode : $parentNode->ownerDocument;
         $node = $dom->createElement($nodeName);
         if (null !== $key) {
             $node->setAttribute('key', $key);

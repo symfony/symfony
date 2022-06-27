@@ -214,7 +214,7 @@ class SerializerTest extends TestCase
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
         $data = ['foo' => new \stdClass()];
 
-        //Old buggy behaviour
+        // Old buggy behaviour
         $result = $serializer->serialize($data, 'json');
         $this->assertEquals('{"foo":[]}', $result);
 
@@ -505,14 +505,14 @@ class SerializerTest extends TestCase
     public function testNormalizeTransformEmptyArrayObjectToArray()
     {
         $serializer = new Serializer(
-          [
-              new PropertyNormalizer(),
-              new ObjectNormalizer(),
-              new ArrayDenormalizer(),
-          ],
-          [
-              'json' => new JsonEncoder(),
-          ]
+            [
+                new PropertyNormalizer(),
+                new ObjectNormalizer(),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
         );
 
         $object = [];
@@ -526,14 +526,14 @@ class SerializerTest extends TestCase
     public function testNormalizePreserveEmptyArrayObject()
     {
         $serializer = new Serializer(
-          [
-              new PropertyNormalizer(),
-              new ObjectNormalizer(),
-              new ArrayDenormalizer(),
-          ],
-          [
-              'json' => new JsonEncoder(),
-          ]
+            [
+                new PropertyNormalizer(),
+                new ObjectNormalizer(),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
         );
 
         $object = [];

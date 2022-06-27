@@ -169,7 +169,7 @@ class SimpleFormTest extends TestCase
 
         $config = new FormConfigBuilder('name', null, new EventDispatcher());
         $config->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use (&$passedDataIsNull): void {
-            $passedDataIsNull = $event->getData() === null;
+            $passedDataIsNull = null === $event->getData();
         });
         $form = new Form($config);
 

@@ -471,15 +471,15 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             // group sequence and abort if necessary (G1, G2)
             if ($group instanceof GroupSequence) {
                 $this->stepThroughGroupSequence(
-                     $object,
-                     $object,
-                     $cacheKey,
-                     $metadata,
-                     $propertyPath,
-                     $traversalStrategy,
-                     $group,
-                     $defaultOverridden ? Constraint::DEFAULT_GROUP : null,
-                     $context
+                    $object,
+                    $object,
+                    $cacheKey,
+                    $metadata,
+                    $propertyPath,
+                    $traversalStrategy,
+                    $group,
+                    $defaultOverridden ? Constraint::DEFAULT_GROUP : null,
+                    $context
                 );
 
                 // Skip the group sequence when validating properties, because
@@ -588,15 +588,15 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         foreach ($groups as $key => $group) {
             if ($group instanceof GroupSequence) {
                 $this->stepThroughGroupSequence(
-                     $value,
-                     $object,
-                     $cacheKey,
-                     $metadata,
-                     $propertyPath,
-                     $traversalStrategy,
-                     $group,
-                     null,
-                     $context
+                    $value,
+                    $object,
+                    $cacheKey,
+                    $metadata,
+                    $propertyPath,
+                    $traversalStrategy,
+                    $group,
+                    null,
+                    $context
                 );
 
                 // Skip the group sequence when cascading, as the cascading
@@ -695,26 +695,26 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
             if ($metadata instanceof ClassMetadataInterface) {
                 $this->validateClassNode(
-                     $value,
-                     $cacheKey,
-                     $metadata,
-                     $propertyPath,
-                     $groups,
-                     $cascadedGroups,
-                     $traversalStrategy,
-                     $context
+                    $value,
+                    $cacheKey,
+                    $metadata,
+                    $propertyPath,
+                    $groups,
+                    $cascadedGroups,
+                    $traversalStrategy,
+                    $context
                 );
             } else {
                 $this->validateGenericNode(
-                     $value,
-                     $object,
-                     $cacheKey,
-                     $metadata,
-                     $propertyPath,
-                     $groups,
-                     $cascadedGroups,
-                     $traversalStrategy,
-                     $context
+                    $value,
+                    $object,
+                    $cacheKey,
+                    $metadata,
+                    $propertyPath,
+                    $groups,
+                    $cascadedGroups,
+                    $traversalStrategy,
+                    $context
                 );
             }
 

@@ -110,7 +110,7 @@ class Dumper
                         continue;
                     }
 
-                    if ($inline - 1 <= 0 || null === $value->getValue() || is_scalar($value->getValue())) {
+                    if ($inline - 1 <= 0 || null === $value->getValue() || \is_scalar($value->getValue())) {
                         $output .= ' '.$this->dump($value->getValue(), $inline - 1, 0, $flags)."\n";
                     } else {
                         $output .= "\n";

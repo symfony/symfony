@@ -27,7 +27,7 @@ trait TagTrait
         }
 
         foreach ($attributes as $attribute => $value) {
-            if (!is_scalar($value) && null !== $value) {
+            if (!\is_scalar($value) && null !== $value) {
                 throw new InvalidArgumentException(sprintf('A tag attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $this->id, $name, $attribute));
             }
         }

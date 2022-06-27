@@ -45,7 +45,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     {
         $this->data = [
             'memory' => 0,
-            'memory_limit' => $this->convertToBytes(ini_get('memory_limit')),
+            'memory_limit' => $this->convertToBytes(\ini_get('memory_limit')),
         ];
     }
 

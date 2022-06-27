@@ -1133,7 +1133,7 @@ class ProcessTest extends TestCase
     public function responsesCodeProvider()
     {
         return [
-            //expected output / getter / code to execute
+            // expected output / getter / code to execute
             // [1,'getExitCode','exit(1);'],
             // [true,'isSuccessful','exit();'],
             ['output', 'getOutput', 'echo \'output\';'],

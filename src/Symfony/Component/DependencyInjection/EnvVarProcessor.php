@@ -111,7 +111,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('file' === $prefix || 'require' === $prefix) {
-            if (!is_scalar($file = $getEnv($name))) {
+            if (!\is_scalar($file = $getEnv($name))) {
                 throw new RuntimeException(sprintf('Invalid file name: env var "%s" is non-scalar.', $name));
             }
             if (!file_exists($file)) {
@@ -183,7 +183,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return null;
         }
 
-        if (!is_scalar($env)) {
+        if (!\is_scalar($env)) {
             throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to "%s".', $name, $prefix));
         }
 
@@ -280,7 +280,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                     $value = $this->container->getParameter($match[1]);
                 }
 
-                if (!is_scalar($value)) {
+                if (!\is_scalar($value)) {
                     throw new RuntimeException(sprintf('Parameter "%s" found when resolving env var "%s" must be scalar, "%s" given.', $match[1], $name, \gettype($value)));
                 }
 

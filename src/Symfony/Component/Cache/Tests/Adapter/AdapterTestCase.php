@@ -106,18 +106,19 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $cache = $this->createCachePool(0, __FUNCTION__);
 
-        $v1 = $cache->get('some-key', function($item, &$save){
-           $save = false;
-           return 1;
+        $v1 = $cache->get('some-key', function ($item, &$save) {
+            $save = false;
+
+            return 1;
         });
         $this->assertSame($v1, 1);
 
-        $v2 = $cache->get('some-key', function(){
+        $v2 = $cache->get('some-key', function () {
             return 2;
         });
         $this->assertSame($v2, 2, 'First value was cached and should not have been');
 
-        $v3 = $cache->get('some-key', function(){
+        $v3 = $cache->get('some-key', function () {
             $this->fail('Value should have come from cache');
         });
         $this->assertSame($v3, 2);

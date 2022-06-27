@@ -156,7 +156,7 @@ class TranslatorTest extends TestCase
   </body>
 </html>
 HTML
-);
+        );
 
         $xpath = new \DOMXPath($document);
         $nodeList = $xpath->query($translator->cssToXPath('span:only-of-type'));

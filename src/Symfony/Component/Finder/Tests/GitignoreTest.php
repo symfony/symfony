@@ -349,7 +349,7 @@ class GitignoreTest extends TestCase
                     'logs/',
                     '!logs/important.log',
                 ],
-                ['logs/debug.log'/* must be pruned on traversal 'logs/important.log'*/],
+                ['logs/debug.log'/* must be pruned on traversal 'logs/important.log' */],
                 [],
             ],
             [

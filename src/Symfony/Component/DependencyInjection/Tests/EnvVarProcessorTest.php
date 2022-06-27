@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IntBackedEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 class EnvVarProcessorTest extends TestCase
 {
@@ -462,6 +464,78 @@ class EnvVarProcessorTest extends TestCase
                 'index' => 'password',
             ];
         }));
+    }
+
+    /**
+     * @dataProvider provideGetEnvEnum
+     */
+    public function testGetEnvEnum(\BackedEnum $backedEnum)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('enum', $backedEnum::class.':foo', function (string $name) use ($backedEnum) {
+            $this->assertSame('foo', $name);
+
+            return $backedEnum->value;
+        });
+
+        $this->assertSame($backedEnum, $result);
+    }
+
+    public function provideGetEnvEnum(): iterable
+    {
+        return [
+            [StringBackedEnum::Bar],
+            [IntBackedEnum::Nine],
+        ];
+    }
+
+    public function testGetEnvEnumInvalidEnum()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid env "enum:foo": a "BackedEnum" class-string should be provided.');
+
+        $processor->getEnv('enum', 'foo', function () {
+            $this->fail('Should not get here');
+        });
+    }
+
+    public function testGetEnvEnumInvalidResolvedValue()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Resolved value of "foo" did not result in a string or int value.');
+
+        $processor->getEnv('enum', StringBackedEnum::class.':foo', function () {
+            return null;
+        });
+    }
+
+    public function testGetEnvEnumInvalidArg()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"bogus" is not a "BackedEnum".');
+
+        $processor->getEnv('enum', 'bogus:foo', function () {
+            return '';
+        });
+    }
+
+    public function testGetEnvEnumInvalidBackedValue()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Enum value "bogus" is not backed by "'.StringBackedEnum::class.'".');
+
+        $processor->getEnv('enum', StringBackedEnum::class.':foo', function () {
+            return 'bogus';
+        });
     }
 
     /**

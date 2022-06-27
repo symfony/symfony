@@ -221,4 +221,16 @@ class EnvConfigurator extends ParamConfigurator
 
         return $this;
     }
+
+    /**
+     * @param class-string<\BackedEnum> $backedEnumClassName
+     *
+     * @return $this
+     */
+    public function enum(string $backedEnumClassName): static
+    {
+        array_unshift($this->stack, 'enum', $backedEnumClassName);
+
+        return $this;
+    }
 }

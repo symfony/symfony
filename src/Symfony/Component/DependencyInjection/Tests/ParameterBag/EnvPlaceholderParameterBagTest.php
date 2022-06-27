@@ -14,14 +14,24 @@ namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Loader\Configurator\EnvConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 class EnvPlaceholderParameterBagTest extends TestCase
 {
+    public function testEnumEnvVarProcessorPassesRegex()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $name = \trim((new EnvConfigurator('FOO'))->enum(StringBackedEnum::class), '%');
+        $this->assertIsString($bag->get($name));
+    }
+
     public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
     {
-        $this->expectException(InvalidArgumentException::class);
         $bag = new EnvPlaceholderParameterBag();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid env(%foo%) name: only "word" characters are allowed.');
         $bag->get('env(%foo%)');
     }
 

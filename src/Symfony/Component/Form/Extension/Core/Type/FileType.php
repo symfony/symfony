@@ -175,7 +175,7 @@ class FileType extends AbstractType
      */
     private static function getMaxFilesize(): int|float
     {
-        $iniMax = strtolower(ini_get('upload_max_filesize'));
+        $iniMax = strtolower(\ini_get('upload_max_filesize'));
 
         if ('' === $iniMax) {
             return \PHP_INT_MAX;

@@ -116,7 +116,7 @@ class FileValidator extends ConstraintValidator
             }
         }
 
-        if (!is_scalar($value) && !$value instanceof FileObject && !$value instanceof \Stringable) {
+        if (!\is_scalar($value) && !$value instanceof FileObject && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 

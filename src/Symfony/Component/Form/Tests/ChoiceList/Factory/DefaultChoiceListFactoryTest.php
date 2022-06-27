@@ -285,12 +285,12 @@ class DefaultChoiceListFactoryTest extends TestCase
         $view = $this->factory->createView($this->list);
 
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], []
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], []
         ), $view);
     }
 
@@ -365,12 +365,12 @@ class DefaultChoiceListFactoryTest extends TestCase
         );
 
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], []
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], []
         ), $view);
     }
 
@@ -957,64 +957,64 @@ class DefaultChoiceListFactoryTest extends TestCase
     private function assertFlatView($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], [
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                ]
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], [
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+            ]
         ), $view);
     }
 
     private function assertFlatViewWithCustomIndices($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    'w' => new ChoiceView($this->obj1, '0', 'A'),
-                    'x' => new ChoiceView($this->obj2, '1', 'B'),
-                    'y' => new ChoiceView($this->obj3, '2', 'C'),
-                    'z' => new ChoiceView($this->obj4, '3', 'D'),
-                ], [
-                    'x' => new ChoiceView($this->obj2, '1', 'B'),
-                    'y' => new ChoiceView($this->obj3, '2', 'C'),
-                ]
+            [
+                'w' => new ChoiceView($this->obj1, '0', 'A'),
+                'x' => new ChoiceView($this->obj2, '1', 'B'),
+                'y' => new ChoiceView($this->obj3, '2', 'C'),
+                'z' => new ChoiceView($this->obj4, '3', 'D'),
+            ], [
+                'x' => new ChoiceView($this->obj2, '1', 'B'),
+                'y' => new ChoiceView($this->obj3, '2', 'C'),
+            ]
         ), $view);
     }
 
     private function assertFlatViewWithAttr($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView(
-                        $this->obj2,
-                        '1',
-                        'B',
-                        ['attr1' => 'value1']
-                    ),
-                    2 => new ChoiceView(
-                        $this->obj3,
-                        '2',
-                        'C',
-                        ['attr2' => 'value2']
-                    ),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], [
-                    1 => new ChoiceView(
-                        $this->obj2,
-                        '1',
-                        'B',
-                        ['attr1' => 'value1']
-                    ),
-                    2 => new ChoiceView(
-                        $this->obj3,
-                        '2',
-                        'C',
-                        ['attr2' => 'value2']
-                    ),
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView(
+                    $this->obj2,
+                    '1',
+                    'B',
+                    ['attr1' => 'value1']
+                ),
+                2 => new ChoiceView(
+                    $this->obj3,
+                    '2',
+                    'C',
+                    ['attr2' => 'value2']
+                ),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], [
+                1 => new ChoiceView(
+                    $this->obj2,
+                    '1',
+                    'B',
+                    ['attr1' => 'value1']
+                ),
+                2 => new ChoiceView(
+                    $this->obj3,
+                    '2',
+                    'C',
+                    ['attr2' => 'value2']
+                ),
                 ]
         ), $view);
     }
@@ -1037,30 +1037,30 @@ class DefaultChoiceListFactoryTest extends TestCase
     private function assertGroupedView($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    'Group 1' => new ChoiceGroupView(
-                        'Group 1',
-                        [
-                            0 => new ChoiceView($this->obj1, '0', 'A'),
-                            1 => new ChoiceView($this->obj2, '1', 'B'),
-                        ]
-                    ),
-                    'Group 2' => new ChoiceGroupView(
-                        'Group 2',
-                        [
-                            2 => new ChoiceView($this->obj3, '2', 'C'),
-                            3 => new ChoiceView($this->obj4, '3', 'D'),
-                        ]
-                    ),
-                ], [
-                    'Group 1' => new ChoiceGroupView(
-                        'Group 1',
-                        [1 => new ChoiceView($this->obj2, '1', 'B')]
-                    ),
-                    'Group 2' => new ChoiceGroupView(
-                        'Group 2',
-                        [2 => new ChoiceView($this->obj3, '2', 'C')]
-                    ),
+            [
+                'Group 1' => new ChoiceGroupView(
+                    'Group 1',
+                    [
+                        0 => new ChoiceView($this->obj1, '0', 'A'),
+                        1 => new ChoiceView($this->obj2, '1', 'B'),
+                    ]
+                ),
+                'Group 2' => new ChoiceGroupView(
+                    'Group 2',
+                    [
+                        2 => new ChoiceView($this->obj3, '2', 'C'),
+                        3 => new ChoiceView($this->obj4, '3', 'D'),
+                    ]
+                ),
+            ], [
+                'Group 1' => new ChoiceGroupView(
+                    'Group 1',
+                    [1 => new ChoiceView($this->obj2, '1', 'B')]
+                ),
+                'Group 2' => new ChoiceGroupView(
+                    'Group 2',
+                    [2 => new ChoiceView($this->obj3, '2', 'C')]
+                ),
                 ]
         ), $view);
     }

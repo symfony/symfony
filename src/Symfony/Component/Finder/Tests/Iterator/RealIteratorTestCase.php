@@ -70,9 +70,9 @@ abstract class RealIteratorTestCase extends IteratorTestCase
     public static function tearDownAfterClass(): void
     {
         $paths = new \RecursiveIteratorIterator(
-             new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),
-             \RecursiveIteratorIterator::CHILD_FIRST
-         );
+            new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
 
         foreach ($paths as $path) {
             if ($path->isDir()) {

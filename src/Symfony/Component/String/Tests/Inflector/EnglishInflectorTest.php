@@ -87,7 +87,7 @@ class EnglishInflectorTest extends TestCase
             ['halves', ['half', 'halve', 'halff']],
             ['hats', 'hat'],
             ['heroes', ['hero', 'heroe']],
-            ['hippopotamuses', ['hippopotamus', 'hippopotamuse', 'hippopotamusis']], //hippopotami
+            ['hippopotamuses', ['hippopotamus', 'hippopotamuse', 'hippopotamusis']], // hippopotami
             ['hoaxes', 'hoax'],
             ['hooves', ['hoof', 'hoove', 'hooff']],
             ['houses', ['hous', 'house', 'housis']],
@@ -130,7 +130,7 @@ class EnglishInflectorTest extends TestCase
             ['roses', ['ros', 'rose', 'rosis']],
             ['sandwiches', ['sandwich', 'sandwiche']],
             ['scarves', ['scarf', 'scarve', 'scarff']],
-            ['schemas', 'schema'], //schemata
+            ['schemas', 'schema'], // schemata
             ['seasons', 'season'],
             ['selfies', 'selfie'],
             ['series', 'series'],
@@ -176,7 +176,7 @@ class EnglishInflectorTest extends TestCase
             ['agenda', 'agendas'],
             ['alumnus', 'alumni'],
             ['analysis', 'analyses'],
-            ['antenna', 'antennas'], //antennae
+            ['antenna', 'antennas'], // antennae
             ['appendix', ['appendicies', 'appendixes']],
             ['arch', 'arches'],
             ['atlas', 'atlases'],
@@ -221,7 +221,7 @@ class EnglishInflectorTest extends TestCase
             ['feedback', 'feedback'],
             ['focus', 'focuses'],
             ['foot', 'feet'],
-            ['formula', 'formulas'], //formulae
+            ['formula', 'formulas'], // formulae
             ['conspectus', 'conspectuses'],
             ['fungus', 'fungi'],
             ['garage', 'garages'],
@@ -229,7 +229,7 @@ class EnglishInflectorTest extends TestCase
             ['half', ['halfs', 'halves']],
             ['hat', 'hats'],
             ['hero', 'heroes'],
-            ['hippopotamus', 'hippopotami'], //hippopotamuses
+            ['hippopotamus', 'hippopotami'], // hippopotamuses
             ['hoax', 'hoaxes'],
             ['hoof', ['hoofs', 'hooves']],
             ['house', 'houses'],
@@ -269,7 +269,7 @@ class EnglishInflectorTest extends TestCase
             ['rose', 'roses'],
             ['sandwich', 'sandwiches'],
             ['scarf', ['scarfs', 'scarves']],
-            ['schema', 'schemas'], //schemata
+            ['schema', 'schemas'], // schemata
             ['season', 'seasons'],
             ['selfie', 'selfies'],
             ['series', 'series'],

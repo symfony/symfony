@@ -96,7 +96,7 @@ abstract class AbstractConfigurator
 
         switch (true) {
             case null === $value:
-            case is_scalar($value):
+            case \is_scalar($value):
                 return $value;
 
             case $value instanceof ArgumentInterface:

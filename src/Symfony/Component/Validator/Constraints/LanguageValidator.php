@@ -37,7 +37,7 @@ class LanguageValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !$value instanceof \Stringable) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 

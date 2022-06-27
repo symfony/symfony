@@ -142,10 +142,10 @@ class FailoverTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(3))
             ->method('send')->willReturnOnConsecutiveCalls(
-            null,
-            null,
-            $this->throwException(new TransportException())
-        );
+                null,
+                null,
+                $this->throwException(new TransportException())
+            );
         $t = new FailoverTransport([$t1, $t2], 1);
         $t->send(new RawMessage(''));
         sleep(1);

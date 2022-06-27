@@ -81,7 +81,7 @@ class HtmlDumper extends CliDumper
     {
         AbstractDumper::__construct($output, $charset, $flags);
         $this->dumpId = 'sf-dump-'.mt_rand();
-        $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->displayOptions['fileLinkFormat'] = \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->styles = static::$themes['dark'] ?? self::$themes['dark'];
     }
 
@@ -864,7 +864,7 @@ EOHTML
         }
 
         if ('const' === $style && isset($attr['value'])) {
-            $style .= sprintf(' title="%s"', esc(is_scalar($attr['value']) ? $attr['value'] : json_encode($attr['value'])));
+            $style .= sprintf(' title="%s"', esc(\is_scalar($attr['value']) ? $attr['value'] : json_encode($attr['value'])));
         } elseif ('public' === $style) {
             $style .= sprintf(' title="%s"', empty($attr['dynamic']) ? 'Public property' : 'Runtime added dynamic property');
         } elseif ('str' === $style && 1 < $attr['length']) {

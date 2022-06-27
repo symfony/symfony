@@ -304,7 +304,7 @@ class YamlFileLoader extends FileLoader
                 }
 
                 foreach ($tag as $attribute => $value) {
-                    if (!is_scalar($value) && null !== $value) {
+                    if (!\is_scalar($value) && null !== $value) {
                         throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in "%s". Check your YAML syntax.', $name, $attribute, $file));
                     }
                 }
@@ -612,7 +612,7 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($tag as $attribute => $value) {
-                if (!is_scalar($value) && null !== $value) {
+                if (!\is_scalar($value) && null !== $value) {
                     throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in "%s". Check your YAML syntax.', $id, $name, $attribute, $file));
                 }
             }

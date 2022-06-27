@@ -19,13 +19,13 @@ class FrenchInflectorTest extends TestCase
     public function pluralizeProvider()
     {
         return [
-            //Le pluriel par défaut
+            // Le pluriel par défaut
             ['voiture', 'voitures'],
-            //special characters
+            // special characters
             ['œuf', 'œufs'],
             ['oeuf', 'oeufs'],
 
-            //Les mots finissant par s, x, z sont invariables en nombre
+            // Les mots finissant par s, x, z sont invariables en nombre
             ['bois', 'bois'],
             ['fils', 'fils'],
             ['héros', 'héros'],
@@ -36,21 +36,21 @@ class FrenchInflectorTest extends TestCase
             ['tas', 'tas'],
             ['toux', 'toux'],
 
-            //Les mots finissant en eau prennent tous un x au pluriel
+            // Les mots finissant en eau prennent tous un x au pluriel
             ['eau', 'eaux'],
             ['sceau', 'sceaux'],
 
-            //Les mots finissant en au prennent tous un x au pluriel sauf landau
+            // Les mots finissant en au prennent tous un x au pluriel sauf landau
             ['noyau', 'noyaux'],
             ['landau', 'landaus'],
 
-            //Les mots finissant en eu prennent un x au pluriel sauf pneu, bleu et émeu
+            // Les mots finissant en eu prennent un x au pluriel sauf pneu, bleu et émeu
             ['pneu', 'pneus'],
             ['bleu', 'bleus'],
             ['émeu', 'émeus'],
             ['cheveu', 'cheveux'],
 
-            //Les mots finissant en al se terminent en aux au pluriel
+            // Les mots finissant en al se terminent en aux au pluriel
             ['amiral', 'amiraux'],
             ['animal', 'animaux'],
             ['arsenal', 'arsenaux'],
@@ -74,7 +74,7 @@ class FrenchInflectorTest extends TestCase
             ['radical', 'radicaux'],
             ['terminal', 'terminaux'],
 
-            //sauf bal, carnaval, caracal, chacal, choral, corral, étal, festival, récital et val
+            // sauf bal, carnaval, caracal, chacal, choral, corral, étal, festival, récital et val
             ['bal', 'bals'],
             ['carnaval', 'carnavals'],
             ['caracal', 'caracals'],
@@ -105,7 +105,7 @@ class FrenchInflectorTest extends TestCase
             ['trou', 'trous'],
             ['fou', 'fous'],
 
-            //SAUF Bijou, caillou, chou, genou, hibou, joujou et pou qui prennent un x au pluriel
+            // SAUF Bijou, caillou, chou, genou, hibou, joujou et pou qui prennent un x au pluriel
             ['bijou', 'bijoux'],
             ['caillou', 'cailloux'],
             ['chou', 'choux'],
@@ -114,12 +114,12 @@ class FrenchInflectorTest extends TestCase
             ['joujou', 'joujoux'],
             ['pou', 'poux'],
 
-            //Inflected word
+            // Inflected word
             ['cinquante', 'cinquante'],
             ['soixante', 'soixante'],
             ['mille', 'mille'],
 
-            //Titles
+            // Titles
             ['monsieur', 'messieurs'],
             ['madame', 'mesdames'],
             ['mademoiselle', 'mesdemoiselles'],

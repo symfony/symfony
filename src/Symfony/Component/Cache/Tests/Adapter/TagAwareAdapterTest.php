@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -101,7 +100,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $anotherPool = $this->createCachePool();
 
         $adapter = new FilesystemAdapter();
-        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); //simulate item losing tags pair
+        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); // simulate item losing tags pair
 
         $this->assertFalse($anotherPool->hasItem($itemKey));
     }
@@ -117,7 +116,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $anotherPool = $this->createCachePool();
 
         $adapter = new FilesystemAdapter();
-        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); //simulate item losing tags pair
+        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); // simulate item losing tags pair
 
         $item = $anotherPool->getItem($itemKey);
         $this->assertFalse($item->isHit());
@@ -134,7 +133,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $anotherPool = $this->createCachePool();
 
         $adapter = new FilesystemAdapter();
-        $adapter->deleteItem($itemKey); //simulate losing item but keeping tags
+        $adapter->deleteItem($itemKey); // simulate losing item but keeping tags
 
         $this->assertFalse($anotherPool->hasItem($itemKey));
     }
@@ -169,7 +168,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $anotherPool = $this->createCachePool();
 
         $adapter = new FilesystemAdapter();
-        $adapter->deleteItem($itemKey); //simulate losing item but keeping tags
+        $adapter->deleteItem($itemKey); // simulate losing item but keeping tags
 
         $item = $anotherPool->getItem($itemKey);
         $this->assertFalse($item->isHit());

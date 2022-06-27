@@ -82,7 +82,7 @@ class AuthenticatedVoterTest extends TestCase
 
         $this->assertTrue($voter->supportsType(get_debug_type('foo')));
         $this->assertTrue($voter->supportsType(get_debug_type(null)));
-        $this->assertTrue($voter->supportsType(get_debug_type(new \StdClass())));
+        $this->assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
     }
 
     protected function getToken($authenticated)

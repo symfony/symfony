@@ -28,7 +28,7 @@ final class CodeExtension extends AbstractExtension
 
     public function __construct(string|FileLinkFormatter $fileLinkFormat, string $projectDir, string $charset)
     {
-        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->fileLinkFormat = $fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->projectDir = str_replace('\\', '/', $projectDir).'/';
         $this->charset = $charset;
     }
@@ -204,7 +204,7 @@ final class CodeExtension extends AbstractExtension
         if ($context && str_contains($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
-                if (is_scalar($val)) {
+                if (\is_scalar($val)) {
                     $replacements['{'.$key.'}'] = $val;
                 }
             }

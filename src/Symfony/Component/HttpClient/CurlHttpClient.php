@@ -447,7 +447,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     private function validateExtraCurlOptions(array $options): void
     {
         $curloptsToConfig = [
-            //options used in CurlHttpClient
+            // options used in CurlHttpClient
             \CURLOPT_HTTPAUTH => 'auth_ntlm',
             \CURLOPT_USERPWD => 'auth_ntlm',
             \CURLOPT_RESOLVE => 'resolve',
@@ -475,7 +475,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_CERTINFO => 'capture_peer_cert_chain',
             \CURLOPT_USERAGENT => 'normalized_headers',
             \CURLOPT_REFERER => 'headers',
-            //options used in CurlResponse
+            // options used in CurlResponse
             \CURLOPT_NOPROGRESS => 'on_progress',
             \CURLOPT_PROGRESSFUNCTION => 'on_progress',
         ];

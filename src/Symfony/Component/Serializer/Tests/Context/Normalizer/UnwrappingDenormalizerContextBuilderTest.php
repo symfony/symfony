@@ -12,8 +12,8 @@
 namespace Symfony\Component\Serializer\Tests\Context\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Context\Normalizer\UnwrappingDenormalizerContextBuilder;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 
 /**
@@ -48,7 +48,7 @@ class UnwrappingDenormalizerContextBuilderTest extends TestCase
     public function withersDataProvider(): iterable
     {
         yield 'With values' => [[
-            UnwrappingDenormalizer::UNWRAP_PATH => 'foo'
+            UnwrappingDenormalizer::UNWRAP_PATH => 'foo',
         ]];
 
         yield 'With null values' => [[

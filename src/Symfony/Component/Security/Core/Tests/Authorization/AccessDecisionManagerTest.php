@@ -45,15 +45,15 @@ class AccessDecisionManagerTest extends TestCase
                 $i = 0;
                 foreach ($results as $result) {
                     switch ($i++) {
-                       case 0:
-                           Assert::assertSame(VoterInterface::ACCESS_DENIED, $result);
+                        case 0:
+                            Assert::assertSame(VoterInterface::ACCESS_DENIED, $result);
 
-                           break;
-                       case 1:
-                           Assert::assertSame(VoterInterface::ACCESS_GRANTED, $result);
+                            break;
+                        case 1:
+                            Assert::assertSame(VoterInterface::ACCESS_GRANTED, $result);
 
-                           return true;
-                   }
+                            return true;
+                    }
                 }
 
                 return false;

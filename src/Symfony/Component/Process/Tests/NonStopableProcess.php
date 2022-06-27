@@ -21,7 +21,7 @@ function handleSignal($signal)
     $name = match ($signal) {
         \SIGTERM => 'SIGTERM',
         \SIGINT => 'SIGINT',
-        default => $signal . ' (unknown)',
+        default => $signal.' (unknown)',
     };
 
     echo "signal $name\n";

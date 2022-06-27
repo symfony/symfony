@@ -114,7 +114,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
                     $value,
                     $this->lazy || $targetDefinition?->isLazy(),
                     true
-               );
+                );
             }
 
             return $value;

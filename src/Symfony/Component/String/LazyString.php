@@ -64,7 +64,7 @@ class LazyString implements \Stringable, \JsonSerializable
      */
     final public static function isStringable(mixed $value): bool
     {
-        return \is_string($value) || $value instanceof \Stringable || is_scalar($value);
+        return \is_string($value) || $value instanceof \Stringable || \is_scalar($value);
     }
 
     /**

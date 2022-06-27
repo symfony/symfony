@@ -267,7 +267,7 @@ class Connection
 
     private static function hasCaCertConfigured(array $amqpOptions): bool
     {
-        return (isset($amqpOptions['cacert']) && '' !== $amqpOptions['cacert']) || '' !== ini_get('amqp.cacert');
+        return (isset($amqpOptions['cacert']) && '' !== $amqpOptions['cacert']) || '' !== \ini_get('amqp.cacert');
     }
 
     /**

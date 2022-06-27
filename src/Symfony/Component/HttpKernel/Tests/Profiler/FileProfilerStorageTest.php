@@ -297,7 +297,7 @@ class FileProfilerStorageTest extends TestCase
             $profile->setUrl('http://example.net/');
             $profile->setMethod('GET');
 
-            ///three duplicates
+            // three duplicates
             $this->storage->write($profile);
             $this->storage->write($profile);
             $this->storage->write($profile);

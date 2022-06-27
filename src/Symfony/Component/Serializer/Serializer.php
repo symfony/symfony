@@ -161,7 +161,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $normalizer->normalize($data, $format, $context);
         }
 
-        if (null === $data || is_scalar($data)) {
+        if (null === $data || \is_scalar($data)) {
             return $data;
         }
 

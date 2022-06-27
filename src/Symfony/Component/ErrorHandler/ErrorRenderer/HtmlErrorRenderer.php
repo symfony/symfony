@@ -49,11 +49,11 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     public function __construct(bool|callable $debug = false, string $charset = null, string|FileLinkFormatter $fileLinkFormat = null, string $projectDir = null, string|callable $outputBuffer = '', LoggerInterface $logger = null)
     {
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
-        $this->charset = $charset ?: (ini_get('default_charset') ?: 'UTF-8');
+        $this->charset = $charset ?: (\ini_get('default_charset') ?: 'UTF-8');
         $fileLinkFormat ??= $_SERVER['SYMFONY_IDE'] ?? null;
-        $this->fileLinkFormat = is_string($fileLinkFormat)
+        $this->fileLinkFormat = \is_string($fileLinkFormat)
             ? (ErrorRendererInterface::IDE_LINK_FORMATS[$fileLinkFormat] ?? $fileLinkFormat ?: false)
-            : ($fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: false);
+            : ($fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: false);
         $this->projectDir = $projectDir;
         $this->outputBuffer = \is_string($outputBuffer) ? $outputBuffer : $outputBuffer(...);
         $this->logger = $logger;
@@ -309,7 +309,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         if ($context && str_contains($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
-                if (is_scalar($val)) {
+                if (\is_scalar($val)) {
                     $replacements['{'.$key.'}'] = $val;
                 }
             }

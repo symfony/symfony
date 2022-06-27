@@ -39,7 +39,7 @@ interface DecoderInterface
     /**
      * Checks whether the deserializer can decode from given format.
      *
-     * @param string $format Format name
+     * @param string $format  Format name
      * @param array  $context Options that decoders have access to
      *
      * @return bool

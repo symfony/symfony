@@ -197,7 +197,6 @@ final class PhpStanTypeHelper
                 'array-key' => [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)],
                 default => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveStringName($node->name))],
             };
-
         }
 
         return [];

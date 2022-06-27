@@ -147,7 +147,7 @@ ReflectionParameter {
   typeHint: "Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass"
 }
 EOTXT
-                , $var
+            , $var
         );
     }
 
@@ -333,7 +333,7 @@ EOTXT
 
     public function testReturnType()
     {
-        $f = function ():int {};
+        $f = function (): int {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT

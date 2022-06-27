@@ -160,7 +160,7 @@ class AnnotationLoader implements LoaderInterface
                 try {
                     yield $attribute->newInstance();
                 } catch (\Error $e) {
-                    if ($e::class !== \Error::class) {
+                    if (\Error::class !== $e::class) {
                         throw $e;
                     }
                     $on = match (true) {

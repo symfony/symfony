@@ -182,6 +182,5 @@ class Serializer implements SerializerInterface
             'csv' => 'text/csv',
             default => null,
         };
-
     }
 }

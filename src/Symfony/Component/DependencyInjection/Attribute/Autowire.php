@@ -33,9 +33,9 @@ class Autowire
      * @param string|null $expression Expression (ie 'service("some.service").someMethod()')
      */
     public function __construct(
-        ?string $value = null,
-        ?string $service = null,
-        ?string $expression = null,
+        string $value = null,
+        string $service = null,
+        string $expression = null,
     ) {
         if (!($service xor $expression xor null !== $value)) {
             throw new LogicException('#[Autowire] attribute must declare exactly one of $service, $expression, or $value.');

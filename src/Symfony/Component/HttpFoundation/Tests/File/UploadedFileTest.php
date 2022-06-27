@@ -27,7 +27,7 @@ class UploadedFileTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (!ini_get('file_uploads')) {
+        if (!\ini_get('file_uploads')) {
             $this->markTestSkipped('file_uploads is disabled in php.ini');
         }
     }
@@ -318,7 +318,7 @@ class UploadedFileTest extends TestCase
 
         $this->assertGreaterThan(0, $size);
 
-        if (0 === (int) ini_get('post_max_size') && 0 === (int) ini_get('upload_max_filesize')) {
+        if (0 === (int) \ini_get('post_max_size') && 0 === (int) \ini_get('upload_max_filesize')) {
             $this->assertSame(\PHP_INT_MAX, $size);
         }
     }

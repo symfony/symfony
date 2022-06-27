@@ -7,6 +7,34 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.2 (2022-06-26)
+
+ * bug #46779 [String] Add an invariable word in french (lemonlab)
+ * bug #46765 [Serializer] Fix denormalization union types with constructor (Gwemox)
+ * bug #46769 [HttpKernel] Fix a PHP 8.1 deprecation notice in HttpCache (mpdude)
+ * bug #46760 Fix double authentication via RememberMe resulting in wrong RememberMe cookie being set in client (heiglandreas)
+ * bug #46766 Initially set user null. (mogilvie)
+ * bug #46735 [Messenger] Do not log the message object itself (ajardin)
+ * bug #46748 [Security] Fix legacy impersonation system (dunglas)
+ * bug #46747 Fix global state pollution between tests run with ApplicationTester (Seldaek)
+ * bug #46730 [Intl] Fix the IntlDateFormatter::formatObject signature (damienalexandre)
+ * bug #46668 [FrameworkBundle] Lower JsonSerializableNormalizer priority (aprat84)
+ * bug #46711 [PhpUnitBridge] Exclude from baseline generation deprecations triggered in legacy test (mondrake)
+ * bug #46678 [HttpFoundation] Update "[Session] Overwrite invalid session id" to only validate when files session storage is used (alexpott)
+ * bug #46665 [HttpClient] Fix Copy as curl with base uri (HypeMC)
+ * bug #46670 [HttpClient] Fix json encode flags usage in copy-as-curl generation (welcoMattic)
+ * bug #45861 [Serializer] Try all possible denormalization route with union types when ALLOW_EXTRA_ATTRIBUTES=false (T-bond)
+ * bug #46676 [DoctrineBridge] Extend type guessing on enum fields (Gigino Chianese)
+ * bug #46699 [Cache] Respect $save option in all adapters (jrjohnson)
+ * bug #46697 [HttpKernel] Disable session tracking while collecting profiler data (nicolas-grekas)
+ * bug #46704 Allow passing null in twig_is_selected_choice (raziel057)
+ * bug #46684 [MonologBridge] Fixed support of elasticsearch 7.+ in ElasticsearchLogstashHandler (lyrixx)
+ * bug #46650  [WebProfilerBundle] Bump http-kernel requirement to ^6.1  (ostrolucky)
+ * bug #46646 [Messenger] move resetting services at worker stopped into listener (Thomas Talbot)
+ * bug #46611 [PropertyInfo] Fix multi phpdoc covered promoted properties (ostrolucky, simPod)
+ * bug #46368 [Mailer] Fix for missing sender name in case with usage of the EnvelopeListener (bobahvas)
+ * bug #46603 [Mailer] Fix Error Handling for OhMySMTP Bridge (paul-oms)
+
 * 6.1.1 (2022-06-09)
 
  * bug #46570 [HttpClient][WebProfilerBundle] Catch errors when encoding body for c… (Phillip Look)

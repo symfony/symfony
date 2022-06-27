@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**

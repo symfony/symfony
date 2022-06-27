@@ -70,7 +70,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
 
         if ($this->singleState) {
             $marking = [(string) $marking => 1];
-        } elseif (!is_array($marking)) {
+        } elseif (!\is_array($marking)) {
             throw new LogicException(sprintf('The method "%s::%s()" did not return an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $method));
         }
 

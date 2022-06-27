@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Context\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Context\Normalizer\ConstraintViolationListNormalizerContextBuilder;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 

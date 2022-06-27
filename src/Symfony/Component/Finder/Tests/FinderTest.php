@@ -465,7 +465,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testIgnoreVCSIgnoredWithOpenBasedir()
     {
-        if (ini_get('open_basedir')) {
+        if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
@@ -1380,12 +1380,12 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ],
             ['A/B', 'foobar',
                 [
-                    //dirs
+                    // dirs
                     'A'.\DIRECTORY_SEPARATOR.'B',
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
                     'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B',
                     'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
-                    //files
+                    // files
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'ab.dat',
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat',
                     'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'ab.dat.copy',

@@ -14,7 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\SmsFactor;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Thibault Buathier <thibault.buathier@gmail.com>
@@ -48,7 +47,7 @@ final class SmsFactorTransportFactory extends AbstractTransportFactory
     {
         $pushType = $dsn->getOption('push_type');
 
-        if (!is_string($pushType)) {
+        if (!\is_string($pushType)) {
             return null;
         }
 

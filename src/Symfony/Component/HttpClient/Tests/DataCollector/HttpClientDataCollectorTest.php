@@ -324,7 +324,7 @@ class HttpClientDataCollectorTest extends TestCase
                             'foo' => [
                                 'bar' => 'baz',
                                 'qux' => [1.10, 1.0],
-                                'fred' => ['<foo>',"'bar'",'"baz"','&blong&'],
+                                'fred' => ['<foo>', "'bar'", '"baz"', '&blong&'],
                             ],
                         ],
                     ],

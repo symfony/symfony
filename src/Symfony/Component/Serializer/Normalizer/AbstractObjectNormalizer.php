@@ -200,7 +200,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->applyCallbacks($attributeValue, $object, $attribute, $format, $attributeContext);
 
-            if (null !== $attributeValue && !is_scalar($attributeValue)) {
+            if (null !== $attributeValue && !\is_scalar($attributeValue)) {
                 $stack[$attribute] = $attributeValue;
             }
 

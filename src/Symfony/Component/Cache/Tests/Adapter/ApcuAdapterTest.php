@@ -26,10 +26,10 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
-        if (!\function_exists('apcu_fetch') || !filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (!\function_exists('apcu_fetch') || !filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
             $this->markTestSkipped('APCu extension is required.');
         }
-        if ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+        if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
             if ('testWithCliSapi' !== $this->getName()) {
                 $this->markTestSkipped('apc.enable_cli=1 is required.');
             }

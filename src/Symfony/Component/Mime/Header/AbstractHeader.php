@@ -193,7 +193,7 @@ abstract class AbstractHeader implements HeaderInterface
         $encodingWrapperLength = \strlen('=?'.$charsetDecl.'?'.self::$encoder->getName().'??=');
 
         if ($firstLineOffset >= 75) {
-            //Does this logic need to be here?
+            // Does this logic need to be here?
             $firstLineOffset = 0;
         }
 

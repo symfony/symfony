@@ -104,7 +104,7 @@ abstract class AbstractPipes implements PipesInterface
                 stream_set_blocking($input, 0);
             } elseif (!isset($this->inputBuffer[0])) {
                 if (!\is_string($input)) {
-                    if (!is_scalar($input)) {
+                    if (!\is_scalar($input)) {
                         throw new InvalidArgumentException(sprintf('"%s" yielded a value of type "%s", but only scalars and stream resources are supported.', get_debug_type($this->input), get_debug_type($input)));
                     }
                     $input = (string) $input;

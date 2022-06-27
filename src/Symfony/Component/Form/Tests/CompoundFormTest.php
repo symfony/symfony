@@ -806,9 +806,9 @@ class CompoundFormTest extends TestCase
         $errors = $this->form->getErrors();
 
         $this->assertSame(
-             "ERROR: Error 1\n".
-             "ERROR: Error 2\n",
-             (string) $errors
+            "ERROR: Error 1\n".
+            "ERROR: Error 2\n",
+            (string) $errors
         );
 
         $this->assertSame([$error1, $error2], iterator_to_array($errors));
@@ -826,15 +826,15 @@ class CompoundFormTest extends TestCase
         $errors = $this->form->getErrors(true);
 
         $this->assertSame(
-             "ERROR: Error 1\n".
-             "ERROR: Error 2\n".
-             "ERROR: Nested Error\n",
-             (string) $errors
+            "ERROR: Error 1\n".
+            "ERROR: Error 2\n".
+            "ERROR: Nested Error\n",
+            (string) $errors
         );
 
         $this->assertSame(
-             [$error1, $error2, $nestedError],
-             iterator_to_array($errors)
+            [$error1, $error2, $nestedError],
+            iterator_to_array($errors)
         );
     }
 
@@ -850,11 +850,11 @@ class CompoundFormTest extends TestCase
         $errors = $this->form->getErrors(true, false);
 
         $this->assertSame(
-             "ERROR: Error 1\n".
-             "ERROR: Error 2\n".
-             "Child:\n".
-             "    ERROR: Nested Error\n",
-             (string) $errors
+            "ERROR: Error 1\n".
+            "ERROR: Error 2\n".
+            "Child:\n".
+            "    ERROR: Nested Error\n",
+            (string) $errors
         );
 
         $errorsAsArray = iterator_to_array($errors);

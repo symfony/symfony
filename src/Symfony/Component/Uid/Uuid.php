@@ -72,7 +72,6 @@ class Uuid extends AbstractUid
             UuidV6::TYPE => new UuidV6($uuid),
             default => new self($uuid),
         };
-
     }
 
     final public static function v1(): UuidV1

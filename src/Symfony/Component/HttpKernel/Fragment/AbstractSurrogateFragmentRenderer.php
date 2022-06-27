@@ -91,7 +91,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         foreach ($values as $value) {
             if (\is_array($value)) {
                 return $this->containsNonScalars($value);
-            } elseif (!is_scalar($value) && null !== $value) {
+            } elseif (!\is_scalar($value) && null !== $value) {
                 return true;
             }
         }

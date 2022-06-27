@@ -14,7 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\Engagespot;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Daniel GORGAN <https://github.com/danut007ro>

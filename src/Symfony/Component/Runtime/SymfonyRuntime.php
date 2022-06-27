@@ -182,7 +182,6 @@ class SymfonyRuntime extends GenericRuntime
             Command::class => $this->command ??= new Command(),
             default => parent::getArgument($parameter, $type),
         };
-
     }
 
     protected static function register(GenericRuntime $runtime): GenericRuntime

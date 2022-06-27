@@ -63,7 +63,7 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
             return;
         }
 
-        if (null !== $value && !is_scalar($value) && !$value instanceof \Stringable) {
+        if (null !== $value && !\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 

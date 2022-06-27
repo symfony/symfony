@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Contracts\Cache\ItemInterface;
-
 /**
  * A short namespace-less class to serialize items with metadata.
  *

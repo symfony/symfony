@@ -237,8 +237,7 @@ class CommandTesterTest extends TestCase
         $command->addArgument('foo');
         $command->setCode(function ($input, $output) {
             $output->getErrorOutput()->write('foo');
-        }
-        );
+        });
 
         $tester = new CommandTester($command);
         $tester->execute(

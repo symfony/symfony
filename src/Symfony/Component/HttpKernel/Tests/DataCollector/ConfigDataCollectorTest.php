@@ -39,8 +39,8 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(4 === Kernel::MINOR_VERSION, $c->isSymfonyLts());
         $this->assertNull($c->getToken());
         $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
-        $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());
-        $this->assertSame(\extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN), $c->hasApcu());
+        $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());
+        $this->assertSame(\extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN), $c->hasApcu());
         $this->assertSame(sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
         $this->assertContains($c->getSymfonyState(), ['eol', 'eom', 'dev', 'stable']);
 
@@ -67,8 +67,8 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(4 === Kernel::MINOR_VERSION, $c->isSymfonyLts());
         $this->assertNull($c->getToken());
         $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
-        $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());
-        $this->assertSame(\extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN), $c->hasApcu());
+        $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());
+        $this->assertSame(\extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN), $c->hasApcu());
         $this->assertSame(sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
         $this->assertContains($c->getSymfonyState(), ['eol', 'eom', 'dev', 'stable']);
 

@@ -304,7 +304,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ['test@email>'],
             ['test@email<'],
             ['test@email{'],
-            [str_repeat('x', 254).'@example.com'], //email with warnings
+            [str_repeat('x', 254).'@example.com'], // email with warnings
         ];
     }
 }

@@ -139,7 +139,7 @@ class CompleteCommandTest_HelloCommand extends Command
         $this->setName('hello')
              ->setAliases(['ahoy'])
              ->addArgument('name', InputArgument::REQUIRED)
-         ;
+        ;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

@@ -708,13 +708,13 @@ EOF;
                     if ($v instanceof Reference && $this->container->has($id = (string) $v) && $this->container->findDefinition($id)->isSynthetic()) {
                         continue;
                     }
-                    if (!is_scalar($v) || $this->dumpValue($v) !== $this->dumpValue($v, false)) {
+                    if (!\is_scalar($v) || $this->dumpValue($v) !== $this->dumpValue($v, false)) {
                         return false;
                     }
                 }
             } elseif ($arg instanceof Reference && $this->container->has($id = (string) $arg) && $this->container->findDefinition($id)->isSynthetic()) {
                 continue;
-            } elseif (!is_scalar($arg) || $this->dumpValue($arg) !== $this->dumpValue($arg, false)) {
+            } elseif (!\is_scalar($arg) || $this->dumpValue($arg) !== $this->dumpValue($arg, false)) {
                 return false;
             }
         }

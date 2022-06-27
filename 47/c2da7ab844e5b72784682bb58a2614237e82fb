@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by Toflar at 2022-06-24T09:25:25Z
+
+Failing tests unrelated, imho.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2022-06-24T09:30:34Z
+
+Mentioning some users of `HttpCache` for their OSS projects: @dbu @alexander-schranz @chirimoya @andrerom
+
+---------------------------------------------------------------------------
+
+by andrerom at 2022-06-24T11:07:52Z
+
+I think it makes (a lot of) sense for eZ=>Ibexa as well, but as I'm not there anymore I'll ping @bdunogier who might know who is involved in this now
+
+---------------------------------------------------------------------------
+
+by bdunogier at 2022-06-24T11:09:31Z
+
+Thank you @andrerom ! I'll ping @adamwojs about it :)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-06-24T12:44:45Z
+
+That seems reasonable.
+Regarding our policy, this is a performance improvement that may break someone's code if they need the terminate listeners to be called on cache hit. Your PR should target 6.2.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2022-06-24T15:14:03Z
+
+To me, this is definitely a bug so I don't see why this would not need to be fixed in 4.4.
+However, I understand that we cannot simply change the current behavior in a bugfix release so I've introduced a new configuration option. That allows everybody to fix it whenever they want.
+
+Not sure if I should deprecate this as I did now. And if so, how the heck did we expect deprecations in 4.4? With the annotation still - so I would need to have two test methods and cannot use `if - else` in the same test as I do now?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2022-06-24T15:43:27Z
+
+I agree, that's why the default remains untouched now. However, I think we should be given the ability to fix it easily in all actively supported versions without having to override `terminate()` in every single project.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-06-25T06:44:05Z
+
+Forgot to mention that I think this is indeed a good idea to have that in 6.2.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2022-06-25T12:46:30Z
+
+With the option there is no BC break. It just offers the users the ability to adjust their setups in 4.4 already.
+I'm unsure what I need to do now :)
+If you want this in 6.2 only, would you want me to still keep the option when I rebase or not? :)
+
+---------------------------------------------------------------------------
+
+by Toflar at 2022-06-25T20:32:35Z
+
+My question was just if you want to still keep the option now that we've decided it should be 6.2 but I guess we should do that. PR is updated. Failing tests seem unrelated, the current 6.2 branch does not pass apparently :)

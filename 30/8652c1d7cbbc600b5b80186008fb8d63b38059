@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-03T18:36:56Z
+
+Hey!
+
+I think @ruudk has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-24T13:24:02Z
+
+This might miss some pieces as I think some regexps like this one might prevent using FQCN in `%env()%` parameters:
+https://github.com/symfony/symfony/blob/bbf25d618b32cdd8548083d40542dd20110c7522/src/Symfony/Component/DependencyInjection/ParameterBag/EnvPlaceholderParameterBag.php#L47
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-24T13:32:09Z
+
+Please update the description of the PR to make it clear what you're proposing. I could guess by looking at the tests, but providing a proper PR description is nonetheless a good thing to help ppl understand what this is about, and start the doc later on.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-27T16:11:15Z
+
+A next step could be to find a way to make autowiring do its part, so that the `enum:` prefix wouldn't be needed.
+But that's for another PR :)
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-27T17:41:04Z
+
+Can you please rebase on latest 6.2? We don't merge PRs with merge commits. If you want to squash while doing so, please do (we'll do it when merging otherwise.)
+
+---------------------------------------------------------------------------
+
+by jack-worman at 2022-06-27T18:22:11Z
+
+Rebase and squash is done!

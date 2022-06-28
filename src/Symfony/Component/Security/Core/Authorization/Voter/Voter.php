@@ -43,7 +43,9 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
             }
 
             // as soon as at least one attribute is supported, default is to deny access
-            $vote = $this->deny();
+            if (!$vote->isDenied()) {
+                $vote = $this->deny();
+            }
 
             $decision = $this->voteOnAttribute($attribute, $subject, $token);
             if (\is_bool($decision)) {
@@ -56,7 +58,9 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
                 return $decision;
             }
 
-            $vote->setMessage($vote->getMessage().trim(' '.$decision->getMessage()));
+            if ('' !== $decision->getMessage()) {
+                $vote->addMessage($decision->getMessage());
+            }
         }
 
         return $vote;
@@ -71,26 +75,32 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
 
     /**
      * Creates a granted vote.
+     *
+     * @param string|string[] $messages
      */
-    protected function grant(string $message = '', array $context = []): Vote
+    protected function grant(string|array $messages = [], array $context = []): Vote
     {
-        return Vote::createGranted($message, $context);
+        return Vote::createGranted($messages, $context);
     }
 
     /**
      * Creates an abstained vote.
+     *
+     * @param string|string[] $messages
      */
-    protected function abstain(string $message = '', array $context = []): Vote
+    protected function abstain(string|array $messages = [], array $context = []): Vote
     {
-        return Vote::createAbstain($message, $context);
+        return Vote::createAbstain($messages, $context);
     }
 
     /**
      * Creates a denied vote.
+     *
+     * @param string|string[] $messages
      */
-    protected function deny(string $message = '', array $context = []): Vote
+    protected function deny(string|array $messages = [], array $context = []): Vote
     {
-        return Vote::createDenied($message, $context);
+        return Vote::createDenied($messages, $context);
     }
 
     /**

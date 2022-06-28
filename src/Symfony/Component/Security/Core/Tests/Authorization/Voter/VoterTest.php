@@ -110,8 +110,15 @@ class VoterTest extends TestCase
     public function testVoteMessage()
     {
         $voter = new IntegerVoterVoteTest_Voter();
-        $vote = $voter->getVote($this->token, new \stdClass(), [43, 44]);
+        $vote = $voter->getVote($this->token, new \stdClass(), [43]);
         $this->assertSame('foobar message', $vote->getMessage());
+    }
+
+    public function testVoteMessageMultipleAttributes()
+    {
+        $voter = new IntegerVoterVoteTest_Voter();
+        $vote = $voter->getVote($this->token, new \stdClass(), [43, 44]);
+        $this->assertSame('foobar message, foobar message', $vote->getMessage());
     }
 
     public function testGetVoteWithTypeError()
@@ -183,7 +190,7 @@ class IntegerVoterVoteTest_Voter extends Voter
             return Vote::createGranted();
         }
 
-        return Vote::createDenied(' foobar message ');
+        return Vote::createDenied('foobar message');
     }
 
     protected function supports($attribute, $object): bool

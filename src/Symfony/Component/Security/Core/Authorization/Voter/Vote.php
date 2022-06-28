@@ -11,26 +11,36 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
+
 /**
  * A Vote is returned by a Voter and contains the access (granted, abstain or denied).
- * It can also contain a message explaining the vote decision.
+ * It can also contain one or multiple messages explaining the vote decision.
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
+ * @author Antoine Lamirault <lamiraultantoine@gmail.com>
  */
 final class Vote
 {
-    /** @var int One of the VoterInterface::ACCESS_* constants */
-    private $access;
-    private $message;
-    private $context;
+    /**
+     * @var int One of the VoterInterface::ACCESS_* constants
+     */
+    private int $access;
+
+    /**
+     * @var string[]
+     */
+    private array $messages;
+
+    private array $context;
 
     /**
      * @param int $access One of the VoterInterface::ACCESS_* constants
      */
-    public function __construct(int $access, string $message = '', array $context = [])
+    public function __construct(int $access, string|array $messages = [], array $context = [])
     {
         $this->access = $access;
-        $this->message = $message;
+        $this->setMessages($messages);
         $this->context = $context;
     }
 
@@ -54,34 +64,67 @@ final class Vote
         return VoterInterface::ACCESS_DENIED === $this->access;
     }
 
-    public static function create(int $access, string $message = '', array $context = []): self
+    /**
+     * @param string|string[] $messages
+     */
+    public static function create(int $access, string|array $messages = [], array $context = []): self
     {
-        return new self($access, $message, $context);
+        return new self($access, $messages, $context);
     }
 
-    public static function createGranted(string $message = '', array $context = []): self
+    /**
+     * @param string|string[] $messages
+     */
+    public static function createGranted(string|array $messages = [], array $context = []): self
     {
-        return new self(VoterInterface::ACCESS_GRANTED, $message, $context);
+        return new self(VoterInterface::ACCESS_GRANTED, $messages, $context);
     }
 
-    public static function createAbstain(string $message = '', array $context = []): self
+    /**
+     * @param string|string[] $messages
+     */
+    public static function createAbstain(string|array $messages = [], array $context = []): self
     {
-        return new self(VoterInterface::ACCESS_ABSTAIN, $message, $context);
+        return new self(VoterInterface::ACCESS_ABSTAIN, $messages, $context);
     }
 
-    public static function createDenied(string $message = '', array $context = []): self
+    /**
+     * @param string|string[] $messages
+     */
+    public static function createDenied(string|array $messages = [], array $context = []): self
     {
-        return new self(VoterInterface::ACCESS_DENIED, $message, $context);
+        return new self(VoterInterface::ACCESS_DENIED, $messages, $context);
     }
 
-    public function setMessage(string $message)
+    /**
+     * @param string|string[] $messages
+     */
+    public function setMessages(string|array $messages)
     {
-        $this->message = $message;
+        $this->messages = (array) $messages;
+        foreach ($this->messages as $message) {
+            if (!\is_string($message)) {
+                throw new InvalidArgumentException(sprintf('Message must be string, "%s" given.', get_debug_type($message)));
+            }
+        }
+    }
+
+    public function addMessage(string $message)
+    {
+        $this->messages[] = $message;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMessages(): array
+    {
+        return $this->messages;
     }
 
     public function getMessage(): string
     {
-        return $this->message;
+        return implode(', ', $this->messages);
     }
 
     public function getContext(): array

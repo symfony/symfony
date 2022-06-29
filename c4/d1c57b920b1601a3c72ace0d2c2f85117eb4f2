@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fmata at 2022-06-28T18:59:31Z
+
+@nicolas-grekas what is missing in this PR to be merged & released ? Last 6.1 patch was released 2 days ago :disappointed: We are facing fatal errors in dev environment on each request using HttpClient (we use it to upload PDF files).

@@ -138,6 +138,7 @@ class QuestionHelper extends Helper
         }
 
         if ($output instanceof ConsoleSectionOutput) {
+            $output->addContent(''); // add EOL to the question
             $output->addContent($ret);
         }
 

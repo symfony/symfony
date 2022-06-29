@@ -81,7 +81,11 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
-        $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
+        $query = str_replace('{username}', '{user_identifier}', $this->defaultSearch, $replaceCount);
+        if ($replaceCount > 0) {
+            trigger_deprecation('symfony/ldap', '6.2', 'Using "{username}" parameter in LDAP configuration is deprecated, consider using "{user_identifier}" instead.');
+        }
+        $query = str_replace('{user_identifier}', $identifier, $query);
         $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
 
         $entries = $search->execute();

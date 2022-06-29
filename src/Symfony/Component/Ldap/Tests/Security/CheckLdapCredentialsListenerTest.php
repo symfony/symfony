@@ -127,6 +127,43 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent());
     }
 
+    /**
+     * @group legacy
+     *
+     * @dataProvider queryForDnProvider
+     */
+    public function testLegacyQueryForDn(string $dnString, string $queryString)
+    {
+        $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
+            public function toArray(): array
+            {
+                return $this->getArrayCopy();
+            }
+        };
+
+        $query = $this->createMock(QueryInterface::class);
+        $query->expects($this->once())->method('execute')->willReturn($collection);
+
+        $this->ldap
+            ->method('bind')
+            ->withConsecutive(
+                ['elsa', 'test1234A$']
+            );
+        $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
+        $this->ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
+
+        $listener = $this->createListener();
+        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', $dnString, 'elsa', 'test1234A$', $queryString)));
+    }
+
+    public function queryForDnProvider(): iterable
+    {
+        yield ['{username}', '{username}_test'];
+        yield ['{user_identifier}', '{username}_test'];
+        yield ['{username}', '{user_identifier}_test'];
+        yield ['{user_identifier}', '{user_identifier}_test'];
+    }
+
     public function testQueryForDn()
     {
         $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
@@ -145,16 +182,16 @@ class CheckLdapCredentialsListenerTest extends TestCase
                 ['elsa', 'test1234A$']
             );
         $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
-        $this->ldap->expects($this->once())->method('query')->with('{username}', 'wouter_test')->willReturn($query);
+        $this->ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
 
         $listener = $this->createListener();
-        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{username}', 'elsa', 'test1234A$', '{username}_test')));
+        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test')));
     }
 
     public function testEmptyQueryResultShouldThrowAnException()
     {
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('The presented username is invalid.');
+        $this->expectExceptionMessage('The presented user identifier is invalid.');
 
         $collection = $this->createMock(CollectionInterface::class);
 
@@ -170,7 +207,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->ldap->expects($this->once())->method('query')->willReturn($query);
 
         $listener = $this->createListener();
-        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{username}', 'elsa', 'test1234A$', '{username}_test')));
+        $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test')));
     }
 
     private function createEvent($password = 's3cr3t', $ldapBadge = null)

@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-28T11:57:54Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-28T12:13:59Z
+
+Thank you. Can you please add a test that reproduces your bug?
+
+---------------------------------------------------------------------------
+
+by WissameMekhilef at 2022-06-28T13:03:52Z
+
+> Thank you. Can you please add a test that reproduces your bug?
+
+Absolutely, I have updated the `MultiplierRetryStrategyTest` and added a few scenarios where the multiplier is a float.
+
+Let me know if you need anything else
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-28T13:23:25Z
+
+Thank you. However, the tests you've added pass even without your change.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-28T13:30:45Z
+
+One more thing, is Symfony 4.4 also affected by this bug? If so, we need to rebase your PR to the 4.4 branch.
+
+---------------------------------------------------------------------------
+
+by WissameMekhilef at 2022-06-28T14:00:47Z
+
+> Thank you. However, the tests you've added pass even without your change.
+
+That's not quite right, there is an issue with how the tests are currently set up. The testGetWaitTime function in the MultiplierRetryStrategy is wrong, the test function has this profile
+```
+public function testGetWaitTime(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
+```
+
+When the constructor of the MultiplierRetryStrategy has this profile
+
+```
+public function __construct(int $maxRetries = 3, int $delayMilliseconds = 1000, float $multiplier = 1, int $maxDelayMilliseconds = 0)
+```
+
+If I just add the scenario where the multiplier is a float and I don't change anything else, the test is failing.
+```
+Symfony\Component\Messenger\Tests\Retry\MultiplierRetryStrategyTest::testGetWaitTime with data set #15 (1000, 1.0, 5000, 0, 1000)
+TypeError: Symfony\Component\Messenger\Tests\Retry\MultiplierRetryStrategyTest::testGetWaitTime(): Argument #2 ($multiplier) must be of type int, float given, called in /home/wissamemkh/Documents/Projects/symfony/.phpunit/phpunit-9.5-0/src/Framework/TestCase.php on line 1546
+```
+
+Now if apply the change in the `\Symfony\Component\Messenger\Retry\MultiplierRetryStrategy::getWaitingTime` function and I add the scenario where the multiplier is a float the test is still failing because of the profile of the test function. The test is failing for the same reason as I mentioned above.
+
+So I need to change the profile of the test to reflect the actual parameters that are allowed by the `MultiplierRetryStrategy` constructor.
+
+I think the issue needed 2 fix
+
+1. Cast the return value of the `\Symfony\Component\Messenger\Retry\MultiplierRetryStrategy::getWaitingTime` function to an int
+2. Update the profile of the `\Symfony\Component\Messenger\Tests\Retry\MultiplierRetryStrategyTest::testGetWaitTime` function to reflect the parameters allowed by the constructor of the strategy
+
+Let me know if you still think that I missed something, I'll be happy to take another look.
+
+Thanks! :)
+
+---------------------------------------------------------------------------
+
+by WissameMekhilef at 2022-06-28T14:03:17Z
+
+> One more thing, is Symfony 4.4 also affected by this bug? If so, we need to rebase your PR to the 4.4 branch.
+
+I'll wait for you to confirm the comment is ok, then I'll rebase on Symfony 4.4 and change the base for the PR
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-28T14:34:46Z
+
+Here's what I did: I checked out your branch and reverted your change to `MultiplierRetryStrategy` only. I ran the tests and they all pass, even your new ones. That tells me that your new tests don't reproduce the bug.
+
+![Bildschirmfoto 2022-06-28 um 16 31 41](https://user-images.githubusercontent.com/1506493/176206103-7ea55f22-7684-4aca-8258-43a6e0d477ac.png)
+
+---------------------------------------------------------------------------
+
+by WissameMekhilef at 2022-06-28T15:21:55Z
+
+Mmh that's interesting, I did some more digging and I found this PR that was accepted in April this year -- https://github.com/symfony/symfony/pull/45925/files#
+
+Not sure how to reproduce this bug then
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-06-29T06:16:53Z
+
+> Mmh that's interesting, I did some more digging and I found this PR that was accepted in April this year -- https://github.com/symfony/symfony/pull/45925/files#
+>
+> Not sure how to reproduce this bug then
+
+In this case, a deprecation was here before fix
+
+```
+Remaining self deprecation notices (1)
+
+  1x: Implicit conversion from float 29.999989986419678 to int loses precision
+    1x in SlidingWindowTest::testGetExpirationTime from Symfony\Component\RateLimiter\Tests\Policy
+```
+
+In our case no deprecation is triggered. And `testGetWaitTime` is KO only with `strict_types=1`. Not know if it's currently testable.
+
+I confirm bug in 4.4

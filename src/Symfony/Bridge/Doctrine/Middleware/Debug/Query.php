@@ -52,7 +52,7 @@ class Query
         $this->types[$idx] = $type;
     }
 
-    public function setValue(string|int $param, null|string|int|float|bool $value, int $type): void
+    public function setValue(string|int $param, mixed $value, int $type): void
     {
         // Numeric indexes start at 0 in profiler
         $idx = \is_int($param) ? $param - 1 : $param;

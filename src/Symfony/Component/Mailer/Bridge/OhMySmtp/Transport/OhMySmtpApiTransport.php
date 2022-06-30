@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\TagHeader;
@@ -24,12 +25,12 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-trigger_deprecation('symfony/oh-my-smtp-mailer', '6.2', 'The "%s" class is deprecated, use "%s" instead.', OhMySmtpApiTransport::class, 'Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceApiTransport');
+trigger_deprecation('symfony/oh-my-smtp-mailer', '6.2', 'The "%s" class is deprecated, use "%s" instead.', OhMySmtpApiTransport::class, MailPaceApiTransport::class);
 
 /**
  * @author Paul Oms <support@ohmysmtp.com>
  *
- * @deprecated since Symfony 6.2, use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceApiTransport instead
+ * @deprecated since Symfony 6.2, use MailPaceApiTransport instead
  */
 final class OhMySmtpApiTransport extends AbstractApiTransport
 {

@@ -86,7 +86,7 @@ class MultiplierRetryStrategyTest extends TestCase
 
         // Float delay
         yield [1000, 1.5555, 5000, 0, 1000];
-        yield [1000, 1.5555, 5000, 1, 1555];
-        yield [1000, 1.5555, 5000, 2, 2419];
+        yield [1000, 1.5555, 5000, 1, 1556];
+        yield [1000, 1.5555, 5000, 2, 2420];
     }
 }

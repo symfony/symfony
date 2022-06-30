@@ -29,7 +29,7 @@ final class NativeTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'native', $this->getSupportedSchemes());
         }
 
-        if ($sendMailPath = \ini_get('sendmail_path')) {
+        if ($sendMailPath = ini_get('sendmail_path')) {
             return new SendmailTransport($sendMailPath, $this->dispatcher, $this->logger);
         }
 
@@ -39,8 +39,8 @@ final class NativeTransportFactory extends AbstractTransportFactory
 
         // Only for windows hosts; at this point non-windows
         // host have already thrown an exception or returned a transport
-        $host = \ini_get('SMTP');
-        $port = (int) \ini_get('smtp_port');
+        $host = ini_get('SMTP');
+        $port = (int) ini_get('smtp_port');
 
         if (!$host || !$port) {
             throw new TransportException('smtp or smtp_port is not configured in php.ini.');

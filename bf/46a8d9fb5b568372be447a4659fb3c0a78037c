@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by BrokenSourceCode at 2022-06-27T16:47:30Z
+
+@xabbuh Does the `PHPUnit / Tests (8.2) (pull_request)` check failure depend on my code? I don't think so.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-28T12:16:56Z
+
+Hey!
+
+I think @BradJonesLLC has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by BrokenSourceCode at 2022-06-29T11:26:28Z
+
+> I think this change is too strict and breaks legit use cases (typically when migrating from one set of settings to another). The only required change is adding `,256` to me.
+
+Hi @nicolas-grekas,
+
+If we only change the regular expression from `{22,}` to `{22,256}`, there will be, in my opinion, some problems depending of the OS.
+
+On my windows, I can't set `session.sid_length` to be more than `250`, otherwise a warning will be emitted between `251` and `256`. Probably because the filenames can not be longer than `255` bytes on Windows or Linux OS, and because of the session files prefix length: `sess_` contains `5` bytes and `255 - 5 = 250`.
+
+![screenshot](https://user-images.githubusercontent.com/59090546/176434754-2d489f43-6f26-43ba-ba51-74d024b8e351.png)
+
+For example, in my case, the regular expression would have to check `{22,250}` and not `{22,256}` to avoid the warning emitted by PHP. So, that's why I think we should create the regular expression based on the PHP ini configuration provided by the developer.
+
+Or maybe we could just change the regular expression from `{22,}` to `{22,250}` instead of `{22,256}` as you suggest.
+
+What do you think? Do you have another solution to avoid the problem on Windows and Linux OS?
+
+> I think this change is too strict and breaks legit use cases (typically when migrating from one set of settings to another).
+
+The code I suggest in this PR is a workaround that I use on my websites, and I have never encountered one problem so far.
+
+---------------------------------------------------------------------------
+
+by BrokenSourceCode at 2022-06-30T10:50:37Z
+
+> I think this change is too strict and breaks legit use cases (typically when migrating from one set of settings to another). The only required change is adding `,256` to me.
+
+@nicolas-grekas  I pushed a commit, changing only the regular expression, as you requested. But I set the max limit to 250 (see the comment above).

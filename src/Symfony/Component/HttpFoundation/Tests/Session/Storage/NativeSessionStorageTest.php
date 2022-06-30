@@ -295,7 +295,7 @@ class NativeSessionStorageTest extends TestCase
         $started = $storage->start();
 
         $this->assertTrue($started);
-        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,}$/', session_id());
+        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,250}$/', session_id());
         $storage->save();
 
         $_COOKIE[session_name()] = '&~[';
@@ -304,7 +304,7 @@ class NativeSessionStorageTest extends TestCase
         $started = $storage->start();
 
         $this->assertTrue($started);
-        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,}$/', session_id());
+        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,250}$/', session_id());
         $storage->save();
 
         $_COOKIE[session_name()] = '&~[';

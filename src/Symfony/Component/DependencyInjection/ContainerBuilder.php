@@ -1549,7 +1549,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * {@inheritdoc}
      */
-    protected function getEnv(string $name): mixed
+    public function getEnv(string $name): mixed
     {
         $value = parent::getEnv($name);
         $bag = $this->getParameterBag();
@@ -1612,7 +1612,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (!class_exists(Expression::class)) {
                 throw new LogicException('Expressions cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".');
             }
-            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders, null, $this->getEnv(...));
+            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders, null);
         }
 
         return $this->expressionLanguage;

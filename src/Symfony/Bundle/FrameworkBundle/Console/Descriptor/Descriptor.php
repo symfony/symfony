@@ -329,8 +329,6 @@ abstract class Descriptor implements DescriptorInterface
         };
         $getDefaultParameter = $getDefaultParameter->bindTo($bag, \get_class($bag));
 
-        $getEnvReflection = new \ReflectionMethod($container, 'getEnv');
-
         $envs = [];
 
         foreach ($envVars as $env) {
@@ -343,7 +341,7 @@ abstract class Descriptor implements DescriptorInterface
             if (false === ($runtimeValue = $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name))) {
                 $runtimeValue = null;
             }
-            $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
+            $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $container->getEnv($env) : null;
             $envs["$name$processor"] = [
                 'name' => $name,
                 'processor' => $processor,

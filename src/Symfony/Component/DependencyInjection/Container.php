@@ -334,7 +334,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @throws EnvNotFoundException When the environment variable is not found and has no default value
      */
-    protected function getEnv(string $name): mixed
+    public function getEnv(string $name): mixed
     {
         if (isset($this->resolving[$envName = "env($name)"])) {
             throw new ParameterCircularReferenceException(array_keys($this->resolving));

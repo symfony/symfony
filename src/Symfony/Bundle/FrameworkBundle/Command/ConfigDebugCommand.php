@@ -19,6 +19,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
@@ -46,6 +47,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
+                new InputOption('resolve-env', null, InputOption::VALUE_NONE, 'Display resolved environment variable values instead of placeholders'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the current configuration for an
@@ -94,7 +96,7 @@ EOF
         $extensionAlias = $extension->getAlias();
         $container = $this->compileContainer();
 
-        $config = $this->getConfig($extension, $container);
+        $config = $this->getConfig($extension, $container, $input->getOption('resolve-env'));
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
@@ -210,12 +212,12 @@ EOF
         return $availableBundles;
     }
 
-    private function getConfig(ExtensionInterface $extension, ContainerBuilder $container)
+    private function getConfig(ExtensionInterface $extension, ContainerBuilder $container, bool $resolveEnvs = false)
     {
         return $container->resolveEnvPlaceholders(
             $container->getParameterBag()->resolveValue(
                 $this->getConfigForExtension($extension, $container)
-            )
+            ), $resolveEnvs ?: null
         );
     }
 

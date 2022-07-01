@@ -60,6 +60,18 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('secret: test', $tester->getDisplay());
     }
 
+    public function testParametersValuesAreFullyResolved()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'framework', '--resolve-env' => true]);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('locale: en', $tester->getDisplay());
+        $this->assertStringContainsString('secret: test', $tester->getDisplay());
+        $this->assertStringContainsString('cookie_httponly: true', $tester->getDisplay());
+        $this->assertStringContainsString('ide: null', $tester->getDisplay());
+    }
+
     public function testDefaultParameterValueIsResolvedIfConfigIsExisting()
     {
         $tester = $this->createCommandTester();

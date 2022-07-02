@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-30T15:28:50Z
+
+Can you please add a test case that would also fail on 6.1?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-30T15:30:02Z
+
+OK, I see #46810
+Please borrow the test case from there to this PR after #46810 is finished (and we'll then close it)
+
+---------------------------------------------------------------------------
+
+by l-vo at 2022-06-30T19:37:54Z
+
+@nicolas-grekas tests added :)

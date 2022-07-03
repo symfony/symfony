@@ -390,6 +390,18 @@
                 <source>This value should be a valid expression.</source>
                 <target>Balio hori baliozko adierazpena izan beharko litzateke.</target>
             </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Balio hori ez da baliozko CSS kolorea.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Balio hori ez da baliozko CIDR notazioa.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Maskararen balioa {{ min }} eta {{ max }} artekoa izan beharko litzateke.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -18,36 +18,34 @@ namespace Symfony\Component\Form\Util;
  *
  * @internal
  *
- * @template-covariant TKey of array-key
  * @template-covariant TValue
  *
- * @implements \Iterator<TKey, TValue>
+ * @implements \Iterator<string, TValue>
  */
 class OrderedHashMapIterator implements \Iterator
 {
-    /** @var array<TKey, TValue> */
+    /** @var TValue[] */
     private array $elements;
-    /** @var list<TKey> */
+    /** @var list<string> */
     private array $orderedKeys;
     private int $cursor = 0;
     private int $cursorId;
     /** @var array<int, int> */
     private array $managedCursors;
-    /** @var TKey|null */
-    private string|int|null $key = null;
+    private string|null $key = null;
     /** @var TValue|null */
     private mixed $current = null;
 
     /**
-     * @param array<TKey, TValue> $elements       The elements of the map, indexed by their
-     *                                            keys
-     * @param list<TKey>          $orderedKeys    The keys of the map in the order in which
-     *                                            they should be iterated
-     * @param array<int, int>     $managedCursors An array from which to reference the
-     *                                            iterator's cursor as long as it is alive.
-     *                                            This array is managed by the corresponding
-     *                                            {@link OrderedHashMap} instance to support
-     *                                            recognizing the deletion of elements.
+     * @param TValue[]        $elements       The elements of the map, indexed by their
+     *                                        keys
+     * @param list<string>    $orderedKeys    The keys of the map in the order in which
+     *                                        they should be iterated
+     * @param array<int, int> $managedCursors An array from which to reference the
+     *                                        iterator's cursor as long as it is alive.
+     *                                        This array is managed by the corresponding
+     *                                        {@link OrderedHashMap} instance to support
+     *                                        recognizing the deletion of elements.
      */
     public function __construct(array &$elements, array &$orderedKeys, array &$managedCursors)
     {
@@ -113,9 +111,7 @@ class OrderedHashMapIterator implements \Iterator
             return null;
         }
 
-        $array = [$this->key => null];
-
-        return key($array);
+        return $this->key;
     }
 
     /**

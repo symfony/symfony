@@ -77,7 +77,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * A map of FormInterface instances.
      *
-     * @var OrderedHashMap<string, FormInterface>
+     * @var OrderedHashMap<FormInterface>
      */
     private OrderedHashMap $children;
 

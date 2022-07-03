@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by DanielBadura at 2022-06-15T12:39:28Z
+
+Failing tests seems unrelated.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-06-15T17:07:42Z
+
+Thanks for submitting this ❤️
+
+I think it should target 6.2 however, as a new feature rather than a bug fix
+
+---------------------------------------------------------------------------
+
+by DanielBadura at 2022-06-16T14:23:51Z
+
+Well i guess its debatable if its a bug or feature. Since the Attribute supports to be set on properties and 5.4 is supporting php 8.0 you could say it's a bug. But I'm fine with saying this is a new feature 😅

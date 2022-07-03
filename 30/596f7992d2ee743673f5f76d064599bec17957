@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-01T09:58:40Z
+
+We'd rather patch `OrderedHashMap` and `OrderedHashMapIterator` to make *them* cast to string. I'd also remove the template on `TKey` and declare it to be always `string`.

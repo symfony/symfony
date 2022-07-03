@@ -100,6 +100,14 @@ abstract class FileLoader extends BaseFileLoader
         if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++$/', $namespace)) {
             throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: "%s".', $namespace));
         }
+        // This can happen with YAML files
+        if (\is_array($exclude) && \in_array(null, $exclude, true)) {
+            throw new InvalidArgumentException('The exclude list must not contain a "null" value.');
+        }
+        // This can happen with XML files
+        if (\is_array($exclude) && \in_array('', $exclude, true)) {
+            throw new InvalidArgumentException('The exclude list must not contain an empty value.');
+        }
 
         $source = \func_num_args() > 4 ? func_get_arg(4) : null;
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();

@@ -744,11 +744,14 @@ class XmlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
-    public function testPrototypeExcludeWithArray()
+    /**
+     * @dataProvider prototypeExcludeWithArrayDataProvider
+     */
+    public function testPrototypeExcludeWithArray(string $fileName)
     {
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services_prototype_array.xml');
+        $loader->load($fileName);
 
         $ids = array_keys(array_filter($container->getDefinitions(), fn ($def) => !$def->hasTag('container.excluded')));
         sort($ids);
@@ -757,7 +760,7 @@ class XmlFileLoaderTest extends TestCase
         $resources = array_map('strval', $container->getResources());
 
         $fixturesDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR;
-        $this->assertContains((string) new FileResource($fixturesDir.'xml'.\DIRECTORY_SEPARATOR.'services_prototype_array.xml'), $resources);
+        $this->assertContains((string) new FileResource($fixturesDir.'xml'.\DIRECTORY_SEPARATOR.$fileName), $resources);
 
         $prototypeRealPath = realpath(__DIR__.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Prototype');
         $globResource = new GlobResource(
@@ -774,6 +777,25 @@ class XmlFileLoaderTest extends TestCase
         $this->assertContains((string) $globResource, $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
+    }
+
+    public function prototypeExcludeWithArrayDataProvider(): iterable
+    {
+        return [
+            ['services_prototype_array.xml'],
+            // Same config than above but “<exclude> </exclude>” has been added
+            ['services_prototype_array_with_space_node.xml'],
+        ];
+    }
+
+    public function testPrototypeExcludeWithArrayWithEmptyNode()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The exclude list must not contain an empty value.');
+
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_prototype_array_with_empty_node.xml');
     }
 
     public function testAliasDefinitionContainsUnsupportedElements()

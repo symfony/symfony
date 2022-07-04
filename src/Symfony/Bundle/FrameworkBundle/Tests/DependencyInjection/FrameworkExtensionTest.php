@@ -2103,6 +2103,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
     }
 
+    public function testHtmlSanitizerDefaultNullAllowedLinkMediaHost()
+    {
+        $container = $this->createContainerFromFile('html_sanitizer_default_allowed_link_and_media_hosts');
+
+        $calls = $container->getDefinition('html_sanitizer.config.custom_default')->getMethodCalls();
+        $this->assertContains(['allowLinkHosts', [null], true], $calls);
+        $this->assertContains(['allowMediaHosts', [null], true], $calls);
+    }
+
     public function testHtmlSanitizerDefaultConfig()
     {
         $container = $this->createContainerFromFile('html_sanitizer_default_config');

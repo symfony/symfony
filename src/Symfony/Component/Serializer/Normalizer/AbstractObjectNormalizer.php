@@ -228,8 +228,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Computes the normalization context merged with current one. Metadata always wins over global context, as more specific.
+     *
+     * @internal
      */
-    private function getAttributeNormalizationContext(object $object, string $attribute, array $context): array
+    protected function getAttributeNormalizationContext(object $object, string $attribute, array $context): array
     {
         if (null === $metadata = $this->getAttributeMetadata($object, $attribute)) {
             return $context;
@@ -240,8 +242,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Computes the denormalization context merged with current one. Metadata always wins over global context, as more specific.
+     *
+     * @internal
      */
-    private function getAttributeDenormalizationContext(string $class, string $attribute, array $context): array
+    protected function getAttributeDenormalizationContext(string $class, string $attribute, array $context): array
     {
         $context['deserialization_path'] = ($context['deserialization_path'] ?? false) ? $context['deserialization_path'].'.'.$attribute : $attribute;
 

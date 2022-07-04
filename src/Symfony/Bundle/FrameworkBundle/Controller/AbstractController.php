@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -173,10 +174,16 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function addFlash(string $type, mixed $message): void
     {
         try {
-            $this->container->get('request_stack')->getSession()->getFlashBag()->add($type, $message);
+            $session = $this->container->get('request_stack')->getSession();
         } catch (SessionNotFoundException $e) {
             throw new \LogicException('You cannot use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".', 0, $e);
         }
+
+        if (!$session instanceof FlashBagAwareSessionInterface) {
+            trigger_deprecation('symfony/framework-bundle', '6.2', 'Calling "addFlash()" method when the session does not implement %s is deprecated.', FlashBagAwareSessionInterface::class);
+        }
+
+        $session->getFlashBag()->add($type, $message);
     }
 
     /**

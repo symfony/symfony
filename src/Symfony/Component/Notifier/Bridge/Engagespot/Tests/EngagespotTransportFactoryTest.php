@@ -13,17 +13,13 @@ namespace Symfony\Component\Notifier\Bridge\Engagespot\Tests;
 
 use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Daniel GORGAN <https://github.com/danut007ro>
  */
 final class EngagespotTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return EngagespotTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): EngagespotTransportFactory
     {
         return new EngagespotTransportFactory();
     }

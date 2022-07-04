@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add support for constructor promoted properties to `Context` attribute
+
 6.1
 ---
 

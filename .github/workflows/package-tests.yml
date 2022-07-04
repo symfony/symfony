@@ -5,6 +5,9 @@ on:
     paths:
       - src/**
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: Verify

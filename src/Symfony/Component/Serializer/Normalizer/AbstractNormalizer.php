@@ -517,7 +517,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         return array_merge($context, $metadata->getDenormalizationContextForGroups($this->getGroups($context)));
     }
 
-    private function getAttributeMetadata($objectOrClass, string $attribute): ?AttributeMetadataInterface
+    /**
+     * @internal
+     */
+    protected function getAttributeMetadata(object|string $objectOrClass, string $attribute): ?AttributeMetadataInterface
     {
         if (!$this->classMetadataFactory) {
             return null;

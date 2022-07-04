@@ -168,6 +168,7 @@ use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransport;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
+use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
@@ -2567,6 +2568,7 @@ class FrameworkExtension extends Extension
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             VonageTransportFactory::class => 'notifier.transport_factory.vonage',
             YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
+            ZendeskTransportFactory::class => 'notifier.transport_factory.zendesk',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
         ];
 

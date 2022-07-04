@@ -6,12 +6,6 @@ CHANGELOG
 
 * Deprecate the `Security` class, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
 
-6.1
----
-
-* Add `Security::login()` to login programmatically
-
-
 6.0
 ---
 

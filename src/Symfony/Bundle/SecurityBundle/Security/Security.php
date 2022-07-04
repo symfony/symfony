@@ -22,11 +22,15 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 /**
  * Helper class for commonly-needed security tasks.
  *
+ * @author Ryan Weaver <ryan@symfonycasts.com>
+ * @author Robin Chalas <robin.chalas@gmail.com>
+ * @author Arnaud Frézet <arnaud@larriereguichet.fr>
+ *
  * @final
  */
 class Security extends LegacySecurity
 {
-    public function __construct(private ContainerInterface $container, private array $authenticators = [])
+    public function __construct(private readonly ContainerInterface $container, private readonly array $authenticators = [])
     {
         parent::__construct($container, false);
     }
@@ -36,14 +40,21 @@ class Security extends LegacySecurity
         return $this->container->get('security.firewall.map')->getFirewallConfig($request);
     }
 
+    /**
+     * @param UserInterface $user              The user to authenticate
+     * @param string|null   $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
+     * @param string|null   $firewallName      The firewall name - required only if multiple firewalls are configured
+     */
     public function login(UserInterface $user, string $authenticatorName = null, string $firewallName = null): void
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
+        $firewallName ??= $this->getFirewallConfig($request)?->getName();
 
-        if (!class_exists(AuthenticatorInterface::class)) {
-            throw new \LogicException('Security HTTP is missing. Try running "composer require symfony/security-http".');
+        if (!$firewallName) {
+            throw new LogicException('Unable to login as the current route is not covered by any firewall.');
         }
-        $authenticator = $this->getAuthenticator($authenticatorName, $firewallName ?? $this->getFirewallName($request));
+
+        $authenticator = $this->getAuthenticator($authenticatorName, $firewallName);
 
         $this->container->get('security.user_checker')->checkPreAuth($user);
         $this->container->get('security.user_authenticator')->authenticateUser($user, $authenticator, $request);
@@ -54,6 +65,7 @@ class Security extends LegacySecurity
         if (!\array_key_exists($firewallName, $this->authenticators)) {
             throw new LogicException(sprintf('No authenticators found for firewall "%s".', $firewallName));
         }
+
         /** @var ServiceProviderInterface $firewallAuthenticatorLocator */
         $firewallAuthenticatorLocator = $this->authenticators[$firewallName];
 
@@ -61,32 +73,25 @@ class Security extends LegacySecurity
             $authenticatorIds = array_keys($firewallAuthenticatorLocator->getProvidedServices());
 
             if (!$authenticatorIds) {
-                throw new LogicException('No authenticator was found for the firewall "%s".');
+                throw new LogicException(sprintf('No authenticator was found for the firewall "%s".', $firewallName));
             }
-
             if (1 < \count($authenticatorIds)) {
                 throw new LogicException(sprintf('Too much authenticators were found for the current firewall "%s". You must provide an instance of "%s" to login programmatically. The available authenticators for the firewall "%s" are "%s".', $firewallName, AuthenticatorInterface::class, $firewallName, implode('" ,"', $authenticatorIds)));
             }
 
             return $firewallAuthenticatorLocator->get($authenticatorIds[0]);
         }
+
+        if ($firewallAuthenticatorLocator->has($authenticatorName)) {
+            return $firewallAuthenticatorLocator->get($authenticatorName);
+        }
+
         $authenticatorId = 'security.authenticator.'.$authenticatorName.'.'.$firewallName;
 
         if (!$firewallAuthenticatorLocator->has($authenticatorId)) {
-            throw new LogicException(sprintf('Unable to find an authenticator named "%s" for the firewall "%s". Try to pass a firewall name in the Security::login() method.', $authenticatorName, $firewallName));
+            throw new LogicException(sprintf('Unable to find an authenticator named "%s" for the firewall "%s". Available authenticators: "%s".', $authenticatorName, implode('", "', $firewallAuthenticatorLocator->getProvidedServices())));
         }
 
         return $firewallAuthenticatorLocator->get($authenticatorId);
-    }
-
-    private function getFirewallName(Request $request): string
-    {
-        $firewall = $this->container->get('security.firewall.map')->getFirewallConfig($request);
-
-        if (null === $firewall) {
-            throw new LogicException('No firewall found as the current route is not covered by any firewall.');
-        }
-
-        return $firewall->getName();
     }
 }

@@ -12,7 +12,9 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
+use Symfony\Bundle\SecurityBundle\Security\Security;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -80,6 +82,22 @@ class SecurityTest extends AbstractWebTestCase
                 new UserWithoutEquatable('user1', 'test', ['ROLE_USER']),
             ],
         ];
+    }
+
+    /**
+     * @testWith    ["json_login"]
+     *              ["Symfony\\Bundle\\SecurityBundle\\Tests\\Functional\\Bundle\\AuthenticatorBundle\\ApiAuthenticator"]
+     */
+    public function testLoginWithBuiltInAuthenticator(string $authenticator)
+    {
+        $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml', 'debug' => true]);
+        static::getContainer()->get(WelcomeController::class)->authenticator = $authenticator;
+        $client->request('GET', '/welcome');
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @chalasr!'], json_decode($response->getContent(), true));
     }
 }
 
@@ -187,5 +205,22 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
      */
     public function eraseCredentials(): void
     {
+    }
+}
+
+class WelcomeController
+{
+    public $authenticator = 'json_login';
+
+    public function __construct(private Security $security)
+    {
+    }
+
+    public function welcome()
+    {
+        $user = new InMemoryUser('chalasr', '', ['ROLE_USER']);
+        $this->security->login($user, $this->authenticator);
+
+        return new JsonResponse(['message' => sprintf('Welcome @%s!', $this->security->getUser()->getUserIdentifier())]);
     }
 }

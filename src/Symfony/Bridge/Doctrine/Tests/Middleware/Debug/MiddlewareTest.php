@@ -17,6 +17,7 @@ use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Statement;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Bridge\Doctrine\Middleware\Debug\Middleware;
@@ -61,9 +62,20 @@ CREATE TABLE products (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
 	price REAL NOT NULL,
-	stock INTEGER NOT NULL
+	stock INTEGER NOT NULL,
+	picture BLOB NULL,
+	tags TEXT NULL,
+	created_at TEXT NULL
 );
 EOT);
+    }
+
+    private function getResourceFromString(string $str)
+    {
+        $res = fopen('php://temp', 'r+');
+        fwrite($res, $str);
+
+        return $res;
     }
 
     public function provideExecuteMethod(): array
@@ -102,18 +114,26 @@ EOT);
     {
         $this->init();
 
-        $stmt = $this->conn->prepare('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)');
+        $sql = <<<EOT
+INSERT INTO products(name, price, stock, picture, tags, created_at)
+VALUES (?, ?, ?, ?, ?, ?)
+EOT;
+
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(1, 'product1');
         $stmt->bindValue(2, 12.5);
         $stmt->bindValue(3, 5, ParameterType::INTEGER);
+        $stmt->bindValue(4, $res = $this->getResourceFromString('mydata'), ParameterType::BINARY);
+        $stmt->bindValue(5, ['foo', 'bar'], Types::SIMPLE_ARRAY);
+        $stmt->bindValue(6, new \DateTime('2022-06-12 11:00:00'), Types::DATETIME_MUTABLE);
 
         $executeMethod($stmt);
 
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
         $this->assertCount(2, $debug);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)', $debug[1]['sql']);
-        $this->assertSame(['product1', 12.5, 5], $debug[1]['params']);
-        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER], $debug[1]['types']);
+        $this->assertSame($sql, $debug[1]['sql']);
+        $this->assertSame(['product1', 12.5, 5, $res, 'foo,bar', '2022-06-12 11:00:00'], $debug[1]['params']);
+        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::BINARY, ParameterType::STRING, ParameterType::STRING], $debug[1]['types']);
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
     }
 

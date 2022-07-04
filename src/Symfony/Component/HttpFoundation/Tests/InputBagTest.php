@@ -68,7 +68,7 @@ class InputBagTest extends TestCase
     public function testSetWithNonScalarOrArray()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Excepted a scalar, or an array as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::set()", "Symfony\Component\HttpFoundation\InputBag" given.');
+        $this->expectExceptionMessage('Expected a scalar, or an array as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::set()", "Symfony\Component\HttpFoundation\InputBag" given.');
 
         $bag = new InputBag();
         $bag->set('foo', new InputBag());
@@ -86,7 +86,7 @@ class InputBagTest extends TestCase
     public function testGetWithNonStringDefaultValue()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Excepted a scalar value as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::get()", "array" given.');
+        $this->expectExceptionMessage('Expected a scalar value as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::get()", "array" given.');
 
         $bag = new InputBag(['foo' => 'bar']);
         $bag->get('foo', ['a', 'b']);

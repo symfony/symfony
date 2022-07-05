@@ -208,10 +208,6 @@ class Hydrator
                 };
         }
 
-        if (!$classReflector->isInternal()) {
-            return $baseHydrator->bindTo(null, $class);
-        }
-
         if ($classReflector->name !== $class) {
             return self::$simpleHydrators[$classReflector->name] ??= self::getSimpleHydrator($classReflector->name);
         }

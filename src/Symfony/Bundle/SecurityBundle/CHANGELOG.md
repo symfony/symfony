@@ -7,6 +7,7 @@ CHANGELOG
  * Add the `Security` helper class
  * Deprecate the `Symfony\Component\Security\Core\Security` service alias, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
  * Add `Security::getFirewallConfig()` to help to get the firewall configuration associated to the Request
+ * Add `Security::login()` to login programmatically
 
 6.1
 ---

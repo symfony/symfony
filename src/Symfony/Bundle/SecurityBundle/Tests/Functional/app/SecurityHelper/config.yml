@@ -11,6 +11,12 @@ services:
         alias: security.token_storage
         public: true
 
+    Symfony\Bundle\SecurityBundle\Tests\Functional\WelcomeController:
+        arguments: ['@security.helper']
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
+
 security:
     enable_authenticator_manager: true
     providers:
@@ -20,3 +26,11 @@ security:
 
     firewalls:
         default:
+            json_login:
+                username_path: user.login
+                password_path: user.password
+            custom_authenticators:
+                - 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator'
+
+    access_control:
+        - { path: ^/foo, roles: PUBLIC_ACCESS }

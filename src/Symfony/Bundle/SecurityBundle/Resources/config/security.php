@@ -77,11 +77,17 @@ return static function (ContainerConfigurator $container) {
         ->set('security.untracked_token_storage', TokenStorage::class)
 
         ->set('security.helper', Security::class)
-            ->args([service_locator([
-                'security.token_storage' => service('security.token_storage'),
-                'security.authorization_checker' => service('security.authorization_checker'),
-                'security.firewall.map' => service('security.firewall.map'),
-            ])])
+            ->args([
+                service_locator([
+                    'security.token_storage' => service('security.token_storage'),
+                    'security.authorization_checker' => service('security.authorization_checker'),
+                    'security.user_authenticator' => service('security.user_authenticator')->ignoreOnInvalid(),
+                    'request_stack' => service('request_stack'),
+                    'security.firewall.map' => service('security.firewall.map'),
+                    'security.user_checker' => service('security.user_checker'),
+                ]),
+                abstract_arg('authenticators'),
+            ])
         ->alias(Security::class, 'security.helper')
         ->alias(LegacySecurity::class, 'security.helper')
             ->deprecate('symfony/security-bundle', '6.2', 'The "%alias_id%" service alias is deprecated, use "'.Security::class.'" instead.')

@@ -1510,7 +1510,13 @@ class Request
      */
     public function toObject(): object
     {
-        return (object)[];
+        try {
+            $data = $this->toArray();
+        } catch (JsonException $message) {
+            throw new JsonException($message);
+        }
+
+        return (object) $data;
     }
 
     /**

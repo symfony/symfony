@@ -7,6 +7,7 @@ FrameworkBundle
  * Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
    `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Deprecate `AbstractController::renderForm()`, use `render()` instead
 
 Mailer
 --------

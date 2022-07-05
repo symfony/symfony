@@ -19,7 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -219,6 +218,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Returns a rendered view.
+     *
+     * Forms found in parameters are auto-cast to form views.
      */
     protected function renderView(string $view, array $parameters = []): string
     {
@@ -226,11 +227,20 @@ abstract class AbstractController implements ServiceSubscriberInterface
             throw new \LogicException('You cannot use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
         }
 
+        foreach ($parameters as $k => $v) {
+            if ($v instanceof FormInterface) {
+                $parameters[$k] = $v->createView();
+            }
+        }
+
         return $this->container->get('twig')->render($view, $parameters);
     }
 
     /**
      * Renders a view.
+     *
+     * If an invalid form is found in the list of parameters, a 422 status code is returned.
+     * Forms found in parameters are auto-cast to form views.
      */
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
@@ -238,6 +248,15 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
         if (null === $response) {
             $response = new Response();
+        }
+
+        if (200 === $response->getStatusCode()) {
+            foreach ($parameters as $v) {
+                if ($v instanceof FormInterface && $v->isSubmitted() && !$v->isValid()) {
+                    $response->setStatusCode(422);
+                    break;
+                }
+            }
         }
 
         $response->setContent($content);
@@ -249,28 +268,12 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * Renders a view and sets the appropriate status code when a form is listed in parameters.
      *
      * If an invalid form is found in the list of parameters, a 422 status code is returned.
+     *
+     * @deprecated since Symfony 6.2, use render() instead
      */
     protected function renderForm(string $view, array $parameters = [], Response $response = null): Response
     {
-        if (null === $response) {
-            $response = new Response();
-        }
-
-        foreach ($parameters as $k => $v) {
-            if ($v instanceof FormView) {
-                throw new \LogicException(sprintf('Passing a FormView to "%s::renderForm()" is not supported, pass directly the form instead for parameter "%s".', get_debug_type($this), $k));
-            }
-
-            if (!$v instanceof FormInterface) {
-                continue;
-            }
-
-            $parameters[$k] = $v->createView();
-
-            if (200 === $response->getStatusCode() && $v->isSubmitted() && !$v->isValid()) {
-                $response->setStatusCode(422);
-            }
-        }
+        trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s::renderForm()" method is deprecated, use "render()" instead.', get_debug_type($this));
 
         return $this->render($view, $parameters, $response);
     }

@@ -4,10 +4,11 @@ CHANGELOG
 6.2
 ---
 
-* Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
-  `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
-  `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Add option `framework.catch_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to catch all kinds of `Throwable`
+ * Make `AbstractController::render()` able to deal with forms and deprecate `renderForm()`
+ * Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+   `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
 
 6.1
 ---

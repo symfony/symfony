@@ -1278,6 +1278,46 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $req->toArray());
     }
 
+    public function testToObject()
+    {
+        $content = [
+            'parent' => [
+                'child' => 'value'
+            ],
+            'foo' => 'bar'
+        ];
+
+        $req = new Request(content: json_encode($content));
+        $this->assertEquals((object) $content, $req->toObject());
+        $this->assertIsObject($req->toObject());
+    }
+
+    public function testToObjectEmptyContent()
+    {
+        $content = [];
+
+        $req = new Request(content: json_encode($content));
+        $this->assertEquals((object) $content, $req->toObject());
+    }
+
+    public function testToObjectNonContent()
+    {
+        $req = new Request();
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('Request body is empty.');
+        $req->toObject();
+    }
+
+    public function testToObjectNonJson()
+    {
+        $content = 'foobar';
+
+        $req = new Request(content: $content);
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessageMatches('|Could not decode request body.+|');
+        $req->toObject();
+    }
+
     /**
      * @dataProvider provideOverloadedMethods
      */

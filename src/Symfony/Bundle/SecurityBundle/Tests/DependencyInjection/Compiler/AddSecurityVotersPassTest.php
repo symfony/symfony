@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -36,7 +37,10 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
     }
 
-    public function testThatSecurityVotersAreProcessedInPriorityOrder()
+    /**
+     * @dataProvider priorityOrderProvider
+     */
+    public function testThatSecurityVotersAreProcessedInPriorityOrder(array $lowest, array $highest, array $zero): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -50,16 +54,16 @@ class AddSecurityVotersPassTest extends TestCase
             ->addTag('security.voter')
         ;
         $container
-            ->register('lowest_prio_service', Voter::class)
-            ->addTag('security.voter', ['priority' => 100])
+            ->register('lowest_prio_service', $lowest['class'])
+            ->addTag('security.voter', $lowest['attributes'])
         ;
         $container
-            ->register('highest_prio_service', Voter::class)
-            ->addTag('security.voter', ['priority' => 200])
+            ->register('highest_prio_service', $highest['class'])
+            ->addTag('security.voter', $highest['attributes'])
         ;
         $container
-            ->register('zero_prio_service', Voter::class)
-            ->addTag('security.voter', ['priority' => 0])
+            ->register('zero_prio_service', $zero['class'])
+            ->addTag('security.voter', $zero['attributes'])
         ;
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
@@ -68,7 +72,30 @@ class AddSecurityVotersPassTest extends TestCase
         $refs = $argument->getValues();
         $this->assertEquals(new Reference('highest_prio_service'), $refs[0]);
         $this->assertEquals(new Reference('lowest_prio_service'), $refs[1]);
+        $this->assertEquals(new Reference('no_prio_service'), $refs[2]);
+        $this->assertEquals(new Reference('zero_prio_service'), $refs[3]);
         $this->assertCount(4, $refs);
+    }
+
+    public function priorityOrderProvider(): iterable
+    {
+        yield 'Priority configured with attributes' => [
+            'lowest' => ['class' => Voter::class, 'attributes' => ['priority' => 100]],
+            'highest' => ['class' => Voter::class, 'attributes' => ['priority' => 200]],
+            'zero' => ['class' => Voter::class, 'attributes' => ['priority' => 0]],
+        ];
+
+        yield 'Priority configured with defaultPriority' => [
+            'lowest' => ['class' => LowestPriorityVoter::class, 'attributes' => []],
+            'highest' => ['class' => HighestPriorityVoter::class, 'attributes' => []],
+            'zero' => ['class' => ZeroPriorityVoter::class, 'attributes' => []],
+        ];
+
+        yield 'Mixed priority configuration' => [
+            'lowest' => ['class' => Voter::class, 'attributes' => ['priority' => 100]],
+            'highest' => ['class' => HighestPriorityVoter::class, 'attributes' => []],
+            'zero' => ['class' => HighestPriorityVoter::class, 'attributes' => ['priority' => 0]],
+        ];
     }
 
     public function testThatVotersAreTraceableInDebugMode()
@@ -147,5 +174,39 @@ class AddSecurityVotersPassTest extends TestCase
         ;
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
+    }
+}
+
+class ZeroPriorityVoter extends Voter
+{
+    protected function supports(string $attribute, $subject): bool
+    {
+        return false;
+    }
+
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    {
+        return false;
+    }
+
+    public static function getDefaultPriority(): int
+    {
+        return 0;
+    }
+}
+
+class LowestPriorityVoter extends ZeroPriorityVoter
+{
+    public static function getDefaultPriority(): int
+    {
+        return 100;
+    }
+}
+
+class HighestPriorityVoter extends ZeroPriorityVoter
+{
+    public static function getDefaultPriority(): int
+    {
+        return 200;
     }
 }

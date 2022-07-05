@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -38,7 +39,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
             return;
         }
 
-        $voters = $this->findAndSortTaggedServices('security.voter', $container);
+        $voters = $this->findAndSortTaggedServices(new TaggedIteratorArgument('security.voter'), $container);
         if (!$voters) {
             throw new LogicException('No security voters found. You need to tag at least one with "security.voter".');
         }

@@ -1282,9 +1282,9 @@ class RequestTest extends TestCase
     {
         $content = [
             'parent' => [
-                'child' => 'value'
+                'child' => 'value',
             ],
-            'foo' => 'bar'
+            'foo' => 'bar',
         ];
 
         $req = new Request(content: json_encode($content));

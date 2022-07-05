@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-19T10:35:58Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-20T06:39:41Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by emancypage at 2021-06-02T22:05:51Z
+
+Hello @johnkrovitch!
+I tried to use your code in my environment and I noticed one issue here. In case of this configuration for firewall security:
+```
+firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+```
+I've got an error message:
+![image](https://user-images.githubusercontent.com/24941274/120558194-67c56a80-c3ff-11eb-9cf0-d51a5f533635.png)
+
+You are assuming that we always will have fourth parameter from \Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension::createFirewall() but please look into this line of code: https://github.com/symfony/symfony/blob/2fe4442a1a28ea0d78bfe8d00476229e84ccf19c/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php#L365
+This also should be adjusted in your code I think.
+
+---------------------------------------------------------------------------
+
+by johnkrovitch at 2021-06-03T12:41:58Z
+
+Thanks for your response. It is fixed.
+
+---------------------------------------------------------------------------
+
+by johnkrovitch at 2021-12-06T20:46:58Z
+
+The security change log has been updated
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-12-08T15:12:38Z
+
+Same as #41406, we need to require security-http as a dev dependency to make tests pass, and throw an exception if it's not installed.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-02-21T15:00:46Z
+
+Hi! Thanks for these 2 PRs and sorry for the long wait, @johnkrovitch.
+I very much like this feature from a usage point. Whenever programmatic login/logout code is complex to use, there is a chance an application forgets one important bit and creates a security issue. These 2 PRs seem to make things simpler to use, and thus safer!
+
+But I've been silent in this PR because I'm afraid the implementation is not that optimal. I've been discussing this internally with some core team members during last SymfonyWorld online, but we cannot easily come up with a good alternative.
+
+I'm concerned about 2 main things, which are also shared by #41406:
+
+1. The duplicated code between `Security` and `AuthenticatorManager`. With security code in particular, duplicating the same code can create unwanted vulnerabilities (e.g. whenever we fix a CVE in one place, but forget there was a duplicate piece somewhere else).
+2. The `Security` class was already a "black sheep" in the Security Core component, given it relies on service names configured in the SecurityBundle. The changes in these 2 PRs make this coupling issue even more visible (not only coupling to service names, but also classes from SecurityBundle and Security Http). To clarify: this is not an issue with the code you wrote, but an issue with the original design of this class.
+
+In short, I would really love to merge these 2 PRs from a DX point of view - but I can't from a maintainer perspective. Does anyone have great insights in how to overcome these issues? :)
+
+---------------------------------------------------------------------------
+
+by johnkrovitch at 2022-02-23T18:53:09Z
+
+@wouterj Thanks for your response ! No problem about the wait.
+
+I totally forgot about the csrf logout indeed in the other PR. I choose to use the `Security`class from a developer point of view : I generally use this class because it as all the required methods to handle the security process we need. So it make senses for me to add the login/logout features in this one. But i totally understand your point of view about this class.
+
+But I don't know what should we do ? :) Create a new class to only handle the login/logout ? Maybe create a "context" like "UserContext" with a getUser method, like Sylius does, to get rid of this `Security` class ? The good point about the Security class is that you do not have to inject several classes to handle common case such as retreving user, then checking permissions...
+
+And yes the coupling is so visible that I had to add the require http to the composer of the Security component :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-06-06T20:45:43Z
+
+I'm happy to tell that we've moved the `Security` class to the SecurityBundle in the 6.2 branch: https://github.com/symfony/symfony/pull/46094 This means we have unlocked the biggest blocker in these 2 PRs: depending on SecurityBundle from this "facade" class.
+
+@johnkrovitch I know this PR is in the brewing stage for a long time, do you have time to rebase on these recent changes and unlock this PR? If you no longer have time, please tell us and I'll continue this PR with your commits :)
+
+---------------------------------------------------------------------------
+
+by johnkrovitch at 2022-06-08T07:37:52Z
+
+@wouterj Hi thanks for the changes and thank @chalasr . I try to rebase this evening.
+
+---------------------------------------------------------------------------
+
+by johnkrovitch at 2022-06-16T20:42:11Z
+
+@wouterj The pr is rebased with the last changes from 6.2
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-04T16:36:29Z
+
+Now with a functional test. Remaining comments addressed. PR ready

@@ -211,6 +211,13 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Autoconfigured: '.($definition->isAutoconfigured() ? 'yes' : 'no')
         ;
 
+        if ($definition->isDeprecated()) {
+            $output .= "\n".'- Deprecated: yes';
+            $output .= "\n".'- Deprecation message: '.$definition->getDeprecation($options['id'])['message'];
+        } else {
+            $output .= "\n".'- Deprecated: no';
+        }
+
         if (isset($options['show_arguments']) && $options['show_arguments']) {
             $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
         }

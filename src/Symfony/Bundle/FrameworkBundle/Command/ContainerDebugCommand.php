@@ -166,6 +166,21 @@ EOF
         try {
             $helper->describe($io, $object, $options);
 
+            if ('txt' === $options['format'] && isset($options['id'])) {
+                if ($object->hasDefinition($options['id'])) {
+                    $definition = $object->getDefinition($options['id']);
+                    if ($definition->isDeprecated()) {
+                        $errorIo->warning($definition->getDeprecation($options['id'])['message'] ?? sprintf('The "%s" service is deprecated.', $options['id']));
+                    }
+                }
+                if ($object->hasAlias($options['id'])) {
+                    $alias = $object->getAlias($options['id']);
+                    if ($alias->isDeprecated()) {
+                        $errorIo->warning($alias->getDeprecation($options['id'])['message'] ?? sprintf('The "%s" alias is deprecated.', $options['id']));
+                    }
+                }
+            }
+
             if (isset($options['id']) && isset($kernel->getContainer()->getRemovedIds()[$options['id']])) {
                 $errorIo->note(sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
             }

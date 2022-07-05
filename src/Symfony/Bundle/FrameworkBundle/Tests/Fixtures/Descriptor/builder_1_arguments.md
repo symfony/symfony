@@ -14,6 +14,7 @@ Definitions
 - Abstract: yes
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - Arguments: yes
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
@@ -29,6 +30,7 @@ Definitions
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - Arguments: no
 - Usages: none
 
@@ -43,6 +45,7 @@ Definitions
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - Arguments: no
 - Usages: none
 

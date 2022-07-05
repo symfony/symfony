@@ -341,6 +341,12 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
         $serviceXML->setAttribute('autoconfigured', $definition->isAutoconfigured() ? 'true' : 'false');
+        if ($definition->isDeprecated()) {
+            $serviceXML->setAttribute('deprecated', 'true');
+            $serviceXML->setAttribute('deprecation_message', $definition->getDeprecation($id)['message']);
+        } else {
+            $serviceXML->setAttribute('deprecated', 'false');
+        }
         $serviceXML->setAttribute('file', $definition->getFile() ?? '');
 
         $calls = $definition->getMethodCalls();

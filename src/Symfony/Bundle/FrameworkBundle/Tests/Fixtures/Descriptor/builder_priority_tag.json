@@ -9,6 +9,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "tags": [
                 {
@@ -38,6 +39,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
@@ -74,6 +76,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "tags": [
                 {
@@ -94,6 +97,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "tags": [
                 {

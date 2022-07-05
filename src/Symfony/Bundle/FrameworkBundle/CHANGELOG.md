@@ -10,6 +10,7 @@ CHANGELOG
    `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Add service usages list to the `debug:container` command output
+ * Add service and alias deprecation message to `debug:container [<name>]` output
 
 6.1
 ---

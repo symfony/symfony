@@ -230,6 +230,13 @@ class JsonDescriptor extends Descriptor
             'autoconfigure' => $definition->isAutoconfigured(),
         ];
 
+        if ($definition->isDeprecated()) {
+            $data['deprecated'] = true;
+            $data['deprecation_message'] = $definition->getDeprecation($id)['message'];
+        } else {
+            $data['deprecated'] = false;
+        }
+
         if ('' !== $classDescription = $this->getClassDescription((string) $definition->getClass())) {
             $data['description'] = $classDescription;
         }

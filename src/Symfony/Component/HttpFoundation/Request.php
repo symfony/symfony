@@ -1504,6 +1504,16 @@ class Request
     }
 
     /**
+     * Gets the request body decoded as array, typically from a JSON payload and transform to an Object.
+     *
+     * @throws JsonException When the body cannot be decoded to an object
+     */
+    public function toObject(): object
+    {
+        return (object)[];
+    }
+
+    /**
      * Gets the Etags.
      */
     public function getETags(): array

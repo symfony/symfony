@@ -19,10 +19,10 @@ class AsCommand
 {
     public $name;
     public $description;
-    
+
     public function __construct(
         string $name,
-        ?string $description = null,
+        string $description = null,
         array $aliases = [],
         bool $hidden = false,
     ) {

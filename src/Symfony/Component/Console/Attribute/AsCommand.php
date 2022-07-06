@@ -24,7 +24,7 @@ class AsCommand
         string $name,
         string $description = null,
         array $aliases = [],
-        bool $hidden = false,
+        bool $hidden = false
     ) {
         if (!$hidden && !$aliases) {
             return;

@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-06-29T18:59:02Z
+
+Build failures unrelated.
+
+---------------------------------------------------------------------------
+
+by jwage at 2022-06-29T19:20:30Z
+
+Thanks. This will definitely fix the issue for me but I am not sure why $_SESSION is null and I can't reproduce it. I only see the error stacktrace in newrelic. I think it was always potentially null sometimes prior to PHP 8.x too and array_keys() just changed to no longer accept null. I am going to keep trying to reproduce it in my app.
+
+---------------------------------------------------------------------------
+
+by jwage at 2022-06-29T20:00:13Z
+
+I finally figured out how to reproduce this. If you delete the session cookie `PHPSESSID` and then hit an action that calls $session->save() on the very first line of the action, you will get the following:
+
+![Screen Shot 2022-06-29 at 2 57 51 PM](https://user-images.githubusercontent.com/97422/176533913-88d966bf-c727-466a-9d33-f004c75dee63.png)
+
+This error is different in my development environment but in production $_SESSION would be null and would error when it gets passed to array_keys() on line [246 in NativeSessionStorage.php](https://github.com/symfony/symfony/blob/v5.4.3/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php#L246).
+
+The session does get successfully recreated from the remember me cookie, but $_SESSION is still null on that first request in the controller and when you send a 2nd request everything works correctly.
+
+---------------------------------------------------------------------------
+
+by jwage at 2022-06-29T20:46:51Z
+
+Just for some added context. This was happening before in PHP 7.4 too, but it only started throwing an exception in PHP 8. In PHP 7.4 it was only a warning hence why I didn't see this error show up in production NewRelic.
+
+```
+$ php7.4 test.php
+PHP Warning:  array_keys() expects parameter 1 to be array, null given in /data/repositories/traderspost/test.php on line 3
+```
+
+```
+$ php8.1 test.php
+PHP Fatal error:  Uncaught TypeError: array_keys(): Argument #1 ($array) must be of type array, null given in /data/repositories/traderspost/test.php:3
+Stack trace:
+#0 /data/repositories/traderspost/test.php(3): array_keys()
+#1 {main}
+  thrown in /data/repositories/traderspost/test.php on line 3
+```
+
+---------------------------------------------------------------------------
+
+by jwage at 2022-06-29T20:58:26Z
+
+Now that I understand the problem a little more, I am not sure if the above patch is the right fix. When you use remember me cookie and session cookie expires, remember me cookie should recreate the session which it does, but it seems like it happens at the end of the request lifecycle so anything that calls SessionInterface::save() before $_SESSION is recreated will fail. Should something be reinstantiating $_SESSION earlier in the request lifecycle?
+
+As a temporary workaround in my app, I am testing this. It does fix the issue but I am not sure yet if this will have any negative side effects:
+
+```
+<?php
+
+declare(strict_types=1);
+
+namespace App\EventListener\Session;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
+class FixSessionGlobalVariableSubscriber implements EventSubscriberInterface
+{
+    /**
+     * @return array<string, string>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [KernelEvents::REQUEST => 'onKernelRequest'];
+    }
+
+    public function onKernelRequest(RequestEvent $event): void
+    {
+        if (! $event->isMainRequest()) {
+            return;
+        }
+
+        if (! isset($_SESSION)) {
+            $_SESSION = [];
+        }
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-04T13:14:12Z
+
+@jwage Unless I'm mistaken the issue is only with `save()` and should be solved with the proposed patch. Apart from that, I'd say it's not Symfony's job to initialize the `$_SESSION` superglobal (which should never be used directly in userland applications anyway).
+
+---------------------------------------------------------------------------
+
+by jwage at 2022-07-05T18:50:26Z
+
+@chalasr that makes sense then. Thanks!

@@ -39,17 +39,17 @@ final class Mailer implements MailerInterface
 
     public function send(RawMessage $message, Envelope $envelope = null): void
     {
-        if (null === $this->bus) {
-            $this->transport->send($message, $envelope);
-
-            return;
-        }
-
         if (null !== $this->dispatcher) {
             $message = clone $message;
             $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
             $event = new MessageEvent($message, $envelope, (string) $this->transport, true);
             $this->dispatcher->dispatch($event);
+        }
+
+        if (null === $this->bus) {
+            $this->transport->send($message, $envelope);
+
+            return;
         }
 
         try {

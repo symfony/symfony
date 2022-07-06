@@ -35,6 +35,9 @@ class BasicErrorHandler
             ini_set('assert.warning', 0);
             ini_set('assert.exception', 1);
         }
+        if ($debug) {
+            ini_set('intl.use_exceptions', 1);
+        }
 
         set_error_handler(new self());
     }

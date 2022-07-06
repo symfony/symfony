@@ -33,6 +33,7 @@ class Debug
         ini_set('assert.active', 1);
         ini_set('assert.warning', 0);
         ini_set('assert.exception', 1);
+        ini_set('intl.use_exceptions', 1);
 
         DebugClassLoader::enable();
 

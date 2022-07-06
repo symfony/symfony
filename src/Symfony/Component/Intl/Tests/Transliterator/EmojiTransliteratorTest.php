@@ -49,68 +49,83 @@ final class EmojiTransliteratorTest extends TestCase
     /** @dataProvider provideTransliterateTests */
     public function testTransliterate(string $locale, string $input, string $expected)
     {
-        $tr = EmojiTransliterator::getInstance($locale);
+        $tr = EmojiTransliterator::create($locale);
 
         $this->assertSame($expected, $tr->transliterate($input));
-    }
-
-    public function testTransliteratorCache()
-    {
-        $tr1 = EmojiTransliterator::getInstance('en');
-        $tr2 = EmojiTransliterator::getInstance('en');
-
-        $this->assertSame($tr1, $tr2);
     }
 
     public function provideLocaleTest(): iterable
     {
         $file = (new Finder())
             ->in(__DIR__.'/../../Resources/data/transliterator/emoji')
-            ->name('*.txt')
+            ->name('*.php')
             ->files()
         ;
 
         foreach ($file as $file) {
-            yield [$file->getBasename('.txt')];
+            yield [$file->getBasename('.php')];
         }
     }
 
     /** @dataProvider provideLocaleTest */
     public function testAllTransliterator(string $locale)
     {
-        $tr = EmojiTransliterator::getInstance($locale);
+        $tr = EmojiTransliterator::create($locale);
 
         $this->assertNotEmpty($tr->transliterate('😀'));
     }
 
     public function testTransliterateWithInvalidLocale()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "../emoji/en" locale.');
+        $this->expectException(\IntlException::class);
+        $this->expectExceptionMessage('transliterator_create: unable to open ICU transliterator with id "Emoji: invalid"');
 
-        EmojiTransliterator::getInstance('../emoji/en');
+        EmojiTransliterator::create('invalid');
     }
 
-    public function testTransliterateWithMissingLocale()
+    public function testListIds()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('The transliterator rules source does not exist for locale "invalid".');
-
-        EmojiTransliterator::getInstance('invalid');
+        $this->assertContains('en_ca', EmojiTransliterator::listIDs());
+        $this->assertNotContains('..', EmojiTransliterator::listIDs());
     }
 
-    public function testTransliterateWithBrokenLocale()
+    public function testSlice()
     {
-        $brokenFilename = __DIR__.'/../../Resources/data/transliterator/emoji/broken.txt';
-        file_put_contents($brokenFilename, '😀 > oups\' ;');
+        $tr = EmojiTransliterator::create('en');
+        $this->assertSame('😀grinning face', $tr->transliterate('😀😀', 2));
+    }
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Unable to create EmojiTransliterator instance: "transliterator_create_from_rules: unable to create ICU transliterator from rules (parse error at offset 4, after "😀 >", before or at " oups\' ;"): U_UNTERMINATED_QUOTE".');
+    public function testNotUtf8()
+    {
+        $tr = EmojiTransliterator::create('en');
 
-        try {
-            EmojiTransliterator::getInstance('broken');
-        } finally {
-            unlink($brokenFilename);
-        }
+        $this->iniSet('intl.use_exceptions', 0);
+
+        $this->assertFalse($tr->transliterate("Not \xE9 UTF-8"));
+        $this->assertSame('String conversion of string to UTF-16 failed: U_INVALID_CHAR_FOUND', intl_get_error_message());
+
+        $this->iniSet('intl.use_exceptions', 1);
+
+        $this->expectException(\IntlException::class);
+        $this->expectExceptionMessage('String conversion of string to UTF-16 failed');
+
+        $tr->transliterate("Not \xE9 UTF-8");
+    }
+
+    public function testBadOffsets()
+    {
+        $tr = EmojiTransliterator::create('en');
+
+        $this->iniSet('intl.use_exceptions', 0);
+
+        $this->assertFalse($tr->transliterate('Abc', 1, 5));
+        $this->assertSame('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3): U_ILLEGAL_ARGUMENT_ERROR', intl_get_error_message());
+
+        $this->iniSet('intl.use_exceptions', 1);
+
+        $this->expectException(\IntlException::class);
+        $this->expectExceptionMessage('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3)');
+
+        $this->assertFalse($tr->transliterate('Abc', 1, 5));
     }
 }

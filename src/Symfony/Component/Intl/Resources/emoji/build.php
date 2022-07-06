@@ -14,6 +14,7 @@ require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\VarExporter\VarExporter;
 
 Builder::cleanTarget();
 $emojisCodePoints = Builder::getEmojisCodePoints();
@@ -91,8 +92,17 @@ final class Builder
             }
         }
 
+        ksort($mapsByLocale);
+
         foreach ($mapsByLocale as $locale => $maps) {
-            yield $locale => self::createRules($maps);
+            $parentLocale = $locale;
+
+            while (false !== $i = strrpos($parentLocale, '_')) {
+                $parentLocale = substr($parentLocale, 0, $i);
+                $maps += $mapsByLocale[$parentLocale] ?? [];
+            }
+
+            yield strtolower($locale) => self::createRules($maps);
         }
     }
 
@@ -105,9 +115,20 @@ final class Builder
 
     public static function saveRules(iterable $rulesByLocale): void
     {
+        $firstChars = [];
         foreach ($rulesByLocale as $locale => $rules) {
-            file_put_contents(self::TARGET_DIR."/$locale.txt", $rules);
+            file_put_contents(self::TARGET_DIR."/$locale.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
+
+            foreach ($rules as $k => $v) {
+                $firstChars[$k[0]] = $k[0];
+            }
         }
+        sort($firstChars);
+
+        $quickCheck = '"'.str_replace('%', '\\x', rawurlencode(implode('', $firstChars))).'"';
+
+        $file = \dirname(__DIR__, 2).'/Transliterator/EmojiTransliterator.php';
+        file_put_contents($file, preg_replace('/QUICK_CHECK = .*;/m', "QUICK_CHECK = {$quickCheck};", file_get_contents($file)));
     }
 
     private static function testEmoji(string $emoji, string $locale): void
@@ -117,19 +138,13 @@ final class Builder
         }
     }
 
-    private static function createRules(array $maps): string
+    private static function createRules(array $maps): array
     {
         // We must sort the maps by the number of code points, because the order really matters:
         // 🫶🏼 must be before 🫶
         krsort($maps);
         $maps = array_merge(...$maps);
 
-        $rules = '';
-        foreach ($maps as $emoji => $name) {
-            $name = preg_replace('{([^[:alnum:]])}u', '\\\\$1', $name);
-            $rules .= "\\$emoji > $name ;\n";
-        }
-
-        return $rules;
+        return $maps;
     }
 }

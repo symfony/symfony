@@ -17,9 +17,12 @@ namespace Symfony\Component\Console\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsCommand
 {
+    public $name;
+    public $description;
+    
     public function __construct(
-        public string $name,
-        public ?string $description = null,
+        string $name,
+        ?string $description = null,
         array $aliases = [],
         bool $hidden = false,
     ) {
@@ -35,5 +38,6 @@ class AsCommand
         }
 
         $this->name = implode('|', $name);
+        $this->description = $description;
     }
 }

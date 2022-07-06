@@ -1510,7 +1510,7 @@ class Request
      */
     public function toObject(): object
     {
-            $data = $this->toArray();
+        $data = $this->toArray();
 
         return (object) $data;
     }

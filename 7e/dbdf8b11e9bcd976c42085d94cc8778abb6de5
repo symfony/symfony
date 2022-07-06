@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-07-05T09:35:39Z
+
+With this change the API becomes implicit and too magical, 👎 from me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-05T09:38:11Z
+
+I suggested this change and I think it makes a lot of sense. The current method looks weird to me as it does not render a form ; it’s very confusing.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-07-05T09:40:32Z
+
+I see the point, maybe better phpdoc blocks would help describing what these methods do?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-06T12:25:19Z
+
+UPGRADEd

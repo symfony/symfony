@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-04-11T21:52:04Z
+
+I wanted do that for ages! Thanks for doing it. But iirc we already had an instance of the reflection somewhere. Can't we reuse it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-12T08:38:30Z
+
+> we already had an instance of the reflection somewhere. Can't we reuse it?
+
+yes we can, updated!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-05T13:54:16Z
+
+PR is ready for another round of reviews.
+
+@stof, I  addressed your comment this way:
+> the attributes being added in the ControllerEvent need to be exposed (as read-only) in the ControllerArgumentsEvent.
+
+> the IsGrantedListener runs on ControllerArgumentsEvent, not on ControllerEvent. The goal is to run after argument resolvers, so that you can vote on the resolved arguments.
+
+Understood and done. Just one thing: because there is `ControllerArgumentsEvent::setController()`, I think we should allow also updating the attributes. This is what the patch does.
+
+> should we have a addAttribute method instead, that allows adding additional attributes without loosing the ones coming from Reflection ?
+
+> well, the need to perform a recursive merge is easy to overlook. And I don't see any use case where you would want to remove the attributes coming from Reflection. This would be a big WTF for someone having to debug why their attributes have no effect.
+
+I replaced `setAttributes()` by a new `$attributes` argument on `setController()` ~and a new `addAttribute()` method~. Note that I think it's important to allow ppl to opt-out from reflection. This is the same principle that we're following everywhere we read attributes: they should remain declarative, which means optional.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-05T14:33:18Z
+
+I missed this comment:
+
+> if setController is called before setAttributes (likely to be the case if a listener is the one calling setAttributes to set custom attributes), the assignment done in setController will not include those custom attributes.
+
+Having `$attributes` on `setController()` binds controllers and their attributes. I think this solve this concern. But having a separate `addAttribute()` method reintroduces this concern. That's why I've removed it. I think we need to provide a way to override real attributes, but this way should not be a foot-gun. Since it's for advanced use cases, it's fine to me if it's a bit involving.
+
+> To me, the kernel should be the one doing that assignment after triggering the event, based on $event->getAttributes
+
+I want everything to remain lazy, that's what the current implementation provides.

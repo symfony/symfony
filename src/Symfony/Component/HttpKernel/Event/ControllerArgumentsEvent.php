@@ -28,25 +28,32 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 final class ControllerArgumentsEvent extends KernelEvent
 {
-    private $controller;
+    private ControllerEvent $controllerEvent;
     private array $arguments;
 
-    public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, ?int $requestType)
+    public function __construct(HttpKernelInterface $kernel, callable|ControllerEvent $controller, array $arguments, Request $request, ?int $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
 
-        $this->controller = $controller;
+        if (!$controller instanceof ControllerEvent) {
+            $controller = new ControllerEvent($kernel, $controller, $request, $requestType);
+        }
+
+        $this->controllerEvent = $controller;
         $this->arguments = $arguments;
     }
 
     public function getController(): callable
     {
-        return $this->controller;
+        return $this->controllerEvent->getController();
     }
 
-    public function setController(callable $controller)
+    /**
+     * @param array<class-string, list<object>>|null $attributes
+     */
+    public function setController(callable $controller, array $attributes = null): void
     {
-        $this->controller = $controller;
+        $this->controllerEvent->setController($controller, $attributes);
     }
 
     public function getArguments(): array
@@ -57,5 +64,13 @@ final class ControllerArgumentsEvent extends KernelEvent
     public function setArguments(array $arguments)
     {
         $this->arguments = $arguments;
+    }
+
+    /**
+     * @return array<class-string, list<object>>
+     */
+    public function getAttributes(): array
+    {
+        return $this->controllerEvent->getAttributes();
     }
 }

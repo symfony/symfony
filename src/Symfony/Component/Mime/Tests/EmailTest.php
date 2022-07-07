@@ -458,4 +458,24 @@ class EmailTest extends TestCase
         $email->text($contents);
         $this->assertSame($contents, $email->getTextBody());
     }
+
+    public function testBodyCache()
+    {
+        $email = new Email();
+        $email->from('fabien@symfony.com');
+        $email->to('fabien@symfony.com');
+        $email->text('foo');
+        $body1 = $email->getBody();
+        $body2 = $email->getBody();
+        $this->assertSame($body1, $body2, 'The two bodies must reference the same object, so the body cache ensures that the hash for the DKIM signature is unique.');
+
+        $email = new Email();
+        $email->from('fabien@symfony.com');
+        $email->to('fabien@symfony.com');
+        $email->text('foo');
+        $body1 = $email->getBody();
+        $email->html('<b>bar</b>'); // We change a part to reset the body cache.
+        $body2 = $email->getBody();
+        $this->assertNotSame($body1, $body2, 'The two bodies must not reference the same object, so the body cache does not ensure that the hash for the DKIM signature is unique.');
+    }
 }

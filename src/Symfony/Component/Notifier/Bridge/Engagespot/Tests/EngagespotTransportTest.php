@@ -16,7 +16,6 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,10 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class EngagespotTransportTest extends TransportTestCase
 {
-    /**
-     * @return EngagespotTransport
-     */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): EngagespotTransport
     {
         return new EngagespotTransport('apiKey', 'TEST', $client ?? $this->createMock(HttpClientInterface::class));
     }

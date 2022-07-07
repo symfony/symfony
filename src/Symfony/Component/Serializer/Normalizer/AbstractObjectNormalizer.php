@@ -103,6 +103,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
+    /**
+     * allow to overide json format with elasticsearch format (it is json)
+     * it will allow to convert int to float
+     */
+    public const JSON_ENCODER_FORMAT = JsonEncoder::FORMAT;
+
     private $propertyTypeExtractor;
     private $typesCache = [];
     private $attributesCache = [];
@@ -565,7 +571,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // PHP's json_decode automatically converts Numbers without a decimal part to integers.
                 // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
                 // a float is expected.
-                if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && null !== $format && str_contains($format, JsonEncoder::FORMAT)) {
+                if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && null !== $format && str_contains($format, static::JSON_ENCODER_FORMAT)) {
                     return (float) $data;
                 }
 

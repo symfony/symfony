@@ -314,4 +314,13 @@ class NativeSessionStorageTest extends TestCase
         $this->assertTrue($started);
         $this->assertSame('&~[', session_id());
     }
+
+    public function testSaveHandlesNullSessionGracefully()
+    {
+        $storage = $this->getStorage();
+        $_SESSION = null;
+        $storage->save();
+
+        $this->addToAssertionCount(1);
+    }
 }

@@ -43,6 +43,7 @@ class Email extends Message
     private $html;
     private $htmlCharset;
     private $attachments = [];
+    private ?AbstractPart $cachedBody = null; // Used to avoid wrong body hash in DKIM signatures with multiple parts (e.g. HTML + TEXT) due to multiple boundaries.
 
     /**
      * @return $this
@@ -282,6 +283,7 @@ class Email extends Message
             throw new \TypeError(sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
         }
 
+        $this->cachedBody = null;
         $this->text = $body;
         $this->textCharset = $charset;
 
@@ -312,6 +314,7 @@ class Email extends Message
             throw new \TypeError(sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
         }
 
+        $this->cachedBody = null;
         $this->html = $body;
         $this->htmlCharset = $charset;
 
@@ -342,6 +345,7 @@ class Email extends Message
             throw new \TypeError(sprintf('The body must be a string or a resource (got "%s").', get_debug_type($body)));
         }
 
+        $this->cachedBody = null;
         $this->attachments[] = ['body' => $body, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
 
         return $this;
@@ -352,6 +356,7 @@ class Email extends Message
      */
     public function attachFromPath(string $path, string $name = null, string $contentType = null)
     {
+        $this->cachedBody = null;
         $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
 
         return $this;
@@ -368,6 +373,7 @@ class Email extends Message
             throw new \TypeError(sprintf('The body must be a string or a resource (got "%s").', get_debug_type($body)));
         }
 
+        $this->cachedBody = null;
         $this->attachments[] = ['body' => $body, 'name' => $name, 'content-type' => $contentType, 'inline' => true];
 
         return $this;
@@ -378,6 +384,7 @@ class Email extends Message
      */
     public function embedFromPath(string $path, string $name = null, string $contentType = null)
     {
+        $this->cachedBody = null;
         $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => true];
 
         return $this;
@@ -388,6 +395,7 @@ class Email extends Message
      */
     public function attachPart(DataPart $part)
     {
+        $this->cachedBody = null;
         $this->attachments[] = ['part' => $part];
 
         return $this;
@@ -446,6 +454,10 @@ class Email extends Message
      */
     private function generateBody(): AbstractPart
     {
+        if (null !== $this->cachedBody) {
+            return $this->cachedBody;
+        }
+
         $this->ensureValidity();
 
         [$htmlPart, $attachmentParts, $inlineParts] = $this->prepareParts();
@@ -470,6 +482,8 @@ class Email extends Message
                 $part = new MixedPart(...$attachmentParts);
             }
         }
+
+        $this->cachedBody = $part;
 
         return $part;
     }

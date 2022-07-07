@@ -58,6 +58,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'trim' => 'string',
             'require' => 'bool|int|float|string|array',
             'enum' => \BackedEnum::class,
+            'shuffle' => 'array',
         ];
     }
 
@@ -204,6 +205,12 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             return null;
+        }
+
+        if ('shuffle' === $prefix) {
+            \is_array($env) ? shuffle($env) : throw new RuntimeException(sprintf('Env var "%s" cannot be shuffled, expected array, got "%s".', $name, get_debug_type($env)));
+
+            return $env;
         }
 
         if (!\is_scalar($env)) {

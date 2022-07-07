@@ -455,6 +455,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     false === $firewall['stateless'] && isset($firewall['context']) ? $firewall['context'] : null,
                 ])
             ;
+
+            $config->replaceArgument(12, $firewall['logout']);
         }
 
         // Determine default entry point

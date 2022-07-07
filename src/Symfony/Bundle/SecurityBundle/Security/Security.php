@@ -14,11 +14,15 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
+use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -69,17 +73,30 @@ class Security extends LegacySecurity
      */
     public function logout(): ?Response
     {
-        $request = $this->container->get('request_stack')->getMainRequest();
-        $logoutEvent = new LogoutEvent($request, $this->container->get('security.token_storage')->getToken());
-        $firewallConfig = $this->container->get('security.firewall.map')->getFirewallConfig($request);
+        /** @var TokenStorageInterface $tokenStorage */
+        $tokenStorage = $this->container->get('security.token_storage');
 
-        if (!$firewallConfig) {
-            throw new LogicException('It is not possible to logout, as the request is not behind a firewall.');
+        if (!($token = $tokenStorage->getToken()) || !$token->getUser()) {
+            throw new LogicException('Unable to logout as there is no logged-in user.');
         }
-        $firewallName = $firewallConfig->getName();
 
-        $this->container->get('security.firewall.event_dispatcher_locator')->get($firewallName)->dispatch($logoutEvent);
-        $this->container->get('security.token_storage')->setToken();
+        $request = $this->container->get('request_stack')->getMainRequest();
+
+        if (!$firewallConfig = $this->container->get('security.firewall.map')->getFirewallConfig($request)) {
+            throw new LogicException('Unable to logout as the request is not behind a firewall.');
+        }
+
+        if ($this->container->has('security.csrf.token_manager') && $logoutConfig = $firewallConfig->getLogout()) {
+            $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $logoutConfig['csrf_parameter']);
+            if (!\is_string($csrfToken) || false === $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($logoutConfig['csrf_token_id'], $csrfToken))) {
+                throw new LogoutException('Invalid CSRF token.');
+            }
+        }
+
+        $logoutEvent = new LogoutEvent($request, $token);
+        $this->container->get('security.firewall.event_dispatcher_locator')->get($firewallConfig->getName())->dispatch($logoutEvent);
+
+        $tokenStorage->setToken();
 
         return $logoutEvent->getResponse();
     }

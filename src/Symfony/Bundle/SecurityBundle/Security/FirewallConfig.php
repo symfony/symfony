@@ -16,33 +16,21 @@ namespace Symfony\Bundle\SecurityBundle\Security;
  */
 final class FirewallConfig
 {
-    private string $name;
-    private string $userChecker;
-    private ?string $requestMatcher;
-    private bool $securityEnabled;
-    private bool $stateless;
-    private ?string $provider;
-    private ?string $context;
-    private ?string $entryPoint;
-    private ?string $accessDeniedHandler;
-    private ?string $accessDeniedUrl;
-    private array $authenticators;
-    private ?array $switchUser;
-
-    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $authenticators = [], array $switchUser = null)
-    {
-        $this->name = $name;
-        $this->userChecker = $userChecker;
-        $this->requestMatcher = $requestMatcher;
-        $this->securityEnabled = $securityEnabled;
-        $this->stateless = $stateless;
-        $this->provider = $provider;
-        $this->context = $context;
-        $this->entryPoint = $entryPoint;
-        $this->accessDeniedHandler = $accessDeniedHandler;
-        $this->accessDeniedUrl = $accessDeniedUrl;
-        $this->authenticators = $authenticators;
-        $this->switchUser = $switchUser;
+    public function __construct(
+        private readonly string $name,
+        private readonly string $userChecker,
+        private readonly ?string $requestMatcher = null,
+        private readonly bool $securityEnabled = true,
+        private readonly bool $stateless = false,
+        private readonly ?string $provider = null,
+        private readonly ?string $context = null,
+        private readonly ?string $entryPoint = null,
+        private readonly ?string $accessDeniedHandler = null,
+        private readonly ?string $accessDeniedUrl = null,
+        private readonly array $authenticators = [],
+        private readonly ?array $switchUser = null,
+        private readonly ?array $logout = null
+    ) {
     }
 
     public function getName(): string
@@ -110,5 +98,10 @@ final class FirewallConfig
     public function getSwitchUser(): ?array
     {
         return $this->switchUser;
+    }
+
+    public function getLogout(): ?array
+    {
+        return $this->logout;
     }
 }

@@ -1,0 +1,42 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+services:
+    # alias the service so we can access it in the tests
+    functional_test.security.helper:
+        alias: security.helper
+        public: true
+
+    functional.test.security.token_storage:
+        alias: security.token_storage
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\WelcomeController:
+        arguments: ['@security.helper']
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\LogoutController:
+        arguments: ['@security.helper', '@security.csrf.token_manager']
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
+
+security:
+    enable_authenticator_manager: true
+    providers:
+        in_memory:
+            memory:
+                users: []
+
+    firewalls:
+        default:
+            json_login:
+                username_path: user.login
+                password_path: user.password
+            logout:
+                path: /regular-logout
+            custom_authenticators:
+                - 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator'
+
+    access_control:
+        - { path: ^/foo, roles: PUBLIC_ACCESS }

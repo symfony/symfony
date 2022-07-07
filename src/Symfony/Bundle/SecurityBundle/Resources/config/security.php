@@ -87,6 +87,7 @@ return static function (ContainerConfigurator $container) {
                     'security.firewall.map' => service('security.firewall.map'),
                     'security.user_checker' => service('security.user_checker'),
                     'security.firewall.event_dispatcher_locator' => service('security.firewall.event_dispatcher_locator'),
+                    'security.csrf.token_manager' => service('security.csrf.token_manager')->ignoreOnInvalid(),
                 ]),
                 abstract_arg('authenticators'),
             ])
@@ -207,6 +208,7 @@ return static function (ContainerConfigurator $container) {
                 null,
                 [], // listeners
                 null, // switch_user
+                null, // logout
             ])
 
         ->set('security.logout_url_generator', LogoutUrlGenerator::class)

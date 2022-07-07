@@ -2,6 +2,6 @@ welcome:
     path: /welcome
     controller: Symfony\Bundle\SecurityBundle\Tests\Functional\WelcomeController::welcome
 
-logout:
-    path: /auto-logout
+force-logout:
+    path: /force-logout
     controller: Symfony\Bundle\SecurityBundle\Tests\Functional\LogoutController::logout

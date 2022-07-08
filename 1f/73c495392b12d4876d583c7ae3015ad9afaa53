@@ -1,0 +1,251 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-29T22:10:01Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-29T22:10:04Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-06-29T22:10:06Z
+
+PS: this is my first PR and I have done my best in following code style and any other applicable rules. Please advice if the PR needs improvement
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-06-29T22:18:57Z
+
+Appears as the tests that failed are not in the Console component. Does it still apply? I've only tested the Console componend with
+
+`php ./phpunit -v src/Symfony/Component/Console/`
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-06-30T10:22:53Z
+
+The following code can be used to display the new feature.
+
+Please note, however, that `INITIAL_ELEMENTS` needs to be set in such a way that the row with "Element_X" entries does not consume more than one line, as otherwise things will get messy.
+
+```PHP
+<?php
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
+
+require_once 'vendor/autoload.php';
+
+const INITIAL_ELEMENTS = 5;
+
+class TestCommand
+    extends
+    Command
+{
+
+    protected function configure(): void
+    {
+
+        $this->setName('test-command');
+        parent::configure();
+    }
+
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output
+    ): int {
+
+        $output1 = $output->section();
+        $output2 = $output->section();
+        $output3 = $output->section();
+
+        for ($i = 0; $i <= INITIAL_ELEMENTS;) {
+            $output3->write(sprintf('Element_%s ', ++$i), false);
+        }
+
+        $progress1 = new ProgressBar($output1, 50, 0);
+        $progress2 = new ProgressBar($output2, 50, 0);
+
+        $progress1->setFormat(' [%bar%] %percent:3s%% %current%/%max% %message%');
+        $progress2->setFormat(' [%bar%] %percent:3s%% %current%/%max% %message%');
+
+        $progress1->setMessage('progress_1');
+        $progress2->setMessage('progress_2');
+
+        $progress1->start();
+        sleep(1);
+        $output3->write(sprintf('Element_%s ', ++$i), false);
+
+        $progress2->start();
+        sleep(1);
+        $output3->write(sprintf('Element_%s ', ++$i), false);
+
+        $progress2->advance(20);
+        sleep(1);
+        $output3->write(sprintf('Element_%s ', ++$i), false);
+
+        $progress1->advance(10);
+        sleep(1);
+        $output3->write(sprintf('Element_%s ', ++$i), false);
+
+        $output4 = $output->section();
+        $output5 = $output->section();
+
+        $output5->write("Wait for the question!");
+        sleep(1);
+        $output3->write(sprintf('Element_%s ', ++$i), false);
+
+        $question = new QuestionHelper();
+        $answer   = $question->ask($input, $output4, new Question('What\'s your favorite super hero?'));
+        $output4->clear();
+
+        $output3->writeln(". The answer is: $answer");
+        $output5->writeln(" Thank you.");
+
+        return 0;
+    }
+
+}
+
+$application = new Application('test', '1.0');
+
+$application->add(new TestCommand());
+$application->setDefaultCommand('test-command');
+$application->run();
+
+```
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-06-30T11:33:39Z
+
+Thanks @chalasr for your feedback. I have updated the code accordingly.
+
+Also happy to stash the changes into one single commit. As I could not find the "Allow edits from maintainers" as mentioned by the bot.
+
+> It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+>
+> Cheers!
+>
+> Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-06-30T11:40:59Z
+
+You can find that checkbox on the right side of your PR:
+<img width="353" alt="Screenshot 2022-06-30 at 13 39 57" src="https://user-images.githubusercontent.com/7502063/176668701-41ce6ac7-2dc0-4b48-b47b-915ef867ebc5.png">
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-06-30T11:53:13Z
+
+> You can find that checkbox on the right side of your PR
+
+Thank you. Actually, that's where I was looking for it but there is nothing following the Participants list ... But no worries, I'll do the stashing.
+
+![image](https://user-images.githubusercontent.com/87441244/176671105-711f6589-18c6-4cd0-9f56-9cf41a17def7.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-06-30T15:40:34Z
+
+As this is a behavior change that people rely on, it cannot be fixed in 4.4. I'm not even sure having this in 6.2 would be acceptable.
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-06-30T15:57:40Z
+
+@fabpot in that case, #37304 should not be considered a but, but a feature request.
+
+But why would people rely on this bug? If you want to have a new line at the end of your message, then you would certainly use `writeln()` and not `write()`. In case you have always used `writeln()`, then the behavior does not change. If you used `write()` instead, relying on the fact that the newline would be added (but only if you write to a section), then I would consider this a buggy code that should be fixed. (IMO)
+
+Fact is, that it is currently not possible to write partial lines. Imagine the case of `./configure` in binary projects. Where you have something like:
+
+`checking for make ...`
+
+which will then become
+
+`checking for make ... ok.`
+
+This is possible in a normal console output, but not if it's a section. To me, that does not make sense. As a workaround, people could overwrite the entire section. If they do that, this will still work even with the fix applied.
+
+It would be good to have a use case, where people actually rely on the current buggy behavior.
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-07-05T13:36:57Z
+
+@fabpot, how do we proceed with this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-05T14:48:13Z
+
+I'm personally fine merging this on 6.2 if we consider this is too risky for 4.4.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-05T17:38:38Z
+
+There is no use case for the bug, just people not realizing the difference. Anyway, as this is "just" some CLI output, let's merge it in 6.2.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-05T17:39:56Z
+
+Can you change the branch to 6.2?
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-07-05T22:00:51Z
+
+Thank you guys for getting back on this. Certainly I can change the branch.
+
+Given that **v6.2 requires php v8.1** and this is unfortunately still not available on many platforms, would maybe **v5.4** be an acceptable compromise?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-06T09:42:55Z
+
+@bhujagendra-ishaya I fear it is not, sorry. Either we qualify it as a bug and then the fix goes to the lowest branch where it applies, or we qualify it as an enhancement (which is the case here for the reasons given) and then it is for the current development branch, namely 6.2.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-06T09:45:23Z
+
+@chalasr is right.

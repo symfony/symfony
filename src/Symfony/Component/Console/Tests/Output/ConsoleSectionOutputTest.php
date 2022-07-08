@@ -141,6 +141,52 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[2A\x1b[0JBar".\PHP_EOL."\x1b[1A\x1b[0JBaz".\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0JFoobar".\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
+    public function testMultipleSectionsOutputWithoutNewline()
+    {
+        $expected = '';
+        $output = new StreamOutput($this->stream);
+        $sections = [];
+        $output1 = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $output2 = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output1->write('Foo');
+        $expected .= 'Foo'.\PHP_EOL;
+        $output2->writeln('Bar');
+        $expected .= 'Bar'.\PHP_EOL;
+
+        $output1->writeln(' is not foo.');
+        $expected .= "\x1b[2A\x1b[0JFoo is not foo.".\PHP_EOL.'Bar'.\PHP_EOL;
+
+        $output2->write('Baz');
+        $expected .= 'Baz'.\PHP_EOL;
+        $output2->write('bar');
+        $expected .= "\x1b[1A\x1b[0JBazbar".\PHP_EOL;
+        $output2->writeln('');
+        $expected .= "\x1b[1A\x1b[0JBazbar".\PHP_EOL;
+        $output2->writeln('');
+        $expected .= \PHP_EOL;
+        $output2->writeln('Done.');
+        $expected .= 'Done.'.\PHP_EOL;
+
+        rewind($output->getStream());
+        $this->assertSame($expected, stream_get_contents($output->getStream()));
+    }
+
+    public function testClearAfterOverwriteClearsCorrectNumberOfLines()
+    {
+        $expected = '';
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->overwrite('foo');
+        $expected .= 'foo'.\PHP_EOL;
+        $output->clear();
+        $expected .= "\x1b[1A\x1b[0J";
+
+        rewind($output->getStream());
+        $this->assertSame($expected, stream_get_contents($output->getStream()));
+    }
+
     public function testClearSectionContainingQuestion()
     {
         $inputStream = fopen('php://memory', 'r+', false);

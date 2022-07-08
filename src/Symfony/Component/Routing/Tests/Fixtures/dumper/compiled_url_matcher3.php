@@ -24,7 +24,7 @@ return [
     ],
     static function ($condition, $context, $request) { // $checkCondition
         switch ($condition) {
-            case -1: return ($context->getMethod() == "GET");
+            case -1: return $context->getMethod() == "GET";
         }
     },
 ];

@@ -61,11 +61,11 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $instance->foo2 = null;
         $instance->foo3 = ($this->privates['foo3'] ?? null);
         $instance->closures = [0 => function () {
-            return ($this->services['foo1'] ?? null);
+            return $this->services['foo1'] ?? null;
         }, 1 => function () {
             return null;
         }, 2 => function () {
-            return ($this->privates['foo3'] ?? null);
+            return $this->privates['foo3'] ?? null;
         }];
         $instance->iter = new RewindableGenerator(function () {
             if (isset($this->services['foo1'])) {
@@ -78,7 +78,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
                 yield 'foo3' => ($this->privates['foo3'] ?? null);
             }
         }, function () {
-            return 0 + (int) (isset($this->services['foo1'])) + (int) (false) + (int) (isset($this->privates['foo3']));
+            return 0 + (int) (isset($this->services['foo1'])) + (int) false + (int) (isset($this->privates['foo3']));
         });
 
         return $instance;

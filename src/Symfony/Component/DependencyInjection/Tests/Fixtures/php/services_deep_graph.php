@@ -54,7 +54,7 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
     {
         $this->services['bar'] = $instance = new \stdClass();
 
-        $instance->p5 = new \stdClass(($this->services['foo'] ?? $this->getFooService()));
+        $instance->p5 = new \stdClass($this->services['foo'] ?? $this->getFooService());
 
         return $instance;
     }

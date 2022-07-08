@@ -53,7 +53,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('file://'.\dirname(__DIR__, 1)), [('file://'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
+        return $this->services['test'] = new \stdClass('file://'.\dirname(__DIR__, 1), [('file://'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
     }
 
     /**

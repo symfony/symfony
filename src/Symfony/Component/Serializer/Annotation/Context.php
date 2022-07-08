@@ -38,7 +38,7 @@ final class Context
     public function __construct(array $options = [], array $context = [], array $normalizationContext = [], array $denormalizationContext = [], $groups = [])
     {
         if (!$context) {
-            if (!array_intersect((array_keys($options)), ['normalizationContext', 'groups', 'context', 'value', 'denormalizationContext'])) {
+            if (!array_intersect(array_keys($options), ['normalizationContext', 'groups', 'context', 'value', 'denormalizationContext'])) {
                 // gracefully supports context as first, unnamed attribute argument if it cannot be confused with Doctrine-style options
                 $context = $options;
             } else {

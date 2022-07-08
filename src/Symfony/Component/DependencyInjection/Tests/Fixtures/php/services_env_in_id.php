@@ -56,7 +56,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        return $this->services['bar'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass())));
+        return $this->services['bar'] = new \stdClass($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass()));
     }
 
     /**
@@ -66,7 +66,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass())), ['baz_'.$this->getEnv('string:BAR') => new \stdClass()]);
+        return $this->services['foo'] = new \stdClass($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass()), ['baz_'.$this->getEnv('string:BAR') => new \stdClass()]);
     }
 
     /**

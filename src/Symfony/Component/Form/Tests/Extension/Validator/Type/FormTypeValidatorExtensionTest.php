@@ -80,7 +80,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
             ->getFormFactory()
-            ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
+            ->create(FormTypeTest::TESTED_TYPE, null, ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
                     new Length(['min' => 10, 'groups' => ['First']]),
@@ -126,7 +126,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension($validator))
             ->getFormFactory()
-            ->create(FormTypeTest::TESTED_TYPE, new Author(), (['validation_groups' => new GroupSequence(['First', 'Second'])]))
+            ->create(FormTypeTest::TESTED_TYPE, new Author(), ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('firstName', TextTypeTest::TESTED_TYPE)
             ->add('lastName', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [

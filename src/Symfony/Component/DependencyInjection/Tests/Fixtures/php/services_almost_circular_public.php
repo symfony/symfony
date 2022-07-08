@@ -110,7 +110,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $this->services['bar'] = $instance = new \BarCircular();
 
-        $instance->addFoobar(($this->services['foobar'] ?? $this->getFoobarService()));
+        $instance->addFoobar($this->services['foobar'] ?? $this->getFoobarService());
 
         return $instance;
     }
@@ -203,7 +203,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $this->services['connection2'] = $instance = new \stdClass($a, $b);
 
         $c = new \stdClass($instance);
-        $c->handler2 = new \stdClass(($this->services['manager2'] ?? $this->getManager2Service()));
+        $c->handler2 = new \stdClass($this->services['manager2'] ?? $this->getManager2Service());
 
         $b->logger2 = $c;
 
@@ -261,7 +261,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $this->services['dispatcher2'] = $instance = new \stdClass();
 
-        $instance->subscriber2 = new \stdClass(($this->services['manager2'] ?? $this->getManager2Service()));
+        $instance->subscriber2 = new \stdClass($this->services['manager2'] ?? $this->getManager2Service());
 
         return $instance;
     }
@@ -299,7 +299,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getDoctrine_ListenerService()
     {
-        return $this->services['doctrine.listener'] = new \stdClass(($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService()));
+        return $this->services['doctrine.listener'] = new \stdClass($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService());
     }
 
     /**
@@ -329,7 +329,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
 
         $this->services['foo2'] = $instance = new \FooCircular($a);
 
-        $a->addFoobar(($this->services['foobar2'] ?? $this->getFoobar2Service()));
+        $a->addFoobar($this->services['foobar2'] ?? $this->getFoobar2Service());
 
         return $instance;
     }
@@ -483,7 +483,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
 
         $this->services['logger'] = $instance = new \stdClass($a);
 
-        $instance->handler = new \stdClass(($this->services['manager'] ?? $this->getManagerService()));
+        $instance->handler = new \stdClass($this->services['manager'] ?? $this->getManagerService());
 
         return $instance;
     }
@@ -518,7 +518,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getMailer_TransportFactory_AmazonService()
     {
-        return $this->services['mailer.transport_factory.amazon'] = new \stdClass(($this->services['monolog.logger_2'] ?? $this->getMonolog_Logger2Service()));
+        return $this->services['mailer.transport_factory.amazon'] = new \stdClass($this->services['monolog.logger_2'] ?? $this->getMonolog_Logger2Service());
     }
 
     /**
@@ -540,7 +540,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getMailerInline_TransportFactory_AmazonService()
     {
-        return $this->services['mailer_inline.transport_factory.amazon'] = new \stdClass(($this->services['monolog_inline.logger_2'] ?? $this->getMonologInline_Logger2Service()));
+        return $this->services['mailer_inline.transport_factory.amazon'] = new \stdClass($this->services['monolog_inline.logger_2'] ?? $this->getMonologInline_Logger2Service());
     }
 
     /**
@@ -723,7 +723,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
 
         $b = new \stdClass();
 
-        $a->call(new \stdClass(new \stdClass($b, ($this->privates['level5'] ?? $this->getLevel5Service()))));
+        $a->call(new \stdClass(new \stdClass($b, $this->privates['level5'] ?? $this->getLevel5Service())));
 
         return $this->services['root'] = new \stdClass($a, $b);
     }

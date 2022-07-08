@@ -110,7 +110,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     {
         $this->services['bar2'] = $instance = new \BarCircular();
 
-        $instance->addFoobar(new \FoobarCircular(($this->services['foo2'] ?? $this->getFoo2Service())));
+        $instance->addFoobar(new \FoobarCircular($this->services['foo2'] ?? $this->getFoo2Service()));
 
         return $instance;
     }
@@ -331,7 +331,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
         $this->services['logger'] = $instance = new \stdClass($a);
 
-        $instance->handler = new \stdClass(($this->services['manager'] ?? $this->getManagerService()));
+        $instance->handler = new \stdClass($this->services['manager'] ?? $this->getManagerService());
 
         return $instance;
     }
@@ -447,7 +447,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
         $b = new \stdClass();
 
-        $a->call(new \stdClass(new \stdClass($b, ($this->privates['level5'] ?? $this->getLevel5Service()))));
+        $a->call(new \stdClass(new \stdClass($b, $this->privates['level5'] ?? $this->getLevel5Service())));
 
         return $this->services['root'] = new \stdClass($a, $b);
     }
@@ -491,7 +491,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected function getDoctrine_ListenerService()
     {
-        return $this->privates['doctrine.listener'] = new \stdClass(($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService()));
+        return $this->privates['doctrine.listener'] = new \stdClass($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService());
     }
 
     /**

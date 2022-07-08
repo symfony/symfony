@@ -143,7 +143,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['baz'] = $instance = new \Baz();
 
-        $instance->setFoo(($this->services['foo_with_inline'] ?? $this->getFooWithInlineService()));
+        $instance->setFoo($this->services['foo_with_inline'] ?? $this->getFooWithInlineService());
 
         return $instance;
     }
@@ -158,7 +158,7 @@ class ProjectServiceContainer extends Container
         $this->services['configured_service'] = $instance = new \stdClass();
 
         $a = new \ConfClass();
-        $a->setFoo(($this->services['baz'] ?? $this->getBazService()));
+        $a->setFoo($this->services['baz'] ?? $this->getBazService());
 
         $a->configureStdClass($instance);
 
@@ -247,7 +247,7 @@ class ProjectServiceContainer extends Container
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = ['bar' => 'foo is bar', 'foobar' => 'bar'];
-        $instance->setBar(($this->services['bar'] ?? $this->getBar3Service()));
+        $instance->setBar($this->services['bar'] ?? $this->getBar3Service());
         $instance->initialize();
         sc_configure($instance);
 
@@ -276,7 +276,7 @@ class ProjectServiceContainer extends Container
     protected function getFooBarService()
     {
         $this->factories['foo_bar'] = function () {
-            return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
+            return new \Bar\FooClass($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService());
         };
 
         return $this->factories['foo_bar']();
@@ -293,7 +293,7 @@ class ProjectServiceContainer extends Container
 
         $a = new \Bar();
         $a->pub = 'pub';
-        $a->setBaz(($this->services['baz'] ?? $this->getBazService()));
+        $a->setBaz($this->services['baz'] ?? $this->getBazService());
 
         $instance->setBar($a);
 
@@ -340,9 +340,9 @@ class ProjectServiceContainer extends Container
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
-        $instance->setBar(($this->services['foo'] ?? $this->getFooService()));
+        $instance->setBar($this->services['foo'] ?? $this->getFooService());
         $instance->setBar(NULL);
-        $instance->setBar((($this->services['foo'] ?? $this->getFooService())->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
+        $instance->setBar(($this->services['foo'] ?? $this->getFooService())->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default")));
 
         return $instance;
     }

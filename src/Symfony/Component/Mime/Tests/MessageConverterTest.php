@@ -66,11 +66,13 @@ class MessageConverterTest extends TestCase
 
     private function assertConversion(Email $expected)
     {
-        $r = new \ReflectionMethod($expected, 'generateBody');
-        $r->setAccessible(true);
-
-        $message = new Message($expected->getHeaders(), $r->invoke($expected));
+        $message = new Message($expected->getHeaders(), $expected->getBody());
         $converted = MessageConverter::toEmail($message);
+
+        $r = new \ReflectionMethod($converted, 'generateBody');
+        $r->setAccessible(true);
+        $r->invoke($converted);
+
         if ($expected->getHtmlBody()) {
             $this->assertStringMatchesFormat(str_replace('cid:test.jpg', 'cid:%s', $expected->getHtmlBody()), $converted->getHtmlBody());
             $expected->html('HTML content');

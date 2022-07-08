@@ -80,6 +80,7 @@ class TemplatedEmailTest extends TestCase
             "inline": false
         }
     ],
+    "cachedBody": null,
     "headers": {
         "to": [
             {

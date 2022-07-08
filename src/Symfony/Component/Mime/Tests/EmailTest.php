@@ -418,6 +418,7 @@ class EmailTest extends TestCase
             "inline": false
         }
     ],
+    "cachedBody": null,
     "headers": {
         "to": [
             {

@@ -64,9 +64,8 @@ final class TranslationPullCommand extends Command
         if ($input->mustSuggestOptionValuesFor('domains')) {
             $provider = $this->providerCollection->get($input->getArgument('provider'));
 
-            if ($provider && method_exists($provider, 'getDomains')) {
-                $domains = $provider->getDomains();
-                $suggestions->suggestValues($domains);
+            if (method_exists($provider, 'getDomains')) {
+                $suggestions->suggestValues($provider->getDomains());
             }
 
             return;

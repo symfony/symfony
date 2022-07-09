@@ -4,7 +4,7 @@ CHANGELOG
 6.2
 ---
 
- * The Sendgrid API transport now adds the `Envelope`'s options to the payload
+ * Add support for the `Envelope`'s options to the Sendgrid API transport
 
 5.4
 ---

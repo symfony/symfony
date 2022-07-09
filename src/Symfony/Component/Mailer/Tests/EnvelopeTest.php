@@ -147,8 +147,7 @@ class EnvelopeTest extends TestCase
 
     public function testSettingOptions()
     {
-        $message = $this->getMockBuilder(Message::class)->getMock();
-        $e = Envelope::create($message);
+        $e = Envelope::create(new Message());
         $e->setOption('setting_name1', 'setting_value1');
         $e->setOption('setting_name2', 'setting_value2');
         $this->assertEquals(['setting_name1' => 'setting_value1', 'setting_name2' => 'setting_value2'], $e->getOptions());

@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-6.1
+6.2
 ---
 
-* Check the `Envelope` options for a "mail_settings" property and send the
-  value in the payload to Sendgrid
+ * The Sendgrid API transport now adds the `Envelope`'s options to the payload
 
 5.4
 ---

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-10T14:47:52Z
+
+Can/will this be chainable with the « env(csv:FOO) » env processor?
+Like doing « env(shuffle:csv:FOO) »
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2022-07-10T18:22:12Z
+
+of course

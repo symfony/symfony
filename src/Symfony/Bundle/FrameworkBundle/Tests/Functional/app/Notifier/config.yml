@@ -1,0 +1,25 @@
+imports:
+    - { resource: ../config/default.yml }
+    - { resource: services.yml }
+
+framework:
+    mailer:
+        dsn: 'null://null'
+    notifier:
+        chatter_transports:
+            slack: 'null://null'
+            mercure: 'null://null'
+        channel_policy:
+            urgent: ['chat/mercure']
+        admin_recipients:
+            - { email: admin@example.com }
+    profiler: ~
+
+mercure:
+    hubs:
+        default:
+            url: 'null://null'
+            jwt:
+                secret: '!ChangeMe!'
+                publish: [ 'foo', 'https://example.com/foo' ]
+                subscribe: [ 'bar', 'https://example.com/bar' ]

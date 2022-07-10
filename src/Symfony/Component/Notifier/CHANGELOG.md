@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add PHPUnit constraints
+
 6.1
 ---
 

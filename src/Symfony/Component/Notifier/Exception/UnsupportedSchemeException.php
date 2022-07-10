@@ -212,6 +212,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Yunpian\YunpianTransportFactory::class,
             'package' => 'symfony/yunpian-notifier',
         ],
+        'zendesk' => [
+            'class' => Bridge\Zendesk\ZendeskTransportFactory::class,
+            'package' => 'symfony/zendesk-notifier',
+        ],
         'zulip' => [
             'class' => Bridge\Zulip\ZulipTransportFactory::class,
             'package' => 'symfony/zulip-notifier',

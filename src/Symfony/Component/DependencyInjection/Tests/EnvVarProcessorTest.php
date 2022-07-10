@@ -708,6 +708,23 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
+    public function testGetEnvShuffle()
+    {
+        mt_srand(2);
+
+        $this->assertSame(
+            ['bar', 'foo'],
+            (new EnvVarProcessor(new Container()))->getEnv('shuffle', '', fn () => ['foo', 'bar']),
+        );
+    }
+
+    public function testGetEnvShuffleInvalid()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Env var "foo" cannot be shuffled, expected array, got "string".');
+        (new EnvVarProcessor(new Container()))->getEnv('shuffle', 'foo', fn () => 'bar');
+    }
+
     public function validCsv()
     {
         $complex = <<<'CSV'

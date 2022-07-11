@@ -38,19 +38,7 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
             return;
         }
 
-        $namedArguments = [];
-        $arguments = $event->getArguments();
-        $r = $event->getRequest()->attributes->get('_controller_reflectors')[1] ?? new \ReflectionFunction($event->getController());
-
-        foreach ($r->getParameters() as $i => $param) {
-            if ($param->isVariadic()) {
-                $namedArguments[$param->name] = \array_slice($arguments, $i);
-                break;
-            }
-            if (\array_key_exists($i, $arguments)) {
-                $namedArguments[$param->name] = $arguments[$i];
-            }
-        }
+        $arguments = $event->getNamedArguments();
 
         foreach ($attributes as $attribute) {
             $subjectRef = $attribute->subject;
@@ -59,15 +47,15 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
             if ($subjectRef) {
                 if (\is_array($subjectRef)) {
                     foreach ($subjectRef as $ref) {
-                        if (!\array_key_exists($ref, $namedArguments)) {
+                        if (!\array_key_exists($ref, $arguments)) {
                             throw new \RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $ref, $ref));
                         }
-                        $subject[$ref] = $namedArguments[$ref];
+                        $subject[$ref] = $arguments[$ref];
                     }
-                } elseif (!\array_key_exists($subjectRef, $namedArguments)) {
+                } elseif (!\array_key_exists($subjectRef, $arguments)) {
                     throw new \RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $subjectRef, $subjectRef));
                 } else {
-                    $subject = $namedArguments[$subjectRef];
+                    $subject = $arguments[$subjectRef];
                 }
             }
 

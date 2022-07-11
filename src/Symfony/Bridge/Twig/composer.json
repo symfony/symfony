@@ -30,7 +30,7 @@
         "symfony/form": "^6.1",
         "symfony/html-sanitizer": "^6.1",
         "symfony/http-foundation": "^5.4|^6.0",
-        "symfony/http-kernel": "^5.4|^6.0",
+        "symfony/http-kernel": "^6.2",
         "symfony/intl": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0",
         "symfony/polyfill-intl-icu": "~1.0",
@@ -58,7 +58,7 @@
         "symfony/console": "<5.4",
         "symfony/form": "<6.1",
         "symfony/http-foundation": "<5.4",
-        "symfony/http-kernel": "<5.4",
+        "symfony/http-kernel": "<6.2",
         "symfony/translation": "<5.4",
         "symfony/workflow": "<5.4"
     },

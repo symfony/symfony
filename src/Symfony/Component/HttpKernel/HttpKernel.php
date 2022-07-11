@@ -156,14 +156,13 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER_ARGUMENTS);
         $controller = $event->getController();
         $arguments = $event->getArguments();
-        $request->attributes->remove('_controller_reflectors');
 
         // call controller
         $response = $controller(...$arguments);
 
         // view
         if (!$response instanceof Response) {
-            $event = new ViewEvent($this, $request, $type, $response);
+            $event = new ViewEvent($this, $request, $type, $response, $event);
             $this->dispatcher->dispatch($event, KernelEvents::VIEW);
 
             if ($event->hasResponse()) {
@@ -179,6 +178,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 throw new ControllerDoesNotReturnResponseException($msg, $controller, __FILE__, __LINE__ - 17);
             }
         }
+        $request->attributes->remove('_controller_reflectors');
 
         return $this->filterResponse($response, $request, $type);
     }

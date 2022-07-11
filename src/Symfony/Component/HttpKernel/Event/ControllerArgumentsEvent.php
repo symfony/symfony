@@ -30,6 +30,7 @@ final class ControllerArgumentsEvent extends KernelEvent
 {
     private ControllerEvent $controllerEvent;
     private array $arguments;
+    private array $namedArguments;
 
     public function __construct(HttpKernelInterface $kernel, callable|ControllerEvent $controller, array $arguments, Request $request, ?int $requestType)
     {
@@ -54,6 +55,7 @@ final class ControllerArgumentsEvent extends KernelEvent
     public function setController(callable $controller, array $attributes = null): void
     {
         $this->controllerEvent->setController($controller, $attributes);
+        unset($this->namedArguments);
     }
 
     public function getArguments(): array
@@ -64,6 +66,32 @@ final class ControllerArgumentsEvent extends KernelEvent
     public function setArguments(array $arguments)
     {
         $this->arguments = $arguments;
+        unset($this->namedArguments);
+    }
+
+    public function getNamedArguments(): array
+    {
+        if (isset($this->namedArguments)) {
+            return $this->namedArguments;
+        }
+
+        $namedArguments = [];
+        $arguments = $this->arguments;
+        $r = $this->getRequest()->attributes->get('_controller_reflectors')[1] ?? new \ReflectionFunction($this->controllerEvent->getController());
+
+        foreach ($r->getParameters() as $i => $param) {
+            if ($param->isVariadic()) {
+                $namedArguments[$param->name] = \array_slice($arguments, $i);
+                break;
+            }
+            if (\array_key_exists($i, $arguments)) {
+                $namedArguments[$param->name] = $arguments[$i];
+            } elseif ($param->isDefaultvalueAvailable()) {
+                $namedArguments[$param->name] = $param->getDefaultValue();
+            }
+        }
+
+        return $this->namedArguments = $namedArguments;
     }
 
     /**

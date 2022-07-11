@@ -76,7 +76,7 @@ class Security extends LegacySecurity
                 throw new LogicException(sprintf('No authenticator was found for the firewall "%s".', $firewallName));
             }
             if (1 < \count($authenticatorIds)) {
-                throw new LogicException(sprintf('Too much authenticators were found for the current firewall "%s". You must provide an instance of "%s" to login programmatically. The available authenticators for the firewall "%s" are "%s".', $firewallName, AuthenticatorInterface::class, $firewallName, implode('" ,"', $authenticatorIds)));
+                throw new LogicException(sprintf('Too many authenticators were found for the current firewall "%s". You must provide an instance of "%s" to login programmatically. The available authenticators for the firewall "%s" are "%s".', $firewallName, AuthenticatorInterface::class, $firewallName, implode('" ,"', $authenticatorIds)));
             }
 
             return $firewallAuthenticatorLocator->get($authenticatorIds[0]);

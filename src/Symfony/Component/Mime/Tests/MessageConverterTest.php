@@ -75,6 +75,12 @@ class MessageConverterTest extends TestCase
             $expected->html('HTML content');
             $converted->html('HTML content');
         }
+
+        $r = new \ReflectionProperty($expected, 'cachedBody');
+        $r->setAccessible(true);
+        $r->setValue($expected, null);
+        $r->setValue($converted, null);
+
         $this->assertEquals($expected, $converted);
     }
 }

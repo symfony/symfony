@@ -172,6 +172,30 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
+    /**
+     * @dataProvider forwardSlashesRequestPathProvider
+     */
+    public function testMultipleForwardSlashesRequestPath(string $requestPath)
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with('GET', 'http://localhost'.$requestPath)
+            ->willReturn($this->createMock(ResponseInterface::class));
+        $browser = new HttpBrowser($client);
+        $browser->request('GET', $requestPath);
+    }
+
+    public function forwardSlashesRequestPathProvider()
+    {
+        return [
+            'one slash' => ['/'],
+            'two slashes' => ['//'],
+            'multiple slashes' => ['////'],
+        ];
+    }
+
     private function uploadFile(string $data): string
     {
         $path = tempnam(sys_get_temp_dir(), 'http');

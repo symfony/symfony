@@ -3,7 +3,7 @@
   <commands>
     <command id="_complete" name="_complete" hidden="1">
       <usages>
-        <usage>_complete [-s|--shell SHELL] [-i|--input INPUT] [-c|--current CURRENT] [-S|--symfony SYMFONY]</usage>
+        <usage>_complete [-s|--shell SHELL] [-i|--input INPUT] [-c|--current CURRENT] [-a|--api-version API-VERSION] [-S|--symfony SYMFONY]</usage>
       </usages>
       <description>Internal command to provide shell completion suggestions</description>
       <help>Internal command to provide shell completion suggestions</help>
@@ -21,8 +21,12 @@
           <description>The index of the "input" array that the cursor is in (e.g. COMP_CWORD)</description>
           <defaults/>
         </option>
+        <option name="--api-version" shortcut="-a" accept_value="1" is_value_required="1" is_multiple="0">
+          <description>The API version of the completion script</description>
+          <defaults/>
+        </option>
         <option name="--symfony" shortcut="-S" accept_value="1" is_value_required="1" is_multiple="0">
-          <description>The version of the completion script</description>
+          <description>deprecated</description>
           <defaults/>
         </option>
         <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">

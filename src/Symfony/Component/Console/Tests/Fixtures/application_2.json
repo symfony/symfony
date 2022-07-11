@@ -8,7 +8,7 @@
             "name": "_complete",
             "hidden": true,
             "usage": [
-                "_complete [-s|--shell SHELL] [-i|--input INPUT] [-c|--current CURRENT] [-S|--symfony SYMFONY]"
+                "_complete [-s|--shell SHELL] [-i|--input INPUT] [-c|--current CURRENT] [-a|--api-version API-VERSION] [-S|--symfony SYMFONY]"
             ],
             "description": "Internal command to provide shell completion suggestions",
             "help": "Internal command to provide shell completion suggestions",
@@ -21,7 +21,7 @@
                         "accept_value": true,
                         "is_value_required": true,
                         "is_multiple": false,
-                        "description": "The version of the completion script",
+                        "description": "deprecated",
                         "default": null
                     },
                     "help": {
@@ -113,6 +113,15 @@
                         "is_multiple": true,
                         "description": "An array of input tokens (e.g. COMP_WORDS or argv)",
                         "default": []
+                    },
+                    "api-version": {
+                        "name": "--api-version",
+                        "shortcut": "-a",
+                        "accept_value": true,
+                        "is_value_required": true,
+                        "is_multiple": false,
+                        "description": "The API version of the completion script",
+                        "default": null
                     }
                 }
             }

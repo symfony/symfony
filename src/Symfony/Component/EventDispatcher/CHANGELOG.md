@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `NamedListener` interface and `AbstractNamedListener` class to support self-naming Event listeners in debug/profiling scenarios
+
 6.0
 ---
 

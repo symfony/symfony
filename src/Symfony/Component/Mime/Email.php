@@ -43,7 +43,10 @@ class Email extends Message
     private $html;
     private $htmlCharset;
     private $attachments = [];
-    private ?AbstractPart $cachedBody = null; // Used to avoid wrong body hash in DKIM signatures with multiple parts (e.g. HTML + TEXT) due to multiple boundaries.
+    /**
+     * @var AbstractPart|null
+     */
+    private $cachedBody; // Used to avoid wrong body hash in DKIM signatures with multiple parts (e.g. HTML + TEXT) due to multiple boundaries.
 
     /**
      * @return $this

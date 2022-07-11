@@ -49,6 +49,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'trim' => ['string'],
             'require' => ['bool', 'int', 'float', 'string', 'array'],
             'enum' => [\BackedEnum::class],
+            'shuffle' => ['array'],
         ];
 
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());

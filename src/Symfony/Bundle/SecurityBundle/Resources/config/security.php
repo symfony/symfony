@@ -42,6 +42,7 @@ use Symfony\Component\Security\Core\User\MissingUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
+use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -269,5 +270,9 @@ return static function (ContainerConfigurator $container) {
                 service('security.expression_language'),
             ])
             ->tag('kernel.cache_warmer')
+
+        ->set('controller.is_granted_attribute_listener', IsGrantedAttributeListener::class)
+            ->args([service('security.authorization_checker')])
+            ->tag('kernel.event_subscriber')
     ;
 };

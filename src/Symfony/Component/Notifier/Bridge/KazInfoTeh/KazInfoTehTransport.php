@@ -32,7 +32,7 @@ class KazInfoTehTransport extends AbstractTransport
     private string $password;
     private string $sender;
 
-    public function __construct(string $username, string $password, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $username, #[\SensitiveParameter] string $password, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->username = $username;
         $this->password = $password;

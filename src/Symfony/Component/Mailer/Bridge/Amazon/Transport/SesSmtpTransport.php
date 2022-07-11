@@ -28,7 +28,7 @@ class SesSmtpTransport extends EsmtpTransport
     /**
      * @param string|null $region Amazon SES region
      */
-    public function __construct(string $username, string $password, string $region = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $username, #[\SensitiveParameter] string $password, string $region = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct(sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1'), 465, true, $dispatcher, $logger);
 

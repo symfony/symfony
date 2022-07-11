@@ -34,7 +34,7 @@ final class SendberryTransport extends AbstractTransport
     private string $authKey;
     private string $from;
 
-    public function __construct(string $username, string $password, string $authKey, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $username, #[\SensitiveParameter] string $password, string $authKey, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->username = $username;
         $this->password = $password;

@@ -37,7 +37,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
     {
         if (!isset($this->tokens[$series])) {
             throw new TokenNotFoundException('No token found.');

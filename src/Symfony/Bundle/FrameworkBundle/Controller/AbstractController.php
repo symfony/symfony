@@ -374,7 +374,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * @param string      $id    The id used when generating the token
      * @param string|null $token The actual token sent with the request that should be validated
      */
-    protected function isCsrfTokenValid(string $id, ?string $token): bool
+    protected function isCsrfTokenValid(string $id, #[\SensitiveParameter] ?string $token): bool
     {
         if (!$this->container->has('security.csrf.token_manager')) {
             throw new \LogicException('CSRF protection is not enabled in your application. Enable it with the "csrf_protection" key in "config/packages/framework.yaml".');

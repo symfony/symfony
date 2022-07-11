@@ -22,7 +22,7 @@ class MandrillSmtpTransport extends EsmtpTransport
 {
     use MandrillHeadersTrait;
 
-    public function __construct(string $username, string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $username, #[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('smtp.mandrillapp.com', 587, false, $dispatcher, $logger);
 

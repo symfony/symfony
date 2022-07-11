@@ -32,7 +32,7 @@ final class RocketChatTransport extends AbstractTransport
     private string $accessToken;
     private ?string $chatChannel;
 
-    public function __construct(string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accessToken = $accessToken;
         $this->chatChannel = $chatChannel;

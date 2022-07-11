@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-04-28T16:06:13Z
+
+Just saying: in the PHP repository there was an issue about making this `#[\SensitiveParameter]` feature configurable because in dev/test you probably don't want to hide anything.
+
+See https://github.com/php/php-src/issues/8381
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-04-28T16:48:45Z
+
+@javiereguiluz we should expose the `SensitiveParameterValue` in Symfony error page and profiler?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-04-28T16:55:05Z
+
+I don't know. It was just a "maybe we should think about this" comment.
+
+Imagine a bug where you mistyped some chars in your password. But is that common?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-05T09:11:26Z
+
+Can you take a look at the rest of the codebase where this could be useful? I think it's fine do it once for all, everywhere plain credentials are passed around (#46853 mentions some relevant places btw)
+
+---------------------------------------------------------------------------
+
+by TimWolla at 2022-07-05T09:18:47Z
+
+RFC author here :wave:
+
+> Can you take a look at the rest of the codebase where this could be useful? I think it's fine do it once for all, everywhere plain credentials are passed around
+
+I recommend not just looking at credentials, but also stuff like plaintext values that are passed into an encryption component to be encrypted. I'm not a Symfony user, but an example would likely be `CsrfTokenManager::randomize()`.
+
+My php-src PR that adds the attribute is this one: https://github.com/php/php-src/pull/8352, it might be a good reference.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-07-09T22:10:20Z
+
+I added the annotation on every method argument that looks like a secret.
+
+Notes:
+- A DSN string can contain the password. Hiding the whole DSN can hurt debugging.
+- Some functions cannot throw an exception or make an error. Adding the annotation may be useless.
+- This annotation is not a guarantee that a sensitive value will not be exposed. This values are passed to generic functions that will not have the annotation.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-10T14:21:27Z
+
+> A DSN string can contain the password. Hiding the whole DSN can hurt debugging.
+
+That's ok as long as we manage to reveal the sensitive values in debugging contexts such as the webprofiler, right?
+
+> Some functions cannot throw an exception or make an error. Adding the annotation may be useless.
+
+Fine to me as well, as they might do at some point or be extended.

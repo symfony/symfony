@@ -477,9 +477,7 @@ class Email extends Message
             }
         }
 
-        $this->cachedBody = $part;
-
-        return $part;
+        return $this->cachedBody = $part;
     }
 
     private function prepareParts(): ?array

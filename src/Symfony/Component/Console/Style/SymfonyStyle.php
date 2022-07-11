@@ -274,14 +274,17 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function choice(string $question, array $choices, mixed $default = null): mixed
+    public function choice(string $question, array $choices, mixed $default = null, bool $multiSelect = false): mixed
     {
         if (null !== $default) {
             $values = array_flip($choices);
             $default = $values[$default] ?? $default;
         }
+        
+        $questionChoice = new ChoiceQuestion($question, $choices, $default);
+        $questionChoice->setMultiselect($multiSelect);
 
-        return $this->askQuestion(new ChoiceQuestion($question, $choices, $default));
+        return $this->askQuestion($questionChoice);
     }
 
     /**

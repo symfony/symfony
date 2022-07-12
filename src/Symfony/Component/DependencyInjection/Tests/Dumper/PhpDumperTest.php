@@ -36,6 +36,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -312,7 +313,6 @@ class PhpDumperTest extends TestCase
             ->setLazy(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -708,7 +708,10 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper($asGhostObject));
+
+        if (!$asGhostObject) {
+            $dumper->setProxyDumper(new \DummyProxyDumper());
+        }
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy'.($asGhostObject ? '_ghost' : '').'.php', $dumper->dump());
     }
@@ -726,7 +729,6 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_duplicates.php', $dumper->dump());
     }
@@ -759,12 +761,12 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
         $dumper->dump();
 
         $this->addToAssertionCount(1);
 
         $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new NullDumper());
 
         $message = 'Circular reference detected for service "foo", path: "foo -> bar -> foo". Try running "composer require symfony/proxy-manager-bridge".';
         $this->expectException(ServiceCircularReferenceException::class);
@@ -785,7 +787,10 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper($asGhostObject));
+
+        if (!$asGhostObject) {
+            $dumper->setProxyDumper(new \DummyProxyDumper());
+        }
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy'.($asGhostObject ? '_ghost' : '_proxy').'.php', $dumper->dump());
     }
@@ -1059,6 +1064,7 @@ class PhpDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
         $container->compile();
         $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new NullDumper());
 
         $container = 'Symfony_DI_PhpDumper_Test_Almost_Circular_'.ucfirst($visibility);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_almost_circular_'.$visibility.'.php', $dumper->dump(['class' => $container]));

@@ -23,7 +23,11 @@ class getNonSharedFooService extends ProjectServiceContainer
             return self::do($container);
         };
 
-        // lazy factory for Bar\FooLazyClass
+        if (true === $lazyLoad) {
+            return $container->createProxy('FooLazyClass_f814e3a', function () use ($container) {
+                return \FooLazyClass_f814e3a::createLazyGhostObject(function ($proxy) use ($container) { return self::do($container, $proxy); });
+            });
+        }
 
         static $include = true;
 
@@ -33,18 +37,21 @@ class getNonSharedFooService extends ProjectServiceContainer
             $include = false;
         }
 
-        return new \Bar\FooLazyClass();
+        return $lazyLoad;
     }
 }
 
-    [Container%s/proxy.php] => <?php
+    [Container%s/FooLazyClass_f814e3a.php] => <?php
 
 namespace Container%s;
 
-// proxy code for Bar\FooLazyClass
+class FooLazyClass_f814e3a extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyGhostObjectInterface
+{
+    use \Symfony\Component\VarExporter\LazyGhostObjectTrait;
+}
 
-if (!\class_exists('proxy', false)) {
-    \class_alias(__NAMESPACE__.'\\proxy', 'proxy', false);
+if (!\class_exists('FooLazyClass_f814e3a', false)) {
+    \class_alias(__NAMESPACE__.'\\FooLazyClass_f814e3a', 'FooLazyClass_f814e3a', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -140,7 +147,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 (require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
-require __DIR__.'/Container%s/proxy.php';
+require __DIR__.'/Container%s/FooLazyClass_f814e3a.php';
 require __DIR__.'/Container%s/getNonSharedFooService.php';
 
 $classes = [];

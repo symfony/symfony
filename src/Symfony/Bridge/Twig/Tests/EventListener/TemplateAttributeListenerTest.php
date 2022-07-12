@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bridge\Twig\EventListener\TemplateAttributeListener;
 use Symfony\Bridge\Twig\Tests\Fixtures\TemplateAttributeController;
 use Symfony\Component\Form\FormInterface;
@@ -26,11 +27,12 @@ class TemplateAttributeListenerTest extends TestCase
     public function testAttribute()
     {
         $twig = $this->createMock(Environment::class);
-        $twig->expects($this->exactly(2))
+        $twig->expects($this->exactly(3))
             ->method('render')
             ->withConsecutive(
                 ['templates/foo.html.twig', ['foo' => 'bar']],
-                ['templates/foo.html.twig', ['bar' => 'Bar', 'buz' => 'def']]
+                ['templates/foo.html.twig', ['bar' => 'Bar', 'buz' => 'def']],
+                ['templates/foo.html.twig', []],
             )
             ->willReturn('Bar');
 
@@ -50,6 +52,11 @@ class TemplateAttributeListenerTest extends TestCase
         $event = new ViewEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, null);
         $listener->onKernelView($event);
         $this->assertNull($event->getResponse());
+
+        $request->attributes->set('_template', new Template('templates/foo.html.twig'));
+        $event = new ViewEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, []);
+        $listener->onKernelView($event);
+        $this->assertSame('Bar', $event->getResponse()->getContent());
     }
 
     public function testForm()

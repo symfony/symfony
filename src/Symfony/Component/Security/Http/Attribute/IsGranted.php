@@ -15,7 +15,7 @@ namespace Symfony\Component\Security\Http\Attribute;
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
-class IsGranted
+final class IsGranted
 {
     public function __construct(
         /**

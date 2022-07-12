@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add constructor argument `bool $catchThrowable` to `HttpKernel`
  * Add `ControllerEvent::getAttributes()` to handle attributes on controllers
+ * Add `#[Cache]` to describe the default HTTP cache headers on controllers
 
 6.1
 ---

@@ -21,7 +21,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createArgumentMetadata(string|object|array $controller, \ReflectionClass $class = null, \ReflectionFunction $reflection = null): array
+    public function createArgumentMetadata(string|object|array $controller, \ReflectionClass $class = null, \ReflectionFunctionAbstract $reflection = null): array
     {
         $arguments = [];
 

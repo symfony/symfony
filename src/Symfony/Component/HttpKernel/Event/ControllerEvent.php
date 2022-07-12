@@ -61,8 +61,18 @@ final class ControllerEvent extends KernelEvent
             unset($this->attributes);
         }
 
-        $action = new \ReflectionFunction($controller(...));
-        $this->getRequest()->attributes->set('_controller_reflectors', [str_contains($action->name, '{closure}') ? null : $action->getClosureScopeClass(), $action]);
+        if (\is_array($controller) && method_exists(...$controller)) {
+            $action = new \ReflectionMethod(...$controller);
+            $class = new \ReflectionClass($controller[0]);
+        } elseif (\is_string($controller) && false !== $i = strpos($controller, '::')) {
+            $action = new \ReflectionMethod($controller);
+            $class = new \ReflectionClass(substr($controller, 0, $i));
+        } else {
+            $action = new \ReflectionFunction($controller(...));
+            $class = str_contains($action->name, '{closure}') ? null : $action->getClosureScopeClass();
+        }
+
+        $this->getRequest()->attributes->set('_controller_reflectors', [$class, $action]);
         $this->controller = $controller;
     }
 

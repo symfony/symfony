@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate the "loose" e-mail validation mode, use "html5" instead
+ * Add the `checkTldDns` option to the `UrlValidator`, to enable/disable DNS check whether the top-level domain has a valid name server
 
 6.1
 ---

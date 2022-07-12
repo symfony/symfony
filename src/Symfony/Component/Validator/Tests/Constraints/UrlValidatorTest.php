@@ -311,6 +311,61 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['git://[::1]/'],
         ];
     }
+
+    public function getInvalidTldUrls()
+    {
+        return [
+            ['http://www.example.com.'],
+            ['http://symfony.tldnotreal/blog/'],
+            ['http://localhost'],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidTldUrls
+     */
+    public function testInvalidTld($url)
+    {
+        $constraint = new Url([
+            'message' => 'myMessage',
+            'checkTldDns' => true,
+        ]);
+
+        $this->validator->validate($url, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$url.'"')
+            ->setCode(Url::INVALID_TLD_ERROR)
+            ->assertRaised();
+    }
+
+    public function getValidUrlsWithValidTld()
+    {
+        return [
+            ['http://a.pl'],
+            ['http://www.example.com'],
+            ['http://www.example.museum'],
+            ['https://example.net:80/'],
+            ['http://www.example.coop/'],
+            ['http://xn--sopaulo-xwa.com.br/'],
+            ['http://العربية.idn.icann.org/'],
+            ['http://☎.com/'],
+        ];
+    }
+
+    /**
+     * @dataProvider getValidUrlsWithValidTld
+     */
+    public function testValidTld($url)
+    {
+        $constraint = new Url([
+            'checkTldDns' => true,
+        ]);
+
+        $this->validator->validate($url, $constraint);
+
+        $this->assertNoViolation();
+    }
 }
 
 class EmailProvider

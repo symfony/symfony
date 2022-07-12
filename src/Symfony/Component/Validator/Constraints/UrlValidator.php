@@ -82,5 +82,17 @@ class UrlValidator extends ConstraintValidator
 
             return;
         }
+
+        if ($constraint->checkTldDns) {
+            /* check whether TLD has a name server */
+            $host = parse_url($value, \PHP_URL_HOST);
+            $tld = substr($host, strrpos($host, '.') + 1);
+            if (!$tld || !checkdnsrr($tld, 'NS')) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Url::INVALID_TLD_ERROR)
+                    ->addViolation();
+            }
+        }
     }
 }

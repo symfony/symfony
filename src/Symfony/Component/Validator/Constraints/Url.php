@@ -24,9 +24,11 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 class Url extends Constraint
 {
     public const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
+    public const INVALID_TLD_ERROR = '6c079631-e31d-4e2a-9075-65abeb7a0455';
 
     protected const ERROR_NAMES = [
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
+        self::INVALID_TLD_ERROR => 'INVALID_TLD_ERROR',
     ];
 
     /**
@@ -34,9 +36,10 @@ class Url extends Constraint
      */
     protected static $errorNames = self::ERROR_NAMES;
 
-    public $message = 'This value is not a valid URL.';
-    public $protocols = ['http', 'https'];
-    public $relativeProtocol = false;
+    public string $message = 'This value is not a valid URL.';
+    public array $protocols = ['http', 'https'];
+    public mixed $relativeProtocol = false;
+    public bool $checkTldDns = false;
     public $normalizer;
 
     public function __construct(

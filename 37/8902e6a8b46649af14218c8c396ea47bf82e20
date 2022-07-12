@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-07-11T21:43:55Z
+
+I just tested on a project, it works for the general use-case 👏🏻.
+
+In a specific controller, I modify the name of the template, to set a value from the routing config (a kind of custom [`TemplateController`](https://symfony.com/doc/6.0/templates.html#rendering-a-template-directly-from-a-route)). The template is not rendered in the controller because there is some processing on the data between the controller result and the template listener.
+```php
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+class TemplateController
+    /**
+     * @Template
+     */
+    public function templateAction(Request $request, string $template): array
+    {
+        $request->attributes->get('_template')->setTemplate($template);
+
+        // Fetch data
+
+        return [/* some data for the template */];
+    }
+}
+```
+
+This cannot be done with the controller attributes. Even if I could access the `ControllerArgumentsEvent` or the `ControllerEvent`, they provide access to the attributes, but do not allow update.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-12T07:08:26Z
+
+@GromNaN thanks trying and having a look.
+The code now reads the `_template` attribute on the request. The attribute is not pre-populated because the listener reads it only after the controller is called, this means you can now do:
+`$request->attributes->set('_template', new Template($template))`

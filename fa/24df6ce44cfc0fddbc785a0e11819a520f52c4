@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-07-12T10:14:59Z
+
+Btw, we should probably check our other attributes too, to see whether our usages are supporting inheritance or no.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-12T10:27:24Z
+
+Indeed it's quite inconsistent right now, I'll check them all in another PR.

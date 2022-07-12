@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-11T18:42:23Z
+
+> I did not implement the proposals from Stof to keep this first iteration simple
+
+👍 just to be sure, the proposal you're talking about is the expression-language related part of https://github.com/symfony/symfony/pull/45415#issuecomment-1077625813?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-11T20:18:04Z
+
+> the proposal you're talking about is the expression-language related part
+
+yep

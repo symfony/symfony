@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2022-06-24T14:30:36Z
+
+> For Symfony, having a simple lazy ghost object implementation will allow services declared as lazy to be actually lazy out of the box (today, you need to install proxy-manager-bridge as an optional dependency.) \o/
+
+How do you plan to do this integration? I assume devs need to mark a service as lazy and also `use LazyGhostObjectTrait` in their class. Or do you want to do code generation for lazy marked services that implements automatically?
+```
+class FooGhost extends Foo implements LazyGhostObjectInterface
+{
+    use LazyGhostObjectTrait;
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-24T14:31:51Z
+
+@Tobion this is already implemented, you might want to check #46752
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-30T13:28:01Z
+
+I reworked the implementation to allow partial initialization. There are two ways to achieve it:
+-  the `$initializer` can optionally accept two more arguments `$propertyName` and `$propertyScope`. When doing so, it is going to be called on a property-by-property basis and is expected to return the computed value of the corresponding property.
+- because lazy-initialization is *not* triggered when (un)setting a property, it's also possible to do partial initialization by calling setters on a just-created ghost object.
+
+PR description + README updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-05T08:06:55Z
+
+/cc @symfony/mergers this PR is ready :)

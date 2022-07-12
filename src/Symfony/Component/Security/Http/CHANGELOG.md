@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add maximum username length enforcement of 4096 characters in `UserBadge`
+ * Add `#[IsGranted()]`
 
 6.0
 ---

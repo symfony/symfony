@@ -85,7 +85,7 @@ class EntityValueResolverTest extends TestCase
     public function testSupportWithoutAttribute()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
-        $converter = new EntityValueResolver($registry, null, ['attribute_only' => true]);
+        $converter = new EntityValueResolver($registry, null, new MapEntity(disabled: true));
 
         $registry->expects($this->once())
             ->method('getManagerNames')
@@ -353,7 +353,7 @@ class EntityValueResolverTest extends TestCase
     public function testIgnoreMappingWhenAutoMappingDisabled()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
-        $converter = new EntityValueResolver($registry, null, ['auto_mapping' => false]);
+        $converter = new EntityValueResolver($registry, null, new MapEntity(mapping: []));
 
         $request = new Request();
         $request->attributes->set('foo', 1);

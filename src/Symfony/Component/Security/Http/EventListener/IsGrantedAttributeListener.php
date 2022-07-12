@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\RuntimeException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
@@ -48,12 +49,12 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
                 if (\is_array($subjectRef)) {
                     foreach ($subjectRef as $ref) {
                         if (!\array_key_exists($ref, $arguments)) {
-                            throw new \RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $ref, $ref));
+                            throw new RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $ref, $ref));
                         }
                         $subject[$ref] = $arguments[$ref];
                     }
                 } elseif (!\array_key_exists($subjectRef, $arguments)) {
-                    throw new \RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $subjectRef, $subjectRef));
+                    throw new RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $subjectRef, $subjectRef));
                 } else {
                     $subject = $arguments[$subjectRef];
                 }

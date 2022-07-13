@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -277,24 +276,22 @@ class PhpDumperTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_inlined_factories.txt', $dump);
     }
 
-    /**
-     * @requires function \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper::getProxyCode
-     */
     public function testDumpAsFilesWithLazyFactoriesInlined()
     {
         $container = new ContainerBuilder();
         $container->setParameter('container.dumper.inline_factories', true);
         $container->setParameter('container.dumper.inline_class_loader', true);
+        $container->setParameter('lazy_foo_class', \Bar\FooClass::class);
 
-        $container->register('lazy_foo', \Bar\FooClass::class)
+        $container->register('lazy_foo', '%lazy_foo_class%')
             ->addArgument(new Definition(\Bar\FooLazyClass::class))
             ->setPublic(true)
             ->setLazy(true);
 
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new ProxyDumper());
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {

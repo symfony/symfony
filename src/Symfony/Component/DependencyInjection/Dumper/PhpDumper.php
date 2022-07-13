@@ -2299,7 +2299,7 @@ EOF;
         $bag = $this->container->getParameterBag();
         $definition = (clone $definition)
             ->setClass($bag->resolveValue($definition->getClass()))
-            ->setTags($bag->resolveValue($definition->getTags()));
+            ->setTags(($definition->hasTag('proxy') ? ['proxy' => $bag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags());
 
         return $proxyDumper->isProxyCandidate($definition, $asGhostObject) ? $definition : null;
     }

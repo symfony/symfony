@@ -676,6 +676,9 @@ EOF;
 
         $return = '';
         if ($isSimpleInstance) {
+            if ($asGhostObject && null !== $definition->getFactory()) {
+                $instantiation .= '$this->hydrateProxy($lazyLoad, ';
+            }
             $return = 'return ';
         } else {
             $instantiation .= ' = ';
@@ -1058,7 +1061,7 @@ EOTXT
             if ('instance' === $name) {
                 $code .= $this->addServiceInstance($id, $definition, $isSimpleInstance);
             } else {
-                $code .= $this->addNewInstance($inlineDef, '        $'.$name.' = ', $id, $asGhostObject);
+                $code .= $this->addNewInstance($inlineDef, '        $'.$name.' = ', $id);
             }
 
             if ('' !== $inline = $this->addInlineVariables($id, $definition, $arguments, false)) {
@@ -1072,11 +1075,15 @@ EOTXT
             $code .= $this->addServiceConfigurator($inlineDef, $name);
         }
 
-        if ($isRootInstance && !$isSimpleInstance) {
-            $code .= "\n        return \$instance;\n";
+        if (!$isRootInstance || $isSimpleInstance) {
+            return $code;
         }
 
-        return $code;
+        if (!$asGhostObject) {
+            return $code."\n        return \$instance;\n";
+        }
+
+        return $code."\n        return \$this->hydrateProxy(\$lazyLoad, \$instance);\n";
     }
 
     private function addServices(array &$services = null): string
@@ -1123,7 +1130,7 @@ EOTXT
 
     private function addNewInstance(Definition $definition, string $return = '', string $id = null, bool $asGhostObject = false): string
     {
-        $tail = $return ? ";\n" : '';
+        $tail = $return ? str_repeat(')', substr_count($return, '(') - substr_count($return, ')')).";\n" : '';
 
         if (BaseServiceLocator::class === $definition->getClass() && $definition->hasTag($this->serviceLocatorTag)) {
             $arguments = [];
@@ -1141,11 +1148,6 @@ EOTXT
 
         if (null !== $definition->getFactory()) {
             $callable = $definition->getFactory();
-
-            if ($asGhostObject) {
-                $return .= '$this->hydrateProxy($lazyLoad, ';
-                $tail = ')'.$tail;
-            }
 
             if (['Closure', 'fromCallable'] === $callable && [0] === array_keys($definition->getArguments())) {
                 $callable = $definition->getArgument(0);
@@ -1202,7 +1204,7 @@ EOTXT
             return $return.sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments)).$tail;
         }
 
-        if (!method_exists($class, '__construct')) {
+        if (!method_exists($this->container->getParameterBag()->resolveValue($class), '__construct')) {
             return $return.'$lazyLoad'.$tail;
         }
 
@@ -1329,6 +1331,10 @@ EOF;
 
     protected function hydrateProxy(\$proxy, \$instance)
     {
+        if (\$proxy === \$instance) {
+            return \$proxy;
+        }
+
         if (!\in_array(\get_class(\$instance), [\get_class(\$proxy), get_parent_class(\$proxy)], true)) {
             throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1\$s".', get_parent_class(\$proxy), get_debug_type(\$instance)));
         }
@@ -1880,10 +1886,7 @@ EOF;
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');
             }
 
-            $asGhostObject = false;
-            $this->isProxyCandidate($value, $asGhostObject);
-
-            return $this->addNewInstance($value, '', null, $asGhostObject);
+            return $this->addNewInstance($value);
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {

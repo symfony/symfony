@@ -121,8 +121,7 @@ class LogoutListener extends AbstractListener
         $logoutEvent = new LogoutEvent($request, $this->tokenStorage->getToken());
         $this->eventDispatcher->dispatch($logoutEvent);
 
-        $response = $logoutEvent->getResponse();
-        if (!$response instanceof Response) {
+        if (!$response = $logoutEvent->getResponse()) {
             throw new \RuntimeException('No logout listener set the Response, make sure at least the DefaultLogoutListener is registered.');
         }
 

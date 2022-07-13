@@ -387,6 +387,19 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame('Bar\FooClass', \get_class($foo1));
     }
 
+    public function testCreateLazyProxy()
+    {
+        $builder = new ContainerBuilder();
+
+        $builder->setParameter('foo1_class', 'Bar\FooClass');
+        $builder->register('foo1', '%foo1_class%')->setLazy(true);
+
+        $foo1 = $builder->get('foo1');
+
+        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
+        $this->assertInstanceOf(\Bar\FooClass::class, $foo1);
+    }
+
     public function testCreateServiceClass()
     {
         $builder = new ContainerBuilder();

@@ -995,10 +995,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
 
+        $parameterBag = $this->getParameterBag();
+
         if (true === $tryProxy && $definition->isLazy() && !$tryProxy = !($proxy = $this->proxyInstantiator ??= new LazyServiceInstantiator()) || $proxy instanceof RealServiceInstantiator) {
             $proxy = $proxy->instantiateProxy(
                 $this,
-                $definition,
+                (clone $definition)
+                    ->setClass($parameterBag->resolveValue($definition->getClass()))
+                    ->setTags($parameterBag->resolveValue($definition->getTags())),
                 $id, function ($proxy = false) use ($definition, &$inlineServices, $id) {
                     return $this->createService($definition, $inlineServices, true, $id, $proxy);
                 }
@@ -1007,8 +1011,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             return $proxy;
         }
-
-        $parameterBag = $this->getParameterBag();
 
         if (null !== $definition->getFile()) {
             require_once $parameterBag->resolveValue($definition->getFile());
@@ -1039,7 +1041,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $service = $factory(...$arguments);
 
             if (\is_object($tryProxy)) {
-                if (\get_class($service) !== $definition->getClass()) {
+                if (\get_class($service) !== $parameterBag->resolveValue($definition->getClass())) {
                     throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', $definition->getClass(), get_debug_type($service)));
                 }
 

@@ -554,7 +554,7 @@ EOF;
         $proxyDumper = $this->getProxyDumper();
         ksort($definitions);
         foreach ($definitions as $definition) {
-            if (!$proxyDumper->isProxyCandidate($definition)) {
+            if (!$definition = $this->isProxyCandidate($definition)) {
                 continue;
             }
             if (isset($alreadyGenerated[$class = $definition->getClass()])) {
@@ -599,11 +599,11 @@ EOF;
         return $proxyClasses;
     }
 
-    private function addServiceInclude(string $cId, Definition $definition): string
+    private function addServiceInclude(string $cId, Definition $definition, bool $isProxyCandidate): string
     {
         $code = '';
 
-        if ($this->inlineRequires && (!$this->isHotPath($definition) || $this->getProxyDumper()->isProxyCandidate($definition))) {
+        if ($this->inlineRequires && (!$this->isHotPath($definition) || $isProxyCandidate)) {
             $lineage = [];
             foreach ($this->inlinedDefinitions as $def) {
                 if (!$def->isDeprecated()) {
@@ -658,7 +658,7 @@ EOF;
         }
 
         $asGhostObject = false;
-        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition, $asGhostObject);
+        $isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject);
         $instantiation = '';
 
         $lastWitherIndex = null;
@@ -886,7 +886,9 @@ EOF;
             }
 
             $asGhostObject = false;
-            if ($isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition, $asGhostObject)) {
+            if ($isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject)) {
+                $definition = $isProxyCandidate;
+
                 if (!$definition->isShared()) {
                     $code .= sprintf('        %s ??= ', $factory);
 
@@ -905,7 +907,7 @@ EOF;
                 $code .= $asFile ? preg_replace('/function \(([^)]*+)\)( {|:)/', 'function (\1) use ($container)\2', $factoryCode) : $factoryCode;
             }
 
-            $c = $this->addServiceInclude($id, $definition);
+            $c = $this->addServiceInclude($id, $definition, null !== $isProxyCandidate);
 
             if ('' !== $c && $isProxyCandidate && !$definition->isShared()) {
                 $c = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $c)));
@@ -1044,7 +1046,7 @@ EOTXT
         }
 
         $asGhostObject = false;
-        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($inlineDef, $asGhostObject);
+        $isProxyCandidate = $this->isProxyCandidate($inlineDef, $asGhostObject);
 
         if (isset($this->definitionVariables[$inlineDef])) {
             $isSimpleInstance = false;
@@ -1307,9 +1309,8 @@ EOF;
 EOF;
         }
 
-        $proxyDumper = $this->getProxyDumper();
         foreach ($this->container->getDefinitions() as $definition) {
-            if (!$proxyDumper->isProxyCandidate($definition)) {
+            if (!$definition->isLazy() || $this->getProxyDumper() instanceof NullDumper) {
                 continue;
             }
 
@@ -1496,7 +1497,7 @@ EOF;
         foreach ($hotPathServices as $id => $tags) {
             $definition = $this->container->getDefinition($id);
 
-            if ($this->getProxyDumper()->isProxyCandidate($definition)) {
+            if ($definition->isLazy() && !$this->getProxyDumper() instanceof NullDumper) {
                 continue;
             }
 
@@ -1880,7 +1881,7 @@ EOF;
             }
 
             $asGhostObject = false;
-            $this->getProxyDumper()->isProxyCandidate($value, $asGhostObject);
+            $this->isProxyCandidate($value, $asGhostObject);
 
             return $this->addNewInstance($value, '', null, $asGhostObject);
         } elseif ($value instanceof Variable) {
@@ -2252,6 +2253,7 @@ EOF;
     private function getClasses(Definition $definition, string $id): array
     {
         $classes = [];
+        $resolve = $this->container->getParameterBag()->resolveValue(...);
 
         while ($definition instanceof Definition) {
             foreach ($definition->getTag($this->preloadTags[0]) as $tag) {
@@ -2263,7 +2265,7 @@ EOF;
             }
 
             if ($class = $definition->getClass()) {
-                $classes[] = trim($class, '\\');
+                $classes[] = trim($resolve($class), '\\');
             }
             $factory = $definition->getFactory();
 
@@ -2272,6 +2274,8 @@ EOF;
             }
 
             if (\is_string($factory[0])) {
+                $factory[0] = $resolve($factory[0]);
+
                 if (false !== $i = strrpos($factory[0], '::')) {
                     $factory[0] = substr($factory[0], 0, $i);
                 }
@@ -2282,5 +2286,21 @@ EOF;
         }
 
         return $classes;
+    }
+
+    private function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): ?Definition
+    {
+        $asGhostObject = false;
+
+        if (!$definition->isLazy() || ($proxyDumper = $this->getProxyDumper()) instanceof NullDumper) {
+            return null;
+        }
+
+        $bag = $this->container->getParameterBag();
+        $definition = (clone $definition)
+            ->setClass($bag->resolveValue($definition->getClass()))
+            ->setTags($bag->resolveValue($definition->getTags()));
+
+        return $proxyDumper->isProxyCandidate($definition, $asGhostObject) ? $definition : null;
     }
 }

@@ -12,13 +12,14 @@
 namespace Symfony\Component\VarExporter;
 
 use Symfony\Component\VarExporter\Internal\EmptyScope;
+use Symfony\Component\VarExporter\Internal\GhostObjectId;
 use Symfony\Component\VarExporter\Internal\GhostObjectRegistry as Registry;
 use Symfony\Component\VarExporter\Internal\GhostObjectState;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 
 trait LazyGhostObjectTrait
 {
-    private int $lazyGhostObjectId = 0;
+    private ?GhostObjectId $lazyGhostObjectId = null;
 
     /**
      * @param \Closure(static):void|\Closure(static, string, ?string):mixed $initializer Initializes the instance passed as argument; when partial initialization
@@ -31,8 +32,8 @@ trait LazyGhostObjectTrait
         $instance = (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
 
         Registry::$defaultProperties[$class] ??= (array) $instance;
-        $instance->lazyGhostObjectId = $id = spl_object_id($instance);
-        $state = Registry::$states[$id] = new GhostObjectState();
+        $instance->lazyGhostObjectId = new GhostObjectId();
+        $state = Registry::$states[$instance->lazyGhostObjectId->id] = new GhostObjectState();
         $state->initializer = $initializer;
 
         foreach (Registry::$classResetters[$class] ??= Registry::getClassResetters($class) as $reset) {
@@ -47,7 +48,7 @@ trait LazyGhostObjectTrait
      */
     public function initializeLazyGhostObject(): void
     {
-        if (!$state = Registry::$states[$this->lazyGhostObjectId] ?? null) {
+        if (!$state = Registry::$states[$this->lazyGhostObjectId?->id] ?? null) {
             return;
         }
 
@@ -72,7 +73,7 @@ trait LazyGhostObjectTrait
      */
     public function resetLazyGhostObject(): bool
     {
-        if (!$state = Registry::$states[$this->lazyGhostObjectId] ?? null) {
+        if (!$state = Registry::$states[$this->lazyGhostObjectId?->id] ?? null) {
             return false;
         }
 
@@ -119,7 +120,7 @@ trait LazyGhostObjectTrait
                 }
             }
 
-            if ($state = Registry::$states[$this->lazyGhostObjectId] ?? null) {
+            if ($state = Registry::$states[$this->lazyGhostObjectId?->id] ?? null) {
                 if (isset($state->unsetProperties[$scope ?? '*'][$name])) {
                     $class = null;
                 } elseif (null === $scope || isset($propertyScopes["\0$scope\0$name"])) {
@@ -163,7 +164,6 @@ trait LazyGhostObjectTrait
     {
         $propertyScopes = Hydrator::$propertyScopes[static::class] ??= Hydrator::getPropertyScopes(static::class);
         $scope = null;
-        $id = $this->lazyGhostObjectId;
 
         if ([$class, , $readonlyScope] = $propertyScopes[$name] ?? null) {
             if (null !== $readonlyScope || isset($propertyScopes["\0$class\0$name"]) || isset($propertyScopes["\0*\0$name"])) {
@@ -174,7 +174,7 @@ trait LazyGhostObjectTrait
                 }
             }
 
-            $state = Registry::$states[$this->lazyGhostObjectId] ?? null;
+            $state = Registry::$states[$this->lazyGhostObjectId?->id] ?? null;
             if ($state && ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"]))) {
                 if (!$state->status && null === $state->preInitUnsetProperties) {
                     $propertyScopes[$k = "\0$class\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = $name;
@@ -219,7 +219,7 @@ trait LazyGhostObjectTrait
                 }
             }
 
-            if ($state = Registry::$states[$this->lazyGhostObjectId] ?? null) {
+            if ($state = Registry::$states[$this->lazyGhostObjectId?->id] ?? null) {
                 if (isset($state->unsetProperties[$scope ?? '*'][$name])) {
                     return false;
                 }
@@ -249,7 +249,6 @@ trait LazyGhostObjectTrait
     {
         $propertyScopes = Hydrator::$propertyScopes[static::class] ??= Hydrator::getPropertyScopes(static::class);
         $scope = null;
-        $id = $this->lazyGhostObjectId;
 
         if ([$class, , $readonlyScope] = $propertyScopes[$name] ?? null) {
             if (null !== $readonlyScope || isset($propertyScopes["\0$class\0$name"]) || isset($propertyScopes["\0*\0$name"])) {
@@ -260,7 +259,7 @@ trait LazyGhostObjectTrait
                 }
             }
 
-            $state = Registry::$states[$this->lazyGhostObjectId] ?? null;
+            $state = Registry::$states[$this->lazyGhostObjectId?->id] ?? null;
             if ($state && ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"]))) {
                 if (!$state->status && null === $state->preInitUnsetProperties) {
                     $propertyScopes[$k = "\0$class\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = $name;
@@ -290,9 +289,9 @@ trait LazyGhostObjectTrait
 
     public function __clone()
     {
-        if ($previousId = $this->lazyGhostObjectId) {
-            $this->lazyGhostObjectId = $id = spl_object_id($this);
-            Registry::$states[$id] = clone Registry::$states[$previousId];
+        if ($previousId = $this->lazyGhostObjectId?->id) {
+            $this->lazyGhostObjectId = clone $this->lazyGhostObjectId;
+            Registry::$states[$this->lazyGhostObjectId->id] = clone Registry::$states[$previousId];
         }
 
         if ((Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['clone']) {
@@ -334,15 +333,12 @@ trait LazyGhostObjectTrait
 
     public function __destruct()
     {
-        $state = Registry::$states[$this->lazyGhostObjectId] ?? null;
+        if (!(Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['destruct']) {
+            return;
+        }
 
-        try {
-            if ($state?->status && (Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['destruct']) {
-                parent::__destruct();
-            }
-        } finally {
-            unset(Registry::$states[$this->lazyGhostObjectId]);
-            $this->lazyGhostObjectId = 0;
+        if ((Registry::$states[$this->lazyGhostObjectId?->id] ?? null)?->status) {
+            parent::__destruct();
         }
     }
 }

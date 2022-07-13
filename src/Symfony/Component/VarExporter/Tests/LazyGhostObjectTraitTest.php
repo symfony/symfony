@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarExporter\Internal\GhostObjectId;
 use Symfony\Component\VarExporter\Internal\GhostObjectRegistry;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildMagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildTestClass;
@@ -77,6 +78,9 @@ class LazyGhostObjectTraitTest extends TestCase
         $this->assertNotSame((array) $instance, (array) $clone);
         $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
         $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $clone));
+
+        $clone = clone $clone;
+        $this->assertTrue($clone->resetLazyGhostObject());
     }
 
     public function testSerialize()
@@ -201,7 +205,9 @@ class LazyGhostObjectTraitTest extends TestCase
 
         $properties = (array) $instance;
         $this->assertSame(array_keys((array) new ChildTestClass()), array_keys($properties));
-        $this->assertSame([123, 345, 456, 567, spl_object_id($instance), 234, 678], array_values($properties));
+        $properties = array_values($properties);
+        $this->assertInstanceOf(GhostObjectId::class, array_splice($properties, 4, 1)[0]);
+        $this->assertSame([123, 345, 456, 567, 234, 678], array_values($properties));
     }
 
     public function testPartialInitializationWithReset()

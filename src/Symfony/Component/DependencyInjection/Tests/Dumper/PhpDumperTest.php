@@ -1434,6 +1434,30 @@ PHP
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
+    public function testLazyWither()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', Wither::class)
+            ->setLazy(true)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Lazy']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_lazy.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_Wither_Lazy();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither->foo);
+        $this->assertTrue($wither->resetLazyGhostObject());
+    }
+
     public function testWitherWithStaticReturnType()
     {
         $container = new ContainerBuilder();

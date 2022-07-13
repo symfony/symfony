@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarExporter\Internal\GhostObjectId;
 use Symfony\Component\VarExporter\Internal\GhostObjectRegistry;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildMagicClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildTestClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\MagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\TestClass;
@@ -245,5 +246,14 @@ class LazyGhostObjectTraitTest extends TestCase
         });
 
         $this->assertSame(123, $instance->public);
+    }
+
+    public function testSetStdClassProperty()
+    {
+        $instance = ChildStdClass::createLazyGhostObject(function (ChildStdClass $ghost) {
+        });
+
+        $instance->public = 12;
+        $this->assertSame(12, $instance->public);
     }
 }

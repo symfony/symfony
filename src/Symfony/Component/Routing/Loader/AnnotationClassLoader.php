@@ -368,11 +368,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
             return;
         }
 
-        $anntotations = $reflection instanceof \ReflectionClass
+        $annotations = $reflection instanceof \ReflectionClass
             ? $this->reader->getClassAnnotations($reflection)
             : $this->reader->getMethodAnnotations($reflection);
 
-        foreach ($anntotations as $annotation) {
+        foreach ($annotations as $annotation) {
             if ($annotation instanceof $this->routeAnnotationClass) {
                 yield $annotation;
             }

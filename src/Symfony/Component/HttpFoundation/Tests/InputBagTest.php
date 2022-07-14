@@ -72,10 +72,10 @@ class InputBagTest extends TestCase
     /**
      * @group legacy
      */
-    public function testGettingANonStringValueIsDeprecated()
+    public function testGettingANonScalarValueIsDeprecated()
     {
         $bag = new InputBag(['foo' => ['a', 'b']]);
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Retrieving a non-string value from "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" exception in Symfony 6.0, use "Symfony\Component\HttpFoundation\InputBag::all($key)" instead.');
+        $this->expectDeprecation('Since symfony/http-foundation 5.1: Retrieving a non-scalar value from "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" exception in Symfony 6.0, use "Symfony\Component\HttpFoundation\InputBag::all($key)" instead.');
         $bag->get('foo');
     }
 

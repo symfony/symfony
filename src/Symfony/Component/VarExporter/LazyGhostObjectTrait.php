@@ -164,6 +164,7 @@ trait LazyGhostObjectTrait
     {
         $propertyScopes = Hydrator::$propertyScopes[static::class] ??= Hydrator::getPropertyScopes(static::class);
         $scope = null;
+        $state = null;
 
         if ([$class, , $readonlyScope] = $propertyScopes[$name] ?? null) {
             if (null !== $readonlyScope || isset($propertyScopes["\0$class\0$name"]) || isset($propertyScopes["\0*\0$name"])) {

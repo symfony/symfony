@@ -24,6 +24,12 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\CacheAttributeControl
 
 class CacheAttributeListenerTest extends TestCase
 {
+    private CacheAttributeListener $listener;
+    private Response $response;
+    private Cache $cache;
+    private Request $request;
+    private ResponseEvent $event;
+
     protected function setUp(): void
     {
         $this->listener = new CacheAttributeListener();
@@ -294,12 +300,12 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(CacheAttributeController::CLASS_SMAXAGE, $response->getMaxAge());
     }
 
-    private function createRequest(Cache $cache = null)
+    private function createRequest(Cache $cache): Request
     {
         return new Request([], [], ['_cache' => [$cache]]);
     }
 
-    private function createEventMock(Request $request, Response $response)
+    private function createEventMock(Request $request, Response $response): ResponseEvent
     {
         return new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $response);
     }

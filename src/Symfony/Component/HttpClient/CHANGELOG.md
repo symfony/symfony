@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add new option `json_encode_flags` to pass custom flags to `json_encode()`
+
 6.1
 ---
 

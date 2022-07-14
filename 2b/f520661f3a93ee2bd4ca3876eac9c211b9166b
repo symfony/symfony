@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-07-13T09:58:30Z
+
+If this was not caught by the testsuite, it tells me that the testsuite is incomplete. It would be great to add tests covering the broken scenario
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-07-13T10:28:10Z
+
+@alexander-schranz The trait is new and was merged into the `6.2` branch just yesterday.
+
+I am going to look into improving the test suite.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-07-13T10:33:13Z
+
+Oh okay. Seems like github did foul me with showing 9. June as last change 🙈
+
+<img width="1244" alt="Bildschirmfoto 2022-07-13 um 12 30 58" src="https://user-images.githubusercontent.com/1698337/178713726-3f7b1910-d1e1-46b8-8f63-dfed6287d74c.png">
+
+Thx for having a look at this!
+
+---------------------------------------------------------------------------
+
+by stof at 2022-07-13T14:17:00Z
+
+@alexander-schranz that's the date of the commit in the PR, not of the merge commit.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-07-14T07:04:35Z
+
+test case added, thanks for the hint Nicolas 👍

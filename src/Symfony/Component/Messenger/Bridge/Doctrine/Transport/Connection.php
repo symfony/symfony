@@ -24,6 +24,7 @@ use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -467,8 +468,9 @@ class Connection implements ResetInterface
             return;
         }
 
-        $comparator = new Comparator();
-        $schemaDiff = $comparator->compare($this->createSchemaManager()->createSchema(), $this->getSchema());
+        $schemaManager = $this->createSchemaManager();
+        $comparator = $this->createComparator($schemaManager);
+        $schemaDiff = $this->compareSchemas($comparator, $schemaManager->createSchema(), $this->getSchema());
 
         foreach ($schemaDiff->toSaveSql($this->driverConnection->getDatabasePlatform()) as $sql) {
             if (method_exists($this->driverConnection, 'executeStatement')) {
@@ -484,6 +486,20 @@ class Connection implements ResetInterface
         return method_exists($this->driverConnection, 'createSchemaManager')
             ? $this->driverConnection->createSchemaManager()
             : $this->driverConnection->getSchemaManager();
+    }
+
+    private function createComparator(AbstractSchemaManager $schemaManager): Comparator
+    {
+        return method_exists($schemaManager, 'createComparator')
+            ? $schemaManager->createComparator()
+            : new Comparator();
+    }
+
+    private function compareSchemas(Comparator $comparator, Schema $from, Schema $to): SchemaDiff
+    {
+        return method_exists($comparator, 'compareSchemas')
+            ? $comparator->compareSchemas($from, $to)
+            : $comparator->compare($from, $to);
     }
 }
 

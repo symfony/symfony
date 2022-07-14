@@ -122,8 +122,6 @@ class LogoutListenerTest extends TestCase
 
     public function testNoResponseSet()
     {
-        $this->expectException(\RuntimeException::class);
-
         [$listener, , $httpUtils, $options] = $this->getListener();
 
         $request = new Request();
@@ -133,7 +131,11 @@ class LogoutListenerTest extends TestCase
             ->with($request, $options['logout_path'])
             ->willReturn(true);
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $listener($event);
+
+        $this->assertNull($event->getResponse());
     }
 
     /**

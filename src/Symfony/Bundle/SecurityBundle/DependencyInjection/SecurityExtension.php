@@ -413,10 +413,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 'logout_path' => $firewall['logout']['path'],
             ]);
 
-            $logoutSuccessListenerId = 'security.logout.listener.default.'.$id;
-            $container->setDefinition($logoutSuccessListenerId, new ChildDefinition('security.logout.listener.default'))
-                ->replaceArgument(1, $firewall['logout']['target'])
-                ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+            if (null !== $firewall['logout']['target']) {
+                $logoutSuccessListenerId = 'security.logout.listener.default.'.$id;
+                $container->setDefinition($logoutSuccessListenerId, new ChildDefinition('security.logout.listener.default'))
+                    ->replaceArgument(1, $firewall['logout']['target'])
+                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+            }
 
             // add CSRF provider
             if (isset($firewall['logout']['csrf_token_generator'])) {

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Allow passing `TranslatableInterface` objects to the `ChoiceView` label
+
 6.1
 ---
 

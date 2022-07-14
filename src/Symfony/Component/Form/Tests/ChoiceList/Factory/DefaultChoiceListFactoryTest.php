@@ -22,6 +22,8 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
@@ -772,6 +774,26 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertInstanceOf(TranslatableMessage::class, $view->choices[0]->label);
         $this->assertEquals('my_message', $view->choices[0]->label->getMessage());
         $this->assertArrayHasKey('param1', $view->choices[0]->label->getParameters());
+    }
+
+    public function testPassTranslatableInterfaceAsLabelDoesntCastItToString()
+    {
+        $message = new class() implements TranslatableInterface {
+            public function trans(TranslatorInterface $translator, string $locale = null): string
+            {
+                return 'my_message';
+            }
+        };
+
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj1],
+            static function () use ($message) {
+                return $message;
+            }
+        );
+
+        $this->assertSame($message, $view->choices[0]->label);
     }
 
     public function testCreateViewFlatLabelTranslationParametersAsArray()

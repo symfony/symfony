@@ -1236,7 +1236,7 @@ class Configuration implements ConfigurationInterface
                                 ->info('The status code of the response. Null to let Symfony decide.')
                                 ->validate()
                                     ->ifTrue(function ($v) { return $v < 100 || $v > 599; })
-                                    ->thenInvalid('The log level is not valid. Pick a value between 100 and 599.')
+                                    ->thenInvalid('The status code is not valid. Pick a value between 100 and 599.')
                                 ->end()
                                 ->defaultNull()
                             ->end()

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-07-04T13:56:48Z
+
+I think the PR should target the 5.4 branch: https://symfony.com/doc/current/contributing/code/pull_requests.html#choose-the-right-branch
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2022-07-15T22:18:12Z
+
+CI failure is unrelated

@@ -676,7 +676,7 @@ abstract class Client
         }
 
         // protocol relative URL
-        if (str_starts_with($uri, '//')) {
+        if ('' !== trim($uri, '/') && str_starts_with($uri, '//')) {
             return parse_url($currentUri, \PHP_URL_SCHEME).':'.$uri;
         }
 

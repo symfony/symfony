@@ -35,7 +35,7 @@ final class InputBag extends ParameterBag
 
         $value = parent::get($key, $this);
 
-        if (null !== $value && $this !== $value && !\is_scalar($value)) {
+        if (null !== $value && $this !== $value && !\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             trigger_deprecation('symfony/http-foundation', '5.1', 'Retrieving a non-scalar value from "%s()" is deprecated, and will throw a "%s" exception in Symfony 6.0, use "%s::all($key)" instead.', __METHOD__, BadRequestException::class, __CLASS__);
         }
 

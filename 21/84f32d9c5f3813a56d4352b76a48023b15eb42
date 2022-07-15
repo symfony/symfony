@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-12T07:40:03Z
+
+There are other similar checks in the codebase, let's update them all?
+`grep "'//'" src/ -r`

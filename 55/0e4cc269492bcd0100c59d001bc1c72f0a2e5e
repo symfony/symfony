@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-07T09:44:52Z
+
+Can you please add a test case? Note also that we cannot use mixed as 5.4 should support PHP 7.2
+
+---------------------------------------------------------------------------
+
+by tobias-93 at 2022-05-11T15:11:29Z
+
+@nicolas-grekas Thanks for the feedback. I have removed the `mixed` parameter, and added a test. The remaining failing tests are parts of Symfony I didn't touch, so that's hopefully not my fault...
+
+---------------------------------------------------------------------------
+
+by tobias-93 at 2022-06-29T10:00:33Z
+
+@nicolas-grekas @derrabus Any progress here?

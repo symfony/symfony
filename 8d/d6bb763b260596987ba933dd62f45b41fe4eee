@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-07-14T20:07:29Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-14T22:27:04Z
+
+Thanks for the PR!
+Can you check if 5.4 is also impacted? If yes, this PR should target 5.4.
+Also, do other config formats suffer from the same issue? The behavior must be consistent across all formats so if it's the case the corresponding loaders should be patched as well.
+
+---------------------------------------------------------------------------
+
+by astepin at 2022-07-15T07:21:29Z
+
+Hey @chalasr, the bug is in fact already present in 5.4. I have now rebased to 5.4.
+Furthermore, I have modified the test so that it checks annotations and attributes, because the error behavior is identical.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-15T19:09:51Z
+
+@astepin Alright, by "other config formats" I was thinking of yaml and xml. After a quick look to these loaders it turns out they have no single validation rule regarding the accessor/mutator, so I'd say we can ignore them and go ahead here.
+It seems like we do have an inconsistency on that point though, so feel free to have a look and submit a PR to add such validation if it's relevant and possible.

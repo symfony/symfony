@@ -19,13 +19,19 @@ class InputBagTest extends TestCase
 {
     public function testGet()
     {
-        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false]);
+        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return 'strval';
+            }
+        }]);
 
         $this->assertSame('bar', $bag->get('foo'), '->get() gets the value of a string parameter');
         $this->assertSame('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
         $this->assertSame(1, $bag->get('int'), '->get() gets the value of an int parameter');
         $this->assertSame(1.0, $bag->get('float'), '->get() gets the value of a float parameter');
+        $this->assertSame('strval', $bag->get('stringable'), '->get() gets the string value of a \Stringable parameter');
         $this->assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
     }
 

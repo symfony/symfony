@@ -27,7 +27,8 @@
                 "arg2"
             ],
             "file": null,
-            "tags": []
+            "tags": [],
+            "usages": []
         },
         [
             "foo",
@@ -46,7 +47,8 @@
                 "autoconfigure": false,
                 "arguments": [],
                 "file": null,
-                "tags": []
+                "tags": [],
+                "usages": []
             }
         ],
         [
@@ -67,5 +69,6 @@
     "file": null,
     "factory_class": "Full\\Qualified\\FactoryClass",
     "factory_method": "get",
-    "tags": []
+    "tags": [],
+    "usages": []
 }

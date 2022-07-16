@@ -26,7 +26,8 @@
                         "priority": 0
                     }
                 }
-            ]
+            ],
+            "usages": []
         },
         "definition_1": {
             "class": "Full\\Qualified\\Class1",
@@ -61,7 +62,8 @@
                     "name": "tag2",
                     "parameters": []
                 }
-            ]
+            ],
+            "usages": []
         },
         "definition_4": {
             "class": "Full\\Qualified\\Class4",
@@ -80,7 +82,8 @@
                         "priority": 0
                     }
                 }
-            ]
+            ],
+            "usages": []
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
@@ -101,7 +104,8 @@
                         "priority": -20
                     }
                 }
-            ]
+            ],
+            "usages": []
         }
     },
     "aliases": [],

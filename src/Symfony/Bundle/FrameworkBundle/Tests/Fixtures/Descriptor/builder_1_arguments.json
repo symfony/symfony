@@ -29,7 +29,8 @@
                         "arg2"
                     ],
                     "file": null,
-                    "tags": []
+                    "tags": [],
+                    "usages": []
                 },
                 [
                     "foo",
@@ -48,7 +49,8 @@
                         "autoconfigure": false,
                         "arguments": [],
                         "file": null,
-                        "tags": []
+                        "tags": [],
+                        "usages": []
                     }
                 ],
                 [
@@ -69,7 +71,8 @@
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": []
+            "tags": [],
+            "usages": []
         },
         "definition_without_class": {
             "class": "",
@@ -82,7 +85,8 @@
             "autoconfigure": false,
             "arguments": [],
             "file": null,
-            "tags": []
+            "tags": [],
+            "usages": []
         },
         "service_container": {
             "class": "Symfony\\Component\\DependencyInjection\\ContainerInterface",
@@ -96,7 +100,8 @@
             "description": "ContainerInterface is the interface implemented by service container classes.",
             "arguments": [],
             "file": null,
-            "tags": []
+            "tags": [],
+            "usages": []
         }
     },
     "aliases": {

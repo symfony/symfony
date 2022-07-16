@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-30T16:27:26Z
+
+Wow, what a great first contribution =)
+
+---------------------------------------------------------------------------
+
+by bertterheide at 2020-10-30T18:29:48Z
+
+Fixed @derrabus's comments in my own commits. Please check again!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-11T13:39:19Z
+
+@bertterheide Now that the 6.1 branch is open, can you retarget it and resolve the conflicts. I would love to be able to merge it for the upcoming 6.1 release. Thank you.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-13T06:52:38Z
+
+@bertterheide @fabpot Hi, this PR seems stale but could be nice imho, can I try continuing the work on this?
+Can be done in parallel of https://github.com/symfony/symfony/pull/46814
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-07-13T07:08:09Z
+
+Since this has been inactive for a while, I assume it safe for you to continue to work.
+Make sure to save the existing commits. Ie dont copy the work as your own.
+
+---------------------------------------------------------------------------
+
+by bertterheide at 2022-07-13T07:24:34Z
+
+@94noni @Nyholm ill try resolving the conflicts asap so this feature can be merged.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-07-13T07:26:26Z
+
+Oh, that is awesome! Thank you <3
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-13T07:42:07Z
+
+fantastic thx!
+
+---------------------------------------------------------------------------
+
+by bertterheide at 2022-07-15T22:17:09Z
+
+Rebased the code on 6.2, updated the PR!

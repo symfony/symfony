@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by bradjones1 at 2022-07-13T23:53:16Z
+
+The PHP 8.2 test failure seems unrelated...
+
+The Appveyor test seems to target Windows (?) and this is suspicious:
+
+```
+Symfony\Component\VarDumper\Tests\Server\ConnectionTest::testDump
+Symfony\Component\Process\Exception\ProcessTimedOutException: The process "c:\php\php.exe" exceeded the timeout of 9 seconds.
+```
+
+I'll postpone digging too deeply into that until I get feedback on the general approach, though. If this is something Symfony will concern itself with, then we can address that.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-07-14T13:52:10Z
+
+Hey!
+
+I think @abdounikarim has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-15T09:11:32Z
+
+It looks like we should consider this as a bug, so this should probably be rebased on 4.4?
+
+---------------------------------------------------------------------------
+
+by bradjones1 at 2022-07-15T15:33:05Z
+
+Thanks for the review, @fabpot.
+
+> It looks like we should consider this as a bug, so this should probably be rebased on 4.4?
+
+I wasn't sure if this was a purposeful omission or not (I erred on the side of yes, it was) so I can recategorize and retarget as a bug.

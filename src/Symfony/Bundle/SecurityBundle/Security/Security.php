@@ -69,9 +69,13 @@ class Security extends LegacySecurity
     /**
      * Logout the current user by dispatching the LogoutEvent.
      *
+     * @param bool $validateCsrfToken Whether to look for a valid CSRF token based on the `logout` listener configuration
+     *
      * @return Response|null The LogoutEvent's Response if any
+     *
+     * @throws LogoutException When $validateCsrfToken is true and the CSRF token is not found or invalid
      */
-    public function logout(): ?Response
+    public function logout(bool $validateCsrfToken = true): ?Response
     {
         /** @var TokenStorageInterface $tokenStorage */
         $tokenStorage = $this->container->get('security.token_storage');
@@ -86,9 +90,12 @@ class Security extends LegacySecurity
             throw new LogicException('Unable to logout as the request is not behind a firewall.');
         }
 
-        if ($this->container->has('security.csrf.token_manager') && $logoutConfig = $firewallConfig->getLogout()) {
+        if ($validateCsrfToken) {
+            if (!$this->container->has('security.csrf.token_manager') || !$logoutConfig = $firewallConfig->getLogout()) {
+                throw new LogicException(sprintf('Unable to logout with CSRF token validation. Either make sure that CSRF protection is enabled and "logout" is configured on the "%s" firewall, or bypass CSRF token validation explicitly by passing false to the $validateCsrfToken argument of this method.', $firewallConfig->getName()));
+            }
             $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $logoutConfig['csrf_parameter']);
-            if (!\is_string($csrfToken) || false === $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($logoutConfig['csrf_token_id'], $csrfToken))) {
+            if (!\is_string($csrfToken) || !$this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($logoutConfig['csrf_token_id'], $csrfToken))) {
                 throw new LogoutException('Invalid CSRF token.');
             }
         }
@@ -96,7 +103,7 @@ class Security extends LegacySecurity
         $logoutEvent = new LogoutEvent($request, $token);
         $this->container->get('security.firewall.event_dispatcher_locator')->get($firewallConfig->getName())->dispatch($logoutEvent);
 
-        $tokenStorage->setToken();
+        $tokenStorage->setToken(null);
 
         return $logoutEvent->getResponse();
     }

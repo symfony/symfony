@@ -28,6 +28,8 @@ use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
@@ -177,7 +179,7 @@ class SecurityTest extends TestCase
         $token->method('getUser')->willReturn(new InMemoryUser('foo', 'bar'));
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
-        $tokenStorage->expects($this->once())->method('setToken');
+        $tokenStorage->expects($this->once())->method('setToken')->with(null);
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher
@@ -215,7 +217,7 @@ class SecurityTest extends TestCase
             ])
         ;
         $security = new Security($container);
-        $security->logout();
+        $security->logout(false);
     }
 
     public function testLogoutWithoutFirewall()
@@ -253,7 +255,7 @@ class SecurityTest extends TestCase
 
         $this->expectException(LogicException::class);
         $security = new Security($container);
-        $security->logout();
+        $security->logout(false);
     }
 
     public function testLogoutWithResponse()
@@ -266,7 +268,7 @@ class SecurityTest extends TestCase
         $token->method('getUser')->willReturn(new InMemoryUser('foo', 'bar'));
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
-        $tokenStorage->expects($this->once())->method('setToken')->with();
+        $tokenStorage->expects($this->once())->method('setToken')->with(null);
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher
@@ -306,15 +308,15 @@ class SecurityTest extends TestCase
             ])
         ;
         $security = new Security($container);
-        $response = $security->logout();
+        $response = $security->logout(false);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals('a custom response', $response->getContent());
     }
 
-    public function testLogoutWithCsrf()
+    public function testLogoutWithValidCsrf()
     {
-        $request = new Request();
+        $request = new Request(['_csrf_token' => 'dummytoken']);
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->expects($this->once())->method('getMainRequest')->willReturn($request);
 
@@ -322,7 +324,7 @@ class SecurityTest extends TestCase
         $token->method('getUser')->willReturn(new InMemoryUser('foo', 'bar'));
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
-        $tokenStorage->expects($this->once())->method('setToken')->with();
+        $tokenStorage->expects($this->once())->method('setToken')->with(null);
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher
@@ -340,7 +342,7 @@ class SecurityTest extends TestCase
         ;
 
         $firewallMap = $this->createMock(FirewallMap::class);
-        $firewallConfig = new FirewallConfig('my_firewall', 'user_checker');
+        $firewallConfig = new FirewallConfig(name: 'my_firewall', userChecker: 'user_checker', logout: ['csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'logout']);
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewallConfig);
 
         $eventDispatcherLocator = $this->createMock(ContainerInterface::class);
@@ -350,7 +352,11 @@ class SecurityTest extends TestCase
             ->willReturnMap([['my_firewall', $eventDispatcher]])
         ;
 
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->once())->method('isTokenValid')->with($this->equalTo(new CsrfToken('logout', 'dummytoken')))->willReturn(true);
+
         $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->once())->method('has')->with('security.csrf.token_manager')->willReturn(true);
         $container
             ->expects($this->atLeastOnce())
             ->method('get')
@@ -359,6 +365,7 @@ class SecurityTest extends TestCase
                 ['security.token_storage', $tokenStorage],
                 ['security.firewall.map', $firewallMap],
                 ['security.firewall.event_dispatcher_locator', $eventDispatcherLocator],
+                ['security.csrf.token_manager', $csrfTokenManager],
             ])
         ;
         $security = new Security($container);

@@ -84,6 +84,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
     }
 
+    public function testFormCsrfProtectionWithCsrfDisabled()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('To use form CSRF protection `framework.csrf_protection` must be enabled.');
+
+        $this->createContainerFromFile('form_csrf_disabled');
+    }
+
     public function testPropertyAccessWithDefaultValue()
     {
         $container = $this->createContainerFromFile('full');

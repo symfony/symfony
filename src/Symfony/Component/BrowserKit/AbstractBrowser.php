@@ -658,7 +658,7 @@ abstract class AbstractBrowser
         }
 
         // protocol relative URL
-        if (0 === strpos($uri, '//')) {
+        if ('' !== trim($uri, '/') && str_starts_with($uri, '//')) {
             return parse_url($currentUri, \PHP_URL_SCHEME).':'.$uri;
         }
 

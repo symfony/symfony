@@ -161,6 +161,31 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testEndpointWithInvalidValueInReturn()
+    {
+        $returnValue = implode(
+            "\r\n",
+            [
+                '36039744C253F9B2A4E90CBEDB02EBFB82D:5',
+                'This should not break the validator',
+                '3686792BBC66A72D40D928ED15621124CFE:7',
+                '36EEC709091B810AA240179A44317ED415C:2',
+                '',
+            ]
+        );
+
+        $validator = new NotCompromisedPasswordValidator(
+            $this->createHttpClientStub($returnValue),
+            'UTF-8',
+            true,
+            'https://password-check.internal.example.com/range/%s'
+        );
+
+        $validator->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
     public function testInvalidConstraint()
     {
         $this->expectException(UnexpectedTypeException::class);
@@ -195,11 +220,11 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
     }
 
-    private function createHttpClientStub(): HttpClientInterface
+    private function createHttpClientStub(?string $returnValue = null): HttpClientInterface
     {
         $httpClientStub = $this->createMock(HttpClientInterface::class);
         $httpClientStub->method('request')->willReturnCallback(
-            function (string $method, string $url): ResponseInterface {
+            function (string $method, string $url) use ($returnValue): ResponseInterface {
                 if (self::PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL === $url) {
                     throw new class('Problem contacting the Have I been Pwned API.') extends \Exception implements ServerExceptionInterface {
                         public function getResponse(): ResponseInterface
@@ -212,7 +237,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                 $responseStub = $this->createMock(ResponseInterface::class);
                 $responseStub
                     ->method('getContent')
-                    ->willReturn(implode("\r\n", self::RETURN));
+                    ->willReturn($returnValue ?? implode("\r\n", self::RETURN));
 
                 return $responseStub;
             }

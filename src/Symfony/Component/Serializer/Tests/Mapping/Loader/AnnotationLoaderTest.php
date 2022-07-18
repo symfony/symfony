@@ -134,6 +134,19 @@ abstract class AnnotationLoaderTest extends TestCase
         $loader->loadClassMetadata($classMetadata);
     }
 
+    public function testCanHandleUnrelatedIgnoredMethods()
+    {
+        $class = $this->getNamespace().'\Entity45016';
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', $class));
+
+        $metadata = new ClassMetadata($class);
+        $loader = $this->getLoaderForContextMapping();
+
+        $loader->loadClassMetadata($metadata);
+    }
+
     abstract protected function createLoader(): AnnotationLoader;
 
     abstract protected function getNamespace(): string;

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-18T09:49:32Z
+
+@derrabus I've opened severals symfony/components/(dotenv|passwordhasher|console) etc and each one have its own naming, thus maybe this small change is enough :)

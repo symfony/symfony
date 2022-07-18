@@ -107,7 +107,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setChunkSize(int $chunkSize): self
+    public function setChunkSize(int $chunkSize): static
     {
         if ($chunkSize < 1 || $chunkSize > \PHP_INT_MAX) {
             throw new \LogicException('The chunk size of a BinaryFileResponse cannot be less than 1 or greater than PHP_INT_MAX.');

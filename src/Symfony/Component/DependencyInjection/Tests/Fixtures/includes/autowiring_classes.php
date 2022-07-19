@@ -9,6 +9,9 @@ require __DIR__.'/autowiring_classes_80.php';
 if (\PHP_VERSION_ID >= 80100) {
     require __DIR__.'/intersectiontype_classes.php';
 }
+if (\PHP_VERSION_ID >= 80200) {
+    require __DIR__.'/compositetype_classes.php';
+}
 
 class Foo
 {

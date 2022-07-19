@@ -483,25 +483,37 @@ class Email extends Message
             $names = array_filter(array_unique(array_merge($names[2], $names[3])));
         }
 
+        // usage of reflection is a temporary workaround for missing getters that will be added in 6.2
+        $dispositionRef = new \ReflectionProperty(TextPart::class, 'disposition');
+        $dispositionRef->setAccessible(true);
+        $nameRef = new \ReflectionProperty(TextPart::class, 'name');
+        $nameRef->setAccessible(true);
         $attachmentParts = $inlineParts = [];
         foreach ($this->attachments as $attachment) {
+            $part = $this->createDataPart($attachment);
+            if (isset($attachment['part'])) {
+                $attachment['name'] = $nameRef->getValue($part);
+            }
+
             foreach ($names as $name) {
-                if (isset($attachment['part'])) {
-                    continue;
-                }
                 if ($name !== $attachment['name']) {
                     continue;
                 }
                 if (isset($inlineParts[$name])) {
                     continue 2;
                 }
-                $attachment['inline'] = true;
-                $inlineParts[$name] = $part = $this->createDataPart($attachment);
+                $part->setDisposition('inline');
                 $html = str_replace('cid:'.$name, 'cid:'.$part->getContentId(), $html);
                 $part->setName($part->getContentId());
-                continue 2;
+
+                break;
             }
-            $attachmentParts[] = $this->createDataPart($attachment);
+
+            if ('inline' === $dispositionRef->getValue($part)) {
+                $inlineParts[$attachment['name']] = $part;
+            } else {
+                $attachmentParts[] = $part;
+            }
         }
         if (null !== $htmlPart) {
             $htmlPart = new TextPart($html, $this->htmlCharset, 'html');

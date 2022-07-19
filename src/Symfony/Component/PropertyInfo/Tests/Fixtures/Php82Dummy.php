@@ -16,4 +16,6 @@ class Php82Dummy
     public null $nil = null;
 
     public false $false = false;
+
+    public (\Traversable&\Countable)|null $someCollection = null;
 }

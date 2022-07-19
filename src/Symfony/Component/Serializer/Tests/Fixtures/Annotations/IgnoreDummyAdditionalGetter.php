@@ -6,7 +6,6 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 
 class IgnoreDummyAdditionalGetter
 {
-
     private $myValue;
 
     /**
@@ -17,7 +16,8 @@ class IgnoreDummyAdditionalGetter
         return $this->myValue;
     }
 
-    public function getExtraValue(string $parameter) {
+    public function getExtraValue(string $parameter)
+    {
         return $parameter;
     }
 }

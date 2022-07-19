@@ -4,7 +4,6 @@ namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 
 class IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations
 {
-
     private $myValue;
 
     public function getMyValue()
@@ -12,7 +11,8 @@ class IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations
         return $this->myValue;
     }
 
-    public function getExtraValue(string $parameter) {
+    public function getExtraValue(string $parameter)
+    {
         return $parameter;
     }
 }

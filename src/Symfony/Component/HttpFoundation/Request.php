@@ -1332,8 +1332,20 @@ class Request
 
     /**
      * Gets the format associated with the request.
+     *
+     * @deprecated since Symfony 6.2, use getContentFormat() instead.
      */
     public function getContentType(): ?string
+    {
+        trigger_deprecation('symfony/http-foundation', '6.2', 'The "%s::getContentType()" method is deprecated, use "getContentFormat()" instead.', get_debug_type($this));
+
+        return $this->getContentFormat();
+    }
+
+    /**
+     * Gets the format associated with the request.
+     */
+    public function getContentFormat(): ?string
     {
         return $this->getFormat($this->headers->get('CONTENT_TYPE', ''));
     }

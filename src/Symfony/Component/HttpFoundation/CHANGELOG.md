@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Deprecate the `Request::getContentType()` method and add `getContentFormat()` as replacement
+
 6.1
 ---
 

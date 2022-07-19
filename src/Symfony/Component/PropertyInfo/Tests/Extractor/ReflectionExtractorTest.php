@@ -309,11 +309,15 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy', $property, []));
     }
 
-    public function php82TypesProvider()
+    public function php82TypesProvider(): iterable
     {
         yield ['nil', null];
         yield ['false', [new Type(Type::BUILTIN_TYPE_FALSE)]];
         yield ['true', [new Type(Type::BUILTIN_TYPE_TRUE)]];
+
+        // Nesting intersection and union types is not supported yet,
+        // but we should make sure this kind of composite types does not crash the extractor.
+        yield ['someCollection', null];
     }
 
     /**

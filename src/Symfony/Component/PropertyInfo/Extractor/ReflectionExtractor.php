@@ -537,6 +537,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $nullable = $reflectionType->allowsNull();
 
         foreach (($reflectionType instanceof \ReflectionUnionType || $reflectionType instanceof \ReflectionIntersectionType) ? $reflectionType->getTypes() : [$reflectionType] as $type) {
+            if (!$type instanceof \ReflectionNamedType) {
+                // Nested composite types are not supported yet.
+                return [];
+            }
+
             $phpTypeOrClass = $type->getName();
             if ('null' === $phpTypeOrClass || 'mixed' === $phpTypeOrClass || 'never' === $phpTypeOrClass) {
                 continue;

@@ -206,9 +206,23 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->assertDescription($expectedDescription, $callable);
     }
 
-    public function getDescribeCallableTestData()
+    public function getDescribeCallableTestData(): array
     {
         return $this->getDescriptionTestData(ObjectsProvider::getCallables());
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getDescribeDeprecatedCallableTestData
+     */
+    public function testDescribeDeprecatedCallable($callable, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $callable);
+    }
+
+    public function getDescribeDeprecatedCallableTestData(): array
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getDeprecatedCallables());
     }
 
     /** @dataProvider getClassDescriptionTestData */

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
+use Symfony\Component\ExpressionLanguage\Expression;
+
 /**
  * AccessDeniedException is thrown when the account has not the required role.
  *
@@ -35,11 +37,11 @@ class AccessDeniedException extends RuntimeException
     }
 
     /**
-     * @param array|string $attributes
+     * @param array|string|Expression $attributes
      */
     public function setAttributes($attributes)
     {
-        $this->attributes = (array) $attributes;
+        $this->attributes = $attributes instanceof Expression ? [$attributes] : (array) $attributes;
     }
 
     /**

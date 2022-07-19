@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by flack at 2022-07-18T08:52:28Z
+
+I tested this against 5.4.10, and it seems to fix the issue mentioned in #43255

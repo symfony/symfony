@@ -100,6 +100,11 @@ class AnnotationLoader implements LoaderInterface
                 continue;
             }
 
+            $getAccessor = preg_match('/^(get|)(.+)$/i', $method->name);
+            if ($getAccessor && 0 !== $method->getNumberOfRequiredParameters()) {
+                continue; /*  matches the BC behavior in `Symfony\Component\Serializer\Normalizer\ObjectNormalizer::extractAttributes` */
+            }
+
             $accessorOrMutator = preg_match('/^(get|is|has|set)(.+)$/i', $method->name, $matches);
             if ($accessorOrMutator) {
                 $attributeName = lcfirst($matches[2]);

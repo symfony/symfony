@@ -147,6 +147,24 @@ abstract class AnnotationLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
     }
 
+    public function testIgnoreGetterWirhRequiredParameterIfIgnoreAnnotationIsUsed()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetter');
+        $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
+
+        $attributes = $classMetadata->getAttributesMetadata();
+        self::assertArrayNotHasKey('extraValue', $attributes);
+    }
+
+    public function testIgnoreGetterWirhRequiredParameterIfIgnoreAnnotationIsNotUsed()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations');
+        $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
+
+        $attributes = $classMetadata->getAttributesMetadata();
+        self::assertArrayNotHasKey('extraValue', $attributes);
+    }
+
     abstract protected function createLoader(): AnnotationLoader;
 
     abstract protected function getNamespace(): string;

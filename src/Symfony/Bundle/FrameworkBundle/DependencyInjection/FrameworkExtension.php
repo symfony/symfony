@@ -708,6 +708,10 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
+            if (!$container->hasDefinition('security.csrf.token_generator')) {
+                throw new \LogicException('To use form CSRF protection, "framework.csrf_protection" must be enabled.');
+            }
+
             $loader->load('form_csrf.php');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);

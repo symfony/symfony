@@ -253,76 +253,116 @@ class EmailTest extends TestCase
         $this->assertEquals($text, $e->getBody());
     }
 
-    public function testGenerateBody()
+    public function testGenerateBodyWithTextOnly()
     {
         $text = new TextPart('text content');
-        $html = new TextPart('html content', 'utf-8', 'html');
-        $att = new DataPart($file = fopen(__DIR__.'/Fixtures/mimetypes/test', 'r'));
-        $img = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'test.gif');
-
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->text('text content');
         $this->assertEquals($text, $e->getBody());
         $this->assertEquals('text content', $e->getTextBody());
+    }
 
+    public function testGenerateBodyWithHtmlOnly()
+    {
+        $html = new TextPart('html content', 'utf-8', 'html');
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content');
         $this->assertEquals($html, $e->getBody());
         $this->assertEquals('html content', $e->getHtmlBody());
+    }
 
+    public function testGenerateBodyWithTextAndHtml()
+    {
+        $text = new TextPart('text content');
+        $html = new TextPart('html content', 'utf-8', 'html');
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content');
         $e->text('text content');
         $this->assertEquals(new AlternativePart($text, $html), $e->getBody());
+    }
 
+    public function testGenerateBodyWithTextAndHtmlNotUtf8()
+    {
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content', 'iso-8859-1');
         $e->text('text content', 'iso-8859-1');
         $this->assertEquals('iso-8859-1', $e->getTextCharset());
         $this->assertEquals('iso-8859-1', $e->getHtmlCharset());
         $this->assertEquals(new AlternativePart(new TextPart('text content', 'iso-8859-1'), new TextPart('html content', 'iso-8859-1', 'html')), $e->getBody());
+    }
 
+    public function testGenerateBodyWithTextContentAndAttachedFile()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->attach($file);
         $e->text('text content');
-        $this->assertEquals(new MixedPart($text, $att), $e->getBody());
+        $this->assertEquals(new MixedPart($text, $filePart), $e->getBody());
+    }
 
+    public function testGenerateBodyWithHtmlContentAndAttachedFile()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->attach($file);
         $e->html('html content');
-        $this->assertEquals(new MixedPart($html, $att), $e->getBody());
+        $this->assertEquals(new MixedPart($html, $filePart), $e->getBody());
+    }
 
+    public function testGenerateBodyWithAttachedFileOnly()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->attach($file);
-        $this->assertEquals(new MixedPart($att), $e->getBody());
+        $this->assertEquals(new MixedPart($filePart), $e->getBody());
+    }
 
+    public function testGenerateBodyWithTextAndHtmlContentAndAttachedFile()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content');
         $e->text('text content');
         $e->attach($file);
-        $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $att), $e->getBody());
+        $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart), $e->getBody());
+    }
 
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferenced()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content');
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
-        $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $att, $img), $e->getBody());
+        $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart, $imagePart), $e->getBody());
+    }
 
+    public function testGenerateBodyWithTextAndAttachedFileAndAttachedImageNotReferenced()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
-        $this->assertEquals(new MixedPart($text, $att, $img), $e->getBody());
+        $this->assertEquals(new MixedPart($text, $filePart, $imagePart), $e->getBody());
+    }
 
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferencedViaCid()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html($content = 'html content <img src="test.gif">');
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
         $fullhtml = new TextPart($content, 'utf-8', 'html');
-        $this->assertEquals(new MixedPart(new AlternativePart($text, $fullhtml), $att, $img), $e->getBody());
+        $this->assertEquals(new MixedPart(new AlternativePart($text, $fullhtml), $filePart, $imagePart), $e->getBody());
+    }
 
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageReferencedViaCid()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html($content = 'html content <img src="cid:test.gif">');
         $e->text('text content');
@@ -332,12 +372,35 @@ class EmailTest extends TestCase
         $this->assertInstanceOf(MixedPart::class, $body);
         $this->assertCount(2, $related = $body->getParts());
         $this->assertInstanceOf(RelatedPart::class, $related[0]);
-        $this->assertEquals($att, $related[1]);
+        $this->assertEquals($filePart, $related[1]);
         $this->assertCount(2, $parts = $related[0]->getParts());
         $this->assertInstanceOf(AlternativePart::class, $parts[0]);
         $generatedHtml = $parts[0]->getParts()[1];
         $this->assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
+    }
 
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImagePartAsInlineReferencedViaCid()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html($content = 'html content <img src="cid:test.gif">');
+        $e->text('text content');
+        $e->attach($file);
+        $e->attachPart((new DataPart($image, 'test.gif'))->asInline());
+        $body = $e->getBody();
+        $this->assertInstanceOf(MixedPart::class, $body);
+        $this->assertCount(2, $related = $body->getParts());
+        $this->assertInstanceOf(RelatedPart::class, $related[0]);
+        $this->assertEquals($filePart, $related[1]);
+        $this->assertCount(2, $parts = $related[0]->getParts());
+        $this->assertInstanceOf(AlternativePart::class, $parts[0]);
+        $generatedHtml = $parts[0]->getParts()[1];
+        $this->assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
+    }
+
+    public function testGenerateBodyWithHtmlAndInlinedImageTwiceReferencedViaCid()
+    {
+        // inline image (twice) referenced in the HTML content
         $content = 'html content <img src="cid:test.gif">';
         $r = fopen('php://memory', 'r+', false);
         fwrite($r, $content);
@@ -346,6 +409,7 @@ class EmailTest extends TestCase
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html($r);
         // embedding the same image twice results in one image only in the email
+        $image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r');
         $e->embed($image, 'test.gif');
         $e->embed($image, 'test.gif');
         $body = $e->getBody();
@@ -363,8 +427,19 @@ class EmailTest extends TestCase
         $this->assertStringMatchesFormat('<div background=3D"cid:%s@symfony"></div>', $parts[0]->bodyToString());
     }
 
+    private function generateSomeParts(): array
+    {
+        $text = new TextPart('text content');
+        $html = new TextPart('html content', 'utf-8', 'html');
+        $filePart = new DataPart($file = fopen(__DIR__.'/Fixtures/mimetypes/test', 'r'));
+        $imagePart = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'test.gif');
+
+        return [$text, $html, $filePart, $file, $imagePart, $image];
+    }
+
     public function testAttachments()
     {
+        // inline part
         $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test', 'r');
         $att = new DataPart($file = fopen($name, 'r'), 'test');
         $inline = (new DataPart($contents, 'test'))->asInline();
@@ -373,6 +448,7 @@ class EmailTest extends TestCase
         $e->embed($contents, 'test');
         $this->assertEquals([$att, $inline], $e->getAttachments());
 
+        // inline part from path
         $att = DataPart::fromPath($name, 'test');
         $inline = DataPart::fromPath($name, 'test')->asInline();
         $e = new Email();

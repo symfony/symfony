@@ -109,6 +109,11 @@ abstract class AbstractHeader implements HeaderInterface
                 }
                 $phraseStr = $this->encodeWords($header, $string, $usedLength);
             }
+        } elseif (str_contains($phraseStr, '(')) {
+            foreach (['\\', '"'] as $char) {
+                $phraseStr = str_replace($char, '\\'.$char, $phraseStr);
+            }
+            $phraseStr = '"'.$phraseStr.'"';
         }
 
         return $phraseStr;

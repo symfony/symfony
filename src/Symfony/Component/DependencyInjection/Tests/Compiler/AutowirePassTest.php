@@ -241,8 +241,6 @@ class AutowirePassTest extends TestCase
      */
     public function testTypeNotGuessableUnionType()
     {
-        $this->expectException(AutowiringFailedException::class);
-        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA|Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB" but this class was not found.');
         $container = new ContainerBuilder();
 
         $container->register(CollisionA::class);
@@ -252,6 +250,9 @@ class AutowirePassTest extends TestCase
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA|Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB" but this class was not found.');
         $pass->process($container);
     }
 
@@ -260,8 +261,6 @@ class AutowirePassTest extends TestCase
      */
     public function testTypeNotGuessableIntersectionType()
     {
-        $this->expectException(AutowiringFailedException::class);
-        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\IntersectionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface&Symfony\Component\DependencyInjection\Tests\Compiler\AnotherInterface" but this class was not found.');
         $container = new ContainerBuilder();
 
         $container->register(CollisionInterface::class);
@@ -271,6 +270,29 @@ class AutowirePassTest extends TestCase
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\IntersectionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface&Symfony\Component\DependencyInjection\Tests\Compiler\AnotherInterface" but this class was not found.');
+        $pass->process($container);
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testTypeNotGuessableCompositeType()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(CollisionInterface::class);
+        $container->register(AnotherInterface::class);
+
+        $aDefinition = $container->register('a', CompositeTypeClasses::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\CompositeTypeClasses::__construct()" has type "(Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface&Symfony\Component\DependencyInjection\Tests\Compiler\AnotherInterface)|Symfony\Component\DependencyInjection\Tests\Compiler\YetAnotherInterface" but this class was not found.');
         $pass->process($container);
     }
 
@@ -365,6 +387,22 @@ class AutowirePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $optDefinition = $container->register('opt', UnionNull::class);
+        $optDefinition->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('opt');
+        $this->assertNull($definition->getArgument(0));
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testParameterWithNullableIntersectionIsSkipped()
+    {
+        $container = new ContainerBuilder();
+
+        $optDefinition = $container->register('opt', NullableIntersection::class);
         $optDefinition->setAutowired(true);
 
         (new AutowirePass())->process($container);

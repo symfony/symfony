@@ -20,6 +20,7 @@ use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionIntersectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeFixture;
+use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeWithIntersectionFixture;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -78,7 +79,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "71 to 71"
+  line: "72 to 72"
 }
 EOTXT
             , $var
@@ -318,6 +319,44 @@ ReflectionIntersectionType {
       name: "Countable"
       allowsNull: false
       isBuiltin: false
+    }
+  ]
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testReflectionUnionTypeWithIntersection()
+    {
+        $var = (new \ReflectionProperty(ReflectionUnionTypeWithIntersectionFixture::class, 'a'))->getType();
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionUnionType {
+  allowsNull: true
+  types: array:2 [
+    0 => ReflectionIntersectionType {
+      allowsNull: false
+      types: array:2 [
+        0 => ReflectionNamedType {
+          name: "Traversable"
+          allowsNull: false
+          isBuiltin: false
+        }
+        1 => ReflectionNamedType {
+          name: "Countable"
+          allowsNull: false
+          isBuiltin: false
+        }
+      ]
+    }
+    1 => ReflectionNamedType {
+      name: "null"
+      allowsNull: true
+      isBuiltin: true
     }
   ]
 }

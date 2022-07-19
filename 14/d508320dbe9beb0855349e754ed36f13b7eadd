@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-30T12:42:00Z
+
+Hey!
+
+I think @Th3Mouk has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-01T10:22:02Z
+
+I don't know about the change, but this should target 5.4 or maybe 4.4 if the bug exists there also. Can you please confirm?
+
+---------------------------------------------------------------------------
+
+by phramz at 2022-04-04T11:00:09Z
+
+@nicolas-grekas yes this also applies to 5.4.x (I changed the PR to target 5.4 now) ... 4.4.x seems to be far off so running the test will result in totally different errors so i guess it's incompatible. Maybe someone with deeper knowledge/understanding of the component can check on 4.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-14T12:17:42Z
+
+/cc @symfony/mergers anyone available to review this one?
+
+---------------------------------------------------------------------------
+
+by stvnwrgs at 2022-07-18T21:56:40Z
+
+@nicolas-grekas No one here to review? We also would love to see this fixed.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-17T15:36:24Z
+
+Such DX improvements are usually merged as features AFAIK
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-07-19T08:14:36Z
+
+IMO when core DI extension classes or compiler classes fail with a service not found exception fixing them is not a DX enhancement but a real bugfix.

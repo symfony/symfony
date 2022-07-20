@@ -147,8 +147,7 @@ class SmtpTransport extends AbstractTransport
             throw $e;
         }
 
-        $messageId = $this->parseMessageId($this->mtaResult);
-        if ($messageId) {
+        if ($this->mtaResult && $messageId = $this->parseMessageId()) {
             $message->setMessageId($messageId);
         }
 
@@ -157,26 +156,20 @@ class SmtpTransport extends AbstractTransport
         return $message;
     }
 
-    protected function parseMessageId(string $mtaResult): ?string
+    protected function parseMessageId(): string
     {
         $regexps = [
             '/250 Ok (?P<id>[0-9a-f-]+)\r?$/mis',
             '/250 Ok:? queued as (?P<id>[A-Z0-9]+)\r?$/mis'
         ];
-
-        if ($mtaResult === '') {
-            return null;
-        }
-
         $matches = [];
         foreach ($regexps as $regexp) {
-            preg_match($regexp, $mtaResult, $matches);
-            if (!empty($matches['id'])) {
+            if (preg_match($regexp, $this->mtaResult, $matches)) {
                 return $matches['id'];
             }
         }
 
-        return null;
+        return '';
     }
 
     public function __toString(): string

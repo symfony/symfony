@@ -31,7 +31,7 @@ _sf_{{ COMMAND_NAME }}() {
     fi
 
     # Prepare the command to obtain completions
-    requestComp="${words[0]} ${words[1]} _complete -szsh -S{{ VERSION }} -c$((CURRENT-1))" i=""
+    requestComp="${words[0]} ${words[1]} _complete -szsh -a{{ VERSION }} -c$((CURRENT-1))" i=""
     for w in ${words[@]}; do
         w=$(printf -- '%b' "$w")
         # remove quotes from typed values
@@ -49,7 +49,7 @@ _sf_{{ COMMAND_NAME }}() {
         fi
     done
 
-    # Ensure atleast 1 input
+    # Ensure at least 1 input
     if [ "${i}" = "" ]; then
         requestComp="${requestComp} -i\" \""
     else

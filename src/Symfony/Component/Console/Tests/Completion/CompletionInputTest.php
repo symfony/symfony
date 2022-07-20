@@ -132,12 +132,4 @@ class CompletionInputTest extends TestCase
         yield ['bin/console cache:clear "multi word string"', ['bin/console', 'cache:clear', '"multi word string"']];
         yield ['bin/console cache:clear \'multi word string\'', ['bin/console', 'cache:clear', '\'multi word string\'']];
     }
-
-    public function testShell()
-    {
-        $input = CompletionInput::fromString('bin/console cache:clear \'multi word string\'', 1);
-        $input->setShell('zsh');
-
-        $this->assertTrue($input->isShell('zsh'));
-    }
 }

@@ -16,7 +16,7 @@ namespace Symfony\Component\Console\Completion;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class Suggestion
+class Suggestion implements \Stringable
 {
     public function __construct(
         private readonly string $value,

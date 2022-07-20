@@ -48,6 +48,7 @@ final class DumpCompletionCommand extends Command
         $shell = $this->guessShell();
         [$rcFile, $completionFile] = match ($shell) {
             'fish' => ['~/.config/fish/config.fish', "/etc/fish/completions/$commandName.fish"],
+            'zsh' => ['~/.zshrc', '$fpath[1]/'.$commandName],
             default => ['~/.bashrc', "/etc/bash_completion.d/$commandName"],
         };
 

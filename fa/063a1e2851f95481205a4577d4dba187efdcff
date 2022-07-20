@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-10T17:56:26Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by aleho at 2022-02-07T09:09:42Z
+
+@nicolas-grekas Could I get a review on this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-13T16:40:11Z
+
+I'm not sure I get the full consequences of this. Maybe @aschempp could help review?
+
+---------------------------------------------------------------------------
+
+by aleho at 2022-02-14T09:43:57Z
+
+For completeness: I provided a minimal reproducer in the PR mentioned above ([aleho/symfony-httpcache](https://github.com/aleho/symfony-httpcache))
+
+Have a look at [Esi.php](https://github.com/aleho/symfony-httpcache/blob/main/src/HttpCache/Esi.php) to reproduce the issue.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2022-02-15T07:18:27Z
+
+Thanks for the ping @nicolas-grekas. The PR sounds valid, but if I understand it correctly it can only ever appear if https://github.com/symfony/symfony/pull/42355 gets merged, is that correct @aleho? Also, I'm unsure if HttpCache correctly handles a 304 from an ESI fragment, possibly extending the lifetime of the cache etc, did you maybe check for that?
+
+---------------------------------------------------------------------------
+
+by aleho at 2022-02-15T11:34:39Z
+
+@aschempp
+
+Yes, that's right, the problem isn't triggered normally, because `ResponseCacheStrategy` doesn't "support" 304 at the moment and won't send the headers, so clients won't request with an "If-Modified-Since" header.
+
+But, and this is what this PR is about, you can easily trigger a server 500 by sending the header in a request.
+I demonstrated this in the [repo I linked to](https://github.com/aleho/symfony-httpcache).
+
+Unmodified Symfony with ESI enabled:
+```
+curl -kI https://symfony.localhost -H 'If-Modified-Since: Tue, 15 Feb 2022 9:00:00 GMT'
+
+HTTP/2 500
+access-control-allow-origin: https://symfony.localhost
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+cache-control: no-cache, private
+content-type: text/html; charset=UTF-8
+date: Tue, 15 Feb 2022 11:18:28 GMT
+status: 500 Internal Server Error
+x-debug-exception: Error%20when%20rendering%20%22https%3A%2F%2Fsymfony.localhost%2F_fragment%3F_hash%3DfF%252Bd4YUs%252BLEmtFBw8s987QLP7mBirm5Ra2EBed1yzbk%253D%26_path%3D_format%253Dhtml%2526_locale%253Den%2526_controller%253DApp%25255CController%25255CDefaultController%25253A%25253Aheader%22%20%28Status%20code%20is%20304%29.
+x-debug-exception-file: %2Fapplication%2Fvendor%2Fsymfony%2Fhttp-kernel%2FHttpCache%2FAbstractSurrogate.php:99
+```
+
+Again, this happens with an unmodified Symfony installation and ESI enabled. In my opinion this is a bug, there should be no 500 when sending a request with an "If-Modified-Since" header.
+
+In my demo I didn't even return a 304 in [any of the controller actions](https://github.com/aleho/symfony-httpcache/blob/main/src/Controller/DefaultController.php) / fragments, I only set a last modified date.
+This is enough for `HttpCache` to correctly check `isNotModified` with the (client) request and correctly return a 304 (as the fragment action set a last-modified date), but ESI assuming 304 is an invalid status will throw an exception.
+
+---------------------------------------------------------------------------
+
+by aleho at 2022-06-27T07:52:36Z
+
+@aschempp @nicolas-grekas Do you have any new feedback on this?
+
+All Symfony versions I tested are still affected.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-06-27T09:08:23Z
+
+IIUC, it needs #42355, which is going to be part of 6.2 (as a new feature). So, I'd suggest to wait for the other PR to merged and then, this one can be added on top for 6.2 as well.
+
+---------------------------------------------------------------------------
+
+by aleho at 2022-07-20T19:28:23Z
+
+@fabpot This PR is actually independent of the other one.
+
+The 500 can be observed in any Symfony version if the browser sends an `If-Modified-Since` header (even though it shouldn't, Symfony should also not produce a 500 on the other hand, I think).

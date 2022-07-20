@@ -13,11 +13,12 @@ namespace Symfony\Component\String\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\AbstractString;
-use function Symfony\Component\String\b;
 use Symfony\Component\String\ByteString;
+use Symfony\Component\String\UnicodeString;
+
+use function Symfony\Component\String\b;
 use function Symfony\Component\String\s;
 use function Symfony\Component\String\u;
-use Symfony\Component\String\UnicodeString;
 
 final class FunctionsTest extends TestCase
 {

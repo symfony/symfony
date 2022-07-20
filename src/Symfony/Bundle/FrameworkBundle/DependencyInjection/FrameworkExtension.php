@@ -921,7 +921,7 @@ class FrameworkExtension extends Extension
             if (isset($workflow['marking_store']['type'])) {
                 $markingStoreDefinition = new ChildDefinition('workflow.marking_store.method');
                 $markingStoreDefinition->setArguments([
-                    'state_machine' === $type, //single state
+                    'state_machine' === $type, // single state
                     $workflow['marking_store']['property'],
                 ]);
             } elseif (isset($workflow['marking_store']['service'])) {

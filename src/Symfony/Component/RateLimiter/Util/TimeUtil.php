@@ -22,6 +22,6 @@ final class TimeUtil
     {
         $now = new \DateTimeImmutable();
 
-        return ($now->add($interval))->getTimestamp() - $now->getTimestamp();
+        return $now->add($interval)->getTimestamp() - $now->getTimestamp();
     }
 }

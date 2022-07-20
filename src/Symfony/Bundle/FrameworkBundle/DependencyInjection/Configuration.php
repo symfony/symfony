@@ -1861,7 +1861,7 @@ class Configuration implements ConfigurationInterface
                     ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite)')->end()
                     ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness in percent (between 0 and 1) to apply to the delay')->end()
                 ->end()
-            ;
+        ;
     }
 
     private function addMailerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)

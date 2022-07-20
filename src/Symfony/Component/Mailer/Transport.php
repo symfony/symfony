@@ -63,7 +63,7 @@ class Transport
      * @param HttpClientInterface|null      $client
      * @param LoggerInterface|null          $logger
      */
-    public static function fromDsn(string $dsn/*, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null*/): TransportInterface
+    public static function fromDsn(string $dsn/* , EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null */): TransportInterface
     {
         $dispatcher = 2 <= \func_num_args() ? func_get_arg(1) : null;
         $client = 3 <= \func_num_args() ? func_get_arg(2) : null;
@@ -79,7 +79,7 @@ class Transport
      * @param HttpClientInterface|null      $client
      * @param LoggerInterface|null          $logger
      */
-    public static function fromDsns(array $dsns/*, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null*/): TransportInterface
+    public static function fromDsns(array $dsns/* , EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null */): TransportInterface
     {
         $dispatcher = 2 <= \func_num_args() ? func_get_arg(1) : null;
         $client = 3 <= \func_num_args() ? func_get_arg(2) : null;
@@ -183,7 +183,7 @@ class Transport
      *
      * @return \Traversable<int, TransportFactoryInterface>
      */
-    public static function getDefaultFactories(/*EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null*/): iterable
+    public static function getDefaultFactories(/* EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null */): iterable
     {
         $dispatcher = 1 <= \func_num_args() ? func_get_arg(0) : null;
         $client = 2 <= \func_num_args() ? func_get_arg(1) : null;

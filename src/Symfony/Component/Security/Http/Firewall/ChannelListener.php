@@ -34,7 +34,7 @@ class ChannelListener extends AbstractListener
     private $httpPort;
     private $httpsPort;
 
-    public function __construct(AccessMapInterface $map, /*LoggerInterface*/ $logger = null, /*int*/ $httpPort = 80, /*int*/ $httpsPort = 443)
+    public function __construct(AccessMapInterface $map, /* LoggerInterface */ $logger = null, /* int */ $httpPort = 80, /* int */ $httpsPort = 443)
     {
         if ($logger instanceof AuthenticationEntryPointInterface) {
             trigger_deprecation('symfony/security-http', '5.4', 'The "$authenticationEntryPoint" argument of "%s()" is deprecated.', __METHOD__);

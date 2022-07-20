@@ -364,8 +364,8 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue']
-        ));
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue'])
+        );
     }
 
     public function testLoadChoicesForValuesLoadsAllIfSingleIntIdAndValueGiven()

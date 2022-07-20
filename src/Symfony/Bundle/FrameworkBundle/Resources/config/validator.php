@@ -104,5 +104,5 @@ return static function (ContainerConfigurator $container) {
                 service('property_info'),
             ])
             ->tag('validator.auto_mapper')
-        ;
+    ;
 };

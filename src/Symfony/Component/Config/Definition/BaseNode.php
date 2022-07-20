@@ -203,7 +203,7 @@ abstract class BaseNode implements NodeInterface
      * You can use %node% and %path% placeholders in your message to display,
      * respectively, the node name and its complete path
      */
-    public function setDeprecated(?string $package/*, string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.' */)
+    public function setDeprecated(?string $package/* , string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.' */)
     {
         $args = \func_get_args();
 

@@ -615,7 +615,7 @@ class Filesystem
      *
      * @return string The new temporary filename (with path), or throw an exception on failure
      */
-    public function tempnam(string $dir, string $prefix/*, string $suffix = ''*/)
+    public function tempnam(string $dir, string $prefix/* , string $suffix = '' */)
     {
         $suffix = \func_num_args() > 2 ? func_get_arg(2) : '';
         [$scheme, $hierarchy] = $this->getSchemeAndHierarchy($dir);
@@ -700,7 +700,7 @@ class Filesystem
      *
      * @throws IOException If the file is not writable
      */
-    public function appendToFile(string $filename, $content/*, bool $lock = false*/)
+    public function appendToFile(string $filename, $content/* , bool $lock = false */)
     {
         if (\is_array($content)) {
             throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be string or resource, array given.', __METHOD__));

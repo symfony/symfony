@@ -99,7 +99,7 @@ abstract class AbstractUidType extends Type
     private function hasNativeGuidType(AbstractPlatform $platform): bool
     {
         // Compatibility with DBAL < 3.4
-        $method = \method_exists($platform, 'getStringTypeDeclarationSQL')
+        $method = method_exists($platform, 'getStringTypeDeclarationSQL')
             ? 'getStringTypeDeclarationSQL'
             : 'getVarcharTypeDeclarationSQL';
 

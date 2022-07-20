@@ -28,7 +28,7 @@ class PreAuthenticatedToken extends AbstractToken
      * @param string        $firewallName
      * @param string[]      $roles
      */
-    public function __construct($user, /*string*/ $firewallName, /*array*/ $roles = [])
+    public function __construct($user, /* string */ $firewallName, /* array */ $roles = [])
     {
         if (\is_string($roles)) {
             trigger_deprecation('symfony/security-core', '5.4', 'Argument $credentials of "%s()" is deprecated.', __METHOD__);

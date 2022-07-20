@@ -518,7 +518,7 @@ class Command
      *
      * @final since Symfony 5.1
      */
-    public function setHidden(bool $hidden /*= true*/)
+    public function setHidden(bool $hidden /* = true */)
     {
         $this->hidden = $hidden;
 

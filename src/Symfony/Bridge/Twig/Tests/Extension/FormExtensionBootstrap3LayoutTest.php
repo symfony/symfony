@@ -102,7 +102,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
                             <span class="input-group-addon">&euro; </span>
             <input type="text" id="name" name="name" required="required" class="form-control" />        </div>
 HTML
-        , trim($this->renderWidget($view)));
+            , trim($this->renderWidget($view)));
     }
 
     protected function renderForm(FormView $view, array $vars = [])

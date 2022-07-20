@@ -106,7 +106,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
                     <span class="input-group-text">&euro; </span>
                 </div><input type="text" id="name" name="name" required="required" class="form-control" /></div>
 HTML
-        , trim($this->renderWidget($view)));
+            , trim($this->renderWidget($view)));
     }
 
     protected function renderForm(FormView $view, array $vars = [])

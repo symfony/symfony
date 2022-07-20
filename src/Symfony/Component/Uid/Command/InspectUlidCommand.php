@@ -64,7 +64,7 @@ EOF
             ['toBase58', $ulid->toBase58()],
             ['toRfc4122', $ulid->toRfc4122()],
             new TableSeparator(),
-            ['Time', ($ulid->getDateTime())->format('Y-m-d H:i:s.v \U\T\C')],
+            ['Time', $ulid->getDateTime()->format('Y-m-d H:i:s.v \U\T\C')],
         ]);
 
         return 0;

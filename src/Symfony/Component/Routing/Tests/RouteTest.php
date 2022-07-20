@@ -357,7 +357,7 @@ class RouteTest extends TestCase
     public function provideNonLocalizedRoutes()
     {
         return [
-            [(new Route('/foo'))],
+            [new Route('/foo')],
             [(new Route('/foo'))->setDefault('_locale', 'en')],
             [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')],
             [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'foobar')],

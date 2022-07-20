@@ -68,7 +68,7 @@ EODUMP;
   }
 ]
 DUMP
-        , [1, 2, new \DateTime('2019-07-09T0:00:00+00:00')]);
+            , [1, 2, new \DateTime('2019-07-09T0:00:00+00:00')]);
 
         $this->tearDownVarDumper();
 

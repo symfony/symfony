@@ -25,7 +25,7 @@ final class MobytOptionsTest extends TestCase
     {
         $notification = (new Notification('Foo'))->importance($importance);
 
-        $options = (MobytOptions::fromNotification($notification))->toArray();
+        $options = MobytOptions::fromNotification($notification)->toArray();
 
         $this->assertSame($expectedMessageType, $options['message_type']);
     }
@@ -45,7 +45,7 @@ final class MobytOptionsTest extends TestCase
     {
         $notification = (new Notification('Foo'))->importance('Bar');
 
-        $options = (MobytOptions::fromNotification($notification))->toArray();
+        $options = MobytOptions::fromNotification($notification)->toArray();
 
         $this->assertSame(MobytOptions::MESSAGE_TYPE_QUALITY_HIGH, $options['message_type']);
     }

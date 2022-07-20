@@ -41,7 +41,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 new CallbackChoiceLoader(static function () use ($choices) {
                     return $choices;
                 }
-            ), $filter), $value);
+                ), $filter), $value);
         }
 
         return new ArrayChoiceList($choices, $value);

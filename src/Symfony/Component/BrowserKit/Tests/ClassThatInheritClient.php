@@ -40,7 +40,7 @@ class ClassThatInheritClient extends AbstractBrowser
     /**
      * @param array $serverParameters
      */
-    public function submit(DomCrawlerForm $form, array $values = []/*, array $serverParameters = []*/): Crawler
+    public function submit(DomCrawlerForm $form, array $values = []/* , array $serverParameters = [] */): Crawler
     {
         return parent::submit($form, $values);
     }

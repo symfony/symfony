@@ -159,7 +159,7 @@ class Workflow implements WorkflowInterface
      *
      * @param array $context Some context
      */
-    public function apply($subject, $transitionName/*, array $context = []*/)
+    public function apply($subject, $transitionName/* , array $context = [] */)
     {
         $context = \func_get_args()[2] ?? [];
 

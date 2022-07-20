@@ -37,7 +37,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
      *
      * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response/* , \Throwable $exception = null */)
     {
         // Noop. Everything is collected live by the traceable buses & cloned as late as possible.
     }

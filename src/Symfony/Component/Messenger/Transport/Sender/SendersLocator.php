@@ -32,7 +32,7 @@ class SendersLocator implements SendersLocatorInterface
      * @param string[][]         $sendersMap     An array, keyed by "type", set to an array of sender aliases
      * @param ContainerInterface $sendersLocator Locator of senders, keyed by sender alias
      */
-    public function __construct(array $sendersMap, /*ContainerInterface*/ $sendersLocator = null)
+    public function __construct(array $sendersMap, /* ContainerInterface */ $sendersLocator = null)
     {
         $this->sendersMap = $sendersMap;
 

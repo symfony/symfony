@@ -57,7 +57,7 @@ class SingleStateMarkingStore implements MarkingStoreInterface
      *
      * @param array $context Some context
      */
-    public function setMarking($subject, Marking $marking/*, array $context = []*/)
+    public function setMarking($subject, Marking $marking/* , array $context = [] */)
     {
         $this->propertyAccessor->setValue($subject, $this->property, key($marking->getPlaces()));
     }

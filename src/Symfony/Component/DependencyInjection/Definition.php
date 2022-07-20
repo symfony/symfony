@@ -143,7 +143,7 @@ class Definition
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    public function setDecoratedService($id, $renamedId = null, $priority = 0/*, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE*/)
+    public function setDecoratedService($id, $renamedId = null, $priority = 0/* , int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE */)
     {
         if ($renamedId && $id === $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
@@ -370,7 +370,7 @@ class Definition
      *
      * @throws InvalidArgumentException on empty $method param
      */
-    public function addMethodCall($method, array $arguments = []/*, bool $returnsClone = false*/)
+    public function addMethodCall($method, array $arguments = []/* , bool $returnsClone = false */)
     {
         if (empty($method)) {
             throw new InvalidArgumentException('Method name cannot be empty.');

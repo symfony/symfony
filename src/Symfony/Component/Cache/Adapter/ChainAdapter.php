@@ -210,7 +210,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
      *
      * @return bool
      */
-    public function clear(/*string $prefix = ''*/)
+    public function clear(/* string $prefix = '' */)
     {
         $prefix = 0 < \func_num_args() ? (string) func_get_arg(0) : '';
         $cleared = true;

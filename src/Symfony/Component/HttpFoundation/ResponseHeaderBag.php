@@ -90,7 +90,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @param string|null $key The name of the headers to return or null to get them all
      */
-    public function all(/*string $key = null*/)
+    public function all(/* string $key = null */)
     {
         $headers = parent::all();
 
@@ -254,7 +254,7 @@ class ResponseHeaderBag extends HeaderBag
      * @param bool   $httpOnly
      * @param string $sameSite
      */
-    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true/*, $sameSite = null*/)
+    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true/* , $sameSite = null */)
     {
         $sameSite = \func_num_args() > 5 ? func_get_arg(5) : null;
 

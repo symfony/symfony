@@ -197,9 +197,9 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         // HOW TO REPRODUCE?
 
-        //$this->expectException(\Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException::class);
+        // $this->expectException(\Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException::class);
 
-        //$transformer->transform(1.5);
+        // $transformer->transform(1.5);
     }
 
     /**

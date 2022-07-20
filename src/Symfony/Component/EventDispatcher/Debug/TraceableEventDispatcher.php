@@ -133,7 +133,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      *
      * @param string|null $eventName
      */
-    public function dispatch($event/*, string $eventName = null*/)
+    public function dispatch($event/* , string $eventName = null */)
     {
         if (null === $this->callStack) {
             $this->callStack = new \SplObjectStorage();

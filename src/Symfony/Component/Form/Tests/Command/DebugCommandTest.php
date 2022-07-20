@@ -55,7 +55,7 @@ Service form types
 
 
 TXT
-        , $tester->getDisplay(true));
+            , $tester->getDisplay(true));
     }
 
     public function testDebugSingleFormType()
@@ -137,7 +137,7 @@ Select one of the following form types to display its information: [%A\A\Ambiguo
 %A\A\AmbiguousType (Block prefix: "ambiguous")
 %A
 TXT
-        , $output);
+            , $output);
     }
 
     public function testDebugInvalidFormType()

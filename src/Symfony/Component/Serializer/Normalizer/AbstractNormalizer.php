@@ -304,7 +304,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws CircularReferenceException
      */
-    protected function handleCircularReference($object/*, string $format = null, array $context = []*/)
+    protected function handleCircularReference($object/* , string $format = null, array $context = [] */)
     {
         if (\func_num_args() < 2 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
             @trigger_error(sprintf('The "%s()" method will have two new "string $format = null" and "array $context = []" arguments in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), \E_USER_DEPRECATED);
@@ -542,7 +542,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute/*, ?string $format */): array
+    protected function createChildContext(array $parentContext, $attribute/* , ?string $format */): array
     {
         if (\func_num_args() < 3) {
             @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', static::class, __FUNCTION__), \E_USER_DEPRECATED);

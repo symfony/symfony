@@ -116,7 +116,7 @@ Symfony Container Environment Variables
  * UNKNOWN
 
 TXT
-        , $tester->getDisplay(true));
+            , $tester->getDisplay(true));
 
         putenv('REAL');
     }

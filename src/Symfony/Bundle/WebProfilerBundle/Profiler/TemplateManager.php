@@ -99,7 +99,7 @@ class TemplateManager
     /**
      * @deprecated since Symfony 4.4
      */
-    protected function templateExists($template/*, bool $triggerDeprecation = true */)
+    protected function templateExists($template/* , bool $triggerDeprecation = true */)
     {
         if (1 === \func_num_args()) {
             @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the "exists()" method of the Twig loader instead.', __METHOD__), \E_USER_DEPRECATED);

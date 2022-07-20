@@ -28,7 +28,7 @@ class AjaxDataCollector extends DataCollector
      *
      * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response/* , \Throwable $exception = null */)
     {
         // all collecting is done client side
     }

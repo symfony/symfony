@@ -59,7 +59,7 @@ interface WorkflowInterface
      *
      * @throws LogicException If the transition is not applicable
      */
-    public function apply($subject, $transitionName/*, array $context = []*/);
+    public function apply($subject, $transitionName/* , array $context = [] */);
 
     /**
      * Returns all enabled transitions.

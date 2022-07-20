@@ -136,7 +136,7 @@ class JsonLoginAuthenticatorTest extends TestCase
      */
     public function testAuthenticationForEmptyCredentialDeprecation($request)
     {
-        $this->expectDeprecation('Since symfony/security 6.2: Passing empty string for username or password is deprecated and will be removed in 7.0');
+        $this->expectDeprecation('Since symfony/security 6.2: Passing empty string for username or password is deprecated.');
         $this->setUpAuthenticator();
 
         $this->authenticator->authenticate($request);

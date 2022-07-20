@@ -83,9 +83,9 @@ final class SlackOptionsTest extends TestCase
     public function getRecipientIdProvider(): iterable
     {
         yield [null, new SlackOptions()];
-        yield [null, (new SlackOptions(['recipient_id' => null]))];
+        yield [null, new SlackOptions(['recipient_id' => null])];
         yield ['foo', (new SlackOptions())->recipient('foo')];
-        yield ['foo', (new SlackOptions(['recipient_id' => 'foo']))];
+        yield ['foo', new SlackOptions(['recipient_id' => 'foo'])];
     }
 
     /**

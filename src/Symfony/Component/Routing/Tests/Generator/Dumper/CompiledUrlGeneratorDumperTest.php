@@ -91,7 +91,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testDumpWithSimpleLocalizedRoutes()
     {
-        $this->routeCollection->add('test', (new Route('/foo')));
+        $this->routeCollection->add('test', new Route('/foo'));
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'en'));
         $this->routeCollection->add('test.nl', (new Route('/testen/is/leuk'))->setDefault('_locale', 'nl')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'nl'));
 

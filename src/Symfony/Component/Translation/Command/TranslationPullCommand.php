@@ -141,7 +141,7 @@ EOF
 
         switch ($format) {
             case 'xlf20': $xliffVersion = '2.0';
-            // no break
+                // no break
             case 'xlf12': $format = 'xlf';
         }
 
@@ -159,7 +159,7 @@ EOF
 
         if ($force) {
             foreach ($providerTranslations->getCatalogues() as $catalogue) {
-                $operation = new TargetOperation((new MessageCatalogue($catalogue->getLocale())), $catalogue);
+                $operation = new TargetOperation(new MessageCatalogue($catalogue->getLocale()), $catalogue);
                 if ($intlIcu) {
                     $operation->moveMessagesToIntlDomainsIfPossible();
                 }

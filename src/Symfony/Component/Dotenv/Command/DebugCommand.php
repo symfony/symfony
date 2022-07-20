@@ -59,7 +59,7 @@ The <info>%command.full_name%</info> command displays all the environment variab
 
   <info>php %command.full_name%</info>
 
-To get specific variable, specify its full or partial name:
+To get specific variables, specify its full or partial name:
 
     <info>php %command.full_name% FOO_BAR</info>
 

@@ -4,7 +4,7 @@ CHANGELOG
 6.2
 ---
 
- * Add new `filter` argument to `debug:dotenv` command to be able to filter certain variable
+ * Add a new `filter` argument to `debug:dotenv` command to filter variable names
 
 5.4
 ---

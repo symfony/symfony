@@ -32,6 +32,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/Debug/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Compiler/OptionalServiceClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/includes/autowiring_classes.php'):
+        case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/includes/compositetype_classes.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/includes/intersectiontype_classes.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/includes/MultipleArgumentsOptionalScalarNotReallyOptional.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/CheckTypeDeclarationsPass/IntersectionConstructor.php'):
@@ -46,6 +47,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/Serializer/Tests/Normalizer/Features/ObjectOuter.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/NotLoadableClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/ReflectionIntersectionTypeFixture.php'):
+        case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/ReflectionUnionTypeWithIntersectionFixture.php'):
             continue 2;
     }
 

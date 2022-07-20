@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by B-Galati at 2022-04-29T08:00:41Z
+
+@OskarStark Thanks! All fixed, hope I did not forget anything :+1:
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2022-05-02T09:29:43Z
+
+just done a little update to fix the SMTP client, all good now.
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2022-05-02T09:37:10Z
+
+Rebased with last commit to check if it fixes psalm error.
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2022-05-09T09:21:02Z
+
+@OskarStark I know it's a bit late but do you know if it could be released with 6.1?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-05-09T20:36:55Z
+
+We’ve been in feature freeze for more than a month now, so it’ll be for 6.2 unfortunately.
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2022-05-16T09:25:56Z
+
+Thank you, I will change the branch target then :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-17T16:06:43Z
+
+@B-Galati Are you still interested in finishing this PR?
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2022-07-17T20:35:07Z
+
+Yes @fabpot 👍
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2022-07-18T07:16:51Z
+
+@fabpot it's ready, the CI failure looks unrelated but I am may be wrong of course.

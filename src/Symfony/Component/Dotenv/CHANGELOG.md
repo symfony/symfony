@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add new `filter` argument to `debug:dotenv` command to be able to filter certain variable
+
 5.4
 ---
 

@@ -73,6 +73,7 @@ EOF
             ['toRfc4122 (canonical)', (string) $uuid],
             ['toBase58', $uuid->toBase58()],
             ['toBase32', $uuid->toBase32()],
+            ['toHex', $uuid->toHex()],
         ];
 
         if ($uuid instanceof UuidV1 || $uuid instanceof UuidV6) {

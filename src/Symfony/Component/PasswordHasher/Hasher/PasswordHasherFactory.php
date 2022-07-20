@@ -40,7 +40,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
     {
         $hasherKey = null;
 
-        if (($user instanceof PasswordHasherAwareInterface && null !== $hasherName = $user->getPasswordHasherName())) {
+        if ($user instanceof PasswordHasherAwareInterface && null !== $hasherName = $user->getPasswordHasherName()) {
             if (!\array_key_exists($hasherName, $this->passwordHashers)) {
                 throw new \RuntimeException(sprintf('The password hasher "%s" was not configured.', $hasherName));
             }

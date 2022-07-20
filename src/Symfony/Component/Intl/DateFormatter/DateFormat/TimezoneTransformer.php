@@ -57,7 +57,7 @@ class TimezoneTransformer extends Transformer
             return $dateTime->format('\G\M\TP');
         }
 
-        return sprintf('GMT%s%d', ($offset >= 0 ? '+' : ''), $offset / 100);
+        return sprintf('GMT%s%d', $offset >= 0 ? '+' : '', $offset / 100);
     }
 
     /**

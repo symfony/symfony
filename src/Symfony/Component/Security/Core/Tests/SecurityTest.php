@@ -64,7 +64,7 @@ class SecurityTest extends TestCase
 
         yield ['string_username', null];
 
-        //yield [new StringishUser(), null]; // 5.0 behavior
+        // yield [new StringishUser(), null]; // 5.0 behavior
 
         $user = new User('nice_user', 'foo');
         yield [$user, $user];

@@ -47,7 +47,7 @@ string,int,false,true,int_one,string_one
 foo,2,0,1,1,1
 
 CSV
-        , $this->encoder->encode($data, 'csv'));
+            , $this->encoder->encode($data, 'csv'));
 
         $this->assertSame([
             'string' => 'foo',
@@ -69,7 +69,7 @@ CSV
 ,"""","foo""","\""",\,foo\
 
 CSV
-        , $this->encoder->encode($data = ['', '"', 'foo"', '\\"', '\\', 'foo\\'], 'csv'));
+            , $this->encoder->encode($data = ['', '"', 'foo"', '\\"', '\\', 'foo\\'], 'csv'));
 
         $this->assertSame($data, $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
@@ -99,7 +99,7 @@ foo,bar
 hello,"hey ho"
 
 CSV
-    , $this->encoder->encode($value, 'csv'));
+            , $this->encoder->encode($value, 'csv'));
     }
 
     public function testEncodeCollection()
@@ -115,7 +115,7 @@ hello,"hey ho"
 hi,"let's go"
 
 CSV
-    , $this->encoder->encode($value, 'csv'));
+            , $this->encoder->encode($value, 'csv'));
     }
 
     public function testEncodePlainIndexedArray()
@@ -150,7 +150,7 @@ foo,bar.0.id,bar.0.1,bar.1.baz,bar.1.foo
 hello,yo,wesh,Halo,olá
 
 CSV
-    , $this->encoder->encode($value, 'csv'));
+            , $this->encoder->encode($value, 'csv'));
     }
 
     public function testEncodeCustomSettings()
@@ -183,7 +183,7 @@ a;c-d
 'he''llo';foo
 
 CSV
-    , $this->encoder->encode($value, 'csv'));
+            , $this->encoder->encode($value, 'csv'));
     }
 
     public function testEncodeCustomSettingsPassedInContext()
@@ -195,12 +195,12 @@ a;c-d
 'he''llo';foo
 
 CSV
-        , $this->encoder->encode($value, 'csv', [
-            CsvEncoder::DELIMITER_KEY => ';',
-            CsvEncoder::ENCLOSURE_KEY => "'",
-            CsvEncoder::ESCAPE_CHAR_KEY => '|',
-            CsvEncoder::KEY_SEPARATOR_KEY => '-',
-        ]));
+            , $this->encoder->encode($value, 'csv', [
+                CsvEncoder::DELIMITER_KEY => ';',
+                CsvEncoder::ENCLOSURE_KEY => "'",
+                CsvEncoder::ESCAPE_CHAR_KEY => '|',
+                CsvEncoder::KEY_SEPARATOR_KEY => '-',
+            ]));
     }
 
     public function testEncodeCustomSettingsPassedInConstructor()
@@ -218,7 +218,7 @@ a;c-d
 'he''llo';foo
 
 CSV
-        , $encoder->encode($value, 'csv'));
+            , $encoder->encode($value, 'csv'));
     }
 
     public function testEncodeEmptyArray()
@@ -527,7 +527,7 @@ CSV
 foo,bar
 a,b
 CSV
-        , 'csv'));
+            , 'csv'));
     }
 
     public function testDecodeAsSingle()
@@ -538,7 +538,7 @@ CSV
 foo,bar
 a,b
 CSV
-        , 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
+            , 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
     public function testDecodeCollection()
@@ -556,7 +556,7 @@ c,d
 f
 
 CSV
-        , 'csv'));
+            , 'csv'));
     }
 
     public function testDecode()
@@ -570,9 +570,9 @@ foo
 a
 
 CSV
-        , 'csv', [
-            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
-        ]));
+            , 'csv', [
+                CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+            ]));
     }
 
     public function testDecodeToManyRelation()
@@ -606,7 +606,7 @@ foo,bar.baz.bat
 a,b
 c,d
 CSV
-        , 'csv'));
+            , 'csv'));
     }
 
     public function testDecodeCustomSettings()
@@ -637,9 +637,9 @@ CSV
 a;bar-baz
 'hell''o';b;c
 CSV
-        , 'csv', [
-            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
-        ]));
+            , 'csv', [
+                CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+            ]));
     }
 
     public function testDecodeCustomSettingsPassedInContext()
@@ -649,13 +649,13 @@ CSV
 a;bar-baz
 'hell''o';b;c
 CSV
-        , 'csv', [
-            CsvEncoder::DELIMITER_KEY => ';',
-            CsvEncoder::ENCLOSURE_KEY => "'",
-            CsvEncoder::ESCAPE_CHAR_KEY => '|',
-            CsvEncoder::KEY_SEPARATOR_KEY => '-',
-            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
-        ]));
+            , 'csv', [
+                CsvEncoder::DELIMITER_KEY => ';',
+                CsvEncoder::ENCLOSURE_KEY => "'",
+                CsvEncoder::ESCAPE_CHAR_KEY => '|',
+                CsvEncoder::KEY_SEPARATOR_KEY => '-',
+                CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+            ]));
     }
 
     public function testDecodeCustomSettingsPassedInConstructor()
@@ -672,7 +672,7 @@ CSV
 a;bar-baz
 'hell''o';b;c
 CSV
-        , 'csv'));
+            , 'csv'));
     }
 
     public function testDecodeMalformedCollection()
@@ -705,18 +705,18 @@ a,b
 c,d
 
 CSV
-        , 'csv', [
-            CsvEncoder::NO_HEADERS_KEY => true,
-        ]));
+            , 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+            ]));
         $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
         $this->assertEquals([['a', 'b'], ['c', 'd']], $encoder->decode(<<<'CSV'
 a,b
 c,d
 
 CSV
-        , 'csv', [
-            CsvEncoder::NO_HEADERS_KEY => true,
-        ]));
+            , 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+            ]));
     }
 
     public function testBOMIsAddedOnDemand()

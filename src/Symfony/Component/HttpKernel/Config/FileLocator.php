@@ -28,7 +28,7 @@ class FileLocator extends BaseFileLocator
      */
     private $path;
 
-    public function __construct(KernelInterface $kernel/*, string $path = null, array $paths = [], bool $triggerDeprecation = true*/)
+    public function __construct(KernelInterface $kernel/* , string $path = null, array $paths = [], bool $triggerDeprecation = true */)
     {
         $this->kernel = $kernel;
 

@@ -833,7 +833,7 @@ class OptionsResolver implements Options
      *                                   lazy options and/or normalizers
      */
     #[\ReturnTypeWillChange]
-    public function offsetGet($option/*, bool $triggerDeprecation = true*/)
+    public function offsetGet($option/* , bool $triggerDeprecation = true */)
     {
         if (!$this->locked) {
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');

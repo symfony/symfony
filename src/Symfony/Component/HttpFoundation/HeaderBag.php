@@ -62,7 +62,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return array An array of headers
      */
-    public function all(/*string $key = null*/)
+    public function all(/* string $key = null */)
     {
         if (1 <= \func_num_args() && null !== $key = func_get_arg(0)) {
             return $this->headers[strtr($key, self::UPPER, self::LOWER)] ?? [];

@@ -39,5 +39,5 @@ interface MarkingStoreInterface
      * @param object $subject A subject
      * @param array  $context Some context
      */
-    public function setMarking($subject, Marking $marking/*, array $context = []*/);
+    public function setMarking($subject, Marking $marking/* , array $context = [] */);
 }

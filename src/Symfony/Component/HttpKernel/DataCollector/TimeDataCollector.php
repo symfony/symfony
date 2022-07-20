@@ -38,7 +38,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      *
      * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response/* , \Throwable $exception = null */)
     {
         if (null !== $this->kernel) {
             $startTime = $this->kernel->getStartTime();

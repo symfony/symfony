@@ -29,7 +29,7 @@ class ExceptionDataCollector extends DataCollector
      *
      * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response/* , \Throwable $exception = null */)
     {
         $exception = 2 < \func_num_args() ? func_get_arg(2) : null;
 

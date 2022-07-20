@@ -237,7 +237,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function locateResource($name/*, $dir = null, $first = true, $triggerDeprecation = true*/)
+    public function locateResource($name/* , $dir = null, $first = true, $triggerDeprecation = true */)
     {
         if (2 <= \func_num_args()) {
             $dir = func_get_arg(1);

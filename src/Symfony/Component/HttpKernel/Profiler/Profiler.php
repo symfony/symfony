@@ -143,7 +143,7 @@ class Profiler implements ResetInterface
      *
      * @return Profile|null A Profile instance or null if the profiler is disabled
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response/* , \Throwable $exception = null */)
     {
         $exception = 2 < \func_num_args() ? func_get_arg(2) : null;
 

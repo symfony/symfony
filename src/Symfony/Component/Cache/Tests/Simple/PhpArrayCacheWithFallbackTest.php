@@ -27,7 +27,7 @@ class PhpArrayCacheWithFallbackTest extends CacheTestCase
         'testGetMultipleInvalidKeys' => 'PhpArrayCache does no validation',
         'testDeleteInvalidKeys' => 'PhpArrayCache does no validation',
         'testDeleteMultipleInvalidKeys' => 'PhpArrayCache does no validation',
-        //'testSetValidData' => 'PhpArrayCache does no validation',
+        // 'testSetValidData' => 'PhpArrayCache does no validation',
         'testSetInvalidKeys' => 'PhpArrayCache does no validation',
         'testSetInvalidTtl' => 'PhpArrayCache does no validation',
         'testSetMultipleInvalidKeys' => 'PhpArrayCache does no validation',

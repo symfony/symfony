@@ -30,7 +30,7 @@ class PluralizationRules
      *
      * @return int The plural position
      */
-    public static function get($number, $locale/*, bool $triggerDeprecation = true*/)
+    public static function get($number, $locale/* , bool $triggerDeprecation = true */)
     {
         $number = abs($number);
 

@@ -335,7 +335,7 @@ class DateType extends AbstractType
 
                 if ($html5 && 'single_text' === $widget && self::HTML5_FORMAT !== $format) {
                     return sprintf('Using a custom format when the "html5" option of %s is enabled is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                    //throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
+                    // throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
                 }
 
                 return '';

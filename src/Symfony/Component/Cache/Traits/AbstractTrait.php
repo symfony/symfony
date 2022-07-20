@@ -109,7 +109,7 @@ trait AbstractTrait
      *
      * @return bool
      */
-    public function clear(/*string $prefix = ''*/)
+    public function clear(/* string $prefix = '' */)
     {
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {

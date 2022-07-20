@@ -45,5 +45,5 @@ interface AdapterInterface extends CacheItemPoolInterface
      *
      * @return bool
      */
-    public function clear(/*string $prefix = ''*/);
+    public function clear(/* string $prefix = '' */);
 }

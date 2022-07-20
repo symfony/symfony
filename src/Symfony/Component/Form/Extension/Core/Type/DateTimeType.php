@@ -324,7 +324,7 @@ class DateTimeType extends AbstractType
         $resolver->setDeprecated('date_format', function (Options $options, $dateFormat) {
             if (null !== $dateFormat && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
                 return sprintf('Using the "date_format" option of %s with an HTML5 date widget is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                //throw new LogicException(sprintf('Cannot use the "date_format" option of the "%s" with an HTML5 date.', self::class));
+                // throw new LogicException(sprintf('Cannot use the "date_format" option of the "%s" with an HTML5 date.', self::class));
             }
 
             return '';
@@ -332,7 +332,7 @@ class DateTimeType extends AbstractType
         $resolver->setDeprecated('date_widget', function (Options $options, $dateWidget) {
             if (null !== $dateWidget && 'single_text' === $options['widget']) {
                 return sprintf('Using the "date_widget" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                //throw new LogicException(sprintf('Cannot use the "date_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+                // throw new LogicException(sprintf('Cannot use the "date_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
             }
 
             return '';
@@ -340,7 +340,7 @@ class DateTimeType extends AbstractType
         $resolver->setDeprecated('time_widget', function (Options $options, $timeWidget) {
             if (null !== $timeWidget && 'single_text' === $options['widget']) {
                 return sprintf('Using the "time_widget" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                //throw new LogicException(sprintf('Cannot use the "time_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
+                // throw new LogicException(sprintf('Cannot use the "time_widget" option of the "%s" when the "widget" option is set to "single_text".', self::class));
             }
 
             return '';
@@ -356,7 +356,7 @@ class DateTimeType extends AbstractType
 
                 if ($html5 && self::HTML5_FORMAT !== $format) {
                     return sprintf('Using a custom format when the "html5" option of %s is enabled is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                    //throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
+                    // throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
                 }
 
                 return '';

@@ -162,7 +162,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
   [łabądź] baz
  >
 EOT
-        , $output, true);
+            , $output, true);
     }
 
     public function testChoiceQuestionCustomPrompt()
@@ -181,7 +181,7 @@ EOT
   [0] foo
  >ccc>
 EOT
-        , $output, true);
+            , $output, true);
     }
 
     protected function getInputStream($input)

@@ -88,9 +88,9 @@ class GeneratedConfigTest extends TestCase
         $expectedCode = $basePath.$name;
 
         // to regenerate snapshot files, uncomment these lines
-        //(new Filesystem())->remove($expectedCode);
-        //$this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
-        //$this->markTestIncomplete('Re-comment the line above and relaunch the tests');
+        // (new Filesystem())->remove($expectedCode);
+        // $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
+        // $this->markTestIncomplete('Re-comment the line above and relaunch the tests');
 
         $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
         $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);

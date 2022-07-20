@@ -48,7 +48,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      * @param string $format  The format being (de-)serialized from or into
      * @param array  $context
      */
-    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
         return $data instanceof NormalizableInterface;
     }
@@ -61,7 +61,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      * @param string $format  The format being deserialized from
      * @param array  $context
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
     {
         return is_subclass_of($type, DenormalizableInterface::class);
     }

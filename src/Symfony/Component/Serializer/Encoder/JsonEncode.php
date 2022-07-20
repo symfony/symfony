@@ -60,7 +60,7 @@ class JsonEncode implements EncoderInterface
      *
      * @param array $context
      */
-    public function supportsEncoding(string $format /*, array $context = [] */): bool
+    public function supportsEncoding(string $format /* , array $context = [] */): bool
     {
         return JsonEncoder::FORMAT === $format;
     }

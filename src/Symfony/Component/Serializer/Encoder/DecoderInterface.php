@@ -44,5 +44,5 @@ interface DecoderInterface
      *
      * @return bool
      */
-    public function supportsDecoding(string $format /*, array $context = [] */);
+    public function supportsDecoding(string $format /* , array $context = [] */);
 }

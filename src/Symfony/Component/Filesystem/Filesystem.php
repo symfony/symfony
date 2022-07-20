@@ -673,7 +673,7 @@ class Filesystem
      *
      * @throws IOException If the file is not writable
      */
-    public function appendToFile(string $filename, $content/*, bool $lock = false*/)
+    public function appendToFile(string $filename, $content/* , bool $lock = false */)
     {
         if (\is_array($content)) {
             throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be string or resource, array given.', __METHOD__));

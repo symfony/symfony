@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2022-05-30T17:51:20Z
+
+@GromNaN @94noni thanks for the comments, adjusted the code based on it
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2022-05-30T18:04:22Z
+
+P.S. added filtering not only by exact value, but by prefix as well. For example if there are more than one variable with same prefix in the name - it will be possible to filter by prefix and get all values with that prefix:)
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2022-06-03T08:46:37Z
+
+@fabpot updated, based on comments. The failing pipeline does not relate with my changes (except for the low-deps of 8.1 which is due to dependency of 5.4 symfony components)

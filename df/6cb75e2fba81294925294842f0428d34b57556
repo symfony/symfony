@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-27T18:32:28Z
+
+Hey!
+
+Oh no, it looks like you have made this PR towards a branch that is not maintained anymore. :/
+Could you update the [PR base branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request) to target one of these branches instead? 4.4, 5.4, 6.0, 6.1, 6.2.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by magikid at 2022-07-11T17:07:38Z
+
+I've added a test for this based on the initial report of the issue.  A bunch of the tests are failing but the failures seem to be unrelated to this change.

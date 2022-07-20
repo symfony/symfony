@@ -20,7 +20,7 @@ use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
@@ -175,7 +175,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             if (false === $dynamicLabel) {
                 $label = false;
-            } elseif ($dynamicLabel instanceof TranslatableMessage) {
+            } elseif ($dynamicLabel instanceof TranslatableInterface) {
                 $label = $dynamicLabel;
             } else {
                 $label = (string) $dynamicLabel;

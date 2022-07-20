@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-05-13T17:46:56Z
+
+Hey!
+
+I think @edefimov has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-06-23T14:37:19Z
+
+@wouterj @chalasr friendly ping as code owner
+does this small feature would be accepted so I can continue working on the PR (tests etc ?)
+
+many thanks !
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-06-23T18:15:33Z
+
+Thanks for the ping @94noni, this looks sensible to me.
+
+Should we throw an error if both `target_url` and `stateless` are set?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-06-28T06:23:10Z
+
+@chalasr I appreciate the fast feedback!
+
+> this looks sensible to me. Should we throw an error if both target_url and stateless are set?
+
+I will check this part as I know a little bit on this side
+Are you thinking on any pitfall regarding this?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-06-29T20:36:53Z
+
+@94noni It's just about DX: setting a `target_url` on a stateless firewall does not make sense as there is no redirect in that case, hence forbidding that combination would make sense I think. Better be explicit than silent :) especially in the security area. That check could be done in SecurityExtension::createSwitchUserListener
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-06T15:02:39Z
+
+@chalasr Indeed it makes sens, I will have a deeper look at it soon, thx
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-19T16:29:52Z
+
+@chalasr I've tried to implement your [request comment](https://github.com/symfony/symfony/pull/46338#issuecomment-1170469831)
+
+feel free to give me feedbacks :)

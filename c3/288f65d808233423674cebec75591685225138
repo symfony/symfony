@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2022-04-05T07:53:32Z
+
+Can't fix the `Coding standard` from fabbot.io because `assertSame` has to have those spaces (was really annoying to fix with `.editorconfig`)
+
+If the branch is 6.1 will this be integrated into 6.0/5.4 versions or only 6.1?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-04-05T21:13:35Z
+
+> If the branch is 6.1 will this be integrated into 6.0/5.4 versions or only 6.1?
+
+Only in 6.1
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-06T07:28:10Z
+
+Should we just add it in the inspect commands? IMHO, adding it to `AbstractUid` makes it a new `Uid` component supported format, so we would have to support it everywhere (`from` methods and format in `UidNormalizer` at least).
+
+We could also add it to the `SymfonyCaster` class from the `VarDumper` component.
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2022-04-08T11:16:44Z
+
+I can add `fromHex` method too, as it depends on binary methods so I don't see why it can cause any issues. My goal for this PR was to add a method for getting hex string values as it's heavily used in our several applications, and having to make wrappers/methods to get value that can be used directly in the database without using converter functions is really nice, because the normal `base32` version is only used basically for the input data into the application and nowhere outside.
+
+I can implement those methods in this PR just provide of additional places it ned to be supported.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-04-08T13:02:58Z
+
+I recommend waiting for @nicolas-grekas opinion before putting in any extra work.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-11T16:45:36Z
+
+I don't see the need for `fromHex`, so I'd prefer not adding it. I agree with @fancyweb about the commands.
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2022-05-10T09:14:12Z
+
+Any progress on this?

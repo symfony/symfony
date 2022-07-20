@@ -251,7 +251,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
     }
 
     /**
-     * Let's be defensive : we authorize only size of 8kio on Windows for escapeshellarg() argument to avoid a fatal error
+     * Let's be defensive : we authorize only size of 8kio on Windows for escapeshellarg() argument to avoid a fatal error.
      *
      * @see https://github.com/php/php-src/blob/9458f5f2c8a8e3d6c65cc181747a5a75654b7c6e/ext/standard/exec.c#L397
      */

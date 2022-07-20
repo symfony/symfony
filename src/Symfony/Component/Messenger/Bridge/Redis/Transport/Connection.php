@@ -125,8 +125,8 @@ class Connection
         $this->maxEntries = $options['stream_max_entries'];
         $this->deleteAfterAck = $options['delete_after_ack'];
         $this->deleteAfterReject = $options['delete_after_reject'];
-        $this->redeliverTimeout = ($options['redeliver_timeout']) * 1000;
-        $this->claimInterval = ($options['claim_interval']) / 1000;
+        $this->redeliverTimeout = $options['redeliver_timeout'] * 1000;
+        $this->claimInterval = $options['claim_interval'] / 1000;
     }
 
     /**

@@ -138,7 +138,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param array $context
      */
-    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */)
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
@@ -340,7 +340,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param array $context
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
     {
         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
@@ -509,6 +509,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             if (is_numeric($data)) {
                                 return (float) $data;
                             }
+
                             return match ($data) {
                                 'NaN' => \NAN,
                                 'INF' => \INF,

@@ -70,7 +70,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
      *
      * @param array $context
      */
-    public function supportsEncoding(string $format /*, array $context = [] */): bool
+    public function supportsEncoding(string $format /* , array $context = [] */): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
@@ -90,7 +90,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
      *
      * @param array $context
      */
-    public function supportsDecoding(string $format /*, array $context = [] */): bool
+    public function supportsDecoding(string $format /* , array $context = [] */): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }

@@ -56,5 +56,5 @@ interface DenormalizerInterface
      *
      * @return bool
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */);
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
 }

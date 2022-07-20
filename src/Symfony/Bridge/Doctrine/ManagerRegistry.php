@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Doctrine;
 use Doctrine\Persistence\AbstractManagerRegistry;
 use ProxyManager\Proxy\GhostObjectInterface;
 use ProxyManager\Proxy\LazyLoadingInterface;
-use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\VarExporter\LazyGhostObjectInterface;
 

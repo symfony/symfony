@@ -280,7 +280,7 @@ class SymfonyStyle extends OutputStyle
             $values = array_flip($choices);
             $default = $values[$default] ?? $default;
         }
-        
+
         $questionChoice = new ChoiceQuestion($question, $choices, $default);
         $questionChoice->setMultiselect($multiSelect);
 

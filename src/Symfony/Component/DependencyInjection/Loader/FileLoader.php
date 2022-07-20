@@ -92,7 +92,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      * @param string|null          $source    The path to the file that defines the auto-discovery rule
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/*, string $source = null*/)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));

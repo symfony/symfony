@@ -25,7 +25,7 @@ interface DumperInterface
      *
      * @param bool|null &$asGhostObject Set to true after the call if the proxy is a ghost object
      */
-    public function isProxyCandidate(Definition $definition/*, bool &$asGhostObject = null */): bool;
+    public function isProxyCandidate(Definition $definition/* , bool &$asGhostObject = null */): bool;
 
     /**
      * Generates the code to be used to instantiate a proxy in the dumped factory code.

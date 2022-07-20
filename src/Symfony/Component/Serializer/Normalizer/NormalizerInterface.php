@@ -47,5 +47,5 @@ interface NormalizerInterface
      *
      * @return bool
      */
-    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */);
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
 }

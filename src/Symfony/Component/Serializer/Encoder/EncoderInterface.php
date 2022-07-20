@@ -35,5 +35,5 @@ interface EncoderInterface
      * @param string $format  Format name
      * @param array  $context Options that normalizers/encoders have access to
      */
-    public function supportsEncoding(string $format /*, array $context = [] */): bool;
+    public function supportsEncoding(string $format /* , array $context = [] */): bool;
 }

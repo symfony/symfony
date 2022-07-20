@@ -376,7 +376,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse(is_dir($basePath.'dir-link'));
+        $this->assertDirectoryDoesNotExist($basePath.'dir-link');
 
         $this->filesystem->remove($basePath);
 

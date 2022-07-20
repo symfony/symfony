@@ -34,7 +34,7 @@ class Connection
     ];
 
     /**
-     * Available options:
+     * Available options:.
      *
      * * tube_name: name of the tube
      * * timeout: message reservation timeout (in seconds)

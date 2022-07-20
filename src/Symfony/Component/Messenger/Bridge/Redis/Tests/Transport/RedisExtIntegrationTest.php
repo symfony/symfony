@@ -339,6 +339,27 @@ class RedisExtIntegrationTest extends TestCase
         $redis->del('messenger-rejectthenget');
     }
 
+    public function testItCountMessages()
+    {
+        $this->assertSame(0, $this->connection->getMessageCount());
+
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+
+        $this->assertSame(3, $this->connection->getMessageCount());
+
+        $message = $this->connection->get();
+        $this->connection->ack($message['id']);
+
+        $this->assertSame(2, $this->connection->getMessageCount());
+
+        $message = $this->connection->get();
+        $this->connection->reject($message['id']);
+
+        $this->assertSame(1, $this->connection->getMessageCount());
+    }
+
     private function getConnectionGroup(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('group');

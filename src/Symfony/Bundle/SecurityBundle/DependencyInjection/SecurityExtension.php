@@ -376,6 +376,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->register($firewallEventDispatcherId, EventDispatcher::class)
             ->addTag('event_dispatcher.dispatcher', ['name' => $firewallEventDispatcherId]);
 
+        $eventDispatcherLocator = $container->getDefinition('security.firewall.event_dispatcher_locator');
+        $eventDispatcherLocator
+            ->replaceArgument(0, array_merge($eventDispatcherLocator->getArgument(0), [
+                $id => new ServiceClosureArgument(new Reference($firewallEventDispatcherId)),
+            ]))
+        ;
+
         // Register listeners
         $listeners = [];
         $listenerKeys = [];
@@ -448,6 +455,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     false === $firewall['stateless'] && isset($firewall['context']) ? $firewall['context'] : null,
                 ])
             ;
+
+            $config->replaceArgument(12, $firewall['logout']);
         }
 
         // Determine default entry point

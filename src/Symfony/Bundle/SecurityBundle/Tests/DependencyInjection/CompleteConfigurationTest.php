@@ -141,6 +141,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 '',
                 [],
                 null,
+                null,
             ],
             [
                 'secure',
@@ -165,6 +166,14 @@ abstract class CompleteConfigurationTest extends TestCase
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
                 ],
+                [
+                    'csrf_parameter' => '_csrf_token',
+                    'csrf_token_id' => 'logout',
+                    'path' => '/logout',
+                    'target' => '/',
+                    'invalidate_session' => true,
+                    'delete_cookies' => [],
+                ],
             ],
             [
                 'host',
@@ -181,6 +190,7 @@ abstract class CompleteConfigurationTest extends TestCase
                     'http_basic',
                 ],
                 null,
+                null,
             ],
             [
                 'with_user_checker',
@@ -196,6 +206,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 [
                     'http_basic',
                 ],
+                null,
                 null,
             ],
         ], $configs);

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-05-02T11:44:33Z
+
+Getting the actual message count might be more complicated: https://github.com/symfony/symfony/pull/39127.
+/cc @alexander-schranz fyi
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-05-02T11:47:59Z
+
+@chalasr yes `xlen` does not represent the number which somebody would expect. It requires another logic. See comment here: https://github.com/symfony/symfony/pull/31545#discussion_r285447357. I know that `xinfo` format changed between versions of the php redis extension, so it is not easy task here. So there need to be checked how to implement this for different versions. Also there could be that they did add a easier way to get the correct value. I did not yet update myself about the changes in the streams in Redis 6.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-05-03T16:17:34Z
+
+Thanks @alexander-schranz ! I updated my code.
+
+But, I am wondering if we have to limit `xRange` results to 1000 (for example) in order to limit memory usage and use the last element to get the next "page" (like using a SCAN).
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-05-03T16:24:03Z
+
+I did have a look at the latest changes about redis. The new version Redis 7 provides `entries_read` and `lag`.
+
+https://github.com/redis/redis/pull/9127
+https://redis.io/commands/xinfo-groups/
+
+Not 100% sure but could be that lag provide the information we need.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-05-03T21:05:26Z
+
+I ran tests on a Redis 7.x a `lag` seems to do the job !

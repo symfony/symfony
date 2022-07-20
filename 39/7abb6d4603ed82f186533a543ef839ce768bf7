@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-11T10:20:31Z
+
+This should be considered as anew feature, so it should target 6.2 (branch 6.1 for now)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-05-13T08:20:30Z
+
+Is there anything else interesting that could be added to the DSN?

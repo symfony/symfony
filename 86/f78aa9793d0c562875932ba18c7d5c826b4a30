@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by johnkrovitch at 2021-11-09T22:57:38Z
+
+Thanks for your returns, I'm working on it.
+
+---------------------------------------------------------------------------
+
+by johnkrovitch at 2021-12-06T20:40:24Z
+
+The right security change log has been updated.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-02-21T15:02:25Z
+
+To know why this PR is not merged yet (and potentially help with fixing my concerns), see https://github.com/symfony/symfony/pull/41274#issuecomment-1046967394
+
+On top of the 2 points mentioned there, this PR forgot the logout CSRF protection. This is a great example of why these PRs add 2 great features: it's very easy to forget logout CSRF. By having a bulletproof programmatic logout, all applications get safer :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-06T06:10:55Z
+
+@johnkrovitch Can you update this PR now that the other one has been merged? cc @chalasr
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-06T14:19:23Z
+
+Something to clarify before we can move forward:
+
+>  this PR forgot the logout CSRF protection
+
+@wouterj Can you please elaborate? The method dispatches the LogoutEvent whose both `RememberMeListener` and `CsrfTokenClearingLogoutListener` are listening on. Is there something else missing?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-07-06T14:25:33Z
+
+The logout feature can be protected with CSRF, forcing to have a valid CSRF token to log out.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-06T14:28:00Z
+
+Got it, thanks
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-12T13:03:22Z
+
+CSRF validation added.
+If CSRF protection is enabled and logout is configured on the firewall for which `logout()` is called, then the method checks that the logout csrf token is there and valid.
+Otherwise, in case `logout()` is called for a firewall that don't have `logout` configured, the responsibility of validating a CSRF token is left up to the developer.
+
+Reviews welcome.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-07-12T14:40:28Z
+
+I wonder if there should be a way to bypass CSRF? One of the use cases where I've needed programmatic logout is when handling user invitations.. There if you click the invite email and you are already logged in we show "accept invite" or "create new account". If you click that we log you out and send you back to the invite page which then shows a registration form.
+
+In this case, we authenticate the request has the token from the email anyway, and we absolutely do not need a CSRF token.. Of course we could add one on the "create new account" button I guess if needed, just doesn't seem necessary.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-12T15:33:53Z
+
+I think most use cases for this method are in similar situations. I'll think of a way to bypass it, will probably end up with a bool parameter. Thanks!
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-07-17T19:16:09Z
+
+@chalasr thanks, LGTM now I think - haven't reviewed the whole code in depth though, but on the surface the API makes sense to me.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-07-19T15:57:23Z
+
+I'm not 100% sure, but I'm leaning towards *not* allowing to bypass CSRF. If an application enabled logout CSRF as a way to prevent login csrf, I would expect all ways of logging out to be protected by CSRF. With this boolean, I no longer can be sure.
+
+Of course, @Seldaek understands login CSRF and knows that CSRF would only be "added noise" in this specific scenario, but I think the framework has a duty to protect those unaware of login CSRF to be as safe as possible.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-19T16:32:55Z
+
+CSRF protection is pointless if logout happens on a GET request, or as a side effect of a state change of another resource which might itself already be CSRF protected using a different token, or Jordi's use case.
+I strongly think such cases are the ones for which this method makes the most sense instead of requesting a regular logout endpoint, I would find it too bad to force dealing with it while it's not needed
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-07-19T16:43:46Z
+
+Yeah IMO there's a clear need for the bypass.. But I could live with csrf being enabled by default instead of bypassed by default.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-20T08:38:27Z
+
+I think that having the default value (for CSRF validation) set to `true` by default is enough for me as it forces a conscious decision from the developer.

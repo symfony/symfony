@@ -286,7 +286,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
   [2] Custom\Class\Test\User
   [3] Symfony\Component\Security\Core\User\InMemoryUser
 EOTXT
-        , $this->passwordEncoderCommandTester->getDisplay(true));
+            , $this->passwordEncoderCommandTester->getDisplay(true));
     }
 
     public function testNonInteractiveEncodePasswordUsesFirstUserClass()

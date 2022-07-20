@@ -89,7 +89,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      *
      * {@inheritdoc}
      */
-    public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/)
+    public function decide(TokenInterface $token, array $attributes, $object = null/* , bool $allowMultipleAttributes = false */)
     {
         $allowMultipleAttributes = 3 < \func_num_args() && func_get_arg(3);
 

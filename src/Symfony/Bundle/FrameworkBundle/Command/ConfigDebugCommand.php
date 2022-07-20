@@ -100,7 +100,7 @@ EOF
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
-                sprintf('Current configuration for %s', ($name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name)))
+                sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
             );
 
             $io->writeln(Yaml::dump([$extensionAlias => $config], 10));

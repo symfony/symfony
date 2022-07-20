@@ -41,8 +41,8 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
             // this will not work as PHP will use actual date to replace missing info
             // and after change of date will lookup for closest Wednesday
             // i.e. value: 2010-02, PHP value: 2010-02-(today i.e. 20), parsed date: 2010-02-24
-            //['Y-m-D', '2010-02-Wed', '2010-02-03 00:00:00 UTC'],
-            //['Y-m-l', '2010-02-Wednesday', '2010-02-03 00:00:00 UTC'],
+            // ['Y-m-D', '2010-02-Wed', '2010-02-03 00:00:00 UTC'],
+            // ['Y-m-l', '2010-02-Wednesday', '2010-02-03 00:00:00 UTC'],
 
             // different month representations
             ['Y-n-d', '2010-2-03', '2010-02-03 00:00:00 UTC'],

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-20T23:14:26Z
+
+This is a BC break, which Symfony doesn't allow in minor versions. We need to deprecate passing empty strings at first, then convert the deprecation to an error in the next major version.
+
+---------------------------------------------------------------------------
+
+by bikalbasnet at 2022-04-24T06:39:46Z
+
+@chalasr Do I need to create a new `UPGRADE-6.2.md` myself right or have to wait until `6.2` branch is created?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-04-25T08:59:54Z
+
+We'll create the 6.2 after the stabilization period, you can then rebase this PR on the new 6.1 branch. I guess you can create a new `UPGRADE-6.2.md` file.

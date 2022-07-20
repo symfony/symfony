@@ -42,7 +42,7 @@ final class InspectUuidCommandTest extends TestCase
 
 
 EOF
-                , $commandTester->getDisplay(true));
+            , $commandTester->getDisplay(true));
     }
 
     public function testUnknown()

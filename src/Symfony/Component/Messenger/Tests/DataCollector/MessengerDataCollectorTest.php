@@ -122,7 +122,7 @@ array:6 [
   ]
 ]
 DUMP
-        , $this->getDataAsString($messages[0]));
+            , $this->getDataAsString($messages[0]));
     }
 
     public function testKeepsOrderedDispatchCalls()

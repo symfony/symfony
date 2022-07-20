@@ -28,7 +28,7 @@ final class UlidFactoryTest extends TestCase
         $this->assertSame('999999.123000', $ulid2->getDateTime()->format('U.u'));
 
         $this->assertFalse($ulid1->equals($ulid2));
-        $this->assertSame(-1, ($ulid1->compare($ulid2)));
+        $this->assertSame(-1, $ulid1->compare($ulid2));
 
         $ulid3 = $ulidFactory->create(new \DateTime('@1234.162524'));
         $this->assertSame('1234.162000', $ulid3->getDateTime()->format('U.u'));

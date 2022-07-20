@@ -607,7 +607,7 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('access_decision_manager_default_strategy');
 
-        $this->assertEquals((new Definition(AffirmativeStrategy::class, [false])), $container->getDefinition('security.access.decision_manager')->getArgument(1), 'Default vote strategy is affirmative');
+        $this->assertEquals(new Definition(AffirmativeStrategy::class, [false]), $container->getDefinition('security.access.decision_manager')->getArgument(1), 'Default vote strategy is affirmative');
     }
 
     public function testCustomAccessDecisionManagerService()
@@ -630,7 +630,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $accessDecisionManagerDefinition = $container->getDefinition('security.access.decision_manager');
 
-        $this->assertEquals((new Definition(AffirmativeStrategy::class, [true])), $accessDecisionManagerDefinition->getArgument(1));
+        $this->assertEquals(new Definition(AffirmativeStrategy::class, [true]), $accessDecisionManagerDefinition->getArgument(1));
     }
 
     public function testAccessDecisionManagerWithStrategyService()

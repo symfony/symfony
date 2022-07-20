@@ -139,7 +139,7 @@ class TranslatorTest extends TestCase
         $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
         $container = $this->createMock(ContainerInterface::class);
 
-        (new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']));
+        new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']);
     }
 
     /** @dataProvider getDebugModeAndCacheDirCombinations */

@@ -164,7 +164,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 $value['hour'] ?? $this->referenceDate->format('H'),
                 $value['minute'] ?? $this->referenceDate->format('i'),
                 $value['second'] ?? $this->referenceDate->format('s')
-                ),
+            ),
                 new \DateTimeZone($this->outputTimezone)
             );
 

@@ -283,7 +283,7 @@ EOF
 <info>
 some text</info>
 EOF
-        ));
+            ));
 
         $this->assertEquals(<<<EOF
 \033[32msome text
@@ -293,7 +293,7 @@ EOF
 <info>some text
 </info>
 EOF
-        ));
+            ));
 
         $this->assertEquals(<<<EOF
 \033[32m
@@ -305,7 +305,7 @@ EOF
 some text
 </info>
 EOF
-        ));
+            ));
 
         $this->assertEquals(<<<EOF
 \033[32m
@@ -319,7 +319,7 @@ some text
 more text
 </info>
 EOF
-        ));
+            ));
     }
 
     public function testFormatAndWrap()

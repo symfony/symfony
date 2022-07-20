@@ -1,0 +1,362 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2021-11-12T07:50:50Z
+
+> Can we add a constructor flag to make the resolver opt-in? I'd like to keep it dormant unless I use the attribute.
+
+Added a constructor option that make the resolver ignoring arguments without attribute
+
+---------------------------------------------------------------------------
+
+by codedmonkey at 2022-02-15T20:50:21Z
+
+Hey @jderusse, are you ok with me picking up this feature since I'm already working on deprecating the extra bundle?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-02-15T23:59:17Z
+
+> Hey @jderusse, are you ok with me picking up this feature since I'm already working on deprecating the extra bundle?
+
+Hello @codedmonkey thank you for the proposition and the help. Your comment reminds me I didn't finish this PR.
+
+I'm :+1: for deprecating the Framework Bundle, and I'm really happy you are willing to take care of it :heart:. I think we should migrate ParamConverters/Features one by one (and not all in one single PR) This will be easier to review and debate.
+
+This PR is almost done, I'll take care of finishing it. If you want help, don't hesitate to review it.
+
+---------------------------------------------------------------------------
+
+by codedmonkey at 2022-02-17T10:03:47Z
+
+Ok no worries! The main thing I would implement differently are the listener options. Attributes can be extended, so I would push for developers creating an `App\Attribute\PayloadEntity` class if they want to change the defaults, but there are probably still use cases for options in the resolver that I'm not seeing so good work! 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-04T16:54:54Z
+
+What about always registering the resolver, but require the attribute by default so that this doesn't impact perf?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-04T16:56:37Z
+
+I'm looking for a fast-path to detect entities. Maybe we could look at the attributes of the type-class for `#[Entity]`, if we want to save requiring `#[MapEntity]`?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-03-05T18:12:27Z
+
+> What about always registering the resolver, but require the attribute by default so that this doesn't impact perf?
+
+I truly believe requiring attributes everywhere is bad for DX. (At least for my personal case, I'll be upset if I have to replace `sensiolab paramConverter` by adding attributes on all my routes...
+
+Does argument value resolving suffer from performance issue? As far as I know, the previous implementation (with paramConvervter) did not have such issue.
+
+If yes, this is a global problem that could be improved by caching the list of argument resolvers for each argument: because in 99% of cases, that's always the same argument resolver that will be called for a given controller's argument.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-06T16:33:23Z
+
+> I truly believe requiring attributes everywhere is bad for DX.
+
+I truly believe the opposite. The fact that the param converter is active everywhere by default has already caused trouble (see #40333 for instance). We do have the unique oppertunity to fix this now.
+
+The attribute makes the intend clear: The entity should be loaded from the database. This is especially important, if the entity to load could also be loaded differently (e.g. the authenticated user or the request payload).
+
+> (At least for my personal case, I'll be upset if I have to replace `sensiolab paramConverter` by adding attributes on all my routes...
+
+I would be fine with an option that enables the resolver without attribute, to make the transition easier. But that should not be the default.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-06T19:24:06Z
+
+> I would be fine with an option that enables the resolver without attribute, to make the transition easier
+
+Whatever the end result of this discussion, it'd be nice not to add any config option if possible.
+
+> I'm looking for a fast-path to detect entities. Maybe we could look at the attributes of the type-class for #[Entity], if we want to save requiring #[MapEntity]?
+
+What about that idea?
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2022-05-23T17:35:56Z
+
+i too would like it if there was a config option to enable it for all controllers
+
+to prevent it from colliding with the Security one, would it be enough if the User Resolver has a higher Priority? (in case the config option is active)
+
+one thing i currently didn't found in the code for Argument Resolver, how does it react in case it didn't find an entity (for what ever reason)
+This MR makes it throw a LogicException, but what is the other code doing with it?
+ParamConverter does make a 404 instead, could that be possible too?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-30T08:39:19Z
+
+Time to resume this PR @jderusse :) Still up to work on it?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2022-05-31T14:53:17Z
+
+About the attribute. I agree with @jderusse: we should not require the user to add the `#[MapEntity]` attribute (I think everyone agrees that this should at least be an "option") and this (not requiring it) should be the default value, just like SensioFrameworkExtraBundle.
+
+@derrabus DOES make a valid point when he says:
+
+> This is especially important, if the entity to load could also be loaded differently (e.g. the authenticated user or the request payload).
+
+The only example I'm aware of is the authenticated user (I'm not familiar with the "request payload" situation). So, we should make sure there is a smooth path - e.g. adding `#[CurrentUser]` is enough for the "authenticated user" argument resolver to "win" (and for the Doctrine param converter to not cause any issues).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-05-31T15:29:14Z
+
+> I'm not familiar with the "request payload" situation
+
+That feature is WIP (#45628), but I've had similar mechanisms in place in several projects. It's pretty straightforward to implement this in userland.
+
+The default behavior of FEB has always been in the way if you have multiple ways to resolve an argument with a type that happens to be an entity. And switching FEB's behavior in an existing project to opt-in is not much fun because you suddenly need to browse all controllers and add the annotation to actions that rely on FEB's param converter. And those are not really discoverable.
+
+All I want is that we don't repeat that mistake.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-06-01T00:05:26Z
+
+As far as I can see, there's nothing to add to this PR.
+
+I'm just not agree with forcing people to use attributes by default.
+
+You'll notice the `attribute_only` option in the PR to let people opt-out.
+
+The conflict between resolvers will be handled by registering the tag with the right priority (like we do for all other argumentResolvers).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-06-06T16:00:50Z
+
+Nice work!
+
+It seems like a new option is unavoidable here. I'm not sure about the `require_attribute` name though, `auto_convert` from framework-extra-bundle seems better. I mean, when discovering the feature one will see that config option before knowing what the attribute is, which may imply some round trips in order to understand the whole picture.
+Maybe `auto_map` or `auto_resolve`?
+
+For the default behavior, I agree with Alexander that we would probably better require to opt in explicitly on a per argument basis using the attribute...
+Regardless of the potential incompatibility issues with other argument value resolvers, it turned out that refactoring apps relying on implicit entity param converters is a painful task that no tool can help with. As often, verbosity/explicitness improves maintainability.
+
+But I do understand that we prefer a RAD-ish approach here so I'm not going to fight on this one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-06T16:04:40Z
+
+> Maybe we could look at the attributes of the type-class for #[Entity], if we want to save requiring #[MapEntity]?
+
+Why doesn't anybody answer to me on this one? I might be missing something obvious, but why can't we save adding any option by doing so?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-06T16:10:30Z
+
+> > Maybe we could look at the attributes of the type-class for #[Entity], if we want to save requiring #[MapEntity]?
+>
+> Why doesn't anybody answer to me on this one?
+
+tbh, I did not really understand your suggestion, sorry. 🙈
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-06T16:46:55Z
+
+My idea is something like that:
+
+<details>
+
+```patch
+index 2c46924b55..3674c5d511 100644
+--- a/src/Symfony/Bridge/Doctrine/ArgumentResolver/EntityValueResolver.php
++++ b/src/Symfony/Bridge/Doctrine/ArgumentResolver/EntityValueResolver.php
+@@ -45,6 +45,7 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
+
+     public function __construct(
+         private ManagerRegistry $registry,
++        private array $entityClasses, // TODO: to be populated by the classes of the services that have the container.excluded tag - we need to ship a compiler pass for that - or find a better way to spot entities at compile time
+         private ?ExpressionLanguage $language = null,
+         array $defaultOptions = [],
+     ) {
+@@ -56,25 +57,31 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
+      */
+     public function supports(Request $request, ArgumentMetadata $argument): bool
+     {
+-        if (!$this->registry->getManagerNames()) {
++        $class = $argument->getType();
++
++        if (!isset($this->entityClasses[$class])) { // TODO: container.excluded might contain prefixes instead of exact class names when whole dirs are excluded, we need to make the check able to cope with those prefixes
+             return false;
+         }
+
+-        $options = $this->getOptions($argument);
+-        if (null === $options['class']) {
++        // TODO: check the attributes on $class by reflection and return false if #[Entity] is not found
++        //       skip the check if $class matched exactly in $this->entityClasses (and make the pass exclude potential exact candidates that don't have the attribute)
++
++        if (!$this->registry->getManagerNames()) {
+             return false;
+         }
+
++        $options = $this->getOptions($argument);
++
+         if ($options['attribute_only'] && !$options['has_attribute']) {
+             return false;
+         }
+
+         // Doctrine Entity?
+-        if (null === $objectManager = $this->getManager($options['object_manager'], $options['class'])) {
++        if (null === $objectManager = $this->getManager($options['object_manager'], $class)) {
+             return false;
+         }
+
+-        return !$objectManager->getMetadataFactory()->isTransient($options['class']);
++        return !$objectManager->getMetadataFactory()->isTransient($class);
+     }
+
+     /**
+@@ -264,20 +271,15 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
+         /** @var ?MapEntity $configuration */
+         $configuration = $argument->getAttributes(MapEntity::class, ArgumentMetadata::IS_INSTANCEOF)[0] ?? null;
+
+-        $argumentClass = $argument->getType();
+-        if ($argumentClass && !class_exists($argumentClass)) {
+-            $argumentClass = null;
+-        }
+-
+         if (null === $configuration) {
+             return array_merge($this->defaultOptions, [
+-                'class' => $argumentClass,
++                'class' => $argument->getType(),
+                 'has_attribute' => false,
+             ]);
+         }
+
+         return [
+-            'class' => $configuration->class ?? $argumentClass,
++            'class' => $argument->getType(),
+             'object_manager' => $configuration->objectManager ?? $this->defaultOptions['object_manager'],
+             'expr' => $configuration->expr ?? $this->defaultOptions['expr'],
+             'mapping' => $configuration->mapping ?? $this->defaultOptions['mapping'],
+diff --git a/src/Symfony/Bridge/Doctrine/Attribute/MapEntity.php b/src/Symfony/Bridge/Doctrine/Attribute/MapEntity.php
+index b8b84848e4..9a0ac7ead2 100644
+--- a/src/Symfony/Bridge/Doctrine/Attribute/MapEntity.php
++++ b/src/Symfony/Bridge/Doctrine/Attribute/MapEntity.php
+@@ -18,7 +18,6 @@ namespace Symfony\Bridge\Doctrine\Attribute;
+ class MapEntity
+ {
+     public function __construct(
+-        public readonly ?string $class = null,
+         public readonly ?string $objectManager = null,
+         public readonly ?string $expr = null,
+         public readonly array $mapping = [],
+
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-06T20:42:39Z
+
+🤔 @nicolas-grekas
+
+I'm not sure what this change will accomplish, tbh.
+
+Checking the manager registry should be fast enough, otherwise we should fix that. The `Entity` attribute is just one way to configure metadata mapping. There's still classic annotations and XML and you could even invent your own driver. The manager registry should be the more robust source of truth for whether a class is an entity or not.
+
+This is why I don't think the resolver should keep it's own list of valid entities: We should already have a fast and reliable source of truth here.
+
+The other change I don't understand is why you would remove the ability to override the entity class via the `MapEntity` attribute. The resolver would derive the class from the parameter type. Cases where that type does not match the actual entity class might be rare, but maintaining the possibility to be explicit about the entity class should not be too hard.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-06T20:47:33Z
+
+> Checking the manager registry should be fast enough, otherwise we should fix that
+
+The EM is a service that is commonly made lazy. I figured out that once the entity-argument-resolver of SensioFrameworkExtraBundle is turned on, this lazyness is needless as the service is instantiated 100% of the time. That's what I'm wondering about.
+Otherwise, why care about adding an option if always enabling this resolver has a negligible impact?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-06T21:24:57Z
+
+> The EM is a service that is commonly made lazy. I figured out that once the entity-argument-resolver of SensioFrameworkExtraBundle is turned on, this lazyness is needless as the service is instantiated 100% of the time.
+
+I see. We should monitor that, but since the DBAL connection is lazy by design, creating the EM without running a query should not be too harmful.
+
+> Otherwise, why care about adding an option if always enabling this resolver has a negligible impact?
+
+The performance is not the issue that is being discussed here. My concern is the ambiguity of typing a controller parameter with a class that also happens to be an entity. Please re-read my previous comments. 🙏🏻
+
+Apart from that: we're adding magic to argument resolving and providing at least an off switch for that kind of magic is reasonable, imho. Most magic behavior in Symfony is currently opt-in (like autowiring/autoconfiguration) and active by default via recipe. How's the situation different here?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-06-06T22:05:59Z
+
++1 to add a config option to enable automatic resolving and to turn the switch on by default in the recipe.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-07T12:04:13Z
+
+I think the main reason why you see the EM being lazy in most cases is because DoctrineBundle makes the EM lazy to make it resettable (by resetting the proxy), not to lazy-load its dependency graph.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-12T09:31:47Z
+
+> DoctrineBundle makes the EM lazy to make it resettable (by resetting the proxy), not to lazy-load its dependency graph.
+
+Indeed, that answers my concerns!
+
+> The conflict between resolvers will be handled by registering the tag with the right priority (like we do for all other argumentResolvers).
+
+I'd like to see this approach before adding an option to opt-in.
+
+I rebased the PR on your fork and submitted https://github.com/jderusse/symfony/pull/3 on top.
+After that patch, I'll be :+1: as is.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-07-14T17:49:03Z
+
+@weaverryan but when these edge cases appear, users can opt-out.
+
+I prefer to have this kind of feature on by default, this helps making the framework easy to use for newcomers and to make the catchy features more discoverable. This also allow to not bloat the "default" config generated by Flex.
+
+For instance, I would like to enable auto-validation by default. Sure there are some known edge cases, but they are easy to fix by disabling the feature for an entity or a property (require some googling but that's all). On the other hand, with the current situation (not enabled by default), only advanced users leverage this feature while it mostly targets newcomers who except (rightly imho) to not have to duplicate similar metadata (ORM, validation, PHPDoc...).
+
+Bundles should be opiniated but configurable, enabling by default features with a high DX value like this one is a huge one for newcomers and for the simplicity of use of the framework.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-14T17:53:54Z
+
+I’d at least make it explicitly opt-in when FrameworkExtraBundle is installed to prevent any conflicting situations or ambiguity
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-07-14T17:59:06Z
+
+> I prefer to have this kind of feature on by default
+
+I agree, the question is where this "on by default" happens. I'd prefer it to happen in the recipe which would make it consistent with other magic behavior like autowiring. And we would also make the "off switch" discoverable.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-07-14T21:24:38Z
+
+The verbose config that we generate per default just to enable these features increase the perceived complexity of Symfony. Take a look at the default services.yaml file, it can be a bit scary and discouraging for newcomers just starting a new project.
+
+IMHO the DX is better is it just works with as few generated config as possible by default, but you can tweak every features by reading the documentation.

@@ -29,7 +29,7 @@ class SwitchUserToken extends UsernamePasswordToken
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, /*string*/ $firewallName, /*array*/ $roles, /*TokenInterface*/ $originalToken, /*string*/ $originatedFromUri = null)
+    public function __construct($user, /* string */ $firewallName, /* array */ $roles, /* TokenInterface */ $originalToken, /* string */ $originatedFromUri = null)
     {
         if (\is_string($roles)) {
             // @deprecated since 5.4, deprecation is triggered by UsernamePasswordToken::__construct()

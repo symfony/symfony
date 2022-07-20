@@ -44,7 +44,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      * @param RequestStack $requestStack
      * @param string       $namespace    The namespace under which the token is stored in the requestStack
      */
-    public function __construct(/* RequestStack*/ $requestStack, string $namespace = self::SESSION_NAMESPACE)
+    public function __construct(/* RequestStack */ $requestStack, string $namespace = self::SESSION_NAMESPACE)
     {
         if ($requestStack instanceof SessionInterface) {
             trigger_deprecation('symfony/security-csrf', '5.3', 'Passing a "%s" to "%s" is deprecated, use a "%s" instead.', SessionInterface::class, __CLASS__, RequestStack::class);

@@ -264,7 +264,7 @@ class UserPasswordHashCommandTest extends TestCase
   [2] Custom\Class\Test\User
   [3] Symfony\Component\Security\Core\User\InMemoryUser
 EOTXT
-        , $this->passwordHasherCommandTester->getDisplay(true));
+            , $this->passwordHasherCommandTester->getDisplay(true));
     }
 
     public function testNonInteractiveEncodePasswordUsesFirstUserClass()

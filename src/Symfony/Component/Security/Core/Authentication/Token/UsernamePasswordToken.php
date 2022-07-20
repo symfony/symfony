@@ -29,7 +29,7 @@ class UsernamePasswordToken extends AbstractToken
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, /*string*/ $firewallName, /*array*/ $roles = [])
+    public function __construct($user, /* string */ $firewallName, /* array */ $roles = [])
     {
         if (\is_string($roles)) {
             trigger_deprecation('symfony/security-core', '5.4', 'The $credentials argument of "%s" is deprecated.', static::class.'::__construct');

@@ -32,7 +32,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
                 '@type' => 'MessageCard',
                 '@context' => 'https://schema.org/extensions',
             ],
-            (MicrosoftTeamsOptions::fromNotification($notification))->toArray()
+            MicrosoftTeamsOptions::fromNotification($notification)->toArray()
         );
     }
 

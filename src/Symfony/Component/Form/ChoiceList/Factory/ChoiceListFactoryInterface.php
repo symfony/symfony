@@ -35,7 +35,7 @@ interface ChoiceListFactoryInterface
      *
      * @return ChoiceListInterface
      */
-    public function createListFromChoices(iterable $choices, callable $value = null/*, callable $filter = null*/);
+    public function createListFromChoices(iterable $choices, callable $value = null/* , callable $filter = null */);
 
     /**
      * Creates a choice list that is loaded with the given loader.
@@ -48,7 +48,7 @@ interface ChoiceListFactoryInterface
      *
      * @return ChoiceListInterface
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/*, callable $filter = null*/);
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/* , callable $filter = null */);
 
     /**
      * Creates a view for the given choice list.
@@ -84,5 +84,5 @@ interface ChoiceListFactoryInterface
      *
      * @return ChoiceListView
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/);
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null/* , $labelTranslationParameters = [] */);
 }

@@ -34,7 +34,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
             ->willReturnCallback(function ($key, $params) {
                 return strtr(sprintf('Translation of: %s', $key), $params);
             }
-        );
+            );
 
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);
     }

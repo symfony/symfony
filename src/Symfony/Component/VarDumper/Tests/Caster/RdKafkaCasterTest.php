@@ -181,7 +181,7 @@ EODUMP;
         $producer->addBrokers($this->broker);
 
         $topic = $producer->newTopic('test');
-        $topic->produce(RD_KAFKA_PARTITION_UA, 0, '{}');
+        $topic->produce(\RD_KAFKA_PARTITION_UA, 0, '{}');
 
         $expectedDump = <<<EODUMP
 RdKafka\ProducerTopic {

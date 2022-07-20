@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
                     ->values(['dark', 'light'])
                     ->defaultValue('dark')
                 ->end()
-            ;
+        ;
 
         return $treeBuilder;
     }

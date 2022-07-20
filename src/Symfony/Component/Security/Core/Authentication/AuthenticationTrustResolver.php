@@ -32,7 +32,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function isAnonymous(TokenInterface $token = null/*, $deprecation = true*/)
+    public function isAnonymous(TokenInterface $token = null/* , $deprecation = true */)
     {
         if (1 === \func_num_args() || false !== func_get_arg(1)) {
             trigger_deprecation('symfony/security-core', '5.4', 'The "%s()" method is deprecated, use "isAuthenticated()" or "isFullFledged()" if you want to check if the request is (fully) authenticated.', __METHOD__);

@@ -65,7 +65,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListInterface
      */
-    public function createListFromChoices(iterable $choices, $value = null/*, $filter = null*/)
+    public function createListFromChoices(iterable $choices, $value = null/* , $filter = null */)
     {
         $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
 
@@ -106,7 +106,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListInterface
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/*, $filter = null*/)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/* , $filter = null */)
     {
         $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
 
@@ -151,7 +151,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListView
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/* , $labelTranslationParameters = [] */)
     {
         $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];
         $accessor = $this->propertyAccessor;

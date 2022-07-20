@@ -39,7 +39,7 @@ class AccessListener extends AbstractListener
     private $authManager;
     private $exceptionOnNoToken;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, /*bool*/ $exceptionOnNoToken = true)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, /* bool */ $exceptionOnNoToken = true)
     {
         if ($exceptionOnNoToken instanceof AuthenticationManagerInterface) {
             trigger_deprecation('symfony/security-http', '5.4', 'The $authManager argument of "%s" is deprecated.', __METHOD__);

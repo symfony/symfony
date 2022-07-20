@@ -437,7 +437,7 @@ class OptionsResolver implements Options
      *
      * @return $this
      */
-    public function setDeprecated(string $option/*, string $package, string $version, $message = 'The option "%name%" is deprecated.' */): self
+    public function setDeprecated(string $option/* , string $package, string $version, $message = 'The option "%name%" is deprecated.' */): self
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be deprecated from a lazy option or normalizer.');

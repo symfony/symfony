@@ -55,7 +55,7 @@ interface AuthenticatorInterface
      *
      * @return Passport
      */
-    public function authenticate(Request $request); /*: Passport;*/
+    public function authenticate(Request $request); /* : Passport; */
 
     /**
      * Create an authenticated token for the given user.

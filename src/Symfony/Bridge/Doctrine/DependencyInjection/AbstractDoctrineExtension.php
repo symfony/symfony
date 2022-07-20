@@ -139,7 +139,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @return array|false
      */
-    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container/*, string $bundleDir = null*/)
+    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container/* , string $bundleDir = null */)
     {
         if (\func_num_args() < 4 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
             trigger_deprecation('symfony/doctrine-bridge', '5.4', 'The "%s()" method will have a new "string $bundleDir = null" argument in version 6.0, not defining it is deprecated.', __METHOD__);
@@ -462,7 +462,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @return string
      */
-    abstract protected function getMappingResourceConfigDirectory(/*string $bundleDir = null*/);
+    abstract protected function getMappingResourceConfigDirectory(/* string $bundleDir = null */);
 
     /**
      * Extension used by the mapping files.

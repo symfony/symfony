@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-07-02T03:22:03Z
+
+Hey!
+
+I think @jack-worman has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-07-13T14:46:14Z
+
+Didn't think of this case @GromNaN, thank you! I'm taking a look at it soon.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-07-13T17:38:57Z
+
+That seems to be a special feature made by @nicolas-grekas. The value is correctly resolved by the command from a config pov.
+https://github.com/symfony/symfony/blob/517530cefc0f6380423c0f839d04151485a76805/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1725-L1735
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-07-13T17:40:21Z
+
+There is a conflict in the changelog, can you rebase please?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-07-14T09:05:41Z
+
+Very interesting, thank you for the investigation Jérôme!
+
+Also, the rebase is done :slightly_smiling_face:

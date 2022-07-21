@@ -12,6 +12,7 @@
         "abstract": true,
         "autowire": false,
         "autoconfigure": false,
+        "deprecated": false,
         "file": null,
         "factory_class": "Full\\Qualified\\FactoryClass",
         "factory_method": "get",

@@ -13,6 +13,7 @@
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`

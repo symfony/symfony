@@ -9,6 +9,7 @@
             "abstract": true,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
@@ -24,6 +25,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": null,
             "tags": [],
             "usages": []
@@ -37,6 +39,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "description": "ContainerInterface is the interface implemented by service container classes.",
             "file": null,
             "tags": [],

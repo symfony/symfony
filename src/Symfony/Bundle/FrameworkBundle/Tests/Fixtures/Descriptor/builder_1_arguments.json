@@ -9,6 +9,7 @@
             "abstract": true,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "arguments": [
                 {
                     "type": "service",
@@ -24,6 +25,7 @@
                     "abstract": false,
                     "autowire": false,
                     "autoconfigure": false,
+                    "deprecated": false,
                     "arguments": [
                         "arg1",
                         "arg2"
@@ -47,6 +49,7 @@
                         "abstract": false,
                         "autowire": false,
                         "autoconfigure": false,
+                        "deprecated": false,
                         "arguments": [],
                         "file": null,
                         "tags": [],
@@ -83,6 +86,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "arguments": [],
             "file": null,
             "tags": [],
@@ -97,6 +101,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "description": "ContainerInterface is the interface implemented by service container classes.",
             "arguments": [],
             "file": null,

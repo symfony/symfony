@@ -6,5 +6,6 @@
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - Arguments: yes
 - Usages: none

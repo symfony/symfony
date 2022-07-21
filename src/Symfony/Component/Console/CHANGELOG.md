@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Improve truecolor terminal detection in some cases
+* Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+
 6.1
 ---
 

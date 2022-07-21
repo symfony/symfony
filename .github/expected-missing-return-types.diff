@@ -902,8 +902,8 @@ index f38069e471..0966eb3e89 100644
 @@ -45,4 +45,4 @@ interface DecoderInterface
       * @return bool
       */
--    public function supportsDecoding(string $format /*, array $context = [] */);
-+    public function supportsDecoding(string $format /*, array $context = [] */): bool;
+-    public function supportsDecoding(string $format /* , array $context = [] */);
++    public function supportsDecoding(string $format /* , array $context = [] */): bool;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 index 44ba45f581..3398115497 100644
@@ -937,8 +937,8 @@ index 511dd1c724..c319e1839b 100644
 @@ -139,5 +139,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @param array $context
       */
--    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */)
-+    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
+-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
++    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
      {
          return \is_object($data) && !$data instanceof \Traversable;
 @@ -147,5 +147,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
@@ -972,8 +972,8 @@ index 511dd1c724..c319e1839b 100644
 @@ -341,5 +341,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @param array $context
       */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */)
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */): bool
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
++    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
      {
          return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
 @@ -349,5 +349,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
@@ -997,8 +997,8 @@ index 1c708738a1..3b6c9d5056 100644
 @@ -57,4 +57,4 @@ interface DenormalizerInterface
       * @return bool
       */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */);
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */): bool;
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
++    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 index 741f19e50b..acf3be931b 100644
@@ -1014,8 +1014,8 @@ index 741f19e50b..acf3be931b 100644
 @@ -48,4 +48,4 @@ interface NormalizerInterface
       * @return bool
       */
--    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */);
-+    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool;
+-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
++    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool;
  }
 diff --git a/src/Symfony/Component/Templating/Helper/HelperInterface.php b/src/Symfony/Component/Templating/Helper/HelperInterface.php
 index 5dade65db5..db0d0a00ea 100644

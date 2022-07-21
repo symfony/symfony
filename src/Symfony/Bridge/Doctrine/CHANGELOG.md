@@ -4,7 +4,7 @@ CHANGELOG
 6.2
 ---
 
- * Add `#[MapEntity]` with its corresponding `EntityArgumentResolver`
+ * Add `#[MapEntity]` with its corresponding `EntityValueResolver`
  * Add `NAME` constant to `UlidType` and `UuidType`
 
 6.0

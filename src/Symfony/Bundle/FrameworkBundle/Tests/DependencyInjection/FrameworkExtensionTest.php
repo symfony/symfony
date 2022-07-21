@@ -2193,12 +2193,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.chat')->getArgument(1));
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.email')->getArgument(1));
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
-
-        $this->assertNull($container->getDefinition('chatter')->getArgument(0));
-        $this->assertNull($container->getDefinition('texter')->getArgument(0));
-        $this->assertNull($container->getDefinition('notifier.channel.chat')->getArgument(0));
-        $this->assertNull($container->getDefinition('notifier.channel.email')->getArgument(0));
-        $this->assertNull($container->getDefinition('notifier.channel.sms')->getArgument(0));
     }
 
     protected function createContainer(array $data = [])

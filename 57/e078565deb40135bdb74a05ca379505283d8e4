@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by neclimdul at 2022-04-28T17:35:36Z
+
+Was trying to audit the code and couldn't find any code coverage for this so wrote something down to help me step through it. Figured it might be useful for a little extra code coverage and protection against regressions.

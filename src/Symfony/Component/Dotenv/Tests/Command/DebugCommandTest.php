@@ -12,6 +12,7 @@
 namespace Symfony\Component\Dotenv\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -207,6 +208,9 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testCompletion()
     {
         $env = 'prod';
@@ -216,8 +220,10 @@ class DebugCommandTest extends TestCase
         (new Dotenv('TEST_ENV_KEY'))->bootEnv($projectDirectory.'/.env');
 
         $command = new DebugCommand($env, $projectDirectory);
-        $tester = new CommandCompletionTester($command);
-        $this->assertSame(['FOO', 'HELLO', 'TEST', 'TEST123'], $tester->complete(['']));
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandCompletionTester($application->get('debug:dotenv'));
+        $this->assertSame(['FOO', 'TEST'], $tester->complete(['']));
     }
 
     private function executeCommand(string $projectDirectory, string $env, array $input = []): string

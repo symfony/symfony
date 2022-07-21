@@ -78,7 +78,7 @@ class FailedMessagesShowCommandTest extends TestCase
   Error         Things are bad!      
   Error Code    123                  
   Error Class   Exception            
-  Transport     async                
+  Transport     async
 EOF
             ,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
@@ -120,7 +120,7 @@ EOF
   Error         Things are bad!      
   Error Code    123                  
   Error Class   Exception            
-  Transport     async                
+  Transport     async
 EOF
             ,
             $redeliveryStamp2->getRedeliveredAt()->format('Y-m-d H:i:s')),

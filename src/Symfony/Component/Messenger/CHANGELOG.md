@@ -27,7 +27,7 @@ CHANGELOG
  * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
  * Add log when worker should stop.
  * Add log when `SIGTERM` is received.
- * Add the options `stats` and `class-filter` to `FailedMessagesShowCommand`
+ * Add `--stats` and `--class-filter` options to `FailedMessagesShowCommand`
 
 5.3
 ---

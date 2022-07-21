@@ -90,7 +90,7 @@ EOF
         return 0;
     }
 
-    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max, ?string $classFilter)
+    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max, string $classFilter = null)
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);

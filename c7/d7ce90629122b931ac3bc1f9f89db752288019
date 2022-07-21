@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2022-06-30T14:22:57Z
+
+Test failure unrelated in Mailer
+
+```
+There was 1 failure:
+1) Symfony\Component\Mailer\Tests\Transport\NativeTransportFactoryTest::testCreateSendmailWithNoSendmailPath
+Failed asserting that exception of type "Exception" is thrown.
+FAILURES!
+Tests: 382, Assertions: 765, Failures: 1, Skipped: 8.
+Error: KO src/Symfony/Component/Mailer
+```
+
+I think it is due to the actual code `\ini_get` ([here](https://github.com/symfony/symfony/blob/b893a718f86742c4165439a6e6985c27baad4962/src/Symfony/Component/Mailer/Transport/NativeTransportFactory.php#L32)) VS original code `ini_get` ([here](https://github.com/symfony/symfony/pull/36131/files#diff-9950dcc713433442d3820ae52db63d0de699df9800f3e0f72404eeb20dd21602R32))
+
+---
+
+edit: fixed via https://github.com/symfony/symfony/commit/78e4118987ce7d952c654ca2ae913c3174f13307
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-07-03T13:34:49Z
+
+What about showing the deprecation message as well?
+Regarding the txt output, this could even be shown in a warning block.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-03T18:08:45Z
+
+@ogizanagi it could indeed be a nice idea!
+
+But as there are lot of test files to update, I would prefer asking first a consensus before doing the proposed change if you dont mind :)
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-04T06:08:46Z
+
+@GromNaN @ogizanagi oki, I will try adding the deprecated message, and a colored output for when applicable
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-04T08:20:31Z
+
+With new code changes, I can get such results (with faking a service deprecation)
+
+<img width="1271" alt="Capture d’écran 2022-07-04 à 10 19 35" src="https://user-images.githubusercontent.com/1358361/177113120-fc1cdddc-bb93-434d-be66-6b9121203ce0.png">
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-07-04T12:21:12Z
+
+@94noni : Sorry to make you change this again, I should have been clearer:
+what about removing the info from the table output to show the deprecation message if the service is deprecated, using `$io->warning()` at the end of the command output?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-04T21:08:49Z
+
+@ogizanagi hey, do you mean like in my screenshot and written above the ! [Note] but as warning?
+
+if yes I can rework as requested :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-07-04T21:14:39Z
+
+@94noni : exactly what I meant :)
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-05T09:21:48Z
+
+@ogizanagi @GromNaN PR reworked and description updated based on addressed comments :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-05T09:30:57Z
+
+Looks good to me. Can you please go ahead with the missing test(s)?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-05T09:46:01Z
+
+@chalasr The only failed test I can see in the above checks is about `1) Symfony\Component\VarDumper\Tests\Server\ConnectionTest::testDump` seem unrelated isn't it?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-05T10:52:03Z
+
+What I mean is that this feature should be covered by a test if possible
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-06T15:26:15Z
+
+@chalasr
+
+> What I mean is that this feature should be covered by a test if possible
+
+I've added one, please have a look at 2nd commit with help of the doc but I got error like `Symfony\Component\DependencyInjection\Exception\InvalidArgumentException: Missing attribute "package" of the "deprecated" option in "/home/runner/work/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests/Functional/app/ContainerDebug/config.yml".`
+
+is the doc incomplete?
+
+edit: opened a PR [here](https://github.com/symfony/symfony-docs/pull/16952) to see (merged, doc is fixed and PR updated)
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-08T08:12:16Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-18T19:30:09Z
+
+With https://github.com/symfony/symfony/pull/38903 being recently merged there are lot of conflicts
+May I ask from reviewers another round of reviews on the core code, before taking time to fix all tests conflicts?
+thanks :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-20T20:12:51Z
+
+@94noni Can you rebase this PR to get rid of the merge commit (that prevents me from merging this PR)?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-07-20T20:41:32Z
+
+@fabpot I'll handle this very soon and ping back

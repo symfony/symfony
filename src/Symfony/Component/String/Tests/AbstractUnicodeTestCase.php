@@ -15,6 +15,16 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
 
 abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 {
+    public function testWidth()
+    {
+        $text = "<<<END
+This is a
+multiline text
+END";
+        $s = static::createFromString($text);
+        $this->assertSame(14, $s->width());
+    }
+
     public function testCreateFromStringWithInvalidUtf8Input()
     {
         $this->expectException(InvalidArgumentException::class);

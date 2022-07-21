@@ -54,10 +54,6 @@ class SendmailTransport extends AbstractTransport
         parent::__construct($dispatcher, $logger);
 
         if (null !== $command) {
-            if (!str_contains($command, ' -bs') && !str_contains($command, ' -t')) {
-                throw new \InvalidArgumentException(sprintf('Unsupported sendmail command flags "%s"; must be one of "-bs" or "-t" but can include additional flags.', $command));
-            }
-
             $this->command = $command;
         }
 

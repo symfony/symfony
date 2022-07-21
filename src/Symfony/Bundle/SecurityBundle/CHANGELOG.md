@@ -9,6 +9,7 @@ CHANGELOG
  * Add `Security::getFirewallConfig()` to help to get the firewall configuration associated to the Request
  * Add `Security::login()` to login programmatically
  * Add `Security::logout()` to logout programmatically
+ * Add `security.firewalls.logout.enable_csrf` to enable CSRF protection using the default CSRF token generator
 
 6.1
 ---

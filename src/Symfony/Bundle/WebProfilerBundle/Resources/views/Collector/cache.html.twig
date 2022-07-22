@@ -97,6 +97,14 @@
                     <h3 class="tab-title">{{ name }} <span class="badge">{{ collector.statistics[name].calls }}</span></h3>
 
                     <div class="tab-content">
+                        <h4>Adapter</h4>
+                        <div class="card">
+                            {% if collector.adapters[name] is defined %}
+                                <code>{{ collector.adapters[name] }}</code>
+                            {% else %}
+                                <span class="text-muted">Unable to get adapter class.</span>
+                            {% endif %}
+                        </div>
                         {% if calls|length == 0 %}
                             <div class="empty">
                                 <p>No calls were made for {{ name }} pool.</p>

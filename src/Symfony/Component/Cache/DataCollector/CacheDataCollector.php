@@ -41,10 +41,11 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $empty = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
+        $empty = ['calls' => [], 'adapters' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
             $this->data['instances']['calls'][$name] = $instance->getCalls();
+            $this->data['instances']['adapters'][$name] = \get_debug_type($instance->getPool());
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
@@ -94,6 +95,14 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     public function getCalls(): mixed
     {
         return $this->data['instances']['calls'];
+    }
+
+    /**
+     * Method returns all logged Cache adapter classes.
+     */
+    public function getAdapters(): array
+    {
+        return $this->data['instances']['adapters'];
     }
 
     private function calculateStatistics(): array

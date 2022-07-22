@@ -1264,7 +1264,7 @@ class PhpDumperTest extends TestCase
                 0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
                 1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
             ],
-            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+            default => throw new ParameterNotFoundException($name),
         };
 %A
 PHP

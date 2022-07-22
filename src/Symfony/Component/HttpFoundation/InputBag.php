@@ -33,7 +33,7 @@ final class InputBag extends ParameterBag
 
         $value = parent::get($key, $this);
 
-        if (null !== $value && $this !== $value && !\is_scalar($value)) {
+        if (null !== $value && $this !== $value && !\is_scalar($value) && !$value instanceof \Stringable) {
             throw new BadRequestException(sprintf('Input value "%s" contains a non-scalar value.', $key));
         }
 

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-04T16:43:52Z
+
+Hey!
+
+I think @alexandre-daubois has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-06-07T19:37:53Z
+
+@mtarld I made changes and add more flexibility
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2022-06-28T13:06:22Z
+
+@alamirault That's an awesome addition I would love to have as part of the property normalizer.
+I found a typo in your changes, but unfortunately hit the wrong button, my bad.
+Is there anything I could do to help this PR getting done? 🙂
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-06-28T17:35:06Z
+
+We need core member review. Maybe @dunglas ?
+
+(Failed tests are not related)

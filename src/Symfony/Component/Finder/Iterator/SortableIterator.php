@@ -27,6 +27,8 @@ class SortableIterator implements \IteratorAggregate
     public const SORT_BY_CHANGED_TIME = 4;
     public const SORT_BY_MODIFIED_TIME = 5;
     public const SORT_BY_NAME_NATURAL = 6;
+    public const SORT_BY_NAME_CASE_INSENSITIVE = 7;
+    public const SORT_BY_NAME_NATURAL_CASE_INSENSITIVE = 8;
 
     /** @var \Traversable<string, \SplFileInfo> */
     private \Traversable $iterator;
@@ -50,6 +52,14 @@ class SortableIterator implements \IteratorAggregate
         } elseif (self::SORT_BY_NAME_NATURAL === $sort) {
             $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
                 return $order * strnatcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            };
+        } elseif (self::SORT_BY_NAME_CASE_INSENSITIVE === $sort) {
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
+                return $order * strcasecmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            };
+        } elseif (self::SORT_BY_NAME_NATURAL_CASE_INSENSITIVE === $sort) {
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
+                return $order * strnatcasecmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_TYPE === $sort) {
             $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {

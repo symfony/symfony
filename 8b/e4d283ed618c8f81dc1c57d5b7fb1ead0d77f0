@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-21T14:02:23Z
+
+Thanks for looking at it!
+Sadly this patch does not seem to fix the issue, see https://github.com/symfony/symfony/runs/7449393160?check_suite_focus=true#step:8:3691
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2022-07-21T14:54:36Z
+
+@chalasr unfortunately I'm not able to reproduce such behavior...
+
+Test is failing on low-deps test case. Locally I run:
+- `composer update --no-progress --ansi --prefer-lowest --prefer-stable`
+- `./phpunit src/Symfony/Component/Dotenv` ends with all greens
+
+Could you help here? Maybe I'm doing something wrong
+
+---------------------------------------------------------------------------
+
+by stof at 2022-07-21T15:00:29Z
+
+@rmikalkenas installing the lowest deps of the fullstack repo or the lowest deps of the component does not produce the same result.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-21T15:01:54Z
+
+Here is what is needed to reproduce the low-deps check locally assuming you are at the root directory of the symfony/symfony project:
+```
+cd src/Symfony/Component/Dotenv/
+composer update --prefer-lowest --prefer-stable
+../../../../phpunit
+```
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2022-07-21T15:30:46Z
+
+@stof @chalasr thanks for the guidance, everything should be fine now. The rest failing tests have nothing to do with my changes

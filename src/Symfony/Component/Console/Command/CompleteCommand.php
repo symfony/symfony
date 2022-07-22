@@ -17,6 +17,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Completion\Output\CompletionOutputInterface;
 use Symfony\Component\Console\Completion\Output\FishCompletionOutput;
+use Symfony\Component\Console\Completion\Output\ZshCompletionOutput;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,6 +57,7 @@ final class CompleteCommand extends Command
         $this->completionOutputs = $completionOutputs + [
             'bash' => BashCompletionOutput::class,
             'fish' => FishCompletionOutput::class,
+            'zsh' => ZshCompletionOutput::class,
         ];
 
         parent::__construct();

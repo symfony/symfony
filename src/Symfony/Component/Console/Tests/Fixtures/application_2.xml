@@ -10,7 +10,7 @@
       <arguments/>
       <options>
         <option name="--shell" shortcut="-s" accept_value="1" is_value_required="1" is_multiple="0">
-          <description>The shell type ("bash", "fish")</description>
+          <description>The shell type ("bash", "fish", "zsh")</description>
           <defaults/>
         </option>
         <option name="--input" shortcut="-i" accept_value="1" is_value_required="1" is_multiple="1">

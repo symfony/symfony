@@ -36,7 +36,7 @@ class JsonResponse extends Response
     /**
      * @param bool $json If the data is already a JSON string
      */
-    public function __construct(mixed $data = null, int $status = 200, array $headers = [], bool $json = false)
+    public function __construct(mixed $data = null, int $status = Response::HTTP_OK, array $headers = [], bool $json = false)
     {
         parent::__construct('', $status, $headers);
 
@@ -63,7 +63,7 @@ class JsonResponse extends Response
      * @param int    $status  The response status code
      * @param array  $headers An array of response headers
      */
-    public static function fromJsonString(string $data, int $status = 200, array $headers = []): static
+    public static function fromJsonString(string $data, int $status = Response::HTTP_OK, array $headers = []): static
     {
         return new static($data, $status, $headers, true);
     }

@@ -214,7 +214,7 @@ class Response
     /**
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      */
-    public function __construct(?string $content = '', int $status = 200, array $headers = [])
+    public function __construct(?string $content = '', int $status = self::HTTP_OK, array $headers = [])
     {
         $this->headers = new ResponseHeaderBag($headers);
         $this->setContent($content);

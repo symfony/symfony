@@ -1,3 +1,4 @@
+* text=auto eol=lf
 /src/Symfony/Contracts export-ignore
 /src/Symfony/Bridge/PhpUnit export-ignore
 /src/Symfony/Component/Mailer/Bridge export-ignore

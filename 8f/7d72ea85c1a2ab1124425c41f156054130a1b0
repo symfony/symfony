@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-03T08:38:02Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mbrodala at 2022-06-03T08:48:16Z
+
+No idea about the (unrelated?) test failures: https://github.com/symfony/symfony/runs/6722797430?check_suite_focus=true#step:8:4374

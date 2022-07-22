@@ -86,7 +86,7 @@ class RequestTest extends TestCase
      */
     public function testGetContentType()
     {
-        $this->expectDeprecation('Since symfony/http-foundation 6.2: The method "Symfony\Component\HttpFoundation\Request::getContentType" is deprecated, use "getContentTypeFormat" instead.');
+        $this->expectDeprecation('Since symfony/http-foundation 6.2: The "Symfony\Component\HttpFoundation\Request::getContentType()" method is deprecated, use "getContentTypeFormat()" instead.');
         $request = new Request();
 
         $contentType = $request->getContentType();

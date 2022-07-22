@@ -9,6 +9,7 @@ CHANGELOG
  * Add `enum` env var processor
  * Add `shuffle` env var processor
  * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
+ * Add support of `enum` method return type for `!tagged_locator`
 
 6.1
 ---

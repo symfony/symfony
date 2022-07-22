@@ -159,6 +159,10 @@ class PriorityTaggedServiceUtil
             return $default;
         }
 
+        if (\is_object($default) && enum_exists($default::class)) {
+            $default = $default->name;
+        }
+
         if (\is_int($default)) {
             $default = (string) $default;
         }

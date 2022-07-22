@@ -13,9 +13,11 @@ _sf_{{ COMMAND_NAME }}() {
     # for an alias, get the real script behind it
     if [[ $(type -t $sf_cmd) == "alias" ]]; then
         sf_cmd=$(alias $sf_cmd | sed -E "s/alias $sf_cmd='(.*)'/\1/")
+    else
+        sf_cmd=$(type -p $sf_cmd)
     fi
 
-    if [ ! -f "$sf_cmd" ]; then
+    if [ ! -x "$sf_cmd" ]; then
         return 1
     fi
 

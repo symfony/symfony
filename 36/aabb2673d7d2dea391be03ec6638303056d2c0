@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-22T14:14:46Z
+
+@fabpot Please close if we don't want to fix that inconsistency :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-22T14:19:00Z
+
+I still don't get the use case to be very honest (get and set).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-22T14:22:00Z
+
+That was meant to be temporary à priori, but we can't make it stop as a bugfix. So I'd say this can be merged, and we can deprecate the \Stringable support for both `get` and `set` on 6.2 (I can do the PR later in the weekend).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-22T14:35:30Z
+
+If we deprecate it in 6.2, let's not merge this PR.
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2022-07-22T14:39:48Z
+
+> If we deprecate it in 6.2, let's not merge this PR.
+
+But then `set` and `get` stay inconsistent in 6.x? I do not understand why you do not want to fix this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-22T14:40:42Z
+
+Because we don't want people to use it as we will deprecate the feature in 6.2.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-22T16:10:28Z
+
+The thing is that it works on 5.4, so anyone relying on this will have their code breaks when upgrading to 6.x.
+Probably not a big deal so let's reconsider if someone complains about it
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-22T16:13:09Z
+
+Oh, I didn't remember that it used to work on 5.4. Let's merge then, but let's not forget the 6.2 PR to deprecate this.

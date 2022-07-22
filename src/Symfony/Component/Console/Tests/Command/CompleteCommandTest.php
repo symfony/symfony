@@ -128,7 +128,7 @@ class CompleteCommandTest extends TestCase
     private function execute(array $input)
     {
         // run in verbose mode to assert exceptions
-        $this->tester->execute($input ? ($input + ['--shell' => 'bash']) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);
+        $this->tester->execute($input ? ($input + ['--shell' => 'bash', '--api-version' => CompleteCommand::COMPLETION_API_VERSION]) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);
     }
 }
 

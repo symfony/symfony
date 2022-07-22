@@ -12,6 +12,10 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Converts between objects and arrays by mapping properties.
@@ -32,6 +36,24 @@ use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
  */
 class PropertyNormalizer extends AbstractObjectNormalizer
 {
+    public const NORMALIZE_PUBLIC = 1;
+    public const NORMALIZE_PROTECTED = 2;
+    public const NORMALIZE_PRIVATE = 4;
+
+    /**
+     * Flag to control whether fields should be output based on visibility.
+     */
+    public const NORMALIZE_VISIBILITY = 'normalize_visibility';
+
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    {
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
+
+        if (!isset($this->defaultContext[self::NORMALIZE_VISIBILITY])) {
+            $this->defaultContext[self::NORMALIZE_VISIBILITY] = self::NORMALIZE_PUBLIC | self::NORMALIZE_PROTECTED | self::NORMALIZE_PRIVATE;
+        }
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -90,14 +112,29 @@ class PropertyNormalizer extends AbstractObjectNormalizer
 
         try {
             $reflectionProperty = $this->getReflectionProperty($classOrObject, $attribute);
-            if ($reflectionProperty->isStatic()) {
-                return false;
-            }
         } catch (\ReflectionException) {
             return false;
         }
 
-        return true;
+        if ($reflectionProperty->isStatic()) {
+            return false;
+        }
+
+        $normalizeVisibility = $context[self::NORMALIZE_VISIBILITY] ?? $this->defaultContext[self::NORMALIZE_VISIBILITY];
+
+        if ((self::NORMALIZE_PUBLIC & $normalizeVisibility) && $reflectionProperty->isPublic()) {
+            return true;
+        }
+
+        if ((self::NORMALIZE_PROTECTED & $normalizeVisibility) && $reflectionProperty->isProtected()) {
+            return true;
+        }
+
+        if ((self::NORMALIZE_PRIVATE & $normalizeVisibility) && $reflectionProperty->isPrivate()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

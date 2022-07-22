@@ -11,11 +11,48 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Output\AnsiColorMode;
+
 class Terminal
 {
     private static ?int $width = null;
     private static ?int $height = null;
     private static ?bool $stty = null;
+
+    /**
+     * About Ansi color types: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+     * For more information about true color support with terminals https://github.com/termstandard/colors/.
+     */
+    public static function getTermColorSupport(): AnsiColorMode
+    {
+        // Try with $COLORTERM first
+        if (\is_string($colorterm = getenv('COLORTERM'))) {
+            $colorterm = strtolower($colorterm);
+
+            if (str_contains($colorterm, 'truecolor')) {
+                return AnsiColorMode::Ansi24;
+            }
+
+            if (str_contains($colorterm, '256color')) {
+                return AnsiColorMode::Ansi8;
+            }
+        }
+
+        // Try with $TERM
+        if (\is_string($term = getenv('TERM'))) {
+            $term = strtolower($term);
+
+            if (str_contains($term, 'truecolor')) {
+                return AnsiColorMode::Ansi24;
+            }
+
+            if (str_contains($term, '256color')) {
+                return AnsiColorMode::Ansi8;
+            }
+        }
+
+        return AnsiColorMode::Ansi4;
+    }
 
     /**
      * Gets the terminal width.

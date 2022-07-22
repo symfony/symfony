@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class RequestTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function tearDown(): void
     {
         Request::setTrustedProxies([], -1);
@@ -78,12 +81,31 @@ class RequestTest extends TestCase
         $this->assertFalse($isNoCache);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetContentType()
     {
+        $this->expectDeprecation('Since symfony/http-foundation 6.2: The method "Symfony\Component\HttpFoundation\Request::getContentType" is deprecated, use "getContentTypeFormat" instead.');
         $request = new Request();
+
         $contentType = $request->getContentType();
 
         $this->assertNull($contentType);
+    }
+
+    public function testGetContentTypeFormat()
+    {
+        $request = new Request();
+        $this->assertNull($request->getContentTypeFormat());
+
+        $server = ['HTTP_CONTENT_TYPE' => 'application/json'];
+        $request = new Request([], [], [], [], [], $server);
+        $this->assertEquals('json', $request->getContentTypeFormat());
+
+        $server = ['HTTP_CONTENT_TYPE' => 'text/html'];
+        $request = new Request([], [], [], [], [], $server);
+        $this->assertEquals('html', $request->getContentTypeFormat());
     }
 
     public function testSetDefaultLocale()

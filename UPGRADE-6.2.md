@@ -9,6 +9,11 @@ FrameworkBundle
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Deprecate `AbstractController::renderForm()`, use `render()` instead
 
+HttpFoundation
+--------------
+
+ * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
+
 Mailer
 --------
 

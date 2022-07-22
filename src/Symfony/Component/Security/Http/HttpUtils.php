@@ -49,7 +49,7 @@ class HttpUtils
      * Creates a redirect Response.
      *
      * @param string $path   A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
-     * @param int    $status The status code
+     * @param int    $status The HTTP status code (302 "Found" by default)
      */
     public function createRedirectResponse(Request $request, string $path, int $status = 302): RedirectResponse
     {

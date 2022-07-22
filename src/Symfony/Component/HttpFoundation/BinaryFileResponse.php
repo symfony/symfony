@@ -38,7 +38,7 @@ class BinaryFileResponse extends Response
 
     /**
      * @param \SplFileInfo|string $file               The file to stream
-     * @param int                 $status             The response status code
+     * @param int                 $status             The response status code (200 "OK" by default)
      * @param array               $headers            An array of response headers
      * @param bool                $public             Files are public by default
      * @param string|null         $contentDisposition The type of Content-Disposition to set automatically with the filename

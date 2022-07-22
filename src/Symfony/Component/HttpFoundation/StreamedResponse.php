@@ -30,6 +30,9 @@ class StreamedResponse extends Response
     protected $streamed;
     private bool $headersSent;
 
+    /**
+     * @param int $status The HTTP status code (200 "OK" by default)
+     */
     public function __construct(callable $callback = null, int $status = 200, array $headers = [])
     {
         parent::__construct(null, $status, $headers);

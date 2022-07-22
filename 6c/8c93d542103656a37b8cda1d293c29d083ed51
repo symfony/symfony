@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-07-15T13:16:45Z
+
+Hey!
+
+I think @CupOfTea696 has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by julien-boudry at 2022-07-15T16:03:56Z
+
+In pratice:
+
+* Many terminals support Ansi24 (truecolor), but can not be identified (Gnome, Windows Terminal...) as true color. Before this PR, Sf rollback to Ansi4 (16 colors) for them. After this PR, is still often the case yet, but few of them can be added to the Ansi24 detection, and some others can be added at least at the Ansi8 (256 colors) detection (because of env TERM name like xterm-256). But is not possible for Gnome Terminal and Windows Terminal (for example), still unchanged.
+
+* Almost all terminals support 256 colors (Ansi8). Before this PR, Sf rollback to Ansi4 (16 colors) for them. After this PR, almost all (including Apple Terminal) use conversion from true Ansi 24 (truecolor) to Ansi8 (256 colors). It's better. (but also not Gnome, not Windows)
+
+* Future scope?
+  * Use Ansi24 (truecolor) by default, and degrade only if 256 colors is explicit? (today, it's the opposite) Could work in a large majority of cases (including Gnome or Windows Terminal for many years), has no impact on Apple Terminal, but can lead to some problems with very old or rare terminals. _(but Gnome developer says about that: We don't care :smile:)_
+ In fact, conversion to Ansi4 (16 colors) will never happen (because no one declares it explicitly) without using a database like Termcap maybe (but not perfect also).
+
+  * Or go ahead with speculative detection based on other ENV variables (like env OS variable on windows).
+
+---------------------------------------------------------------------------
+
+by julien-boudry at 2022-07-19T00:02:14Z
+
+Note: @fabpot fabbot.io doesn't like Enum with methods. And not also empty line before doc. comments on` CASE`. (I have removed it here).
+
+---------------------------------------------------------------------------
+
+by julien-boudry at 2022-07-19T11:51:48Z
+
+I will change the enum name soon as discussed. Add one more test. And Squash all these commits at the end. And possibly, we will be perfect.

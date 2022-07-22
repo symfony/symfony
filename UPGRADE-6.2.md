@@ -21,6 +21,7 @@ Security
    prevent [session storage flooding](https://symfony.com/blog/cve-2016-4423-large-username-storage-in-session)
  * Deprecate the `Symfony\Component\Security\Core\Security` class and service, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
  * Passing empty username or password parameter when using `JsonLoginAuthenticator` is not supported anymore
+ * Add `$lifetime` parameter to `LoginLinkHandlerInterface::createLoginLink()`
 
 Validator
 ---------

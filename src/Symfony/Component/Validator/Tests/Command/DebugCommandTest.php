@@ -80,6 +80,7 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 | -             | Symfony\Component\Validator\Constraints\Expression | Default | [                                                          |
 |               |                                                    |         |   "expression" => "1 + 1 = 2",                             |
 |               |                                                    |         |   "message" => "This value is not valid.",                 |
+|               |                                                    |         |   "negate" => true,                                        |
 |               |                                                    |         |   "payload" => null,                                       |
 |               |                                                    |         |   "values" => []                                           |
 |               |                                                    |         | ]                                                          |
@@ -152,6 +153,7 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 | -             | Symfony\Component\Validator\Constraints\Expression | Default | [                                                          |
 |               |                                                    |         |   "expression" => "1 + 1 = 2",                             |
 |               |                                                    |         |   "message" => "This value is not valid.",                 |
+|               |                                                    |         |   "negate" => true,                                        |
 |               |                                                    |         |   "payload" => null,                                       |
 |               |                                                    |         |   "values" => []                                           |
 |               |                                                    |         | ]                                                          |
@@ -178,6 +180,7 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassTwo
 | -             | Symfony\Component\Validator\Constraints\Expression | Default | [                                                          |
 |               |                                                    |         |   "expression" => "1 + 1 = 2",                             |
 |               |                                                    |         |   "message" => "This value is not valid.",                 |
+|               |                                                    |         |   "negate" => true,                                        |
 |               |                                                    |         |   "payload" => null,                                       |
 |               |                                                    |         |   "values" => []                                           |
 |               |                                                    |         | ]                                                          |

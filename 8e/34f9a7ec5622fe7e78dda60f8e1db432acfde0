@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by remicollet at 2022-07-22T06:16:10Z
+
+Notice: I also think the **-f** (file) should be replaced by **-x** (executable)
+
+---------------------------------------------------------------------------
+
+by remicollet at 2022-07-22T06:49:55Z
+
+Notice (but this is another issue), that alias case may be broken if contains options,
+e.g. `alias composer /usr/local/bin/composer --verbose `
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-07-22T08:41:58Z
+
+cc @wouterj too as he did the original implementation.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2022-07-22T10:36:02Z
+
+Two confirmations it works with this patch applied: https://github.com/composer/composer/issues/10961

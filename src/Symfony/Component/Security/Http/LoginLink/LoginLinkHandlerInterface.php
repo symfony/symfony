@@ -24,7 +24,7 @@ interface LoginLinkHandlerInterface
     /**
      * Generate a link that can be used to authenticate as the given user.
      *
-     * @param int $lifetime
+     * @param int|null $lifetime When not null, the argument overrides any default lifetime previously set
      */
     public function createLoginLink(UserInterface $user, Request $request = null /*, int $lifetime = null */): LoginLinkDetails;
 

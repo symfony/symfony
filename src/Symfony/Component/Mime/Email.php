@@ -501,16 +501,11 @@ class Email extends Message
             $names = array_filter(array_unique($names));
         }
 
-        // usage of reflection is a temporary workaround for missing getters that will be added in 6.2
-        $dispositionRef = new \ReflectionProperty(TextPart::class, 'disposition');
-        $dispositionRef->setAccessible(true);
-        $nameRef = new \ReflectionProperty(TextPart::class, 'name');
-        $nameRef->setAccessible(true);
         $attachmentParts = $inlineParts = [];
         foreach ($this->attachments as $attachment) {
             $part = $this->createDataPart($attachment);
             if (isset($attachment['part'])) {
-                $attachment['name'] = $nameRef->getValue($part);
+                $attachment['name'] = $part->getName();
             }
 
             foreach ($names as $name) {
@@ -527,7 +522,7 @@ class Email extends Message
                 break;
             }
 
-            if ('inline' === $dispositionRef->getValue($part)) {
+            if ('inline' === $part->getDisposition()) {
                 $inlineParts[$attachment['name']] = $part;
             } else {
                 $attachmentParts[] = $part;

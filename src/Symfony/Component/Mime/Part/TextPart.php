@@ -89,6 +89,11 @@ class TextPart extends AbstractPart
         return $this;
     }
 
+    public function getDisposition(): ?string
+    {
+        return $this->disposition;
+    }
+
     /**
      * Sets the name of the file (used by FormDataPart).
      *
@@ -102,7 +107,7 @@ class TextPart extends AbstractPart
     }
 
     /**
-     * Gets the name of the file (used by FormDataPart).
+     * Gets the name of the file.
      */
     public function getName(): ?string
     {

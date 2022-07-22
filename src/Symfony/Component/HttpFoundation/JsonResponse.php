@@ -60,7 +60,7 @@ class JsonResponse extends Response
      *         ->setSharedMaxAge(300);
      *
      * @param string $data    The JSON response string
-     * @param int    $status  The response status code
+     * @param int    $status  The response status code (200 "OK" by default)
      * @param array  $headers An array of response headers
      */
     public static function fromJsonString(string $data, int $status = 200, array $headers = []): static

@@ -124,6 +124,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Returns a RedirectResponse to the given URL.
+     *
+     * @param int $status The HTTP status code (302 "Found" by default)
      */
     protected function redirect(string $url, int $status = 302): RedirectResponse
     {
@@ -132,6 +134,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Returns a RedirectResponse to the given route with the given parameters.
+     *
+     * @param int $status The HTTP status code (302 "Found" by default)
      */
     protected function redirectToRoute(string $route, array $parameters = [], int $status = 302): RedirectResponse
     {
@@ -140,6 +144,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Returns a JsonResponse that uses the serializer component if enabled, or json_encode.
+     *
+     * @param int $status The HTTP status code (200 "OK" by default)
      */
     protected function json(mixed $data, int $status = 200, array $headers = [], array $context = []): JsonResponse
     {

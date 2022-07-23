@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add a `mailer:test` command
+
 6.1
 ---
 

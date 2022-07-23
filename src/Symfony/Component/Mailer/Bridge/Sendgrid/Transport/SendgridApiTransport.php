@@ -145,6 +145,10 @@ class SendgridApiTransport extends AbstractApiTransport
             $personalization['custom_args'] = $customArguments;
         }
 
+        foreach ($envelope->getOptions() as $name => $value) {
+            $payload[$name] = $value;
+        }
+
         $payload['personalizations'][] = $personalization;
 
         return $payload;

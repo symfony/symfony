@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add the `options` property to `Envelope`
+
 6.1
 ---
 

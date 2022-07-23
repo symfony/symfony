@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support for the `Envelope`'s options to the Sendgrid API transport
+
 5.4
 ---
 

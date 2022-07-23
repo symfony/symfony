@@ -23,6 +23,7 @@ class Envelope
 {
     private Address $sender;
     private array $recipients = [];
+    private array $options = [];
 
     /**
      * @param Address[] $recipients
@@ -84,5 +85,21 @@ class Envelope
     public function getRecipients(): array
     {
         return $this->recipients;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function setOption(string $name, $value): void
+    {
+        $this->options[$name] = $value;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

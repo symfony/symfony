@@ -66,6 +66,69 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testResumeNoMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(null, 15);
+        $bar->advance();
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '   15 [--------------->------------]'.
+            $this->generateOutput('   16 [---------------->-----------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeWithMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 5000, 0);
+        $bar->start(null, 1000);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            ' 1000/5000 [=====>----------------------]  20%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegularTimeEstimation()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);
+        $bar->start();
+
+        $bar->advance();
+        $bar->advance();
+
+        sleep(1);
+
+        $this->assertEquals(
+            600.0,
+            $bar->getEstimated()
+        );
+    }
+
+    public function testResumedTimeEstimation()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);
+        $bar->start(null, 599);
+        $bar->advance();
+
+        sleep(1);
+
+        $this->assertEquals(
+            1_200.0,
+            $bar->getEstimated()
+        );
+
+        $this->assertEquals(
+            600.0,
+            $bar->getRemaining()
+        );
+    }
+
     public function testAdvanceWithStep()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);

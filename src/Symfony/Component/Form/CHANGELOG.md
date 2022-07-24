@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
 * Allow passing `TranslatableInterface` objects to the `ChoiceView` label
+* Allow passing `TranslatableInterface` objects to the `help` option
 
 6.1
 ---

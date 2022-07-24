@@ -417,6 +417,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                     if (!\is_scalar($data)) {
                         $data = $this->serializer->normalize($data, $format, $context);
                     }
+                    if (\is_bool($data)) {
+                        $data = (int) $data;
+                    }
                     $parentNode->setAttribute($attributeName, $data);
                 } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data, $format, $context);

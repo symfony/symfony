@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by ismail1432 at 2022-07-12T18:08:35Z
+
+> This makes sense to me and looks to match the email assertions. I'm not that familiar with notifier but should there be assertions on:
+>
+> Who the notification was sent to?
+> What was in the body?
+
+I add more assertion, my point here is to introduce basic assertions and add more later by me or community :+1:
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-07-12T18:10:37Z
+
+> my point here is to introduce basic assertions and add more later by me or community
+
+Sure, that's fair!

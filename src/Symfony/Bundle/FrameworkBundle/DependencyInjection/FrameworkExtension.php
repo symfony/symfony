@@ -101,6 +101,7 @@ use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
+use Symfony\Component\Mailer\Command\MailerTestCommand;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -384,6 +385,10 @@ class FrameworkExtension extends Extension
 
         if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+        }
+
+        if (!$this->mailerConfigEnabled || !class_exists(MailerTestCommand::class)) {
+            $container->removeDefinition('console.command.mailer_test');
         }
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);

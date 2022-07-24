@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-05-05T07:49:01Z
+
+Alright thanks for having a look :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-24T08:48:05Z
+
+@wouterj Can you have a look at this one? I'd love to be able to merge it for 6.2.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-07-24T10:25:03Z
+
+I've checked the changes and added a test for all policies to make sure we don't break peeking behavior.
+
+@Seldaek I've basically reverted the changes you did in f9229e62f38e7f0d364c346dbc9ebcddc7e6e481. Do you maybe know why you made these changes? If `$availableTokens >= $consumedTokens`, this means the token can be consumed immediately without waiting. I can't follow the reasoning to add wait time in this case.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-07-24T12:11:16Z
+
+I don't recall exactly sorry, mentally quite far away from this PR at this point.. But I think your change makes sense. I will for sure check in real life conditions whenever it is merged that the original intent is still achieved.

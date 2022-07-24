@@ -4,6 +4,7 @@ CHANGELOG
 6.2
 ---
 
+ * Add `NotificationAssertionsTrait`
  * Add option `framework.catch_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to catch all kinds of `Throwable`
  * Make `AbstractController::render()` able to deal with forms and deprecate `renderForm()`
  * Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and

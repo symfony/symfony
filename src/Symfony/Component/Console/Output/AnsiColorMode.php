@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Console\Output;
 
-use Symfony\Component\Asset\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -19,20 +19,20 @@ use Symfony\Component\Asset\Exception\InvalidArgumentException;
  */
 enum AnsiColorMode
 {
-    /**
+    /*
      * Classical 4-bit Ansi colors, including 8 classical colors and 8 bright color. Output syntax is "ESC[${foreGroundColorcode};${backGroundColorcode}m"
      * Must be compatible with all terminals and it's the minimal version supported.
      */
     case Ansi4;
 
-    /**
+    /*
      * 8-bit Ansi colors (240 differents colors + 16 duplicate color codes, ensuring backward compatibility).
      * Output syntax is: "ESC[38;5;${foreGroundColorcode};48;5;${backGroundColorcode}m"
      * Should be compatible with most terminals.
      */
     case Ansi8;
 
-    /**
+    /*
      * 24-bit Ansi colors (RGB).
      * Output syntax is: "ESC[38;2;${foreGroundColorcodeRed};${foreGroundColorcodeGreen};${foreGroundColorcodeBlue};48;2;${backGroundColorcodeRed};${backGroundColorcodeGreen};${backGroundColorcodeBlue}m"
      * May be compatible with many modern terminals.

@@ -31,6 +31,10 @@ class ExpressionLanguageSyntaxValidator extends ConstraintValidator
 
     public function __construct(ExpressionLanguage $expressionLanguage = null)
     {
+        if (!class_exists(ExpressionLanguage::class)) {
+            throw new \LogicException(sprintf('The "%s" class requires the "ExpressionLanguage" component. Try running "composer require symfony/expression-language".', self::class));
+        }
+
         $this->expressionLanguage = $expressionLanguage;
     }
 

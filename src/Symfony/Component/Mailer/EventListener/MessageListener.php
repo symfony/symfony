@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Mailer\EventListener;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
@@ -119,6 +121,10 @@ class MessageListener implements EventSubscriberInterface
     private function renderMessage(Message $message): void
     {
         if (!$this->renderer) {
+            if ($message instanceof TemplatedEmail && ($message->getTextTemplate() || $message->getHtmlTemplate())) {
+                throw new LogicException(sprintf('You must configure a "%s" when a "%s" instance has a text or HTML template set.', BodyRendererInterface::class, get_debug_type($message)));
+            }
+
             return;
         }
 

@@ -56,7 +56,7 @@ EOF
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $message = (new Email())
             ->to($input->getArgument('to'))

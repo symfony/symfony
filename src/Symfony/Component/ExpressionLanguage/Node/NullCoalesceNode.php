@@ -39,7 +39,7 @@ class NullCoalesceNode extends Node
     public function evaluate(array $functions, array $values)
     {
         if ($this->nodes['expr1'] instanceof GetAttrNode) {
-            $this->nodes['expr1']->isNullCoalesce = true;
+            $this->nodes['expr1']->attributes['is_null_coalesce'] = true;
         }
 
         return $this->nodes['expr1']->evaluate($functions, $values) ?? $this->nodes['expr2']->evaluate($functions, $values);

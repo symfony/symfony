@@ -316,46 +316,6 @@ class InfobipApiTransportTest extends TestCase
         $this->assertEquals([new Address('bcc@example.com')], $sentMessage->getOriginalMessage()->getBcc());
     }
 
-    public function testSendEmailWithAttachmentsWithSuccess()
-    {
-        $email = $this->basicValidEmail()
-            ->text('foobar')
-            ->attach('some attachment', 'attachment.txt', 'text/plain')
-            ->embed('some inline attachment', 'inline.txt', 'text/plain')
-        ;
-
-        $sentMessage = $this->transport->send($email);
-
-        $this->assertInstanceOf(SentMessage::class, $sentMessage);
-        $this->assertStringMatchesFormat(
-            <<<'TXT'
-            %a
-            Content-Type: multipart/mixed; boundary=%s
-
-            --%s
-            Content-Type: text/plain; charset=utf-8
-            Content-Transfer-Encoding: quoted-printable
-
-            foobar
-            --%s
-            Content-Type: text/plain; name=attachment.txt
-            Content-Transfer-Encoding: base64
-            Content-Disposition: attachment; name=attachment.txt;
-             filename=attachment.txt
-
-            c29tZSBhdHRhY2htZW50
-            --%s
-            Content-Type: text/plain; name=inline.txt
-            Content-Transfer-Encoding: base64
-            Content-Disposition: inline; name=inline.txt; filename=inline.txt
-
-            c29tZSBpbmxpbmUgYXR0YWNobWVudA==
-            --%s--
-            TXT,
-            $sentMessage->toString()
-        );
-    }
-
     public function testSentMessageShouldCaptureInfobipMessageId()
     {
         $this->response = new MockResponse('{"messages": [{"messageId": "somexternalMessageId0"}]}');

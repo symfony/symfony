@@ -55,11 +55,13 @@ final class MessageBirdTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/messages', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => 'AccessKey:'.$this->token,
             'body' => [
-                'originator' => $this->from,
+                'originator' => $from,
                 'recipients' => $message->getPhone(),
                 'body' => $message->getSubject(),
             ],

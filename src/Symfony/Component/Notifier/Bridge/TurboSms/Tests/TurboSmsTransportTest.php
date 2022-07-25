@@ -148,4 +148,14 @@ final class TurboSmsTransportTest extends TransportTestCase
 
         $transport->send($message);
     }
+
+    public function testSmsMessageWithInvalidFrom()
+    {
+        $transport = $this->createTransport();
+
+        $this->expectException(LengthException::class);
+        $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
+
+        $transport->send(new SmsMessage('380931234567', 'test', 'abcdefghijklmnopqrstu'));
+    }
 }

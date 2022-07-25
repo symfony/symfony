@@ -59,6 +59,8 @@ final class Sms77Transport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/api/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -67,7 +69,7 @@ final class Sms77Transport extends AbstractTransport
                 'X-Api-Key' => $this->apiKey,
             ],
             'json' => [
-                'from' => $this->from,
+                'from' => $from,
                 'json' => 1,
                 'text' => $message->getSubject(),
                 'to' => $message->getPhone(),

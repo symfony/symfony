@@ -5,3 +5,4 @@ CHANGELOG
 ---
 
  * Add the bridge
+ * Throw exception when `SmsMessage->from` defined

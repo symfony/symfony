@@ -62,6 +62,8 @@ final class MessageMediaTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/v1/messages', $this->getEndpoint());
         $response = $this->client->request(
             'POST',
@@ -72,7 +74,7 @@ final class MessageMediaTransport extends AbstractTransport
                     'messages' => [
                         [
                             'destination_number' => $message->getPhone(),
-                            'source_number' => $this->from,
+                            'source_number' => $from,
                             'content' => $message->getSubject(),
                         ],
                     ],

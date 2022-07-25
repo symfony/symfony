@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add PHPUnit constraints
+ * Add `from` property in `SmsMessage`
 
 6.1
 ---

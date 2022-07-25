@@ -63,7 +63,9 @@ final class EsendexTransport extends AbstractTransport
             'body' => $message->getSubject(),
         ];
 
-        if (null !== $this->from) {
+        if ('' !== $message->getFrom()) {
+            $messageData['from'] = $message->getFrom();
+        } elseif (null !== $this->from) {
             $messageData['from'] = $this->from;
         }
 

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-27T13:20:17Z
+
+Can you please rebase? This conflicts after #46454
+Please also double check that the issue fixed in #46454 didn't happen here just in case.
+
+---------------------------------------------------------------------------
+
+by kvailas at 2022-07-13T11:08:19Z
+
+Hello @nicolas-grekas , many many many thanks for working on this one!
+Is there a plan to release the new feature within the month or so?
+It would be great to know!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-20T10:02:03Z
+
+@kvailas See https://symfony.com/doc/current/contributing/community/releases.html for more information about our release process.
+If this PR is merged in the next couple of months, it will be part of 6.2.
+
+---------------------------------------------------------------------------
+
+by kvailas at 2022-07-20T11:30:58Z
+
+@fabpot actually i am using the expression language library as part of a **non-symfony** based project. Just loading the library in order to use the expression language from its respective repo.
+
+Thanks for your input, appreciated.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-07-20T13:07:45Z
+
+@kvailas this does not change *when* the releases of the components happen (btw, Symfony-based projects also download components from the subtree-split repos)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-20T17:13:56Z
+
+Can you rebase on current 6.2?

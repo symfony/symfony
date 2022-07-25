@@ -77,6 +77,10 @@ class Lexer
                 // null-safe
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, '?.', ++$cursor);
                 ++$cursor;
+            } elseif ('?' === $expression[$cursor] && '?' === ($expression[$cursor + 1] ?? '')) {
+                // null-coalescing
+                $tokens[] = new Token(Token::PUNCTUATION_TYPE, '??', ++$cursor);
+                ++$cursor;
             } elseif (str_contains('.,?:', $expression[$cursor])) {
                 // punctuation
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);

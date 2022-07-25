@@ -19,12 +19,9 @@ class OutputWrapperTest extends TestCase
     /**
      * @dataProvider textProvider
      */
-    public function testBasicWrap(string $text, int $width, ?bool $allowCutUrls, string $expected)
+    public function testBasicWrap(string $text, int $width, bool $allowCutUrls, string $expected)
     {
-        $wrapper = new OutputWrapper();
-        if (\is_bool($allowCutUrls)) {
-            $wrapper->setAllowCutUrls($allowCutUrls);
-        }
+        $wrapper = new OutputWrapper($allowCutUrls);
         $result = $wrapper->wrap($text, $width);
         $this->assertEquals($expected, $result);
     }
@@ -36,7 +33,7 @@ class OutputWrapperTest extends TestCase
         yield 'Default URL cut' => [
             $baseTextWithUtf8AndUrl,
             20,
-            null,
+            false,
             <<<'EOS'
             Árvíztűrőtükörfúrógé
             p https://github.com/symfony/symfony Lorem ipsum

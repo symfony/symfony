@@ -42,22 +42,15 @@ namespace Symfony\Component\Console\Helper;
  *
  * @see https://stackoverflow.com/a/20434776/1476819
  */
-final class OutputWrapper implements OutputWrapperInterface
+final class OutputWrapper
 {
+    private const TAG_OPEN_REGEX_SEGMENT = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
+    private const TAG_CLOSE_REGEX_SEGMENT = '[a-z][^<>]*+';
     private const URL_PATTERN = 'https?://\S+';
 
-    private bool $allowCutUrls = false;
-
-    public function isAllowCutUrls(): bool
-    {
-        return $this->allowCutUrls;
-    }
-
-    public function setAllowCutUrls(bool $allowCutUrls)
-    {
-        $this->allowCutUrls = $allowCutUrls;
-
-        return $this;
+    public function __construct(
+        private bool $allowCutUrls = false
+    ) {
     }
 
     public function wrap(string $text, int $width, string $break = "\n"): string
@@ -66,7 +59,7 @@ final class OutputWrapper implements OutputWrapperInterface
             return $text;
         }
 
-        $tagPattern = sprintf('<(?:(?:%s)|/(?:%s)?)>', OutputWrapperInterface::TAG_OPEN_REGEX_SEGMENT, OutputWrapperInterface::TAG_CLOSE_REGEX_SEGMENT);
+        $tagPattern = sprintf('<(?:(?:%s)|/(?:%s)?)>', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
         $limitPattern = "{1,$width}";
         $patternBlocks = [$tagPattern];
         if (!$this->allowCutUrls) {

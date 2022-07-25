@@ -16,7 +16,6 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\OutputWrapper;
-use Symfony\Component\Console\Helper\OutputWrapperInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
@@ -46,30 +45,16 @@ class SymfonyStyle extends OutputStyle
     private ProgressBar $progressBar;
     private int $lineLength;
     private TrimmedBufferOutput $bufferedOutput;
-    private OutputWrapperInterface $outputWrapper;
 
-    public function __construct(InputInterface $input, OutputInterface $output, OutputWrapperInterface $outputWrapper = null)
+    public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->bufferedOutput = new TrimmedBufferOutput(\DIRECTORY_SEPARATOR === '\\' ? 4 : 2, $output->getVerbosity(), false, clone $output->getFormatter());
         // Windows cmd wraps lines as soon as the terminal width is reached, whether there are following chars or not.
         $width = (new Terminal())->getWidth() ?: self::MAX_LINE_LENGTH;
         $this->lineLength = min($width - (int) (\DIRECTORY_SEPARATOR === '\\'), self::MAX_LINE_LENGTH);
-        $this->outputWrapper = $outputWrapper ?: new OutputWrapper();
 
         parent::__construct($this->output = $output);
-    }
-
-    public function getOutputWrapper(): OutputWrapperInterface
-    {
-        return $this->outputWrapper;
-    }
-
-    public function setOutputWrapper(OutputWrapperInterface $outputWrapper)
-    {
-        $this->outputWrapper = $outputWrapper;
-
-        return $this;
     }
 
     /**
@@ -477,6 +462,7 @@ class SymfonyStyle extends OutputStyle
         }
 
         // wrap and add newlines for each element
+        $outputWrapper = new OutputWrapper();
         foreach ($messages as $key => $message) {
             if ($escape) {
                 $message = OutputFormatter::escape($message);
@@ -484,7 +470,7 @@ class SymfonyStyle extends OutputStyle
 
             $lines = array_merge(
                 $lines,
-                explode(\PHP_EOL, $this->outputWrapper->wrap(
+                explode(\PHP_EOL, $outputWrapper->wrap(
                     $message,
                     $this->lineLength - $prefixLength - $indentLength,
                     \PHP_EOL

@@ -28,12 +28,12 @@ final class NotificationTest extends AbstractWebTestCase
         $this->assertNotificationSubjectContains($notification, 'Hello World!');
         $this->assertNotificationSubjectNotContains($notification, 'New urgent notification');
         $this->assertNotificationTransportIsEqual($notification, 'slack');
-        $this->assertNotificationTransportIsNotEqual($notification, 'mercure');
+        $this->assertNotificationTransportIsNotEqual($notification, 'microsoftteams');
 
         $notification = $this->getNotifierMessage($second);
         $this->assertNotificationSubjectContains($notification, 'New urgent notification');
         $this->assertNotificationSubjectNotContains($notification, 'Hello World!');
-        $this->assertNotificationTransportIsEqual($notification, 'mercure');
+        $this->assertNotificationTransportIsEqual($notification, 'microsoftteams');
         $this->assertNotificationTransportIsNotEqual($notification, 'slack');
     }
 }

@@ -11,10 +11,8 @@
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
-use Symfony\Bundle\MercureBundle\MercureBundle;
 
 return [
     new FrameworkBundle(),
     new TestBundle(),
-    new MercureBundle(),
 ];

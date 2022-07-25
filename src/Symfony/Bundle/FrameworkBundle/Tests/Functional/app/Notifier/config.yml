@@ -8,18 +8,9 @@ framework:
     notifier:
         chatter_transports:
             slack: 'null://null'
-            mercure: 'null://null'
+            microsoftteams: 'null://null'
         channel_policy:
-            urgent: ['chat/mercure']
+            urgent: ['chat/microsoftteams']
         admin_recipients:
             - { email: admin@example.com }
     profiler: ~
-
-mercure:
-    hubs:
-        default:
-            url: 'null://null'
-            jwt:
-                secret: '!ChangeMe!'
-                publish: [ 'foo', 'https://example.com/foo' ]
-                subscribe: [ 'bar', 'https://example.com/bar' ]

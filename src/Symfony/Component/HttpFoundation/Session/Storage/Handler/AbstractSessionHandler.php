@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Session\SessionUtils;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+abstract class AbstractSessionHandler implements \SessionHandlerInterface, \SessionIdInterface, \SessionUpdateTimestampHandlerInterface
 {
     private string $sessionName;
     private string $prefetchId;
@@ -34,7 +34,6 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
         if (!headers_sent() && !\ini_get('session.cache_limiter') && '0' !== \ini_get('session.cache_limiter')) {
             header(sprintf('Cache-Control: max-age=%d, private, must-revalidate', 60 * (int) \ini_get('session.cache_expire')));
         }
-
         return true;
     }
 

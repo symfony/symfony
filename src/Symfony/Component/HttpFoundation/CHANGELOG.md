@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.2
+---
+ * Implement `SessionIdInterface` in `AbstractSessionHandler`
+
 6.1
 ---
 

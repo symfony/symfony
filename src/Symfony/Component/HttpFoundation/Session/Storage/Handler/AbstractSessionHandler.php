@@ -43,6 +43,8 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
 
     abstract protected function doDestroy(string $sessionId): bool;
 
+    abstract public function create_sid():string;
+
     public function validateId(string $sessionId): bool
     {
         $this->prefetchData = $this->read($sessionId);

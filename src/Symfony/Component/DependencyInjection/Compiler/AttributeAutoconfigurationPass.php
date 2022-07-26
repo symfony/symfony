@@ -120,7 +120,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 
         if ($this->methodAttributeConfigurators || $this->parameterAttributeConfigurators) {
             foreach ($classReflector->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodReflector) {
-                if ($methodReflector->isStatic() || $methodReflector->isConstructor() || $methodReflector->isDestructor()) {
+                if ($methodReflector->isConstructor() || $methodReflector->isDestructor()) {
                     continue;
                 }
 

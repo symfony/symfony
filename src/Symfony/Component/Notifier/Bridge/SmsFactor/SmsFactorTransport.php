@@ -74,7 +74,9 @@ final class SmsFactorTransport extends AbstractTransport
             'gsmsmsid' => $messageId,
         ];
 
-        if (null !== $this->sender) {
+        if ('' !== $message->getFrom()) {
+            $query['sender'] = $message->getFrom();
+        } elseif (null !== $this->sender) {
             $query['sender'] = $this->sender;
         }
 

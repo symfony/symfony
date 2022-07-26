@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\ContactEveryone;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -65,6 +66,10 @@ final class ContactEveryoneTransport extends AbstractTransport
     {
         if (!$message instanceof SmsMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
+        }
+
+        if ('' !== $message->getFrom()) {
+            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
         $endpoint = sprintf('https://%s/api/light/diffusions/sms', self::HOST);

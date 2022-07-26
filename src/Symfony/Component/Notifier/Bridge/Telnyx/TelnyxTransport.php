@@ -62,14 +62,16 @@ final class TelnyxTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $this->from)) {
-            if ('' === $this->from) {
+        $from = $message->getFrom() ?: $this->from;
+
+        if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $from)) {
+            if ('' === $from) {
                 throw new IncompleteDsnException('This phone number is invalid.');
-            } elseif ('' !== $this->from && null === $this->messagingProfileId) {
+            } elseif ('' !== $from && null === $this->messagingProfileId) {
                 throw new IncompleteDsnException('The sending messaging profile must be specified.');
             }
 
-            if (!preg_match('/^[a-zA-Z0-9 ]+$/', $this->from)) {
+            if (!preg_match('/^[a-zA-Z0-9 ]+$/', $from)) {
                 throw new IncompleteDsnException('The Sender ID is invalid.');
             }
         }
@@ -78,7 +80,7 @@ final class TelnyxTransport extends AbstractTransport
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->apiKey,
             'json' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => $message->getPhone(),
                 'text' => $message->getSubject(),
                 'messaging_profile_id' => $this->messagingProfileId ?? '',

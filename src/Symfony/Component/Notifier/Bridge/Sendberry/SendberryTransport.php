@@ -60,12 +60,14 @@ final class SendberryTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $this->from)) {
-            if ('' === $this->from) {
+        $from = $message->getFrom() ?: $this->from;
+
+        if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $from)) {
+            if ('' === $from) {
                 throw new IncompleteDsnException('This phone number is invalid.');
             }
 
-            if (!preg_match('/^[a-zA-Z0-9 ]+$/', $this->from)) {
+            if (!preg_match('/^[a-zA-Z0-9 ]+$/', $from)) {
                 throw new IncompleteDsnException('The Sender ID is invalid.');
             }
         }
@@ -73,7 +75,7 @@ final class SendberryTransport extends AbstractTransport
         $endpoint = sprintf('https://%s/SMS/SEND', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'json' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => [$message->getPhone()],
                 'content' => $message->getSubject(),
                 'key' => $this->authKey,

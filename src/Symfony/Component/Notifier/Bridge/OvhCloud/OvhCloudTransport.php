@@ -97,7 +97,9 @@ final class OvhCloudTransport extends AbstractTransport
             'priority' => 'medium',
         ];
 
-        if ($this->sender) {
+        if ('' !== $message->getFrom()) {
+            $content['sender'] = $message->getFrom();
+        } elseif ($this->sender) {
             $content['sender'] = $this->sender;
         } else {
             $content['senderForResponse'] = true;

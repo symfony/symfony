@@ -72,6 +72,8 @@ final class SpotHitTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://www.%s/api/envoyer/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => [
@@ -79,7 +81,7 @@ final class SpotHitTransport extends AbstractTransport
                 'destinataires' => $message->getPhone(),
                 'type' => 'premium',
                 'message' => $message->getSubject(),
-                'expediteur' => $this->from,
+                'expediteur' => $from,
             ],
         ]);
 

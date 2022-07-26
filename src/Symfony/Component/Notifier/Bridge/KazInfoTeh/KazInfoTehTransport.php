@@ -60,6 +60,8 @@ class KazInfoTehTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $originator = $message->getFrom() ?: $this->sender;
+
         $endpoint = sprintf('http://%s/api', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'query' => [
@@ -68,7 +70,7 @@ class KazInfoTehTransport extends AbstractTransport
                 'password' => $this->password,
                 'recipient' => $message->getPhone(),
                 'messagetype' => 'SMS:TEXT',
-                'originator' => $this->sender,
+                'originator' => $originator,
                 'messagedata' => $message->getSubject(),
             ],
         ]);

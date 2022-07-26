@@ -100,10 +100,12 @@ final class LightSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $data = [
             'login' => $this->login,
             'phone' => $phone = $this->escapePhoneNumber($message->getPhone()),
-            'sender' => $this->from,
+            'sender' => $from,
             'text' => $message->getSubject(),
             'timestamp' => time(),
         ];

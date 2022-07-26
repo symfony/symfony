@@ -55,12 +55,14 @@ final class GatewayApiTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/rest/mtsms', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authToken, ''],
             'json' => [
-                'sender' => $this->from,
+                'sender' => $from,
                 'recipients' => [['msisdn' => $message->getPhone()]],
                 'message' => $message->getSubject(),
             ],

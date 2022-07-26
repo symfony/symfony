@@ -25,6 +25,7 @@ class AsMessageHandler
         public ?string $handles = null,
         public ?string $method = null,
         public int $priority = 0,
+        public ?string $batchStrategy = null,
     ) {
     }
 }

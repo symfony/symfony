@@ -23,7 +23,7 @@ final class HandlerDescriptor
     private ?BatchHandlerInterface $batchHandler = null;
     private array $options;
 
-    public function __construct(callable $handler, array $options = [])
+    public function __construct(callable $handler, array $options = [], BatchStrategyInterface $batchStrategy = null)
     {
         $handler = $handler(...);
 
@@ -44,6 +44,22 @@ final class HandlerDescriptor
             }
 
             $this->name = \get_class($handler).'::'.$r->name;
+        }
+
+        if (!$this->batchHandler && $r->isVariadic()) {
+            $h = $this->handler;
+            if (Result::class !== ($r->getParameters()[0] ?? null)?->getType()?->getName()) {
+                $h = new ResultWrappedHandler($h);
+            }
+
+            if ($handler instanceof BatchStrategyProviderInterface) {
+                $batchStrategy = $handler->getBatchStrategy();
+            }
+
+            $h = new BatchHandlerAdapter($h, $batchStrategy ?: new CountBatchStrategy(1));
+            $this->batchHandler = $h;
+            $this->handler = $h(...);
+            unset($h);
         }
     }
 

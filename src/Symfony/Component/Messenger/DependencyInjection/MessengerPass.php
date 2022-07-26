@@ -135,10 +135,12 @@ class MessengerPass implements CompilerPassInterface
                         $definitionId = $serviceId;
                     }
 
+                    $batchStrategy = isset($tag['batch_strategy']) ? new Reference($tag['batch_strategy']) : null;
+
                     $handlerToOriginalServiceIdMapping[$definitionId] = $serviceId;
 
                     foreach ($buses as $handlerBus) {
-                        $handlersByBusAndMessage[$handlerBus][$message][$priority][] = [$definitionId, $options];
+                        $handlersByBusAndMessage[$handlerBus][$message][$priority][] = [$definitionId, $options, $batchStrategy];
                     }
                 }
 
@@ -160,7 +162,14 @@ class MessengerPass implements CompilerPassInterface
             foreach ($handlersByMessage as $message => $handlers) {
                 $handlerDescriptors = [];
                 foreach ($handlers as $handler) {
-                    $definitions[$definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0])] = (new Definition(HandlerDescriptor::class))->setArguments([new Reference($handler[0]), $handler[1]]);
+                    $definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0]);
+                    $definition = (new Definition(HandlerDescriptor::class))
+                        ->addArgument(new Reference($handler[0]))
+                        ->addArgument($handler[1])
+                        ->addArgument($handler[2])
+                    ;
+
+                    $definitions[$definitionId] = $definition;
                     $handlerDescriptors[] = new Reference($definitionId);
                 }
 

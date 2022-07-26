@@ -29,6 +29,9 @@ use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\BatchHandlerTrait;
+use Symfony\Component\Messenger\Handler\BatchStrategyInterface;
+use Symfony\Component\Messenger\Handler\BatchStrategyProviderInterface;
+use Symfony\Component\Messenger\Handler\CountBatchStrategy;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
@@ -537,6 +540,43 @@ class WorkerTest extends TestCase
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
     }
+
+    public function testVariadicBatchHandler()
+    {
+        $expectedMessages = [
+            new DummyMessage('Hey'),
+            new DummyMessage('Bob'),
+        ];
+
+        $receiver = new DummyReceiver([
+            [new Envelope($expectedMessages[0])],
+            [new Envelope($expectedMessages[1])],
+        ]);
+
+        $handler = new VariadicBatchHandler();
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $bus = new MessageBus([$middleware]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
+            static $i = 0;
+            if (1 < ++$i) {
+                $event->getWorker()->stop();
+                $this->assertSame(2, $receiver->getAcknowledgeCount());
+            } else {
+                $this->assertSame(0, $receiver->getAcknowledgeCount());
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker->run();
+
+        $this->assertSame($expectedMessages, $handler->processedMessages);
+    }
 }
 
 class DummyReceiver implements ReceiverInterface
@@ -621,6 +661,21 @@ class DummyBatchHandler implements BatchHandlerInterface
         foreach ($jobs as [$job, $ack]) {
             $ack->ack($job);
         }
+    }
+}
+
+class VariadicBatchHandler implements BatchStrategyProviderInterface
+{
+    public $processedMessages;
+
+    public function __invoke(DummyMessage ...$messages): void
+    {
+        $this->processedMessages = $messages;
+    }
+
+    public function getBatchStrategy(): BatchStrategyInterface
+    {
+        return new CountBatchStrategy(2);
     }
 }
 

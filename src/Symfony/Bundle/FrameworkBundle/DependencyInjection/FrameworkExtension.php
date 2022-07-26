@@ -661,7 +661,8 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
             $tagAttributes = get_object_vars($attribute);
             $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
-            unset($tagAttributes['fromTransport']);
+            $tagAttributes['batch_strategy'] = $tagAttributes['batchStrategy'];
+            unset($tagAttributes['fromTransport'], $tagAttributes['batchStrategy']);
             if ($reflector instanceof \ReflectionMethod) {
                 if (isset($tagAttributes['method'])) {
                     throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));

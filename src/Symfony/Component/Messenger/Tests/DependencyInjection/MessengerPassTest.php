@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -59,6 +60,8 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class MessengerPassTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testProcess()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
@@ -302,6 +305,9 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetClassesFromTheHandlerSubscriberInterface()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
@@ -314,6 +320,7 @@ class MessengerPassTest extends TestCase
             ->addTag('messenger.message_handler')
         ;
 
+        $this->expectDeprecation('Since symfony/messenger 6.2: Implementing "Symfony\Component\Messenger\Handler\MessageSubscriberInterface" is deprecated, use the "Symfony\Component\Messenger\Attribute\AsMessageHandler" attribute instead.');
         (new MessengerPass())->process($container);
 
         $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
@@ -325,6 +332,9 @@ class MessengerPassTest extends TestCase
         $this->assertHandlerDescriptor($container, $handlersMapping, SecondMessage::class, [PrioritizedHandler::class, HandlerWithMultipleMessages::class], [['priority' => 10]]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetClassesAndMethodsAndPrioritiesFromTheSubscriber()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
@@ -404,6 +414,9 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsExceptionIfTheHandlerMethodDoesNotExist()
     {
         $this->expectException(RuntimeException::class);
@@ -475,6 +488,9 @@ class MessengerPassTest extends TestCase
         $this->assertSame(['amqp', 'dummy'], $container->getDefinition('console.command.messenger_setup_transports')->getArgument(1));
     }
 
+    /**
+     * @group legacy
+     */
     public function testItShouldNotThrowIfGeneratorIsReturnedInsteadOfArray()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
@@ -502,6 +518,9 @@ class MessengerPassTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testItRegistersHandlersOnDifferentBuses()
     {
         $container = $this->getContainerBuilder($eventsBusId = 'event_bus');
@@ -534,6 +553,9 @@ class MessengerPassTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testItThrowsAnExceptionOnUnknownBus()
     {
         $this->expectException(RuntimeException::class);
@@ -560,6 +582,9 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    /**
+     * @group legacy
+     */
     public function testUndefinedMessageClassForHandlerImplementingMessageHandlerInterface()
     {
         $this->expectException(RuntimeException::class);
@@ -573,6 +598,9 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    /**
+     * @group legacy
+     */
     public function testUndefinedMessageClassForHandlerImplementingMessageSubscriberInterface()
     {
         $this->expectException(RuntimeException::class);
@@ -669,6 +697,9 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    /**
+     * @group legacy
+     */
     public function testNeedsToHandleAtLeastOneMessage()
     {
         $this->expectException(RuntimeException::class);

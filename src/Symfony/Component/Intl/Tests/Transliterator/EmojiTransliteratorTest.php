@@ -18,8 +18,15 @@ use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
 /**
  * @requires extension intl
  */
-final class EmojiTransliteratorTest extends TestCase
+class EmojiTransliteratorTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (\PHP_VERSION_ID >= 80200 && !(new \ReflectionProperty(\Transliterator::class, 'id'))->isReadOnly()) {
+            $this->markTestSkipped('Waiting for https://github.com/php/php-src/pull/9167 to be merged');
+        }
+    }
+
     public function provideTransliterateTests(): iterable
     {
         yield [

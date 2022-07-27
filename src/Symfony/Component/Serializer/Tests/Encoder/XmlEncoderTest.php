@@ -96,6 +96,13 @@ class XmlEncoderTest extends TestCase
             'föo_bär' => 'a',
             'Bar' => [1, 2, 3],
             'a' => 'b',
+            'scalars' => [
+                '@bool-true' => true,
+                '@bool-false' => false,
+                '@int' => 3,
+                '@float' => 3.4,
+                '@sring' => 'a',
+            ],
         ];
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>'.
@@ -106,6 +113,7 @@ class XmlEncoderTest extends TestCase
             '<Bar>2</Bar>'.
             '<Bar>3</Bar>'.
             '<a>b</a>'.
+            '<scalars bool-true="1" bool-false="0" int="3" float="3.4" sring="a"/>'.
             '</response>'."\n";
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }

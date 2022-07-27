@@ -5,10 +5,6 @@
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This code is partially based on the Rack-Cache library by Ryan Tomayko,
- * which is released under the MIT license.
- * (based on commit 02d2b48d75bcb63cf1c0c7149c077ad256542801)
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -136,6 +132,28 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->update($mainResponse);
 
         $this->assertTrue($mainResponse->isFresh());
+    }
+
+    public function testLastModifiedIsMergedWithEmbeddedResponse()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $embeddedDate = new \DateTime('-1 hour');
+
+        // This master response uses the "validation" model
+        $masterResponse = new Response();
+        $masterResponse->setLastModified(new \DateTime('-2 hour'));
+        $masterResponse->setEtag('foo');
+
+        // Embedded response uses "expiry" model
+        $embeddedResponse = new Response();
+        $embeddedResponse->setLastModified($embeddedDate);
+        $cacheStrategy->add($embeddedResponse);
+
+        $cacheStrategy->update($masterResponse);
+
+        $this->assertTrue($masterResponse->isValidateable());
+        $this->assertSame($embeddedDate->getTimestamp(), $masterResponse->getLastModified()->getTimestamp());
     }
 
     public function testMainResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()

@@ -1,0 +1,311 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-29T07:42:03Z
+
+Did you want to also provide a map for short names that could work both ways?
+Typically mapping :sweat: to `:sweat:`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-06-29T17:17:01Z
+
+@alamirault you review the PR a bit too soon :) It was a WIP (I pushed in order to backup my work).
+
+@nicolas-grekas
+> Typically mapping 😓 to `:sweat:` ?
+
+That's already the case, or I missed something ?
+
+```php
+    public function testTransliterate()
+    {
+        $tr = EmojiTransliterator::getInstance('en');
+
+        $this->assertSame(
+            'a grinning cat, black cat, and a lion go to national park️... smiling face with heart-eyes party popper yellow heart',
+            $tr->transliterate('a 😺, 🐈‍⬛, and a 🦁 go to 🏞️... 😍 🎉 💛')
+        );
+    }
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-06-30T10:06:31Z
+
+@stof Thanks for the review, I've addressed your comments.
+
+I think the PR is now ready.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-06-30T14:40:02Z
+
+@nicolas-grekas Thanks for the review. I addressed your comments.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-06-30T17:50:41Z
+
+I pushed a new version
+
+* cleaned / refactored the Builder
+* added more tests
+* add a Makefile (will be useful late with github and slack)
+* changed the way we build the rule: use `>` instead of `<>` because we cannot reverse the text. The priority is important, and we cannot sort the list for `>` and for `<` at the same time. We can build the other list later if needed)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-07-01T09:31:19Z
+
+* Fabbot.io is KO, but the PR is OK (there is french content in this PR...)
+* appveyor is KO, but it failing on VarDumper, So it's OK
+
+Except theses 2, everything is green 💚
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-07-06T08:40:05Z
+
+ping @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-06T15:06:06Z
+
+I managed to turn the txt files into php, here is the result: https://github.com/lyrixx/symfony/pull/15
+Looks like we should do it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-06T15:10:01Z
+
+BTW, looking at the maps, I'm wondering: shouldn't eg `en` be applied also for `en_ca` (after it likely)? `en_ca` looks very short compared to `en`.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-07-06T15:38:14Z
+
+> BTW, looking at the maps, I'm wondering: shouldn't eg `en` be applied also for `en_ca` (after it likely)? `en_ca` looks very short compared to `en`.
+
+I missed that point!
+
+What do you recommend? we can merge en into en_ca?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-06T15:42:36Z
+
+> What do you recommend? we can merge en into en_ca?
+
+that might increase the size of maps, better run the str_replace twice when needed (with the php-based implem)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-07T13:26:46Z
+
+> we can merge en into en_ca
+
+I went this way actually, not much to merge. The PR on your fork is up to date.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-07-07T14:55:29Z
+
+@nicolas-grekas Feel free to merge this PR, and then you can open a new PR to improve the situation if it needs to
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-07T15:02:49Z
+
+@lyrixx Let's finish this PR before merging it. I don't see why we would merge something that we know is not finished yet.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-07T15:06:44Z
+
+Especially when this means bloating the git history :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-07-07T15:14:06Z
+
+So I think the best way It to merge the PR of @nicolas-grekas (in my PR) (I'll do that in few minutes)
+
+So we can discuss about it. But Unfortunately, I don't understand the new code, and I miss some time to dig into it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-07-07T16:51:23Z
+
+I talked a bit with @nicolas-grekas on slack, and we decided to share our thought on the subject here.
+
+Nikos rewrite all the code to be able to rely on Opcache preloading, in order to increase the performance.
+
+To be honest, I don't like this new implementation (that explains my previous^2 comment). So the rest of this comment might be subjective. But I let you judge :)
+
+The previous code was easier to understand, maintain and work with (see exception message for instance) 😄 :
+* old: https://github.com/lyrixx/symfony/blob/intl-trans-emoji-back/src/Symfony/Component/Intl/Transliterator/EmojiTransliterator.php
+* new: https://github.com/lyrixx/symfony/blob/intl-trans-emoji/src/Symfony/Component/Intl/Transliterator/EmojiTransliterator.php
+
+About the performance, I wrote this Unit Test in both branch
+
+```php
+    public function testBench()
+    {
+        $t = microtime(true);
+
+        for ($i=0; $i < 1000; $i++) {
+            $tr = EmojiTransliterator::create('en'); // I also tried with this line outside the loop. Same result ($tr is cached internally)
+            $tr->transliterate('un 😺, 🐈‍⬛, et a 🦁 vont au 🏞️');
+        }
+
+        dump((microtime(true) - $t));
+    }
+```
+
+Here are the results:
+
+Previous code: 0.0145s
+New code: 0.088s
+
+It looks like the previous code is 6 times faster than the new code when using only one transliterator instance. It's legit to me, since the new code does not use the translitator anymore but strtr.
+
+But what about many transliterator? To know that, I used the following command that run for all locales
+
+```
+./phpunit src/Symfony/Component/Intl/Tests/Transliterator/EmojiTransliteratorTest.php --filter testAllTransliterator --repeat 100
+```
+
+old code 00:01.746
+new code: 00:02.592
+
+So here the old code is also faster
+
+---
+
+<details>
+<summary>php -v</summary>
+
+```
+PHP 8.1.7 (cli) (built: Jun 25 2022 08:13:46) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.1.7, Copyright (c) Zend Technologies
+    with Zend OPcache v8.1.7, Copyright (c), by Zend Technologies
+    with blackfire v1.77.0~linux-x64-non_zts81, https://blackfire.io, by Blackfire
+```
+</details>
+
+<details>
+<summary>php -i | grep opca</summary>
+
+```
+/etc/php/8.1/cli/conf.d/10-opcache.ini,
+opcache.blacklist_filename => no value => no value
+opcache.consistency_checks => 0 => 0
+opcache.dups_fix => Off => Off
+opcache.enable => On => On
+opcache.enable_cli => On => On
+opcache.enable_file_override => Off => Off
+opcache.error_log => no value => no value
+opcache.file_cache => no value => no value
+opcache.file_cache_consistency_checks => On => On
+opcache.file_cache_only => Off => Off
+opcache.file_update_protection => 2 => 2
+opcache.force_restart_timeout => 180 => 180
+opcache.huge_code_pages => Off => Off
+opcache.interned_strings_buffer => 8 => 8
+opcache.jit => tracing => tracing
+opcache.jit_bisect_limit => 0 => 0
+opcache.jit_blacklist_root_trace => 16 => 16
+opcache.jit_blacklist_side_trace => 8 => 8
+opcache.jit_buffer_size => 0 => 0
+opcache.jit_debug => 0 => 0
+opcache.jit_hot_func => 127 => 127
+opcache.jit_hot_loop => 64 => 64
+opcache.jit_hot_return => 8 => 8
+opcache.jit_hot_side_exit => 8 => 8
+opcache.jit_max_exit_counters => 8192 => 8192
+opcache.jit_max_loop_unrolls => 8 => 8
+opcache.jit_max_polymorphic_calls => 2 => 2
+opcache.jit_max_recursive_calls => 2 => 2
+opcache.jit_max_recursive_returns => 2 => 2
+opcache.jit_max_root_traces => 1024 => 1024
+opcache.jit_max_side_traces => 128 => 128
+opcache.jit_prof_threshold => 0.005 => 0.005
+opcache.lockfile_path => /tmp => /tmp
+opcache.log_verbosity_level => 1 => 1
+opcache.max_accelerated_files => 15000 => 15000
+opcache.max_file_size => 0 => 0
+opcache.max_wasted_percentage => 5 => 5
+opcache.memory_consumption => 128 => 128
+opcache.opt_debug_level => 0 => 0
+opcache.optimization_level => 0x7FFEBFFF => 0x7FFEBFFF
+opcache.preferred_memory_model => no value => no value
+opcache.preload => no value => no value
+opcache.preload_user => no value => no value
+opcache.protect_memory => Off => Off
+opcache.record_warnings => Off => Off
+opcache.restrict_api => no value => no value
+opcache.revalidate_freq => 2 => 2
+opcache.revalidate_path => Off => Off
+opcache.save_comments => On => On
+opcache.use_cwd => On => On
+opcache.validate_permission => Off => Off
+opcache.validate_root => Off => Off
+opcache.validate_timestamps => On => On
+```
+</details>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-09T09:14:55Z
+
+Thanks for challenging my proposal @lyrixx
+I figured out that using `strtr()` was way faster than using `str_replace()` for the use case.
+I also figured out that we can skip creating a slicing transliterator most of the time.
+The PHP version is now faster again :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-09T09:28:25Z
+
+My bench: `ab -n 100 http://localhost:8080/` with the script below.
+
+Results with 100 transliterations:
+- before: 75 req/s
+- after: 390 req/s
+
+Results with 1000 transliterations:
+- before: 40 req/s
+- after: 70 req/s
+
+```php
+<?php
+
+use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
+
+require __DIR__.'/vendor/autoload.php';
+
+$tr = EmojiTransliterator::create('en');
+//$tr = EmojiTransliterator::getInstance('en');
+
+for ($i=0; $i < 100; $i++) {
+    $tr->transliterate('un 😺, 🐈<200d>⬛, et a 🦁 vont au 🏞️ ');
+}
+
+echo $tr->transliterate('un 😺, 🐈<200d>⬛, et a 🦁 vont au 🏞️ ');
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-07-11T17:09:31Z
+
+how would we link AsciiSlugger + EmojiTransliterator? is it desired?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-12T16:20:49Z
+
+> how would we link AsciiSlugger + EmojiTransliterator? is it desired?
+
+In a follow up PR, and yes, I think it's desired.

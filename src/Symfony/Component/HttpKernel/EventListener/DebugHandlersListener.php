@@ -54,7 +54,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      */
     public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true)
     {
-        $handler = set_exception_handler('var_dump');
+        $handler = set_exception_handler('is_int');
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 
@@ -80,7 +80,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
         $this->firstCall = $this->hasTerminatedWithException = false;
 
-        $handler = set_exception_handler('var_dump');
+        $handler = set_exception_handler('is_int');
         $handler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 

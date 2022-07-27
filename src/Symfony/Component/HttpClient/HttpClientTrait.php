@@ -106,7 +106,7 @@ trait HttpClientTrait
         }
 
         // Validate on_progress
-        if (!\is_callable($onProgress = $options['on_progress'] ?? 'var_dump')) {
+        if (isset($options['on_progress']) && !\is_callable($onProgress = $options['on_progress'])) {
             throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, "%s" given.', \is_object($onProgress) ? \get_class($onProgress) : \gettype($onProgress)));
         }
 

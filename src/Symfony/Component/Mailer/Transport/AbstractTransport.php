@@ -15,7 +15,9 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Event\FailedMessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
@@ -58,18 +60,35 @@ abstract class AbstractTransport implements TransportInterface
         $message = clone $message;
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
 
-        if (null !== $this->dispatcher) {
+        try {
+            if (!$this->dispatcher) {
+                $sentMessage = new SentMessage($message, $envelope);
+                $this->doSend($sentMessage);
+
+                return $sentMessage;
+            }
+
             $event = new MessageEvent($message, $envelope, (string) $this);
             $this->dispatcher->dispatch($event);
             $envelope = $event->getEnvelope();
+
+            $sentMessage = new SentMessage($message, $envelope);
+
+            try {
+                $this->doSend($sentMessage);
+            } catch (\Throwable $error) {
+                $this->dispatcher->dispatch(new FailedMessageEvent($message, $error));
+                $this->checkThrottling();
+
+                throw $error;
+            }
+
+            $this->dispatcher->dispatch(new SentMessageEvent($sentMessage));
+
+            return $sentMessage;
+        } finally {
+            $this->checkThrottling();
         }
-
-        $message = new SentMessage($message, $envelope);
-        $this->doSend($message);
-
-        $this->checkThrottling();
-
-        return $message;
     }
 
     abstract protected function doSend(SentMessage $message): void;

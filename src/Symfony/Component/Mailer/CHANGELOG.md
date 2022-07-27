@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add a `mailer:test` command
+ * Add `SentMessageEvent` and `FailedMessageEvent` events
 
 6.1
 ---

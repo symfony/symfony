@@ -45,14 +45,12 @@ final class BodyRenderer implements BodyRendererInterface
             return;
         }
 
-        $messageContext = $message->getContext();
-
-        $previousRenderingKey = $messageContext[__CLASS__] ?? null;
-        unset($messageContext[__CLASS__]);
-        $currentRenderingKey = $this->getFingerPrint($message);
-        if ($previousRenderingKey === $currentRenderingKey) {
+        if (null === $message->getTextTemplate() && null === $message->getHtmlTemplate()) {
+            // email has already been rendered
             return;
         }
+
+        $messageContext = $message->getContext();
 
         if (isset($messageContext['email'])) {
             throw new InvalidArgumentException(sprintf('A "%s" context cannot have an "email" entry as this is a reserved variable.', get_debug_type($message)));
@@ -64,34 +62,20 @@ final class BodyRenderer implements BodyRendererInterface
 
         if ($template = $message->getTextTemplate()) {
             $message->text($this->twig->render($template, $vars));
+            $message->textTemplate(null);
         }
 
         if ($template = $message->getHtmlTemplate()) {
             $message->html($this->twig->render($template, $vars));
+            $message->htmlTemplate(null);
         }
+
+        $message->context([]);
 
         // if text body is empty, compute one from the HTML body
         if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
             $message->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
         }
-        $message->context($message->getContext() + [__CLASS__ => $currentRenderingKey]);
-    }
-
-    private function getFingerPrint(TemplatedEmail $message): string
-    {
-        $messageContext = $message->getContext();
-        unset($messageContext[__CLASS__]);
-
-        $payload = [$messageContext, $message->getTextTemplate(), $message->getHtmlTemplate()];
-        try {
-            $serialized = serialize($payload);
-        } catch (\Exception) {
-            // Serialization of 'Closure' is not allowed
-            // Happens when context contain a closure, in that case, we assume that context always change.
-            $serialized = random_bytes(8);
-        }
-
-        return md5($serialized);
     }
 
     private function convertHtmlToText(string $html): string

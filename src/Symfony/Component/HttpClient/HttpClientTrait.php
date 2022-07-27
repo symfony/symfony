@@ -195,9 +195,11 @@ trait HttpClientTrait
 
         $options += $defaultOptions;
 
-        foreach (self::$emptyDefaults ?? [] as $k => $v) {
-            if (!isset($options[$k])) {
-                $options[$k] = $v;
+        if (isset(self::$emptyDefaults)) {
+            foreach (self::$emptyDefaults as $k => $v) {
+                if (!isset($options[$k])) {
+                    $options[$k] = $v;
+                }
             }
         }
 

@@ -545,6 +545,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return $data;
                 }
 
+                if (Type::BUILTIN_TYPE_BOOL === $builtinType && str_contains($format, JsonEncoder::FORMAT)) {
+                    if ('false' === strtolower($data) || '0' === $data) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+
                 if (('is_'.$builtinType)($data)) {
                     return $data;
                 }

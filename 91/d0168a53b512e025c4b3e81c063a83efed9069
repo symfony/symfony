@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by aschempp at 2021-08-04T09:08:08Z
+
+The failing tests don't seem related to me.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-04T20:19:03Z
+
+_from the original issue:_
+> I see @xabbuh has added the feature flag, but I wonder if this isn't actually a bug?
+
+@xabbuh and @symfony/mergers , should we handle this as bug or feature?
+
+@mpdude as you created the issue, can you please give us a review here? Thanks
+
+---------------------------------------------------------------------------
+
+by aschempp at 2021-08-05T06:14:33Z
+
+I also stumbled over these lines:
+
+https://github.com/symfony/symfony/blob/71db7e7616b6723745ea4ac58f67072a0b52b773/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategy.php#L177-L184
+
+I can't remember why we added the check for `Last-Modified` and `Etag`, the RFC clearly states that 200, 203, 300, 301, 410 can be cached. A `Last-Modified` header would trigger revalidation as far as I can tell, but it can still be stored in the cache. Does anyone have more knowledge on this?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2021-08-05T08:01:36Z
+
+I tried to find an answer to my own question. @Toflar pointed out that `ResponseCacheStrategy` is based on RFC2616 (at least some comments say so) but RFC2616 has been superseded by RFC7234. I would suggest to update the implementation with RFC7234 but as a feature PR instead. RFC7234 is [more clear](https://datatracker.ietf.org/doc/html/rfc7234#section-3) on what can actually be considered cacheable.
+
+---------------------------------------------------------------------------
+
+by aleho at 2021-08-05T17:08:28Z
+
+Sorry if I'm not getting this entirely, but the idea of this PR is to allow e.g. a request including ESI to pass the `Last-Modified` header so that the client can actually try to check with `If-Modified-Since` (which is lost as soon as a page includes and ESI), right?
+
+Wouldn't this change break if there's an actual 304 being returned by the app?
+
+`AbstractSurrogate::handle()` does an `if (!$response->isSuccessful()) { …`, but 304 is not a valid response, so each request hitting the cache will break because of this change.
+
+I tested this locally and could reproduce that behavior.
+
+This could be easily fixed with `if (!$response->isSuccessful() && $response->getStatusCode() !== Response::HTTP_NOT_MODIFIED) {` but I'm really not sure whether I'm totally missing the point here.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2021-08-09T14:11:16Z
+
+Interesting that you could reproduce this locally, I didn't check on that at all. What I figured out is:
+
+1. the `HttpCache` already stores `Last-Modified` (and all other headers) in the cache.
+2. It does send `If-Modified-Since` to the backend if that header is present
+    https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php#L383-L386
+3. if the response is 304, it should re-use the existing cache entry
+    https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php#L397-L399
+
+The point of the PR (or what @mpdude) meant in the original issue was to forward the most-recent `Last-Modified` header from multiple fragments to the final response. If that would be the case, then HttpCache would receive an `If-Modified-Since` header **from the browser** and would then in turn send a 304 if the final response generated **after merging ESI** still validates https://github.com/symfony/symfony/blob/e34cd7dd2c6d0b30d24cad443b8f964daa841d71/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php#L241
+
+---------------------------------------------------------------------------
+
+by aleho at 2021-08-09T15:13:09Z
+
+@aschempp My steps to reproduce this are not that trivial to explain, I hope I can though. ;)
+
+Request:
+1. Browser (`If-Not-Modified-Since` as stored)
+2. HttpCache (`If-Not-Midified-Since` also as stored in local cache)
+3. App
+
+Response:
+1. App does the usual `Response::isNotModified()`, because the source data (e.g. `updated_at` field) didn't change it will return a 304.
+2. HttpCache does two requests, main request and subrequest (ESI) to a controller. App for both requests returns a `Last-Modified` and 304.
+    2a. HttpCache replaces the response code with 200, doesn't care about modified headers.
+    2b. HttpCache determines the `Last-Modified` header, response code is 304.
+
+2b. is where I get a 500 because the response is not considered successful.
+
+With this PR and low maxage I can observe one request being fine, one failing each time the cache is fresh enough.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2021-08-09T16:45:24Z
+
+I think I understand the problem, but rather because we're dealing with subrequests a lot in [Contao](https://contao.org) (we even have [our own fragment handler](https://github.com/contao/contao/blob/722d397e3429e3fc4a8d05263fe2f834aa8f2122/core-bundle/src/Fragment/ForwardFragmentRenderer.php)). The `isSuccessful()` check means it is currently not possible to return a 304 in an ESI fragment.
+
+However, that's not really part of this PR and should probably be a separate issue? The proposed changes would neither fix nor worsen that. But it would allow the main request (the `HttpCache`) to send a 304 to the browser if possible. Would you agree?
+
+---------------------------------------------------------------------------
+
+by aleho at 2021-08-09T18:48:47Z
+
+In my testing, depending on cache freshness, there were 500 status responses, caused by this throw:
+https://github.com/symfony/http-kernel/blob/c838cc1203534a030d035ff1380393bfd4c55e1c/HttpCache/AbstractSurrogate.php#L95-L102
+
+Upstream isn't doing anything wrong – it's allowed to send a 304 as far as I'm aware of – and the app should not be forced to change it's behavior, no matter whether a CacheKernel is being used or not (again, as far as I understand it).
+
+The changes in this PR would lead to a 500 response when there was none before. Even worse, serving a newly generated response works and subsequent responses won't, so it might be hard to debug that.
+
+In my opinion this is a BC break, because nowhere in the docs there's a warning "Don't ever response with a 304 in fragment sub-requests" and, even though the status code was always 200, it would work as of now.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2021-08-10T07:04:17Z
+
+But the code lines you mentioned are not added by this pull request? The current surrogate (ESI) implementation do not allow for a response code <> 2xx, therefore this problem should also appear without this pull request? Can you please try to reproduce this in your local setup without my changes?
+
+---------------------------------------------------------------------------
+
+by aleho at 2021-08-10T08:14:51Z
+
+Let me try to explain it differently (I hope I can, language barrier is restricting).
+
+# Setup
+
+Let's say there's a Symfony project that has been setting the last-modified header on sub-requests.
+Haven't found any statement at all that would forbid this. I know I've been doing it (and its the goal of this PR, isn't it, am I missing something?).
+
+Have a look at https://github.com/aleho/symfony-httpcache for a demo, it doesn't even set the upstream response to 304, just a last-modified header and 200, including content.
+
+# Problem
+Before your changes, no response would include a `Last-Modified` header. No client would request with `If-Modified-Since`. Problem never observed.
+
+After this PR there will be a `Last-Modified` header present, so each request by every browser will now set the since-header, resulting in a 500 (next request will work again because, afaik, browsers are supposed to clear the cache on a temporary 500).
+
+It's true that this PR doesn't cause the root problem and the issue currently can also be triggered by setting the request header.
+
+Nevertheless, this PR will definitely always trigger it, because clients implementing a cache are expected to request with `If-Modified-Since`.
+
+# Solution (just my suggestion)
+
+Don't merge this PR unless `AbstractSurrogate::handle()` has been fixed in another PR or fix that simple if-statment in this PR.
+
+---------------------------------------------------------------------------
+
+by aleho at 2021-11-10T17:14:56Z
+
+@aschempp Are there any updates on this?
+
+(Edit / PS: A made a PR fixing the 304 issue described above.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-06-27T09:06:45Z
+
+It is a considered a new feature as it introduces something that was explicitly not supported before. Can you rebase on 6.2 so that I can merge (the code looks good to me.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-20T16:56:53Z
+
+@aschempp Are you still interested in this PR?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2022-07-27T07:34:46Z
+
+PR updated 😊
+The failing checks seem unrelated to me

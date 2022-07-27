@@ -27,14 +27,24 @@ final class InputBag extends ParameterBag
      */
     public function get(string $key, mixed $default = null): string|int|float|bool|null
     {
+        // @deprecated since symfony 6.2, in 7.0 change to:
+        // if (null !== $default && !\is_scalar($default)) {
         if (null !== $default && !\is_scalar($default) && !$default instanceof \Stringable) {
             throw new \InvalidArgumentException(sprintf('Expected a scalar value as a 2nd argument to "%s()", "%s" given.', __METHOD__, get_debug_type($default)));
+        }
+
+        if ($default instanceof \Stringable) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Passing a "%s" object as 2nd argument ($default) to "%s()" is deprecated, pass a scalar or null instead.', get_debug_type($default), __METHOD__);
         }
 
         $value = parent::get($key, $this);
 
         if (null !== $value && $this !== $value && !\is_scalar($value) && !$value instanceof \Stringable) {
             throw new BadRequestException(sprintf('Input value "%s" contains a non-scalar value.', $key));
+        }
+
+        if ($value instanceof \Stringable) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Retrieving a "%s" object from "%s()" is deprecated, use scalars or null instead.', get_debug_type($value), __METHOD__);
         }
 
         return $this === $value ? $default : $value;
@@ -66,8 +76,14 @@ final class InputBag extends ParameterBag
      */
     public function set(string $key, mixed $value)
     {
+        // @deprecated since symfony 6.2, in 7.0 change to:
+        // if (null !== $value && !\is_scalar($value) && !\is_array($value)) {
         if (null !== $value && !\is_scalar($value) && !\is_array($value) && !$value instanceof \Stringable) {
             throw new \InvalidArgumentException(sprintf('Expected a scalar, or an array as a 2nd argument to "%s()", "%s" given.', __METHOD__, get_debug_type($value)));
+        }
+
+        if ($value instanceof \Stringable) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Passing a "%s" object as a 2nd argument ($value) to "%s()" is deprecated. Pass a scalar, an array or null instead.', get_debug_type($value), __METHOD__);
         }
 
         $this->parameters[$key] = $value;

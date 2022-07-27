@@ -12,26 +12,23 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\InputBag;
 
 class InputBagTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testGet()
     {
-        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class() implements \Stringable {
-            public function __toString(): string
-            {
-                return 'strval';
-            }
-        }]);
+        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false]);
 
         $this->assertSame('bar', $bag->get('foo'), '->get() gets the value of a string parameter');
         $this->assertSame('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
         $this->assertSame(1, $bag->get('int'), '->get() gets the value of an int parameter');
         $this->assertSame(1.0, $bag->get('float'), '->get() gets the value of a float parameter');
-        $this->assertSame('strval', $bag->get('stringable'), '->get() gets the string value of a \Stringable parameter');
         $this->assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
     }
 
@@ -105,5 +102,36 @@ class InputBagTest extends TestCase
 
         $bag = new InputBag(['foo' => ['bar', 'baz']]);
         $bag->filter('foo', \FILTER_VALIDATE_INT);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyGetStringableObject()
+    {
+        $bag = new InputBag(['stringable' => new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return 'strval';
+            }
+        }]);
+
+        $this->expectDeprecation('Since symfony/http-foundation 6.2: Retrieving a "Stringable@anonymous" object from "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, use scalars or null instead.');
+        $this->assertSame('strval', $bag->get('stringable'), '->get() gets the string value of a \Stringable parameter');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacySetStringableObject()
+    {
+        $bag = new InputBag();
+        $this->expectDeprecation('Since symfony/http-foundation 6.2: Passing a "Stringable@anonymous" object as a 2nd argument ($value) to "Symfony\Component\HttpFoundation\InputBag::set()" is deprecated. Pass a scalar, an array or null instead.');
+        $bag->set('stringable', new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return 'strval';
+            }
+        });
     }
 }

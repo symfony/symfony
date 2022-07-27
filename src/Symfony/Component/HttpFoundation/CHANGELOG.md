@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate passing `\Stringable` objects to `InputBag`, use scalars, arrays or null instead.
+
 6.1
 ---
 

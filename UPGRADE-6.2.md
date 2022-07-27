@@ -13,6 +13,7 @@ HttpFoundation
 --------------
 
  * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
+ * Deprecate passing `\Stringable` objects to `InputBag`, use scalars, arrays or null instead.
 
 Mailer
 --------

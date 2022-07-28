@@ -35,6 +35,11 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
+    public function getConnection(): Connection
+    {
+        return $this->connection;
+    }
+
     /**
      * {@inheritdoc}
      */

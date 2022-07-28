@@ -215,7 +215,12 @@
         },
         {
             "type": "path",
-            "url": "src/Symfony/Component/Runtime"
+            "url": "src/Symfony/Component/Runtime",
+            "options": {
+                "versions": {
+                    "symfony/runtime": "6.2.x-dev"
+                }
+            }
         }
     ],
     "minimum-stability": "dev"

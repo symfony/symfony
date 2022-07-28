@@ -11,10 +11,29 @@
 
 namespace Symfony\Component\Intl\Transliterator;
 
-final class EmojiTransliterator extends \Transliterator
-{
-    private const QUICK_CHECK = "\xE2\xE3\xF0";
+if (\PHP_VERSION_ID >= 80200) {
+    final class EmojiTransliterator extends \Transliterator
+    {
+        use EmojiTransliteratorTrait;
 
+        private const QUICK_CHECK = "\xE2\xE3\xF0";
+
+        public readonly string $id;
+    }
+} else {
+    final class EmojiTransliterator extends \Transliterator
+    {
+        use EmojiTransliteratorTrait;
+
+        private const QUICK_CHECK = "\xE2\xE3\xF0";
+    }
+}
+
+/**
+ * @internal
+ */
+trait EmojiTransliteratorTrait
+{
     private array $map;
     private \Transliterator $transliterator;
 
@@ -37,7 +56,14 @@ final class EmojiTransliterator extends \Transliterator
         static $maps;
 
         // Create an instance of \Transliterator with a custom id; that's the only way
-        $instance = unserialize(sprintf('O:%d:"%s":1:{s:2:"id";s:%d:"%s";}', \strlen(self::class), self::class, \strlen($id), $id));
+        if (\PHP_VERSION_ID >= 80200) {
+            static $newInstance;
+            $instance = ($newInstance ??= (new \ReflectionClass(self::class))->newInstanceWithoutConstructor(...))();
+            $instance->id = $id;
+        } else {
+            $instance = unserialize(sprintf('O:%d:"%s":1:{s:2:"id";s:%d:"%s";}', \strlen(self::class), self::class, \strlen($id), $id));
+        }
+
         $instance->map = $maps[$id] ??= require \dirname(__DIR__)."/Resources/data/transliterator/emoji/{$id}.php";
 
         return $instance;
@@ -93,10 +119,6 @@ final class EmojiTransliterator extends \Transliterator
 
         if (false === $result = $this->transliterator->transliterate($string, $start, $end)) {
             return false;
-        }
-
-        if ($cookie === $result) {
-            return \strlen($string) === strcspn($string, self::QUICK_CHECK) ? $string : strtr($string, $this->map);
         }
 
         $parts = explode($cookie, $result);

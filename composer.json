@@ -57,6 +57,7 @@
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/cache": "self.version",
+        "symfony/clock": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add method `convertString` to `ParameterBag`
+ * Rename method `getInt` to `convertInt` in `ParameterBag`
+
 6.1
 ---
 

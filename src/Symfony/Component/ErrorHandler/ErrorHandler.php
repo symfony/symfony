@@ -381,7 +381,7 @@ class ErrorHandler
     private function reRegister(int $prev): void
     {
         if ($prev !== $this->thrownErrors | $this->loggedErrors) {
-            $handler = set_error_handler('var_dump');
+            $handler = set_error_handler('is_int');
             $handler = \is_array($handler) ? $handler[0] : null;
             restore_error_handler();
             if ($handler === $this) {
@@ -528,7 +528,7 @@ class ErrorHandler
             $log = 0;
         } else {
             if (\PHP_VERSION_ID < (\PHP_VERSION_ID < 70400 ? 70316 : 70404)) {
-                $currentErrorHandler = set_error_handler('var_dump');
+                $currentErrorHandler = set_error_handler('is_int');
                 restore_error_handler();
             }
 
@@ -645,7 +645,7 @@ class ErrorHandler
         $sameHandlerLimit = 10;
 
         while (!\is_array($handler) || !$handler[0] instanceof self) {
-            $handler = set_exception_handler('var_dump');
+            $handler = set_exception_handler('is_int');
             restore_exception_handler();
 
             if (!$handler) {

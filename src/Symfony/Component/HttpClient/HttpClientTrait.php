@@ -121,7 +121,7 @@ trait HttpClientTrait
         }
 
         // Validate on_progress
-        if (!\is_callable($onProgress = $options['on_progress'] ?? 'var_dump')) {
+        if (isset($options['on_progress']) && !\is_callable($onProgress = $options['on_progress'])) {
             throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, "%s" given.', get_debug_type($onProgress)));
         }
 
@@ -210,9 +210,11 @@ trait HttpClientTrait
 
         $options += $defaultOptions;
 
-        foreach (self::$emptyDefaults ?? [] as $k => $v) {
-            if (!isset($options[$k])) {
-                $options[$k] = $v;
+        if (isset(self::$emptyDefaults)) {
+            foreach (self::$emptyDefaults as $k => $v) {
+                if (!isset($options[$k])) {
+                    $options[$k] = $v;
+                }
             }
         }
 

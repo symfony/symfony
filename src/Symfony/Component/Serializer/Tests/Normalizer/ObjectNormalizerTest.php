@@ -707,7 +707,7 @@ class ObjectNormalizerTest extends TestCase
 
         $obj = $serializer->denormalize([
             'inner' => ['foo' => 'foo', 'bar' => 'bar'],
-            'date' => '1988/01/21',
+            'date' => '1988-01-21T00:00:00+00:00',
             'inners' => [['foo' => 1], ['foo' => 2]],
         ], ObjectOuter::class);
 

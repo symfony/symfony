@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -21,6 +22,8 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
  */
 class DateTimeNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @var DateTimeNormalizer
      */
@@ -177,7 +180,13 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class));
         $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeImmutable::class));
         $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTime::class));
-        $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('  2016-01-01T00:00:00+00:00  ', \DateTime::class));
+    }
+
+    public function testDenormalizeWithoutFormat()
+    {
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => null]);
+
+        $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $normalizer->denormalize('  2016-01-01T00:00:00+00:00  ', \DateTime::class));
     }
 
     public function testDenormalizeUsingTimezonePassedInConstructor()
@@ -203,7 +212,9 @@ class DateTimeNormalizerTest extends TestCase
      */
     public function testDenormalizeUsingTimezonePassedInContext($input, $expected, $timezone, $format = null)
     {
-        $actual = $this->normalizer->denormalize($input, \DateTimeInterface::class, null, [
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'Y/m/d H:i:s']);
+
+        $actual = $normalizer->denormalize($input, \DateTimeInterface::class, null, [
             DateTimeNormalizer::TIMEZONE_KEY => $timezone,
             DateTimeNormalizer::FORMAT_KEY => $format,
         ]);
@@ -236,11 +247,24 @@ class DateTimeNormalizerTest extends TestCase
             \DateTime::RFC3339,
         ];
     }
-
+    /**
+     * Deprecation will be removed as of 7.0, but this test case is still legit
+     * TODO: remove the @group legacy and expectDeprecation in Symfony 7.0
+     *
+     * @group legacy
+     */
     public function testDenormalizeInvalidDataThrowsException()
     {
+        $this->expectDeprecation('Since symfony/serializer 6.2: Relying on a datetime constructor as a fallback when using a specific default date format (`datetime_format`) for the DateTimeNormalizer is deprecated. Respect the "Y-m-d\TH:i:sP" default format.');
+
         $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('invalid date', \DateTimeInterface::class);
+    }
+
+    public function testDenormalizeWithFormatAndInvalidDataThrowsException()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->normalizer->denormalize('invalid date', \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d']);
     }
 
     public function testDenormalizeNullThrowsException()
@@ -282,8 +306,13 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertSame('01/10/2018', $denormalizedDate->format($format));
     }
 
+    /**
+     * @group legacy
+     */
     public function testDenormalizeDateTimeStringWithDefaultContextAllowsErrorFormat()
     {
+        $this->expectDeprecation('Since symfony/serializer 6.2: Relying on a datetime constructor as a fallback when using a specific default date format (`datetime_format`) for the DateTimeNormalizer is deprecated. Respect the "d/m/Y" default format.');
+
         $format = 'd/m/Y'; // the default format
         $string = '2020-01-01'; // the value which is in the wrong format, but is accepted because of `new \DateTime` in DateTimeNormalizer::denormalize
 

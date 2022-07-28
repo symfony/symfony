@@ -22,6 +22,7 @@ CHANGELOG
    * `JsonSerializableNormalizer`
    * `ObjectNormalizer`
    * `PropertyNormalizer`
+ * Deprecate datetime constructor as a fallback whenever the `DateTimeNormalizer` default format mismatches
 
 6.2
 ---

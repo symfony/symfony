@@ -120,6 +120,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
             if (false !== $object) {
                 return $object;
             }
+
+            trigger_deprecation('symfony/serializer', '6.2', 'Relying on a datetime constructor as a fallback when using a specific default date format (`datetime_format`) for the DateTimeNormalizer is deprecated. Respect the "%s" default format.', $defaultDateTimeFormat);
         }
 
         try {

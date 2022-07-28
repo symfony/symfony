@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-05T17:54:53Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by hultberg at 2021-10-05T18:16:14Z
+
+I targeted the wrong branch so the milestone is now wrong.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-10-05T18:54:58Z
+
+> There are no error handling when creating the date time from default context as the logic just continues on which might give the impression to the developer that the denormalization with the specific format worked correctly. I was not able to find a way to handle any error and keeping BC.
+
+We could preserve $defaultDateTimeErrors, and hint about it when the constructor fallback fails too.
+
+> At some point the new DateTime call in denormalize should be deprecated since creating a date time with createFromFormat is considered "safer" in my eyes as it's very explicit while the call to new DateTime is implicit about the date format
+
+We could argue the formatted value in a raw payload is already validated, before being passed to a deserializer :)
+
+That said, i think the datetime-constructor-as-fallback is a generally fine approach, for what is an implementation detail. If you get a DateTime, your value is denormalized.
+
+edit: it also enables robustness-principle by default :)
+
+---------------------------------------------------------------------------
+
+by hultberg at 2021-10-05T19:23:53Z
+
+@ro0NL
+> We could argue the formatted value in a raw payload is already validated, before being passed to a deserializer :)
+
+Can you elaborate on that the _raw payload is already validated_? Are there a "normal apporch" to use a validator with the raw payload? In my real world example I deserialize some JSON payload into a object then I validate it with symfony validator. I have had to override DateTimeNormalizer to catch any errors which are later cough by a custom date validator I made.
+
+> We could preserve $defaultDateTimeErrors, and hint about it when the constructor fallback fails too.
+
+That seems like a good solution to at the least provide some hints about the default context format failing.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-10-05T19:55:22Z
+
+> Are there a "normal apporch" to use a validator with the raw payload?
+
+Im still on a mission to shift the paradigm :) https://github.com/symfony/symfony/pull/43047#issuecomment-922485772
+
+"validation before hydration" benefits object design IMHO.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-23T15:19:34Z
+
+@hultberg Are you still interested in finishing this PR? It looks like we are almost there.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-07-28T08:39:34Z
+
+Well, this targets 4.4 as a bug fix, so we cannot add the deprecation I suggested. So this should be ready to merge as is.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-07-28T10:04:39Z
+
+I added the deprecation and opened the discussion in #47095

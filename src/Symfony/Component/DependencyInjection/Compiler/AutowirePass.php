@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 /**
  * Inspects existing service definitions and wires the autowired ones using the type hints of their classes.
@@ -104,6 +105,19 @@ class AutowirePass extends AbstractRecursivePass
     private function doProcessValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof TypedReference) {
+            if ($attributes = $value->getAttributes()) {
+                $attribute = array_pop($attributes);
+
+                if ($attributes) {
+                    throw new AutowiringFailedException($this->currentId, sprintf('Using multiple attributes with "%s" is not supported.', SubscribedService::class));
+                }
+
+                if (!$attribute instanceof Target) {
+                    return $this->processAttribute($attribute, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior());
+                }
+
+                $value = new TypedReference($value->getType(), $value->getType(), $value->getInvalidBehavior(), $attribute->name);
+            }
             if ($ref = $this->getAutowiredReference($value, true)) {
                 return $ref;
             }
@@ -156,6 +170,29 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return $value;
+    }
+
+    private function processAttribute(object $attribute, bool $isOptional = false): mixed
+    {
+        switch (true) {
+            case $attribute instanceof Autowire:
+                $value = $this->container->getParameterBag()->resolveValue($attribute->value);
+
+                return $value instanceof Reference && $isOptional ? new Reference($value, ContainerInterface::NULL_ON_INVALID_REFERENCE) : $value;
+
+            case $attribute instanceof TaggedIterator:
+                return new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, false, $attribute->defaultPriorityMethod, (array) $attribute->exclude);
+
+            case $attribute instanceof TaggedLocator:
+                return new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, true, $attribute->defaultPriorityMethod, (array) $attribute->exclude));
+
+            case $attribute instanceof MapDecorated:
+                $definition = $this->container->getDefinition($this->currentId);
+
+                return new Reference($definition->innerServiceId ?? $this->currentId.'.inner', $definition->decorationOnInvalid ?? ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        }
+
+        throw new AutowiringFailedException($this->currentId, sprintf('"%s" is an unsupported attribute.', $attribute::class));
     }
 
     private function autowireCalls(\ReflectionClass $reflectionClass, bool $isRoot, bool $checkAttributes): array
@@ -249,34 +286,8 @@ class AutowirePass extends AbstractRecursivePass
 
             if ($checkAttributes) {
                 foreach ($parameter->getAttributes() as $attribute) {
-                    if (TaggedIterator::class === $attribute->getName()) {
-                        $attribute = $attribute->newInstance();
-                        $arguments[$index] = new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, false, $attribute->defaultPriorityMethod, (array) $attribute->exclude);
-                        break;
-                    }
-
-                    if (TaggedLocator::class === $attribute->getName()) {
-                        $attribute = $attribute->newInstance();
-                        $arguments[$index] = new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, true, $attribute->defaultPriorityMethod, (array) $attribute->exclude));
-                        break;
-                    }
-
-                    if (Autowire::class === $attribute->getName()) {
-                        $value = $attribute->newInstance()->value;
-                        $value = $this->container->getParameterBag()->resolveValue($value);
-
-                        if ($value instanceof Reference && $parameter->allowsNull()) {
-                            $value = new Reference($value, ContainerInterface::NULL_ON_INVALID_REFERENCE);
-                        }
-
-                        $arguments[$index] = $value;
-
-                        break;
-                    }
-
-                    if (MapDecorated::class === $attribute->getName()) {
-                        $definition = $this->container->getDefinition($this->currentId);
-                        $arguments[$index] = new Reference($definition->innerServiceId ?? $this->currentId.'.inner', $definition->decorationOnInvalid ?? ContainerInterface::NULL_ON_INVALID_REFERENCE);
+                    if (\in_array($attribute->getName(), [TaggedIterator::class, TaggedLocator::class, Autowire::class, MapDecorated::class], true)) {
+                        $arguments[$index] = $this->processAttribute($attribute->newInstance(), $parameter->allowsNull());
 
                         break;
                     }
@@ -315,7 +326,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $getValue = function () use ($type, $parameter, $class, $method) {
-                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, Target::parseName($parameter)), true)) {
+                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, Target::parseName($parameter)), false)) {
                     $failureMessage = $this->createTypeNotFoundMessageCallback($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
                     if ($parameter->isDefaultValueAvailable()) {

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by warslett at 2022-07-21T08:55:49Z
+
+okay I found the test: RedisAdapterSentinelTest will update
+
+---------------------------------------------------------------------------
+
+by warslett at 2022-07-22T11:49:10Z
+
+I've added multiple sentinel hosts to integration-tests.yml which makes it configure more like a real sentinel setup and I believe would have caught this bug (even though each provided host is actually the same address). I've also fixed the failing test due to the change in exception message.

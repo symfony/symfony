@@ -1,0 +1,377 @@
+---------------------------------------------------------------------------
+
+by drupol at 2022-06-20T07:16:38Z
+
+> With that in mind I'd think about - for the sake of interface segregation - removing the `now` function completely from the `TimeInterface`. The different implementations can then still implement the different interfaces in one class. And should more than one interface be required in a method we can by now require an implementation via a UnionType.
+
+Hi Andreas,
+
+Why would we want to remove the `now` method? The whole point of this component is actually to have such method.
+Could you please develop?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T07:52:35Z
+
+> I doubt that PSR-20 is going to be ready by the release of Symfony 6.2.
+
+:shrug: hurry up PHP-FIG :)
+
+> for the sake of interface segregation - removing the now function completely from the TimeInterface (and perhaps also moving the sleep function into a separate interface - we've discussed that during the PSR-20 discussions IIRC).
+
+I'd better not as I explained in https://github.com/symfony/symfony/pull/46715#discussion_r901352375
+If we end up being incompatible with PSR-20, we'll deal with it with a deprecation layer.
+But looking at the state of PSR-20, it looks unlikely that we'll have to do that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T07:52:56Z
+
+Thanks for the review btw @heiglandreas !
+
+---------------------------------------------------------------------------
+
+by heiglandreas at 2022-06-20T07:56:40Z
+
+> > With that in mind I'd think about - for the sake of interface segregation - removing the `now` function completely from the `TimeInterface`. The different implementations can then still implement the different interfaces in one class. And should more than one interface be required in a method we can by now require an implementation via a UnionType.
+>
+> Hi Andreas,
+>
+> Why would we want to remove the `now` method? The whole point of this component is actually to have such method. Could you please develop?
+
+The `now`-method would be already defined in a `ClockInterface` - like `psr/clock` or `stella-maris/clock`, so defining it here again in a `TimeInterface` is not really necessary. The actual *Implementation* then would implement `TimeInterface, ClockInterface, SleepInterface`.
+
+So the component would either require an external `ClockInterface` or declare a spearate `ClockInterface` in parallel to the current `TimeInterface` and a currently not existing `SleepInterface`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T10:21:14Z
+
+> The now-method would be already defined in a ClockInterface - like psr/clock or stella-maris/clock, so defining it here again in a TimeInterface is not really necessary. The actual Implementation then would implement TimeInterface, ClockInterface, SleepInterface.
+
+I want the component to be standalone and complete on its own. When PSR-20 will be ready, we might extend it, but I wouldn't make a stable PSR-20 a requirement to this component.
+
+> So the component would either require an external ClockInterface or declare a spearate ClockInterface in parallel to the current TimeInterface and a currently not existing SleepInterface.
+
+Replying in the main thread to help readers follow the discussion: see https://github.com/symfony/symfony/pull/46715#discussion_r901498040 about this topic.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-06-20T15:11:11Z
+
+Thanks for this proposal!
+
+In the description we see this:
+
+```
+timeInt(): float returns the current timestamp;
+```
+
+I guess it's a typo that `timeInt()` returns a `float` instead of `int`.
+
+- - - - -
+
+If the naming of the class/methods is up for debate, here's a proposal for your consideration:
+
+```php
+// Before
+interface TimeInterface
+{
+    public function now(): \DateTimeImmutable;
+    public function sleep(float|int $seconds): void;
+    public function timeInt(): int;
+    public function timeFloat(): float;
+    public function timeArray(): array;
+}
+
+// After
+interface ClockInterface
+{
+    public function now(): \DateTimeImmutable;
+    public function sleep(float|int $seconds): void;
+    public function timestamp(): float;
+}
+```
+
+I'd remove `timeInt()`, `timeFloat()` and `timeArray()` ... but you said that they are important for performance reasons. So, why not merging all of them into a single method called `timestamp()` which returns a timestamp with microseconds precision. It'd be equivalent to `timeFloat()` ... and the `timeInt()` value can be obtained as `(int) $clock->timestamp()`. About the `timeArray()` method, I don't understand well its need.
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T15:49:38Z
+
+> I guess it's a typo that timeInt() returns a float instead of int.
+
+Good catch, PR description updated.
+
+> // After
+> interface ClockInterface
+
+We'd rather use another name than the one planned for PSR-20. This will reduce confusion.
+
+> I'd remove timeInt(), timeFloat() and timeArray()
+
+We cannot remove `timeArray()` because that would mean making it impossible to have decently accurate timestamps on 32-bit.
+
+We could remove `timeInt()`. But that would force writing an explicit cast for ppl that use strict types. Consider this:
+`date('Y-m-d', (int) $clock->time())`
+vs
+`date('Y-m-d', $clock->timeInt())`
+
+Note that on 32-bit archs, `(int) $clock->time())` is less accurate than `$clock->timeInt()`. Being accurate on 32-bit archs would require using `$clock->timeArray()[0]`. That might be a good reason to keep the `timeInt()` method.
+
+I realized that we could rename `timeFloat()` to just `time()`, so I just did. Makes sense ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-20T16:41:28Z
+
+First of all: Thank you for your proposal! I do believe that such a component is a great addition to Symfony. And even better if such a component would allow us to move `ClockMock` out of PhpUnitBridge eventually.
+
+Regarding the `HrClock`, I don't think that it is particularly useful in its current form. The numbers that we get from `hrtime()` are arbitrary and only useful when calculating elapsed time. However, you treat them as Unix timestamps which yields funny dates somewhere in the 70's or 80's depending on where you run your code.
+
+However, I believe that for certain tests it is useful to have a clock that I can set to a certain point in time without freezing it. My proposal is a `HrClock` that is initialized with a `DateTimeImmutable` instance, the same way `MockClock` is. But whenever that clock is queried for a current time, we use `hrtime()` to calculate an offset that is added to that initial time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T17:09:11Z
+
+> My proposal is a HrClock that is with an initial DateTimeImmutable instance
+
+Would be nice, but there is no way to implement this: `hrtime()` cannot be seeded and simulating this with `microtime()` would reduce accuracy and break monotonicity.
+
+> Do you plan other implementations of sleep() for async frameworks?
+
+I don't but you know how this works (PR welcome ;) )
+
+> We will need multiple clock services (example: UTC for DB queries and Local TZ for display).
+
+I think so yes!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T17:12:40Z
+
+> But whenever that clock is queried for a current time, we use hrtime() to calculate an offset that is added to that initial time.
+
+Hum, OK, but then we might add a significant overhead. Could be worth a try, in a follow up PR ideally.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2022-06-20T17:33:46Z
+
+@nicolas-grekas I suppose you already have a few strong use cases for `HrClock`? Might be worth sharing them as I doubt many people make use of `hrtime()` and so some reasons as to why you went ahead with this and some decision you took their could be better understood with additional context.
+
+Regarding splitting the interfaces (`SleepInterface`, `ClockInterface`, `TimeInterface`), I think the question is more about the usages. As the cost is:
+
+- if they are too split, you'll often find yourself having to typehint not just one but several interfaces
+- if they are not split enough, implementing your own is more tedious
+
+I admit in practice I never needed more than `ClockInterface` and a system + freezable implementation so it's hard to tell if you really need `timeFloat()` & `timeArray()` when you're relying on `sleep()` for example.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-21T08:07:29Z
+
+> I suppose you already have a few strong use cases for HrClock? Might be worth sharing them as I doubt many people make use of hrtime() and so some reasons as to why you went ahead with this and some decision you took their could be better understood with additional context.
+
+I don't have a strong case. I know what `hrtime()` is for: profiling things. So that's the use case for `HrClock` also I guess. Not many ppl will use it I agree, but that's still a valid clock implementation, with its unique characteristics.
+
+> it's hard to tell if you really need timeFloat() & timeArray() when you're relying on sleep() for example.
+
+I checked the code base of Symfony: next to almost every call to `sleep()` there is a call to `microtime()`.
+
+---------------------------------------------------------------------------
+
+by matthiasnoback at 2022-06-21T10:58:58Z
+
+I think `sleep()` isn't a good name, because it sounds like PHP's `sleep()` function which would actually sleep/halt the execution, whereas if I understand correctly, using it on the clock means only moving the time forward. Also, I'd personally be looking for an actual "setter", not just move the time forward by a number of seconds, but going directly to a specific moment.
+
+Where you inject the clock interface, you wouldn't need access to setter functions like `sleep()` anyway. In fact, you'd be mistaken to use this function. Only a test would want to call this function, so to me it would make sense to not have this method on the interface. Maybe not even on any interface, only on the concrete mock clock. Throwing around principles doesn't always make sense, but in this case consider Liskov; not every clock implementation can provide an implementation for `sleep()` anyway.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-06-21T11:08:09Z
+
+> I think `sleep()` isn't a good name, because it sounds like PHP's `sleep()` function which would actually sleep/halt the execution
+
+If you call `sleep()` on the `NativeClock`, this is exactly what happens.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-21T14:37:42Z
+
+@matthiasnoback thanks for checking this PR. I think you might have misunderstood the purpose of the sleep() method in the interface. It is *really* aimed at implementations, to allow them to abstract out a way to pause the flow of some logic. Turning sleep into a setter could be useful only for tests, but this is not the only use case that this targets.
+
+---------------------------------------------------------------------------
+
+by heiglandreas at 2022-06-21T14:45:21Z
+
+> @matthiasnoback thanks for checking this PR. I think you might have misunderstood the purpose of the sleep() method in the interface. It is _really_ aimed at implementations, to allow them to abstract out a way to pause the flow of some logic. Turning sleep into a setter could be useful only for tests, but this is not the only use case that this targets.
+
+But when `sleep()` is about execution control, then why is that the responsibility of a clock? See [this previous discussion](https://github.com/symfony/symfony/pull/46715#discussion_r901285420)
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-21T14:48:57Z
+
+@heiglandreas the point of `sleep` is that this method will return once the clock has slept for the given time. For a native clock, that means using `sleep()`. For a mock clock, that can instead be implemented by increasing the fixed time of that clock and returning immediately (giving you fast tests). That's why it is a concern related to the clock implementation.
+
+---------------------------------------------------------------------------
+
+by heiglandreas at 2022-06-21T15:04:44Z
+
+> @heiglandreas the point of `sleep` is that this method will return once the clock has slept for the given time. For a native clock, that means using `sleep()`. For a mock clock, that can instead be implemented by increasing the fixed time of that clock and returning immediately (giving you fast tests). That's why it is a concern related to the clock implementation.
+
+A clock never sleeps! You may halt the execution of an *application* but that has nothing to do with a clock. Time passes no matter whether the application is halted or not. And the only responsibility of a clock is to return the current point in time (mocked or not).
+
+When you want to stop the application for a given amount of time and you need the new time afterwards, then you call the clock and it will happily provide you with the new time.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-21T16:51:18Z
+
+@heiglandreas but then, how would you mock the sleeping in MockClock if you don't interact with it ?
+
+---------------------------------------------------------------------------
+
+by heiglandreas at 2022-06-21T16:57:31Z
+
+As @matthiasnoback recommended: The MockClock can have a method that handles that. Or interacts with the call to `sleep`.
+
+But that's an implementation detail unrelated to the interface.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-21T17:10:59Z
+
+@heiglandreas but if the code calls the native `sleep()` because there is no such method on the clock, then there is no way to replace that with advancing the mocked clock instead of making the testsuite actually wait for 10s.
+
+---------------------------------------------------------------------------
+
+by heiglandreas at 2022-06-21T17:13:17Z
+
+That's why I recommended a `SleepInterface` (unrelated to the clock) that can be used to mock the sleep. Alternative would be something that I right now have in my head that I'll code out later today.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-06-21T18:03:23Z
+
+> That's why I recommended a SleepInterface (unrelated to the clock) that can be used to mock the sleep
+
+it should be noted sleep() is related to "TimeInterface", not "ClockInterface"
+
+a mocked sleep can never forward a native clock, which proves things are related
+
+at this point im wondering if the PSR-20 design is flawed/insufficient :thinking:
+
+---------------------------------------------------------------------------
+
+by heiglandreas at 2022-06-21T18:38:31Z
+
+Regarding the "never
+
+> > That's why I recommended a SleepInterface (unrelated to the clock) that can be used to mock the sleep
+>
+> it should be noted sleep() is related to "TimeInterface", not "ClockInterface"
+>
+> a mocked sleep can never forward a native clock, which proves things are related
+
+That depends on how the MockedClock is implemented. I've roughly drafted two possiblilities [in this gist](https://gist.github.com/heiglandreas/70979dbf402e1983448f134b9c96093c) and I'm sure there are many others that people will come up with. And all of them will be SOLID
+
+>
+> at this point im wondering if the PSR-20 design is flawed/insufficient thinking
+
+The PSR-20 design was chosen deliberately that way. The sleep-functionality was a big discussion point and it was decided that a function for flow-control is not in the responsibility of a clock.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-06-21T18:58:17Z
+
+a _mocked sleep_ can never forward a _native clock_ :)
+
+> You may halt the execution of an application but that has nothing to do with a clock.
+
+halting affects the clock 100% ;)
+
+in real life i can fast forward a clock, i cannot fast forward Coordinated Universal Time
+
+following that logic, i think PSR designed TimeInterface, whereas Symfony actually designs ClockInterface
+
+---------------------------------------------------------------------------
+
+by matthiasnoback at 2022-06-24T07:06:18Z
+
+Thanks for explaining the purpose of `sleep()` @nicolas-grekas. I agree then with @afilina that it seems like things are added to the clock that don't really need to be there. Of course, for the purpose of using these interfaces in Symfony you should do whatever makes sense ;) But from the perspective of user-developed code, the idea of a clock is just that you don't have `new DateTimeImmutable('now')` all over the code base, which makes testing any of it hard. That's why I wouldn't turn it into a component. Every new project can just have that one interface and those two really small implementations that @afilina shows. That's exactly what I've always done so far.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2022-06-24T09:46:25Z
+
+@matthiasnoback but in that case people can just type-hint `ClockInterface` right? The extra methods you are referring to are from `TimeInterface` which is more rich and for a slightly different purpose
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-24T10:02:14Z
+
+Brain activity at night made me realize that we could remove the `timeInt()` and `timeArray()` variants and keep only `time()`, provided `time()` returns a string. As a reminder, the concern this addresses is loss-less time measurements on 32-bit archs. This is the same concern that leads to having `microtime(false)` also return a string.
+
+Then I did my homework and tried to verify my own claim about performance, which is the justification I've provided for these `time*()` methods.
+
+Comparing `new \DateTimeImmutable('now', $tz)` to `microtime(true)`, the latter is almost 5x faster.
+But when comparing `new \DateTimeImmutable('now', $tz)` to `(string) microtime(true)`, the latter is only 1.1x faster!
+
+This difference is not significant enough to warrant my claim. I'm thus removing all `time*()` methods from my proposal. Performance-critical time measurements might continue to use `ClockMock` since we can't abstract time measurements without adding overhead to it. Note that using the component for not-so-critical performance measurements is still valid, because we're talking about quite fast measurements.
+
+Since this means the interface now contains only `now()` and `sleep()`, I've renamed it to `SleepableClockInterface`.
+
+I've also implemented the offset logic @derrabus suggested for `HrClock`, which is now renamed `MonotonicClock` (because it's not "high-resolution" anymore, see notes about the overhead above.)
+
+I updated the PR and the description above with all those changes.
+
+I think this addresses most if not all concerns raised so far.
+
+The last thing that remains is the lack of a `ClockInterface`, and that's on the PHP-FIG :pray:
+
+---------------------------------------------------------------------------
+
+by lchrusciel at 2022-06-27T17:02:51Z
+
+I'm looking forward to the newest PSR-20 and this component! At Sylius, we've recently introduced the [Calendar component](https://github.com/Sylius/Calendar), but we will surely try to migrate to the use yours. Our use case mainly decouples implementation from `new` in the code and provides ease-of dates testing - we need to freeze the clock and set its time for some given moment. If you are open to SettableClock implementation and interface, I would love to try it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-29T07:47:40Z
+
+> we need to freeze the clock and set its time for some given moment. If you are open to SettableClock implementation and interface, I would love to try it.
+
+Sure we are if this proves needed :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-21T11:36:31Z
+
+After reading https://github.com/php-fig/fig-standards/pull/1257 I'm wondering if it wouldn't make sense to add `withTimeZone()`?
+
+That'd allow registering only one clock service and give a contract to users to stick to a TZ.
+
+Loosely related, I'm wondering if we shouldn't swap our approach to naming and add `ClockInterface` to the component. That'd be the only interface provided by the component.
+
+The benefit of this approach is that it would make us less dependant on the outcome and pace of the FIG.
+
+My preference goes to doing both changes I propose here: one capable ClockInterface in the component and one more specific in PSR20 when it'll be released.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-27T12:42:43Z
+
+PR updated with the approach proposed in my previous comment:
+The component now provides a `ClockInterface` with 3 methods: `now()`, `sleep()` and `withTimeZone()`.
+
+I also registered a `clock` service into FrameworkBundle and a corresponding autowiring alias for ClockInterface.
+Since we now have `withTimeZone()`, there is no need to provide several clock services (an UTC one and a default-TZ one.)
+
+When PSR20 will be out (and if it remains compatible with the component), ppl will have the choice to use either the generic and narrow abstraction from the FIG - or the more capable one from the component when in need of extra features.
+
+/cc @symfony/mergers even if you already voted, please vote again if you approve these changes.

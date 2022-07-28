@@ -271,6 +271,28 @@ class DateTimeNormalizerTest extends TestCase
         $this->normalizer->denormalize('  2016.01.01  ', \DateTime::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']);
     }
 
+    public function testDenormalizeDateTimeStringWithDefaultContextFormat()
+    {
+        $format = 'd/m/Y';
+        $string = '01/10/2018';
+
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => $format]);
+        $denormalizedDate = $normalizer->denormalize($string, \DateTimeInterface::class);
+
+        $this->assertSame('01/10/2018', $denormalizedDate->format($format));
+    }
+
+    public function testDenormalizeDateTimeStringWithDefaultContextAllowsErrorFormat()
+    {
+        $format = 'd/m/Y'; // the default format
+        $string = '2020-01-01'; // the value which is in the wrong format, but is accepted because of `new \DateTime` in DateTimeNormalizer::denormalize
+
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => $format]);
+        $denormalizedDate = $normalizer->denormalize($string, \DateTimeInterface::class);
+
+        $this->assertSame('2020-01-01', $denormalizedDate->format('Y-m-d'));
+    }
+
     public function testDenormalizeFormatMismatchThrowsException()
     {
         $this->expectException(UnexpectedValueException::class);

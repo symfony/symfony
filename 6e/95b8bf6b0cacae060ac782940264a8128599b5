@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-05-30T23:29:28Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-05-31T19:31:51Z
+
+Hey!
+
+I think @codedmonkey has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-01T07:57:34Z
+
+Would it make sense not add any option and always make the URL absolute instead?
+
+---------------------------------------------------------------------------
+
+by Kern046 at 2022-06-01T08:12:21Z
+
+> Would it make sense not add any option and always make the URL absolute instead?
+
+Wouldn't be a problem to do so, but as #8879 was meant to allow relative URLs, I am not sure that it wouldn't override some users needs. Ready to update the PR in that direction if needed :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-01T08:52:26Z
+
+> #8879 was meant to allow relative URLs
+
+thanks for the pointer, let's not change that
+
+> we faced an issue with the /_fragment relative URIs, as Cloudflare didn't succeed to handle it
+
+Can't this issue be solved without adding this option? Is that problem common to all Cloudflare users or is there something specific to your use case? Did you talk to their support to understand what the issue is? Maybe it's an issue on their side?
+
+---------------------------------------------------------------------------
+
+by Kern046 at 2022-06-01T10:22:30Z
+
+> Can't this issue be solved without adding this option?
+
+Yeah absolutely. I can retrieve the right hostname from the Request URL and then make the Fragment URL absolute within the Worker's code. This issue isn't blocking, we just thought that it could be interesting that the `render_esi` method allows us to choose. This way we wouldn't have to handle relative URLs case in our worker's code.
+
+EDIT: Furthermore I have ofc no trouble with closing this PR if you deem it unnecessary :). I understand that adding more flexibility to a method can make its responsibility more confusing and decrease the maintainability.
+
+> Is that problem common to all Cloudflare users or is there something specific to your use case ?
+
+I think that all Cloudflare users wanting to use ESI with Symfony will get through this, because ESI with Cloudflare needs to use a Cloudflare Worker (which will intercept and parse the server response for `<esi:include>` tags and then fetch the blocks to replace the tag with their content before sending the response to the client).
+
+My best guess is that Cloudflare Worker's environment is isolated and lacks some context to "guess" the current hostname to fetch a relative URL.
+
+> Did you talk to their support to understand what the issue is? Maybe it's an issue on their side?
+
+I just sent a message on their official Discord to get their PoV on the matter. If I'm correct about Cloudflare Worker's isolation I would say that it's not an issue but it's by design.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-01T10:29:03Z
+
+> My best guess is that Cloudflare Worker's environment is isolated and lacks some context to "guess" the current hostname to fetch a relative URL.
+
+Well, the worker environment has the information about the URL (as it has access to the whole Request and Response objects). But the example worker given in their blog post does not try to resolve the ESI URL as a relative URL based on that context.

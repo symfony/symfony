@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-07-29T08:44:42Z
+
+This is the actual diff:
+
+```diff
+--- a/src/Symfony/Component/Mailer/Bridge/Infobip/Tests/Transport/InfobipApiTransportTest.php
++++ b/src/Symfony/Component/Mailer/Bridge/Infobip/Tests/Transport/InfobipApiTransportTest.php
+@@ -332,11 +332,23 @@ class InfobipApiTransportTest extends TestCase
+             %a
+             Content-Type: multipart/mixed; boundary=%s
+
++            --%s
++            Content-Type: multipart/related; boundary=%s
++
+             --%s
+             Content-Type: text/plain; charset=utf-8
+             Content-Transfer-Encoding: quoted-printable
+
+             foobar
++            --%s
++            Content-ID: %s
++            Content-Type: text/plain; name=inline.txt
++            Content-Transfer-Encoding: base64
++            Content-Disposition: inline; name=inline.txt; filename=inline.txt
++
++            c29tZSBpbmxpbmUgYXR0YWNobWVudA==
++            --%s--
++
+             --%s
+             Content-Type: text/plain; name=attachment.txt
+             Content-Transfer-Encoding: base64
+@@ -344,12 +356,6 @@ class InfobipApiTransportTest extends TestCase
+              filename=attachment.txt
+
+             c29tZSBhdHRhY2htZW50
+-            --%s
+-            Content-Type: text/plain; name=inline.txt
+-            Content-Transfer-Encoding: base64
+-            Content-Disposition: inline; name=inline.txt; filename=inline.txt
+-
+-            c29tZSBpbmxpbmUgYXR0YWNobWVudA==
+             --%s--
+             TXT,
+             $sentMessage->toString()
+```

@@ -83,17 +83,17 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
                 } else {
                     throw new LogicException('Using the "query_string" config without using a "search_dn" and a "search_password" is not supported.');
                 }
-                $username = $ldap->escape($user->getUserIdentifier(), '', LdapInterface::ESCAPE_FILTER);
-                $query = str_replace('{username}', $username, $ldapBadge->getQueryString());
+                $identifier = $ldap->escape($user->getUserIdentifier(), '', LdapInterface::ESCAPE_FILTER);
+                $query = str_replace('{user_identifier}', $identifier, $ldapBadge->getQueryString());
                 $result = $ldap->query($ldapBadge->getDnString(), $query)->execute();
                 if (1 !== $result->count()) {
-                    throw new BadCredentialsException('The presented username is invalid.');
+                    throw new BadCredentialsException('The presented user identifier is invalid.');
                 }
 
                 $dn = $result[0]->getDn();
             } else {
-                $username = $ldap->escape($user->getUserIdentifier(), '', LdapInterface::ESCAPE_DN);
-                $dn = str_replace('{username}', $username, $ldapBadge->getDnString());
+                $identifier = $ldap->escape($user->getUserIdentifier(), '', LdapInterface::ESCAPE_DN);
+                $dn = str_replace('{user_identifier}', $identifier, $ldapBadge->getDnString());
             }
 
             $ldap->bind($dn, $presentedPassword);

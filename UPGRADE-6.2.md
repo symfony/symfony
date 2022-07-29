@@ -14,10 +14,15 @@ HttpFoundation
 
  * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
 
-Mailer
---------
+Ldap
+----
 
-* Deprecate the `OhMySMTP` transport, use `MailPace` instead
+ * Deprecate `{username}` parameter use in favour of `{user_identifier}`
+
+Mailer
+------
+
+ * Deprecate the `OhMySMTP` transport, use `MailPace` instead
 
 Security
 --------

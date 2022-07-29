@@ -24,19 +24,19 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     private Entry $entry;
-    private string $username;
+    private string $identifier;
     private ?string $password;
     private array $roles;
     private array $extraFields;
 
-    public function __construct(Entry $entry, string $username, #[\SensitiveParameter] ?string $password, array $roles = [], array $extraFields = [])
+    public function __construct(Entry $entry, string $identifier, #[\SensitiveParameter] ?string $password, array $roles = [], array $extraFields = [])
     {
-        if (!$username) {
+        if (!$identifier) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
 
         $this->entry = $entry;
-        $this->username = $username;
+        $this->identifier = $identifier;
         $this->password = $password;
         $this->roles = $roles;
         $this->extraFields = $extraFields;
@@ -81,7 +81,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
 
     public function getUserIdentifier(): string
     {
-        return $this->username;
+        return $this->identifier;
     }
 
     /**

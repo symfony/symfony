@@ -143,11 +143,11 @@ class Terminal
     private static function initDimensionsUsingStty()
     {
         if ($sttyString = self::getSttyColumns()) {
-            if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
+            if (preg_match('/rows.(\d+);.columns.(\d+);/is', $sttyString, $matches)) {
                 // extract [w, h] from "rows h; columns w;"
                 self::$width = (int) $matches[2];
                 self::$height = (int) $matches[1];
-            } elseif (preg_match('/;.(\d+).rows;.(\d+).columns/i', $sttyString, $matches)) {
+            } elseif (preg_match('/;.(\d+).rows;.(\d+).columns/is', $sttyString, $matches)) {
                 // extract [w, h] from "; h rows; w columns"
                 self::$width = (int) $matches[2];
                 self::$height = (int) $matches[1];
@@ -176,10 +176,10 @@ class Terminal
      */
     private static function getSttyColumns(): ?string
     {
-        return self::readFromProcess('stty -a | grep columns');
+        return self::readFromProcess(['stty', '-a']);
     }
 
-    private static function readFromProcess(string $command): ?string
+    private static function readFromProcess(string|array $command): ?string
     {
         if (!\function_exists('proc_open')) {
             return null;

@@ -7,6 +7,31 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.44 (2022-07-29)
+
+ * bug #47069 [Security] Allow redirect after login to absolute URLs (Tim Ward)
+ * bug #47073 [HttpKernel] Fix non-scalar check in surrogate fragment renderer (aschempp)
+ * bug #43329 [Serializer] Respect default context in DateTimeNormalizer::denormalize (hultberg)
+ * bug #47086 Workaround disabled "var_dump" (nicolas-grekas)
+ * bug #40828 [BrowserKit] Merge fields and files recursively if they are multidimensional array (januszmk)
+ * bug #47048 [Serializer] Fix XmlEncoder encoding attribute false (alamirault)
+ * bug #47000 [ErrorHandler] Fix return type patching for list and class-string pseudo types (derrabus)
+ * bug #43998 [HttpKernel] [HttpCache] Don't throw on 304 Not Modified (aleho)
+ * bug #46981 [Mime]  quote address names if they contain parentheses (xabbuh)
+ * bug #46960 [FrameworkBundle] Fail gracefully when forms use disabled CSRF (HeahDude)
+ * bug #46973 [DependencyInjection] Fail gracefully when attempting to autowire composite types (derrabus)
+ * bug #46963 [Mime] Fix inline parts when added via attachPart() (fabpot)
+ * bug #46968 [PropertyInfo] Make sure nested composite types do not crash ReflectionExtractor (derrabus)
+ * bug #46931 Flush backend output buffer after closing. (bradjones1)
+ * bug #46905 [BrowserKit] fix sending request to paths containing multiple slashes (xabbuh)
+ * bug #42033 [HttpFoundation] Fix deleteFileAfterSend on client abortion (nerg4l)
+ * bug #46941 [Messenger] Fix calls to deprecated DBAL methods (derrabus)
+ * bug #46863 [Mime] Fix invalid DKIM signature with multiple parts (BrokenSourceCode)
+ * bug #46808 [HttpFoundation] Fix TypeError on null `$_SESSION`  in `NativeSessionStorage::save()` (chalasr)
+ * bug #46790 [HttpFoundation] Prevent PHP Warning: Session ID is too long or contains illegal characters (BrokenSourceCode)
+ * bug #46800 Spaces in system temp folder path cause deprecation errors in php 8 (demeritcowboy)
+ * bug #46797 [Messenger] Ceil waiting time when multiplier is a float on retry (WissameMekhilef)
+
 * 4.4.43 (2022-06-26)
 
  * bug #46765 [Serializer] Fix denormalization union types with constructor (Gwemox)

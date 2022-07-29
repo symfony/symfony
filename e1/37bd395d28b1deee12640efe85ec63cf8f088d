@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-06-16T09:22:04Z
+
+Hey!
+
+I think @Jayfrown has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-20T11:56:27Z
+
+It looks like this would benefit from triggering a deprecation when `{username}` is used. This also means this should target 6.2.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-06-20T18:59:33Z
+
+I agree with @nicolas-grekas.
+
+There is no "forward compatibility" here, as we don't replace `{user_identifier}` in Symfony 6.0: https://github.com/symfony/symfony/blob/e0ad2eead3513a558c09d8aa3ae9e867fb10b419/src/Symfony/Component/Ldap/Security/CheckLdapCredentialsListener.php#L87
+
+It would be a good idea to change this parameter name though. That would mean replacing both (like you introduce this PR) and trigger a deprecation when `{username}` is used. This would then need to go in the current development version (6.2), so we can remove `{username}` in 7.0.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ktherage at 2022-06-29T13:04:25Z
+
+@nicolas-grekas / @wouterj,
+
+I made some changes based on your returns.
+As it seems centralised in LdapBadge in 6.2, I've added the deprecations on LdapBadge's construction and replaced `{username}` parameter by `{user_identifier}` if used.
+
+This will allow a smoother change when droping deprecation notice IMO.

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
@@ -28,7 +29,7 @@ class DumpDataCollectorTest extends TestCase
     {
         $data = new Data([[123]]);
 
-        $collector = new DumpDataCollector();
+        $collector = new DumpDataCollector(null, new FileLinkFormatter([]));
 
         $this->assertSame('dump', $collector->getName());
 

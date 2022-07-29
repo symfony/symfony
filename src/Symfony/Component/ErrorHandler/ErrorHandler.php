@@ -360,7 +360,7 @@ class ErrorHandler
      */
     private function reRegister(int $prev): void
     {
-        if ($prev !== $this->thrownErrors | $this->loggedErrors) {
+        if ($prev !== ($this->thrownErrors | $this->loggedErrors)) {
             $handler = set_error_handler('is_int');
             $handler = \is_array($handler) ? $handler[0] : null;
             restore_error_handler();

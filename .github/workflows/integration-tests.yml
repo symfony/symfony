@@ -171,7 +171,7 @@ jobs:
         env:
           REDIS_HOST: 'localhost:16379'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
-          REDIS_SENTINEL_HOSTS: 'localhost:26379'
+          REDIS_SENTINEL_HOSTS: 'localhost:26379 localhost:26379 localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages

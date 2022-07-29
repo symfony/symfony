@@ -135,4 +135,21 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
         $handler->onAuthenticationSuccess($request, $token);
     }
+
+    public function testTargetPathWithAbsoluteUrlFromRequest()
+    {
+        $options = ['target_path_parameter' => '_my_target_path'];
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->once())
+            ->method('get')->with('_my_target_path')
+            ->willReturn('https://localhost/some-path');
+
+        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpUtils->expects($this->once())
+            ->method('createRedirectResponse')->with($request, 'https://localhost/some-path');
+
+        $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
+        $handler->onAuthenticationSuccess($request, $this->createMock(TokenInterface::class));
+    }
 }

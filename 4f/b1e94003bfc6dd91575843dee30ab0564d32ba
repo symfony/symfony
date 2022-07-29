@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-07-29T08:39:10Z
+
+Not all the updated Notifier transport had failing tests before (probably because they only provide chatter integrations). Do we want to update their `composer.json` files anyway?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-29T11:06:40Z
+
+> Not all the updated Notifier transport had failing tests before (probably because they only provide chatter integrations). Do we want to update their composer.json files anyway?
+
+Yes because it's too time consuming to bump selectively and it wouldn't be worth it :)

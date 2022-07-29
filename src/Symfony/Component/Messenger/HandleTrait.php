@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger;
 
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
  * Leverages a message bus to expect a single, synchronous message handling and return its result.
@@ -29,15 +30,16 @@ trait HandleTrait
      * This behavior is useful for both synchronous command & query buses,
      * the last one usually returning the handler result.
      *
-     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     * @param object|Envelope  $message The message or the message pre-wrapped in an envelope
+     * @param StampInterface[] $stamps  Stamps to be set on the Envelope which are used to control middlewares behaviors
      */
-    private function handle(object $message): mixed
+    private function handle(object $message, array $stamps = []): mixed
     {
         if (!isset($this->messageBus)) {
             throw new LogicException(sprintf('You must provide a "%s" instance in the "%s::$messageBus" property, but that property has not been initialized yet.', MessageBusInterface::class, static::class));
         }
 
-        $envelope = $this->messageBus->dispatch($message);
+        $envelope = $this->messageBus->dispatch($message, $stamps);
         /** @var HandledStamp[] $handledStamps */
         $handledStamps = $envelope->all(HandledStamp::class);
 
@@ -50,7 +52,7 @@ trait HandleTrait
                 return sprintf('"%s"', $stamp->getHandlerName());
             }, $handledStamps));
 
-            throw new LogicException(sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s::%s()", got %d: %s.', get_debug_type($envelope->getMessage()), static::class, __FUNCTION__, \count($handledStamps), $handlers));
+            throw new LogicException(sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s::%s()", got %d: "%s".', get_debug_type($envelope->getMessage()), static::class, __FUNCTION__, \count($handledStamps), $handlers));
         }
 
         return $handledStamps[0]->getResult();

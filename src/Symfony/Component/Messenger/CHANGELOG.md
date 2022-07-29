@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `$stamps = []` parameter to `HandleTrait`
+
 6.1
 ---
 

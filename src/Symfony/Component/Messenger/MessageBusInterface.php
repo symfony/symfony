@@ -22,7 +22,7 @@ interface MessageBusInterface
      * Dispatches the given message.
      *
      * @param object|Envelope  $message The message or the message pre-wrapped in an envelope
-     * @param StampInterface[] $stamps
+     * @param StampInterface[] $stamps  Stamps set on the Envelope which are used to control middlewares behaviors
      */
     public function dispatch(object $message, array $stamps = []): Envelope;
 }

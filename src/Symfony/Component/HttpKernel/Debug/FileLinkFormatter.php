@@ -30,12 +30,12 @@ class FileLinkFormatter
     private $urlFormat;
 
     /**
-     * @param string|\Closure $urlFormat the URL format, or a closure that returns it on-demand
+     * @param string|array|null $fileLinkFormat
+     * @param string|\Closure   $urlFormat the URL format, or a closure that returns it on-demand
      */
-    public function __construct(string $fileLinkFormat = null, RequestStack $requestStack = null, string $baseDir = null, $urlFormat = null)
+    public function __construct($fileLinkFormat = null, RequestStack $requestStack = null, string $baseDir = null, $urlFormat = null)
     {
-        $fileLinkFormat = $fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        if ($fileLinkFormat && !\is_array($fileLinkFormat)) {
+        if (!\is_array($fileLinkFormat) && $fileLinkFormat = $fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) {
             $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: \strlen($f);
             $fileLinkFormat = [substr($f, 0, $i)] + preg_split('/&([^>]++)>/', substr($f, $i), -1, \PREG_SPLIT_DELIM_CAPTURE);
         }

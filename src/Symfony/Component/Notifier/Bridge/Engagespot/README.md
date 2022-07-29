@@ -7,12 +7,12 @@ DSN example
 -----------
 
 ```
-ENGAGESPOT_DSN=engagespot://API_KEY@default?campaign_name=CAMPAIGN_NAME
+ENGAGESPOT_DSN=engagespot://API_KEY:API_SECRET@default
 ```
 
 where:
  - `API_KEY` is your Engagespot API Key
- - `CAMPAIGN_NAME` is your default campaign name
+ - `API_SECRET` is your Engagespot API Secret
 
 Resources
 ---------

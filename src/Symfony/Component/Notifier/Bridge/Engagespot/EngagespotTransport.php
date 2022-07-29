@@ -27,15 +27,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class EngagespotTransport extends AbstractTransport
 {
-    protected const HOST = 'api.engagespot.co/2/campaigns';
+    protected const HOST = 'api.engagespot.co/v3/notifications';
 
     private $apiKey;
-    private $campaignName;
+    private $apiSecret;
 
-    public function __construct(string $apiKey, string $campaignName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, string $apiSecret, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
-        $this->campaignName = $campaignName;
+        $this->apiSecret = $apiSecret;
         $this->client = $client;
 
         parent::__construct($client, $dispatcher);
@@ -77,35 +77,27 @@ final class EngagespotTransport extends AbstractTransport
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
-                'API-Key' => $this->apiKey,
+                'X-ENGAGESPOT-API-KEY' => $this->apiKey,
+                'X-ENGAGESPOT-API-SECRET' => $this->apiSecret,
             ],
             'json' => [
-                'campaign_name' => $options['campaign_name'] ?? $this->campaignName,
                 'notification' => [
                     'title' => $message->getSubject(),
                     'message' => $message->getContent(),
                     'icon' => $options['icon'] ?? '',
                     'url' => $options['url'] ?? '#',
                 ],
-                'send_to' => $sendToEveryone ? 'everyone' : 'identifiers',
-                'identifiers' => $identifiers ?? null,
+                'recipients' => $identifiers ?? null,
             ],
         ]);
 
         try {
             $statusCode = $response->getStatusCode();
-            if (200 !== $statusCode) {
-                throw new TransportException('Invalid status code received from Engagespot server: '.$statusCode, $response);
+            if (202 !== $statusCode) {
+                throw new TransportException('Invalid status code received from Engagespot server: '.$statusCode, $response->getContent());
             }
         } catch (TransportExceptionInterface $e) {
             throw new TransportException('Could not reach the remote Engagespot server.', $response, 0, $e);
-        }
-
-        $jsonContents = $response->toArray(false);
-        if ('ok' !== $jsonContents['status'] ?? null) {
-            $errorMessage = $jsonContents['message'] ?? $response->getContent(false);
-
-            throw new TransportException('Unable to post the Engagespot message: '.$errorMessage, $response);
         }
 
         return new SentMessage($message, (string) $this);

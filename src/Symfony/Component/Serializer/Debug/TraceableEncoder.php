@@ -14,9 +14,9 @@ namespace Symfony\Component\Serializer\Debug;
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Encoder\NormalizationAwareEncoder;
 
 /**
  * Collects some data about encoding.
@@ -111,7 +111,7 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
 
     public function needsNormalization(): bool
     {
-        return !$this->encoder instanceof NormalizationAwareEncoder;
+        return !$this->encoder instanceof NormalizationAwareInterface;
     }
 
     /**

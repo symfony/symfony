@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\PriorityStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -55,6 +56,12 @@ class AmqpSender implements SenderInterface
             if (!$amqpStamp || !isset($amqpStamp->getAttributes()['content_type'])) {
                 $amqpStamp = AmqpStamp::createWithAttributes(['content_type' => $contentType], $amqpStamp);
             }
+        }
+
+        /** @var PriorityStamp|null $priorityStamp */
+        $priorityStamp = $envelope->last(PriorityStamp::class);
+        if ($priorityStamp) {
+            $amqpStamp = AmqpStamp::createWithAttributes(['priority' => $priorityStamp->getPriority()], $amqpStamp);
         }
 
         $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);

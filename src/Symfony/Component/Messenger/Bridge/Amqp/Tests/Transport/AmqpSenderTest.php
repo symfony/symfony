@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\PriorityStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -65,6 +67,38 @@ class AmqpSenderTest extends TestCase
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('publish')->with($encoded['body'], []);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testItSendsWithDelay()
+    {
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with(new DelayStamp(1000));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 1000);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testItSendsWithPriority()
+    {
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with(new PriorityStamp(255));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) {
+            return 255 === $stamp->getAttributes()['priority'];
+        }));
 
         $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `form_label_content` and `form_help_content` block to form themes
  * Add `#[Template()]` to describe how to render arrays returned by controllers
+ * Add support for toggle buttons in Bootstrap 5 form theme
 
 6.1
 ---

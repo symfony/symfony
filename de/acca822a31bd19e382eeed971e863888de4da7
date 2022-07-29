@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by cedric-anne at 2022-07-27T13:37:51Z
+
+Sorry for the multiple commits, I have made it one by one from GitHub UI. I can squash them if it is a problem.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-28T08:22:22Z
+
+There are more of them:
+```
+src/Symfony/Contracts/Cache/.gitignore
+src/Symfony/Contracts/.gitignore
+src/Symfony/Contracts/EventDispatcher/.gitignore
+src/Symfony/Contracts/Service/.gitignore
+src/Symfony/Contracts/Translation/.gitignore
+src/Symfony/Contracts/Deprecation/.gitignore
+src/Symfony/Contracts/HttpClient/.gitignore
+```
+
+---------------------------------------------------------------------------
+
+by cedric-anne at 2022-07-29T10:13:22Z
+
+I added `.gitattributes` files where they were missing, and also added `export-ignore` on test files.
+By the way, I noticed that some the namespace of test files is sometimes `Test` on `Symfony\Contracts`, and that is not consistent with namespace `Tests` used everywhere else in Symfony codebase.
+
+---------------------------------------------------------------------------
+
+by cedric-anne at 2022-07-29T10:18:49Z
+
+> By the way, I noticed that some the namespace of test files is sometimes `Test` on `Symfony\Contracts`, and that is not consistent with namespace `Tests` used everywhere else in Symfony codebase.
+
+My bad, these should not be excluded.

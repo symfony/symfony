@@ -30,7 +30,7 @@ final class EngagespotTransportTest extends TransportTestCase
 
     public function toStringProvider(): iterable
     {
-        yield ['engagespot://api.engagespot.co/2/campaigns?campaign_name=TEST', $this->createTransport()];
+        yield ['engagespot://api.engagespot.co/v3/notifications', $this->createTransport()];
     }
 
     public function supportedMessagesProvider(): iterable

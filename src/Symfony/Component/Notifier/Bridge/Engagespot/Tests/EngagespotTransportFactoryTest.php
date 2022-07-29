@@ -27,14 +27,14 @@ final class EngagespotTransportFactoryTest extends TransportFactoryTestCase
     public function createProvider(): iterable
     {
         yield [
-            'engagespot://api.engagespot.co/2/campaigns?campaign_name=TEST',
-            'engagespot://apiKey@default?campaign_name=TEST',
+            'engagespot://api.engagespot.co/v3/notifications',
+            'engagespot://apiKey:apiSecret@default',
         ];
     }
 
     public function supportsProvider(): iterable
     {
-        yield [true, 'engagespot://apiKey@default'];
+        yield [true, 'engagespot://apiKey:apiSecret@default'];
         yield [false, 'somethingElse://username:password@default'];
     }
 

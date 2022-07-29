@@ -29,11 +29,11 @@ final class EngagespotTransportFactory extends AbstractTransportFactory
         }
 
         $apiKey = $dsn->getUser();
-        $campaignName = $dsn->getRequiredOption('campaign_name');
+        $apiSecret = $dsn->getPassword();
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new EngagespotTransport($apiKey, $campaignName, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new EngagespotTransport($apiKey, $apiSecret, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

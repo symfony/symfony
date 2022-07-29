@@ -37,15 +37,6 @@ final class EngagespotOptions implements MessageOptionsInterface
         return $this->options['to'];
     }
 
-    /**
-     * @return $this
-     */
-    public function campaignName(string $campaignName): static
-    {
-        $this->options['campaign_name'] = $campaignName;
-
-        return $this;
-    }
 
     /**
      * @return $this

@@ -80,6 +80,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'routing.expression_language_provider',
         'routing.loader',
         'routing.route_loader',
+        'scheduler.schedule_config_locator',
         'security.authenticator.login_linker',
         'security.expression_language_provider',
         'security.remember_me_aware',

@@ -1,0 +1,23 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    lock: ~
+    messenger:
+        transports:
+            schedule:
+                dsn: 'schedule://default'
+                options:
+                    cache: 'app'
+                    lock: 'default'
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyScheduleConfigLocator:
+        autoconfigure: true
+
+    clock:
+        synthetic: true
+
+    receivers:
+        public: true
+        alias: 'messenger.receiver_locator'

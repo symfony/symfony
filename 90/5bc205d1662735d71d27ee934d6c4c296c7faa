@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-07-29T09:21:16Z
+
+This partially reverts bc6259a8b9186836ecaef137834f75bad86b612f accounting for @stof's review in https://github.com/symfony/symfony/pull/46326#discussion_r871306092.

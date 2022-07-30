@@ -138,7 +138,9 @@ public function NAME(): string
         $hasNormalizationClosures = $this->hasNormalizationClosures($node);
         $comment = $this->getComment($node);
         if ($hasNormalizationClosures) {
-            $comment .= sprintf(' * @return %s|$this'."\n ", $childClass->getFqcn());
+            $comment = sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
+            $comment .= sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
+            $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
         }
         if ('' !== $comment) {
             $comment = "/**\n$comment*/\n";
@@ -279,7 +281,9 @@ public function NAME(string $VAR, TYPE $VALUE): static
 
         $comment = $this->getComment($node);
         if ($hasNormalizationClosures) {
-            $comment .= sprintf(' * @return %s|$this'."\n ", $childClass->getFqcn());
+            $comment = sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
+            $comment .= sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
+            $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
         }
         if ('' !== $comment) {
             $comment = "/**\n$comment*/\n";
@@ -337,7 +341,7 @@ COMMENTpublic function NAME(string $VAR, array $VALUE = []): CLASS
     return $this->PROPERTY[$VAR];
 }';
             $class->addUse(InvalidConfigurationException::class);
-            $class->addMethod($methodName, $body, [
+            $class->addMethod($methodName, str_replace('$value', '$VAR', $body), [
                 'COMMENT' => $comment, 'PROPERTY' => $property->getName(),
                 'CLASS' => $childClass->getFqcn(),
                 'VAR' => '' === $key ? 'key' : $key,

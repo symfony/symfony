@@ -17,8 +17,11 @@ class NestedConfig
     private $_usedProperties = [];
 
     /**
+     * @template TValue
+     * @param TValue $value
      * @default {"enabled":null}
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig : static)
      */
     public function nestedObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|static
     {
@@ -40,7 +43,10 @@ class NestedConfig
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig : static)
      */
     public function nestedListObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|static
     {

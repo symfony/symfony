@@ -638,7 +638,7 @@ XLIFF
         $loader = $this->getLoader();
         $loader->expects($this->once())
             ->method('load')
-            ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain));
+            ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
 
         $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',

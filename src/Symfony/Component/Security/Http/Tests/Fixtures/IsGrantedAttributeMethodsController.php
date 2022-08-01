@@ -19,42 +19,27 @@ class IsGrantedAttributeMethodsController
     {
     }
 
-    #[IsGranted()]
-    public function emptyAttribute()
-    {
-    }
-
-    #[IsGranted(attributes: 'ROLE_ADMIN')]
+    #[IsGranted(attribute: 'ROLE_ADMIN')]
     public function admin()
     {
     }
 
-    #[IsGranted(attributes: ['ROLE_ADMIN', 'ROLE_USER'])]
-    public function adminOrUser()
-    {
-    }
-
-    #[IsGranted(attributes: ['ROLE_ADMIN', 'ROLE_USER'], subject: 'product')]
-    public function adminOrUserWithSubject($product)
-    {
-    }
-
-    #[IsGranted(attributes: 'ROLE_ADMIN', subject: 'arg2Name')]
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: 'arg2Name')]
     public function withSubject($arg1Name, $arg2Name)
     {
     }
 
-    #[IsGranted(attributes: 'ROLE_ADMIN', subject: ['arg1Name', 'arg2Name'])]
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: ['arg1Name', 'arg2Name'])]
     public function withSubjectArray($arg1Name, $arg2Name)
     {
     }
 
-    #[IsGranted(attributes: 'ROLE_ADMIN', subject: 'non_existent')]
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: 'non_existent')]
     public function withMissingSubject()
     {
     }
 
-    #[IsGranted(attributes: 'ROLE_ADMIN', statusCode: 404, message: 'Not found')]
+    #[IsGranted(attribute: 'ROLE_ADMIN', message: 'Not found', statusCode: 404)]
     public function notFound()
     {
     }

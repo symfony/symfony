@@ -21,7 +21,7 @@ final class IsGranted
         /**
          * Sets the first argument that will be passed to isGranted().
          */
-        public array|string|null $attributes = null,
+        public string $attribute,
 
         /**
          * Sets the second argument passed to isGranted().

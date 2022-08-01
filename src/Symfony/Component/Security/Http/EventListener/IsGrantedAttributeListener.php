@@ -60,7 +60,7 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
                 }
             }
 
-            if (!$this->authChecker->isGranted($attribute->attributes, $subject)) {
+            if (!$this->authChecker->isGranted($attribute->attribute, $subject)) {
                 $message = $attribute->message ?: sprintf('Access Denied by #[IsGranted(%s)] on controller', $this->getIsGrantedString($attribute));
 
                 if ($statusCode = $attribute->statusCode) {
@@ -68,7 +68,7 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
                 }
 
                 $accessDeniedException = new AccessDeniedException($message);
-                $accessDeniedException->setAttributes($attribute->attributes);
+                $accessDeniedException->setAttributes($attribute->attribute);
                 $accessDeniedException->setSubject($subject);
 
                 throw $accessDeniedException;
@@ -83,11 +83,13 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
 
     private function getIsGrantedString(IsGranted $isGranted): string
     {
-        $attributes = array_map(fn ($attribute) => '"'.$attribute.'"', (array) $isGranted->attributes);
-        $argsString = 1 === \count($attributes) ? reset($attributes) : '['.implode(', ', $attributes).']';
+        $processValue = fn ($value) => sprintf('"%s"', $value);
 
-        if (null !== $isGranted->subject) {
-            $argsString .= ', "'.implode('", "', (array) $isGranted->subject).'"';
+        $argsString = $processValue($isGranted->attribute);
+
+        if (null !== $subject = $isGranted->subject) {
+            $subject = array_map($processValue, (array) $subject);
+            $argsString .= ', '.(1 === \count($subject) ? reset($subject) : '['.implode(', ', $subject).']');
         }
 
         return $argsString;

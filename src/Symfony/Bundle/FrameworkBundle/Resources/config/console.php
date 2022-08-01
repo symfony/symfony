@@ -42,6 +42,7 @@ use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber
 use Symfony\Component\Console\EventListener\ErrorListener;
 use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
+use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
@@ -206,6 +207,13 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
+        ->set('console.command.messenger_stats', StatsCommand::class)
+            ->args([
+                service('messenger.receiver_locator'),
+                abstract_arg('Receivers names'),
+            ])
+            ->tag('console.command')
+
         ->set('console.command.router_debug', RouterDebugCommand::class)
             ->args([
                 service('router'),
@@ -334,5 +342,5 @@ return static function (ContainerConfigurator $container) {
                 service('secrets.local_vault')->ignoreOnInvalid(),
             ])
             ->tag('console.command')
-    ;
+        ;
 };

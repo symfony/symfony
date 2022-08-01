@@ -394,7 +394,7 @@ EOF
      */
     protected function assertValidLocale(string $locale)
     {
-        LocaleValidator::assertValidLocale($locale);
+        LocaleValidator::validate($locale);
     }
 
     /**

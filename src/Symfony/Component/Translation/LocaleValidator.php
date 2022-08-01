@@ -25,7 +25,7 @@ class LocaleValidator
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public static function assertValidLocale(string $locale): void
+    public static function validate(string $locale): void
     {
         if (!preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));

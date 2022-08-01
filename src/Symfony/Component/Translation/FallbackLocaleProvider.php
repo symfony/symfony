@@ -41,7 +41,7 @@ class FallbackLocaleProvider implements FallbackLocaleProviderInterface
     public function setFallbackLocales(array $locales): void
     {
         foreach ($locales as $locale) {
-            LocaleValidator::assertValidLocale($locale);
+            LocaleValidator::validate($locale);
         }
 
         $this->fallbackLocales = $locales;
@@ -60,7 +60,7 @@ class FallbackLocaleProvider implements FallbackLocaleProviderInterface
      */
     public function computeFallbackLocales(string $locale): array
     {
-        LocaleValidator::assertValidLocale($locale);
+        LocaleValidator::validate($locale);
 
         $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
 

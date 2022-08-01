@@ -42,12 +42,12 @@ use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber
 use Symfony\Component\Console\EventListener\ErrorListener;
 use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
-use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
+use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
@@ -342,5 +342,5 @@ return static function (ContainerConfigurator $container) {
                 service('secrets.local_vault')->ignoreOnInvalid(),
             ])
             ->tag('console.command')
-        ;
+    ;
 };

@@ -25,7 +25,7 @@ class StatsCommandTest extends TestCase
 {
     private StatsCommand $command;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $messageCountableTransport = $this->createMock(MessageCountAwareInterface::class);
         $messageCountableTransport->method('getMessageCount')->willReturn(6);
@@ -55,11 +55,11 @@ class StatsCommandTest extends TestCase
             'message_countable',
             'simple',
             'another_message_countable',
-            'unexisting'
+            'unexisting',
         ]);
     }
 
-    public function testWithoutArgument(): void
+    public function testWithoutArgument()
     {
         $tester = new CommandTester($this->command);
         $tester->execute([]);
@@ -71,7 +71,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithOneExistingMessageCountableTransport(): void
+    public function testWithOneExistingMessageCountableTransport()
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['message_countable']]);
@@ -83,7 +83,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString(' ! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithMultipleExistingMessageCountableTransport(): void
+    public function testWithMultipleExistingMessageCountableTransport()
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['message_countable', 'another_message_countable']]);
@@ -95,7 +95,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithNotMessageCountableTransport(): void
+    public function testWithNotMessageCountableTransport()
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['simple']]);
@@ -107,7 +107,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithNotExistingTransport(): void
+    public function testWithNotExistingTransport()
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['unexisting']]);

@@ -6,7 +6,7 @@ CHANGELOG
 
  * Parameters implementing `TranslatableInterface` are processed
  * Add the file extension to the `XliffFileDumper` constructor
- * Added `FallbackLocaleProvider` to configure the fallback locale chain in `Translator`
+ * Add `FallbackLocaleProvider` to configure the fallback locale chain in `Translator`
 
 5.4
 ---

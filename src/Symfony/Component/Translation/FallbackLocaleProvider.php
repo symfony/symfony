@@ -23,36 +23,33 @@ class FallbackLocaleProvider implements FallbackLocaleProviderInterface
 {
     /**
      * @var string[]
+     *
+     * List of fallback locales to add _after_ the ones derived from ICU information.
      */
-    private array $fallbackLocales = [];
+    private array $ultimateFallbackLocales;
 
-    private array $parentLocales;
+    private ?array $parentLocales = null;
 
     /**
-     * @param string[] $locales
+     * @param string[] $ultimateFallbackLocales
      *
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct(array $locales = [])
+    public function __construct(array $ultimateFallbackLocales = [])
     {
-        $this->setFallbackLocales($locales);
-    }
-
-    public function setFallbackLocales(array $locales): void
-    {
-        foreach ($locales as $locale) {
+        foreach ($ultimateFallbackLocales as $locale) {
             LocaleValidator::validate($locale);
         }
 
-        $this->fallbackLocales = $locales;
+        $this->ultimateFallbackLocales = $ultimateFallbackLocales;
     }
 
     /**
-     * @internal
+     * @return string[]
      */
-    public function getFallbackLocales(): array
+    public function getUltimateFallbackLocales(): array
     {
-        return $this->fallbackLocales;
+        return $this->ultimateFallbackLocales;
     }
 
     /**
@@ -90,7 +87,7 @@ class FallbackLocaleProvider implements FallbackLocaleProviderInterface
             }
         }
 
-        foreach ($this->fallbackLocales as $fallback) {
+        foreach ($this->ultimateFallbackLocales as $fallback) {
             if ($fallback === $originLocale) {
                 continue;
             }

@@ -1269,7 +1269,14 @@ class FrameworkExtension extends Extension
         $container->setAlias('translator', 'translator.default')->setPublic(true);
         $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
         $translator = $container->findDefinition('translator.default');
-        $translator->addMethodCall('setFallbackLocales', [$config['fallbacks'] ?: [$defaultLocale]]);
+
+        if ($container->has('translation.fallback_locale_provider')) {
+            $container
+                ->findDefinition('translation.fallback_locale_provider')
+                ->replaceArgument(0, [$config['fallbacks'] ?: [$defaultLocale]]);
+        } else {
+            $translator->addMethodCall('setFallbackLocales', [$config['fallbacks'] ?: [$defaultLocale]]);
+        }
 
         $defaultOptions = $translator->getArgument(4);
         $defaultOptions['cache_dir'] = $config['cache_dir'];

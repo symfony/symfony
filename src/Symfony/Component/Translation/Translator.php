@@ -85,6 +85,20 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $this->configCacheFactory = $configCacheFactory;
     }
 
+    public function setFallbackLocaleProvider(FallbackLocaleProviderInterface $fallbackLocaleProvider)
+    {
+        $this->fallbackLocaleProvider = $fallbackLocaleProvider;
+
+        // needed as the fallback locales are linked to the already loaded catalogues
+        $this->catalogues = [];
+        $this->cacheVary['fallback_locales'] = $fallbackLocaleProvider->getUltimateFallbackLocales();
+    }
+
+    public function getFallbackLocaleProvider(): FallbackLocaleProviderInterface
+    {
+        return $this->fallbackLocaleProvider;
+    }
+
     /**
      * Adds a Loader.
      *
@@ -114,7 +128,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
         $this->resources[$locale][] = [$format, $resource, $domain];
 
-        if (\in_array($locale, $this->fallbackLocaleProvider->getFallbackLocales())) {
+        if (\in_array($locale, $this->fallbackLocaleProvider->getUltimateFallbackLocales())) {
             $this->catalogues = [];
         } else {
             unset($this->catalogues[$locale]);
@@ -147,11 +161,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function setFallbackLocales(array $locales)
     {
-        $this->fallbackLocaleProvider->setFallbackLocales($locales);
+        trigger_deprecation('symfony/translation', '6.2', 'Changing the fallback locales on the Translator is deprecated. Provide a new FallbackLocaleProviderInterface instance instead.');
 
-        // needed as the fallback locales are linked to the already loaded catalogues
-        $this->catalogues = [];
-        $this->cacheVary['fallback_locales'] = $locales;
+        $this->setFallbackLocaleProvider(new FallbackLocaleProvider($locales));
     }
 
     /**
@@ -159,7 +171,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function getFallbackLocales(): array
     {
-        return $this->fallbackLocaleProvider->getFallbackLocales();
+        trigger_deprecation('symfony/translation', '6.2', 'Querying fallback locales on the Translator is deprecated. Get the FallbackLocaleProvider instead and either use it to compute the fallback locale order, or query its ultimate fallback locale list.');
+
+        return $this->fallbackLocaleProvider->getUltimateFallbackLocales();
     }
 
     /**

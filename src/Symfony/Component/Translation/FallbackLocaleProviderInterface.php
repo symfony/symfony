@@ -22,20 +22,11 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 interface FallbackLocaleProviderInterface
 {
     /**
-     * Sets the fallback locales.
-     *
-     * @param string[] $locales
-     *
-     * @throws InvalidArgumentException If a locale contains invalid characters
-     */
-    public function setFallbackLocales(array $locales): void;
-
-    /**
      * @internal
      *
      * @return string[]
      */
-    public function getFallbackLocales(): array;
+    public function getUltimateFallbackLocales(): array;
 
     /**
      * For a given locale, this method provides the ordered list of alternative (fallback) locales

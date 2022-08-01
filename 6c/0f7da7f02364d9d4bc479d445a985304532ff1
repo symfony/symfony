@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by BrokenSourceCode at 2022-07-31T16:14:03Z
+
+> Thank you for your PR. Would it be possible to add a test that reproduces the bug you're attempting to fix? I'd like to make sure we don't reintroduce it in the future.
+
+@derrabus Unit test done here: https://github.com/symfony/symfony/pull/47130/commits/657f020a82901078d00c604a42e6306d3adc911e

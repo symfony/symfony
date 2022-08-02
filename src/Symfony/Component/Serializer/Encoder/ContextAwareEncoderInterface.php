@@ -15,8 +15,6 @@ namespace Symfony\Component\Serializer\Encoder;
  * Adds the support of an extra $context parameter for the supportsEncoding method.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @deprecated since symfony/serializer 6.1, use EncoderInterface instead
  */
 interface ContextAwareEncoderInterface extends EncoderInterface
 {

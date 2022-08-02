@@ -121,7 +121,7 @@ class ArgumentMetadata
      * @param class-string<T>       $name
      * @param self::IS_INSTANCEOF|0 $flags
      *
-     * @return array<T>
+     * @return list<T>
      */
     public function getAttributesOfType(string $name, int $flags = 0): array
     {

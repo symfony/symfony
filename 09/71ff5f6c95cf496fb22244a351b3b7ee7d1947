@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-22T11:51:28Z
+
+Main difference to 6.1 / 6.2:
+- `testDumpingTaggedValueTopLevelAssoc()`: instead of error we get empty string as result, which is still wrong.
+- `testDumpingTaggedValueTopLevelMultiLine()`: instead of error we get empty string as result, which is still wrong.
+
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-22T12:03:42Z
+
+If we can't have a comma after the last argument of a multi-line function call, I rather put the closing `)` on the same line.
+This also seems to be the convention in the rest of this code.
+```php
+                $this->assertSame(
+                    $expected,
+                    $this->parser->parse(
+                        $this->dumper->dump($expected, 10)),
+                    $test['test']);
+```
+
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-22T12:09:58Z
+
+I'm a bit undecided about code style because it is already so inconsistent :)
+
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-22T12:16:35Z
+
+So how do we bring this to the other branches once it is merged?
+
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-22T12:22:34Z
+
+Added "[Yaml] " in the commit messages.
+I don't know if there is any explicit convention, but seems better than nothing.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-22T14:17:36Z
+
+@donquixote the core team will then merge the 4.4 branch into the 5.4 branch, and so on.
+
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-22T15:11:30Z
+
+We should standardize the use of local variables. Can we agree on something?
+In most of the methods we can have `$data` and `$expected`, and then the rest can be done with nested calls, like this:
+```php
+        $data = new TaggedValue('user', ['name' => 'jane']);
+        $expected = '!user { name: jane }';
+        $this->assertSame($expected, $this->dumper->dump($data));
+        // If we want to keep the round trip test:
+        $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
+```
+Would be even nicer to work with data providers, but these also need to contain the parameters to send to dumper and parser (unless we drop the parser).
+Or a method `$this->assertRoundTrip($data, $expected);`, but then again we need to pass the additional parameters, e.g. `$this->assertRoundTrip($data, $expected, $inline, $indent, $dumperFlags, $parserFlags);`
+
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-22T15:56:14Z
+
+I am going to fix code style later as reported by fabbot.io.
+But let's agree about other points:
+- Standardize local vars.
+- Standardize blank lines.
+- Assert round trip or not, or only sometimes?
+
+---------------------------------------------------------------------------
+
+by donquixote at 2022-06-27T17:52:27Z
+
+The PR is ready for another review, just saying :)
+No need to get lost in the `empty()` question, I already replaced it.

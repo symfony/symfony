@@ -35,7 +35,7 @@ class MissingDataHandler
             $falseValues = $form->getConfig()->getOption('false_values');
 
             if ($data === $this->missingData) {
-                return $falseValues[0]; 
+                return $falseValues[0];
             }
 
             if (\in_array($data, $falseValues)) {

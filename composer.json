@@ -195,7 +195,7 @@
         "docker-build": "docker build --tag symfony-tests .docker/",
         "docker-run": "docker run --rm --tty --user $(id --user):$(id --group) --volume $(pwd):/symfony symfony-tests",
         "docker-composer": "@docker-run env COMPOSER_ROOT_VERSION=6.2.x-dev composer update",
-        "docker-tests": "@docker-run php ./phpunit"
+        "docker-tests": "@docker-run ./phpunit src/Symfony/"
     },
     "scripts-descriptions": {
         "docker-build": "Build the Docker image",

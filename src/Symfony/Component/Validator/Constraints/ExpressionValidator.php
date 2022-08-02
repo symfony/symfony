@@ -56,6 +56,10 @@ class ExpressionValidator extends ConstraintValidator
             $this->expressionLanguage = new ExpressionLanguage();
         }
 
+        if (false === $this->expressionLanguage->hasFunctionByName('is_valid')) {
+            $this->expressionLanguage->registerProvider(new ExpressionLanguageProvider($this->context));
+        }
+
         return $this->expressionLanguage;
     }
 }

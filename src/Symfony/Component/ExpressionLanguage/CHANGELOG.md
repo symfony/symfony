@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add `ExpressionLanguage::hasFunction()` and `ExpressionLanguage::hasFunctionByName()` methods.
+
 6.1
 ---
 

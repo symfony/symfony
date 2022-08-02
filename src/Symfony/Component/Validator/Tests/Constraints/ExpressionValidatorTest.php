@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ToString;
@@ -303,5 +305,42 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ value }}', 2)
             ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
+    }
+
+    public function testIsValidExpression(): void
+    {
+        $constraints = [new NotNull(), new Range(['min' => 2])];
+
+        $constraint = new Expression(
+            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]]
+        );
+
+        $object = new Entity();
+        $object->data = '7';
+
+        $this->setObject($object);
+
+        $this->expectValidateValue(0, $object->data, $constraints);
+
+        $this->validator->validate($object, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testExistingIsValidFunctionIsNotOverridden(): void
+    {
+        $used = false;
+
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->register('is_valid', function () {}, function () use (&$used) {
+            $used = true;
+        });
+
+        $validator = new ExpressionValidator($expressionLanguage);
+        $validator->initialize($this->context);
+
+        $validator->validate('foo', new Expression('is_valid()'));
+
+        $this->assertTrue($used);
     }
 }

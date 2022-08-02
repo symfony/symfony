@@ -61,8 +61,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
                 if ($request->query->has($name)) {
                     $data = $request->query->all()[$name];
-                }
-                else {
+                } else {
                     $data = $missingData;
                 }
 

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-07-21T19:42:44Z
+
+@wouterj you need to update the `.github/expected-missing-return-types.diff` file to account for the change in `Command::getHelper()`
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-07-23T12:49:51Z
+
+This one is ready to merge now imho
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-07-23T19:08:04Z
+
+> Depending on $k, this may access the array with a non scalar key. Should we modify the code and throw an exception or should we specify $k harder?
+
+This is a good catch by Psalm that is easy to produce in a real Symfony app:
+
+```yaml
+parameters:
+    some_list: [1, 2, 3]
+    broken_parameter:
+        '%some_list%': foo
+```
+
+Note that `resolveString()` already has a nice exception message if the array key would have been `'app.%some_list%'`. I've added a check and exception for this newly discovered case.

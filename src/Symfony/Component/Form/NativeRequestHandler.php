@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\MissingDataHandler;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**

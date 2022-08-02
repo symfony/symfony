@@ -12,8 +12,6 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class MissingDataHandler
 {

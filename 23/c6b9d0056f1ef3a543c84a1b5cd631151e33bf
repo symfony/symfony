@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-06-19T11:51:06Z
+
+@xavren still up to finish this one? Can you figure out a failing test case?
+
+---------------------------------------------------------------------------
+
+by xavren at 2022-06-20T15:01:30Z
+
+@nicolas-grekas sorry for the delay, we had some new priorities and forgot to follow this issue.
+
+You are right, this is not the issue, but the bug exists as demonstrated by this https://github.com/xavren/symfony-translator-bug/blob/master/src/Command/TestCommand.php
+
+Code
+```php
+$output->writeln($this->translator->trans('test', ['name' => 'World']));
+$output->writeln($this->translator->trans('test', ['name' => 'World'], 'messages+intl-icu'));
+$output->writeln($this->translator->trans('test', ['name' => 'World'], 'messages'));
+```
+
+Result is
+```bash
+php bin/console app:test
+Hello %name%
+Hello %World%
+Hello %name%
+```
+
+It seems that MessageCatalogue loading messages has an issue but cannot spot it and did not find any tests :/
+
+For the debug, here is the cache file
+
+var/cache/dev/translations/catalogue.en.bBuRKVV.php
+```php
+<?php
+
+use Symfony\Component\Translation\MessageCatalogue;
+
+$catalogue = new MessageCatalogue('en', array (
+  'messages+intl-icu' =>
+  array (
+    'test' => 'Hello %name%',
+  ),
+));
+
+return $catalogue;
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-20T15:12:36Z
+
+Well, using `%name%` in a catalogue that has the intl suffix is not replaced at all and this is expected, as this is not a placeholder at all in the ICU message format.
+
+---------------------------------------------------------------------------
+
+by xavren at 2022-06-20T15:22:38Z
+
+Completly ok with that, but you can see the content of my translations files
+![image](https://user-images.githubusercontent.com/2655636/174634088-c1fb79ac-6ff6-45e6-ae0c-a29c6ff2190b.png)
+
+Result is completly mixed up
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-20T15:41:37Z
+
+@xavren The legacy format replaces whatever you pass as key. so to replace `%name%`, you need to pass `%name%` as key, not `name` (as part if the Intl ICU message format migration, `%` are trimmed from the placeholder name, but they are not _added_ automatically)
+
+---------------------------------------------------------------------------
+
+by xavren at 2022-06-20T17:51:26Z
+
+@stof, the idea was to show mixup catalogue data, we have legacy data in intl-icu domain, that override intl-icu data, formatted by intlFormatter.
+If you tell me this is what's expected, i'll close this issue
+
+---------------------------------------------------------------------------
+
+by stof at 2022-06-21T09:24:53Z
+
+you should not have legacy data in your intl-icu catalogue. That should go in the non-suffixed catalogue for that domain. Putting legacy data in the catalogue that is meant to contain ICU format will indeed not work, and that's totally expected.
+
+---------------------------------------------------------------------------
+
+by xavren at 2022-06-21T09:27:46Z
+
+Hi @stof and @nicolas-grekas, i modified my PR adding tests  that demonstrate the issue (hopefully)
+
+public function testIntlDomainOverlapseWithIntlResourceBefore() does not pass, because MessageCatalogue is mixing up legacy / intl domains

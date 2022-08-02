@@ -223,6 +223,8 @@ class PathTest extends TestCase
         yield ['/..', '/'];
 
         yield ['C:webmozart', ''];
+
+        yield ['D:/Folder/Aééé/Subfolder', 'D:/Folder/Aééé'];
     }
 
     /**

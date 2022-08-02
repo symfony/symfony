@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-07-31T14:58:51Z
+
+> > $accessDeniedException->setAttributes($attribute->attributes);
+>
+> Don't we want to provide the resolved values instead? That would solve the issue with accepting Expression into AccessDeniedException and might improve debugging?
+
+@nicolas-grekas The problem is that the attributes expression is evaluated by the `ExpressionVoter` and I don't see a way to get that info with the current implementation:
+
+https://github.com/symfony/symfony/blob/9d7ff0c59b530460e73c7935a15ee2d3f6763f8c/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php#L67-L74
+
+Also, if I'm not mistaking, the result of the expression is always `false` (or falsy) if access is denied by the voter, so I'm not sure if that would really help with debugging.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-08-02T08:01:38Z
+
+@nicolas-grekas Was this closed by accident or did I miss something ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-02T08:16:48Z
+
+Indeed, this is a mistake because of the other PR description

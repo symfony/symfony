@@ -13,10 +13,10 @@ namespace Symfony\Component\Security\Http\Tests\Fixtures;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted(attributes: ['ROLE_ADMIN', 'ROLE_USER'])]
+#[IsGranted(attribute: 'ROLE_USER')]
 class IsGrantedAttributeController
 {
-    #[IsGranted(attributes: ['ROLE_ADMIN'])]
+    #[IsGranted(attribute: 'ROLE_ADMIN')]
     public function foo()
     {
     }

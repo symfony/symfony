@@ -208,7 +208,7 @@ class IsGrantedAttributeListenerTest extends TestCase
     /**
      * @dataProvider getAccessDeniedMessageTests
      */
-    public function testAccessDeniedMessages(array $attributes, ?string $subject, string $method, string $expectedMessage)
+    public function testAccessDeniedMessages(string $attribute, string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage)
     {
         $authChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
         $authChecker->expects($this->any())
@@ -216,10 +216,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             ->willReturn(false);
 
         // avoid the error of the subject not being found in the request attributes
-        $arguments = [];
-        if (null !== $subject) {
-            $arguments[] = 'bar';
-        }
+        $arguments = array_fill(0, $numOfArguments, 'bar');
 
         $listener = new IsGrantedAttributeListener($authChecker);
 
@@ -236,9 +233,9 @@ class IsGrantedAttributeListenerTest extends TestCase
             $this->fail();
         } catch (AccessDeniedException $e) {
             $this->assertSame($expectedMessage, $e->getMessage());
-            $this->assertSame($attributes, $e->getAttributes());
+            $this->assertSame([$attribute], $e->getAttributes());
             if (null !== $subject) {
-                $this->assertSame('bar', $e->getSubject());
+                $this->assertSame($subject, $e->getSubject());
             } else {
                 $this->assertNull($e->getSubject());
             }
@@ -247,9 +244,9 @@ class IsGrantedAttributeListenerTest extends TestCase
 
     public function getAccessDeniedMessageTests()
     {
-        yield [['ROLE_ADMIN'], null, 'admin', 'Access Denied by #[IsGranted("ROLE_ADMIN")] on controller'];
-        yield [['ROLE_ADMIN', 'ROLE_USER'], null, 'adminOrUser', 'Access Denied by #[IsGranted(["ROLE_ADMIN", "ROLE_USER"])] on controller'];
-        yield [['ROLE_ADMIN', 'ROLE_USER'], 'product', 'adminOrUserWithSubject', 'Access Denied by #[IsGranted(["ROLE_ADMIN", "ROLE_USER"], "product")] on controller'];
+        yield ['ROLE_ADMIN', null, 'admin', 0, 'Access Denied by #[IsGranted("ROLE_ADMIN")] on controller'];
+        yield ['ROLE_ADMIN', 'bar', 'withSubject', 2, 'Access Denied by #[IsGranted("ROLE_ADMIN", "arg2Name")] on controller'];
+        yield ['ROLE_ADMIN', ['arg1Name' => 'bar', 'arg2Name' => 'bar'], 'withSubjectArray', 2, 'Access Denied by #[IsGranted("ROLE_ADMIN", ["arg1Name", "arg2Name"])] on controller'];
     }
 
     public function testNotFoundHttpException()

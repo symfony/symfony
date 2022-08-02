@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-09T00:37:24Z
+
+Thank you for your PR! Can you please add a test hat covers your change?
+
+---------------------------------------------------------------------------
+
+by GwendolenLynch at 2022-02-09T20:40:50Z
+
+Added @derrabus. The act of writing the tests showed up some missing bits, so thank you for the nudge.
+
+Changed
+- Move extracted code back into method and change some of the selection logic.
+- For tests, use `SIGUSRx` instead of `SIGALRM` as the later will cause an exit when there are no more listeners, and we only need to test that the signal was processed by the listener.
+
+Please let me know what changes you'd like made.

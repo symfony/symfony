@@ -297,15 +297,13 @@ class SmtpTransport extends AbstractTransport
             throw new LogicException('You must set the expected response code.');
         }
 
-        if (!$response) {
-            throw new TransportException(sprintf('Expected response code "%s" but got an empty response.', implode('/', $codes)));
-        }
-
         [$code] = sscanf($response, '%3d');
         $valid = \in_array($code, $codes);
 
-        if (!$valid) {
-            throw new TransportException(sprintf('Expected response code "%s" but got code "%s", with message "%s".', implode('/', $codes), $code, trim($response)), $code);
+        if (!$valid || !$response) {
+            $codeStr = $code ? sprintf('code "%s"', $code) : 'empty code';
+            $responseStr = $response ? sprintf(', with message "%s"', trim($response)) : '';
+            throw new TransportException(sprintf('Expected response code "%s" but got ', implode('/', $codes), $codeStr).$codeStr.$responseStr.'.', $code);
         }
     }
 

@@ -100,15 +100,7 @@ class EsmtpTransport extends SmtpTransport
 
     protected function doHeloCommand(): void
     {
-        try {
-            $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-        } catch (TransportExceptionInterface $e) {
-            parent::doHeloCommand();
-
-            return;
-        }
-
-        $capabilities = $this->getCapabilities($response);
+        $capabilities = $this->callHeloCommand();
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
@@ -122,14 +114,7 @@ class EsmtpTransport extends SmtpTransport
                 throw new TransportException('Unable to connect with STARTTLS.');
             }
 
-            try {
-                $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-                $capabilities = $this->getCapabilities($response);
-            } catch (TransportExceptionInterface $e) {
-                parent::doHeloCommand();
-
-                return;
-            }
+            $capabilities = $this->callHeloCommand();
         }
 
         if (\array_key_exists('AUTH', $capabilities)) {
@@ -137,10 +122,22 @@ class EsmtpTransport extends SmtpTransport
         }
     }
 
-    private function getCapabilities(string $ehloResponse): array
+    private function callHeloCommand(): array
     {
+        try {
+            $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+        } catch (TransportExceptionInterface $e) {
+            try {
+                parent::doHeloCommand();
+            } catch (TransportExceptionInterface $ex) {
+                if (!$ex->getCode()) {
+                    throw $e;
+                }
+            }
+        }
+
         $capabilities = [];
-        $lines = explode("\r\n", trim($ehloResponse));
+        $lines = explode("\r\n", trim($response));
         array_shift($lines);
         foreach ($lines as $line) {
             if (preg_match('/^[0-9]{3}[ -]([A-Z0-9-]+)((?:[ =].*)?)$/Di', $line, $matches)) {

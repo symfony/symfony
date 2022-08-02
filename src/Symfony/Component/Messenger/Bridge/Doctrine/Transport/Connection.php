@@ -158,7 +158,7 @@ class Connection implements ResetInterface
     {
         if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
             try {
-                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31']);
+                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59']);
             } catch (DriverException $e) {
                 // Ignore the exception
             }
@@ -252,7 +252,7 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31'], ['id' => $id]) > 0;
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
@@ -265,7 +265,7 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31'], ['id' => $id]) > 0;
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;

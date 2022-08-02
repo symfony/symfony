@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Fixtures;
 
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class IsGrantedAttributeMethodsController
@@ -41,6 +42,24 @@ class IsGrantedAttributeMethodsController
 
     #[IsGranted(attribute: 'ROLE_ADMIN', message: 'Not found', statusCode: 404)]
     public function notFound()
+    {
+    }
+
+    #[IsGranted(attribute: new Expression('"ROLE_ADMIN" in role_names or is_granted("POST_VIEW", subject)'), subject: 'post')]
+    public function withExpressionInAttribute($post)
+    {
+    }
+
+    #[IsGranted(attribute: new Expression('user === subject'), subject: new Expression('args["post"].getAuthor()'))]
+    public function withExpressionInSubject($post)
+    {
+    }
+
+    #[IsGranted(attribute: new Expression('user === subject["author"]'), subject: [
+        'author' => new Expression('args["post"].getAuthor()'),
+        'alias' => 'arg2Name',
+    ])]
+    public function withNestedExpressionInSubject($post, $arg2Name)
     {
     }
 }

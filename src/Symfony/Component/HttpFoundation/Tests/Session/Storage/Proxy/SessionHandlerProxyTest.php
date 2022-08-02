@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
 /**
@@ -158,6 +160,23 @@ class SessionHandlerProxyTest extends TestCase
         ;
 
         $this->proxy->updateTimestamp('id', 'data');
+    }
+
+    /**
+     * @dataProvider provideNativeSessionStorageHandler
+     */
+    public function testNativeSessionStorageSaveHandlerName($handler)
+    {
+        $this->assertSame('files', (new NativeSessionStorage([], $handler))->getSaveHandler()->getSaveHandlerName());
+    }
+
+    public function provideNativeSessionStorageHandler()
+    {
+        return [
+            [new \SessionHandler()],
+            [new StrictSessionHandler(new \SessionHandler())],
+            [new SessionHandlerProxy(new StrictSessionHandler(new \SessionHandler()))],
+        ];
     }
 }
 

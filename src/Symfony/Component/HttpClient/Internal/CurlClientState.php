@@ -99,7 +99,7 @@ final class CurlClientState extends ClientState
         curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_DNS);
         curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_SSL_SESSION);
 
-        if (\defined('CURL_LOCK_DATA_CONNECT')) {
+        if (\defined('CURL_LOCK_DATA_CONNECT') && \PHP_VERSION_ID >= 80000) {
             curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_CONNECT);
         }
     }

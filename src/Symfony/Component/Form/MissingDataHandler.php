@@ -43,9 +43,8 @@ class MissingDataHandler
                     return $data;
                 }
             }
-        }
-        catch (\Error $error) {
-            if ($error->getMessage() === 'Typed property Symfony\Component\Form\FormConfigBuilder::$type must not be accessed before initialization') {
+        } catch (\Error $error) {
+            if ('Typed property Symfony\Component\Form\FormConfigBuilder::$type must not be accessed before initialization' === $error->getMessage()) {
                 return $data;
             }
 

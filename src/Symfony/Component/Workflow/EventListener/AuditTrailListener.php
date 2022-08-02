@@ -13,7 +13,10 @@ namespace Symfony\Component\Workflow\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Workflow\Event\Event;
+use Symfony\Component\Workflow\Event\EnterEvent;
+use Symfony\Component\Workflow\Event\LeaveEvent;
+use Symfony\Component\Workflow\Event\TransitionEvent;
+use Symfony\Component\Workflow\WorkflowEvents;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -27,19 +30,19 @@ class AuditTrailListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function onLeave(Event $event)
+    public function onLeave(LeaveEvent $event)
     {
         foreach ($event->getTransition()->getFroms() as $place) {
             $this->logger->info(sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $place, \get_class($event->getSubject()), $event->getWorkflowName()));
         }
     }
 
-    public function onTransition(Event $event)
+    public function onTransition(TransitionEvent $event)
     {
         $this->logger->info(sprintf('Transition "%s" for subject of class "%s" in workflow "%s".', $event->getTransition()->getName(), \get_class($event->getSubject()), $event->getWorkflowName()));
     }
 
-    public function onEnter(Event $event)
+    public function onEnter(EnterEvent $event)
     {
         foreach ($event->getTransition()->getTos() as $place) {
             $this->logger->info(sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $place, \get_class($event->getSubject()), $event->getWorkflowName()));
@@ -49,9 +52,9 @@ class AuditTrailListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'workflow.leave' => ['onLeave'],
-            'workflow.transition' => ['onTransition'],
-            'workflow.enter' => ['onEnter'],
+            WorkflowEvents::LEAVE => ['onLeave'],
+            WorkflowEvents::TRANSITION => ['onTransition'],
+            WorkflowEvents::ENTER => ['onEnter'],
         ];
     }
 }

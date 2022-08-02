@@ -148,7 +148,12 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
+     * @template TValue of array<array|scalar>|scalar
+     *
+     * @param TValue $value
+     * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
+     *
+     * @return (TValue is scalar ? array|scalar : array<array|scalar>)
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
@@ -158,8 +163,13 @@ class ParameterBag implements ParameterBagInterface
     {
         if (\is_array($value)) {
             $args = [];
-            foreach ($value as $k => $v) {
-                $args[\is_string($k) ? $this->resolveValue($k, $resolving) : $k] = $this->resolveValue($v, $resolving);
+            foreach ($value as $key => $v) {
+                $resolvedKey = \is_string($key) ? $this->resolveValue($key, $resolving) : $key;
+                if (!\is_scalar($resolvedKey) && !$resolvedKey instanceof \Stringable) {
+                    throw new RuntimeException(sprintf('Array keys must be a scalar-value, but found key "%s" to resolve to type "%s".', $key, get_debug_type($resolvedKey)));
+                }
+
+                $args[$resolvedKey] = $this->resolveValue($v, $resolving);
             }
 
             return $args;

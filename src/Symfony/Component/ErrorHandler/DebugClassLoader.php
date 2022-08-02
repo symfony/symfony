@@ -855,6 +855,11 @@ class DebugClassLoader
                 return;
             }
 
+            if (!preg_match('/^(?:\\\\?[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)+$/', $n)) {
+                // exclude any invalid PHP class name (e.g. `Cookie::SAMESITE_*`)
+                continue;
+            }
+
             if (!isset($phpTypes[''])) {
                 $phpTypes[] = $n;
             }

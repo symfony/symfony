@@ -112,6 +112,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'])) {
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
+            $container->removeDefinition('security.is_granted_attribute_expression_language');
         }
 
         // set some global scalars

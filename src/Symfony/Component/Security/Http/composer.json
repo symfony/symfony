@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/security-core": "^5.4.7|^6.0",
+        "symfony/security-core": "^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^6.2",
         "symfony/polyfill-mbstring": "~1.0",
@@ -25,6 +25,7 @@
     },
     "require-dev": {
         "symfony/cache": "^5.4|^6.0",
+        "symfony/expression-language": "^5.4|^6.0",
         "symfony/rate-limiter": "^5.4|^6.0",
         "symfony/routing": "^5.4|^6.0",
         "symfony/security-csrf": "^5.4|^6.0",

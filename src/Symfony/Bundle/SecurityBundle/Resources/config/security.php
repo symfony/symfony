@@ -18,6 +18,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\Security;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -275,7 +276,17 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.cache_warmer')
 
         ->set('controller.is_granted_attribute_listener', IsGrantedAttributeListener::class)
-            ->args([service('security.authorization_checker')])
+            ->args([
+                service('security.authorization_checker'),
+                service('security.is_granted_attribute_expression_language')->nullOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
+
+        ->set('security.is_granted_attribute_expression_language', BaseExpressionLanguage::class)
+            ->args([service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid()])
+
+        ->set('cache.security_is_granted_attribute_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
     ;
 };

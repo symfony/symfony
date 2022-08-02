@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate empty username or password when using when using `JsonLoginAuthenticator`
  * Set custom lifetime for login link
  * Add `$lifetime` parameter to `LoginLinkHandlerInterface::createLoginLink()`
+ * Allow using expressions as `#[IsGranted()]` attribute and subject
 
 6.0
 ---

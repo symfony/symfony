@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Attribute;
 
+use Symfony\Component\ExpressionLanguage\Expression;
+
 /**
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
@@ -21,12 +23,14 @@ final class IsGranted
         /**
          * Sets the first argument that will be passed to isGranted().
          */
-        public string $attribute,
+        public string|Expression $attribute,
 
         /**
          * Sets the second argument passed to isGranted().
+         *
+         * @var array<string|Expression>|string|Expression|null
          */
-        public array|string|null $subject = null,
+        public array|string|Expression|null $subject = null,
 
         /**
          * The message of the exception - has a nice default if not set.

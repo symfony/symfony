@@ -112,13 +112,7 @@ class EsmtpTransport extends SmtpTransport
 
     private function doEhloCommand(): string
     {
-        try {
-            $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-        } catch (TransportExceptionInterface) {
-            return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
-        }
-
-        $this->capabilities = $this->parseCapabilities($response);
+        $response = $this->callHeloCommand();
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
@@ -132,12 +126,7 @@ class EsmtpTransport extends SmtpTransport
                 throw new TransportException('Unable to connect with STARTTLS.');
             }
 
-            try {
-                $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-                $this->capabilities = $this->parseCapabilities($response);
-            } catch (TransportExceptionInterface) {
-                return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
-            }
+            $response = $this->callHeloCommand();
         }
 
         if (\array_key_exists('AUTH', $this->capabilities)) {
@@ -147,19 +136,25 @@ class EsmtpTransport extends SmtpTransport
         return $response;
     }
 
-    private function parseCapabilities(string $ehloResponse): array
+    private function callHeloCommand(): string
     {
-        $capabilities = [];
-        $lines = explode("\r\n", trim($ehloResponse));
+        try {
+            $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+        } catch (TransportExceptionInterface) {
+            return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
+        }
+
+        $this->capabilities = [];
+        $lines = explode("\r\n", trim($response));
         array_shift($lines);
         foreach ($lines as $line) {
             if (preg_match('/^[0-9]{3}[ -]([A-Z0-9-]+)((?:[ =].*)?)$/Di', $line, $matches)) {
                 $value = strtoupper(ltrim($matches[2], ' ='));
-                $capabilities[strtoupper($matches[1])] = $value ? explode(' ', $value) : [];
+                $this->capabilities[strtoupper($matches[1])] = $value ? explode(' ', $value) : [];
             }
         }
 
-        return $capabilities;
+        return $response;
     }
 
     private function handleAuth(array $modes): void

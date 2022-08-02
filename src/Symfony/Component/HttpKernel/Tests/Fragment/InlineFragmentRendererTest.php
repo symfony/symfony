@@ -53,8 +53,8 @@ class InlineFragmentRendererTest extends TestCase
         $subRequest->attributes->replace(['object' => $object, '_format' => 'html', '_controller' => 'main_controller', '_locale' => 'en']);
         $subRequest->headers->set('x-forwarded-for', ['127.0.0.1']);
         $subRequest->headers->set('forwarded', ['for="127.0.0.1";host="localhost";proto=http']);
-        $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
-        $subRequest->server->set('HTTP_FORWARDED', 'for="127.0.0.1";host="localhost";proto=http');
+//        $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+//        $subRequest->server->set('HTTP_FORWARDED', 'for="127.0.0.1";host="localhost";proto=http');
 
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($subRequest));
 

@@ -30,6 +30,16 @@ class StrictSessionHandler extends AbstractSessionHandler
         $this->handler = $handler;
     }
 
+    /**
+     * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
+     *
+     * @internal
+     */
+    public function isWrapper(): bool
+    {
+        return $this->handler instanceof \SessionHandler;
+    }
+
     public function open(string $savePath, string $sessionName): bool
     {
         parent::open($savePath, $sessionName);

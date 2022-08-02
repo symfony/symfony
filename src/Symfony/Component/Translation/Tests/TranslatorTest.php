@@ -15,6 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
+use Symfony\Component\Translation\Formatter\IntlFormatter;
+use Symfony\Component\Translation\Formatter\IntlFormatterInterface;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -561,6 +565,26 @@ class TranslatorTest extends TestCase
 
         $translator->addResource('array', ['some_message' => 'Hi {name}'], 'en', 'messages+intl-icu');
         $this->assertSame('Hi Bob', $translator->trans('some_message', ['%name%' => 'Bob']));
+    }
+
+    public function testIntlDomainOverlapseWithIntlResourceBefore()
+    {
+        $intlFormatterMock = $this->createMock(IntlFormatterInterface::class);
+        $intlFormatterMock->expects($this->once())->method('formatIntl')->with('hello intl', 'en', [])->willReturn('hello intl');
+
+        $messageFormatter = new MessageFormatter(null, $intlFormatterMock);
+
+        $translator = new Translator('en', $messageFormatter);
+        $translator->addLoader('array', new ArrayLoader());
+
+        $translator->addResource('array', ['some_message' => 'hello intl'], 'en', 'messages+intl-icu');
+        $translator->addResource('array', ['some_message' => 'hello'], 'en', 'messages');
+
+        $this->assertSame('hello', $translator->trans('some_message', [], 'messages'));
+
+        $translator->addResource('array', ['some_message' => 'hello intl'], 'en', 'messages+intl-icu');
+
+        $this->assertSame('hello intl', $translator->trans('some_message', [], 'messages'));
     }
 
     public function testMissingLoaderForResourceError()

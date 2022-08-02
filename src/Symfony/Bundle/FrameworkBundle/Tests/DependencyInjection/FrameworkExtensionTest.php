@@ -56,6 +56,8 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
+use Symfony\Component\Notifier\ChatterInterface;
+use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -2018,7 +2020,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('notifier'));
         $this->assertFalse($container->hasDefinition('chatter'));
+        $this->assertFalse($container->hasAlias(ChatterInterface::class));
         $this->assertFalse($container->hasDefinition('texter'));
+        $this->assertFalse($container->hasAlias(TexterInterface::class));
     }
 
     public function testIfNotifierTransportsAreKnownByFrameworkExtension()

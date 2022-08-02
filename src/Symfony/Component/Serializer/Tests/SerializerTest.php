@@ -998,7 +998,7 @@ class SerializerTest extends TestCase
                 ],
                 'path' => 'php74FullWithConstructor',
                 'useMessageForUser' => true,
-                'message' => 'Failed to create object because the object miss the "constructorArgument" property.',
+                'message' => 'Failed to create object because the class misses the "constructorArgument" property.',
             ],
             $classMetadataFactory ?
                 [

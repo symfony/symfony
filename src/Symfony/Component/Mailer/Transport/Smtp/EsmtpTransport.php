@@ -127,6 +127,8 @@ class EsmtpTransport extends SmtpTransport
                 if (!$ex->getCode()) {
                     throw $e;
                 }
+
+                throw $ex;
             }
         }
 

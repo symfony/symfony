@@ -2921,7 +2921,8 @@ YAML;
         $this->assertEquals($expected, $actual);
         $this->assertSame(
             var_export($expected, true),
-            var_export($actual, true));
+            var_export($actual, true)
+        );
     }
 }
 

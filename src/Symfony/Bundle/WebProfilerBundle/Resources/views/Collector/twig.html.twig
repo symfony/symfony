@@ -41,7 +41,7 @@
     {% if collector.templatecount == 0 %}
         <h2>Twig</h2>
 
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No Twig templates were rendered for this request.</p>
         </div>
     {% else %}
@@ -53,19 +53,23 @@
                 <span class="label">Render time</span>
             </div>
 
-            <div class="metric">
-                <span class="value">{{ collector.templatecount }}</span>
-                <span class="label">Template calls</span>
-            </div>
+            <div class="metric-divider"></div>
 
-            <div class="metric">
-                <span class="value">{{ collector.blockcount }}</span>
-                <span class="label">Block calls</span>
-            </div>
+            <div class="metric-group">
+                <div class="metric">
+                    <span class="value">{{ collector.templatecount }}</span>
+                    <span class="label">Template calls</span>
+                </div>
 
-            <div class="metric">
-                <span class="value">{{ collector.macrocount }}</span>
-                <span class="label">Macro calls</span>
+                <div class="metric">
+                    <span class="value">{{ collector.blockcount }}</span>
+                    <span class="label">Block calls</span>
+                </div>
+
+                <div class="metric">
+                    <span class="value">{{ collector.macrocount }}</span>
+                    <span class="label">Macro calls</span>
+                </div>
             </div>
         </div>
 
@@ -85,17 +89,14 @@
             <tbody>
             {% for template, count in collector.templates %}
                 <tr>
-                    {%- set file = collector.templatePaths[template]|default(false) -%}
-                    {%- set link = file ? file|file_link(1) : false -%}
-                    <td>
-                        <span class="sf-icon icon-twig">{{ source('@WebProfiler/Icon/twig.svg') }}</span>
+                    {% set file = collector.templatePaths[template]|default(false) %}
+                    {% set link = file ? file|file_link(1) : false %}
+                    <td class="font-normal">
                         {% if link %}
-                            <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
-                            <div>
-                                <a class="text-muted" href="{{ link }}" title="{{ file }}">
-                                    {{ file|file_relative|default(file) }}
-                                </a>
-                            </div>
+                            <a href="{{ link }}" title="{{ file }}" class="stretched-link">
+                                {{ template }}
+                                <span class="template-file-path">{{ file|file_relative|default(file) }}</span>
+                            </a>
                         {% else %}
                             {{ template }}
                         {% endif %}

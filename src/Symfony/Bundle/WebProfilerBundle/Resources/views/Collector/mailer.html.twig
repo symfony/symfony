@@ -82,22 +82,24 @@
     <h2>Emails</h2>
 
     {% if not events.messages|length %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No emails were sent.</p>
         </div>
+    {% else %}
+        <div class="metrics">
+            <div class="metric-group">
+                <div class="metric">
+                    <span class="value">{{ events.events|filter(e => e.isQueued())|length }}</span>
+                    <span class="label">Queued</span>
+                </div>
+
+                <div class="metric">
+                    <span class="value">{{ events.events|filter(e => not e.isQueued())|length }}</span>
+                    <span class="label">Sent</span>
+                </div>
+            </div>
+        </div>
     {% endif %}
-
-    <div class="metrics">
-        <div class="metric">
-            <span class="value">{{ events.events|filter(e => e.isQueued())|length }}</span>
-            <span class="label">Queued</span>
-        </div>
-
-        <div class="metric">
-            <span class="value">{{ events.events|filter(e => not e.isQueued())|length }}</span>
-            <span class="label">Sent</span>
-        </div>
-    </div>
 
     {% for transport in events.transports %}
         <div class="card-block">

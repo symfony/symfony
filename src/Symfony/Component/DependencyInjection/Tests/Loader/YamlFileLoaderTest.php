@@ -522,6 +522,27 @@ class YamlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
+    /**
+     * @dataProvider prototypeWithNullOrEmptyNodeDataProvider
+     */
+    public function testPrototypeWithNullOrEmptyNode(string $fileName)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The exclude list must not contain a "null" value.');
+
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load($fileName);
+    }
+
+    public function prototypeWithNullOrEmptyNodeDataProvider(): iterable
+    {
+        return [
+            ['services_prototype_with_null_node.yml'],
+            ['services_prototype_with_empty_node.yml'],
+        ];
+    }
+
     public function testPrototypeWithNamespace()
     {
         $container = new ContainerBuilder();

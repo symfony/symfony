@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-07-21T11:14:39Z
+
+I would rather fail with a good error message explaining you your mistake rather than silently ignoring the invalid pattern.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-07-21T11:28:32Z
+
+@stof Right, I force-pushed a check that will throw an error instead of ignoring it.
+
+If it's ok for you, tests will have to be updated to handle this case in a new test.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-21T12:06:19Z
+
+I think this should be rebased on 6.2.
+Can you update the tests?
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-07-21T21:43:54Z
+
+What if using an empty item in another part of the config throw another error in another part of Symfony? Should the config validator be more strict? As I wrote in #46833, the YAML (or XML, etc.) is still valid.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-07-21T23:24:58Z
+
+the Yaml being valid for the Yaml parser does not mean that the content of this Yaml is a valid input for the DependencyInjection file loader. That's why it is the FileLoader doing its validation on the input it expects.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-27T16:27:03Z
+
+Tests fail, see failures + fabbot report also.
+
+It'd be better to create dedicated test cases to me. Can you please update the PR to do so?
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-08-02T18:52:23Z
+
+The branch has been rebased and tests have been added.

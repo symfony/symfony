@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig;
 
+use Composer\InstalledVersions;
 use Symfony\Bundle\FullStack;
 use Twig\Error\SyntaxError;
 
@@ -93,6 +94,12 @@ class UndefinedCallableHandler
             throw new SyntaxError(sprintf('Did you forget to %s? Unknown %s "%s".', self::FULL_STACK_ENABLE[$component], $type, $name));
         }
 
-        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown %s "%s".', $component, $type, $name));
+        $missingPackage = 'symfony/'.$component;
+
+        if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled($missingPackage)) {
+            $missingPackage = 'symfony/twig-bundle';
+        }
+
+        throw new SyntaxError(sprintf('Did you forget to run "composer require %s"? Unknown %s "%s".', $missingPackage, $type, $name));
     }
 }

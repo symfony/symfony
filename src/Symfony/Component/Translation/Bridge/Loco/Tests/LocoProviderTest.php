@@ -458,9 +458,9 @@ class LocoProviderTest extends ProviderTestCase
         $expectedTranslatorBagEn->addCatalogue($arrayLoader->load([
             'index.hello' => 'Hello',
             'index.greetings' => 'Welcome, {firstname}!',
-        ], 'en'));
+        ], 'en', 'messages+intl-icu'));
 
-        yield ['en', 'messages', <<<'XLIFF'
+        yield ['en', 'messages+intl-icu', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
@@ -468,7 +468,7 @@ class LocoProviderTest extends ProviderTestCase
       <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
     </header>
     <body>
-      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext" extradata="loco:format=icu">
         <source>index.hello</source>
         <target state="translated">Hello</target>
       </trans-unit>
@@ -488,9 +488,9 @@ XLIFF
         $expectedTranslatorBagFr->addCatalogue($arrayLoader->load([
             'index.hello' => 'Bonjour',
             'index.greetings' => 'Bienvenue, {firstname} !',
-        ], 'fr'));
+        ], 'fr', 'messages+intl-icu'));
 
-        yield ['fr', 'messages', <<<'XLIFF'
+        yield ['fr', 'messages+intl-icu', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
@@ -498,7 +498,7 @@ XLIFF
       <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
     </header>
     <body>
-      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext" extradata="loco:format=icu">
         <source>index.hello</source>
         <target state="translated">Bonjour</target>
       </trans-unit>

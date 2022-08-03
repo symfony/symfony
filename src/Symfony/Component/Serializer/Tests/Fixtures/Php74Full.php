@@ -31,6 +31,8 @@ final class Php74Full
     public DummyMessageInterface $dummyMessage;
     /** @var TestFoo[] $nestedArray */
     public TestFoo $nestedObject;
+    /** @var Php74Full[] */
+    public $anotherCollection;
 }
 
 

@@ -9,14 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject;
+namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost;
 
-use Symfony\Component\VarExporter\LazyGhostObjectTrait;
+use Symfony\Component\VarExporter\LazyGhostTrait;
 
 class TestClass extends NoMagicClass
 {
-    use LazyGhostObjectTrait;
+    use LazyGhostTrait;
 
+    private int $lazyObjectId;
     public int $public = 1;
     protected int $protected = 2;
     protected readonly int $protectedReadonly;

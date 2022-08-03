@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\LazyProxy\Instantiator;
 
-use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
-use Symfony\Component\VarExporter\LazyGhostObjectInterface;
-use Symfony\Component\VarExporter\LazyGhostObjectTrait;
+use Symfony\Component\VarExporter\LazyGhostTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -27,14 +25,10 @@ final class LazyServiceInstantiator implements InstantiatorInterface
     {
         $dumper = new LazyServiceDumper();
 
-        if ($dumper->useProxyManager($definition)) {
-            return (new RuntimeInstantiator())->instantiateProxy($container, $definition, $id, $realInstantiator);
+        if (!class_exists($proxyClass = $dumper->getProxyClass($definition, $class), false)) {
+            eval($dumper->getProxyCode($definition));
         }
 
-        if (!class_exists($proxyClass = $dumper->getProxyClass($definition), false)) {
-            eval(sprintf('class %s extends %s implements %s { use %s; }', $proxyClass, $definition->getClass(), LazyGhostObjectInterface::class, LazyGhostObjectTrait::class));
-        }
-
-        return $proxyClass::createLazyGhostObject($realInstantiator);
+        return isset(class_uses($proxyClass)[LazyGhostTrait::class]) ? $proxyClass::createLazyGhost($realInstantiator) : $proxyClass::createLazyProxy($realInstantiator);
     }
 }

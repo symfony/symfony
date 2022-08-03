@@ -21,7 +21,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Prophecy\ProphecySubjectInterface;
 use ProxyManager\Proxy\ProxyInterface;
 use Symfony\Component\ErrorHandler\Internal\TentativeTypes;
-use Symfony\Component\VarExporter\LazyGhostObjectInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * Autoloader checking if the class is really defined in the file found.
@@ -251,7 +251,7 @@ class DebugClassLoader
                     && !is_subclass_of($symbols[$i], ProphecySubjectInterface::class)
                     && !is_subclass_of($symbols[$i], Proxy::class)
                     && !is_subclass_of($symbols[$i], ProxyInterface::class)
-                    && !is_subclass_of($symbols[$i], LazyGhostObjectInterface::class)
+                    && !is_subclass_of($symbols[$i], LazyObjectInterface::class)
                     && !is_subclass_of($symbols[$i], LegacyProxy::class)
                     && !is_subclass_of($symbols[$i], MockInterface::class)
                     && !is_subclass_of($symbols[$i], IMock::class)

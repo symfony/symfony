@@ -12,16 +12,16 @@
 namespace Symfony\Component\VarExporter\Internal;
 
 /**
- * Stores the state of lazy ghost objects and caches related reflection information.
+ * Stores the state of lazy objects and caches related reflection information.
  *
  * As a micro-optimization, this class uses no type declarations.
  *
  * @internal
  */
-class GhostObjectRegistry
+class LazyObjectRegistry
 {
     /**
-     * @var array<int, GhostObjectState>
+     * @var array<int, LazyObjectState>
      */
     public static $states = [];
 
@@ -46,17 +46,24 @@ class GhostObjectRegistry
     public static $classAccessors = [];
 
     /**
-     * @var array<class-string, array{get: int, set: bool, isset: bool, unset: bool, clone: bool, serialize: bool, sleep: bool, destruct: bool}>
+     * @var array<class-string, array{set: bool, isset: bool, unset: bool, clone: bool, serialize: bool, unserialize: bool, sleep: bool, wakeup: bool, destruct: bool, get: int}>
      */
     public static $parentMethods = [];
 
     public static function getClassResetters($class)
     {
         $classProperties = [];
-        $propertyScopes = Hydrator::$propertyScopes[$class] ??= Hydrator::getPropertyScopes($class);
+
+        if ((self::$classReflectors[$class] ??= new \ReflectionClass($class))->isInternal()) {
+            $propertyScopes = [];
+        } else {
+            $propertyScopes = Hydrator::$propertyScopes[$class] ??= Hydrator::getPropertyScopes($class);
+        }
 
         foreach ($propertyScopes as $key => [$scope, $name, $readonlyScope]) {
-            if ('lazyGhostObjectId' !== $name && null !== ($propertyScopes["\0$scope\0$name"] ?? $propertyScopes["\0*\0$name"] ?? $readonlyScope)) {
+            $propertyScopes[$k = "\0$scope\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = null !== $readonlyScope ? $name : null;
+
+            if ($k === $key && "\0$class\0lazyObjectId" !== $k) {
                 $classProperties[$readonlyScope ?? $scope][$name] = $key;
             }
         }
@@ -105,22 +112,40 @@ class GhostObjectRegistry
                     unset($instance->$name);
                 },
             ];
-        }, null, $class)();
+        }, null, \Closure::class === $class ? null : $class)();
     }
 
     public static function getParentMethods($class)
     {
         $parent = get_parent_class($class);
+        $methods = [];
 
-        return [
-            'get' => $parent && method_exists($parent, '__get') ? ((new \ReflectionMethod($parent, '__get'))->returnsReference() ? 2 : 1) : 0,
-            'set' => $parent && method_exists($parent, '__set'),
-            'isset' => $parent && method_exists($parent, '__isset'),
-            'unset' => $parent && method_exists($parent, '__unset'),
-            'clone' => $parent && method_exists($parent, '__clone'),
-            'serialize' => $parent && method_exists($parent, '__serialize'),
-            'sleep' => $parent && method_exists($parent, '__sleep'),
-            'destruct' => $parent && method_exists($parent, '__destruct'),
-        ];
+        foreach (['set', 'isset', 'unset', 'clone', 'serialize', 'unserialize', 'sleep', 'wakeup', 'destruct', 'get'] as $method) {
+            if (!$parent || !method_exists($parent, '__'.$method)) {
+                $methods[$method] = false;
+            } else {
+                $m = new \ReflectionMethod($parent, '__'.$method);
+                $methods[$method] = !$m->isAbstract() && !$m->isPrivate();
+            }
+        }
+
+        $methods['get'] = $methods['get'] ? ($m->returnsReference() ? 2 : 1) : 0;
+
+        return $methods;
+    }
+
+    public static function getScope($propertyScopes, $class, $property, $readonlyScope = null)
+    {
+        if (null === $readonlyScope && !isset($propertyScopes["\0$class\0$property"]) && !isset($propertyScopes["\0*\0$property"])) {
+            return null;
+        }
+
+        $scope = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['class'] ?? \Closure::class;
+
+        if (null === $readonlyScope && isset($propertyScopes["\0*\0$property"]) && ($class === $scope || is_subclass_of($class, $scope))) {
+            return null;
+        }
+
+        return $scope;
     }
 }

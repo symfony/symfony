@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject;
+namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost;
 
-use Symfony\Component\VarExporter\LazyGhostObjectInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
-class ChildTestClass extends TestClass implements LazyGhostObjectInterface
+class ChildTestClass extends TestClass implements LazyObjectInterface
 {
     public int $public = 4;
     public readonly int $publicReadonly;

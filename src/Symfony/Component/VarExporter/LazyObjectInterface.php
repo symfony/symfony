@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\VarExporter;
 
-interface LazyGhostObjectInterface
+interface LazyObjectInterface
 {
     /**
-     * Forces initialization of a lazy ghost object.
+     * Forces initialization of a lazy object and returns it.
      */
-    public function initializeLazyGhostObject(): void;
+    public function initializeLazyObject(): object;
 
     /**
-     * @return bool Returns false when the object cannot be reset, ie when it's not a ghost object
+     * @return bool Returns false when the object cannot be reset, ie when it's not a lazy object
      */
-    public function resetLazyGhostObject(): bool;
+    public function resetLazyObject(): bool;
 }

@@ -12,45 +12,44 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\VarExporter\Internal\GhostObjectId;
-use Symfony\Component\VarExporter\Internal\GhostObjectRegistry;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildMagicClass;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildStdClass;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\ChildTestClass;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\MagicClass;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhostObject\TestClass;
+use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildMagicClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\TestClass;
 
-class LazyGhostObjectTraitTest extends TestCase
+class LazyGhostTraitTest extends TestCase
 {
     public function testGetPublic()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $ghost) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $this->assertSame(-4, $instance->public);
         $this->assertSame(4, $instance->publicReadonly);
     }
 
     public function testIssetPublic()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $ghost) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $this->assertTrue(isset($instance->public));
         $this->assertSame(4, $instance->publicReadonly);
     }
 
     public function testUnsetPublic()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $ghost) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         unset($instance->public);
         $this->assertFalse(isset($instance->public));
         $this->assertSame(4, $instance->publicReadonly);
@@ -58,11 +57,11 @@ class LazyGhostObjectTraitTest extends TestCase
 
     public function testSetPublic()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $ghost) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $instance->public = 12;
         $this->assertSame(12, $instance->public);
         $this->assertSame(4, $instance->publicReadonly);
@@ -70,32 +69,35 @@ class LazyGhostObjectTraitTest extends TestCase
 
     public function testClone()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $ghost) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
             $ghost->__construct();
         });
 
         $clone = clone $instance;
 
         $this->assertNotSame((array) $instance, (array) $clone);
-        $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
-        $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $clone));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $clone));
 
         $clone = clone $clone;
-        $this->assertTrue($clone->resetLazyGhostObject());
+        $this->assertTrue($clone->resetLazyObject());
     }
 
     public function testSerialize()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $ghost) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
             $ghost->__construct();
         });
 
         $serialized = serialize($instance);
-        $this->assertStringNotContainsString('lazyGhostObjectId', $serialized);
+        $this->assertStringNotContainsString('lazyObjectId', $serialized);
 
         $clone = unserialize($serialized);
-        $this->assertSame(array_keys((array) $instance), array_keys((array) $clone));
-        $this->assertFalse($clone->resetLazyGhostObject());
+        $expected = (array) $instance;
+        $this->assertArrayHasKey("\0".TestClass::class."\0lazyObjectId", $expected);
+        unset($expected["\0".TestClass::class."\0lazyObjectId"]);
+        $this->assertSame(array_keys($expected), array_keys((array) $clone));
+        $this->assertFalse($clone->resetLazyObject());
     }
 
     /**
@@ -124,49 +126,49 @@ class LazyGhostObjectTraitTest extends TestCase
     {
         yield [new MagicClass()];
 
-        yield [ChildMagicClass::createLazyGhostObject(function (ChildMagicClass $instance) {
+        yield [ChildMagicClass::createLazyGhost(function (ChildMagicClass $instance) {
             $instance->__construct();
         })];
     }
 
     public function testDestruct()
     {
-        $registryCount = \count(GhostObjectRegistry::$states);
+        $registryCount = \count(LazyObjectRegistry::$states);
         $destructCounter = MagicClass::$destructCounter;
 
-        $instance = ChildMagicClass::createLazyGhostObject(function (ChildMagicClass $instance) {
+        $instance = ChildMagicClass::createLazyGhost(function (ChildMagicClass $instance) {
             $instance->__construct();
         });
 
         unset($instance);
         $this->assertSame($destructCounter, MagicClass::$destructCounter);
 
-        $instance = ChildMagicClass::createLazyGhostObject(function (ChildMagicClass $instance) {
+        $instance = ChildMagicClass::createLazyGhost(function (ChildMagicClass $instance) {
             $instance->__construct();
         });
-        $instance->initializeLazyGhostObject();
+        $instance->initializeLazyObject();
         unset($instance);
 
         $this->assertSame(1 + $destructCounter, MagicClass::$destructCounter);
 
-        $this->assertCount($registryCount, GhostObjectRegistry::$states);
+        $this->assertCount($registryCount, LazyObjectRegistry::$states);
     }
 
-    public function testResetLazyGhostObject()
+    public function testResetLazyGhost()
     {
-        $instance = ChildMagicClass::createLazyGhostObject(function (ChildMagicClass $instance) {
+        $instance = ChildMagicClass::createLazyGhost(function (ChildMagicClass $instance) {
             $instance->__construct();
         });
 
         $instance->foo = 234;
-        $this->assertTrue($instance->resetLazyGhostObject());
+        $this->assertTrue($instance->resetLazyObject());
         $this->assertSame('bar', $instance->foo);
     }
 
     public function testFullInitialization()
     {
         $counter = 0;
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $ghost) use (&$counter) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) use (&$counter) {
             ++$counter;
             $ghost->__construct();
         });
@@ -180,7 +182,7 @@ class LazyGhostObjectTraitTest extends TestCase
     public function testPartialInitialization()
     {
         $counter = 0;
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) use (&$counter) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) use (&$counter) {
             ++$counter;
 
             return match ($propertyName) {
@@ -195,25 +197,25 @@ class LazyGhostObjectTraitTest extends TestCase
             };
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $this->assertSame(123, $instance->public);
-        $this->assertSame(['public', "\0".TestClass::class."\0lazyGhostObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectId", 'public'], array_keys((array) $instance));
         $this->assertSame(1, $counter);
 
-        $instance->initializeLazyGhostObject();
+        $instance->initializeLazyObject();
         $this->assertSame(123, $instance->public);
         $this->assertSame(6, $counter);
 
         $properties = (array) $instance;
+        $this->assertIsInt($properties["\0".TestClass::class."\0lazyObjectId"]);
+        unset($properties["\0".TestClass::class."\0lazyObjectId"]);
         $this->assertSame(array_keys((array) new ChildTestClass()), array_keys($properties));
-        $properties = array_values($properties);
-        $this->assertInstanceOf(GhostObjectId::class, array_splice($properties, 4, 1)[0]);
         $this->assertSame([123, 345, 456, 567, 234, 678], array_values($properties));
     }
 
     public function testPartialInitializationWithReset()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) {
             return 234;
         });
 
@@ -222,26 +224,26 @@ class LazyGhostObjectTraitTest extends TestCase
         $this->assertSame(234, $instance->publicReadonly);
         $this->assertSame(123, $instance->public);
 
-        $this->assertTrue($instance->resetLazyGhostObject());
+        $this->assertTrue($instance->resetLazyObject());
         $this->assertSame(234, $instance->publicReadonly);
         $this->assertSame(123, $instance->public);
 
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) {
             return 234;
         });
 
-        $instance->resetLazyGhostObject();
+        $instance->resetLazyObject();
 
         $instance->public = 123;
         $this->assertSame(123, $instance->public);
 
-        $this->assertTrue($instance->resetLazyGhostObject());
+        $this->assertTrue($instance->resetLazyObject());
         $this->assertSame(234, $instance->public);
     }
 
     public function testPartialInitializationWithNastyPassByRef()
     {
-        $instance = ChildTestClass::createLazyGhostObject(function (ChildTestClass $instance, string &$propertyName, ?string &$propertyScope) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string &$propertyName, ?string &$propertyScope) {
             return $propertyName = $propertyScope = 123;
         });
 
@@ -250,7 +252,7 @@ class LazyGhostObjectTraitTest extends TestCase
 
     public function testSetStdClassProperty()
     {
-        $instance = ChildStdClass::createLazyGhostObject(function (ChildStdClass $ghost) {
+        $instance = ChildStdClass::createLazyGhost(function (ChildStdClass $ghost) {
         });
 
         $instance->public = 12;

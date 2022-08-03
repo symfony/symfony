@@ -71,7 +71,12 @@ abstract class AbstractDoctrineExtension extends Extension
                 $mappingConfig['is_bundle'] = !is_dir($mappingConfig['dir']);
             }
 
-            if ($mappingConfig['is_bundle']) {
+            if (!$mappingConfig['is_bundle']) {
+                if (!$mappingConfig['type']) {
+                    $mappingConfig['type'] = $this->detectMappingType($mappingConfig['dir'], $container);
+                } else {
+                }
+            } else {
                 $bundle = null;
                 $bundleMetadata = null;
                 foreach ($container->getParameter('kernel.bundles') as $name => $class) {
@@ -91,8 +96,6 @@ abstract class AbstractDoctrineExtension extends Extension
                 if (!$mappingConfig) {
                     continue;
                 }
-            } elseif (!$mappingConfig['type']) {
-                $mappingConfig['type'] = $this->detectMappingType($mappingConfig['dir'], $container);
             }
 
             $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
@@ -108,10 +111,10 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function setMappingDriverAlias(array $mappingConfig, string $mappingName)
     {
-        if (isset($mappingConfig['alias'])) {
-            $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
-        } else {
+        if (!isset($mappingConfig['alias'])) {
             $this->aliasMap[$mappingName] = $mappingConfig['prefix'];
+        } else {
+            $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
         }
     }
 
@@ -154,10 +157,10 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!$bundleConfig['dir']) {
-            if (\in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
-                $bundleConfig['dir'] = $bundleClassDir.'/'.$this->getMappingObjectDefaultName();
+            if (!\in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
+                $bundleConfig['dir'] = $bundleDir . '/' . $this->getMappingResourceConfigDirectory($bundleDir);
             } else {
-                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory($bundleDir);
+                $bundleConfig['dir'] = $bundleClassDir . '/' . $this->getMappingObjectDefaultName();
             }
         } else {
             $bundleConfig['dir'] = $bundleDir.'/'.$bundleConfig['dir'];
@@ -176,37 +179,39 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container)
     {
         // configure metadata driver for each bundle based on the type of mapping files found
-        if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'))) {
-            $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'));
-        } else {
+        if (!$container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
             $chainDriverDef = new Definition($this->getMetadataDriverClass('driver_chain'));
             $chainDriverDef->setPublic(false);
+        } else {
+            $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'));
         }
 
         foreach ($this->drivers as $driverType => $driverPaths) {
             $mappingService = $this->getObjectManagerElementName($objectManager['name'].'_'.$driverType.'_metadata_driver');
-            if ($container->hasDefinition($mappingService)) {
+            if (!$container->hasDefinition($mappingService)) {
+                if ('attribute' === $driverType) {
+                    $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                        array_values($driverPaths),
+                    ]);
+                } elseif ('annotation' == $driverType) {
+                    $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                        new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
+                        array_values($driverPaths),
+                    ]);
+                } else {
+                    $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                        array_values($driverPaths),
+                    ]);
+                }
+            } else {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
-                if ('annotation' == $driverType) {
-                    $args[1] = array_merge(array_values($driverPaths), $args[1]);
-                } else {
+                if ('annotation' != $driverType) {
                     $args[0] = array_merge(array_values($driverPaths), $args[0]);
+                } else {
+                    $args[1] = array_merge(array_values($driverPaths), $args[1]);
                 }
                 $mappingDriverDef->setArguments($args);
-            } elseif ('attribute' === $driverType) {
-                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
-                    array_values($driverPaths),
-                ]);
-            } elseif ('annotation' == $driverType) {
-                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
-                    new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
-                    array_values($driverPaths),
-                ]);
-            } else {
-                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
-                    array_values($driverPaths),
-                ]);
             }
             $mappingDriverDef->setPublic(false);
             if (str_contains($mappingDriverDef->getClass(), 'yml') || str_contains($mappingDriverDef->getClass(), 'xml')) {
@@ -252,25 +257,27 @@ abstract class AbstractDoctrineExtension extends Extension
         $configPath = $this->getMappingResourceConfigDirectory($dir);
         $extension = $this->getMappingResourceExtension();
 
-        if (glob($dir.'/'.$configPath.'/*.'.$extension.'.xml', \GLOB_NOSORT)) {
-            $driver = 'xml';
-        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.yml', \GLOB_NOSORT)) {
-            $driver = 'yml';
-        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.php', \GLOB_NOSORT)) {
-            $driver = 'php';
+        if (!glob($dir . '/' . $configPath . '/*.' . $extension . '.xml', \GLOB_NOSORT)) {
+            if (glob($dir . '/' . $configPath . '/*.' . $extension . '.yml', \GLOB_NOSORT)) {
+                $driver = 'yml';
+            } elseif (glob($dir . '/' . $configPath . '/*.' . $extension . '.php', \GLOB_NOSORT)) {
+                $driver = 'php';
+            } else {
+                // add the closest existing directory as a resource
+                $resource = $dir . '/' . $configPath;
+                while (!is_dir($resource)) {
+                    $resource = \dirname($resource);
+                }
+                $container->fileExists($resource, false);
+
+                if ($container->fileExists($dir . '/' . $this->getMappingObjectDefaultName(), false)) {
+                    return $this->detectMappingType($dir, $container);
+                }
+
+                return null;
+            }
         } else {
-            // add the closest existing directory as a resource
-            $resource = $dir.'/'.$configPath;
-            while (!is_dir($resource)) {
-                $resource = \dirname($resource);
-            }
-            $container->fileExists($resource, false);
-
-            if ($container->fileExists($dir.'/'.$this->getMappingObjectDefaultName(), false)) {
-                return $this->detectMappingType($dir, $container);
-            }
-
-            return null;
+            $driver = 'xml';
         }
         $container->fileExists($dir.'/'.$configPath, false);
 

@@ -77,10 +77,10 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => ParameterType::STRING];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
+        if (!method_exists($this->conn, 'executeStatement')) {
             $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        } else {
+            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
         }
     }
 
@@ -100,10 +100,10 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             'lastUsed' => Types::DATETIME_MUTABLE,
             'series' => ParameterType::STRING,
         ];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
+        if (!method_exists($this->conn, 'executeStatement')) {
             $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        } else {
+            $updated = $this->conn->executeStatement($sql, $paramValues, $paramTypes);
         }
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
@@ -130,10 +130,10 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             'value' => ParameterType::STRING,
             'lastUsed' => Types::DATETIME_MUTABLE,
         ];
-        if (method_exists($this->conn, 'executeStatement')) {
-            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
-        } else {
+        if (!method_exists($this->conn, 'executeStatement')) {
             $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
+        } else {
+            $this->conn->executeStatement($sql, $paramValues, $paramTypes);
         }
     }
 

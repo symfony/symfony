@@ -130,12 +130,12 @@ class DoctrineDataCollector extends DataCollector
                 $s->value = $o->getObject();
 
                 $r = new \ReflectionClass($o->getClass());
-                if ($f = $r->getFileName()) {
-                    $s->attr['file'] = $f;
-                    $s->attr['line'] = $r->getStartLine();
-                } else {
+                if (!($f = $r->getFileName())) {
                     unset($s->attr['file']);
                     unset($s->attr['line']);
+                } else {
+                    $s->attr['file'] = $f;
+                    $s->attr['line'] = $r->getStartLine();
                 }
 
                 if ($error = $o->getError()) {

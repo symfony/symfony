@@ -105,21 +105,21 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                     [$managerDef, $managerClass] = $managerDefs[$con];
                 }
 
-                if (ContainerAwareEventManager::class === $managerClass) {
+                if (ContainerAwareEventManager::class !== $managerClass) {
+                    if ($subscriberTag !== $tagName) {
+                        $managerDef->addMethodCall('addEventListener', [[$tag['event']], new Reference($id)]);
+                    } else {
+                        $managerDef->addMethodCall('addEventSubscriber', [new Reference($id)]);
+                    }
+                } else {
                     $refs = $managerDef->getArguments()[1] ?? [];
                     $listenerRefs[$con][$id] = new Reference($id);
-                    if ($subscriberTag === $tagName) {
-                        $refs[] = $id;
-                    } else {
+                    if ($subscriberTag !== $tagName) {
                         $refs[] = [[$tag['event']], $id];
+                    } else {
+                        $refs[] = $id;
                     }
                     $managerDef->setArgument(1, $refs);
-                } else {
-                    if ($subscriberTag === $tagName) {
-                        $managerDef->addMethodCall('addEventSubscriber', [new Reference($id)]);
-                    } else {
-                        $managerDef->addMethodCall('addEventListener', [[$tag['event']], new Reference($id)]);
-                    }
                 }
             }
         }

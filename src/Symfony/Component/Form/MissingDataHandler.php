@@ -31,24 +31,16 @@ class MissingDataHandler
 
     private function handleMissingData(FormInterface $form, mixed $data): mixed
     {
-        try {
-            if ($form->getConfig()->getType() instanceof ResolvedFormTypeInterface && $form->getConfig()->getType()->getInnerType() instanceof CheckboxType) {
-                $falseValues = $form->getConfig()->getOption('false_values');
+        if ($form->getConfig()->getType() instanceof ResolvedFormTypeInterface && $form->getConfig()->getType()->getInnerType() instanceof CheckboxType) {
+            $falseValues = $form->getConfig()->getOption('false_values');
 
-                if ($data === $this->missingData) {
-                    return $falseValues[0];
-                }
-
-                if (\in_array($data, $falseValues)) {
-                    return $data;
-                }
+            if ($data === $this->missingData) {
+                return $falseValues[0];
             }
-        } catch (\Error $error) {
-            if ('Typed property Symfony\Component\Form\FormConfigBuilder::$type must not be accessed before initialization' === $error->getMessage()) {
+
+            if (\in_array($data, $falseValues)) {
                 return $data;
             }
-
-            throw $error;
         }
 
         if (null === $data || $this->missingData === $data) {

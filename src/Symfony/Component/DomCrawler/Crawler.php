@@ -623,7 +623,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $text = $this->getNode(0)->nodeValue;
 
         if ($normalizeWhitespace) {
-            return trim(preg_replace('/(?:\s{2,}+|[^\S ])/', ' ', $text));
+            return trim(preg_replace("/(?:[ \n\r\t\x0C]{2,}+|[\n\r\t\x0C])/", ' ', $text), " \n\r\t\x0C");
         }
 
         return $text;

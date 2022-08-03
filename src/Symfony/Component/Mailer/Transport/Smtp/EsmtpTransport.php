@@ -114,8 +114,16 @@ class EsmtpTransport extends SmtpTransport
     {
         try {
             $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-        } catch (TransportExceptionInterface) {
-            return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
+        } catch (TransportExceptionInterface $e) {
+            try {
+                return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
+            } catch (TransportExceptionInterface $ex) {
+                if (!$ex->getCode()) {
+                    throw $e;
+                }
+
+                throw $ex;
+            }
         }
 
         $this->capabilities = $this->parseCapabilities($response);
@@ -132,12 +140,8 @@ class EsmtpTransport extends SmtpTransport
                 throw new TransportException('Unable to connect with STARTTLS.');
             }
 
-            try {
-                $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
-                $this->capabilities = $this->parseCapabilities($response);
-            } catch (TransportExceptionInterface) {
-                return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
-            }
+            $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+            $this->capabilities = $this->parseCapabilities($response);
         }
 
         if (\array_key_exists('AUTH', $this->capabilities)) {

@@ -854,7 +854,8 @@ class SerializerTest extends TestCase
             },
             "nestedObject": {
                 "int": "string"
-            }
+            },
+            "anotherCollection": null
         }';
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
@@ -1029,6 +1030,13 @@ class SerializerTest extends TestCase
                 'path' => 'nestedObject[int]',
                 'useMessageForUser' => true,
                 'message' => 'The type of the key "int" must be "int" ("string" given).',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => ['array'],
+                'path' => 'anotherCollection',
+                'useMessageForUser' => false,
+                'message' => 'Data expected to be "Symfony\Component\Serializer\Tests\Fixtures\Php74Full[]", "null" given.',
             ],
         ];
 

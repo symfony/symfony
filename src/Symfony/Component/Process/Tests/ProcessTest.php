@@ -176,7 +176,6 @@ class ProcessTest extends TestCase
 
         // Don't call Process::run nor Process::wait to avoid any read of pipes
         $h = new \ReflectionProperty($p, 'process');
-        $h->setAccessible(true);
         $h = $h->getValue($p);
         $s = @proc_get_status($h);
 
@@ -568,7 +567,6 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('');
         $r = new \ReflectionObject($process);
         $p = $r->getProperty('exitcode');
-        $p->setAccessible(true);
 
         $p->setValue($process, 2);
         $this->assertEquals('Misuse of shell builtins', $process->getExitCodeText());
@@ -1133,7 +1131,7 @@ class ProcessTest extends TestCase
     public function responsesCodeProvider()
     {
         return [
-            //expected output / getter / code to execute
+            // expected output / getter / code to execute
             // [1,'getExitCode','exit(1);'],
             // [true,'isSuccessful','exit();'],
             ['output', 'getOutput', 'echo \'output\';'],
@@ -1505,8 +1503,11 @@ class ProcessTest extends TestCase
 
     public function testEnvArgument()
     {
-        $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $cmd = '\\' === \DIRECTORY_SEPARATOR ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
+        $p = Process::fromShellCommandline($cmd);
+        $this->assertSame([], $p->getEnv());
+
+        $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $p = Process::fromShellCommandline($cmd, null, $env);
         $p->run(null, ['BAR' => 'baR', 'BAZ' => 'baZ']);
 
@@ -1547,9 +1548,7 @@ class ProcessTest extends TestCase
             $process = new Process($commandline, $cwd, $env, $input, $timeout);
         }
 
-        if (self::$process) {
-            self::$process->stop(0);
-        }
+        self::$process?->stop(0);
 
         return self::$process = $process;
     }

@@ -27,8 +27,8 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactoryInter
  */
 final class ArgumentResolver implements ArgumentResolverInterface
 {
-    private $argumentMetadataFactory;
-    private $argumentValueResolvers;
+    private ArgumentMetadataFactoryInterface $argumentMetadataFactory;
+    private iterable $argumentValueResolvers;
 
     /**
      * @param iterable<mixed, ArgumentValueResolverInterface> $argumentValueResolvers
@@ -45,8 +45,9 @@ final class ArgumentResolver implements ArgumentResolverInterface
     public function getArguments(Request $request, callable $controller): array
     {
         $arguments = [];
+        $reflectors = $request->attributes->get('_controller_reflectors') ?? [];
 
-        foreach ($this->argumentMetadataFactory->createArgumentMetadata($controller) as $metadata) {
+        foreach ($this->argumentMetadataFactory->createArgumentMetadata($controller, ...$reflectors) as $metadata) {
             foreach ($this->argumentValueResolvers as $resolver) {
                 if (!$resolver->supports($request, $metadata)) {
                     continue;

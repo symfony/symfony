@@ -13,10 +13,10 @@ namespace Symfony\Bridge\Doctrine\DataCollector;
 
 final class ObjectParameter
 {
-    private $object;
-    private $error;
-    private $stringable;
-    private $class;
+    private object $object;
+    private ?\Throwable $error;
+    private bool $stringable;
+    private string $class;
 
     public function __construct(object $object, ?\Throwable $error)
     {

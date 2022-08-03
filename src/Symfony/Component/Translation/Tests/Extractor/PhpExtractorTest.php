@@ -130,9 +130,6 @@ EOF;
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
     }
 
-    /**
-     * @requires PHP 7.3
-     */
     public function testExtractionFromIndentedHeredocNowdoc()
     {
         $catalogue = new MessageCatalogue('en');

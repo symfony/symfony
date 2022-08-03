@@ -32,8 +32,8 @@ class HandleMessageMiddleware implements MiddlewareInterface
 {
     use LoggerAwareTrait;
 
-    private $handlersLocator;
-    private $allowNoHandlers;
+    private HandlersLocatorInterface $handlersLocator;
+    private bool $allowNoHandlers;
 
     public function __construct(HandlersLocatorInterface $handlersLocator, bool $allowNoHandlers = false)
     {
@@ -53,7 +53,6 @@ class HandleMessageMiddleware implements MiddlewareInterface
         $message = $envelope->getMessage();
 
         $context = [
-            'message' => $message,
             'class' => \get_class($message),
         ];
 

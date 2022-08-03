@@ -1,4 +1,5 @@
 framework:
+    http_method_override: false
     assets:
         version: SomeVersionScheme
         version_format: '%%s?version=%%s'

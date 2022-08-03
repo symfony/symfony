@@ -48,7 +48,7 @@ class Ip extends Constraint
 
     public const INVALID_IP_ERROR = 'b1b427ae-9f6f-41b0-aa9b-84511fbb3c5b';
 
-    protected static $versions = [
+    protected const VERSIONS = [
         self::V4,
         self::V6,
         self::ALL,
@@ -66,9 +66,19 @@ class Ip extends Constraint
         self::ALL_ONLY_PUBLIC,
     ];
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_IP_ERROR => 'INVALID_IP_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const VERSIONS instead
+     */
+    protected static $versions = self::VERSIONS;
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $version = self::V4;
 
@@ -85,7 +95,7 @@ class Ip extends Constraint
         string $message = null,
         callable $normalizer = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 

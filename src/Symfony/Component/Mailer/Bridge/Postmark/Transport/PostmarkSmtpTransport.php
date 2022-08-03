@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
@@ -53,6 +54,10 @@ class PostmarkSmtpTransport extends EsmtpTransport
 
         foreach ($headers->all() as $name => $header) {
             if ($header instanceof TagHeader) {
+                if ($headers->has('X-PM-Tag')) {
+                    throw new TransportException('Postmark only allows a single tag per email.');
+                }
+
                 $headers->addTextHeader('X-PM-Tag', $header->getValue());
                 $headers->remove($name);
             }
@@ -71,7 +76,7 @@ class PostmarkSmtpTransport extends EsmtpTransport
     /**
      * @return $this
      */
-    public function setMessageStream(string $messageStream): self
+    public function setMessageStream(string $messageStream): static
     {
         $this->messageStream = $messageStream;
 

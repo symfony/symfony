@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -151,10 +160,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertTrue(isset($data[0]['bar_hit']));
     }
 
-    /**
-     * @return MockObject&Reader
-     */
-    private function getReadOnlyReader(): Reader
+    private function getReadOnlyReader(): MockObject&Reader
     {
         $readerMock = $this->createMock(Reader::class);
         $readerMock->expects($this->exactly(0))->method('getClassAnnotations');

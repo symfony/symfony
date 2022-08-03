@@ -19,23 +19,9 @@ use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
-use Symfony\Contracts\Tests\Fixtures\TestServiceSubscriberUnion;
 
 class ServiceSubscriberTraitTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
-    {
-        $expected = [LegacyTestService::class.'::aService' => '?'.Service2::class];
-
-        $this->assertEquals($expected, LegacyChildTestService::getSubscribedServices());
-    }
-
-    /**
-     * @requires PHP 8
-     */
     public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
     {
         $expected = [
@@ -55,15 +41,30 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertSame($container, (new TestService())->setContainer($container));
     }
 
-    /**
-     * @requires PHP 8
-     * @group legacy
-     */
-    public function testMethodsWithUnionReturnTypesAreIgnored()
+    public function testParentNotCalledIfHasMagicCall()
     {
-        $expected = [TestServiceSubscriberUnion::class.'::method1' => '?Symfony\Contracts\Tests\Fixtures\Service1'];
+        $container = new class([]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+        $service = new class() extends ParentWithMagicCall {
+            use ServiceSubscriberTrait;
+        };
 
-        $this->assertEquals($expected, TestServiceSubscriberUnion::getSubscribedServices());
+        $this->assertNull($service->setContainer($container));
+        $this->assertSame([], $service::getSubscribedServices());
+    }
+
+    public function testParentNotCalledIfNoParent()
+    {
+        $container = new class([]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+        $service = new class() {
+            use ServiceSubscriberTrait;
+        };
+
+        $this->assertNull($service->setContainer($container));
+        $this->assertSame([], $service::getSubscribedServices());
     }
 }
 
@@ -76,22 +77,6 @@ class ParentTestService
     public function setContainer(ContainerInterface $container)
     {
         return $container;
-    }
-}
-
-class LegacyTestService extends ParentTestService implements ServiceSubscriberInterface
-{
-    use ServiceSubscriberTrait;
-
-    public function aService(): Service2
-    {
-    }
-}
-
-class LegacyChildTestService extends LegacyTestService
-{
-    public function aChildService(): Service3
-    {
     }
 }
 
@@ -115,6 +100,19 @@ class ChildTestService extends TestService
     #[SubscribedService]
     public function aChildService(): Service3
     {
+    }
+}
+
+class ParentWithMagicCall
+{
+    public function __call($method, $args)
+    {
+        throw new \BadMethodCallException('Should not be called.');
+    }
+
+    public static function __callStatic($method, $args)
+    {
+        throw new \BadMethodCallException('Should not be called.');
     }
 }
 

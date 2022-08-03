@@ -391,6 +391,62 @@ class ConfigurationTest extends TestCase
         $configuration->writeBaseline();
     }
 
+    public function testExistingIgnoreFile()
+    {
+        $filename = $this->createFile();
+        $ignorePatterns = [
+            '/Test message .*/',
+            '/^\d* occurrences/',
+        ];
+        file_put_contents($filename, implode("\n", $ignorePatterns));
+
+        $configuration = Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertFalse($configuration->isIgnoredDeprecation(new Deprecation('Test mexxage 3', $trace, '')));
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('1 occurrences', $trace, '')));
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('1200 occurrences and more', $trace, '')));
+        $this->assertFalse($configuration->isIgnoredDeprecation(new Deprecation('Many occurrences', $trace, '')));
+    }
+
+    public function testIgnoreFilePatternInvalid()
+    {
+        $filename = $this->createFile();
+        $ignorePatterns = [
+            '/Test message (.*/',
+        ];
+        file_put_contents($filename, implode("\n", $ignorePatterns));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('missing closing parenthesis');
+        $configuration = Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
+    }
+
+    public function testIgnoreFilePatternException()
+    {
+        $filename = $this->createFile();
+        $ignorePatterns = [
+            '/(?:\D+|<\d+>)*[!?]/',
+        ];
+        file_put_contents($filename, implode("\n", $ignorePatterns));
+
+        $configuration = Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
+        $trace = debug_backtrace();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/[Bb]acktrack limit exhausted/');
+        $configuration->isIgnoredDeprecation(new Deprecation('foobar foobar foobar', $trace, ''));
+    }
+
+    public function testIgnoreFileException()
+    {
+        $filename = $this->createFile();
+        unlink($filename);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The ignoreFile "%s" does not exist.', $filename));
+        Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
+    }
+
     protected function setUp(): void
     {
         $this->files = [];

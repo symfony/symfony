@@ -20,7 +20,7 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
  */
 class ParsedExpression extends Expression
 {
-    private $nodes;
+    private Node $nodes;
 
     public function __construct(string $expression, Node $nodes)
     {

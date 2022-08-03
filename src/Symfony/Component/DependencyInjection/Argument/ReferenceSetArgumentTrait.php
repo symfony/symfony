@@ -11,16 +11,20 @@
 
 namespace Symfony\Component\DependencyInjection\Argument;
 
+trigger_deprecation('symfony/dependency-injection', '6.1', '"%s" is deprecated.', ReferenceSetArgumentTrait::class);
+
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since Symfony 6.1
  */
 trait ReferenceSetArgumentTrait
 {
-    private $values;
+    private array $values;
 
     /**
      * @param Reference[] $values
@@ -33,7 +37,7 @@ trait ReferenceSetArgumentTrait
     /**
      * @return Reference[]
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

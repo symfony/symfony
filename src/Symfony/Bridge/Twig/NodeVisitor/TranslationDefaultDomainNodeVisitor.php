@@ -30,7 +30,7 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
  */
 final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 {
-    private $scope;
+    private Scope $scope;
 
     public function __construct()
     {

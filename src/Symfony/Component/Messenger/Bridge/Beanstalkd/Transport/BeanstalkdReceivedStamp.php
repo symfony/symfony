@@ -18,8 +18,8 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class BeanstalkdReceivedStamp implements NonSendableStampInterface
 {
-    private $id;
-    private $tube;
+    private string $id;
+    private string $tube;
 
     public function __construct(string $id, string $tube)
     {

@@ -20,7 +20,7 @@ namespace Symfony\Component\Config\Builder;
  */
 class Method
 {
-    private $content;
+    private string $content;
 
     public function __construct(string $content)
     {

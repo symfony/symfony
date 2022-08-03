@@ -52,7 +52,7 @@ class MultiplierRetryStrategyTest extends TestCase
     /**
      * @dataProvider getWaitTimeTests
      */
-    public function testGetWaitTime(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
+    public function testGetWaitTime(int $delay, float $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
         $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries)]);
@@ -83,5 +83,10 @@ class MultiplierRetryStrategyTest extends TestCase
         // never a delay
         yield [0, 2, 10000, 0, 0];
         yield [0, 2, 10000, 1, 0];
+
+        // Float delay
+        yield [1000, 1.5555, 5000, 0, 1000];
+        yield [1000, 1.5555, 5000, 1, 1556];
+        yield [1000, 1.5555, 5000, 2, 2420];
     }
 }

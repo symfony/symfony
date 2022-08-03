@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Deprecate the `Security` class, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+
+6.0
+---
+
+ * `TokenInterface` does not extend `Serializable` anymore
+ * Remove all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
+ * Remove methods `getPassword()` and `getSalt()` from `UserInterface`, use `PasswordAuthenticatedUserInterface`
+   or `LegacyPasswordAuthenticatedUserInterface` instead
+* `AccessDecisionManager` requires the strategy to be passed as in instance of `AccessDecisionStrategyInterface`
+
 5.4
 ---
 

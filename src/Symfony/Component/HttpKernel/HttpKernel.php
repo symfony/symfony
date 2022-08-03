@@ -53,26 +53,35 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     protected $dispatcher;
     protected $resolver;
     protected $requestStack;
-    private $argumentResolver;
+    private ArgumentResolverInterface $argumentResolver;
+    private bool $catchThrowable;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null, bool $catchThrowable = false)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?? new RequestStack();
         $this->argumentResolver = $argumentResolver ?? new ArgumentResolver();
+        $this->catchThrowable = $catchThrowable;
+        if (!$catchThrowable) {
+            trigger_deprecation('symfony/http-kernel', '6.2', 'Starting from 7.0, "%s::handle()" will catch \Throwable exceptions and convert them to HttpFoundation responses. Pass $catchThrowable=true to adapt to this behavior now.', self::class);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true)
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         $request->headers->set('X-Php-Ob-Level', (string) ob_get_level());
 
         try {
             return $this->handleRaw($request, $type);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            if (!$this->catchThrowable && !$e instanceof \Exception) {
+                throw $e;
+            }
+
             if ($e instanceof RequestExceptionInterface) {
                 $e = new BadRequestHttpException($e->getMessage(), $e);
             }
@@ -143,7 +152,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         // controller arguments
         $arguments = $this->argumentResolver->getArguments($request, $controller);
 
-        $event = new ControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
+        $event = new ControllerArgumentsEvent($this, $event, $arguments, $request, $type);
         $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER_ARGUMENTS);
         $controller = $event->getController();
         $arguments = $event->getArguments();
@@ -153,7 +162,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // view
         if (!$response instanceof Response) {
-            $event = new ViewEvent($this, $request, $type, $response);
+            $event = new ViewEvent($this, $request, $type, $response, $event);
             $this->dispatcher->dispatch($event, KernelEvents::VIEW);
 
             if ($event->hasResponse()) {
@@ -169,6 +178,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 throw new ControllerDoesNotReturnResponseException($msg, $controller, __FILE__, __LINE__ - 17);
             }
         }
+        $request->attributes->remove('_controller_reflectors');
 
         return $this->filterResponse($response, $request, $type);
     }
@@ -205,7 +215,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Handles a throwable by trying to convert it to a Response.
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
@@ -237,7 +247,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         try {
             return $this->filterResponse($response, $request, $type);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            if (!$this->catchThrowable && !$e instanceof \Exception) {
+                throw $e;
+            }
+
             return $response;
         }
     }
@@ -245,7 +259,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Returns a human-readable string for the specified variable.
      */
-    private function varToString($var): string
+    private function varToString(mixed $var): string
     {
         if (\is_object($var)) {
             return sprintf('an object of type %s', \get_class($var));

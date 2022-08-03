@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,14 +38,6 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        ];
-    }
-
     /**
      * Gets the public 'foo' shared service.
      *
@@ -63,8 +55,8 @@ class ProjectServiceContainer extends Container
      */
     protected function getServiceClosureService()
     {
-        return $this->services['service_closure'] = new \Bar(function () {
-            return ($this->services['foo'] ?? ($this->services['foo'] = new \Foo()));
+        return $this->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] function () {
+            return ($this->services['foo'] ??= new \Foo());
         });
     }
 

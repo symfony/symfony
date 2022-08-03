@@ -89,7 +89,7 @@ return [
         'co' => 'corso',
         'cop' => 'copta',
         'cr' => 'cree',
-        'crh' => 'turco da Crimeia',
+        'crh' => 'tártara da Crimeia',
         'crs' => 'crioulo francês seichelense',
         'cs' => 'tcheco',
         'csb' => 'kashubian',

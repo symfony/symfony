@@ -104,6 +104,7 @@ return [
         'en_MS' => 'Gĩthungũ (Montserrati)',
         'en_MT' => 'Gĩthungũ (Malta)',
         'en_MU' => 'Gĩthungũ (Morisi)',
+        'en_MV' => 'Gĩthungũ (Modivu)',
         'en_MW' => 'Gĩthungũ (Malawi)',
         'en_MY' => 'Gĩthungũ (Malesia)',
         'en_NA' => 'Gĩthungũ (Namimbia)',

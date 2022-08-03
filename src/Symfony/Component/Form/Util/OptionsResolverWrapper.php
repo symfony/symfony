@@ -22,16 +22,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OptionsResolverWrapper extends OptionsResolver
 {
-    private $undefined = [];
+    private array $undefined = [];
 
     /**
      * @return $this
      */
-    public function setNormalizer(string $option, \Closure $normalizer): self
+    public function setNormalizer(string $option, \Closure $normalizer): static
     {
         try {
             parent::setNormalizer($option, $normalizer);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -41,11 +41,11 @@ class OptionsResolverWrapper extends OptionsResolver
     /**
      * @return $this
      */
-    public function setAllowedValues(string $option, $allowedValues): self
+    public function setAllowedValues(string $option, mixed $allowedValues): static
     {
         try {
             parent::setAllowedValues($option, $allowedValues);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -55,11 +55,11 @@ class OptionsResolverWrapper extends OptionsResolver
     /**
      * @return $this
      */
-    public function addAllowedValues(string $option, $allowedValues): self
+    public function addAllowedValues(string $option, mixed $allowedValues): static
     {
         try {
             parent::addAllowedValues($option, $allowedValues);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -71,11 +71,11 @@ class OptionsResolverWrapper extends OptionsResolver
      *
      * @return $this
      */
-    public function setAllowedTypes(string $option, $allowedTypes): self
+    public function setAllowedTypes(string $option, $allowedTypes): static
     {
         try {
             parent::setAllowedTypes($option, $allowedTypes);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 
@@ -87,11 +87,11 @@ class OptionsResolverWrapper extends OptionsResolver
      *
      * @return $this
      */
-    public function addAllowedTypes(string $option, $allowedTypes): self
+    public function addAllowedTypes(string $option, $allowedTypes): static
     {
         try {
             parent::addAllowedTypes($option, $allowedTypes);
-        } catch (UndefinedOptionsException $e) {
+        } catch (UndefinedOptionsException) {
             $this->undefined[$option] = true;
         }
 

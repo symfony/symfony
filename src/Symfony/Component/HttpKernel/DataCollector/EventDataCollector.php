@@ -22,13 +22,15 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
+ * @see TraceableEventDispatcher
+ *
  * @final
  */
 class EventDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    protected $dispatcher;
-    private $requestStack;
-    private $currentRequest;
+    private ?EventDispatcherInterface $dispatcher;
+    private ?RequestStack $requestStack;
+    private ?Request $currentRequest = null;
 
     public function __construct(EventDispatcherInterface $dispatcher = null, RequestStack $requestStack = null)
     {
@@ -70,8 +72,6 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     }
 
     /**
-     * @param array $listeners An array of called listeners
-     *
      * @see TraceableEventDispatcher
      */
     public function setCalledListeners(array $listeners)
@@ -81,10 +81,8 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * @see TraceableEventDispatcher
-     *
-     * @return array|Data
      */
-    public function getCalledListeners()
+    public function getCalledListeners(): array|Data
     {
         return $this->data['called_listeners'];
     }
@@ -99,10 +97,8 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * @see TraceableEventDispatcher
-     *
-     * @return array|Data
      */
-    public function getNotCalledListeners()
+    public function getNotCalledListeners(): array|Data
     {
         return $this->data['not_called_listeners'];
     }
@@ -119,10 +115,8 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * @see TraceableEventDispatcher
-     *
-     * @return array|Data
      */
-    public function getOrphanedEvents()
+    public function getOrphanedEvents(): array|Data
     {
         return $this->data['orphaned_events'];
     }

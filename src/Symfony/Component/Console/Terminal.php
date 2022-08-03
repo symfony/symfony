@@ -11,18 +11,53 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Output\AnsiColorMode;
+
 class Terminal
 {
-    private static $width;
-    private static $height;
-    private static $stty;
+    private static ?int $width = null;
+    private static ?int $height = null;
+    private static ?bool $stty = null;
+
+    /**
+     * About Ansi color types: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+     * For more information about true color support with terminals https://github.com/termstandard/colors/.
+     */
+    public static function getTermColorSupport(): AnsiColorMode
+    {
+        // Try with $COLORTERM first
+        if (\is_string($colorterm = getenv('COLORTERM'))) {
+            $colorterm = strtolower($colorterm);
+
+            if (str_contains($colorterm, 'truecolor')) {
+                return AnsiColorMode::Ansi24;
+            }
+
+            if (str_contains($colorterm, '256color')) {
+                return AnsiColorMode::Ansi8;
+            }
+        }
+
+        // Try with $TERM
+        if (\is_string($term = getenv('TERM'))) {
+            $term = strtolower($term);
+
+            if (str_contains($term, 'truecolor')) {
+                return AnsiColorMode::Ansi24;
+            }
+
+            if (str_contains($term, '256color')) {
+                return AnsiColorMode::Ansi8;
+            }
+        }
+
+        return AnsiColorMode::Ansi4;
+    }
 
     /**
      * Gets the terminal width.
-     *
-     * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
         $width = getenv('COLUMNS');
         if (false !== $width) {
@@ -38,10 +73,8 @@ class Terminal
 
     /**
      * Gets the terminal height.
-     *
-     * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
         $height = getenv('LINES');
         if (false !== $height) {
@@ -110,11 +143,11 @@ class Terminal
     private static function initDimensionsUsingStty()
     {
         if ($sttyString = self::getSttyColumns()) {
-            if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
+            if (preg_match('/rows.(\d+);.columns.(\d+);/is', $sttyString, $matches)) {
                 // extract [w, h] from "rows h; columns w;"
                 self::$width = (int) $matches[2];
                 self::$height = (int) $matches[1];
-            } elseif (preg_match('/;.(\d+).rows;.(\d+).columns/i', $sttyString, $matches)) {
+            } elseif (preg_match('/;.(\d+).rows;.(\d+).columns/is', $sttyString, $matches)) {
                 // extract [w, h] from "; h rows; w columns"
                 self::$width = (int) $matches[2];
                 self::$height = (int) $matches[1];
@@ -143,10 +176,10 @@ class Terminal
      */
     private static function getSttyColumns(): ?string
     {
-        return self::readFromProcess('stty -a | grep columns');
+        return self::readFromProcess(['stty', '-a']);
     }
 
-    private static function readFromProcess(string $command): ?string
+    private static function readFromProcess(string|array $command): ?string
     {
         if (!\function_exists('proc_open')) {
             return null;

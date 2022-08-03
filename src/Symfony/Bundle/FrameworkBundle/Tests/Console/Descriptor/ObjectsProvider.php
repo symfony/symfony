@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -62,14 +64,22 @@ class ObjectsProvider
 
     public static function getContainerParameters()
     {
-        return [
-            'parameters_1' => new ParameterBag([
-                'integer' => 12,
-                'string' => 'Hello world!',
-                'boolean' => true,
-                'array' => [12, 'Hello world!', true],
-            ]),
-        ];
+        yield 'parameters_1' => new ParameterBag([
+            'integer' => 12,
+            'string' => 'Hello world!',
+            'boolean' => true,
+            'array' => [12, 'Hello world!', true],
+        ]);
+
+        yield 'parameters_enums' => new ParameterBag([
+            'unit_enum' => FooUnitEnum::BAR,
+            'backed_enum' => Suit::Hearts,
+            'array_of_enums' => Suit::cases(),
+            'map' => [
+                'mixed' => [Suit::Hearts, FooUnitEnum::BAR],
+                'single' => FooUnitEnum::BAR,
+            ],
+        ]);
     }
 
     public static function getContainerParameter()
@@ -177,6 +187,7 @@ class ObjectsProvider
         $definition1 = new Definition('Full\\Qualified\\Class1');
         $definition2 = new Definition('Full\\Qualified\\Class2');
         $definition3 = new Definition('Full\\Qualified\\Class3');
+        $definition4 = new Definition('Full\\Qualified\\Class4');
 
         return [
             'definition_1' => $definition1
@@ -205,6 +216,13 @@ class ObjectsProvider
                 ->setAbstract(false)
                 ->addTag('tag1', ['attr1' => 'val1', 'attr2' => 'val2', 'priority' => 0])
                 ->addTag('tag1', ['attr3' => 'val3', 'priority' => 40]),
+            'definition_4' => $definition4
+                ->setPublic(true)
+                ->setSynthetic(true)
+                ->setFile('/path/to/file')
+                ->setLazy(false)
+                ->setAbstract(false)
+                ->addTag('tag1', ['priority' => 0]),
         ];
     }
 
@@ -227,17 +245,23 @@ class ObjectsProvider
         return ['event_dispatcher_1' => $eventDispatcher];
     }
 
-    public static function getCallables()
+    public static function getCallables(): array
     {
         return [
             'callable_1' => 'array_key_exists',
             'callable_2' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'],
             'callable_3' => [new CallableClass(), 'method'],
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
-            'callable_5' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'],
             'callable_6' => function () { return 'Closure'; },
             'callable_7' => new CallableClass(),
-            'callable_from_callable' => \Closure::fromCallable(new CallableClass()),
+            'callable_from_callable' => (new CallableClass())(...),
+        ];
+    }
+
+    public static function getDeprecatedCallables(): array
+    {
+        return [
+            'callable_5' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'],
         ];
     }
 }

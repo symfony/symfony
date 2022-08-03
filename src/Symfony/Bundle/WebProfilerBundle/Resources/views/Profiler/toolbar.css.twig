@@ -190,6 +190,9 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 .sf-toolbar-block .sf-toolbar-info-piece span {
     font-size: 12px;
 }
+div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext a {
+    text-decoration: none;
+}
 
 .sf-toolbar-block .sf-toolbar-info {
     background-color: #444;
@@ -333,7 +336,7 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 .sf-toolbar-block.hover .sf-toolbar-info {
     display: block;
     padding: 10px;
-    max-width: 480px;
+    max-width: 525px;
     max-height: 480px;
     word-wrap: break-word;
     overflow: hidden;
@@ -420,6 +423,13 @@ div.sf-toolbar .sf-toolbar-block a:hover {
 }
 .sf-toolbar-block-dump .sf-toolbar-info img {
     display: none;
+}
+
+.sf-toolbar-block-serializer .detailed-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 15px;
+    margin-top: 15px;
 }
 
 /* Responsive Design */

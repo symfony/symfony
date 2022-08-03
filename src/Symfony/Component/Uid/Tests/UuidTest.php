@@ -116,6 +116,13 @@ class UuidTest extends TestCase
         $this->assertSame(self::A_UUID_V4, (string) $uuid);
     }
 
+    public function testHex()
+    {
+        $uuid = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame('0xd6b3345b29054048a83cb5988e765d98', $uuid->toHex());
+    }
+
     public function testFromUlid()
     {
         $ulid = new Ulid();
@@ -320,13 +327,13 @@ class UuidTest extends TestCase
 
     public function testGetDateTime()
     {
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '103072857660.684697'), ((new UuidV1('ffffffff-ffff-1fff-a456-426655440000'))->getDateTime()));
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.000001'), ((new UuidV1('1381400a-1dd2-11b2-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '103072857660.684697'), (new UuidV1('ffffffff-ffff-1fff-a456-426655440000'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.000001'), (new UuidV1('1381400a-1dd2-11b2-a456-426655440000'))->getDateTime());
         $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814001-1dd2-11b2-a456-426655440000'))->getDateTime());
         $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814000-1dd2-11b2-a456-426655440000'))->getDateTime());
         $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getDateTime());
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), ((new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime()));
-        $this->assertEquals(new \DateTimeImmutable('@-12219292800'), ((new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), (new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('@-12219292800'), (new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime());
     }
 
     public function testFromStringBase58Padding()

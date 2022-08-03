@@ -40,7 +40,7 @@ final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir): array
+    public function warmUp(string $cacheDir): array
     {
         $metadatas = [];
 

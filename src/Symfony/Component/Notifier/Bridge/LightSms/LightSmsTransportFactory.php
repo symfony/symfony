@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\LightSms;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Vasilij Duško <vasilij@prado.lt>
  */
 final class LightSmsTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return LightSmsTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): LightSmsTransport
     {
         $scheme = $dsn->getScheme();
 

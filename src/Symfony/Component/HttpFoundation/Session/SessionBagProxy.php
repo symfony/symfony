@@ -18,17 +18,17 @@ namespace Symfony\Component\HttpFoundation\Session;
  */
 final class SessionBagProxy implements SessionBagInterface
 {
-    private $bag;
-    private $data;
-    private $usageIndex;
-    private $usageReporter;
+    private SessionBagInterface $bag;
+    private array $data;
+    private ?int $usageIndex;
+    private ?\Closure $usageReporter;
 
     public function __construct(SessionBagInterface $bag, array &$data, ?int &$usageIndex, ?callable $usageReporter)
     {
         $this->bag = $bag;
         $this->data = &$data;
         $this->usageIndex = &$usageIndex;
-        $this->usageReporter = $usageReporter;
+        $this->usageReporter = null === $usageReporter ? null : $usageReporter(...);
     }
 
     public function getBag(): SessionBagInterface
@@ -88,7 +88,7 @@ final class SessionBagProxy implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): mixed
     {
         return $this->bag->clear();
     }

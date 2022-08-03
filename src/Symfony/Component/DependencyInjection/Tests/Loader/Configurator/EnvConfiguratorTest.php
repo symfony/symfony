@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader\Configurator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Loader\Configurator\EnvConfigurator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 final class EnvConfiguratorTest extends TestCase
 {
@@ -24,7 +25,7 @@ final class EnvConfiguratorTest extends TestCase
         $this->assertSame($expected, (string) $envConfigurator);
     }
 
-    public function provide()
+    public function provide(): iterable
     {
         yield ['%env(FOO)%', new EnvConfigurator('FOO')];
         yield ['%env(string:FOO)%', new EnvConfigurator('string:FOO')];
@@ -32,5 +33,6 @@ final class EnvConfiguratorTest extends TestCase
         yield ['%env(key:path:url:FOO)%', (new EnvConfigurator('FOO'))->url()->key('path')];
         yield ['%env(default:fallback:bar:arg1:FOO)%', (new EnvConfigurator('FOO'))->custom('bar', 'arg1')->default('fallback')];
         yield ['%env(my_processor:my_argument:FOO)%', (new EnvConfigurator('FOO'))->myProcessor('my_argument')];
+        yield ['%env(enum:'.StringBackedEnum::class.':FOO)%', (new EnvConfigurator('FOO'))->enum(StringBackedEnum::class)];
     }
 }

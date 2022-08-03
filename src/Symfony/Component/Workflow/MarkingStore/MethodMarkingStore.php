@@ -29,8 +29,8 @@ use Symfony\Component\Workflow\Marking;
  */
 final class MethodMarkingStore implements MarkingStoreInterface
 {
-    private $singleState;
-    private $property;
+    private bool $singleState;
+    private string $property;
 
     /**
      * @param string $property Used to determine methods to call
@@ -54,7 +54,15 @@ final class MethodMarkingStore implements MarkingStoreInterface
             throw new LogicException(sprintf('The method "%s::%s()" does not exist.', get_debug_type($subject), $method));
         }
 
-        $marking = $subject->{$method}();
+        $marking = null;
+        try {
+            $marking = $subject->{$method}();
+        } catch (\Error $e) {
+            $unInitializedPropertyMessage = sprintf('Typed property %s::$%s must not be accessed before initialization', get_debug_type($subject), $this->property);
+            if ($e->getMessage() !== $unInitializedPropertyMessage) {
+                throw $e;
+            }
+        }
 
         if (null === $marking) {
             return new Marking();
@@ -62,6 +70,8 @@ final class MethodMarkingStore implements MarkingStoreInterface
 
         if ($this->singleState) {
             $marking = [(string) $marking => 1];
+        } elseif (!\is_array($marking)) {
+            throw new LogicException(sprintf('The method "%s::%s()" did not return an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $method));
         }
 
         return new Marking($marking);

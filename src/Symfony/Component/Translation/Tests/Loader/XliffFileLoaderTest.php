@@ -87,17 +87,9 @@ XLIFF;
 
     public function testLoadWithExternalEntitiesDisabled()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-        }
-
         $loader = new XliffFileLoader();
         $resource = __DIR__.'/../fixtures/resources.xlf';
         $catalogue = $loader->load($resource, 'en', 'domain1');
-
-        if (\LIBXML_VERSION < 20900) {
-            libxml_disable_entity_loader($disableEntities);
-        }
 
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
@@ -124,12 +116,12 @@ XLIFF;
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/encoding.xlf', 'en', 'domain1');
 
-        $this->assertEquals(utf8_decode('föö'), $catalogue->get('bar', 'domain1'));
-        $this->assertEquals(utf8_decode('bär'), $catalogue->get('foo', 'domain1'));
+        $this->assertEquals(mb_convert_encoding('föö', 'ISO-8859-1', 'UTF-8'), $catalogue->get('bar', 'domain1'));
+        $this->assertEquals(mb_convert_encoding('bär', 'ISO-8859-1', 'UTF-8'), $catalogue->get('foo', 'domain1'));
         $this->assertEquals(
             [
                 'source' => 'foo',
-                'notes' => [['content' => utf8_decode('bäz')]],
+                'notes' => [['content' => mb_convert_encoding('bäz', 'ISO-8859-1', 'UTF-8')]],
                 'id' => '1',
                 'file' => [
                     'original' => 'file.ext',

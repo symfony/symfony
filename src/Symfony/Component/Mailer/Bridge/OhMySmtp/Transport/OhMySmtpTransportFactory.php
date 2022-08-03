@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Transport;
 
+use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -18,11 +19,15 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
  * @author Paul Oms <support@ohmysmtp.com>
+ *
+ * @deprecated since Symfony 6.2, use MailPaceTransportFactory instead
  */
 final class OhMySmtpTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
+        trigger_deprecation('symfony/oh-my-smtp-mailer', '6.2', 'The "%s" class is deprecated, use "%s" instead.', self::class, MailPaceTransportFactory::class);
+
         $scheme = $dsn->getScheme();
 
         if ('ohmysmtp+api' === $scheme) {

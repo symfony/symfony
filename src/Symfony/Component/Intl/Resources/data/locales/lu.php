@@ -104,6 +104,7 @@ return [
         'en_MS' => 'Lingelesa (Musera)',
         'en_MT' => 'Lingelesa (Malite)',
         'en_MU' => 'Lingelesa (Morise)',
+        'en_MV' => 'Lingelesa (Madive)',
         'en_MW' => 'Lingelesa (Malawi)',
         'en_MY' => 'Lingelesa (Malezi)',
         'en_NA' => 'Lingelesa (Namibi)',

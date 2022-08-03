@@ -25,9 +25,8 @@ class AppKernel extends Kernel
     private $varDir;
     private $testCase;
     private $rootConfig;
-    private $authenticatorManagerEnabled;
 
-    public function __construct($varDir, $testCase, $rootConfig, $environment, $debug, $authenticatorManagerEnabled = false)
+    public function __construct($varDir, $testCase, $rootConfig, $environment, $debug)
     {
         if (!is_dir(__DIR__.'/'.$testCase)) {
             throw new \InvalidArgumentException(sprintf('The test case "%s" does not exist.', $testCase));
@@ -43,7 +42,6 @@ class AppKernel extends Kernel
 
             $this->rootConfig[] = $config;
         }
-        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
 
         parent::__construct($environment, $debug);
     }
@@ -53,7 +51,7 @@ class AppKernel extends Kernel
      */
     public function getContainerClass(): string
     {
-        return parent::getContainerClass().substr(md5(implode('', $this->rootConfig).$this->authenticatorManagerEnabled), -16);
+        return parent::getContainerClass().substr(md5(implode('', $this->rootConfig)), -16);
     }
 
     public function registerBundles(): iterable
@@ -84,14 +82,6 @@ class AppKernel extends Kernel
     {
         foreach ($this->rootConfig as $config) {
             $loader->load($config);
-        }
-
-        if ($this->authenticatorManagerEnabled) {
-            $loader->load(function ($container) {
-                $container->loadFromExtension('security', [
-                    'enable_authenticator_manager' => true,
-                ]);
-            });
         }
     }
 

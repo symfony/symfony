@@ -29,10 +29,9 @@ final class FirebaseTransport extends AbstractTransport
 {
     protected const HOST = 'fcm.googleapis.com/fcm/send';
 
-    /** @var string */
-    private $token;
+    private string $token;
 
-    public function __construct(string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->client = $client;
@@ -82,7 +81,7 @@ final class FirebaseTransport extends AbstractTransport
         }
 
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
+        $jsonContents = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
         $errorMessage = null;
 
         if ($jsonContents && isset($jsonContents['results'][0]['error'])) {

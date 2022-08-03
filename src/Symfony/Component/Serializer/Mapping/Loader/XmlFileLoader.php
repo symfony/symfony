@@ -34,7 +34,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         if (null === $this->classes) {
             $this->classes = $this->getClassesFromXml();
@@ -72,7 +72,7 @@ class XmlFileLoader extends FileLoader
                 }
 
                 if (isset($attribute['ignore'])) {
-                    $attributeMetadata->setIgnore((bool) $attribute['ignore']);
+                    $attributeMetadata->setIgnore(XmlUtils::phpize($attribute['ignore']));
                 }
 
                 foreach ($attribute->context as $node) {
@@ -119,7 +119,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->classes = $this->getClassesFromXml();

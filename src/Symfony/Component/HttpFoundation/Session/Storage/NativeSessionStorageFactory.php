@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(NativeSessionStorage::class);
@@ -21,15 +22,15 @@ class_exists(NativeSessionStorage::class);
  */
 class NativeSessionStorageFactory implements SessionStorageFactoryInterface
 {
-    private $options;
-    private $handler;
-    private $metaBag;
-    private $secure;
+    private array $options;
+    private AbstractProxy|\SessionHandlerInterface|null $handler;
+    private ?MetadataBag $metaBag;
+    private bool $secure;
 
     /**
      * @see NativeSessionStorage constructor.
      */
-    public function __construct(array $options = [], $handler = null, MetadataBag $metaBag = null, bool $secure = false)
+    public function __construct(array $options = [], AbstractProxy|\SessionHandlerInterface $handler = null, MetadataBag $metaBag = null, bool $secure = false)
     {
         $this->options = $options;
         $this->handler = $handler;
@@ -40,7 +41,7 @@ class NativeSessionStorageFactory implements SessionStorageFactoryInterface
     public function createStorage(?Request $request): SessionStorageInterface
     {
         $storage = new NativeSessionStorage($this->options, $this->handler, $this->metaBag);
-        if ($this->secure && $request && $request->isSecure()) {
+        if ($this->secure && $request?->isSecure()) {
             $storage->setOptions(['cookie_secure' => true]);
         }
 

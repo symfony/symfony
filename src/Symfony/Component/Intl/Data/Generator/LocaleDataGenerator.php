@@ -29,9 +29,9 @@ class LocaleDataGenerator extends AbstractDataGenerator
 {
     use FallbackTrait;
 
-    private $locales = [];
-    private $localeAliases = [];
-    private $localeParents = [];
+    private array $locales = [];
+    private array $localeAliases = [];
+    private array $localeParents = [];
 
     /**
      * {@inheritdoc}
@@ -100,7 +100,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
                 // Script, Region and Variants are optional. If none of them is
                 // available, the braces are not printed.
                 $localeNames[$locale] = $this->generateLocaleName($reader, $tempDir, $locale, $displayLocale, $pattern, $separator);
-            } catch (MissingResourceException $e) {
+            } catch (MissingResourceException) {
                 // Silently ignore incomplete locale names
                 // In this case one should configure at least one fallback locale that is complete (e.g. English) during
                 // runtime. Alternatively a translation for the missing resource can be proposed upstream.

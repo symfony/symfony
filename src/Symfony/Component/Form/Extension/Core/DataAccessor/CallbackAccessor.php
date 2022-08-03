@@ -25,7 +25,7 @@ class CallbackAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue($data, FormInterface $form)
+    public function getValue(object|array $data, FormInterface $form): mixed
     {
         if (null === $getter = $form->getConfig()->getOption('getter')) {
             throw new AccessException('Unable to read from the given form data as no getter is defined.');
@@ -37,7 +37,7 @@ class CallbackAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function setValue(&$data, $value, FormInterface $form): void
+    public function setValue(object|array &$data, mixed $value, FormInterface $form): void
     {
         if (null === $setter = $form->getConfig()->getOption('setter')) {
             throw new AccessException('Unable to write the given value as no setter is defined.');
@@ -49,7 +49,7 @@ class CallbackAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function isReadable($data, FormInterface $form): bool
+    public function isReadable(object|array $data, FormInterface $form): bool
     {
         return null !== $form->getConfig()->getOption('getter');
     }
@@ -57,7 +57,7 @@ class CallbackAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function isWritable($data, FormInterface $form): bool
+    public function isWritable(object|array $data, FormInterface $form): bool
     {
         return null !== $form->getConfig()->getOption('setter');
     }

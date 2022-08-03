@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Loader;
  */
 class ParamConfigurator
 {
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {

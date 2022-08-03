@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -16,7 +25,7 @@ class HandleTraitTest extends TestCase
     public function testItThrowsOnNoMessageBusInstance()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, "null" given.');
+        $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, but that property has not been initialized yet.');
         $queryBus = new TestQueryBus(null);
         $query = new DummyMessage('Hello');
 

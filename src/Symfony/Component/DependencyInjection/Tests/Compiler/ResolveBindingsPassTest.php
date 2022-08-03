@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedEnumArgumentDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedIterableArgumentDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -67,9 +68,6 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testProcessEnum()
     {
         $container = new ContainerBuilder();
@@ -212,9 +210,28 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
+    public function testIterableBindingTypehint()
+    {
+        $autoloader = static function ($class) {
+            if ('iterable' === $class) {
+                throw new \RuntimeException('We should not search pseudo-type iterable as class');
+            }
+        };
+        spl_autoload_register($autoloader);
+
+        $container = new ContainerBuilder();
+        $definition = $container->register('bar', NamedIterableArgumentDummy::class);
+        $definition->setBindings([
+            'iterable $items' => new TaggedIteratorArgument('foo'),
+        ]);
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('bar')->getArgument(0));
+
+        spl_autoload_unregister($autoloader);
+    }
+
     public function testBindWithTarget()
     {
         $container = new ContainerBuilder();

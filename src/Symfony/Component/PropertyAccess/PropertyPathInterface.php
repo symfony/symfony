@@ -22,10 +22,8 @@ interface PropertyPathInterface extends \Traversable
 {
     /**
      * Returns the string representation of the property path.
-     *
-     * @return string
      */
-    public function __toString();
+    public function __toString(): string;
 
     /**
      * Returns the length of the property path, i.e. the number of elements.

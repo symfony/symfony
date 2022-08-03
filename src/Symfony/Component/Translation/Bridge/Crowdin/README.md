@@ -23,7 +23,7 @@ where:
 Sponsor
 -------
 
-This bridge for Symfony 5.4/6.0 is [backed][1] by [Crowdin][2].
+This bridge for Symfony 6.1 is [backed][1] by [Crowdin][2].
 
 Crowdin is a cloud-based localization management software helping teams to go global and stay agile.
 

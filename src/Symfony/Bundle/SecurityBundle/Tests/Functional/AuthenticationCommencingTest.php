@@ -20,15 +20,4 @@ class AuthenticationCommencingTest extends AbstractWebTestCase
         $client->request('GET', '/secure-but-not-covered-by-access-control');
         $this->assertRedirect($client->getResponse(), '/login');
     }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAuthenticationIsCommencingIfAccessDeniedExceptionIsWrapped()
-    {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']);
-
-        $client->request('GET', '/secure-but-not-covered-by-access-control');
-        $this->assertRedirect($client->getResponse(), '/login');
-    }
 }

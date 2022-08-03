@@ -29,6 +29,10 @@ class MemcachedStoreTest extends AbstractStoreTest
 
     public static function setUpBeforeClass(): void
     {
+        if (version_compare(phpversion('memcached'), '3.1.6', '<')) {
+            throw new SkippedTestSuiteError('Extension memcached > 3.1.5 required.');
+        }
+
         $memcached = new \Memcached();
         $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
         $memcached->get('foo');

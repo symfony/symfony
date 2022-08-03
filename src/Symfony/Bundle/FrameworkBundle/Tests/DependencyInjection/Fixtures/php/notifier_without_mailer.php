@@ -4,12 +4,12 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'mailer' => [
         'enabled' => false,
     ],
     'messenger' => [
         'enabled' => true,
-        'reset_on_message' =>  true,
     ],
     'notifier' => [
         'enabled' => true,

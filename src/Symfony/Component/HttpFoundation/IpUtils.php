@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class IpUtils
 {
-    private static $checkedIps = [];
+    private static array $checkedIps = [];
 
     /**
      * This class should not be instantiated.
@@ -31,17 +31,9 @@ class IpUtils
      * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets.
      *
      * @param string|array $ips List of IPs or subnets (can be a string if only a single one)
-     *
-     * @return bool
      */
-    public static function checkIp(?string $requestIp, $ips)
+    public static function checkIp(string $requestIp, string|array $ips): bool
     {
-        if (null === $requestIp) {
-            trigger_deprecation('symfony/http-foundation', '5.4', 'Passing null as $requestIp to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            return false;
-        }
-
         if (!\is_array($ips)) {
             $ips = [$ips];
         }
@@ -65,14 +57,8 @@ class IpUtils
      *
      * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet
      */
-    public static function checkIp4(?string $requestIp, string $ip)
+    public static function checkIp4(string $requestIp, string $ip): bool
     {
-        if (null === $requestIp) {
-            trigger_deprecation('symfony/http-foundation', '5.4', 'Passing null as $requestIp to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            return false;
-        }
-
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];
@@ -114,18 +100,10 @@ class IpUtils
      *
      * @param string $ip IPv6 address or subnet in CIDR notation
      *
-     * @return bool
-     *
      * @throws \RuntimeException When IPV6 support is not enabled
      */
-    public static function checkIp6(?string $requestIp, string $ip)
+    public static function checkIp6(string $requestIp, string $ip): bool
     {
-        if (null === $requestIp) {
-            trigger_deprecation('symfony/http-foundation', '5.4', 'Passing null as $requestIp to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            return false;
-        }
-
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];
@@ -177,7 +155,7 @@ class IpUtils
     public static function anonymize(string $ip): string
     {
         $wrappedIPv6 = false;
-        if ('[' === substr($ip, 0, 1) && ']' === substr($ip, -1, 1)) {
+        if (str_starts_with($ip, '[') && str_ends_with($ip, ']')) {
             $wrappedIPv6 = true;
             $ip = substr($ip, 1, -1);
         }

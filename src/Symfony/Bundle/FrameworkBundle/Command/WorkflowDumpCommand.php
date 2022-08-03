@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -31,16 +32,15 @@ use Symfony\Component\Workflow\Marking;
  *
  * @final
  */
+#[AsCommand(name: 'workflow:dump', description: 'Dump a workflow')]
 class WorkflowDumpCommand extends Command
 {
-    protected static $defaultName = 'workflow:dump';
-    protected static $defaultDescription = 'Dump a workflow';
     /**
      * string is the service id.
      *
      * @var array<string, Definition>
      */
-    private $workflows = [];
+    private array $workflows = [];
 
     private const DUMP_FORMAT_OPTIONS = [
         'puml',
@@ -67,7 +67,6 @@ class WorkflowDumpCommand extends Command
                 new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Label a graph'),
                 new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format ['.implode('|', self::DUMP_FORMAT_OPTIONS).']', 'dot'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the graphical representation of a
 workflow in different formats

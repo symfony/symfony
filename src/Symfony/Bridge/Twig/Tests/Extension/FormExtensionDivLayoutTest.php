@@ -32,8 +32,6 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     private $renderer;
 
-    protected static $supportedFeatureSetVersion = 404;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -205,7 +203,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="class-test help-text"]
     [.="[trans]Help text test![/trans]"]
@@ -223,7 +221,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -231,7 +229,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -251,7 +249,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -259,7 +257,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -279,7 +277,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -287,7 +285,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b

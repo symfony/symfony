@@ -28,12 +28,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
-    private $defaultTokenManager;
-    private $defaultEnabled;
-    private $defaultFieldName;
-    private $translator;
-    private $translationDomain;
-    private $serverParams;
+    private CsrfTokenManagerInterface $defaultTokenManager;
+    private bool $defaultEnabled;
+    private string $defaultFieldName;
+    private ?TranslatorInterface $translator;
+    private ?string $translationDomain;
+    private ?ServerParams $serverParams;
 
     public function __construct(CsrfTokenManagerInterface $defaultTokenManager, bool $defaultEnabled = true, string $defaultFieldName = '_token', TranslatorInterface $translator = null, string $translationDomain = null, ServerParams $serverParams = null)
     {

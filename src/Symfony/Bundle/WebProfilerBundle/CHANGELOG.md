@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add a download link in mailer profiler for email attachments
+
 5.4
 ---
 

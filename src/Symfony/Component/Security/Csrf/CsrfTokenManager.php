@@ -26,18 +26,18 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
  */
 class CsrfTokenManager implements CsrfTokenManagerInterface
 {
-    private $generator;
-    private $storage;
-    private $namespace;
+    private TokenGeneratorInterface $generator;
+    private TokenStorageInterface $storage;
+    private \Closure|string $namespace;
 
     /**
-     * @param string|RequestStack|callable|null $namespace
-     *                                                     * null: generates a namespace using $_SERVER['HTTPS']
-     *                                                     * string: uses the given string
-     *                                                     * RequestStack: generates a namespace using the current main request
-     *                                                     * callable: uses the result of this callable (must return a string)
+     * @param $namespace
+     *                   * null: generates a namespace using $_SERVER['HTTPS']
+     *                   * string: uses the given string
+     *                   * RequestStack: generates a namespace using the current main request
+     *                   * callable: uses the result of this callable (must return a string)
      */
-    public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, $namespace = null)
+    public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, string|RequestStack|callable $namespace = null)
     {
         $this->generator = $generator ?? new UriSafeTokenGenerator();
         $this->storage = $storage ?? new NativeSessionTokenStorage();
@@ -56,8 +56,10 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
 
                 return $superGlobalNamespaceGenerator();
             };
-        } elseif (\is_callable($namespace) || \is_string($namespace)) {
+        } elseif ($namespace instanceof \Closure || \is_string($namespace)) {
             $this->namespace = $namespace;
+        } elseif (\is_callable($namespace)) {
+            $this->namespace = $namespace(...);
         } else {
             throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', get_debug_type($namespace)));
         }
@@ -66,7 +68,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken(string $tokenId)
+    public function getToken(string $tokenId): CsrfToken
     {
         $namespacedId = $this->getNamespace().$tokenId;
         if ($this->storage->hasToken($namespacedId)) {
@@ -83,7 +85,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function refreshToken(string $tokenId)
+    public function refreshToken(#[\SensitiveParameter] string $tokenId): CsrfToken
     {
         $namespacedId = $this->getNamespace().$tokenId;
         $value = $this->generator->generateToken();
@@ -96,7 +98,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function removeToken(string $tokenId)
+    public function removeToken(string $tokenId): ?string
     {
         return $this->storage->removeToken($this->getNamespace().$tokenId);
     }
@@ -104,7 +106,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function isTokenValid(CsrfToken $token)
+    public function isTokenValid(CsrfToken $token): bool
     {
         $namespacedId = $this->getNamespace().$token->getId();
         if (!$this->storage->hasToken($namespacedId)) {
@@ -134,6 +136,9 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
             return $value;
         }
         $key = base64_decode(strtr($parts[1], '-_', '+/'));
+        if ('' === $key || false === $key) {
+            return $value;
+        }
         $value = base64_decode(strtr($parts[2], '-_', '+/'));
 
         return $this->xor($value, $key);

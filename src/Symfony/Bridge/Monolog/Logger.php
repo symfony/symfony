@@ -25,7 +25,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs(Request $request = null)
+    public function getLogs(Request $request = null): array
     {
         if ($logger = $this->getDebugLogger()) {
             return $logger->getLogs($request);
@@ -37,7 +37,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function countErrors(Request $request = null)
+    public function countErrors(Request $request = null): int
     {
         if ($logger = $this->getDebugLogger()) {
             return $logger->countErrors($request);

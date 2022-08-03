@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add new `messenger:stats` command that return a list of transports with their "to be processed" message count.
+
+6.1
+---
+
+ * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs
+ * Automatically resolve handled message type when method different from `__invoke` is used as handler
+ * Allow `#[AsMessageHandler]` attribute on methods
+
+6.0
+---
+
+ * Remove deprecated classes `Symfony/Component/Messenger/Transport/AmqpExt`, `Symfony/Component/Messenger/Transport/Doctrine` and `Symfony/Component/Messenger/Transport/Redis`.
+ * Class `MessengerPass` cannot be configured with constructor arguments
+ * Remove constructor arguments and getters for `RedeliveryStamp`'s properties `exceptionMessage` and `flattenException`
+
 5.4
 ---
 
@@ -13,6 +32,7 @@ CHANGELOG
  * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
  * Add log when worker should stop.
  * Add log when `SIGTERM` is received.
+ * Add `--stats` and `--class-filter` options to `FailedMessagesShowCommand`
 
 5.3
 ---

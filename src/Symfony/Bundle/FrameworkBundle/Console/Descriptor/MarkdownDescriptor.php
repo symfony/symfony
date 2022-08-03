@@ -83,7 +83,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\n".$tag."\n".str_repeat('-', \strlen($tag)));
             foreach ($definitions as $serviceId => $definition) {
                 $this->write("\n\n");
-                $this->describeContainerDefinition($definition, ['omit_tags' => true, 'id' => $serviceId]);
+                $this->describeContainerDefinition($definition, ['omit_tags' => true, 'id' => $serviceId], $builder);
             }
         }
     }
@@ -99,7 +99,7 @@ class MarkdownDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $childOptions, $builder);
         } elseif ($service instanceof Definition) {
-            $this->describeContainerDefinition($service, $childOptions);
+            $this->describeContainerDefinition($service, $childOptions, $builder);
         } else {
             $this->write(sprintf('**`%s`:** `%s`', $options['id'], \get_class($service)));
         }
@@ -172,7 +172,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
                 $this->write("\n");
-                $this->describeContainerDefinition($service, ['id' => $id, 'show_arguments' => $showArguments]);
+                $this->describeContainerDefinition($service, ['id' => $id, 'show_arguments' => $showArguments], $builder);
             }
         }
 
@@ -193,7 +193,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [])
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null)
     {
         $output = '';
 
@@ -210,6 +210,13 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no')
             ."\n".'- Autoconfigured: '.($definition->isAutoconfigured() ? 'yes' : 'no')
         ;
+
+        if ($definition->isDeprecated()) {
+            $output .= "\n".'- Deprecated: yes';
+            $output .= "\n".'- Deprecation message: '.$definition->getDeprecation($options['id'])['message'];
+        } else {
+            $output .= "\n".'- Deprecated: no';
+        }
 
         if (isset($options['show_arguments']) && $options['show_arguments']) {
             $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
@@ -250,6 +257,9 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
+        $inEdges = null !== $builder && isset($options['id']) ? $this->getServiceEdges($builder, $options['id']) : [];
+        $output .= "\n".'- Usages: '.($inEdges ? implode(', ', $inEdges) : 'none');
+
         $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
@@ -271,10 +281,10 @@ class MarkdownDescriptor extends Descriptor
         }
 
         $this->write("\n");
-        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]));
+        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $builder);
     }
 
-    protected function describeContainerParameter($parameter, array $options = [])
+    protected function describeContainerParameter(mixed $parameter, array $options = [])
     {
         $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', \strlen($options['parameter'])), $this->formatParameter($parameter)) : $parameter);
     }
@@ -326,7 +336,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeCallable($callable, array $options = [])
+    protected function describeCallable(mixed $callable, array $options = [])
     {
         $string = '';
 

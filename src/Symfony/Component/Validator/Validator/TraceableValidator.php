@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Validator\Validator;
 
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -21,18 +25,15 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableValidator implements ValidatorInterface, ResetInterface
 {
-    private $validator;
-    private $collectedData = [];
+    private ValidatorInterface $validator;
+    private array $collectedData = [];
 
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
     }
 
-    /**
-     * @return array
-     */
-    public function getCollectedData()
+    public function getCollectedData(): array
     {
         return $this->collectedData;
     }
@@ -45,7 +46,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadataFor($value)
+    public function getMetadataFor(mixed $value): MetadataInterface
     {
         return $this->validator->getMetadataFor($value);
     }
@@ -53,7 +54,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function hasMetadataFor($value)
+    public function hasMetadataFor(mixed $value): bool
     {
         return $this->validator->hasMetadataFor($value);
     }
@@ -61,7 +62,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value, $constraints = null, $groups = null)
+    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
     {
         $violations = $this->validator->validate($value, $constraints, $groups);
 
@@ -105,7 +106,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty(object $object, string $propertyName, $groups = null)
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
     {
         return $this->validator->validateProperty($object, $propertyName, $groups);
     }
@@ -113,7 +114,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null)
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
     {
         return $this->validator->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
     }
@@ -121,7 +122,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function startContext()
+    public function startContext(): ContextualValidatorInterface
     {
         return $this->validator->startContext();
     }
@@ -129,7 +130,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function inContext(ExecutionContextInterface $context)
+    public function inContext(ExecutionContextInterface $context): ContextualValidatorInterface
     {
         return $this->validator->inContext($context);
     }

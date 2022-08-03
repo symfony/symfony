@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormInterface;
  */
 class ChainAccessor implements DataAccessorInterface
 {
-    private $accessors;
+    private iterable $accessors;
 
     /**
      * @param DataAccessorInterface[]|iterable $accessors
@@ -33,7 +33,7 @@ class ChainAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue($data, FormInterface $form)
+    public function getValue(object|array $data, FormInterface $form): mixed
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isReadable($data, $form)) {
@@ -47,7 +47,7 @@ class ChainAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function setValue(&$data, $value, FormInterface $form): void
+    public function setValue(object|array &$data, mixed $value, FormInterface $form): void
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isWritable($data, $form)) {
@@ -63,7 +63,7 @@ class ChainAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function isReadable($data, FormInterface $form): bool
+    public function isReadable(object|array $data, FormInterface $form): bool
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isReadable($data, $form)) {
@@ -77,7 +77,7 @@ class ChainAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function isWritable($data, FormInterface $form): bool
+    public function isWritable(object|array $data, FormInterface $form): bool
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isWritable($data, $form)) {

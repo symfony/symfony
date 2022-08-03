@@ -51,6 +51,7 @@
     --highlight-default: #222222;
     --highlight-keyword: #a71d5d;
     --highlight-string: #183691;
+    --highlight-selected-line: rgba(255, 255, 153, 0.5);
     --base-0: #fff;
     --base-1: #f5f5f5;
     --base-2: #e0e0e0;
@@ -104,6 +105,7 @@
     --highlight-default: var(--base-6);
     --highlight-keyword: #ff413c;
     --highlight-string: #70a6fd;
+    --highlight-selected-line: rgba(14, 14, 14, 0.5);
     --base-0: #2e3136;
     --base-1: #444;
     --base-2: #666;
@@ -1135,7 +1137,7 @@ tr.status-warning td {
 .log-filter .filter-select-all-or-none {
     margin-bottom: 10px;
 }
-.log-filter .filter-select-all-or-none a + a {
+.log-filter .filter-select-all-or-none button + button {
     margin-left: 15px;
 }
 .log-filters .log-filter .log-filter-content .log-filter-option + .log-filter-option {
@@ -1160,10 +1162,10 @@ table.logs .log-timestamp {
 table.logs .log-metadata {
     margin: 8px 0 0;
 }
-table.logs .log-metadata span {
+table.logs .log-metadata > span {
     display: inline-block;
 }
-table.logs .log-metadata span + span {
+table.logs .log-metadata > span + span {
     margin-left: 10px;
 }
 table.logs .log-metadata .log-channel {
@@ -1232,7 +1234,10 @@ tr.log-status-silenced {
 }
 .sql-explain {
     overflow-x: auto;
-    max-width: 920px;
+    max-width: 888px;
+}
+.width-full .sql-explain {
+    max-width: min-content;
 }
 .sql-explain table td, .sql-explain table tr {
     word-break: normal;
@@ -1296,15 +1301,40 @@ tr.log-status-silenced {
     padding: 0;
 }
 #collector-content .sf-validator .trace li.selected {
-    background: rgba(255, 255, 153, 0.5);
+    background: var(--highlight-selected-line);
+}
+
+{# Serializer panel
+   ========================================================================= #}
+
+#collector-content .sf-serializer {
+    margin-bottom: 2em;
+}
+
+#collector-content .sf-serializer .trace {
+    border: var(--border);
+    background: var(--base-0);
+    padding: 10px;
+    margin: 0.5em 0;
+    overflow: auto;
+}
+#collector-content .sf-serializer .trace {
+    font-size: 12px;
+}
+#collector-content .sf-serializer .trace li {
+    margin-bottom: 0;
+    padding: 0;
+}
+#collector-content .sf-serializer .trace li.selected {
+    background: var(--highlight-selected-line);
 }
 
 {# Messenger panel
    ========================================================================= #}
 
 #collector-content .message-bus .trace {
-    border: 1px solid #DDD;
-    background: #FFF;
+    border: var(--border);
+    background: var(--base-0);
     padding: 10px;
     margin: 0.5em 0;
     overflow: auto;
@@ -1317,7 +1347,7 @@ tr.log-status-silenced {
     padding: 0;
 }
 #collector-content .message-bus .trace li.selected {
-    background: rgba(255, 255, 153, 0.5);
+    background: var(--highlight-selected-line);
 }
 
 {# Dump panel

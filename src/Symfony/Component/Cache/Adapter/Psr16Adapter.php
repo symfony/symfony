@@ -30,7 +30,7 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
      */
     protected const NS_SEPARATOR = '_';
 
-    private $miss;
+    private object $miss;
 
     public function __construct(CacheInterface $pool, string $namespace = '', int $defaultLifetime = 0)
     {
@@ -43,7 +43,7 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
     /**
      * {@inheritdoc}
      */
-    protected function doFetch(array $ids)
+    protected function doFetch(array $ids): iterable
     {
         foreach ($this->pool->getMultiple($ids, $this->miss) as $key => $value) {
             if ($this->miss !== $value) {
@@ -55,7 +55,7 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave(string $id): bool
     {
         return $this->pool->has($id);
     }
@@ -63,7 +63,7 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
     /**
      * {@inheritdoc}
      */
-    protected function doClear(string $namespace)
+    protected function doClear(string $namespace): bool
     {
         return $this->pool->clear();
     }
@@ -71,7 +71,7 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
     /**
      * {@inheritdoc}
      */
-    protected function doDelete(array $ids)
+    protected function doDelete(array $ids): bool
     {
         return $this->pool->deleteMultiple($ids);
     }
@@ -79,7 +79,7 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, int $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         return $this->pool->setMultiple($values, 0 === $lifetime ? null : $lifetime);
     }

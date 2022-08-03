@@ -23,8 +23,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmazonSqsSender implements SenderInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer)
     {
@@ -56,9 +56,7 @@ class AmazonSqsSender implements SenderInterface
 
         /** @var AmazonSqsXrayTraceHeaderStamp|null $amazonSqsXrayTraceHeaderStamp */
         $amazonSqsXrayTraceHeaderStamp = $envelope->last(AmazonSqsXrayTraceHeaderStamp::class);
-        if (null !== $amazonSqsXrayTraceHeaderStamp) {
-            $xrayTraceId = $amazonSqsXrayTraceHeaderStamp->getTraceId();
-        }
+        $xrayTraceId = $amazonSqsXrayTraceHeaderStamp?->getTraceId();
 
         try {
             $this->connection->send(

@@ -25,7 +25,7 @@ class PhpBundleReader implements BundleReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read(string $path, string $locale)
+    public function read(string $path, string $locale): mixed
     {
         $fileName = $path.'/'.$locale.'.php';
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -348,7 +349,7 @@ class GitignoreTest extends TestCase
                     'logs/',
                     '!logs/important.log',
                 ],
-                ['logs/debug.log'/* must be pruned on traversal 'logs/important.log'*/],
+                ['logs/debug.log'/* must be pruned on traversal 'logs/important.log' */],
                 [],
             ],
             [
@@ -822,7 +823,7 @@ class GitignoreTest extends TestCase
                 '!logs/important.log',
             ],
             [],
-            ['logs/debug.log'/* must be pruned on traversal 'logs/important.log'*/],
+            ['logs/debug.log'/* must be pruned on traversal 'logs/important.log' */],
         ];
 
         yield [

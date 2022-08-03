@@ -18,8 +18,8 @@ namespace Symfony\Component\DependencyInjection;
  */
 class TypedReference extends Reference
 {
-    private $type;
-    private $name;
+    private string $type;
+    private ?string $name;
 
     /**
      * @param string      $id              The service identifier

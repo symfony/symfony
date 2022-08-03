@@ -83,8 +83,10 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     {
         $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', [
+            'http_method_override' => false,
             'secret' => '$ecret',
             'router' => ['utf8' => true],
+            'catch_all_throwables' => true,
         ]);
 
         $c->setParameter('halloween', 'Have a great day!');

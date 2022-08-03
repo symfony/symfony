@@ -56,6 +56,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValu
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
+use Symfony\Component\Serializer\Tests\Php80Dummy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -106,6 +107,7 @@ class ObjectNormalizerTest extends TestCase
         $obj->setBaz(true);
         $obj->setCamelCase('camelcase');
         $obj->setObject($object);
+        $obj->setGo(true);
 
         $this->serializer
             ->expects($this->once())
@@ -122,14 +124,12 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => 'string_object',
+                'go' => true,
             ],
             $this->normalizer->normalize($obj, 'any')
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testNormalizeObjectWithUninitializedProperties()
     {
         $obj = new Php74Dummy();
@@ -159,9 +159,6 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testNormalizeObjectWithUninitializedPrivateProperties()
     {
         $obj = new Php74DummyPrivate();
@@ -403,6 +400,11 @@ class ObjectNormalizerTest extends TestCase
     protected function getNormalizerForCallbacks(): ObjectNormalizer
     {
         return new ObjectNormalizer();
+    }
+
+    protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): ObjectNormalizer
+    {
+        return new ObjectNormalizer(null, null, null, $this->getCallbackPropertyTypeExtractor());
     }
 
     // circular reference
@@ -669,6 +671,7 @@ class ObjectNormalizerTest extends TestCase
             'camelCase' => null,
             'object' => null,
             'bar' => null,
+            'go' => null,
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, ['not_serializable' => function () {
@@ -761,6 +764,22 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, null, ['include_foo_and_bar' => true]));
     }
 
+    public function testDenormalizeFalsePseudoType()
+    {
+        // given a serializer that extracts the attribute types of an object via ReflectionExtractor
+        $propertyTypeExtractor = new PropertyInfoExtractor([], [new ReflectionExtractor()], [], [], []);
+        $objectNormalizer = new ObjectNormalizer(null, null, null, $propertyTypeExtractor);
+
+        $serializer = new Serializer([$objectNormalizer]);
+
+        // when denormalizing some data into an object where an attribute uses the false pseudo type
+        /** @var Php80Dummy $object */
+        $object = $serializer->denormalize(['canBeFalseOrString' => false], Php80Dummy::class);
+
+        // then the attribute that declared false was filled correctly
+        $this->assertFalse($object->canBeFalseOrString);
+    }
+
     public function testAdvancedNameConverter()
     {
         $nameConverter = new class() implements AdvancedNameConverterInterface {
@@ -789,6 +808,7 @@ class ObjectNormalizerTest extends TestCase
         $obj->setBaz(true);
         $obj->setCamelCase('camelcase');
         $obj->unwantedProperty = 'notwanted';
+        $obj->setGo(false);
 
         $this->assertEquals(
             [
@@ -798,6 +818,7 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => null,
+                'go' => false,
             ],
             $normalizer->normalize($obj, 'any')
         );
@@ -826,6 +847,7 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => null,
+                'go' => null,
             ],
             $normalizer->normalize($obj, 'any')
         );

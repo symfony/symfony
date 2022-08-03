@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStri
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PercentType extends AbstractType
@@ -53,20 +52,12 @@ class PercentType extends AbstractType
     {
         $resolver->setDefaults([
             'scale' => 0,
-            'rounding_mode' => function (Options $options) {
-                trigger_deprecation('symfony/form', '5.1', 'Not configuring the "rounding_mode" option is deprecated. It will default to "\NumberFormatter::ROUND_HALFUP" in Symfony 6.0.');
-
-                return null;
-            },
+            'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
             'symbol' => '%',
             'type' => 'fractional',
             'compound' => false,
             'html5' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a percentage value.';
-            },
+            'invalid_message' => 'Please enter a percentage value.',
         ]);
 
         $resolver->setAllowedValues('type', [
@@ -74,7 +65,6 @@ class PercentType extends AbstractType
             'integer',
         ]);
         $resolver->setAllowedValues('rounding_mode', [
-            null,
             \NumberFormatter::ROUND_FLOOR,
             \NumberFormatter::ROUND_DOWN,
             \NumberFormatter::ROUND_HALFDOWN,
@@ -85,20 +75,13 @@ class PercentType extends AbstractType
         ]);
         $resolver->setAllowedTypes('scale', 'int');
         $resolver->setAllowedTypes('symbol', ['bool', 'string']);
-        $resolver->setDeprecated('rounding_mode', 'symfony/form', '5.1', function (Options $options, $roundingMode) {
-            if (null === $roundingMode) {
-                return 'Not configuring the "rounding_mode" option is deprecated. It will default to "\NumberFormatter::ROUND_HALFUP" in Symfony 6.0.';
-            }
-
-            return '';
-        });
         $resolver->setAllowedTypes('html5', 'bool');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'percent';
     }

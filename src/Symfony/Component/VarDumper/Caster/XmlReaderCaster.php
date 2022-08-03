@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -51,7 +52,7 @@ class XmlReaderCaster
                 'VALIDATE' => @$reader->getParserProperty(\XMLReader::VALIDATE),
                 'SUBST_ENTITIES' => @$reader->getParserProperty(\XMLReader::SUBST_ENTITIES),
             ];
-        } catch (\Error $e) {
+        } catch (\Error) {
             $properties = [
                 'LOADDTD' => false,
                 'DEFAULTATTRS' => false,

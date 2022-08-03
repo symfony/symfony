@@ -20,7 +20,14 @@ class FileLinkFormatterTest extends TestCase
 {
     public function testWhenNoFileLinkFormatAndNoRequest()
     {
-        $sut = new FileLinkFormatter();
+        $sut = new FileLinkFormatter([]);
+
+        $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
+    }
+
+    public function testAfterUnserialize()
+    {
+        $sut = unserialize(serialize(new FileLinkFormatter()));
 
         $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
     }
@@ -47,7 +54,7 @@ class FileLinkFormatterTest extends TestCase
         $request->server->set('SCRIPT_FILENAME', '/public/index.php');
         $request->server->set('REQUEST_URI', '/index.php/example');
 
-        $sut = new FileLinkFormatter(null, $requestStack, __DIR__, '/_profiler/open?file=%f&line=%l#line%l');
+        $sut = new FileLinkFormatter([], $requestStack, __DIR__, '/_profiler/open?file=%f&line=%l#line%l');
 
         $this->assertSame('http://www.example.org/_profiler/open?file=file.php&line=3#line3', $sut->format($file, 3));
     }
@@ -59,5 +66,10 @@ class FileLinkFormatterTest extends TestCase
         $sut = new FileLinkFormatter('atom');
 
         $this->assertSame("atom://core/open/file?filename=$file&line=3", $sut->format($file, 3));
+    }
+
+    public function testSerialize()
+    {
+        $this->assertInstanceOf(FileLinkFormatter::class, unserialize(serialize(new FileLinkFormatter())));
     }
 }

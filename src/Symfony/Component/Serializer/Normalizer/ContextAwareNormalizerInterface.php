@@ -15,6 +15,8 @@ namespace Symfony\Component\Serializer\Normalizer;
  * Adds the support of an extra $context parameter for the supportsNormalization method.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since symfony/serializer 6.1, use NormalizerInterface instead
  */
 interface ContextAwareNormalizerInterface extends NormalizerInterface
 {
@@ -23,5 +25,5 @@ interface ContextAwareNormalizerInterface extends NormalizerInterface
      *
      * @param array $context options that normalizers have access to
      */
-    public function supportsNormalization($data, string $format = null, array $context = []);
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool;
 }

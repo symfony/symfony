@@ -37,7 +37,7 @@ class RdKafkaCaster
 
         try {
             $assignment = $c->getAssignment();
-        } catch (RdKafkaException $e) {
+        } catch (RdKafkaException) {
             $assignment = [];
         }
 
@@ -166,13 +166,13 @@ class RdKafkaCaster
         return $a;
     }
 
-    private static function extractMetadata($c)
+    private static function extractMetadata(KafkaConsumer|\RdKafka $c)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
         try {
             $m = $c->getMetadata(true, null, 500);
-        } catch (RdKafkaException $e) {
+        } catch (RdKafkaException) {
             return [];
         }
 

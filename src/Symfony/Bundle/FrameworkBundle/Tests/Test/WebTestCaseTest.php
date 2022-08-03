@@ -23,7 +23,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
 
 class WebTestCaseTest extends TestCase
 {
@@ -78,10 +77,6 @@ class WebTestCaseTest extends TestCase
 
     public function testAssertResponseFormat()
     {
-        if (!class_exists(ResponseFormatSame::class)) {
-            $this->markTestSkipped('Too old version of HttpFoundation.');
-        }
-
         $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']))->assertResponseFormatSame('custom');
         $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/ld+json']))->assertResponseFormatSame('jsonld');
         $this->getResponseTester(new Response())->assertResponseFormatSame(null);

@@ -60,22 +60,16 @@ class SlotsHelper extends Helper
 
     /**
      * Returns true if the slot exists.
-     *
-     * @return bool
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return isset($this->slots[$name]);
     }
 
     /**
      * Gets the slot value.
-     *
-     * @param bool|string $default The default slot content
-     *
-     * @return string
      */
-    public function get(string $name, $default = false)
+    public function get(string $name, bool|string $default = false): string
     {
         return $this->slots[$name] ?? $default;
     }
@@ -91,11 +85,9 @@ class SlotsHelper extends Helper
     /**
      * Outputs a slot.
      *
-     * @param bool|string $default The default slot content
-     *
      * @return bool true if the slot is defined or if a default content has been provided, false otherwise
      */
-    public function output(string $name, $default = false)
+    public function output(string $name, bool|string $default = false): bool
     {
         if (!isset($this->slots[$name])) {
             if (false !== $default) {
@@ -114,10 +106,8 @@ class SlotsHelper extends Helper
 
     /**
      * Returns the canonical name of this helper.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'slots';
     }

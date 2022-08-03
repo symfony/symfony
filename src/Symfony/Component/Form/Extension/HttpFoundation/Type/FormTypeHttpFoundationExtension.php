@@ -22,7 +22,7 @@ use Symfony\Component\Form\RequestHandlerInterface;
  */
 class FormTypeHttpFoundationExtension extends AbstractTypeExtension
 {
-    private $requestHandler;
+    private RequestHandlerInterface $requestHandler;
 
     public function __construct(RequestHandlerInterface $requestHandler = null)
     {

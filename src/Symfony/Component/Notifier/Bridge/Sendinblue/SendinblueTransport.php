@@ -28,8 +28,8 @@ final class SendinblueTransport extends AbstractTransport
 {
     protected const HOST = 'api.sendinblue.com';
 
-    private $apiKey;
-    private $sender;
+    private string $apiKey;
+    private string $sender;
 
     public function __construct(string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -55,9 +55,11 @@ final class SendinblueTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $sender = $message->getFrom() ?: $this->sender;
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
             'json' => [
-                'sender' => $this->sender,
+                'sender' => $sender,
                 'recipient' => $message->getPhone(),
                 'content' => $message->getSubject(),
             ],

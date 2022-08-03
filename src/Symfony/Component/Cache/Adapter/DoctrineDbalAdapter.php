@@ -27,16 +27,16 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 {
     protected $maxIdLength = 255;
 
-    private $marshaller;
-    private $conn;
-    private $platformName;
-    private $serverVersion;
-    private $table = 'cache_items';
-    private $idCol = 'item_id';
-    private $dataCol = 'item_data';
-    private $lifetimeCol = 'item_lifetime';
-    private $timeCol = 'item_time';
-    private $namespace;
+    private MarshallerInterface $marshaller;
+    private Connection $conn;
+    private string $platformName;
+    private string $serverVersion;
+    private string $table = 'cache_items';
+    private string $idCol = 'item_id';
+    private string $dataCol = 'item_data';
+    private string $lifetimeCol = 'item_lifetime';
+    private string $timeCol = 'item_time';
+    private string $namespace;
 
     /**
      * You can either pass an existing database Doctrine DBAL Connection or
@@ -52,11 +52,9 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
      *  * db_lifetime_col: The column where to store the lifetime [default: item_lifetime]
      *  * db_time_col: The column where to store the timestamp [default: item_time]
      *
-     * @param Connection|string $connOrDsn
-     *
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct($connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], MarshallerInterface $marshaller = null)
+    public function __construct(Connection|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], MarshallerInterface $marshaller = null)
     {
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
@@ -64,13 +62,11 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         if ($connOrDsn instanceof Connection) {
             $this->conn = $connOrDsn;
-        } elseif (\is_string($connOrDsn)) {
+        } else {
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrDsn));
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrDsn]);
-        } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', __METHOD__, Connection::class, get_debug_type($connOrDsn)));
         }
 
         $this->table = $options['db_table'] ?? $this->table;
@@ -92,7 +88,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
      *
      * @throws DBALException When the table already exists
      */
-    public function createTable()
+    public function createTable(): void
     {
         $schema = new Schema();
         $this->addTableToSchema($schema);
@@ -136,7 +132,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $this->conn->executeStatement($deleteSql, $params, $paramTypes);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
         }
 
         return true;
@@ -213,7 +209,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $this->conn->executeStatement($sql);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
         }
 
         return true;
@@ -227,7 +223,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN (?)";
         try {
             $this->conn->executeStatement($sql, [array_values($ids)], [Connection::PARAM_STR_ARRAY]);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
         }
 
         return true;
@@ -236,7 +232,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, int $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
@@ -278,7 +274,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $lifetime = $lifetime ?: null;
         try {
             $stmt = $this->conn->prepare($sql);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
             if (!$this->conn->isTransactionActive() || \in_array($platformName, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                 $this->createTable();
             }
@@ -316,7 +312,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         foreach ($values as $id => $data) {
             try {
                 $rowCount = $stmt->executeStatement();
-            } catch (TableNotFoundException $e) {
+            } catch (TableNotFoundException) {
                 if (!$this->conn->isTransactionActive() || \in_array($platformName, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                     $this->createTable();
                 }
@@ -325,7 +321,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $platformName && 0 === $rowCount) {
                 try {
                     $insertStmt->executeStatement();
-                } catch (DBALException $e) {
+                } catch (DBALException) {
                     // A concurrent write won, let it be
                 }
             }
@@ -342,28 +338,17 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         $platform = $this->conn->getDatabasePlatform();
 
-        switch (true) {
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform:
-                return $this->platformName = 'mysql';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
-                return $this->platformName = 'sqlite';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
-                return $this->platformName = 'pgsql';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform:
-                return $this->platformName = 'oci';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
-                return $this->platformName = 'sqlsrv';
-
-            default:
-                return $this->platformName = \get_class($platform);
-        }
+        return match (true) {
+            $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform => $this->platformName = 'mysql',
+            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform => $this->platformName = 'sqlite',
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform => $this->platformName = 'pgsql',
+            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => $this->platformName = 'oci',
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform => $this->platformName = 'sqlsrv',
+            default => $this->platformName = \get_class($platform),
+        };
     }
 
     private function getServerVersion(): string

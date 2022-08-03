@@ -28,13 +28,13 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class InputDefinition
 {
-    private $arguments;
-    private $requiredCount;
-    private $lastArrayArgument;
-    private $lastOptionalArgument;
-    private $options;
-    private $negations;
-    private $shortcuts;
+    private array $arguments = [];
+    private int $requiredCount = 0;
+    private ?InputArgument $lastArrayArgument = null;
+    private ?InputArgument $lastOptionalArgument = null;
+    private array $options = [];
+    private array $negations = [];
+    private array $shortcuts = [];
 
     /**
      * @param array $definition An array of InputArgument and InputOption instance
@@ -124,13 +124,9 @@ class InputDefinition
     /**
      * Returns an InputArgument by name or by position.
      *
-     * @param string|int $name The InputArgument name or position
-     *
-     * @return InputArgument
-     *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument($name)
+    public function getArgument(string|int $name): InputArgument
     {
         if (!$this->hasArgument($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
@@ -143,12 +139,8 @@ class InputDefinition
 
     /**
      * Returns true if an InputArgument object exists by name or position.
-     *
-     * @param string|int $name The InputArgument name or position
-     *
-     * @return bool
      */
-    public function hasArgument($name)
+    public function hasArgument(string|int $name): bool
     {
         $arguments = \is_int($name) ? array_values($this->arguments) : $this->arguments;
 
@@ -160,27 +152,23 @@ class InputDefinition
      *
      * @return InputArgument[]
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
 
     /**
      * Returns the number of InputArguments.
-     *
-     * @return int
      */
-    public function getArgumentCount()
+    public function getArgumentCount(): int
     {
         return null !== $this->lastArrayArgument ? \PHP_INT_MAX : \count($this->arguments);
     }
 
     /**
      * Returns the number of required InputArguments.
-     *
-     * @return int
      */
-    public function getArgumentRequiredCount()
+    public function getArgumentRequiredCount(): int
     {
         return $this->requiredCount;
     }
@@ -188,7 +176,7 @@ class InputDefinition
     /**
      * @return array<string|bool|int|float|array|null>
      */
-    public function getArgumentDefaults()
+    public function getArgumentDefaults(): array
     {
         $values = [];
         foreach ($this->arguments as $argument) {
@@ -262,11 +250,9 @@ class InputDefinition
     /**
      * Returns an InputOption by name.
      *
-     * @return InputOption
-     *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption(string $name)
+    public function getOption(string $name): InputOption
     {
         if (!$this->hasOption($name)) {
             throw new InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
@@ -280,10 +266,8 @@ class InputDefinition
      *
      * This method can't be used to check if the user included the option when
      * executing the command (use getOption() instead).
-     *
-     * @return bool
      */
-    public function hasOption(string $name)
+    public function hasOption(string $name): bool
     {
         return isset($this->options[$name]);
     }
@@ -293,17 +277,15 @@ class InputDefinition
      *
      * @return InputOption[]
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
     /**
      * Returns true if an InputOption object exists by shortcut.
-     *
-     * @return bool
      */
-    public function hasShortcut(string $name)
+    public function hasShortcut(string $name): bool
     {
         return isset($this->shortcuts[$name]);
     }
@@ -318,10 +300,8 @@ class InputDefinition
 
     /**
      * Gets an InputOption by shortcut.
-     *
-     * @return InputOption
      */
-    public function getOptionForShortcut(string $shortcut)
+    public function getOptionForShortcut(string $shortcut): InputOption
     {
         return $this->getOption($this->shortcutToName($shortcut));
     }
@@ -329,7 +309,7 @@ class InputDefinition
     /**
      * @return array<string|bool|int|float|array|null>
      */
-    public function getOptionDefaults()
+    public function getOptionDefaults(): array
     {
         $values = [];
         foreach ($this->options as $option) {
@@ -373,10 +353,8 @@ class InputDefinition
 
     /**
      * Gets the synopsis.
-     *
-     * @return string
      */
-    public function getSynopsis(bool $short = false)
+    public function getSynopsis(bool $short = false): string
     {
         $elements = [];
 

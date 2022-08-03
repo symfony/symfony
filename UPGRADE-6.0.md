@@ -124,7 +124,7 @@ HttpFoundation
  * Removed the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead
  * Rename `RequestStack::getMasterRequest()` to `getMainRequest()`
  * Not passing `FILTER_REQUIRE_ARRAY` or `FILTER_FORCE_ARRAY` flags to `InputBag::filter()` when filtering an array will throw `BadRequestException`
- * Retrieving non-scalar values using `InputBag::get()` will throw `BadRequestException` (use `InputBad::all()` instead to retrieve an array)
+ * Retrieving non-scalar values using `InputBag::get()` will throw `BadRequestException` (use `InputBag::all()` instead to retrieve an array)
  * Passing non-scalar default value as the second argument `InputBag::get()` will throw `\InvalidArgumentException`
  * Passing non-scalar, non-array value as the second argument `InputBag::set()` will throw `\InvalidArgumentException`
  * Passing `null` as `$requestIp` to `IpUtils::__checkIp()`, `IpUtils::__checkIp4()` or `IpUtils::__checkIp6()` is not supported anymore.
@@ -145,6 +145,11 @@ Inflector
 ---------
 
  * The component has been removed, use `EnglishInflector` from the String component instead.
+
+Ldap
+----
+
+ * Remove `LdapAuthenticator::createAuthenticatedToken()`, use `LdapAuthenticator::createToken()` instead
 
 Lock
 ----

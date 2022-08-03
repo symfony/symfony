@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader;
+use Symfony\Component\Form\Exception\LogicException;
 
 /**
  * Loads choices using a Doctrine object manager.
@@ -21,10 +22,10 @@ use Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader;
  */
 class DoctrineChoiceLoader extends AbstractChoiceLoader
 {
-    private $manager;
-    private $class;
-    private $idReader;
-    private $objectLoader;
+    private ObjectManager $manager;
+    private string $class;
+    private ?IdReader $idReader;
+    private ?EntityLoaderInterface $objectLoader;
 
     /**
      * Creates a new choice loader.
@@ -68,16 +69,7 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
         // know that the IDs are used as values
         // Attention: This optimization does not check choices for existence
         if ($this->idReader) {
-            trigger_deprecation('symfony/doctrine-bridge', '5.1', 'Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "%s" or define the "choice_value" option instead.', __CLASS__);
-            // Maintain order and indices of the given objects
-            $values = [];
-            foreach ($choices as $i => $object) {
-                if ($object instanceof $this->class) {
-                    $values[$i] = $this->idReader->getIdValue($object);
-                }
-            }
-
-            return $values;
+            throw new LogicException('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
         }
 
         return parent::doLoadValuesForChoices($choices);
@@ -85,10 +77,8 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
 
     protected function doLoadChoicesForValues(array $values, ?callable $value): array
     {
-        $legacy = $this->idReader && null === $value;
-
-        if ($legacy) {
-            trigger_deprecation('symfony/doctrine-bridge', '5.1', 'Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "%s" or define the "choice_value" option instead.', __CLASS__);
+        if ($this->idReader && null === $value) {
+            throw new LogicException('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
         }
 
         $idReader = null;
@@ -96,8 +86,6 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
             $idReader = $value[0];
         } elseif ($value instanceof \Closure && ($rThis = (new \ReflectionFunction($value))->getClosureThis()) instanceof IdReader) {
             $idReader = $rThis;
-        } elseif ($legacy) {
-            $idReader = $this->idReader;
         }
 
         // Optimize performance in case we have an object loader and

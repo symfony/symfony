@@ -24,7 +24,6 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -33,6 +32,8 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -46,15 +47,19 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
+use Symfony\Component\Notifier\ChatterInterface;
+use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -66,8 +71,8 @@ use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
-use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow;
@@ -95,6 +100,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(1));
         $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
         $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
+    }
+
+    public function testFormCsrfProtectionWithCsrfDisabled()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('To use form CSRF protection, "framework.csrf_protection" must be enabled.');
+
+        $this->createContainerFromFile('form_csrf_disabled');
     }
 
     public function testPropertyAccessWithDefaultValue()
@@ -158,11 +171,30 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
     }
 
+    public function testFormsCsrfIsEnabledByDefault()
+    {
+        if (class_exists(FullStack::class)) {
+            $this->markTestSkipped('testing with the FullStack prevents verifying default values');
+        }
+        $container = $this->createContainerFromFile('form_default_csrf');
+
+        $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
+        $this->assertTrue($container->hasParameter('form.type_extension.csrf.enabled'));
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+    }
+
     public function testHttpMethodOverride()
     {
         $container = $this->createContainerFromFile('full');
 
         $this->assertFalse($container->getParameter('kernel.http_method_override'));
+    }
+
+    public function testTrustXSendfileTypeHeader()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertTrue($container->getParameter('kernel.trust_x_sendfile_type_header'));
     }
 
     public function testEsi()
@@ -229,6 +261,24 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertFalse($container->hasDefinition('profiler'), '->registerProfilerConfiguration() does not load profiling.xml');
         $this->assertFalse($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() does not load collectors.xml');
+    }
+
+    public function testProfilerCollectSerializerDataEnabled()
+    {
+        $container = $this->createContainerFromFile('profiler_collect_serializer_data');
+
+        $this->assertTrue($container->hasDefinition('profiler'));
+        $this->assertTrue($container->hasDefinition('serializer.data_collector'));
+        $this->assertTrue($container->hasDefinition('debug.serializer'));
+    }
+
+    public function testProfilerCollectSerializerDataDefaultDisabled()
+    {
+        $container = $this->createContainerFromFile('profiler');
+
+        $this->assertTrue($container->hasDefinition('profiler'));
+        $this->assertFalse($container->hasDefinition('serializer.data_collector'));
+        $this->assertFalse($container->hasDefinition('debug.serializer'));
     }
 
     public function testWorkflows()
@@ -546,40 +596,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testRouterWithLegacyTranslatorEnabledLocales()
-    {
-        $container = $this->createContainerFromFile('legacy_translator_enabled_locales');
-
-        $this->assertTrue($container->has('router'), '->registerRouterConfiguration() loads routing.xml');
-        $arguments = $container->findDefinition('router')->getArguments();
-        $this->assertEquals($container->getParameter('kernel.project_dir').'/config/routing.xml', $container->getParameter('router.resource'), '->registerRouterConfiguration() sets routing resource');
-        $this->assertEquals('%router.resource%', $arguments[1], '->registerRouterConfiguration() sets routing resource');
-        $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
-
-        $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
-    }
-
     public function testRouterRequiresResourceOption()
     {
         $this->expectException(InvalidConfigurationException::class);
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
-        $loader->load([['router' => true]], $container);
+        $loader->load([['http_method_override' => false, 'router' => true]], $container);
     }
 
     public function testSession()
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('kernel.default_locale'));
         $this->assertEquals('session.storage.factory.native', (string) $container->getAlias('session.storage.factory'));
-        $this->assertFalse($container->has('session.storage'));
-        $this->assertFalse($container->has('session.storage.native'));
-        $this->assertFalse($container->has('session.storage.php_bridge'));
         $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $options = $container->getParameter('session.storage.options');
@@ -603,31 +633,11 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session');
 
-        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.factory.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.factory.php_bridge')->getArgument(0));
         $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
-        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
-        $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testNullSessionHandlerLegacy()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
-
-        $container = $this->createContainerFromFile('session_legacy');
-
-        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
-        $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
-        $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
-        $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
-
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
@@ -743,11 +753,11 @@ abstract class FrameworkExtensionTest extends TestCase
     /**
      * @group legacy
      */
-    public function testMessengerWithoutResetOnMessageLegacy()
+    public function testMessengerWithExplictResetOnMessageLegacy()
     {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.4: Not setting the "framework.messenger.reset_on_message" configuration option is deprecated, it will default to "true" in version 6.0.');
+        $this->expectDeprecation('Since symfony/framework-bundle 6.1: Option "reset_on_message" at "framework.messenger" is deprecated. It does nothing and will be removed in version 7.0.');
 
-        $container = $this->createContainerFromFile('messenger_without_reset_on_message_legacy');
+        $container = $this->createContainerFromFile('messenger_with_explict_reset_on_message_legacy');
 
         $this->assertTrue($container->hasDefinition('console.command.messenger_consume_messages'));
         $this->assertTrue($container->hasAlias('messenger.default_bus'));
@@ -756,8 +766,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
-        $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
-        $this->assertNull($container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
+        $this->assertTrue($container->hasDefinition('messenger.listener.reset_services'));
+        $this->assertSame('messenger.listener.reset_services', (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
     }
 
     public function testMessenger()
@@ -1020,9 +1030,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
 
+    /**
+     * @group legacy
+     */
     public function testMessengerWithDisabledResetOnMessage()
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
 
         $this->createContainerFromFile('messenger_with_disabled_reset_on_message');
@@ -1051,7 +1064,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass(Security::class);
+        $ref = new \ReflectionClass(AuthenticationEvents::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
@@ -1170,7 +1183,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testFileLinkFormat()
     {
-        if (ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
+        if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
             $this->markTestSkipped('A custom file_link_format is defined.');
         }
 
@@ -1312,10 +1325,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testValidationAutoMapping()
     {
-        if (!class_exists(PropertyInfoLoader::class)) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
-        }
-
         $container = $this->createContainerFromFile('validation_auto_mapping');
         $parameter = [
             'App\\' => ['services' => ['foo', 'bar']],
@@ -1332,16 +1341,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('form_no_csrf');
 
         $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testFormsWithoutImprovedValidationMessages()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.2: Setting the "framework.form.legacy_error_messages" option to "true" is deprecated. It will have no effect as of Symfony 6.0.');
-
-        $this->createContainerFromFile('form_legacy_messages');
     }
 
     public function testStopwatchEnabledWithDebugModeEnabled()
@@ -1449,7 +1448,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $tag = $definition->getTag('serializer.normalizer');
 
         $this->assertEquals(JsonSerializableNormalizer::class, $definition->getClass());
-        $this->assertEquals(-900, $tag[0]['priority']);
+        $this->assertEquals(-950, $tag[0]['priority']);
     }
 
     public function testObjectNormalizerRegistered()
@@ -1633,24 +1632,8 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->assertEquals([
                 ['setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]],
             ], $tagAwareDefinition->getMethodCalls());
+            $this->assertSame([['channel' => 'cache']], $tagAwareDefinition->getTag('monolog.logger'));
         }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDoctrineCache()
-    {
-        if (!class_exists(DoctrineAdapter::class)) {
-            self::markTestSkipped('This test requires symfony/cache 5.4 or lower.');
-        }
-
-        $container = $this->createContainerFromFile('doctrine_cache', [], true, false);
-        $container->setParameter('cache.prefix.seed', 'test');
-        $container->addCompilerPass(new CachePoolPass());
-        $container->compile();
-
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
     }
 
     public function testRedisTagAwareAdapter()
@@ -1714,14 +1697,63 @@ abstract class FrameworkExtensionTest extends TestCase
         ];
     }
 
+    public function testCacheTaggableTagAppliedToPools()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        $servicesToCheck = [
+            'cache.app.taggable' => 'cache.app',
+            'cache.redis_tag_aware.bar' => 'cache.redis_tag_aware.bar',
+            '.cache.foobar.taggable' => 'cache.foobar',
+        ];
+
+        foreach ($servicesToCheck as $id => $expectedPool) {
+            $this->assertTrue($container->hasDefinition($id));
+
+            $def = $container->getDefinition($id);
+
+            $this->assertTrue($def->hasTag('cache.taggable'));
+            $this->assertSame($expectedPool, $def->getTag('cache.taggable')[0]['pool'] ?? null);
+        }
+    }
+
+    /**
+     * @dataProvider appRedisTagAwareConfigProvider
+     */
+    public function testCacheTaggableTagAppliedToRedisAwareAppPool(string $configFile)
+    {
+        $container = $this->createContainerFromFile($configFile);
+
+        $def = $container->getDefinition('cache.app');
+
+        $this->assertTrue($def->hasTag('cache.taggable'));
+        $this->assertSame('cache.app', $def->getTag('cache.taggable')[0]['pool'] ?? null);
+    }
+
+    public function testCachePoolInvalidateTagsCommandRegistered()
+    {
+        $container = $this->createContainerFromFile('cache');
+        $this->assertTrue($container->hasDefinition('console.command.cache_pool_invalidate_tags'));
+
+        $locator = $container->getDefinition('console.command.cache_pool_invalidate_tags')->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+
+        $iterator = $locator->getTaggedIteratorArgument();
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $iterator);
+
+        $this->assertSame('cache.taggable', $iterator->getTag());
+        $this->assertSame('pool', $iterator->getIndexAttribute());
+        $this->assertTrue($iterator->needsIndexes());
+    }
+
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
     {
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([], $container);
+        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
         $this->assertCount(1, $container->getDefinition('config_cache_factory')->getArguments());
 
         $container = $this->createContainer(['kernel.debug' => false]);
-        (new FrameworkExtension())->load([], $container);
+        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
         $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
     }
 
@@ -1745,41 +1777,28 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
-        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSessionCookieSecureAutoLegacy()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
-
-        $container = $this->createContainerFromFile('session_cookie_secure_auto_legacy');
-
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'session_storage', 'request_stack'];
+        $expected = ['session_factory', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
     public function testRobotsTagListenerIsRegisteredInDebugMode()
     {
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([], $container);
+        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
         $this->assertTrue($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should be registered');
 
         $definition = $container->getDefinition('disallow_search_engine_index_response_listener');
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'), 'DisallowRobotsIndexingListener should have the correct tag');
 
         $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([['disallow_search_engine_index' => false]], $container);
+        (new FrameworkExtension())->load([['http_method_override' => false, 'disallow_search_engine_index' => false]], $container);
         $this->assertFalse(
             $container->has('disallow_search_engine_index_response_listener'),
             'DisallowRobotsIndexingListener should not be registered when explicitly disabled'
         );
 
         $container = $this->createContainer(['kernel.debug' => false]);
-        (new FrameworkExtension())->load([], $container);
+        (new FrameworkExtension())->load([['http_method_override' => false]], $container);
         $this->assertFalse($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should NOT be registered');
     }
 
@@ -1956,9 +1975,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasParameter('container.behavior_describing_tags'));
         $this->assertEquals([
+            'annotations.cached_reader',
+            'container.do_not_inline',
             'container.service_locator',
             'container.service_subscriber',
             'kernel.event_subscriber',
+            'kernel.event_listener',
             'kernel.locale_aware',
             'kernel.reset',
         ], $container->getParameter('container.behavior_describing_tags'));
@@ -1998,7 +2020,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('notifier'));
         $this->assertFalse($container->hasDefinition('chatter'));
+        $this->assertFalse($container->hasAlias(ChatterInterface::class));
         $this->assertFalse($container->hasDefinition('texter'));
+        $this->assertFalse($container->hasAlias(TexterInterface::class));
     }
 
     public function testIfNotifierTransportsAreKnownByFrameworkExtension()
@@ -2013,6 +2037,118 @@ abstract class FrameworkExtensionTest extends TestCase
             $transportFactoryName = strtolower(preg_replace('/(.)([A-Z])/', '$1-$2', $bridgeDirectory->getFilename()));
             $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
         }
+    }
+
+    public function testLocaleSwitcherServiceRegistered()
+    {
+        if (!class_exists(LocaleSwitcher::class)) {
+            $this->markTestSkipped('LocaleSwitcher not available.');
+        }
+
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertTrue($container->has('translation.locale_switcher'));
+
+        $switcherDef = $container->getDefinition('translation.locale_switcher');
+
+        $this->assertSame('%kernel.default_locale%', $switcherDef->getArgument(0));
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $switcherDef->getArgument(1));
+        $this->assertSame('kernel.locale_aware', $switcherDef->getArgument(1)->getTag());
+        $this->assertEquals(new Reference('router.request_context', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $switcherDef->getArgument(2));
+    }
+
+    public function testHtmlSanitizer()
+    {
+        $container = $this->createContainerFromFile('html_sanitizer');
+
+        // html_sanitizer service
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.custom')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.custom')->getArguments());
+        $this->assertSame('html_sanitizer.config.custom', (string) $args[0]);
+
+        // config
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config.custom'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.custom')->getClass());
+        $this->assertCount(23, $calls = $container->getDefinition('html_sanitizer.config.custom')->getMethodCalls());
+        $this->assertSame(
+            [
+                ['allowSafeElements', [], true],
+                ['allowStaticElements', [], true],
+                ['allowElement', ['iframe', 'src'], true],
+                ['allowElement', ['custom-tag', ['data-attr', 'data-attr-1']], true],
+                ['allowElement', ['custom-tag-2', '*'], true],
+                ['blockElement', ['section'], true],
+                ['dropElement', ['video'], true],
+                ['allowAttribute', ['src', $this instanceof XmlFrameworkExtensionTest ? 'iframe' : ['iframe']], true],
+                ['allowAttribute', ['data-attr', '*'], true],
+                ['dropAttribute', ['data-attr', $this instanceof XmlFrameworkExtensionTest ? 'custom-tag' : ['custom-tag']], true],
+                ['dropAttribute', ['data-attr-1', []], true],
+                ['dropAttribute', ['data-attr-2', '*'], true],
+                ['forceAttribute', ['a', 'rel', 'noopener noreferrer'], true],
+                ['forceAttribute', ['h1', 'class', 'bp4-heading'], true],
+                ['forceHttpsUrls', [true], true],
+                ['allowLinkSchemes', [['http', 'https', 'mailto']], true],
+                ['allowLinkHosts', [['symfony.com']], true],
+                ['allowRelativeLinks', [true], true],
+                ['allowMediaSchemes', [['http', 'https', 'data']], true],
+                ['allowMediaHosts', [['symfony.com']], true],
+                ['allowRelativeMedias', [true], true],
+                ['withAttributeSanitizer', ['@App\\Sanitizer\\CustomAttributeSanitizer'], true],
+                ['withoutAttributeSanitizer', ['@App\\Sanitizer\\OtherCustomAttributeSanitizer'], true],
+            ],
+
+            // Convert references to their names for easier assertion
+            array_map(
+                static function ($call) {
+                    foreach ($call[1] as $k => $arg) {
+                        $call[1][$k] = $arg instanceof Reference ? '@'.$arg : $arg;
+                    }
+
+                    return $call;
+                },
+                $calls
+            )
+        );
+
+        // Named alias
+        $this->assertSame('html_sanitizer.sanitizer.all.sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class.' $allSanitizer'));
+        $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
+    }
+
+    public function testHtmlSanitizerDefaultNullAllowedLinkMediaHost()
+    {
+        $container = $this->createContainerFromFile('html_sanitizer_default_allowed_link_and_media_hosts');
+
+        $calls = $container->getDefinition('html_sanitizer.config.custom_default')->getMethodCalls();
+        $this->assertContains(['allowLinkHosts', [null], true], $calls);
+        $this->assertContains(['allowMediaHosts', [null], true], $calls);
+    }
+
+    public function testHtmlSanitizerDefaultConfig()
+    {
+        $container = $this->createContainerFromFile('html_sanitizer_default_config');
+
+        // html_sanitizer service
+        $this->assertTrue($container->hasAlias('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads default_config');
+        $this->assertSame('html_sanitizer.sanitizer.default', (string) $container->getAlias('html_sanitizer'));
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.default')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.default')->getArguments());
+        $this->assertSame('html_sanitizer.config.default', (string) $args[0]);
+
+        // config
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config.default'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.default')->getClass());
+        $this->assertCount(1, $calls = $container->getDefinition('html_sanitizer.config.default')->getMethodCalls());
+        $this->assertSame(
+            ['allowSafeElements', [], true],
+            $calls[0]
+        );
+
+        // Named alias
+        $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
+
+        // Default alias
+        $this->assertSame('html_sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class));
     }
 
     protected function createContainer(array $data = [])
@@ -2125,9 +2261,6 @@ abstract class FrameworkExtensionTest extends TestCase
         switch ($adapter) {
             case 'cache.adapter.apcu':
                 $this->assertSame(ApcuAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.doctrine':
-                $this->assertSame(DoctrineAdapter::class, $parentDefinition->getClass());
                 break;
             case 'cache.app':
             case 'cache.adapter.filesystem':

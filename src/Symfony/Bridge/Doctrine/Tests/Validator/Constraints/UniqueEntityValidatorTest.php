@@ -13,9 +13,9 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
@@ -111,7 +111,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($repositoryMock)
         ;
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $classMetadata
             ->expects($this->any())
             ->method('hasField')
@@ -194,9 +194,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'em' => self::EM_NAME,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo')];
     }
 
     /**
@@ -230,9 +228,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'errorPath' => 'bar',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", errorPath: "bar");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', errorPath: 'bar')];
     }
 
     /**
@@ -291,9 +287,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => false,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: false);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: false)];
     }
 
     /**
@@ -340,9 +334,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => true,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: true);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: true)];
     }
 
     public function testValidateUniquenessWithValidCustomErrorPath()
@@ -441,9 +433,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'repositoryMethod' => 'findByCustom',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", repositoryMethod: "findByCustom");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', repositoryMethod: 'findByCustom')];
     }
 
     /**
@@ -892,11 +882,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         return [
             [$entity, new class() implements \Iterator {
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function current()
+                public function current(): mixed
                 {
                     return null;
                 }
@@ -910,11 +896,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                 {
                 }
 
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function key()
+                public function key(): mixed
                 {
                     return false;
                 }
@@ -924,11 +906,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                 }
             }],
             [$entity, new class() implements \Iterator {
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function current()
+                public function current(): mixed
                 {
                     return false;
                 }
@@ -942,11 +920,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                 {
                 }
 
-                /**
-                 * @return mixed
-                 */
-                #[\ReturnTypeWillChange]
-                public function key()
+                public function key(): mixed
                 {
                     return false;
                 }

@@ -18,14 +18,14 @@ namespace Symfony\Component\Routing;
  */
 class CompiledRoute implements \Serializable
 {
-    private $variables;
-    private $tokens;
-    private $staticPrefix;
-    private $regex;
-    private $pathVariables;
-    private $hostVariables;
-    private $hostRegex;
-    private $hostTokens;
+    private array $variables;
+    private array $tokens;
+    private string $staticPrefix;
+    private string $regex;
+    private array $pathVariables;
+    private array $hostVariables;
+    private ?string $hostRegex;
+    private array $hostTokens;
 
     /**
      * @param string      $staticPrefix  The static prefix of the compiled route
@@ -68,7 +68,7 @@ class CompiledRoute implements \Serializable
      */
     final public function serialize(): string
     {
-        return serialize($this->__serialize());
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
     public function __unserialize(array $data): void
@@ -86,87 +86,71 @@ class CompiledRoute implements \Serializable
     /**
      * @internal
      */
-    final public function unserialize($serialized)
+    final public function unserialize(string $serialized)
     {
         $this->__unserialize(unserialize($serialized, ['allowed_classes' => false]));
     }
 
     /**
      * Returns the static prefix.
-     *
-     * @return string
      */
-    public function getStaticPrefix()
+    public function getStaticPrefix(): string
     {
         return $this->staticPrefix;
     }
 
     /**
      * Returns the regex.
-     *
-     * @return string
      */
-    public function getRegex()
+    public function getRegex(): string
     {
         return $this->regex;
     }
 
     /**
      * Returns the host regex.
-     *
-     * @return string|null
      */
-    public function getHostRegex()
+    public function getHostRegex(): ?string
     {
         return $this->hostRegex;
     }
 
     /**
      * Returns the tokens.
-     *
-     * @return array
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
 
     /**
      * Returns the host tokens.
-     *
-     * @return array
      */
-    public function getHostTokens()
+    public function getHostTokens(): array
     {
         return $this->hostTokens;
     }
 
     /**
      * Returns the variables.
-     *
-     * @return array
      */
-    public function getVariables()
+    public function getVariables(): array
     {
         return $this->variables;
     }
 
     /**
      * Returns the path variables.
-     *
-     * @return array
      */
-    public function getPathVariables()
+    public function getPathVariables(): array
     {
         return $this->pathVariables;
     }
 
     /**
      * Returns the host variables.
-     *
-     * @return array
      */
-    public function getHostVariables()
+    public function getHostVariables(): array
     {
         return $this->hostVariables;
     }

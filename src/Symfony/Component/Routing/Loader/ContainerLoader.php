@@ -20,7 +20,7 @@ use Psr\Container\ContainerInterface;
  */
 class ContainerLoader extends ObjectLoader
 {
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container, string $env = null)
     {
@@ -31,7 +31,7 @@ class ContainerLoader extends ObjectLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports(mixed $resource, string $type = null): bool
     {
         return 'service' === $type && \is_string($resource);
     }
@@ -39,7 +39,7 @@ class ContainerLoader extends ObjectLoader
     /**
      * {@inheritdoc}
      */
-    protected function getObject(string $id)
+    protected function getObject(string $id): object
     {
         return $this->container->get($id);
     }

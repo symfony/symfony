@@ -1,9 +1,9 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'serializer' => true,
     'messenger' => [
-        'reset_on_message' =>  true,
         'serializer' => [
             'default_serializer' => 'messenger.transport.symfony_serializer',
             'symfony_serializer' => [

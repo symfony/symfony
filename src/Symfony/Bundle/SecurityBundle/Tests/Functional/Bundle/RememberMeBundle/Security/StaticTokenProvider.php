@@ -49,11 +49,9 @@ class StaticTokenProvider implements TokenProviderInterface
         $token = $this->loadTokenBySeries($series);
         $refl = new \ReflectionClass($token);
         $tokenValueProp = $refl->getProperty('tokenValue');
-        $tokenValueProp->setAccessible(true);
         $tokenValueProp->setValue($token, $tokenValue);
 
         $lastUsedProp = $refl->getProperty('lastUsed');
-        $lastUsedProp->setAccessible(true);
         $lastUsedProp->setValue($token, $lastUsed);
 
         self::$db[$series] = $token;

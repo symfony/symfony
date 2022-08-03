@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Attribute;
  *
  * @author Alireza Mirsepassi <alirezamirsepassi@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class AsMessageHandler
 {
     public function __construct(

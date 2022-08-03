@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Issn;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class IssnTest extends TestCase
 {
     public function testAttributes()

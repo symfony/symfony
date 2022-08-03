@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
 
 /**
@@ -21,11 +22,9 @@ use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
  *
  * @final
  */
+#[AsCommand(name: 'lint:yaml', description: 'Lint a YAML file and outputs encountered errors')]
 class YamlLintCommand extends BaseLintCommand
 {
-    protected static $defaultName = 'lint:yaml';
-    protected static $defaultDescription = 'Lint a YAML file and outputs encountered errors';
-
     public function __construct()
     {
         $directoryIteratorProvider = function ($directory, $default) {

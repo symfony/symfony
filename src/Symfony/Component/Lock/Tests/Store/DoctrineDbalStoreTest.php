@@ -99,7 +99,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
     public function testCreatesTableInTransaction(string $platform)
     {
         $conn = $this->createMock(Connection::class);
-        $conn->expects($this->exactly(3))
+        $conn->expects($this->atLeast(3))
             ->method('executeStatement')
             ->withConsecutive(
                 [$this->stringContains('INSERT INTO')],
@@ -120,7 +120,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
             ->willReturn(true);
 
         $platform = $this->createMock($platform);
-        $platform->method('getCreateTableSQL')
+        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')
@@ -145,7 +145,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
     public function testTableCreationInTransactionNotSupported()
     {
         $conn = $this->createMock(Connection::class);
-        $conn->expects($this->exactly(2))
+        $conn->expects($this->atLeast(2))
             ->method('executeStatement')
             ->withConsecutive(
                 [$this->stringContains('INSERT INTO')],
@@ -165,10 +165,10 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
             ->willReturn(true);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method('getCreateTableSQL')
+        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
-        $conn->expects($this->exactly(2))
+        $conn->expects($this->atLeast(2))
             ->method('getDatabasePlatform');
 
         $store = new DoctrineDbalStore($conn);
@@ -181,7 +181,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
     public function testCreatesTableOutsideTransaction()
     {
         $conn = $this->createMock(Connection::class);
-        $conn->expects($this->exactly(3))
+        $conn->expects($this->atLeast(3))
             ->method('executeStatement')
             ->withConsecutive(
                 [$this->stringContains('INSERT INTO')],
@@ -202,7 +202,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
             ->willReturn(false);
 
         $platform = $this->createMock(AbstractPlatform::class);
-        $platform->method('getCreateTableSQL')
+        $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
         $conn->method('getDatabasePlatform')

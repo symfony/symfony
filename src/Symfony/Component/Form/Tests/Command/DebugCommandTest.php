@@ -45,11 +45,6 @@ class DebugCommandTest extends TestCase
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertSame(<<<TXT
 
-Built-in form types (Symfony\Component\Form\Extension\Core\Type)
-----------------------------------------------------------------
-
- PercentType
-
 Service form types
 ------------------
 
@@ -57,7 +52,7 @@ Service form types
 
 
 TXT
-        , $tester->getDisplay(true));
+            , $tester->getDisplay(true));
     }
 
     public function testDebugSingleFormType()
@@ -139,7 +134,7 @@ Select one of the following form types to display its information: [%A\A\Ambiguo
 %A\A\AmbiguousType (Block prefix: "ambiguous")
 %A
 TXT
-        , $output);
+            , $output);
     }
 
     public function testDebugInvalidFormType()
@@ -194,10 +189,6 @@ TXT
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
         $command = new DebugCommand($formRegistry);
         $application = new Application();
@@ -271,7 +262,6 @@ TXT
     {
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
-        $loadTypesRefMethod->setAccessible(true);
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
         $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
         sort($coreTypes);

@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Catalogue\TargetOperation;
 final class TranslatorBag implements TranslatorBagInterface
 {
     /** @var MessageCatalogue[] */
-    private $catalogues = [];
+    private array $catalogues = [];
 
     public function addCatalogue(MessageCatalogue $catalogue): void
     {
@@ -94,7 +94,10 @@ final class TranslatorBag implements TranslatorBagInterface
             $obsoleteCatalogue = new MessageCatalogue($locale);
 
             foreach ($operation->getDomains() as $domain) {
-                $obsoleteCatalogue->add($operation->getObsoleteMessages($domain), $domain);
+                $obsoleteCatalogue->add(
+                    array_diff($operation->getMessages($domain), $operation->getNewMessages($domain)),
+                    $domain
+                );
             }
 
             $diff->addCatalogue($obsoleteCatalogue);

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
+class JsonLoginFactory extends AbstractFactory
 {
     public const PRIORITY = -40;
 
@@ -42,71 +42,12 @@ class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
     /**
      * {@inheritdoc}
      */
-    public function getPosition(): string
-    {
-        return 'form';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getKey(): string
     {
         return 'json-login';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
-    {
-        $provider = 'security.authentication.provider.dao.'.$id;
-        $container
-            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
-            ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
-            ->replaceArgument(2, $id)
-        ;
-
-        return $provider;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListenerId(): string
-    {
-        return 'security.authentication.listener.json';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isRememberMeAware(array $config): bool
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
-    {
-        $listenerId = $this->getListenerId();
-        $listener = new ChildDefinition($listenerId);
-        $listener->replaceArgument(3, $id);
-        $listener->replaceArgument(4, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)) : null);
-        $listener->replaceArgument(5, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $id, $config)) : null);
-        $listener->replaceArgument(6, array_intersect_key($config, $this->options));
-        $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
-
-        $listenerId .= '.'.$id;
-        $container->setDefinition($listenerId, $listener);
-
-        return $listenerId;
-    }
-
-    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId)
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.json_login.'.$firewallName;
         $options = array_intersect_key($config, $this->options);

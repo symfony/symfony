@@ -29,12 +29,17 @@ class Length extends Constraint
     public const NOT_EQUAL_LENGTH_ERROR = '4b6f5c76-22b4-409d-af16-fbe823ba9332';
     public const INVALID_CHARACTERS_ERROR = '35e6a710-aa2e-4719-b58e-24b35749b767';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
         self::NOT_EQUAL_LENGTH_ERROR => 'NOT_EQUAL_LENGTH_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $maxMessage = 'This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.';
     public $minMessage = 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.';
@@ -44,15 +49,9 @@ class Length extends Constraint
     public $min;
     public $charset = 'UTF-8';
     public $normalizer;
-    public $allowEmptyString = false;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param int|array|null $exactly The expected exact length or a set of options
-     */
     public function __construct(
-        $exactly = null,
+        int|array $exactly = null,
         int $min = null,
         int $max = null,
         string $charset = null,
@@ -62,7 +61,7 @@ class Length extends Constraint
         string $maxMessage = null,
         string $charsetMessage = null,
         array $groups = null,
-        $payload = null,
+        mixed $payload = null,
         array $options = []
     ) {
         if (\is_array($exactly)) {
@@ -70,8 +69,8 @@ class Length extends Constraint
             $exactly = $options['value'] ?? null;
         }
 
-        $min = $min ?? $options['min'] ?? null;
-        $max = $max ?? $options['max'] ?? null;
+        $min ??= $options['min'] ?? null;
+        $max ??= $options['max'] ?? null;
 
         unset($options['value'], $options['min'], $options['max']);
 
@@ -96,10 +95,6 @@ class Length extends Constraint
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
-        }
-
-        if (isset($options['allowEmptyString'])) {
-            trigger_deprecation('symfony/validator', '5.2', sprintf('The "allowEmptyString" option of the "%s" constraint is deprecated.', self::class));
         }
     }
 }

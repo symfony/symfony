@@ -5,7 +5,7 @@
 {% block toolbar %}
     {% if collector.messages|length %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/translation.svg') }}
+            {{ source('@WebProfiler/Icon/translation.svg') }}
             {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}
             <span class="sf-toolbar-value">{{ error_count ?: collector.countDefines }}</span>
@@ -44,7 +44,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.countMissings ? 'error' : collector.countFallbacks ? 'warning' }} {{ collector.messages is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/translation.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/translation.svg') }}</span>
         <strong>Translation</strong>
         {% if collector.countMissings or collector.countFallbacks %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}

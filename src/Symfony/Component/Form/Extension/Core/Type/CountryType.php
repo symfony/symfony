@@ -43,11 +43,7 @@ class CountryType extends AbstractType
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'alpha3' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid country.';
-            },
+            'invalid_message' => 'Please select a valid country.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
@@ -57,7 +53,7 @@ class CountryType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -65,7 +61,7 @@ class CountryType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'country';
     }

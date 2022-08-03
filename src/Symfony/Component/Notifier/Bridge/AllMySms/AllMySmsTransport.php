@@ -28,9 +28,9 @@ final class AllMySmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.allmysms.com';
 
-    private $login;
-    private $apiKey;
-    private $from;
+    private string $login;
+    private string $apiKey;
+    private ?string $from;
 
     public function __construct(string $login, string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -61,11 +61,13 @@ final class AllMySmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => $this->login.':'.$this->apiKey,
             'json' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => $message->getPhone(),
                 'text' => $message->getSubject(),
             ],

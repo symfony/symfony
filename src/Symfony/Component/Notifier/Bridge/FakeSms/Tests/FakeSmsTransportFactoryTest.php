@@ -15,14 +15,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return FakeSmsTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): FakeSmsTransportFactory
     {
         return new FakeSmsTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
     }

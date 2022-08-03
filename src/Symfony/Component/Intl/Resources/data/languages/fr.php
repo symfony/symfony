@@ -107,7 +107,7 @@ return [
         'cop' => 'copte',
         'cps' => 'capiznon',
         'cr' => 'cree',
-        'crh' => 'turc de Crimée',
+        'crh' => 'tatar de Crimée',
         'crs' => 'créole seychellois',
         'cs' => 'tchèque',
         'csb' => 'kachoube',

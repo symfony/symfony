@@ -22,7 +22,7 @@ class IntlCallbackChoiceLoader extends CallbackChoiceLoader
     /**
      * {@inheritdoc}
      */
-    public function loadChoicesForValues(array $values, callable $value = null)
+    public function loadChoicesForValues(array $values, callable $value = null): array
     {
         return parent::loadChoicesForValues(array_filter($values), $value);
     }
@@ -30,7 +30,7 @@ class IntlCallbackChoiceLoader extends CallbackChoiceLoader
     /**
      * {@inheritdoc}
      */
-    public function loadValuesForChoices(array $choices, callable $value = null)
+    public function loadValuesForChoices(array $choices, callable $value = null): array
     {
         $choices = array_filter($choices);
 

@@ -12,14 +12,11 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testConstructor()
     {
         $this->testAll();
@@ -179,15 +176,23 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bang'], $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
     }
 
-    /**
-     * @group legacy
-     */
     public function testFilterCallback()
     {
-        $bag = new ParameterBag(['foo' => 'bar']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A Closure must be passed to "Symfony\Component\HttpFoundation\ParameterBag::filter()" when FILTER_CALLBACK is used, "string" given.');
 
-        $this->expectDeprecation('Since symfony/http-foundation 5.2: Not passing a Closure together with FILTER_CALLBACK to "Symfony\Component\HttpFoundation\ParameterBag::filter()" is deprecated. Wrap your filter in a closure instead.');
-        $this->assertSame('BAR', $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']));
+        $bag = new ParameterBag(['foo' => 'bar']);
+        $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']);
+    }
+
+    public function testFilterClosure()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => function ($value) {
+            return strtoupper($value);
+        }]);
+
+        $this->assertSame('BAR', $result);
     }
 
     public function testGetIterator()

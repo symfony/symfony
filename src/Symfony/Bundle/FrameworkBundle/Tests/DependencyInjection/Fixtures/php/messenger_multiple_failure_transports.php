@@ -1,8 +1,8 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'messenger' => [
-        'reset_on_message' =>  true,
         'transports' => [
             'transport_1' => [
                 'dsn' => 'null://',

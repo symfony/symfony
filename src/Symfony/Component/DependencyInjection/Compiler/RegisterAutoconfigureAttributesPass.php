@@ -31,10 +31,6 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (80000 > \PHP_VERSION_ID) {
-            return;
-        }
-
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($this->accept($definition) && $class = $container->getReflectionClass($definition->getClass(), false)) {
                 $this->processClass($container, $class);
@@ -44,7 +40,7 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 
     public function accept(Definition $definition): bool
     {
-        return 80000 <= \PHP_VERSION_ID && $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes');
+        return $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes');
     }
 
     public function processClass(ContainerBuilder $container, \ReflectionClass $class)
@@ -61,7 +57,6 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
         }
 
         $parseDefinitions = new \ReflectionMethod(YamlFileLoader::class, 'parseDefinitions');
-        $parseDefinitions->setAccessible(true);
         $yamlLoader = $parseDefinitions->getDeclaringClass()->newInstanceWithoutConstructor();
 
         self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
@@ -82,7 +77,8 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
                         ],
                     ],
                 ],
-                $class->getFileName()
+                $class->getFileName(),
+                false
             );
         };
 

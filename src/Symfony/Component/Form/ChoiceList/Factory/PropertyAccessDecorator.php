@@ -38,8 +38,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class PropertyAccessDecorator implements ChoiceListFactoryInterface
 {
-    private $decoratedFactory;
-    private $propertyAccessor;
+    private ChoiceListFactoryInterface $decoratedFactory;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(ChoiceListFactoryInterface $decoratedFactory, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -49,26 +49,17 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
     /**
      * Returns the decorated factory.
-     *
-     * @return ChoiceListFactoryInterface
      */
-    public function getDecoratedFactory()
+    public function getDecoratedFactory(): ChoiceListFactoryInterface
     {
         return $this->decoratedFactory;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param mixed $value
-     * @param mixed $filter
-     *
-     * @return ChoiceListInterface
      */
-    public function createListFromChoices(iterable $choices, $value = null/*, $filter = null*/)
+    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if (\is_string($value)) {
             $value = new PropertyPath($value);
         }
@@ -100,16 +91,9 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param mixed $value
-     * @param mixed $filter
-     *
-     * @return ChoiceListInterface
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/*, $filter = null*/)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if (\is_string($value)) {
             $value = new PropertyPath($value);
         }
@@ -141,19 +125,9 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param mixed $preferredChoices
-     * @param mixed $label
-     * @param mixed $index
-     * @param mixed $groupBy
-     * @param mixed $attr
-     * @param mixed $labelTranslationParameters
-     *
-     * @return ChoiceListView
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
     {
-        $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];
         $accessor = $this->propertyAccessor;
 
         if (\is_string($label)) {
@@ -174,7 +148,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             $preferredChoices = function ($choice) use ($accessor, $preferredChoices) {
                 try {
                     return $accessor->getValue($choice, $preferredChoices);
-                } catch (UnexpectedTypeException $e) {
+                } catch (UnexpectedTypeException) {
                     // Assume not preferred if not readable
                     return false;
                 }
@@ -199,7 +173,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             $groupBy = function ($choice) use ($accessor, $groupBy) {
                 try {
                     return $accessor->getValue($choice, $groupBy);
-                } catch (UnexpectedTypeException $e) {
+                } catch (UnexpectedTypeException) {
                     // Don't group if path is not readable
                     return null;
                 }

@@ -25,10 +25,8 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * Generates the configuration tree builder.
-     *
-     * @return TreeBuilder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('twig');
         $rootNode = $treeBuilder->getRootNode();
@@ -129,7 +127,10 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->variableNode('autoescape')->defaultValue('name')->end()
+                ->variableNode('autoescape')
+                    ->defaultValue('name')
+                    ->setDeprecated('symfony/twig-bundle', '6.1', 'Option "%node%" at "%path%" is deprecated, use autoescape_service[_method] instead.')
+                ->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig\Template')->cannotBeEmpty()->end()
@@ -142,6 +143,15 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('default_path')
                     ->info('The default path used to load templates')
                     ->defaultValue('%kernel.project_dir%/templates')
+                ->end()
+                ->arrayNode('file_name_pattern')
+                    ->example('*.twig')
+                    ->info('Pattern of file name used for cache warmer and linter')
+                    ->beforeNormalization()
+                        ->ifString()
+                            ->then(function ($value) { return [$value]; })
+                        ->end()
+                    ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('paths')
                     ->normalizeKeys(false)

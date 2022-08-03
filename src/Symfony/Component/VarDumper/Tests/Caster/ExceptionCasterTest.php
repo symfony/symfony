@@ -151,7 +151,7 @@ EODUMP;
 
     public function testHtmlDump()
     {
-        if (ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
+        if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
             $this->markTestSkipped('A custom file_link_format is defined.');
         }
 
@@ -175,7 +175,7 @@ EODUMP;
   <span class=sf-dump-meta>trace</span>: {<samp data-depth=2 class=sf-dump-compact>
     <span class=sf-dump-meta title="%sExceptionCasterTest.php
 Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eCaster%eExceptionCasterTest.php</span>:<span class=sf-dump-num>%d</span>
-     &hellip;%d
+     &#8230;%d
   </samp>}
 </samp>}
 </bar>
@@ -184,9 +184,6 @@ EODUMP;
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    /**
-     * @requires function Twig\Template::getSourceContext
-     */
     public function testFrameWithTwig()
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';

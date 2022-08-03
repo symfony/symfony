@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -19,7 +20,6 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
-use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -79,7 +79,7 @@ class CacheCollectorPassTest extends TestCase
         $collector = $container->register('data_collector.cache', CacheDataCollector::class);
 
         $container
-            ->register('cache.object', ArrayCache::class)
+            ->register('cache.object', ArrayAdapter::class)
             ->addTag('cache.pool', ['name' => 'cache.object']);
 
         $container

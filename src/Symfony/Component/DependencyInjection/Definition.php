@@ -24,26 +24,26 @@ class Definition
 {
     private const DEFAULT_DEPRECATION_TEMPLATE = 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.';
 
-    private $class;
-    private $file;
-    private $factory;
-    private $shared = true;
-    private $deprecation = [];
-    private $properties = [];
-    private $calls = [];
-    private $instanceof = [];
-    private $autoconfigured = false;
-    private $configurator;
-    private $tags = [];
-    private $public = false;
-    private $synthetic = false;
-    private $abstract = false;
-    private $lazy = false;
-    private $decoratedService;
-    private $autowired = false;
-    private $changes = [];
-    private $bindings = [];
-    private $errors = [];
+    private ?string $class = null;
+    private ?string $file = null;
+    private string|array|null $factory = null;
+    private bool $shared = true;
+    private array $deprecation = [];
+    private array $properties = [];
+    private array $calls = [];
+    private array $instanceof = [];
+    private bool $autoconfigured = false;
+    private string|array|null $configurator = null;
+    private array $tags = [];
+    private bool $public = false;
+    private bool $synthetic = false;
+    private bool $abstract = false;
+    private bool $lazy = false;
+    private ?array $decoratedService = null;
+    private bool $autowired = false;
+    private array $changes = [];
+    private array $bindings = [];
+    private array $errors = [];
 
     protected $arguments = [];
 
@@ -52,14 +52,14 @@ class Definition
      *
      * Used to store the name of the inner id when using service decoration together with autowiring
      */
-    public $innerServiceId;
+    public ?string $innerServiceId = null;
 
     /**
      * @internal
      *
      * Used to store the behavior to follow when using service decoration and the decorated service is invalid
      */
-    public $decorationOnInvalid;
+    public ?int $decorationOnInvalid = null;
 
     public function __construct(string $class = null, array $arguments = [])
     {
@@ -71,10 +71,8 @@ class Definition
 
     /**
      * Returns all changes tracked for the Definition object.
-     *
-     * @return array
      */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
@@ -86,7 +84,7 @@ class Definition
      *
      * @return $this
      */
-    public function setChanges(array $changes)
+    public function setChanges(array $changes): static
     {
         $this->changes = $changes;
 
@@ -100,7 +98,7 @@ class Definition
      *
      * @return $this
      */
-    public function setFactory($factory)
+    public function setFactory(string|array|Reference|null $factory): static
     {
         $this->changes['factory'] = true;
 
@@ -120,7 +118,7 @@ class Definition
      *
      * @return string|array|null The PHP function or an array containing a class/Reference and a method to call
      */
-    public function getFactory()
+    public function getFactory(): string|array|null
     {
         return $this->factory;
     }
@@ -135,7 +133,7 @@ class Definition
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    public function setDecoratedService(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+    public function setDecoratedService(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): static
     {
         if ($renamedId && $id === $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
@@ -161,7 +159,7 @@ class Definition
      *
      * @return array|null An array composed of the decorated service id, the new id for it and the priority of decoration, null if no service is decorated
      */
-    public function getDecoratedService()
+    public function getDecoratedService(): ?array
     {
         return $this->decoratedService;
     }
@@ -171,7 +169,7 @@ class Definition
      *
      * @return $this
      */
-    public function setClass(?string $class)
+    public function setClass(?string $class): static
     {
         $this->changes['class'] = true;
 
@@ -182,10 +180,8 @@ class Definition
 
     /**
      * Gets the service class.
-     *
-     * @return string|null
      */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
@@ -195,7 +191,7 @@ class Definition
      *
      * @return $this
      */
-    public function setArguments(array $arguments)
+    public function setArguments(array $arguments): static
     {
         $this->arguments = $arguments;
 
@@ -207,7 +203,7 @@ class Definition
      *
      * @return $this
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         $this->properties = $properties;
 
@@ -216,10 +212,8 @@ class Definition
 
     /**
      * Gets the properties to define when creating the service.
-     *
-     * @return array
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -227,11 +221,9 @@ class Definition
     /**
      * Sets a specific property.
      *
-     * @param mixed $value
-     *
      * @return $this
      */
-    public function setProperty(string $name, $value)
+    public function setProperty(string $name, mixed $value): static
     {
         $this->properties[$name] = $value;
 
@@ -241,11 +233,9 @@ class Definition
     /**
      * Adds an argument to pass to the service constructor/factory method.
      *
-     * @param mixed $argument An argument
-     *
      * @return $this
      */
-    public function addArgument($argument)
+    public function addArgument(mixed $argument): static
     {
         $this->arguments[] = $argument;
 
@@ -255,14 +245,11 @@ class Definition
     /**
      * Replaces a specific argument.
      *
-     * @param int|string $index
-     * @param mixed      $argument
-     *
      * @return $this
      *
      * @throws OutOfBoundsException When the replaced argument does not exist
      */
-    public function replaceArgument($index, $argument)
+    public function replaceArgument(int|string $index, mixed $argument): static
     {
         if (0 === \count($this->arguments)) {
             throw new OutOfBoundsException(sprintf('Cannot replace arguments for class "%s" if none have been configured yet.', $this->class));
@@ -284,12 +271,9 @@ class Definition
     /**
      * Sets a specific argument.
      *
-     * @param int|string $key
-     * @param mixed      $value
-     *
      * @return $this
      */
-    public function setArgument($key, $value)
+    public function setArgument(int|string $key, mixed $value): static
     {
         $this->arguments[$key] = $value;
 
@@ -298,10 +282,8 @@ class Definition
 
     /**
      * Gets the arguments to pass to the service constructor/factory method.
-     *
-     * @return array
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -309,13 +291,9 @@ class Definition
     /**
      * Gets an argument to pass to the service constructor/factory method.
      *
-     * @param int|string $index
-     *
-     * @return mixed
-     *
      * @throws OutOfBoundsException When the argument does not exist
      */
-    public function getArgument($index)
+    public function getArgument(int|string $index): mixed
     {
         if (!\array_key_exists($index, $this->arguments)) {
             throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
@@ -329,7 +307,7 @@ class Definition
      *
      * @return $this
      */
-    public function setMethodCalls(array $calls = [])
+    public function setMethodCalls(array $calls = []): static
     {
         $this->calls = [];
         foreach ($calls as $call) {
@@ -350,7 +328,7 @@ class Definition
      *
      * @throws InvalidArgumentException on empty $method param
      */
-    public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = false)
+    public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = false): static
     {
         if (empty($method)) {
             throw new InvalidArgumentException('Method name cannot be empty.');
@@ -365,7 +343,7 @@ class Definition
      *
      * @return $this
      */
-    public function removeMethodCall(string $method)
+    public function removeMethodCall(string $method): static
     {
         foreach ($this->calls as $i => $call) {
             if ($call[0] === $method) {
@@ -378,10 +356,8 @@ class Definition
 
     /**
      * Check if the current definition has a given method to call after service initialization.
-     *
-     * @return bool
      */
-    public function hasMethodCall(string $method)
+    public function hasMethodCall(string $method): bool
     {
         foreach ($this->calls as $call) {
             if ($call[0] === $method) {
@@ -394,10 +370,8 @@ class Definition
 
     /**
      * Gets the methods to call after service initialization.
-     *
-     * @return array
      */
-    public function getMethodCalls()
+    public function getMethodCalls(): array
     {
         return $this->calls;
     }
@@ -409,7 +383,7 @@ class Definition
      *
      * @return $this
      */
-    public function setInstanceofConditionals(array $instanceof)
+    public function setInstanceofConditionals(array $instanceof): static
     {
         $this->instanceof = $instanceof;
 
@@ -421,7 +395,7 @@ class Definition
      *
      * @return ChildDefinition[]
      */
-    public function getInstanceofConditionals()
+    public function getInstanceofConditionals(): array
     {
         return $this->instanceof;
     }
@@ -431,7 +405,7 @@ class Definition
      *
      * @return $this
      */
-    public function setAutoconfigured(bool $autoconfigured)
+    public function setAutoconfigured(bool $autoconfigured): static
     {
         $this->changes['autoconfigured'] = true;
 
@@ -440,10 +414,7 @@ class Definition
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAutoconfigured()
+    public function isAutoconfigured(): bool
     {
         return $this->autoconfigured;
     }
@@ -453,7 +424,7 @@ class Definition
      *
      * @return $this
      */
-    public function setTags(array $tags)
+    public function setTags(array $tags): static
     {
         $this->tags = $tags;
 
@@ -462,20 +433,16 @@ class Definition
 
     /**
      * Returns all tags.
-     *
-     * @return array
      */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->tags;
     }
 
     /**
      * Gets a tag by name.
-     *
-     * @return array
      */
-    public function getTag(string $name)
+    public function getTag(string $name): array
     {
         return $this->tags[$name] ?? [];
     }
@@ -485,7 +452,7 @@ class Definition
      *
      * @return $this
      */
-    public function addTag(string $name, array $attributes = [])
+    public function addTag(string $name, array $attributes = []): static
     {
         $this->tags[$name][] = $attributes;
 
@@ -494,10 +461,8 @@ class Definition
 
     /**
      * Whether this definition has a tag with the given name.
-     *
-     * @return bool
      */
-    public function hasTag(string $name)
+    public function hasTag(string $name): bool
     {
         return isset($this->tags[$name]);
     }
@@ -507,7 +472,7 @@ class Definition
      *
      * @return $this
      */
-    public function clearTag(string $name)
+    public function clearTag(string $name): static
     {
         unset($this->tags[$name]);
 
@@ -519,7 +484,7 @@ class Definition
      *
      * @return $this
      */
-    public function clearTags()
+    public function clearTags(): static
     {
         $this->tags = [];
 
@@ -531,7 +496,7 @@ class Definition
      *
      * @return $this
      */
-    public function setFile(?string $file)
+    public function setFile(?string $file): static
     {
         $this->changes['file'] = true;
 
@@ -542,10 +507,8 @@ class Definition
 
     /**
      * Gets the file to require before creating the service.
-     *
-     * @return string|null
      */
-    public function getFile()
+    public function getFile(): ?string
     {
         return $this->file;
     }
@@ -555,7 +518,7 @@ class Definition
      *
      * @return $this
      */
-    public function setShared(bool $shared)
+    public function setShared(bool $shared): static
     {
         $this->changes['shared'] = true;
 
@@ -566,10 +529,8 @@ class Definition
 
     /**
      * Whether this service is shared.
-     *
-     * @return bool
      */
-    public function isShared()
+    public function isShared(): bool
     {
         return $this->shared;
     }
@@ -579,7 +540,7 @@ class Definition
      *
      * @return $this
      */
-    public function setPublic(bool $boolean)
+    public function setPublic(bool $boolean): static
     {
         $this->changes['public'] = true;
 
@@ -590,34 +551,16 @@ class Definition
 
     /**
      * Whether this service is public facing.
-     *
-     * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
 
     /**
-     * Sets if this service is private.
-     *
-     * @return $this
-     *
-     * @deprecated since Symfony 5.2, use setPublic() instead
-     */
-    public function setPrivate(bool $boolean)
-    {
-        trigger_deprecation('symfony/dependency-injection', '5.2', 'The "%s()" method is deprecated, use "setPublic()" instead.', __METHOD__);
-
-        return $this->setPublic(!$boolean);
-    }
-
-    /**
      * Whether this service is private.
-     *
-     * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return !$this->public;
     }
@@ -627,7 +570,7 @@ class Definition
      *
      * @return $this
      */
-    public function setLazy(bool $lazy)
+    public function setLazy(bool $lazy): static
     {
         $this->changes['lazy'] = true;
 
@@ -638,10 +581,8 @@ class Definition
 
     /**
      * Whether this service is lazy.
-     *
-     * @return bool
      */
-    public function isLazy()
+    public function isLazy(): bool
     {
         return $this->lazy;
     }
@@ -652,7 +593,7 @@ class Definition
      *
      * @return $this
      */
-    public function setSynthetic(bool $boolean)
+    public function setSynthetic(bool $boolean): static
     {
         $this->synthetic = $boolean;
 
@@ -666,10 +607,8 @@ class Definition
     /**
      * Whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
-     *
-     * @return bool
      */
-    public function isSynthetic()
+    public function isSynthetic(): bool
     {
         return $this->synthetic;
     }
@@ -680,7 +619,7 @@ class Definition
      *
      * @return $this
      */
-    public function setAbstract(bool $boolean)
+    public function setAbstract(bool $boolean): static
     {
         $this->abstract = $boolean;
 
@@ -690,10 +629,8 @@ class Definition
     /**
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
-     *
-     * @return bool
      */
-    public function isAbstract()
+    public function isAbstract(): bool
     {
         return $this->abstract;
     }
@@ -710,28 +647,8 @@ class Definition
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated(/* string $package, string $version, string $message */)
+    public function setDeprecated(string $package, string $version, string $message): static
     {
-        $args = \func_get_args();
-
-        if (\func_num_args() < 3) {
-            trigger_deprecation('symfony/dependency-injection', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
-
-            $status = $args[0] ?? true;
-
-            if (!$status) {
-                trigger_deprecation('symfony/dependency-injection', '5.1', 'Passing a null message to un-deprecate a node is deprecated.');
-            }
-
-            $message = (string) ($args[1] ?? null);
-            $package = $version = '';
-        } else {
-            $status = true;
-            $package = (string) $args[0];
-            $version = (string) $args[1];
-            $message = (string) $args[2];
-        }
-
         if ('' !== $message) {
             if (preg_match('#[\r\n]|\*/#', $message)) {
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
@@ -743,7 +660,7 @@ class Definition
         }
 
         $this->changes['deprecated'] = true;
-        $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::DEFAULT_DEPRECATION_TEMPLATE] : [];
+        $this->deprecation = ['package' => $package, 'version' => $version, 'message' => $message ?: self::DEFAULT_DEPRECATION_TEMPLATE];
 
         return $this;
     }
@@ -751,28 +668,10 @@ class Definition
     /**
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
-     *
-     * @return bool
      */
-    public function isDeprecated()
+    public function isDeprecated(): bool
     {
         return (bool) $this->deprecation;
-    }
-
-    /**
-     * Message to use if this definition is deprecated.
-     *
-     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
-     *
-     * @param string $id Service id relying on this definition
-     *
-     * @return string
-     */
-    public function getDeprecationMessage(string $id)
-    {
-        trigger_deprecation('symfony/dependency-injection', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
-
-        return $this->getDeprecation($id)['message'];
     }
 
     /**
@@ -794,7 +693,7 @@ class Definition
      *
      * @return $this
      */
-    public function setConfigurator($configurator)
+    public function setConfigurator(string|array|Reference|null $configurator): static
     {
         $this->changes['configurator'] = true;
 
@@ -811,20 +710,16 @@ class Definition
 
     /**
      * Gets the configurator to call after the service is fully initialized.
-     *
-     * @return string|array|null
      */
-    public function getConfigurator()
+    public function getConfigurator(): string|array|null
     {
         return $this->configurator;
     }
 
     /**
      * Is the definition autowired?
-     *
-     * @return bool
      */
-    public function isAutowired()
+    public function isAutowired(): bool
     {
         return $this->autowired;
     }
@@ -834,7 +729,7 @@ class Definition
      *
      * @return $this
      */
-    public function setAutowired(bool $autowired)
+    public function setAutowired(bool $autowired): static
     {
         $this->changes['autowired'] = true;
 
@@ -848,7 +743,7 @@ class Definition
      *
      * @return BoundArgument[]
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return $this->bindings;
     }
@@ -862,7 +757,7 @@ class Definition
      *
      * @return $this
      */
-    public function setBindings(array $bindings)
+    public function setBindings(array $bindings): static
     {
         foreach ($bindings as $key => $binding) {
             if (0 < strpos($key, '$') && $key !== $k = preg_replace('/[ \t]*\$/', ' $', $key)) {
@@ -882,11 +777,9 @@ class Definition
     /**
      * Add an error that occurred when building this Definition.
      *
-     * @param string|\Closure|self $error
-     *
      * @return $this
      */
-    public function addError($error)
+    public function addError(string|\Closure|Definition $error): static
     {
         if ($error instanceof self) {
             $this->errors = array_merge($this->errors, $error->errors);
@@ -899,10 +792,8 @@ class Definition
 
     /**
      * Returns any errors that occurred while building this Definition.
-     *
-     * @return array
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         foreach ($this->errors as $i => $error) {
             if ($error instanceof \Closure) {

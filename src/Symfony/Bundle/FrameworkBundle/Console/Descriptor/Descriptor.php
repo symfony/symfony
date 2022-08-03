@@ -15,9 +15,12 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
@@ -38,9 +41,13 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describe(OutputInterface $output, $object, array $options = [])
+    public function describe(OutputInterface $output, mixed $object, array $options = [])
     {
         $this->output = $output;
+
+        if ($object instanceof ContainerBuilder) {
+            (new AnalyzeServiceReferencesPass(false, false))->process($object);
+        }
 
         switch (true) {
             case $object instanceof RouteCollection:
@@ -85,6 +92,10 @@ abstract class Descriptor implements DescriptorInterface
             default:
                 throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object)));
         }
+
+        if ($object instanceof ContainerBuilder) {
+            $object->getCompiler()->getServiceReferenceGraph()->clear();
+        }
     }
 
     protected function getOutput(): OutputInterface
@@ -125,11 +136,11 @@ abstract class Descriptor implements DescriptorInterface
 
     abstract protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void;
 
-    abstract protected function describeContainerDefinition(Definition $definition, array $options = []);
+    abstract protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null);
 
     abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null);
 
-    abstract protected function describeContainerParameter($parameter, array $options = []);
+    abstract protected function describeContainerParameter(mixed $parameter, array $options = []);
 
     abstract protected function describeContainerEnvVars(array $envs, array $options = []);
 
@@ -141,20 +152,14 @@ abstract class Descriptor implements DescriptorInterface
      */
     abstract protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = []);
 
-    /**
-     * Describes a callable.
-     *
-     * @param mixed $callable
-     */
-    abstract protected function describeCallable($callable, array $options = []);
+    abstract protected function describeCallable(mixed $callable, array $options = []);
 
-    /**
-     * Formats a value as string.
-     *
-     * @param mixed $value
-     */
-    protected function formatValue($value): string
+    protected function formatValue(mixed $value): string
     {
+        if ($value instanceof \UnitEnum) {
+            return ltrim(var_export($value, true), '\\');
+        }
+
         if (\is_object($value)) {
             return sprintf('object(%s)', \get_class($value));
         }
@@ -166,13 +171,22 @@ abstract class Descriptor implements DescriptorInterface
         return preg_replace("/\n\s*/s", '', var_export($value, true));
     }
 
-    /**
-     * Formats a parameter.
-     *
-     * @param mixed $value
-     */
-    protected function formatParameter($value): string
+    protected function formatParameter(mixed $value): string
     {
+        if ($value instanceof \UnitEnum) {
+            return ltrim(var_export($value, true), '\\');
+        }
+
+        // Recursively search for enum values, so we can replace it
+        // before json_encode (which will not display anything for \UnitEnum otherwise)
+        if (\is_array($value)) {
+            array_walk_recursive($value, static function (&$value) {
+                if ($value instanceof \UnitEnum) {
+                    $value = ltrim(var_export($value, true), '\\');
+                }
+            });
+        }
+
         if (\is_bool($value) || \is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);
 
@@ -186,10 +200,7 @@ abstract class Descriptor implements DescriptorInterface
         return (string) $value;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId)
+    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId): mixed
     {
         if ($builder->hasDefinition($serviceId)) {
             return $builder->getDefinition($serviceId);
@@ -252,7 +263,7 @@ abstract class Descriptor implements DescriptorInterface
     {
         $maxPriority = [];
         foreach ($services as $service => $tags) {
-            $maxPriority[$service] = 0;
+            $maxPriority[$service] = \PHP_INT_MIN;
             foreach ($tags as $tag) {
                 $currentPriority = $tag['priority'] ?? 0;
                 if ($maxPriority[$service] < $currentPriority) {
@@ -303,7 +314,7 @@ abstract class Descriptor implements DescriptorInterface
 
                 return trim(preg_replace('#\s*\n\s*\*\s*#', ' ', $docComment));
             }
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
         }
 
         return '';
@@ -330,7 +341,6 @@ abstract class Descriptor implements DescriptorInterface
         $getDefaultParameter = $getDefaultParameter->bindTo($bag, \get_class($bag));
 
         $getEnvReflection = new \ReflectionMethod($container, 'getEnv');
-        $getEnvReflection->setAccessible(true);
 
         $envs = [];
 
@@ -358,5 +368,16 @@ abstract class Descriptor implements DescriptorInterface
         ksort($envs);
 
         return array_values($envs);
+    }
+
+    protected function getServiceEdges(ContainerBuilder $builder, string $serviceId): array
+    {
+        try {
+            return array_map(function (ServiceReferenceGraphEdge $edge) {
+                return $edge->getSourceNode()->getId();
+            }, $builder->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges());
+        } catch (InvalidArgumentException $exception) {
+            return [];
+        }
     }
 }

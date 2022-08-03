@@ -23,7 +23,7 @@ class HtmlDumperTest extends TestCase
 {
     public function testGet()
     {
-        if (ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
+        if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
             $this->markTestSkipped('A custom file_link_format is defined.');
         }
 
@@ -66,7 +66,7 @@ class HtmlDumperTest extends TestCase
   <span class=sf-dump-key>6</span> => <span class=sf-dump-num>{$intMax}</span>
   "<span class=sf-dump-key>str</span>" => "<span class=sf-dump-str title="5 characters">d&%s;j&%s;<span class="sf-dump-default sf-dump-ns">\\n</span></span>"
   <span class=sf-dump-key>7</span> => b"""
-    <span class=sf-dump-str title="11 binary or non-UTF-8 characters">&eacute;<span class="sf-dump-default">\\x01</span>test<span class="sf-dump-default">\\t</span><span class="sf-dump-default sf-dump-ns">\\n</span></span>
+    <span class=sf-dump-str title="11 binary or non-UTF-8 characters">&#233;<span class="sf-dump-default">\\x01</span>test<span class="sf-dump-default">\\t</span><span class="sf-dump-default sf-dump-ns">\\n</span></span>
     <span class=sf-dump-str title="11 binary or non-UTF-8 characters">ing</span>
     """
   "<span class=sf-dump-key>[]</span>" => []

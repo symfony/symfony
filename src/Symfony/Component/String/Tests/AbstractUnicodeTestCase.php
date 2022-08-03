@@ -1,11 +1,33 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\Exception\InvalidArgumentException;
 
 abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 {
+    public static function provideWidth(): array
+    {
+        return array_merge(
+            parent::provideWidth(),
+            [
+                [14, '<<<END
+This is a
+multiline text
+END'],
+            ]
+        );
+    }
+
     public function testCreateFromStringWithInvalidUtf8Input()
     {
         $this->expectException(InvalidArgumentException::class);

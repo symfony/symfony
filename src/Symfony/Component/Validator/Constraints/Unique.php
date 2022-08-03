@@ -25,24 +25,38 @@ class Unique extends Constraint
 {
     public const IS_NOT_UNIQUE = '7911c98d-b845-4da0-94b7-a8dac36bc55a';
 
-    protected static $errorNames = [
+    public array|string $fields = [];
+
+    protected const ERROR_NAMES = [
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This collection should contain only unique elements.';
     public $normalizer;
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param array|string $fields the combination of fields that must contain unique values or a set of options
+     */
     public function __construct(
         array $options = null,
         string $message = null,
         callable $normalizer = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null,
+        array|string $fields = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->fields = $fields ?? $this->fields;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));

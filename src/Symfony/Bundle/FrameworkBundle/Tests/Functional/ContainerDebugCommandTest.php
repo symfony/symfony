@@ -69,6 +69,22 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('The "private_alias" service or alias has been removed', $tester->getDisplay());
     }
 
+    public function testDeprecatedServiceAndAlias()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'debug:container', 'name' => 'deprecated', '--format' => 'txt']);
+        $this->assertStringContainsString('[WARNING] The "deprecated" service is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
+
+        $tester->run(['command' => 'debug:container', 'name' => 'deprecated_alias', '--format' => 'txt']);
+        $this->assertStringContainsString('[WARNING] The "deprecated_alias" alias is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
+    }
+
     /**
      * @dataProvider provideIgnoreBackslashWhenFindingService
      */
@@ -117,7 +133,7 @@ Symfony Container Environment Variables
  * UNKNOWN
 
 TXT
-        , $tester->getDisplay(true));
+            , $tester->getDisplay(true));
 
         putenv('REAL');
     }

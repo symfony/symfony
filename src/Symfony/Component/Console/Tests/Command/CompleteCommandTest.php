@@ -47,7 +47,7 @@ class CompleteCommandTest extends TestCase
 
     public function testUnsupportedShellOption()
     {
-        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash").');
+        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash", "fish", "zsh").');
         $this->execute(['--shell' => 'unsupported']);
     }
 
@@ -102,9 +102,10 @@ class CompleteCommandTest extends TestCase
 
     public function provideCompleteCommandNameInputs()
     {
-        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello']];
-        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello']];
-        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello']];
+        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy']];
+        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy']];
+        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello', 'ahoy']];
+        yield 'complete-aliases' => [['bin/console', 'ah'], ['hello', 'ahoy']];
     }
 
     /**
@@ -118,14 +119,16 @@ class CompleteCommandTest extends TestCase
 
     public function provideCompleteCommandInputDefinitionInputs()
     {
-        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-interaction']];
+        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
+        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
     }
 
     private function execute(array $input)
     {
         // run in verbose mode to assert exceptions
-        $this->tester->execute($input ? ($input + ['--shell' => 'bash']) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);
+        $this->tester->execute($input ? ($input + ['--shell' => 'bash', '--api-version' => CompleteCommand::COMPLETION_API_VERSION]) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);
     }
 }
 
@@ -134,8 +137,10 @@ class CompleteCommandTest_HelloCommand extends Command
     public function configure(): void
     {
         $this->setName('hello')
+             ->setAliases(['ahoy'])
+             ->setDescription('Hello test command')
              ->addArgument('name', InputArgument::REQUIRED)
-         ;
+        ;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

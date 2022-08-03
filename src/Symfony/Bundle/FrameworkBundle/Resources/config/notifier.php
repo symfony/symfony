@@ -22,6 +22,7 @@ use Symfony\Component\Notifier\Chatter;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\EventListener\NotificationLoggerListener;
 use Symfony\Component\Notifier\EventListener\SendFailedMessageToNotifierListener;
+use Symfony\Component\Notifier\FlashMessage\DefaultFlashMessageImportanceMapper;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -43,8 +44,11 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.channel_policy', ChannelPolicy::class)
             ->args([[]])
 
+        ->set('notifier.flash_message_importance_mapper', DefaultFlashMessageImportanceMapper::class)
+            ->args([[]])
+
         ->set('notifier.channel.browser', BrowserChannel::class)
-            ->args([service('request_stack')])
+            ->args([service('request_stack'), service('notifier.flash_message_importance_mapper')])
             ->tag('notifier.channel', ['channel' => 'browser'])
 
         ->set('notifier.channel.chat', ChatChannel::class)

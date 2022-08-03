@@ -22,6 +22,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\Exception\LogicException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -152,8 +153,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertEquals($choiceList, $loaded = $loader->loadChoiceList());
 
         // no further loads on subsequent calls
-
-        $this->assertSame($loaded, $loader->loadChoiceList());
+        $this->assertEquals($loaded, $loader->loadChoiceList());
     }
 
     public function testLoadValuesForChoices()
@@ -191,12 +191,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadValuesForChoices([]));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
     {
-        $this->expectDeprecation('Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
+
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -293,12 +292,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadChoicesForValues([]));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
-        $this->expectDeprecation('Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
+
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -315,22 +313,13 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->repository->expects($this->never())
             ->method('findAll');
 
-        $this->objectLoader->expects($this->once())
-            ->method('getEntitiesByIds')
-            ->with('idField', [4 => '3', 7 => '2'])
-            ->willReturn($choices);
-
-        $this->idReader->expects($this->any())
-            ->method('getIdValue')
-            ->willReturnMap([
-                [$this->obj2, '2'],
-                [$this->obj3, '3'],
-            ]);
+        $this->objectLoader->expects($this->never())
+            ->method('getEntitiesByIds');
 
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2']
-        ));
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'])
+        );
     }
 
     public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
@@ -365,8 +354,8 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue']
-        ));
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue'])
+        );
     }
 
     public function testLoadChoicesForValuesLoadsAllIfSingleIntIdAndValueGiven()

@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'Turkiyya Lokaci (Istanbul)',
         'Europe/Jersey' => 'Lokacin Greenwhich a London (Jersey)',
         'Europe/Kaliningrad' => 'Lokaci a turai gabas (Kaliningrad)',
-        'Europe/Kiev' => 'Lokaci a turai gabas (Kiev)',
+        'Europe/Kiev' => 'Lokaci a turai gabas (Kyiv)',
         'Europe/Kirov' => 'Rasha Lokaci (Kirov)',
         'Europe/Lisbon' => 'Lokaci ta yammacin turai (Lisbon)',
         'Europe/Ljubljana' => 'Tsakiyar a lokaci turai (Ljubljana)',

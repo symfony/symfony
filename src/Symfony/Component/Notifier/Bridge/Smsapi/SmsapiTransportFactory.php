@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Smsapi;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Marcin Szepczynski <szepczynski@gmail.com>
  */
 final class SmsapiTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return SmsapiTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): SmsapiTransport
     {
         $scheme = $dsn->getScheme();
 
@@ -35,9 +31,11 @@ final class SmsapiTransportFactory extends AbstractTransportFactory
         $authToken = $this->getUser($dsn);
         $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $fast = filter_var($dsn->getOption('fast', false), \FILTER_VALIDATE_BOOLEAN);
+        $test = filter_var($dsn->getOption('test', false), \FILTER_VALIDATE_BOOLEAN);
         $port = $dsn->getPort();
 
-        return (new SmsapiTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new SmsapiTransport($authToken, $from, $this->client, $this->dispatcher))->setFast($fast)->setHost($host)->setPort($port)->setTest($test);
     }
 
     protected function getSupportedSchemes(): array

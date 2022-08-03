@@ -11,8 +11,8 @@
 | Requirements | NO CUSTOM                                                                                     |
 | Class        | Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub                             |
 | Defaults     | _controller: ]8;;myeditor://open?file=[:file:]&line=58\Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\MyController::__invoke()]8;;\ |
-[39;49m| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler[39;49m[39;49m                                       |[39;49m
-[39;49m|              | [39;49m[39;49mopt1: val1[39;49m[39;49m                                                                                    |[39;49m
-[39;49m|              | [39;49mopt2: val2                                                                                    |
+| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler                                       |
+|              | opt1: val1                                                                                    |
+|              | opt2: val2                                                                                    |
 | Condition    | context.getMethod() in ['GET', 'HEAD', 'POST']                                                |
 +--------------+-----------------------------------------------------------------------------------------------+

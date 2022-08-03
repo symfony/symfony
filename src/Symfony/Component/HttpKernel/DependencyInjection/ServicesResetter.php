@@ -23,8 +23,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class ServicesResetter implements ResetInterface
 {
-    private $resettableServices;
-    private $resetMethods;
+    private \Traversable $resettableServices;
+    private array $resetMethods;
 
     /**
      * @param \Traversable<string, object>   $resettableServices

@@ -20,6 +20,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
+/**
+ * @group legacy
+ */
 class SecurityTest extends TestCase
 {
     public function testGetToken()
@@ -39,7 +42,6 @@ class SecurityTest extends TestCase
 
     /**
      * @dataProvider getUserTests
-     * @dataProvider getLegacyUserTests
      */
     public function testGetUser($userInToken, $expectedUser)
     {
@@ -67,16 +69,6 @@ class SecurityTest extends TestCase
         yield [$user, $user];
     }
 
-    /**
-     * @group legacy
-     */
-    public function getLegacyUserTests()
-    {
-        yield ['string_username', null];
-
-        yield [new StringishUser(), null];
-    }
-
     public function testIsGranted()
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -102,13 +94,5 @@ class SecurityTest extends TestCase
             ->willReturn($serviceObject);
 
         return $container;
-    }
-}
-
-class StringishUser
-{
-    public function __toString(): string
-    {
-        return 'stringish_user';
     }
 }

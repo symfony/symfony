@@ -17,11 +17,11 @@ use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 class ExpressionCacheWarmer implements CacheWarmerInterface
 {
-    private $expressions;
-    private $expressionLanguage;
+    private iterable $expressions;
+    private ExpressionLanguage $expressionLanguage;
 
     /**
-     * @param iterable<mixed, Expression> $expressions
+     * @param iterable<mixed, Expression|string> $expressions
      */
     public function __construct(iterable $expressions, ExpressionLanguage $expressionLanguage)
     {
@@ -29,7 +29,7 @@ class ExpressionCacheWarmer implements CacheWarmerInterface
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
@@ -37,7 +37,7 @@ class ExpressionCacheWarmer implements CacheWarmerInterface
     /**
      * @return string[]
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         foreach ($this->expressions as $expression) {
             $this->expressionLanguage->parse($expression, ['token', 'user', 'object', 'subject', 'role_names', 'request', 'trust_resolver']);

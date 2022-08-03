@@ -26,7 +26,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'defaults';
 
-    private $path;
+    private ?string $path;
 
     public function __construct(ServicesConfigurator $parent, Definition $definition, string $path = null)
     {
@@ -42,14 +42,14 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
      *
      * @throws InvalidArgumentException when an invalid tag name or attribute is provided
      */
-    final public function tag(string $name, array $attributes = []): self
+    final public function tag(string $name, array $attributes = []): static
     {
         if ('' === $name) {
             throw new InvalidArgumentException('The tag name in "_defaults" must be a non-empty string.');
         }
 
         foreach ($attributes as $attribute => $value) {
-            if (null !== $value && !is_scalar($value)) {
+            if (null !== $value && !\is_scalar($value)) {
                 throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type.', $name, $attribute));
             }
         }

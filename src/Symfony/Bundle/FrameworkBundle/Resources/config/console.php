@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
+use Symfony\Bundle\FrameworkBundle\Command\CachePoolInvalidateTagsCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand;
@@ -46,6 +47,7 @@ use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
+use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
@@ -90,6 +92,12 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.cache_pool_prune', CachePoolPruneCommand::class)
             ->args([
                 [],
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.cache_pool_invalidate_tags', CachePoolInvalidateTagsCommand::class)
+            ->args([
+                tagged_locator('cache.taggable', 'pool'),
             ])
             ->tag('console.command')
 
@@ -196,6 +204,13 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Default failure receiver name'),
                 abstract_arg('Receivers'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.messenger_stats', StatsCommand::class)
+            ->args([
+                service('messenger.receiver_locator'),
+                abstract_arg('Receivers names'),
             ])
             ->tag('console.command')
 

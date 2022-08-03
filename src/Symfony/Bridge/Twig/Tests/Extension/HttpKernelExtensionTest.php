@@ -58,10 +58,6 @@ class HttpKernelExtensionTest extends TestCase
 
     public function testGenerateFragmentUri()
     {
-        if (!class_exists(FragmentUriGenerator::class)) {
-            $this->markTestSkipped('HttpKernel 5.3+ is required');
-        }
-
         $requestStack = new RequestStack();
         $requestStack->push(Request::create('/'));
 
@@ -74,7 +70,7 @@ class HttpKernelExtensionTest extends TestCase
             'index' => sprintf(<<<TWIG
 {{ fragment_uri(controller("%s::templateAction", {template: "foo.html.twig"})) }}
 TWIG
-            , TemplateController::class), ]);
+                , TemplateController::class), ]);
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new HttpKernelExtension());
 

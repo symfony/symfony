@@ -18,13 +18,13 @@ namespace Symfony\Component\Form\ChoiceList\Loader;
  */
 class FilterChoiceLoaderDecorator extends AbstractChoiceLoader
 {
-    private $decoratedLoader;
-    private $filter;
+    private ChoiceLoaderInterface $decoratedLoader;
+    private \Closure $filter;
 
     public function __construct(ChoiceLoaderInterface $loader, callable $filter)
     {
         $this->decoratedLoader = $loader;
-        $this->filter = $filter;
+        $this->filter = $filter(...);
     }
 
     protected function loadChoices(): iterable
@@ -36,10 +36,17 @@ class FilterChoiceLoaderDecorator extends AbstractChoiceLoader
         }
 
         foreach ($structuredValues as $group => $values) {
-            if ($values && $filtered = array_filter($list->getChoicesForValues($values), $this->filter)) {
-                $choices[$group] = $filtered;
+            if (\is_array($values)) {
+                if ($values && $filtered = array_filter($list->getChoicesForValues($values), $this->filter)) {
+                    $choices[$group] = $filtered;
+                }
+                continue;
+                // filter empty groups
             }
-            // filter empty groups
+
+            if ($filtered = array_filter($list->getChoicesForValues([$values]), $this->filter)) {
+                $choices[$group] = $filtered[0];
+            }
         }
 
         return $choices ?? [];

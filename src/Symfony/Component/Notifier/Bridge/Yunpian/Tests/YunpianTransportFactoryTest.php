@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Yunpian\Tests;
 
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class YunpianTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return YunpianTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): YunpianTransportFactory
     {
         return new YunpianTransportFactory();
     }

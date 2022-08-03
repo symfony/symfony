@@ -26,24 +26,16 @@ class FormRegistry implements FormRegistryInterface
     /**
      * @var FormExtensionInterface[]
      */
-    private $extensions = [];
+    private array $extensions = [];
 
     /**
      * @var ResolvedFormTypeInterface[]
      */
-    private $types = [];
+    private array $types = [];
 
-    /**
-     * @var FormTypeGuesserInterface|false|null
-     */
-    private $guesser = false;
-
-    /**
-     * @var ResolvedFormTypeFactoryInterface
-     */
-    private $resolvedTypeFactory;
-
-    private $checkedTypes = [];
+    private FormTypeGuesserInterface|null|false $guesser = false;
+    private ResolvedFormTypeFactoryInterface $resolvedTypeFactory;
+    private array $checkedTypes = [];
 
     /**
      * @param FormExtensionInterface[] $extensions
@@ -65,7 +57,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getType(string $name)
+    public function getType(string $name): ResolvedFormTypeInterface
     {
         if (!isset($this->types[$name])) {
             $type = null;
@@ -129,7 +121,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function hasType(string $name)
+    public function hasType(string $name): bool
     {
         if (isset($this->types[$name])) {
             return true;
@@ -137,7 +129,7 @@ class FormRegistry implements FormRegistryInterface
 
         try {
             $this->getType($name);
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             return false;
         }
 
@@ -147,7 +139,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getTypeGuesser()
+    public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         if (false === $this->guesser) {
             $guessers = [];
@@ -169,7 +161,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return $this->extensions;
     }

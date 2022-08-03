@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {
-    private $propertyAccessor;
+    private ?PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -37,7 +37,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof AbstractComparison) {
             throw new UnexpectedTypeException($constraint, AbstractComparison::class);
@@ -71,7 +71,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
 
             try {
                 $comparedValue = new $dateTimeClass($comparedValue);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, $dateTimeClass, get_debug_type($constraint)));
             }
         }
@@ -102,20 +102,13 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
 
     /**
      * Compares the two given values to find if their relationship is valid.
-     *
-     * @param mixed $value1 The first value to compare
-     * @param mixed $value2 The second value to compare
-     *
-     * @return bool
      */
-    abstract protected function compareValues($value1, $value2);
+    abstract protected function compareValues(mixed $value1, mixed $value2): bool;
 
     /**
      * Returns the error code used if the comparison fails.
-     *
-     * @return string|null
      */
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return null;
     }

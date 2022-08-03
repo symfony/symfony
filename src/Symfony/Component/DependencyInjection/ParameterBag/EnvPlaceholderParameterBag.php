@@ -19,17 +19,17 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class EnvPlaceholderParameterBag extends ParameterBag
 {
-    private $envPlaceholderUniquePrefix;
-    private $envPlaceholders = [];
-    private $unusedEnvPlaceholders = [];
-    private $providedTypes = [];
+    private string $envPlaceholderUniquePrefix;
+    private array $envPlaceholders = [];
+    private array $unusedEnvPlaceholders = [];
+    private array $providedTypes = [];
 
-    private static $counter = 0;
+    private static int $counter = 0;
 
     /**
      * {@inheritdoc}
      */
-    public function get(string $name)
+    public function get(string $name): array|bool|string|int|float|null
     {
         if (str_starts_with($name, 'env(') && str_ends_with($name, ')') && 'env()' !== $name) {
             $env = substr($name, 4, -1);
@@ -44,7 +44,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                     return $placeholder; // return first result
                 }
             }
-            if (!preg_match('/^(?:[-.\w]*+:)*+\w++$/', $env)) {
+            if (!preg_match('/^(?:[-.\w\\\\]*+:)*+\w++$/', $env)) {
                 throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
             }
             if ($this->has($name) && null !== ($defaultValue = parent::get($name)) && !\is_string($defaultValue)) {
@@ -66,7 +66,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function getEnvPlaceholderUniquePrefix(): string
     {
-        if (null === $this->envPlaceholderUniquePrefix) {
+        if (!isset($this->envPlaceholderUniquePrefix)) {
             $reproducibleEntropy = unserialize(serialize($this->parameters));
             array_walk_recursive($reproducibleEntropy, function (&$v) { $v = null; });
             $this->envPlaceholderUniquePrefix = 'env_'.substr(md5(serialize($reproducibleEntropy)), -16);
@@ -80,7 +80,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      *
      * @return string[][] A map of env var names to their placeholders
      */
-    public function getEnvPlaceholders()
+    public function getEnvPlaceholders(): array
     {
         return $this->envPlaceholders;
     }
@@ -130,7 +130,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      *
      * @return string[][]
      */
-    public function getProvidedTypes()
+    public function getProvidedTypes(): array
     {
         return $this->providedTypes;
     }

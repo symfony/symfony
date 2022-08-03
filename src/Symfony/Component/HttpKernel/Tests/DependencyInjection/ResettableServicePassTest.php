@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
@@ -59,7 +68,7 @@ class ResettableServicePassTest extends TestCase
     public function testMissingMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set.');
+        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set on service "Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService".');
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');

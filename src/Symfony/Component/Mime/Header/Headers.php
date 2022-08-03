@@ -42,8 +42,8 @@ final class Headers
     /**
      * @var HeaderInterface[][]
      */
-    private $headers = [];
-    private $lineLength = 76;
+    private array $headers = [];
+    private int $lineLength = 76;
 
     public function __construct(HeaderInterface ...$headers)
     {
@@ -79,37 +79,31 @@ final class Headers
      *
      * @return $this
      */
-    public function addMailboxListHeader(string $name, array $addresses): self
+    public function addMailboxListHeader(string $name, array $addresses): static
     {
         return $this->add(new MailboxListHeader($name, Address::createArray($addresses)));
     }
 
     /**
-     * @param Address|string $address
-     *
      * @return $this
      */
-    public function addMailboxHeader(string $name, $address): self
+    public function addMailboxHeader(string $name, Address|string $address): static
     {
         return $this->add(new MailboxHeader($name, Address::create($address)));
     }
 
     /**
-     * @param string|array $ids
-     *
      * @return $this
      */
-    public function addIdHeader(string $name, $ids): self
+    public function addIdHeader(string $name, string|array $ids): static
     {
         return $this->add(new IdentificationHeader($name, $ids));
     }
 
     /**
-     * @param Address|string $path
-     *
      * @return $this
      */
-    public function addPathHeader(string $name, $path): self
+    public function addPathHeader(string $name, Address|string $path): static
     {
         return $this->add(new PathHeader($name, $path instanceof Address ? $path : new Address($path)));
     }
@@ -117,7 +111,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function addDateHeader(string $name, \DateTimeInterface $dateTime): self
+    public function addDateHeader(string $name, \DateTimeInterface $dateTime): static
     {
         return $this->add(new DateHeader($name, $dateTime));
     }
@@ -125,7 +119,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function addTextHeader(string $name, string $value): self
+    public function addTextHeader(string $name, string $value): static
     {
         return $this->add(new UnstructuredHeader($name, $value));
     }
@@ -133,7 +127,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function addParameterizedHeader(string $name, string $value, array $params = []): self
+    public function addParameterizedHeader(string $name, string $value, array $params = []): static
     {
         return $this->add(new ParameterizedHeader($name, $value, $params));
     }
@@ -141,7 +135,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function addHeader(string $name, $argument, array $more = []): self
+    public function addHeader(string $name, mixed $argument, array $more = []): static
     {
         $parts = explode('\\', self::HEADER_CLASS_MAP[strtolower($name)] ?? UnstructuredHeader::class);
         $method = 'add'.ucfirst(array_pop($parts));
@@ -162,7 +156,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function add(HeaderInterface $header): self
+    public function add(HeaderInterface $header): static
     {
         self::checkHeaderClass($header);
 
@@ -254,9 +248,6 @@ final class Headers
         return $arr;
     }
 
-    /**
-     * @internal
-     */
     public function getHeaderBody(string $name)
     {
         return $this->has($name) ? $this->get($name)->getBody() : null;
@@ -265,7 +256,7 @@ final class Headers
     /**
      * @internal
      */
-    public function setHeaderBody(string $type, string $name, $body): void
+    public function setHeaderBody(string $type, string $name, mixed $body): void
     {
         if ($this->has($name)) {
             $this->get($name)->setBody($body);

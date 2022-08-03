@@ -27,17 +27,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DecoratorServicePass extends AbstractRecursivePass
 {
-    private $innerId = '.inner';
-
-    public function __construct(?string $innerId = '.inner')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/dependency-injection', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->innerId = $innerId;
-    }
-
     public function process(ContainerBuilder $container)
     {
         $definitions = new \SplPriorityQueue();
@@ -50,6 +39,10 @@ class DecoratorServicePass extends AbstractRecursivePass
             $definitions->insert([$id, $definition], [$decorated[2], --$order]);
         }
         $decoratingDefinitions = [];
+
+        $tagsToKeep = $container->hasParameter('container.behavior_describing_tags')
+            ? $container->getParameter('container.behavior_describing_tags')
+            : ['container.do_not_inline', 'container.service_locator', 'container.service_subscriber'];
 
         foreach ($definitions as [$id, $definition]) {
             $decoratedService = $definition->getDecoratedService();
@@ -91,7 +84,7 @@ class DecoratorServicePass extends AbstractRecursivePass
                 throw new ServiceNotFoundException($inner, $id);
             }
 
-            if ($decoratedDefinition && $decoratedDefinition->isSynthetic()) {
+            if ($decoratedDefinition?->isSynthetic()) {
                 throw new InvalidArgumentException(sprintf('A synthetic service cannot be decorated: service "%s" cannot decorate "%s".', $id, $inner));
             }
 
@@ -101,8 +94,8 @@ class DecoratorServicePass extends AbstractRecursivePass
                 $decoratingTags = $decoratingDefinition->getTags();
                 $resetTags = [];
 
-                // container.service_locator and container.service_subscriber have special logic and they must not be transferred out to decorators
-                foreach (['container.service_locator', 'container.service_subscriber'] as $containerTag) {
+                // Behavior-describing tags must not be transferred out to decorators
+                foreach ($tagsToKeep as $containerTag) {
                     if (isset($decoratingTags[$containerTag])) {
                         $resetTags[$containerTag] = $decoratingTags[$containerTag];
                         unset($decoratingTags[$containerTag]);
@@ -118,9 +111,9 @@ class DecoratorServicePass extends AbstractRecursivePass
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
-        if ($value instanceof Reference && $this->innerId === (string) $value) {
+        if ($value instanceof Reference && '.inner' === (string) $value) {
             return new Reference($this->currentId, $value->getInvalidBehavior());
         }
 

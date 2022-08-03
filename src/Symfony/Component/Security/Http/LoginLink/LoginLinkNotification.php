@@ -28,7 +28,7 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 class LoginLinkNotification extends Notification implements EmailNotificationInterface, SmsNotificationInterface
 {
-    private $loginLinkDetails;
+    private LoginLinkDetails $loginLinkDetails;
 
     public function __construct(LoginLinkDetails $loginLinkDetails, string $subject, array $channels = [])
     {

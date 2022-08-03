@@ -25,9 +25,9 @@ class NullDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function isProxyCandidate(Definition $definition): bool
+    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): bool
     {
-        return false;
+        return $asGhostObject = false;
     }
 
     /**

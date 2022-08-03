@@ -22,7 +22,7 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
     /**
      * @var InMemoryTransport[]
      */
-    private $createdTransports = [];
+    private array $createdTransports = [];
 
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {

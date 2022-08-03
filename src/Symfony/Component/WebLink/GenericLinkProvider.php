@@ -19,7 +19,7 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
     /**
      * @var LinkInterface[]
      */
-    private $links = [];
+    private array $links = [];
 
     /**
      * @param LinkInterface[] $links
@@ -46,7 +46,7 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getLinksByRel($rel): array
+    public function getLinksByRel(string $rel): array
     {
         $links = [];
 
@@ -61,10 +61,8 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
-    public function withLink(LinkInterface $link)
+    public function withLink(LinkInterface $link): static
     {
         $that = clone $this;
         $that->links[spl_object_id($link)] = $link;
@@ -74,10 +72,8 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
-    public function withoutLink(LinkInterface $link)
+    public function withoutLink(LinkInterface $link): static
     {
         $that = clone $this;
         unset($that->links[spl_object_id($link)]);

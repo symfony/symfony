@@ -116,12 +116,9 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidDateTimeNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\DateTime(message: "myMessage", format: "Y-m-d");');
+        $constraint = new DateTime(message: 'myMessage', format: 'Y-m-d');
 
         $this->validator->validate('2010-01-01 00:00:00', $constraint);
 

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Config\Tests\Builder\Fixtures;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -24,6 +33,22 @@ class AddToList implements ConfigurationInterface
                         ->arrayNode('sources')
                             ->useAttributeAsKey('source_class')
                             ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('books')
+                            ->children()
+                                ->arrayNode('page')
+                                    ->example('page 1')
+                                    ->defaultValue(['number' => 1, 'content' => ''])
+                                    ->prototype('array')
+                                        ->children()
+                                            ->integerNode('number')->end()
+                                            ->scalarNode('content')->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->info('looks for translation in old fashion way')
+                            ->setDeprecated('symfony/config', '6.0')
                         ->end()
                     ->end()
                 ->end()

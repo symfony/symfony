@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
-    private $phpArrayFile;
+    private string $phpArrayFile;
 
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached
@@ -32,7 +32,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
@@ -42,7 +42,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
      *
      * @return string[] A list of classes to preload on PHP 7.4+
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $arrayAdapter = new ArrayAdapter();
 
@@ -66,7 +66,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     /**
      * @return string[] A list of classes to preload on PHP 7.4+
      */
-    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): array
     {
         return (array) $phpArrayAdapter->warmUp($values);
     }
@@ -78,12 +78,12 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     {
         try {
             ClassExistenceResource::throwOnRequiredClass($class, $exception);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
         }
     }
 
     /**
      * @return bool false if there is nothing to warm-up
      */
-    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter);
+    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool;
 }

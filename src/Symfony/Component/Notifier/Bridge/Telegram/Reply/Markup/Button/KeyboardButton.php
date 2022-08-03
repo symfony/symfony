@@ -26,7 +26,7 @@ final class KeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function requestContact(bool $bool): self
+    public function requestContact(bool $bool): static
     {
         $this->options['request_contact'] = $bool;
 
@@ -36,7 +36,7 @@ final class KeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function requestLocation(bool $bool): self
+    public function requestLocation(bool $bool): static
     {
         $this->options['request_location'] = $bool;
 
@@ -46,7 +46,7 @@ final class KeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function requestPollType(string $type): self
+    public function requestPollType(string $type): static
     {
         $this->options['request_contact']['type'] = $type;
 

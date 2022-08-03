@@ -169,7 +169,6 @@ class Psr16CacheTest extends SimpleCacheTest
 
         $pool = ((array) $cache)[sprintf("\0%s\0pool", Psr16Cache::class)];
         $getFileMethod = (new \ReflectionObject($pool))->getMethod('getFile');
-        $getFileMethod->setAccessible(true);
 
         return !file_exists($getFileMethod->invoke($pool, $name));
     }

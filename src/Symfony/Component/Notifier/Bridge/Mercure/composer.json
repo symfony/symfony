@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
         "ext-json": "*",
-        "symfony/mercure": "^0.5.2",
-        "symfony/notifier": "^5.3|^6.0",
+        "symfony/mercure": "^0.5.2|^0.6",
+        "symfony/notifier": "^6.2",
         "symfony/service-contracts": "^1.10|^2|^3"
     },
     "autoload": {

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class HiddenType extends AbstractType
@@ -28,18 +27,14 @@ class HiddenType extends AbstractType
             // Pass errors to the parent
             'error_bubbling' => true,
             'compound' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'The hidden field is invalid.';
-            },
+            'invalid_message' => 'The hidden field is invalid.',
         ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'hidden';
     }

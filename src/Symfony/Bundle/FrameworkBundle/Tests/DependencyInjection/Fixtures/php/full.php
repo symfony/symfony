@@ -9,9 +9,9 @@ $container->loadFromExtension('framework', [
         'csrf_protection' => [
             'field_name' => '_csrf',
         ],
-        'legacy_error_messages' => false,
     ],
     'http_method_override' => false,
+    'trust_x_sendfile_type_header' => true,
     'esi' => [
         'enabled' => true,
     ],
@@ -79,5 +79,8 @@ $container->loadFromExtension('framework', [
             ],
             'pdf' => 'application/pdf',
         ],
+    ],
+    'html_sanitizer' => [
+        'enabled' => true,
     ],
 ]);

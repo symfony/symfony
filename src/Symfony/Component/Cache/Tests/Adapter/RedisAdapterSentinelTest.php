@@ -47,9 +47,9 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
     public function testExceptionMessageWhenFailingToRetrieveMasterInformation()
     {
         $hosts = getenv('REDIS_SENTINEL_HOSTS');
-        $firstHost = explode(' ', $hosts)[0];
+        $dsn = 'redis:?host['.str_replace(' ', ']&host[', $hosts).']';
         $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to retrieve master information from master name "invalid-masterset-name" and address "'.$firstHost.'".');
-        AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => 'invalid-masterset-name']);
+        $this->expectExceptionMessage('Failed to retrieve master information from sentinel "invalid-masterset-name" and dsn "'.$dsn.'".');
+        AbstractAdapter::createConnection($dsn, ['redis_sentinel' => 'invalid-masterset-name']);
     }
 }

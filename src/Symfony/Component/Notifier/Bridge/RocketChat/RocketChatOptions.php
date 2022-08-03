@@ -20,11 +20,11 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class RocketChatOptions implements MessageOptionsInterface
 {
-    /** @var string|null prefix with '@' for personal messages */
-    private $channel;
+    /** prefix with '@' for personal messages */
+    private ?string $channel = null;
 
     /** @var mixed[] */
-    private $attachments;
+    private array $attachments;
 
     /**
      * @param string[] $attachments
@@ -49,7 +49,7 @@ final class RocketChatOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function channel(string $channel): self
+    public function channel(string $channel): static
     {
         $this->channel = $channel;
 

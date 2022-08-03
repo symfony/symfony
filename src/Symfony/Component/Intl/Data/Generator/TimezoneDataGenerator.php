@@ -35,9 +35,9 @@ class TimezoneDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $zoneIds = [];
-    private $zoneToCountryMapping = [];
-    private $localeAliases = [];
+    private array $zoneIds = [];
+    private array $zoneToCountryMapping = [];
+    private array $localeAliases = [];
 
     /**
      * {@inheritdoc}
@@ -182,7 +182,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             if (isset($this->zoneToCountryMapping[$id])) {
                 try {
                     $country = $reader->readEntry($tempDir.'/region', $locale, ['Countries', $this->zoneToCountryMapping[$id]]);
-                } catch (MissingResourceException $e) {
+                } catch (MissingResourceException) {
                     return null;
                 }
 
@@ -200,7 +200,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             foreach (\func_get_args() as $indices) {
                 try {
                     return $reader->readEntry($tempDir, $locale, $indices);
-                } catch (MissingResourceException $e) {
+                } catch (MissingResourceException) {
                 }
             }
 

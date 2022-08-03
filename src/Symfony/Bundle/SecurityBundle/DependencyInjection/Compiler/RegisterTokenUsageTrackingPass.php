@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
-use Symfony\Bridge\Monolog\Processor\ProcessorInterface;
+use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -41,7 +41,7 @@ class RegisterTokenUsageTrackingPass implements CompilerPassInterface
             TokenStorageInterface::class => new BoundArgument(new Reference('security.untracked_token_storage'), false),
         ]);
 
-        if (!$container->has('session.factory') && !$container->has('session.storage')) {
+        if (!$container->has('session.factory')) {
             $container->setAlias('security.token_storage', 'security.untracked_token_storage')->setPublic(true);
             $container->getDefinition('security.untracked_token_storage')->addTag('kernel.reset', ['method' => 'reset']);
         } elseif ($container->hasDefinition('security.context_listener')) {

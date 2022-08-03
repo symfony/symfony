@@ -31,14 +31,10 @@ class WebProfilerExtensionTest extends TestCase
      */
     private $container;
 
-    public static function assertSaneContainer(Container $container, $message = '', $knownPrivates = [])
+    public static function assertSaneContainer(Container $container)
     {
         $errors = [];
-        $knownPrivates[] = 'debug.file_link_formatter.url_format';
         foreach ($container->getServiceIds() as $id) {
-            if (\in_array($id, $knownPrivates, true)) { // for BC with 3.4
-                continue;
-            }
             try {
                 $container->get($id);
             } catch (\Exception $e) {
@@ -46,7 +42,7 @@ class WebProfilerExtensionTest extends TestCase
             }
         }
 
-        self::assertEquals([], $errors, $message);
+        self::assertSame([], $errors);
     }
 
     protected function setUp(): void
@@ -122,7 +118,7 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
-        self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
+        self::assertSaneContainer($this->getCompiledContainer());
 
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
@@ -163,7 +159,7 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
-        self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
+        self::assertSaneContainer($this->getCompiledContainer());
 
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());

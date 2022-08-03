@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\AnsiColorMode;
 use Symfony\Component\Console\Terminal;
 
 class TerminalTest extends TestCase
@@ -40,7 +41,6 @@ class TerminalTest extends TestCase
     {
         foreach (['height', 'width', 'stty'] as $name) {
             $property = new \ReflectionProperty(Terminal::class, $name);
-            $property->setAccessible(true);
             $property->setValue(null);
         }
     }
@@ -93,5 +93,36 @@ class TerminalTest extends TestCase
 
         $terminal = new Terminal();
         $this->assertSame((int) $matches[1], $terminal->getWidth());
+    }
+
+    /**
+     * @dataProvider provideTerminalColorEnv
+     */
+    public function testGetTermColorSupport(?string $testColorTerm, ?string $testTerm, AnsiColorMode $expected)
+    {
+        $oriColorTerm = getenv('COLORTERM');
+        $oriTerm = getenv('TERM');
+
+        try {
+            putenv($testColorTerm ? "COLORTERM={$testColorTerm}" : 'COLORTERM');
+            putenv($testTerm ? "TERM={$testTerm}" : 'TERM');
+
+            $this->assertSame($expected, Terminal::getTermColorSupport());
+        } finally {
+            (false !== $oriColorTerm) ? putenv('COLORTERM='.$oriColorTerm) : putenv('COLORTERM');
+            (false !== $oriTerm) ? putenv('TERM='.$oriTerm) : putenv('TERM');
+        }
+    }
+
+    public function provideTerminalColorEnv(): \Generator
+    {
+        yield ['truecolor', null, AnsiColorMode::Ansi24];
+        yield ['TRUECOLOR', null, AnsiColorMode::Ansi24];
+        yield ['somethingLike256Color', null, AnsiColorMode::Ansi8];
+        yield [null, 'xterm-truecolor', AnsiColorMode::Ansi24];
+        yield [null, 'xterm-TRUECOLOR', AnsiColorMode::Ansi24];
+        yield [null, 'xterm-256color', AnsiColorMode::Ansi8];
+        yield [null, 'xterm-256COLOR', AnsiColorMode::Ansi8];
+        yield [null, null, AnsiColorMode::Ansi4];
     }
 }

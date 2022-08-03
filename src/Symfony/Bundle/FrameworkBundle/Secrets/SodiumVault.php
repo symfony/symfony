@@ -23,21 +23,17 @@ use Symfony\Component\VarExporter\VarExporter;
  */
 class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 {
-    private $encryptionKey;
-    private $decryptionKey;
-    private $pathPrefix;
-    private $secretsDir;
+    private ?string $encryptionKey = null;
+    private string|\Stringable|null $decryptionKey = null;
+    private string $pathPrefix;
+    private ?string $secretsDir;
 
     /**
-     * @param string|\Stringable|null $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
-     *                                               or null to store generated keys in the provided $secretsDir
+     * @param $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
+     *                       or null to store generated keys in the provided $secretsDir
      */
-    public function __construct(string $secretsDir, $decryptionKey = null)
+    public function __construct(string $secretsDir, string|\Stringable $decryptionKey = null)
     {
-        if (null !== $decryptionKey && !\is_string($decryptionKey) && !(\is_object($decryptionKey) && method_exists($decryptionKey, '__toString'))) {
-            throw new \TypeError(sprintf('Decryption key should be a string or an object that implements the __toString() method, "%s" given.', get_debug_type($decryptionKey)));
-        }
-
         $this->pathPrefix = rtrim(strtr($secretsDir, '/', \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.basename($secretsDir).'.';
         $this->decryptionKey = $decryptionKey;
         $this->secretsDir = $secretsDir;
@@ -55,7 +51,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         try {
             $this->loadKeys();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             // ignore failures to load keys
         }
 

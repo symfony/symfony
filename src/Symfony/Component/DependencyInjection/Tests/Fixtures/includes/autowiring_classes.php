@@ -4,12 +4,11 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Psr\Log\LoggerInterface;
 
-if (\PHP_VERSION_ID >= 80000) {
-    require __DIR__.'/uniontype_classes.php';
-    require __DIR__.'/autowiring_classes_80.php';
-}
-if (\PHP_VERSION_ID >= 80100) {
-    require __DIR__.'/intersectiontype_classes.php';
+require __DIR__.'/uniontype_classes.php';
+require __DIR__.'/autowiring_classes_80.php';
+require __DIR__.'/intersectiontype_classes.php';
+if (\PHP_VERSION_ID >= 80200) {
+    require __DIR__.'/compositetype_classes.php';
 }
 
 class Foo
@@ -279,20 +278,16 @@ class Wither
 
     /**
      * @required
-     *
-     * @return static
      */
-    public function withFoo1(Foo $foo): self
+    public function withFoo1(Foo $foo): static
     {
         return $this->withFoo2($foo);
     }
 
     /**
      * @required
-     *
-     * @return static
      */
-    public function withFoo2(Foo $foo): self
+    public function withFoo2(Foo $foo): static
     {
         $new = clone $this;
         $new->foo = $foo;

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
-use Doctrine\DBAL\Driver\PDO\Connection as DoctrinePdoConnection;
 use Doctrine\DBAL\Schema\Table;
 
 /**
@@ -34,7 +33,7 @@ final class PostgreSqlConnection extends Connection
         'get_notify_timeout' => 0,
     ];
 
-    private $listening = false;
+    private bool $listening = false;
 
     public function __sleep(): array
     {
@@ -73,8 +72,8 @@ final class PostgreSqlConnection extends Connection
         if (method_exists($this->driverConnection, 'getNativeConnection')) {
             $wrappedConnection = $this->driverConnection->getNativeConnection();
         } else {
-            $wrappedConnection = $this->driverConnection->getWrappedConnection();
-            if (!$wrappedConnection instanceof \PDO && $wrappedConnection instanceof DoctrinePdoConnection) {
+            $wrappedConnection = $this->driverConnection;
+            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
                 $wrappedConnection = $wrappedConnection->getWrappedConnection();
             }
         }
@@ -119,21 +118,34 @@ final class PostgreSqlConnection extends Connection
 
     private function getTriggerSql(): array
     {
+        $functionName = $this->createTriggerFunctionName();
+
         return [
             // create trigger function
             sprintf(<<<'SQL'
-CREATE OR REPLACE FUNCTION notify_%1$s() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION %1$s() RETURNS TRIGGER AS $$
     BEGIN
-        PERFORM pg_notify('%1$s', NEW.queue_name::text);
+        PERFORM pg_notify('%2$s', NEW.queue_name::text);
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
 SQL
-            , $this->configuration['table_name']),
+                , $functionName, $this->configuration['table_name']),
             // register trigger
             sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
-            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();', $this->configuration['table_name']),
+            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE %2$s();', $this->configuration['table_name'], $functionName),
         ];
+    }
+
+    private function createTriggerFunctionName(): string
+    {
+        $tableConfig = explode('.', $this->configuration['table_name']);
+
+        if (1 === \count($tableConfig)) {
+            return sprintf('notify_%1$s', $tableConfig[0]);
+        }
+
+        return sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
     }
 
     private function unlisten()

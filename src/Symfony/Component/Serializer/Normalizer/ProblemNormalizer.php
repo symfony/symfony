@@ -24,10 +24,14 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
+    public const TITLE = 'title';
+    public const TYPE = 'type';
+    public const STATUS = 'status';
+
     private $debug;
     private $defaultContext = [
-        'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-        'title' => 'An error occurred',
+        self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
+        self::TITLE => 'An error occurred',
     ];
 
     public function __construct(bool $debug = false, array $defaultContext = [])
@@ -38,10 +42,8 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         if (!$object instanceof FlattenException) {
             throw new InvalidArgumentException(sprintf('The object must implement "%s".', FlattenException::class));
@@ -51,9 +53,9 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
         $debug = $this->debug && ($context['debug'] ?? true);
 
         $data = [
-            'type' => $context['type'],
-            'title' => $context['title'],
-            'status' => $context['status'] ?? $object->getStatusCode(),
+            self::TYPE => $context['type'],
+            self::TITLE => $context['title'],
+            self::STATUS => $context['status'] ?? $object->getStatusCode(),
             'detail' => $debug ? $object->getMessage() : $object->getStatusText(),
         ];
         if ($debug) {
@@ -66,8 +68,10 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsNormalization($data, string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
         return $data instanceof FlattenException;
     }

@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% if collector.totals.calls > 0 %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/cache.svg') }}
+            {{ source('@WebProfiler/Icon/cache.svg') }}
             <span class="sf-toolbar-value">{{ collector.totals.calls }}</span>
             <span class="sf-toolbar-info-piece-additional-detail">
                 <span class="sf-toolbar-label">in</span>
@@ -37,7 +37,7 @@
 {% block menu %}
     <span class="label {{ collector.totals.calls == 0 ? 'disabled' }}">
     <span class="icon">
-        {{ include('@WebProfiler/Icon/cache.svg') }}
+        {{ source('@WebProfiler/Icon/cache.svg') }}
     </span>
     <strong>Cache</strong>
 </span>
@@ -97,6 +97,14 @@
                     <h3 class="tab-title">{{ name }} <span class="badge">{{ collector.statistics[name].calls }}</span></h3>
 
                     <div class="tab-content">
+                        <h4>Adapter</h4>
+                        <div class="card">
+                            {% if collector.adapters[name] is defined %}
+                                <code>{{ collector.adapters[name] }}</code>
+                            {% else %}
+                                <span class="text-muted">Unable to get the adapter class.</span>
+                            {% endif %}
+                        </div>
                         {% if calls|length == 0 %}
                             <div class="empty">
                                 <p>No calls were made for {{ name }} pool.</p>

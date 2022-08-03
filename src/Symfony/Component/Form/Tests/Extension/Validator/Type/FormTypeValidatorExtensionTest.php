@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Forms;
@@ -31,7 +30,6 @@ use Symfony\Component\Validator\Validation;
 
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
-    use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
     public function testSubmitValidatesData()
@@ -80,7 +78,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
             ->getFormFactory()
-            ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
+            ->create(FormTypeTest::TESTED_TYPE, null, ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
                     new Length(['min' => 10, 'groups' => ['First']]),
@@ -126,7 +124,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension($validator))
             ->getFormFactory()
-            ->create(FormTypeTest::TESTED_TYPE, new Author(), (['validation_groups' => new GroupSequence(['First', 'Second'])]))
+            ->create(FormTypeTest::TESTED_TYPE, new Author(), ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('firstName', TextTypeTest::TESTED_TYPE)
             ->add('lastName', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
@@ -152,18 +150,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     public function testInvalidMessage()
     {
         $form = $this->createForm();
-
-        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyInvalidMessage()
-    {
-        $this->expectDeprecation('Since symfony/form 5.2: Setting the "legacy_error_messages" option to "true" is deprecated. It will be disabled in Symfony 6.0.');
-
-        $form = $this->createForm(['legacy_error_messages' => true]);
 
         $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }

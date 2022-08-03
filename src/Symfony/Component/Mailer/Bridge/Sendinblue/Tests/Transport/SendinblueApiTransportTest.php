@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Mailer\Bridge\Sendinblue\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
@@ -60,7 +69,6 @@ class SendinblueApiTransportTest extends TestCase
 
         $transport = new SendinblueApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendinblueApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('X-Mailin-Custom', $payload['headers']);

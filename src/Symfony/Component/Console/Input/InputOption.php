@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Console\Input;
 
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 
@@ -46,20 +50,22 @@ class InputOption
      */
     public const VALUE_NEGATABLE = 16;
 
-    private $name;
-    private $shortcut;
-    private $mode;
-    private $default;
-    private $description;
+    private string $name;
+    private string|array|null $shortcut;
+    private int $mode;
+    private string|int|bool|array|null|float $default;
+    private array|\Closure $suggestedValues;
+    private string $description;
 
     /**
      * @param string|array|null                $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param int|null                         $mode     The option mode: One of the VALUE_* constants
      * @param string|bool|int|float|array|null $default  The default value (must be null for self::VALUE_NONE)
+     * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null)
+    public function __construct(string $name, string|array $shortcut = null, int $mode = null, string $description = '', string|bool|int|float|array $default = null, array|\Closure $suggestedValues = [])
     {
         if (str_starts_with($name, '--')) {
             $name = substr($name, 2);
@@ -96,7 +102,11 @@ class InputOption
         $this->shortcut = $shortcut;
         $this->mode = $mode;
         $this->description = $description;
+        $this->suggestedValues = $suggestedValues;
 
+        if ($suggestedValues && !$this->acceptValue()) {
+            throw new LogicException('Cannot set suggested values if the option does not accept a value.');
+        }
         if ($this->isArray() && !$this->acceptValue()) {
             throw new InvalidArgumentException('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
         }
@@ -109,20 +119,16 @@ class InputOption
 
     /**
      * Returns the option shortcut.
-     *
-     * @return string|null
      */
-    public function getShortcut()
+    public function getShortcut(): ?string
     {
         return $this->shortcut;
     }
 
     /**
      * Returns the option name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -132,7 +138,7 @@ class InputOption
      *
      * @return bool true if value mode is not self::VALUE_NONE, false otherwise
      */
-    public function acceptValue()
+    public function acceptValue(): bool
     {
         return $this->isValueRequired() || $this->isValueOptional();
     }
@@ -142,7 +148,7 @@ class InputOption
      *
      * @return bool true if value mode is self::VALUE_REQUIRED, false otherwise
      */
-    public function isValueRequired()
+    public function isValueRequired(): bool
     {
         return self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $this->mode);
     }
@@ -152,7 +158,7 @@ class InputOption
      *
      * @return bool true if value mode is self::VALUE_OPTIONAL, false otherwise
      */
-    public function isValueOptional()
+    public function isValueOptional(): bool
     {
         return self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $this->mode);
     }
@@ -162,7 +168,7 @@ class InputOption
      *
      * @return bool true if mode is self::VALUE_IS_ARRAY, false otherwise
      */
-    public function isArray()
+    public function isArray(): bool
     {
         return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
     }
@@ -172,10 +178,7 @@ class InputOption
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
     }
 
-    /**
-     * @param string|bool|int|float|array|null $default
-     */
-    public function setDefault($default = null)
+    public function setDefault(string|bool|int|float|array $default = null)
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
@@ -194,30 +197,45 @@ class InputOption
 
     /**
      * Returns the default value.
-     *
-     * @return string|bool|int|float|array|null
      */
-    public function getDefault()
+    public function getDefault(): string|bool|int|float|array|null
     {
         return $this->default;
     }
 
     /**
      * Returns the description text.
-     *
-     * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
+    public function hasCompletion(): bool
+    {
+        return [] !== $this->suggestedValues;
+    }
+
+    /**
+     * Adds suggestions to $suggestions for the current completion input.
+     *
+     * @see Command::complete()
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        $values = $this->suggestedValues;
+        if ($values instanceof \Closure && !\is_array($values = $values($input))) {
+            throw new LogicException(sprintf('Closure for option "%s" must return an array. Got "%s".', $this->name, get_debug_type($values)));
+        }
+        if ($values) {
+            $suggestions->suggestValues($values);
+        }
+    }
+
     /**
      * Checks whether the given option equals this one.
-     *
-     * @return bool
      */
-    public function equals(self $option)
+    public function equals(self $option): bool
     {
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()

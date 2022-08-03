@@ -15,19 +15,18 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "composer-plugin-api": "^1.0|^2.0",
-        "symfony/polyfill-php80": "^1.15"
+        "php": ">=8.1",
+        "composer-plugin-api": "^1.0|^2.0"
     },
     "require-dev": {
         "composer/composer": "^1.0.2|^2.0",
-        "symfony/console": "^4.4.30|^5.3.7|^6.0",
-        "symfony/dotenv": "^5.1|^6.0",
-        "symfony/http-foundation": "^4.4.30|^5.3.7|^6.0",
-        "symfony/http-kernel": "^4.4.30|^5.3.7|^6.0"
+        "symfony/console": "^5.4|^6.0",
+        "symfony/dotenv": "^5.4|^6.0",
+        "symfony/http-foundation": "^5.4|^6.0",
+        "symfony/http-kernel": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/dotenv": "<5.1"
+        "symfony/dotenv": "<5.4"
     },
     "autoload": {
         "psr-4": {

@@ -22,7 +22,7 @@ class UuidV6 extends Uuid
 {
     protected const TYPE = 6;
 
-    private static $node;
+    private static string $node;
 
     public function __construct(string $uuid = null)
     {
@@ -55,7 +55,7 @@ class UuidV6 extends Uuid
         // uuid_create() returns a stable "node" that can leak the MAC of the host, but
         // UUIDv6 prefers a truly random number here, let's XOR both to preserve the entropy
 
-        if (null === self::$node) {
+        if (!isset(self::$node)) {
             $seed = [random_int(0, 0xFFFFFF), random_int(0, 0xFFFFFF)];
             $node = unpack('N2', hex2bin('00'.substr($uuidV1, 24, 6)).hex2bin('00'.substr($uuidV1, 30)));
             self::$node = sprintf('%06x%06x', ($seed[0] ^ $node[1]) | 0x010000, $seed[1] ^ $node[2]);

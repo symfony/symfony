@@ -21,11 +21,9 @@ interface TokenStorageInterface
     /**
      * Reads a stored CSRF token.
      *
-     * @return string
-     *
      * @throws \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException If the token ID does not exist
      */
-    public function getToken(string $tokenId);
+    public function getToken(string $tokenId): string;
 
     /**
      * Stores a CSRF token.
@@ -38,12 +36,10 @@ interface TokenStorageInterface
      * @return string|null Returns the removed token if one existed, NULL
      *                     otherwise
      */
-    public function removeToken(string $tokenId);
+    public function removeToken(string $tokenId): ?string;
 
     /**
      * Checks whether a token with the given token ID exists.
-     *
-     * @return bool
      */
-    public function hasToken(string $tokenId);
+    public function hasToken(string $tokenId): bool;
 }

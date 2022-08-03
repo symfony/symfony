@@ -64,7 +64,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], true);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
 
@@ -74,7 +74,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], false);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
 
@@ -86,7 +86,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", true);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
 
@@ -96,7 +96,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", false);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
     }

@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -29,20 +30,25 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
-    private $connections;
-    private $eventManagers;
-    private $managerTemplate;
-    private $tagPrefix;
+    private string $connectionsParameter;
+    private array $connections;
 
     /**
-     * @param string $connections     Parameter ID for connections
+     * @var array<string, Definition>
+     */
+    private array $eventManagers = [];
+
+    private string $managerTemplate;
+    private string $tagPrefix;
+
+    /**
      * @param string $managerTemplate sprintf() template for generating the event
      *                                manager's service ID for a connection name
      * @param string $tagPrefix       Tag prefix for listeners and subscribers
      */
-    public function __construct(string $connections, string $managerTemplate, string $tagPrefix)
+    public function __construct(string $connectionsParameter, string $managerTemplate, string $tagPrefix)
     {
-        $this->connections = $connections;
+        $this->connectionsParameter = $connectionsParameter;
         $this->managerTemplate = $managerTemplate;
         $this->tagPrefix = $tagPrefix;
     }
@@ -52,11 +58,11 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasParameter($this->connections)) {
+        if (!$container->hasParameter($this->connectionsParameter)) {
             return;
         }
 
-        $this->connections = $container->getParameter($this->connections);
+        $this->connections = $container->getParameter($this->connectionsParameter);
         $listenerRefs = $this->addTaggedServices($container);
 
         // replace service container argument of event managers with smaller service locator

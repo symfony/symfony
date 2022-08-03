@@ -13,10 +13,12 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
+use Monolog\LogRecord;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\MailerHandler;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -91,17 +93,9 @@ class MailerHandlerTest extends TestCase
         $handler->handle($this->getRecord(Logger::WARNING, 'message'));
     }
 
-    protected function getRecord($level = Logger::WARNING, $message = 'test', $context = []): array
+    protected function getRecord($level = Logger::WARNING, $message = 'test', $context = []): array|LogRecord
     {
-        return [
-            'message' => $message,
-            'context' => $context,
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'test',
-            'datetime' => \DateTime::createFromFormat('U.u', sprintf('%.6F', microtime(true))),
-            'extra' => [],
-        ];
+        return RecordFactory::create($level, $message, context: $context);
     }
 
     protected function getMultipleRecords(): array

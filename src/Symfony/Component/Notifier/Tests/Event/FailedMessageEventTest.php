@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Tests\Event;
 
 use PHPUnit\Framework\TestCase;
@@ -15,7 +24,7 @@ use Symfony\Component\Notifier\Transport\NullTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class FailedMessageEventTest extends TestCase
+class FailedMessageEventTest extends TestCase
 {
     /**
      * @dataProvider messagesProvider
@@ -47,6 +56,8 @@ final class FailedMessageEventTest extends TestCase
         $clientMock = $this->createMock(HttpClientInterface::class);
 
         $transport = new class($clientMock, $eventDispatcherMock) extends AbstractTransport {
+            public $exception;
+
             public function __construct($client, EventDispatcherInterface $dispatcher = null)
             {
                 $this->exception = new NullTransportException();
@@ -65,6 +76,7 @@ final class FailedMessageEventTest extends TestCase
 
             public function __toString(): string
             {
+                return '';
             }
         };
 

@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 trait HttpExceptionTrait
 {
-    private $response;
+    private ResponseInterface $response;
 
     public function __construct(ResponseInterface $response)
     {
@@ -61,7 +61,7 @@ trait HttpExceptionTrait
                 $separator = isset($body['hydra:title'], $body['hydra:description']) ? "\n\n" : '';
                 $message = ($body['hydra:title'] ?? '').$separator.($body['hydra:description'] ?? '');
             } elseif ((isset($body['title']) || isset($body['detail']))
-                && (is_scalar($body['title'] ?? '') && is_scalar($body['detail'] ?? ''))) {
+                && (\is_scalar($body['title'] ?? '') && \is_scalar($body['detail'] ?? ''))) {
                 // see RFC 7807 and https://jsonapi.org/format/#error-objects
                 $separator = isset($body['title'], $body['detail']) ? "\n\n" : '';
                 $message = ($body['title'] ?? '').$separator.($body['detail'] ?? '');

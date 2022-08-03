@@ -2,43 +2,37 @@
 
 namespace Symfony\Config\ArrayExtraKeys;
 
-
 use Symfony\Component\Config\Loader\ParamConfigurator;
 
-
 /**
- * This class is automatically generated to help creating config.
+ * This class is automatically generated to help in creating a config.
  */
 class BazConfig 
 {
     private $_extraKeys;
-    
+
     public function __construct(array $value = [])
     {
-    
         $this->_extraKeys = $value;
-    
+
     }
-    
+
     public function toArray(): array
     {
         $output = [];
-    
+
         return $output + $this->_extraKeys;
     }
-    
+
     /**
      * @param ParamConfigurator|mixed $value
+     *
      * @return $this
      */
-    public function set(string $key, $value): self
+    public function set(string $key, mixed $value): static
     {
-        if (null === $value) {
-            unset($this->_extraKeys[$key]);
-        } else {
-            $this->_extraKeys[$key] = $value;
-        }
-    
+        $this->_extraKeys[$key] = $value;
+
         return $this;
     }
 

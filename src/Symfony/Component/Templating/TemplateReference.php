@@ -28,10 +28,7 @@ class TemplateReference implements TemplateReferenceInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getLogicalName();
     }
@@ -39,7 +36,7 @@ class TemplateReference implements TemplateReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, string $value)
+    public function set(string $name, string $value): static
     {
         if (\array_key_exists($name, $this->parameters)) {
             $this->parameters[$name] = $value;
@@ -53,7 +50,7 @@ class TemplateReference implements TemplateReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function get(string $name)
+    public function get(string $name): string
     {
         if (\array_key_exists($name, $this->parameters)) {
             return $this->parameters[$name];
@@ -65,7 +62,7 @@ class TemplateReference implements TemplateReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->parameters;
     }
@@ -73,7 +70,7 @@ class TemplateReference implements TemplateReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->parameters['name'];
     }
@@ -81,7 +78,7 @@ class TemplateReference implements TemplateReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogicalName()
+    public function getLogicalName(): string
     {
         return $this->parameters['name'];
     }

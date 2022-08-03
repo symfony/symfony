@@ -20,7 +20,7 @@ class UuidV1 extends Uuid
 {
     protected const TYPE = 1;
 
-    private static $clockSeq;
+    private static ?string $clockSeq = null;
 
     public function __construct(string $uuid = null)
     {

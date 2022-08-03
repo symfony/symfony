@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
@@ -153,6 +154,33 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(1 + $initCounter, DescribedCommand::$initCounter);
     }
 
+    public function testEscapesDefaultFromPhp()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('to-escape', EscapedDefaultsFromPhpCommand::class)
+            ->addTag('console.command')
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $commandLoader = $container->getDefinition('console.command_loader');
+        $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
+
+        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        $this->assertSame(['%%cmd%%' => 'to-escape', '%%cmdalias%%' => 'to-escape'], $commandLoader->getArgument(1));
+        $this->assertEquals([['to-escape' => new ServiceClosureArgument(new Reference('.to-escape.lazy'))]], $commandLocator->getArguments());
+        $this->assertSame([], $container->getParameter('console.command.ids'));
+
+        $command = $container->get('console.command_loader')->get('%%cmd%%');
+
+        $this->assertInstanceOf(LazyCommand::class, $command);
+        $this->assertSame('%cmd%', $command->getName());
+        $this->assertSame(['%cmdalias%'], $command->getAliases());
+        $this->assertSame('Creates a 80% discount', $command->getDescription());
+    }
+
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -281,17 +309,20 @@ class MyCommand extends Command
 {
 }
 
+#[AsCommand(name: 'default')]
 class NamedCommand extends Command
 {
-    protected static $defaultName = 'default';
 }
 
+#[AsCommand(name: '%cmd%|%cmdalias%', description: 'Creates a 80% discount')]
+class EscapedDefaultsFromPhpCommand extends Command
+{
+}
+
+#[AsCommand(name: '|cmdname|cmdalias', description: 'Just testing')]
 class DescribedCommand extends Command
 {
     public static $initCounter = 0;
-
-    protected static $defaultName = '|cmdname|cmdalias';
-    protected static $defaultDescription = 'Just testing';
 
     public function __construct()
     {

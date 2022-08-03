@@ -56,6 +56,7 @@ class BazClass
 
 class BarUserClass
 {
+    public $foo;
     public $bar;
 
     public function __construct(BarClass $bar)
@@ -83,8 +84,10 @@ class MethodCallClass
 
 class DummyProxyDumper implements ProxyDumper
 {
-    public function isProxyCandidate(Definition $definition): bool
+    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): bool
     {
+        $asGhostObject = false;
+
         return $definition->isLazy();
     }
 

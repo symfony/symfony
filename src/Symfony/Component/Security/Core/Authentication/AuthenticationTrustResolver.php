@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -24,27 +23,13 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
 {
     public function isAuthenticated(TokenInterface $token = null): bool
     {
-        return $token && $token->getUser()
-            // @deprecated since Symfony 5.4, TokenInterface::isAuthenticated() and AnonymousToken no longer exists in 6.0
-            && !$token instanceof AnonymousToken && (!method_exists($token, 'isAuthenticated') || $token->isAuthenticated(false));
+        return $token && $token->getUser();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isAnonymous(TokenInterface $token = null/*, $deprecation = true*/)
-    {
-        if (1 === \func_num_args() || false !== func_get_arg(1)) {
-            trigger_deprecation('symfony/security-core', '5.4', 'The "%s()" method is deprecated, use "isAuthenticated()" or "isFullFledged()" if you want to check if the request is (fully) authenticated.', __METHOD__);
-        }
-
-        return $token instanceof AnonymousToken || ($token && !$token->getUser());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRememberMe(TokenInterface $token = null)
+    public function isRememberMe(TokenInterface $token = null): bool
     {
         return $token && $token instanceof RememberMeToken;
     }
@@ -52,8 +37,8 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function isFullFledged(TokenInterface $token = null)
+    public function isFullFledged(TokenInterface $token = null): bool
     {
-        return $token && !$this->isAnonymous($token, false) && !$this->isRememberMe($token);
+        return $this->isAuthenticated($token) && !$this->isRememberMe($token);
     }
 }

@@ -22,6 +22,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslatorTest extends TestCase
 {
@@ -138,7 +139,7 @@ class TranslatorTest extends TestCase
         $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
         $container = $this->createMock(ContainerInterface::class);
 
-        (new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']));
+        new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']);
     }
 
     /** @dataProvider getDebugModeAndCacheDirCombinations */
@@ -310,7 +311,7 @@ class TranslatorTest extends TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = Translator::class, $defaultLocale = 'en', array $enabledLocales = [])
+    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = Translator::class, $defaultLocale = 'en', array $enabledLocales = []): TranslatorInterface
     {
         $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale, $enabledLocales);
 

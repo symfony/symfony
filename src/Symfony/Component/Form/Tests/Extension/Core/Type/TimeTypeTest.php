@@ -280,6 +280,76 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertEquals('03:04:00', $form->getViewData());
     }
 
+    public function testPreSetDataDifferentTimezones()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'input' => 'datetime',
+            'with_seconds' => true,
+            'reference_date' => new \DateTimeImmutable('2019-01-01', new \DateTimeZone('UTC')),
+        ]);
+        $form->setData(new \DateTime('2022-01-01 15:09:10', new \DateTimeZone('UTC')));
+
+        $this->assertSame('15:09:10', $form->getData()->format('H:i:s'));
+        $this->assertSame([
+            'hour' => '16',
+            'minute' => '9',
+            'second' => '10',
+        ], $form->getViewData());
+    }
+
+    public function testPreSetDataDifferentTimezonesDuringDaylightSavingTime()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'input' => 'datetime',
+            'with_seconds' => true,
+            'reference_date' => new \DateTimeImmutable('2019-07-12', new \DateTimeZone('UTC')),
+        ]);
+        $form->setData(new \DateTime('2022-04-29 15:09:10', new \DateTimeZone('UTC')));
+
+        $this->assertSame('15:09:10', $form->getData()->format('H:i:s'));
+        $this->assertSame([
+            'hour' => '17',
+            'minute' => '9',
+            'second' => '10',
+        ], $form->getViewData());
+    }
+
+    public function testPreSetDataDifferentTimezonesUsingSingleTextWidget()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'input' => 'datetime',
+            'with_seconds' => true,
+            'reference_date' => new \DateTimeImmutable('2019-01-01', new \DateTimeZone('UTC')),
+            'widget' => 'single_text',
+        ]);
+        $form->setData(new \DateTime('2022-01-01 15:09:10', new \DateTimeZone('UTC')));
+
+        $this->assertSame('15:09:10', $form->getData()->format('H:i:s'));
+        $this->assertSame('16:09:10', $form->getViewData());
+    }
+
+    public function testPreSetDataDifferentTimezonesDuringDaylightSavingTimeUsingSingleTextWidget()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'input' => 'datetime',
+            'with_seconds' => true,
+            'reference_date' => new \DateTimeImmutable('2019-07-12', new \DateTimeZone('UTC')),
+            'widget' => 'single_text',
+        ]);
+        $form->setData(new \DateTime('2022-04-29 15:09:10', new \DateTimeZone('UTC')));
+
+        $this->assertSame('15:09:10', $form->getData()->format('H:i:s'));
+        $this->assertSame('17:09:10', $form->getViewData());
+    }
+
     public function testSubmitDifferentTimezones()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -998,6 +1068,27 @@ class TimeTypeTest extends BaseTypeTest
             'minute' => '0',
         ], $form->getData());
         $this->assertSame($input, $form->getViewData());
+    }
+
+    public function testArrayTimeWithReferenceDoesUseReferenceDateOnModelTransform()
+    {
+        $input = [
+            'hour' => '21',
+            'minute' => '45',
+        ];
+
+        $form = $this->factory->create(static::TESTED_TYPE, $input, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'reference_date' => new \DateTimeImmutable('01-05-2021 12:34:56', new \DateTimeZone('UTC')),
+            'input' => 'array',
+        ]);
+
+        $this->assertSame($input, $form->getData());
+        $this->assertEquals([
+            'hour' => '23',
+            'minute' => '45',
+        ], $form->getViewData());
     }
 
     /**

@@ -29,17 +29,19 @@ class Connection extends AbstractConnection
     private const LDAP_INVALID_CREDENTIALS = 0x31;
     private const LDAP_TIMEOUT = 0x55;
     private const LDAP_ALREADY_EXISTS = 0x44;
+    private const PRECONNECT_OPTIONS = [
+        ConnectionOptions::DEBUG_LEVEL,
+        ConnectionOptions::X_TLS_CACERTDIR,
+        ConnectionOptions::X_TLS_CACERTFILE,
+        ConnectionOptions::X_TLS_REQUIRE_CERT,
+    ];
 
-    /** @var bool */
-    private $bound = false;
+    private bool $bound = false;
 
     /** @var resource|LDAPConnection */
     private $connection;
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -57,7 +59,7 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function isBound()
+    public function isBound(): bool
     {
         return $this->bound;
     }
@@ -67,7 +69,7 @@ class Connection extends AbstractConnection
      *
      * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
      */
-    public function bind(string $dn = null, string $password = null)
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
     {
         if (!$this->connection) {
             $this->connect();
@@ -99,7 +101,7 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
-    public function setOption(string $name, $value)
+    public function setOption(string $name, array|string|int|bool $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
@@ -131,7 +133,7 @@ class Connection extends AbstractConnection
             }
 
             if (!isset($parent['network_timeout'])) {
-                $options->setDefault('network_timeout', ini_get('default_socket_timeout'));
+                $options->setDefault('network_timeout', \ini_get('default_socket_timeout'));
             }
 
             $options->setDefaults([
@@ -147,10 +149,18 @@ class Connection extends AbstractConnection
             return;
         }
 
+        foreach ($this->config['options'] as $name => $value) {
+            if (\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {
+                $this->setOption($name, $value);
+            }
+        }
+
         $this->connection = ldap_connect($this->config['connection_string']);
 
         foreach ($this->config['options'] as $name => $value) {
-            $this->setOption($name, $value);
+            if (!\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {
+                $this->setOption($name, $value);
+            }
         }
 
         if (false === $this->connection) {

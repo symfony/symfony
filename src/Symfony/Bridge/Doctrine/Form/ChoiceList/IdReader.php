@@ -24,16 +24,12 @@ use Symfony\Component\Form\Exception\RuntimeException;
  */
 class IdReader
 {
-    private $om;
-    private $classMetadata;
-    private $singleId;
-    private $intId;
-    private $idField;
-
-    /**
-     * @var IdReader|null
-     */
-    private $associationIdReader;
+    private ObjectManager $om;
+    private ClassMetadata $classMetadata;
+    private bool $singleId;
+    private bool $intId;
+    private string $idField;
+    private ?self $associationIdReader = null;
 
     public function __construct(ObjectManager $om, ClassMetadata $classMetadata)
     {

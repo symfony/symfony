@@ -55,9 +55,6 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertEquals([], $methodCalls[1][1]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testSetterInjectionWithAttribute()
     {
         if (!class_exists(Required::class)) {
@@ -125,9 +122,6 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame($expected, $methodCalls);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWitherWithStaticReturnTypeInjection()
     {
         $container = new ContainerBuilder();
@@ -149,9 +143,6 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame($expected, $methodCalls);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWitherInjectionWithAttribute()
     {
         if (!class_exists(Required::class)) {

@@ -28,9 +28,9 @@ final class SinchTransport extends AbstractTransport
 {
     protected const HOST = 'sms.api.sinch.com';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
+    private string $accountSid;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $accountSid, string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -57,11 +57,13 @@ final class SinchTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/xms/v1/%s/batches', $this->getEndpoint(), $this->accountSid);
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => [$message->getPhone()],
                 'body' => $message->getSubject(),
             ],

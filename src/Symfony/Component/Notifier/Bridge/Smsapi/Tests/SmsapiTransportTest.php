@@ -19,22 +19,21 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsapiTransportTest extends TransportTestCase
 {
-    /**
-     * @return SmsapiTransport
-     */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, bool $fast = false, bool $test = false): SmsapiTransport
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host')->setFast($fast)->setTest($test);
     }
 
     public function toStringProvider(): iterable
     {
         yield ['smsapi://test.host?from=testFrom', $this->createTransport()];
+        yield ['smsapi://test.host?from=testFrom&fast=1', $this->createTransport(null, true)];
+        yield ['smsapi://test.host?from=testFrom&test=1', $this->createTransport(null, false, true)];
+        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', $this->createTransport(null, true, true)];
     }
 
     public function supportedMessagesProvider(): iterable

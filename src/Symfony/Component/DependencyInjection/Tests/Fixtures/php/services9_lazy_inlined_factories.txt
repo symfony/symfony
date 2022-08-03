@@ -1,21 +1,12 @@
 Array
 (
-    [Container%s/removed-ids.php] => <?php
-
-namespace Container%s;
-
-return [
-    'Psr\\Container\\ContainerInterface' => true,
-    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-];
-
     [Container%s/proxy-classes.php] => <?php
 
 namespace Container%s;
 
 include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
 
-class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
+class FooClass_2b16075 extends \Bar\FooClass implements \Symfony\Component\VarExporter\LazyGhostObjectInterface
 %A
 
 if (!\class_exists('FooClass_%s', false)) {
@@ -29,8 +20,8 @@ namespace Container%s;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -74,51 +65,50 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return require $this->containerDir.\DIRECTORY_SEPARATOR.'removed-ids.php';
-    }
-
     protected function createProxy($class, \Closure $factory)
     {
         return $factory();
     }
 
+    protected function hydrateProxy($proxy, $instance)
+    {
+        if ($proxy === $instance) {
+            return $proxy;
+        }
+
+        if (!\in_array(\get_class($instance), [\get_class($proxy), get_parent_class($proxy)], true)) {
+            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', get_parent_class($proxy), get_debug_type($instance)));
+        }
+
+        return \Symfony\Component\VarExporter\Hydrator::hydrate($proxy, (array) $instance);
+    }
+
     /**
      * Gets the public 'lazy_foo' shared service.
      *
-     * @return \Bar\FooClass
+     * @return object A %lazy_foo_class% instance
      */
     protected function getLazyFooService($lazyLoad = true)
     {
-        if ($lazyLoad) {
-            return $this->services['lazy_foo'] = $this->createProxy('FooClass_8976cfa', function () {
-                return \FooClass_8976cfa::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
-                    $wrappedInstance = $this->getLazyFooService(false);
-
-                    $proxy->setProxyInitializer(null);
-
-                    return true;
-                });
+        if (true === $lazyLoad) {
+            return $this->services['lazy_foo'] = $this->createProxy('FooClass_2b16075', function () {
+                return \FooClass_2b16075::createLazyGhostObject($this->getLazyFooService(...));
             });
         }
 
         include_once $this->targetDir.''.'/Fixtures/includes/foo_lazy.php';
 
-        return new \Bar\FooClass(new \Bar\FooLazyClass());
+        return ($lazyLoad->__construct(new \Bar\FooLazyClass()) && false ?: $lazyLoad);
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
 
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -162,7 +152,7 @@ class ProjectServiceContainer extends Container
 
     private function getDynamicParameter(string $name)
     {
-        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
+        throw new ParameterNotFoundException($name);
     }
 
     protected function getDefaultParameters(): array
@@ -170,6 +160,7 @@ class ProjectServiceContainer extends Container
         return [
             'container.dumper.inline_factories' => true,
             'container.dumper.inline_class_loader' => true,
+            'lazy_foo_class' => 'Bar\\FooClass',
         ];
     }
 }

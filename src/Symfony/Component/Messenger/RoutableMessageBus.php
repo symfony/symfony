@@ -25,8 +25,8 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
  */
 class RoutableMessageBus implements MessageBusInterface
 {
-    private $busLocator;
-    private $fallbackBus;
+    private ContainerInterface $busLocator;
+    private ?MessageBusInterface $fallbackBus;
 
     public function __construct(ContainerInterface $busLocator, MessageBusInterface $fallbackBus = null)
     {

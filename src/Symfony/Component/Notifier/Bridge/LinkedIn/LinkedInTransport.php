@@ -34,8 +34,8 @@ final class LinkedInTransport extends AbstractTransport
     protected const PROTOCOL_HEADER = 'X-Restli-Protocol-Version';
     protected const HOST = 'api.linkedin.com';
 
-    private $authToken;
-    private $accountId;
+    private string $authToken;
+    private string $accountId;
 
     public function __construct(string $authToken, string $accountId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

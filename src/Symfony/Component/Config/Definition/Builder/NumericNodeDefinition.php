@@ -26,13 +26,11 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     /**
      * Ensures that the value is smaller than the given reference.
      *
-     * @param int|float $max
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException when the constraint is inconsistent
      */
-    public function max($max)
+    public function max(int|float $max): static
     {
         if (isset($this->min) && $this->min > $max) {
             throw new \InvalidArgumentException(sprintf('You cannot define a max(%s) as you already have a min(%s).', $max, $this->min));
@@ -45,13 +43,11 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     /**
      * Ensures that the value is bigger than the given reference.
      *
-     * @param int|float $min
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException when the constraint is inconsistent
      */
-    public function min($min)
+    public function min(int|float $min): static
     {
         if (isset($this->max) && $this->max < $min) {
             throw new \InvalidArgumentException(sprintf('You cannot define a min(%s) as you already have a max(%s).', $min, $this->max));
@@ -66,7 +62,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
      *
      * @throws InvalidDefinitionException
      */
-    public function cannotBeEmpty()
+    public function cannotBeEmpty(): static
     {
         throw new InvalidDefinitionException('->cannotBeEmpty() is not applicable to NumericNodeDefinition.');
     }

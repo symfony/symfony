@@ -21,7 +21,7 @@ class PredisStoreTest extends AbstractRedisStoreTest
 {
     public static function setUpBeforeClass(): void
     {
-        $redis = new \Predis\Client('tcp://'.getenv('REDIS_HOST').':6379');
+        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
         try {
             $redis->connect();
         } catch (\Exception $e) {
@@ -29,12 +29,9 @@ class PredisStoreTest extends AbstractRedisStoreTest
         }
     }
 
-    /**
-     * @return \Predis\Client
-     */
-    protected function getRedisConnection(): object
+    protected function getRedisConnection(): \Predis\Client
     {
-        $redis = new \Predis\Client('tcp://'.getenv('REDIS_HOST').':6379');
+        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
         $redis->connect();
 
         return $redis;

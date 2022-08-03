@@ -27,20 +27,13 @@ abstract class ObjectLoader extends Loader
      *
      * For example, if your application uses a service container,
      * the $id may be a service id.
-     *
-     * @return object
      */
-    abstract protected function getObject(string $id);
+    abstract protected function getObject(string $id): object;
 
     /**
      * Calls the object method that will load the routes.
-     *
-     * @param string      $resource object_id::method
-     * @param string|null $type     The resource type
-     *
-     * @return RouteCollection
      */
-    public function load($resource, string $type = null)
+    public function load(mixed $resource, string $type = null): RouteCollection
     {
         if (!preg_match('/^[^\:]+(?:::(?:[^\:]+))?$/', $resource)) {
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the %s route loader: use the format "object_id::method" or "object_id" if your object class has an "__invoke" method.', $resource, \is_string($type) ? '"'.$type.'"' : 'object'));

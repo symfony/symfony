@@ -27,7 +27,7 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
  */
 class Parser implements ParserInterface
 {
-    private $tokenizer;
+    private Tokenizer $tokenizer;
 
     public function __construct(Tokenizer $tokenizer = null)
     {

@@ -23,7 +23,7 @@ class BlankValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Blank) {
             throw new UnexpectedTypeException($constraint, Blank::class);

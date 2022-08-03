@@ -29,7 +29,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public static function fromNotification(Notification $notification): self
+    public static function fromNotification(Notification $notification): static
     {
         $options = new self();
         $options->headings(['en' => $notification->getSubject()]);
@@ -41,7 +41,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function headings(array $headings): self
+    public function headings(array $headings): static
     {
         $this->options['headings'] = $headings;
 
@@ -51,7 +51,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function contents(array $contents): self
+    public function contents(array $contents): static
     {
         $this->options['contents'] = $contents;
 
@@ -61,7 +61,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function url(string $url): self
+    public function url(string $url): static
     {
         $this->options['url'] = $url;
 
@@ -71,7 +71,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function data(array $data): self
+    public function data(array $data): static
     {
         $this->options['data'] = $data;
 
@@ -81,7 +81,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function sendAfter(\DateTimeInterface $datetime): self
+    public function sendAfter(\DateTimeInterface $datetime): static
     {
         $this->options['send_after'] = $datetime->format('Y-m-d H:i:sO');
 
@@ -91,7 +91,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function externalId(string $externalId): self
+    public function externalId(string $externalId): static
     {
         $this->options['external_id'] = $externalId;
 
@@ -101,7 +101,7 @@ final class OneSignalOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function recipient(string $id): self
+    public function recipient(string $id): static
     {
         $this->options['recipient_id'] = $id;
 

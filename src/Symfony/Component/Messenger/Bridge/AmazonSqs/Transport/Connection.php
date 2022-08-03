@@ -41,6 +41,7 @@ class Connection
         'auto_setup' => true,
         'access_key' => null,
         'secret_key' => null,
+        'session_token' => null,
         'endpoint' => 'https://sqs.eu-west-1.amazonaws.com',
         'region' => 'eu-west-1',
         'queue_name' => 'messages',
@@ -49,15 +50,12 @@ class Connection
         'debug' => null,
     ];
 
-    private $configuration;
-    private $client;
-
-    /** @var ReceiveMessageResult */
-    private $currentResponse;
+    private array $configuration;
+    private SqsClient $client;
+    private ?ReceiveMessageResult $currentResponse = null;
     /** @var array[] */
-    private $buffer = [];
-    /** @var string|null */
-    private $queueUrl;
+    private array $buffer = [];
+    private ?string $queueUrl;
 
     public function __construct(array $configuration, SqsClient $client = null, string $queueUrl = null)
     {
@@ -92,6 +90,7 @@ class Connection
      * * account: identifier of the AWS account
      * * access_key: AWS access key
      * * secret_key: AWS secret key
+     * * session_token: AWS session token (required only when using temporary credentials)
      * * buffer_size: number of messages to prefetch (Default: 9)
      * * wait_time: long polling duration in seconds (Default: 20)
      * * poll_timeout: amount of seconds the transport should wait for new message
@@ -138,6 +137,9 @@ class Connection
             'accessKeyId' => urldecode($parsedUrl['user'] ?? '') ?: $options['access_key'] ?? self::DEFAULT_OPTIONS['access_key'],
             'accessKeySecret' => urldecode($parsedUrl['pass'] ?? '') ?: $options['secret_key'] ?? self::DEFAULT_OPTIONS['secret_key'],
         ];
+        if (null !== $options['session_token']) {
+            $clientConfiguration['sessionToken'] = $options['session_token'];
+        }
         if (isset($options['debug'])) {
             $clientConfiguration['debug'] = $options['debug'];
         }
@@ -328,7 +330,7 @@ class Connection
 
         $specialHeaders = [];
         foreach ($headers as $name => $value) {
-            if ('.' === $name[0] || self::MESSAGE_ATTRIBUTE_NAME === $name || \strlen($name) > 256 || '.' === substr($name, -1) || 'AWS.' === substr($name, 0, \strlen('AWS.')) || 'Amazon.' === substr($name, 0, \strlen('Amazon.')) || preg_match('/([^a-zA-Z0-9_\.-]+|\.\.)/', $name)) {
+            if ('.' === $name[0] || self::MESSAGE_ATTRIBUTE_NAME === $name || \strlen($name) > 256 || str_ends_with($name, '.') || str_starts_with($name, 'AWS.') || str_starts_with($name, 'Amazon.') || preg_match('/([^a-zA-Z0-9_\.-]+|\.\.)/', $name)) {
                 $specialHeaders[$name] = $value;
 
                 continue;
@@ -396,6 +398,6 @@ class Connection
 
     private static function isFifoQueue(string $queueName): bool
     {
-        return self::AWS_SQS_FIFO_SUFFIX === substr($queueName, -\strlen(self::AWS_SQS_FIFO_SUFFIX));
+        return str_ends_with($queueName, self::AWS_SQS_FIFO_SUFFIX);
     }
 }

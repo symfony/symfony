@@ -23,7 +23,7 @@ class FloatNode extends NumericNode
     /**
      * {@inheritdoc}
      */
-    protected function validateType($value)
+    protected function validateType(mixed $value)
     {
         // Integers are also accepted, we just cast them
         if (\is_int($value)) {

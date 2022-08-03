@@ -290,7 +290,7 @@ class HeadersTest extends TestCase
     public function testReferencesAcceptsNonIdentifierValues()
     {
         $headers = new Headers();
-        $headers->addTextHeader('References' , 'foobar');
+        $headers->addTextHeader('References', 'foobar');
         $this->assertEquals('foobar', $headers->get('References')->getBody());
     }
 

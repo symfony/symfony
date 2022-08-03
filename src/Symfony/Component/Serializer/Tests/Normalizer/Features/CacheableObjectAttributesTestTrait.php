@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -25,8 +34,6 @@ trait CacheableObjectAttributesTestTrait
      * The same normalizer instance normalizes two objects of the same class in a row:
      *  1. an object having some uninitialized properties
      *  2. an object with all properties being initialized.
-     *
-     * @requires PHP 7.4
      */
     public function testObjectCollectionNormalization()
     {
@@ -38,8 +45,6 @@ trait CacheableObjectAttributesTestTrait
      * The same normalizer instance normalizes two objects of the same class in a row:
      *  1. an object with all properties being initialized
      *  2. an object having some uninitialized properties.
-     *
-     * @requires PHP 7.4
      */
     public function testReversedObjectCollectionNormalization()
     {

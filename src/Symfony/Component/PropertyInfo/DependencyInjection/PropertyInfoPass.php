@@ -25,51 +25,30 @@ class PropertyInfoPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    private $propertyInfoService;
-    private $listExtractorTag;
-    private $typeExtractorTag;
-    private $descriptionExtractorTag;
-    private $accessExtractorTag;
-    private $initializableExtractorTag;
-
-    public function __construct(string $propertyInfoService = 'property_info', string $listExtractorTag = 'property_info.list_extractor', string $typeExtractorTag = 'property_info.type_extractor', string $descriptionExtractorTag = 'property_info.description_extractor', string $accessExtractorTag = 'property_info.access_extractor', string $initializableExtractorTag = 'property_info.initializable_extractor')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/property-info', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->propertyInfoService = $propertyInfoService;
-        $this->listExtractorTag = $listExtractorTag;
-        $this->typeExtractorTag = $typeExtractorTag;
-        $this->descriptionExtractorTag = $descriptionExtractorTag;
-        $this->accessExtractorTag = $accessExtractorTag;
-        $this->initializableExtractorTag = $initializableExtractorTag;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->propertyInfoService)) {
+        if (!$container->hasDefinition('property_info')) {
             return;
         }
 
-        $definition = $container->getDefinition($this->propertyInfoService);
+        $definition = $container->getDefinition('property_info');
 
-        $listExtractors = $this->findAndSortTaggedServices($this->listExtractorTag, $container);
+        $listExtractors = $this->findAndSortTaggedServices('property_info.list_extractor', $container);
         $definition->replaceArgument(0, new IteratorArgument($listExtractors));
 
-        $typeExtractors = $this->findAndSortTaggedServices($this->typeExtractorTag, $container);
+        $typeExtractors = $this->findAndSortTaggedServices('property_info.type_extractor', $container);
         $definition->replaceArgument(1, new IteratorArgument($typeExtractors));
 
-        $descriptionExtractors = $this->findAndSortTaggedServices($this->descriptionExtractorTag, $container);
+        $descriptionExtractors = $this->findAndSortTaggedServices('property_info.description_extractor', $container);
         $definition->replaceArgument(2, new IteratorArgument($descriptionExtractors));
 
-        $accessExtractors = $this->findAndSortTaggedServices($this->accessExtractorTag, $container);
+        $accessExtractors = $this->findAndSortTaggedServices('property_info.access_extractor', $container);
         $definition->replaceArgument(3, new IteratorArgument($accessExtractors));
 
-        $initializableExtractors = $this->findAndSortTaggedServices($this->initializableExtractorTag, $container);
+        $initializableExtractors = $this->findAndSortTaggedServices('property_info.initializable_extractor', $container);
         $definition->setArgument(4, new IteratorArgument($initializableExtractors));
     }
 }

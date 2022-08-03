@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow yielding `Exception` from MockResponse's `$body` to mock transport errors
+ * Remove credentials from requests redirected to same host but different port
+
 5.4
 ---
 

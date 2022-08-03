@@ -12,19 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\Yunpian\Tests;
 
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransport;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class YunpianTransportTest extends TransportTestCase
 {
-    /**
-     * @return YunpianTransport
-     */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): YunpianTransport
     {
         return new YunpianTransport('api_key', $client ?? $this->createMock(HttpClientInterface::class));
     }
@@ -43,5 +40,15 @@ final class YunpianTransportTest extends TransportTestCase
     {
         yield [new ChatMessage('Hello!')];
         yield [$this->createMock(MessageInterface::class)];
+    }
+
+    public function testSmsMessageWithFrom()
+    {
+        $transport = $this->createTransport();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransport" transport does not support "from" in "Symfony\Component\Notifier\Message\SmsMessage".');
+
+        $transport->send(new SmsMessage('0600000000', 'test', 'foo'));
     }
 }

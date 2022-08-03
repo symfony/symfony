@@ -121,7 +121,7 @@ class MongoDbSessionHandlerTest extends TestCase
                 $this->assertEquals(['upsert' => true], $options);
 
                 $data = $updateData['$set'];
-                $expectedExpiry = time() + (int) ini_get('session.gc_maxlifetime');
+                $expectedExpiry = time() + (int) \ini_get('session.gc_maxlifetime');
                 $this->assertInstanceOf(\MongoDB\BSON\Binary::class, $data[$this->options['data_field']]);
                 $this->assertEquals('bar', $data[$this->options['data_field']]->getData());
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['time_field']]);
@@ -198,7 +198,6 @@ class MongoDbSessionHandlerTest extends TestCase
     public function testGetConnection()
     {
         $method = new \ReflectionMethod($this->storage, 'getMongo');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(Client::class, $method->invoke($this->storage));
     }

@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $traceableBuses = [];
+    private array $traceableBuses = [];
 
     public function registerBus(string $name, TraceableMessageBus $bus)
     {

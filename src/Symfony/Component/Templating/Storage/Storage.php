@@ -30,18 +30,14 @@ abstract class Storage
 
     /**
      * Returns the object string representation.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->template;
     }
 
     /**
      * Returns the content of the template.
-     *
-     * @return string
      */
-    abstract public function getContent();
+    abstract public function getContent(): string;
 }

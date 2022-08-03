@@ -40,7 +40,7 @@ class ApiAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $email = $request->headers->get('X-USER-EMAIL');
-        if (false === strpos($email, '@')) {
+        if (!str_contains($email, '@')) {
             throw new BadCredentialsException('Email is not a valid email address.');
         }
 

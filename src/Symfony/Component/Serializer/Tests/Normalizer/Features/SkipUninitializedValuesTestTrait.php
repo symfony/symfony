@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
@@ -13,7 +22,6 @@ trait SkipUninitializedValuesTestTrait
     abstract protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface;
 
     /**
-     * @requires PHP 7.4
      * @dataProvider skipUninitializedValuesFlagProvider
      */
     public function testSkipUninitializedValues(array $context)
@@ -31,9 +39,6 @@ trait SkipUninitializedValuesTestTrait
         yield 'using default context value' => [['groups' => ['foo']]];
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testWithoutSkipUninitializedValues()
     {
         $object = new TypedPropertiesObjectWithGetters();

@@ -18,9 +18,9 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CacheTokenVerifier implements TokenVerifierInterface
 {
-    private $cache;
-    private $outdatedTokenTtl;
-    private $cacheKeyPrefix;
+    private CacheItemPoolInterface $cache;
+    private int $outdatedTokenTtl;
+    private string $cacheKeyPrefix;
 
     /**
      * @param int $outdatedTokenTtl How long the outdated token should still be considered valid. Defaults
@@ -38,18 +38,18 @@ class CacheTokenVerifier implements TokenVerifierInterface
     /**
      * {@inheritdoc}
      */
-    public function verifyToken(PersistentTokenInterface $token, string $tokenValue): bool
+    public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool
     {
         if (hash_equals($token->getTokenValue(), $tokenValue)) {
             return true;
         }
 
         $cacheKey = $this->getCacheKey($token);
-        if (!$this->cache->hasItem($cacheKey)) {
+        $item = $this->cache->getItem($cacheKey);
+        if (!$item->isHit()) {
             return false;
         }
 
-        $item = $this->cache->getItem($cacheKey);
         $outdatedToken = $item->get();
 
         return hash_equals($outdatedToken, $tokenValue);
@@ -58,7 +58,7 @@ class CacheTokenVerifier implements TokenVerifierInterface
     /**
      * {@inheritdoc}
      */
-    public function updateExistingToken(PersistentTokenInterface $token, string $tokenValue, \DateTimeInterface $lastUsed): void
+    public function updateExistingToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         // When a token gets updated, persist the outdated token for $outdatedTokenTtl seconds so we can
         // still accept it as valid in verifyToken

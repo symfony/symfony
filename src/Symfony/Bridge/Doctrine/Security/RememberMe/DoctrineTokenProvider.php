@@ -43,7 +43,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  */
 class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
-    private $conn;
+    private Connection $conn;
 
     public function __construct(Connection $conn)
     {
@@ -53,7 +53,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function loadTokenBySeries(string $series)
+    public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
         // the alias for lastUsed works around case insensitivity in PostgreSQL
         $sql = 'SELECT class, username, value, lastUsed AS last_used FROM rememberme_token WHERE series=:series';
@@ -87,7 +87,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed)
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
         $paramValues = [
@@ -118,8 +118,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
         $paramValues = [
             'class' => $token->getClass(),
-            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
-            'username' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
+            'username' => $token->getUserIdentifier(),
             'series' => $token->getSeries(),
             'value' => $token->getTokenValue(),
             'lastUsed' => $token->getLastUsed(),
@@ -141,7 +140,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function verifyToken(PersistentTokenInterface $token, string $tokenValue): bool
+    public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool
     {
         // Check if the token value matches the current persisted token
         if (hash_equals($token->getTokenValue(), $tokenValue)) {
@@ -164,7 +163,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         // we also accept it as a valid value.
         try {
             $tmpToken = $this->loadTokenBySeries($tmpSeries);
-        } catch (TokenNotFoundException $e) {
+        } catch (TokenNotFoundException) {
             return false;
         }
 
@@ -178,7 +177,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function updateExistingToken(PersistentTokenInterface $token, string $tokenValue, \DateTimeInterface $lastUsed): void
+    public function updateExistingToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         if (!$token instanceof PersistentToken) {
             return;

@@ -16,17 +16,9 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 trait ResetLimiterTrait
 {
-    /**
-     * @var LockInterface
-     */
-    private $lock;
-
-    /**
-     * @var StorageInterface
-     */
-    private $storage;
-
-    private $id;
+    private LockInterface $lock;
+    private StorageInterface $storage;
+    private string $id;
 
     /**
      * {@inheritdoc}

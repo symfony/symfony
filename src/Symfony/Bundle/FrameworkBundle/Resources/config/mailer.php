@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Mailer\Command\MailerTestCommand;
 use Symfony\Component\Mailer\EventListener\EnvelopeListener;
 use Symfony\Component\Mailer\EventListener\MessageListener;
 use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
@@ -69,13 +70,14 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
 
-        ->set('mailer.logger_message_listener', MessageLoggerListener::class)
-            ->tag('kernel.event_subscriber')
-            ->tag('kernel.reset', ['method' => 'reset'])
-            ->deprecate('symfony/framework-bundle', '5.2', 'The "%service_id%" service is deprecated, use "mailer.message_logger_listener" instead.')
-
         ->set('mailer.message_logger_listener', MessageLoggerListener::class)
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => 'reset'])
+
+        ->set('console.command.mailer_test', MailerTestCommand::class)
+            ->args([
+                service('mailer.transports'),
+            ])
+            ->tag('console.command')
     ;
 };

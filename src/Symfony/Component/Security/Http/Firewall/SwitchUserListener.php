@@ -41,18 +41,19 @@ class SwitchUserListener extends AbstractListener
 {
     public const EXIT_VALUE = '_exit';
 
-    private $tokenStorage;
-    private $provider;
-    private $userChecker;
-    private $firewallName;
-    private $accessDecisionManager;
-    private $usernameParameter;
-    private $role;
-    private $logger;
-    private $dispatcher;
-    private $stateless;
+    private TokenStorageInterface $tokenStorage;
+    private UserProviderInterface $provider;
+    private UserCheckerInterface $userChecker;
+    private string $firewallName;
+    private AccessDecisionManagerInterface $accessDecisionManager;
+    private string $usernameParameter;
+    private string $role;
+    private ?LoggerInterface $logger;
+    private ?EventDispatcherInterface $dispatcher;
+    private bool $stateless;
+    private ?string $targetUrl;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false, ?string $targetUrl = null)
     {
         if ('' === $firewallName) {
             throw new \InvalidArgumentException('$firewallName must not be empty.');
@@ -68,6 +69,7 @@ class SwitchUserListener extends AbstractListener
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->stateless = $stateless;
+        $this->targetUrl = $targetUrl;
     }
 
     /**
@@ -122,7 +124,7 @@ class SwitchUserListener extends AbstractListener
         if (!$this->stateless) {
             $request->query->remove($this->usernameParameter);
             $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
-            $response = new RedirectResponse($request->getUri(), 302);
+            $response = new RedirectResponse($this->targetUrl ?? $request->getUri(), 302);
 
             $event->setResponse($response);
         }
@@ -140,8 +142,7 @@ class SwitchUserListener extends AbstractListener
         $originalToken = $this->getOriginalToken($token);
 
         if (null !== $originalToken) {
-            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
-            if ((method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()) === $username) {
+            if ($token->getUserIdentifier() === $username) {
                 return $token;
             }
 
@@ -149,27 +150,20 @@ class SwitchUserListener extends AbstractListener
             $token = $this->attemptExitUser($request);
         }
 
-        // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
-        $currentUsername = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
+        $currentUsername = $token->getUserIdentifier();
         $nonExistentUsername = '_'.md5(random_bytes(8).$username);
 
         // To protect against user enumeration via timing measurements
         // we always load both successfully and unsuccessfully
-        $methodName = 'loadUserByIdentifier';
-        if (!method_exists($this->provider, $methodName)) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->provider));
-
-            $methodName = 'loadUserByUsername';
-        }
         try {
-            $user = $this->provider->$methodName($username);
+            $user = $this->provider->loadUserByIdentifier($username);
 
             try {
-                $this->provider->$methodName($nonExistentUsername);
-            } catch (\Exception $e) {
+                $this->provider->loadUserByIdentifier($nonExistentUsername);
+            } catch (\Exception) {
             }
         } catch (AuthenticationException $e) {
-            $this->provider->$methodName($currentUsername);
+            $this->provider->loadUserByIdentifier($currentUsername);
 
             throw $e;
         }
@@ -181,9 +175,7 @@ class SwitchUserListener extends AbstractListener
             throw $exception;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->info('Attempting to switch to user.', ['username' => $username]);
-        }
+        $this->logger?->info('Attempting to switch to user.', ['username' => $username]);
 
         $this->userChecker->checkPostAuth($user);
 

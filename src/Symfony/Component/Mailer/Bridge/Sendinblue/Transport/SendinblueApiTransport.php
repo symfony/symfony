@@ -32,7 +32,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class SendinblueApiTransport extends AbstractApiTransport
 {
-    private $key;
+    private string $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -58,7 +58,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
@@ -161,7 +161,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
 
                 continue;
             }
-            $headersAndTags['headers'][$name] = $header->getBodyAsString();
+            $headersAndTags['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $headersAndTags;

@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @requires extension redis >= 4.3.0
+ * @requires extension redis
  */
 class RedisTransportFactoryTest extends TestCase
 {
@@ -49,7 +49,7 @@ class RedisTransportFactoryTest extends TestCase
     private function skipIfRedisUnavailable()
     {
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }

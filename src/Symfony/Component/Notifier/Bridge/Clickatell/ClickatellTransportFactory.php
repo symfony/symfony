@@ -14,14 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Clickatell;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Kevin Auvinet <k.auvinet@gmail.com>
  */
 final class ClickatellTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): ClickatellTransport
     {
         $scheme = $dsn->getScheme();
 

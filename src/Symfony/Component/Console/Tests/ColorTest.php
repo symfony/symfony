@@ -16,7 +16,7 @@ use Symfony\Component\Console\Color;
 
 class ColorTest extends TestCase
 {
-    public function testAnsiColors()
+    public function testAnsi4Colors()
     {
         $color = new Color();
         $this->assertSame(' ', $color->apply(' '));
@@ -33,21 +33,27 @@ class ColorTest extends TestCase
 
     public function testTrueColors()
     {
-        if ('truecolor' !== getenv('COLORTERM')) {
-            $this->markTestSkipped('True color not supported.');
+        $colorterm = getenv('COLORTERM');
+        putenv('COLORTERM=truecolor');
+
+        try {
+            $color = new Color('#fff', '#000');
+            $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
+
+            $color = new Color('#ffffff', '#000000');
+            $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
+        } finally {
+            (false !== $colorterm) ? putenv('COLORTERM='.$colorterm) : putenv('COLORTERM');
         }
-
-        $color = new Color('#fff', '#000');
-        $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
-
-        $color = new Color('#ffffff', '#000000');
-        $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
     }
 
-    public function testDegradedTrueColors()
+    public function testDegradedTrueColorsToAnsi4()
     {
         $colorterm = getenv('COLORTERM');
+        $term = getenv('TERM');
+
         putenv('COLORTERM=');
+        putenv('TERM=');
 
         try {
             $color = new Color('#f00', '#ff0');
@@ -56,7 +62,28 @@ class ColorTest extends TestCase
             $color = new Color('#c0392b', '#f1c40f');
             $this->assertSame("\033[31;43m \033[39;49m", $color->apply(' '));
         } finally {
-            putenv('COLORTERM='.$colorterm);
+            (false !== $colorterm) ? putenv('COLORTERM='.$colorterm) : putenv('COLORTERM');
+            (false !== $term) ? putenv('TERM='.$term) : putenv('TERM');
+        }
+    }
+
+    public function testDegradedTrueColorsToAnsi8()
+    {
+        $colorterm = getenv('COLORTERM');
+        $term = getenv('TERM');
+
+        putenv('COLORTERM=');
+        putenv('TERM=symfonyTest-256color');
+
+        try {
+            $color = new Color('#f57255', '#8993c0');
+            $this->assertSame("\033[38;5;210;48;5;146m \033[39;49m", $color->apply(' '));
+
+            $color = new Color('#000000', '#ffffff');
+            $this->assertSame("\033[38;5;16;48;5;231m \033[39;49m", $color->apply(' '));
+        } finally {
+            (false !== $colorterm) ? putenv('COLORTERM='.$colorterm) : putenv('COLORTERM');
+            (false !== $term) ? putenv('TERM='.$term) : putenv('TERM');
         }
     }
 }

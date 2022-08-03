@@ -18,6 +18,9 @@ use Symfony\Component\Uid\AbstractUid;
 
 abstract class AbstractUidType extends Type
 {
+    /**
+     * @return class-string<AbstractUid>
+     */
     abstract protected function getUidClass(): string;
 
     /**
@@ -25,7 +28,7 @@ abstract class AbstractUidType extends Type
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        if ($platform->hasNativeGuidType()) {
+        if ($this->hasNativeGuidType($platform)) {
             return $platform->getGuidTypeDeclarationSQL($column);
         }
 
@@ -40,7 +43,7 @@ abstract class AbstractUidType extends Type
      *
      * @throws ConversionException
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?AbstractUid
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?AbstractUid
     {
         if ($value instanceof AbstractUid || null === $value) {
             return $value;
@@ -64,7 +67,7 @@ abstract class AbstractUidType extends Type
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
-        $toString = $platform->hasNativeGuidType() ? 'toRfc4122' : 'toBinary';
+        $toString = $this->hasNativeGuidType($platform) ? 'toRfc4122' : 'toBinary';
 
         if ($value instanceof AbstractUid) {
             return $value->$toString();
@@ -80,7 +83,7 @@ abstract class AbstractUidType extends Type
 
         try {
             return $this->getUidClass()::fromString($value)->$toString();
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             throw ConversionException::conversionFailed($value, $this->getName());
         }
     }
@@ -91,5 +94,15 @@ abstract class AbstractUidType extends Type
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
+    }
+
+    private function hasNativeGuidType(AbstractPlatform $platform): bool
+    {
+        // Compatibility with DBAL < 3.4
+        $method = method_exists($platform, 'getStringTypeDeclarationSQL')
+            ? 'getStringTypeDeclarationSQL'
+            : 'getVarcharTypeDeclarationSQL';
+
+        return $platform->getGuidTypeDeclarationSQL([]) !== $platform->$method(['fixed' => true, 'length' => 36]);
     }
 }

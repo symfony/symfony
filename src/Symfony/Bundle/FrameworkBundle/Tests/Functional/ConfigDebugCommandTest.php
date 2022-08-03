@@ -60,6 +60,18 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('secret: test', $tester->getDisplay());
     }
 
+    public function testParametersValuesAreFullyResolved()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'framework', '--resolve-env' => true]);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('locale: en', $tester->getDisplay());
+        $this->assertStringContainsString('secret: test', $tester->getDisplay());
+        $this->assertStringContainsString('cookie_httponly: true', $tester->getDisplay());
+        $this->assertStringContainsString('ide: null', $tester->getDisplay());
+    }
+
     public function testDefaultParameterValueIsResolvedIfConfigIsExisting()
     {
         $tester = $this->createCommandTester();
@@ -68,6 +80,15 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $kernelCacheDir = $this->application->getKernel()->getContainer()->getParameter('kernel.cache_dir');
         $this->assertStringContainsString(sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
+    }
+
+    public function testDumpExtensionConfigWithoutBundle()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'test_dump']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('enabled: true', $tester->getDisplay());
     }
 
     public function testDumpUndefinedBundleOption()

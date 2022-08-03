@@ -18,7 +18,6 @@ use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
-use Symfony\Component\Asset\VersionStrategy\RemoteJsonManifestVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 return static function (ContainerConfigurator $container) {
@@ -81,14 +80,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('manifest path'),
                 service('http_client')->nullOnInvalid(),
                 false,
-            ])
-
-        ->set('assets.remote_json_manifest_version_strategy', RemoteJsonManifestVersionStrategy::class)
-            ->abstract()
-            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "assets.json_manifest_version_strategy" instead.')
-            ->args([
-                abstract_arg('manifest url'),
-                service('http_client'),
             ])
     ;
 };

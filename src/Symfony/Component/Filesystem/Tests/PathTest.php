@@ -223,6 +223,8 @@ class PathTest extends TestCase
         yield ['/..', '/'];
 
         yield ['C:webmozart', ''];
+
+        yield ['D:/Folder/Aééé/Subfolder', 'D:/Folder/Aééé'];
     }
 
     /**
@@ -1024,10 +1026,10 @@ class PathTest extends TestCase
         $this->assertSame('/path/to/test/subdir', Path::join('/path', 'to', '/test', 'subdir/'));
     }
 
-    public function testGetHomeDirectoryFailsIfNotSupportedOperationSystem()
+    public function testGetHomeDirectoryFailsIfNotSupportedOperatingSystem()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Your environment or operation system isn\'t supported');
+        $this->expectExceptionMessage('Your environment or operating system isn\'t supported');
 
         putenv('HOME=');
 

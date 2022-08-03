@@ -25,11 +25,11 @@ class FormRenderer implements FormRendererInterface
 {
     public const CACHE_KEY_VAR = 'unique_block_prefix';
 
-    private $engine;
-    private $csrfTokenManager;
-    private $blockNameHierarchyMap = [];
-    private $hierarchyLevelMap = [];
-    private $variableStack = [];
+    private FormRendererEngineInterface $engine;
+    private ?CsrfTokenManagerInterface $csrfTokenManager;
+    private array $blockNameHierarchyMap = [];
+    private array $hierarchyLevelMap = [];
+    private array $variableStack = [];
 
     public function __construct(FormRendererEngineInterface $engine, CsrfTokenManagerInterface $csrfTokenManager = null)
     {
@@ -40,7 +40,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function getEngine()
+    public function getEngine(): FormRendererEngineInterface
     {
         return $this->engine;
     }
@@ -48,7 +48,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormView $view, $themes, bool $useDefaultThemes = true)
+    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true)
     {
         $this->engine->setTheme($view, $themes, $useDefaultThemes);
     }
@@ -56,7 +56,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderCsrfToken(string $tokenId)
+    public function renderCsrfToken(string $tokenId): string
     {
         if (null === $this->csrfTokenManager) {
             throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct(). Try running "composer require symfony/security-csrf".');
@@ -68,7 +68,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, string $blockName, array $variables = [])
+    public function renderBlock(FormView $view, string $blockName, array $variables = []): string
     {
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
@@ -127,7 +127,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = [])
+    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = []): string
     {
         $renderOnlyOnce = 'row' === $blockNameSuffix || 'widget' === $blockNameSuffix;
 
@@ -280,7 +280,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function humanize(string $text)
+    public function humanize(string $text): string
     {
         return ucfirst(strtolower(trim(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
     }

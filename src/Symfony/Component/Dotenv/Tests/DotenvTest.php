@@ -587,6 +587,13 @@ class DotenvTest extends TestCase
         $this->assertSame('BAR', $_SERVER['FOO']);
         $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
         $this->assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
+
+        $resetContext();
+        $_SERVER['TEST_APP_ENV'] = 'ccc';
+        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path, 'dev', ['test'], true);
+        $this->assertSame('BAR', $_SERVER['FOO']);
+        $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
+        $this->assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
         unlink($path.'.local.php');
 
         $resetContext();

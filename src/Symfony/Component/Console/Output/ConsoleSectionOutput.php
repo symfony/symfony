@@ -21,10 +21,10 @@ use Symfony\Component\Console\Terminal;
  */
 class ConsoleSectionOutput extends StreamOutput
 {
-    private $content = [];
-    private $lines = 0;
-    private $sections;
-    private $terminal;
+    private array $content = [];
+    private int $lines = 0;
+    private array $sections;
+    private Terminal $terminal;
 
     /**
      * @param resource               $stream
@@ -50,7 +50,7 @@ class ConsoleSectionOutput extends StreamOutput
         }
 
         if ($lines) {
-            array_splice($this->content, -($lines * 2)); // Multiply lines by 2 to cater for each new line added between content
+            array_splice($this->content, -$lines);
         } else {
             $lines = $this->lines;
             $this->content = [];
@@ -63,10 +63,8 @@ class ConsoleSectionOutput extends StreamOutput
 
     /**
      * Overwrites the previous output with a new message.
-     *
-     * @param array|string $message
      */
-    public function overwrite($message)
+    public function overwrite(string|iterable $message)
     {
         $this->clear();
         $this->writeln($message);
@@ -80,12 +78,42 @@ class ConsoleSectionOutput extends StreamOutput
     /**
      * @internal
      */
-    public function addContent(string $input)
+    public function addContent(string $input, bool $newline = true)
     {
-        foreach (explode(\PHP_EOL, $input) as $lineContent) {
-            $this->lines += ceil($this->getDisplayLength($lineContent) / $this->terminal->getWidth()) ?: 1;
-            $this->content[] = $lineContent;
-            $this->content[] = \PHP_EOL;
+        $width = $this->terminal->getWidth();
+        $lines = explode(\PHP_EOL, $input);
+        $count = \count($lines) - 1;
+        foreach ($lines as $i => $lineContent) {
+            // re-add the line break (that has been removed in the above `explode()` for
+            // - every line that is not the last line
+            // - if $newline is required, also add it to the last line
+            if ($i < $count || $newline) {
+                $lineContent .= \PHP_EOL;
+            }
+
+            // skip line if there is no text (or newline for that matter)
+            if ('' === $lineContent) {
+                continue;
+            }
+
+            // For the first line, check if the previous line (last entry of `$this->content`)
+            // needs to be continued (i.e. does not end with a line break).
+            if (0 === $i
+                && (false !== $lastLine = end($this->content))
+                && !str_ends_with($lastLine, \PHP_EOL)
+            ) {
+                // deduct the line count of the previous line
+                $this->lines -= (int) ceil($this->getDisplayLength($lastLine) / $width) ?: 1;
+                // concatenate previous and new line
+                $lineContent = $lastLine.$lineContent;
+                // replace last entry of `$this->content` with the new expanded line
+                array_splice($this->content, -1, 1, $lineContent);
+            } else {
+                // otherwise just add the new content
+                $this->content[] = $lineContent;
+            }
+
+            $this->lines += (int) ceil($this->getDisplayLength($lineContent) / $width) ?: 1;
         }
     }
 
@@ -100,11 +128,16 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
-        $erasedContent = $this->popStreamContentUntilCurrentSection();
+        // Check if the previous line (last entry of `$this->content`) needs to be continued
+        // (i.e. does not end with a line break). In which case, it needs to be erased first.
+        $deleteLastLine = ($lastLine = end($this->content) ?: '') && !str_ends_with($lastLine, \PHP_EOL) ? 1 : 0;
+        $erasedContent = $this->popStreamContentUntilCurrentSection($deleteLastLine);
 
-        $this->addContent($message);
+        $this->addContent($message, $newline);
 
-        parent::doWrite($message, true);
+        // If the last line was removed, re-print its content together with the new content.
+        // Otherwise, just print the new content.
+        parent::doWrite($deleteLastLine ? $lastLine.$message : $message, true);
         parent::doWrite($erasedContent, false);
     }
 
@@ -123,7 +156,12 @@ class ConsoleSectionOutput extends StreamOutput
             }
 
             $numberOfLinesToClear += $section->lines;
-            $erasedContent[] = $section->getContent();
+            if ('' !== $sectionContent = $section->getContent()) {
+                if (!str_ends_with($sectionContent, \PHP_EOL)) {
+                    $sectionContent .= \PHP_EOL;
+                }
+                $erasedContent[] = $sectionContent;
+            }
         }
 
         if ($numberOfLinesToClear > 0) {

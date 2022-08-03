@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,8 +24,6 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -97,8 +94,11 @@ class PhpFileLoaderTest extends TestCase
         yield ['php7'];
         yield ['anonymous'];
         yield ['lazy_fqcn'];
+        yield ['inline_binding'];
         yield ['remove'];
         yield ['config_builder'];
+        yield ['expression_factory'];
+        yield ['closure'];
     }
 
     public function testAutoConfigureAndChildDefinition()
@@ -164,18 +164,6 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $fixtures = realpath(__DIR__.'/../Fixtures');
-        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
-        $loader->load($fixtures.'/config/deprecated_without_package_version.php');
-    }
-
     public function testNestedBundleConfigNotAllowed()
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
@@ -188,9 +176,6 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/nested_bundle_config.php');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWhenEnv()
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');

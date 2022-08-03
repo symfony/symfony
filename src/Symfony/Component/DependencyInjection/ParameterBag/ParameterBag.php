@@ -51,7 +51,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->parameters;
     }
@@ -59,7 +59,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function get(string $name)
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!\array_key_exists($name, $this->parameters)) {
             if (!$name) {
@@ -99,7 +99,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, $value)
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
     {
         $this->parameters[$name] = $value;
     }
@@ -107,7 +107,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return \array_key_exists($name, $this->parameters);
     }
@@ -148,21 +148,28 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param mixed $value     A value
-     * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
+     * @template TValue of array<array|scalar>|scalar
      *
-     * @return mixed
+     * @param TValue $value
+     * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
+     *
+     * @return (TValue is scalar ? array|scalar : array<array|scalar>)
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem
      */
-    public function resolveValue($value, array $resolving = [])
+    public function resolveValue(mixed $value, array $resolving = []): mixed
     {
         if (\is_array($value)) {
             $args = [];
-            foreach ($value as $k => $v) {
-                $args[\is_string($k) ? $this->resolveValue($k, $resolving) : $k] = $this->resolveValue($v, $resolving);
+            foreach ($value as $key => $v) {
+                $resolvedKey = \is_string($key) ? $this->resolveValue($key, $resolving) : $key;
+                if (!\is_scalar($resolvedKey) && !$resolvedKey instanceof \Stringable) {
+                    throw new RuntimeException(sprintf('Array keys must be a scalar-value, but found key "%s" to resolve to type "%s".', $key, get_debug_type($resolvedKey)));
+                }
+
+                $args[$resolvedKey] = $this->resolveValue($v, $resolving);
             }
 
             return $args;
@@ -180,13 +187,11 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
-     * @return mixed
-     *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem
      */
-    public function resolveString(string $value, array $resolving = [])
+    public function resolveString(string $value, array $resolving = []): mixed
     {
         // we do this to deal with non string values (Boolean, integer, ...)
         // as the preg_replace_callback throw an exception when trying
@@ -235,7 +240,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function escapeValue($value)
+    public function escapeValue(mixed $value): mixed
     {
         if (\is_string($value)) {
             return str_replace('%', '%%', $value);
@@ -256,7 +261,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function unescapeValue($value)
+    public function unescapeValue(mixed $value): mixed
     {
         if (\is_string($value)) {
             return str_replace('%%', '%', $value);

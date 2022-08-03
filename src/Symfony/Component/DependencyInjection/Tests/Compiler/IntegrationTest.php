@@ -28,6 +28,9 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutocon
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomMethodAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomParameterAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomPropertyAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface2;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService1;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
@@ -43,6 +46,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithoutIndex;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedConsumerWithExclude;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
@@ -360,9 +364,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -387,9 +388,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedIteratorWithDefaultIndexMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -414,9 +412,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tag_class' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedIteratorWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -441,9 +436,6 @@ class IntegrationTest extends TestCase
         $this->assertSame([0 => $container->get(FooTagClass::class), 1 => $container->get(BarTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedIteratorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -468,9 +460,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['foo_tag_class' => $container->get(FooTagClass::class), 'bar_tag_class' => $container->get(BarTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -497,9 +486,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorConfiguredViaAttributeWithoutIndex()
     {
         $container = new ContainerBuilder();
@@ -526,9 +512,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get(FooTagClass::class));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorWithDefaultIndexMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -555,9 +538,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -583,14 +563,10 @@ class IntegrationTest extends TestCase
 
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
-        $factories->setAccessible(true);
 
         self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -616,16 +592,12 @@ class IntegrationTest extends TestCase
 
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
-        $factories->setAccessible(true);
 
         self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testNestedDefinitionWithAutoconfiguredConstructorArgument()
     {
         $container = new ContainerBuilder();
@@ -650,9 +622,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testFactoryWithAutoconfiguredArgument()
     {
         $container = new ContainerBuilder();
@@ -848,9 +817,6 @@ class IntegrationTest extends TestCase
         $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTagsViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -886,9 +852,6 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributesAreIgnored()
     {
         $container = new ContainerBuilder();
@@ -919,9 +882,6 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTagsViaAttributeOnPropertyMethodAndParameter()
     {
         $container = new ContainerBuilder();
@@ -954,8 +914,7 @@ class IntegrationTest extends TestCase
         );
         $container->registerAttributeForAutoconfiguration(
             CustomAnyAttribute::class,
-            eval(<<<'PHP'
-            return static function (\Symfony\Component\DependencyInjection\ChildDefinition $definition, \Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector) {
+            static function (ChildDefinition $definition, CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector) {
                 $tagAttributes = get_object_vars($attribute);
                 if ($reflector instanceof \ReflectionClass) {
                     $tagAttributes['class'] = $reflector->getName();
@@ -968,9 +927,8 @@ class IntegrationTest extends TestCase
                 }
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
-            };
-PHP
-            ));
+            }
+        );
 
         $container->register(TaggedService4::class)
             ->setPublic(true)
@@ -1015,9 +973,6 @@ PHP
         ], $collector->collectedTags);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAutoconfigureViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -1046,6 +1001,44 @@ PHP
         self::assertSame(6, $service->sum);
         self::assertTrue($service->hasBeenConfigured);
     }
+
+    public function testTaggedIteratorAndLocatorWithExclude()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AutoconfiguredService1::class)
+            ->addTag(AutoconfiguredInterface2::class)
+            ->setPublic(true)
+        ;
+        $container->register(AutoconfiguredService2::class)
+            ->addTag(AutoconfiguredInterface2::class)
+            ->setPublic(true)
+        ;
+        $container->register(TaggedConsumerWithExclude::class)
+            ->addTag(AutoconfiguredInterface2::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition(AutoconfiguredService1::class)->hasTag(AutoconfiguredInterface2::class));
+        $this->assertTrue($container->getDefinition(AutoconfiguredService2::class)->hasTag(AutoconfiguredInterface2::class));
+        $this->assertTrue($container->getDefinition(TaggedConsumerWithExclude::class)->hasTag(AutoconfiguredInterface2::class));
+
+        $s = $container->get(TaggedConsumerWithExclude::class);
+
+        $items = iterator_to_array($s->items->getIterator());
+        $this->assertCount(2, $items);
+        $this->assertInstanceOf(AutoconfiguredService1::class, $items[0]);
+        $this->assertInstanceOf(AutoconfiguredService2::class, $items[1]);
+
+        $locator = $s->locator;
+        $this->assertTrue($locator->has(AutoconfiguredService1::class));
+        $this->assertTrue($locator->has(AutoconfiguredService2::class));
+        $this->assertFalse($locator->has(TaggedConsumerWithExclude::class));
+    }
 }
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface
@@ -1072,10 +1065,7 @@ class DecoratedServiceLocator implements ServiceProviderInterface
         $this->locator = $locator;
     }
 
-    /**
-     * @return mixed
-     */
-    public function get($id)
+    public function get($id): mixed
     {
         return $this->locator->get($id);
     }

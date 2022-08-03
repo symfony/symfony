@@ -13,9 +13,9 @@ namespace Symfony\Component\Validator\Tests\Fixtures\Attribute;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
 use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
 
 #[
     ConstraintA,
@@ -46,7 +46,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         Assert\NotNull,
         Assert\Range(min: 3),
     ]
-    public $firstName;
+    public string $firstName;
     #[Assert\Valid]
     public $childA;
     #[Assert\Valid]
@@ -115,10 +115,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     {
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChildA()
+    public function getChildA(): mixed
     {
         return $this->childA;
     }
@@ -131,10 +128,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         $this->childA = $childA;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChildB()
+    public function getChildB(): mixed
     {
         return $this->childB;
     }

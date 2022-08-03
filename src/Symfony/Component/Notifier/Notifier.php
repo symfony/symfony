@@ -26,14 +26,14 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 final class Notifier implements NotifierInterface
 {
-    private $adminRecipients = [];
-    private $channels;
-    private $policy;
+    private array $adminRecipients = [];
+    private array|ContainerInterface $channels;
+    private ?ChannelPolicyInterface $policy;
 
     /**
      * @param ChannelInterface[]|ContainerInterface $channels
      */
-    public function __construct($channels, ChannelPolicyInterface $policy = null)
+    public function __construct(array|ContainerInterface $channels, ChannelPolicyInterface $policy = null)
     {
         $this->channels = $channels;
         $this->policy = $policy;
@@ -65,6 +65,9 @@ final class Notifier implements NotifierInterface
         return $this->adminRecipients;
     }
 
+    /**
+     * @return iterable<ChannelInterface, string|null>
+     */
     private function getChannels(Notification $notification, RecipientInterface $recipient): iterable
     {
         $channels = $notification->getChannels($recipient);

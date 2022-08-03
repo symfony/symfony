@@ -1,14 +1,5 @@
 Array
 (
-    [Container%s/removed-ids.php] => <?php
-
-namespace Container%s;
-
-return [
-    'Psr\\Container\\ContainerInterface' => true,
-    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-];
-
     [Container%s/getNonSharedFooService.php] => <?php
 
 namespace Container%s;
@@ -28,11 +19,15 @@ class getNonSharedFooService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->factories['non_shared_foo'] = $container->factories['non_shared_foo'] ?? function () use ($container) {
+        $container->factories['non_shared_foo'] ??= function () use ($container) {
             return self::do($container);
         };
 
-        // lazy factory for Bar\FooLazyClass
+        if (true === $lazyLoad) {
+            return $container->createProxy('FooLazyClass_f814e3a', function () use ($container) {
+                return \FooLazyClass_f814e3a::createLazyGhostObject(function ($proxy) use ($container) { return self::do($container, $proxy); });
+            });
+        }
 
         static $include = true;
 
@@ -42,18 +37,21 @@ class getNonSharedFooService extends ProjectServiceContainer
             $include = false;
         }
 
-        return new \Bar\FooLazyClass();
+        return $lazyLoad;
     }
 }
 
-    [Container%s/proxy.php] => <?php
+    [Container%s/FooLazyClass_f814e3a.php] => <?php
 
 namespace Container%s;
 
-// proxy code for Bar\FooLazyClass
+class FooLazyClass_f814e3a extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyGhostObjectInterface
+{
+    use \Symfony\Component\VarExporter\LazyGhostObjectTrait;
+}
 
-if (!\class_exists('proxy', false)) {
-    \class_alias(__NAMESPACE__.'\\proxy', 'proxy', false);
+if (!\class_exists('FooLazyClass_f814e3a', false)) {
+    \class_alias(__NAMESPACE__.'\\FooLazyClass_f814e3a', 'FooLazyClass_f814e3a', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -63,8 +61,8 @@ namespace Container%s;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -102,11 +100,6 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return require $this->containerDir.\DIRECTORY_SEPARATOR.'removed-ids.php';
-    }
-
     protected function load($file, $lazyLoad = true)
     {
         if (class_exists($class = __NAMESPACE__.'\\'.$file, false)) {
@@ -130,6 +123,19 @@ class ProjectServiceContainer extends Container
 
         return $factory();
     }
+
+    protected function hydrateProxy($proxy, $instance)
+    {
+        if ($proxy === $instance) {
+            return $proxy;
+        }
+
+        if (!\in_array(\get_class($instance), [\get_class($proxy), get_parent_class($proxy)], true)) {
+            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', get_parent_class($proxy), get_debug_type($instance)));
+        }
+
+        return \Symfony\Component\VarExporter\Hydrator::hydrate($proxy, (array) $instance);
+    }
 }
 
     [ProjectServiceContainer.preload.php] => <?php
@@ -145,7 +151,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 (require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
-require __DIR__.'/Container%s/proxy.php';
+require __DIR__.'/Container%s/FooLazyClass_f814e3a.php';
 require __DIR__.'/Container%s/getNonSharedFooService.php';
 
 $classes = [];

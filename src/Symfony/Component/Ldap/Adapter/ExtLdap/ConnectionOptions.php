@@ -40,6 +40,7 @@ final class ConnectionOptions
     public const DEBUG_LEVEL = 0x5001;
     public const TIMEOUT = 0x5002;
     public const NETWORK_TIMEOUT = 0x5005;
+    public const X_TLS_CACERTFILE = 0x6002;
     public const X_TLS_CACERTDIR = 0x6003;
     public const X_TLS_CERTFILE = 0x6004;
     public const X_TLS_CRL_ALL = 0x02;

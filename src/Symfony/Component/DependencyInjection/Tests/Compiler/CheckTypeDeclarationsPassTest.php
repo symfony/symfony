@@ -820,9 +820,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -836,9 +833,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -851,9 +845,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithFalse()
     {
         $container = new ContainerBuilder();
@@ -867,9 +858,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -884,9 +872,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -900,9 +885,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -918,9 +900,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithTrue()
     {
         $container = new ContainerBuilder();
@@ -936,9 +915,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReferencePassesMixed()
     {
         $container = new ContainerBuilder();
@@ -953,9 +929,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -969,9 +942,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -991,6 +961,20 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $container = new ContainerBuilder();
         $definition = $container->register('foo', CallableClass::class);
         $definition->addMethodCall('callMethod', [123]);
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testIgnoreDefinitionFactoryArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', Bar::class)
+            ->setArguments([
+                (new Definition(Foo::class))
+                    ->setFactory([Foo::class, 'createStdClass']),
+            ]);
 
         (new CheckTypeDeclarationsPass())->process($container);
 

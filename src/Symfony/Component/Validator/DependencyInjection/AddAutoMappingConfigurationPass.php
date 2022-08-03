@@ -22,25 +22,12 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddAutoMappingConfigurationPass implements CompilerPassInterface
 {
-    private $validatorBuilderService;
-    private $tag;
-
-    public function __construct(string $validatorBuilderService = 'validator.builder', string $tag = 'validator.auto_mapper')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/validator', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->validatorBuilderService = $validatorBuilderService;
-        $this->tag = $tag;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasParameter('validator.auto_mapping') || !$container->hasDefinition($this->validatorBuilderService)) {
+        if (!$container->hasParameter('validator.auto_mapping') || !$container->hasDefinition('validator.builder')) {
             return;
         }
 
@@ -60,8 +47,8 @@ class AddAutoMappingConfigurationPass implements CompilerPassInterface
             }
         }
 
-        $validatorBuilder = $container->getDefinition($this->validatorBuilderService);
-        foreach ($container->findTaggedServiceIds($this->tag) as $id => $tags) {
+        $validatorBuilder = $container->getDefinition('validator.builder');
+        foreach ($container->findTaggedServiceIds('validator.auto_mapper') as $id => $tags) {
             $regexp = $this->getRegexp(array_merge($globalNamespaces, $servicesToNamespaces[$id] ?? []));
             $validatorBuilder->addMethodCall('addLoader', [new Reference($id)]);
             $container->getDefinition($id)->setArgument('$classValidatorRegexp', $regexp);

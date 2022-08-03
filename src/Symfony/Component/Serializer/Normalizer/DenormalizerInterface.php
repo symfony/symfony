@@ -44,16 +44,17 @@ interface DenormalizerInterface
      * @throws RuntimeException         Occurs if the class cannot be instantiated
      * @throws ExceptionInterface       Occurs for all the other cases of errors
      */
-    public function denormalize($data, string $type, string $format = null, array $context = []);
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.
      *
-     * @param mixed  $data   Data to denormalize from
-     * @param string $type   The class to which the data should be denormalized
-     * @param string $format The format being deserialized from
+     * @param mixed  $data    Data to denormalize from
+     * @param string $type    The class to which the data should be denormalized
+     * @param string $format  The format being deserialized from
+     * @param array  $context Options available to the denormalizer
      *
      * @return bool
      */
-    public function supportsDenormalization($data, string $type, string $format = null);
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
 }

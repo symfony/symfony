@@ -309,9 +309,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                    function ($data) { return $data; },
-                    function () { throw new TransformationFailedException(); }
-                ))
+                function ($data) { return $data; },
+                function () { throw new TransformationFailedException(); }
+            ))
             ->getForm();
 
         // Launch transformer
@@ -366,7 +366,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     public function testTransformationFailedExceptionInvalidMessageIsUsed()
     {
-        $object = $this->createMock('\stdClass');
+        $object = new \stdClass();
 
         $form = $this
             ->getBuilder('name', '\stdClass', [

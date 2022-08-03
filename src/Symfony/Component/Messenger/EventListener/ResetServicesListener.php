@@ -14,13 +14,14 @@ namespace Symfony\Component\Messenger\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class ResetServicesListener implements EventSubscriberInterface
 {
-    private $servicesResetter;
+    private ServicesResetter $servicesResetter;
 
     public function __construct(ServicesResetter $servicesResetter)
     {
@@ -34,10 +35,16 @@ class ResetServicesListener implements EventSubscriberInterface
         }
     }
 
+    public function resetServicesAtStop(WorkerStoppedEvent $event): void
+    {
+        $this->servicesResetter->reset();
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             WorkerRunningEvent::class => ['resetServices', -1024],
+            WorkerStoppedEvent::class => ['resetServicesAtStop', -1024],
         ];
     }
 }

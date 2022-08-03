@@ -26,10 +26,10 @@ use Symfony\Component\Routing\RequestContext;
  */
 trait CompiledUrlMatcherTrait
 {
-    private $matchHost = false;
-    private $staticRoutes = [];
-    private $regexpList = [];
-    private $dynamicRoutes = [];
+    private bool $matchHost = false;
+    private array $staticRoutes = [];
+    private array $regexpList = [];
+    private array $dynamicRoutes = [];
 
     /**
      * @var callable|null
@@ -92,10 +92,6 @@ trait CompiledUrlMatcherTrait
         $supportsRedirections = 'GET' === $canonicalMethod && $this instanceof RedirectableUrlMatcherInterface;
 
         foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as [$ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition]) {
-            if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
-                continue;
-            }
-
             if ($requiredHost) {
                 if ('{' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
                     continue;
@@ -104,6 +100,10 @@ trait CompiledUrlMatcherTrait
                     $hostMatches['_route'] = $ret['_route'];
                     $ret = $this->mergeDefaults($hostMatches, $ret);
                 }
+            }
+
+            if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ??= $this->request ?: $this->createRequest($pathinfo) : null, $ret)) {
+                continue;
             }
 
             if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
@@ -132,13 +132,8 @@ trait CompiledUrlMatcherTrait
         foreach ($this->regexpList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as [$ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition]) {
-                    if (null !== $condition) {
-                        if (0 === $condition) { // marks the last route in the regexp
-                            continue 3;
-                        }
-                        if (!($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
-                            continue;
-                        }
+                    if (0 === $condition) { // marks the last route in the regexp
+                        continue 3;
                     }
 
                     $hasTrailingVar = $trimmedPathinfo !== $pathinfo && $hasTrailingVar;
@@ -151,17 +146,21 @@ trait CompiledUrlMatcherTrait
                         }
                     }
 
+                    foreach ($vars as $i => $v) {
+                        if (isset($matches[1 + $i])) {
+                            $ret[$v] = $matches[1 + $i];
+                        }
+                    }
+
+                    if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ??= $this->request ?: $this->createRequest($pathinfo) : null, $ret)) {
+                        continue;
+                    }
+
                     if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                         if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
                             return $allow = $allowSchemes = [];
                         }
                         continue;
-                    }
-
-                    foreach ($vars as $i => $v) {
-                        if (isset($matches[1 + $i])) {
-                            $ret[$v] = $matches[1 + $i];
-                        }
                     }
 
                     if ($requiredSchemes && !isset($requiredSchemes[$context->getScheme()])) {

@@ -430,6 +430,23 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
     }
 
+    public function testPrototypeOptionsOverrideEntryOptions()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'entry_options' => [
+                'help' => null,
+            ],
+            'prototype_options' => [
+                'help' => 'foo',
+            ],
+        ]);
+
+        $this->assertSame('foo', $form->createView()->vars['prototype']->vars['help']);
+    }
+
     public function testEntriesBlockPrefixes()
     {
         $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [''], [

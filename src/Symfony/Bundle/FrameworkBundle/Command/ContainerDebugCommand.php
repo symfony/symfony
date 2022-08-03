@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -32,12 +33,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  *
  * @internal
  */
+#[AsCommand(name: 'debug:container', description: 'Display current services for an application')]
 class ContainerDebugCommand extends Command
 {
     use BuildDebugContainerTrait;
-
-    protected static $defaultName = 'debug:container';
-    protected static $defaultDescription = 'Display current services for an application';
 
     /**
      * {@inheritdoc}
@@ -60,7 +59,6 @@ class ContainerDebugCommand extends Command
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
                 new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Display deprecations generated when compiling and warming up the container'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
@@ -134,7 +132,7 @@ EOF
             $options = ['env-vars' => true, 'name' => $envVar];
         } elseif ($input->getOption('types')) {
             $options = [];
-            $options['filter'] = [$this, 'filterToServiceTypes'];
+            $options['filter'] = $this->filterToServiceTypes(...);
         } elseif ($input->getOption('parameters')) {
             $parameters = [];
             foreach ($object->getParameterBag()->all() as $k => $v) {
@@ -167,6 +165,21 @@ EOF
 
         try {
             $helper->describe($io, $object, $options);
+
+            if ('txt' === $options['format'] && isset($options['id'])) {
+                if ($object->hasDefinition($options['id'])) {
+                    $definition = $object->getDefinition($options['id']);
+                    if ($definition->isDeprecated()) {
+                        $errorIo->warning($definition->getDeprecation($options['id'])['message'] ?? sprintf('The "%s" service is deprecated.', $options['id']));
+                    }
+                }
+                if ($object->hasAlias($options['id'])) {
+                    $alias = $object->getAlias($options['id']);
+                    if ($alias->isDeprecated()) {
+                        $errorIo->warning($alias->getDeprecation($options['id'])['message'] ?? sprintf('The "%s" alias is deprecated.', $options['id']));
+                    }
+                }
+            }
 
             if (isset($options['id']) && isset($kernel->getContainer()->getRemovedIds()[$options['id']])) {
                 $errorIo->note(sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));

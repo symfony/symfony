@@ -113,14 +113,11 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testValidStrictUuidWithWhitespacesNamed()
     {
         $this->validator->validate(
             "\x09\x09216fff40-98d9-11e3-a5e2-0800200c9a66",
-            eval('return new \Symfony\Component\Validator\Constraints\Uuid(normalizer: "trim", versions: [\Symfony\Component\Validator\Constraints\Uuid::V1_MAC]);')
+            new Uuid(normalizer: 'trim', versions: [Uuid::V1_MAC])
         );
 
         $this->assertNoViolation();
@@ -254,14 +251,11 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidNonStrictUuidNamed()
     {
         $this->validator->validate(
             '216fff40-98d9-11e3-a5e2_0800200c9a66',
-            eval('return new \Symfony\Component\Validator\Constraints\Uuid(strict: false, message: "myMessage");')
+            new Uuid(strict: false, message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')

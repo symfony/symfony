@@ -17,16 +17,20 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CredentialsInterface;
 
 /**
- * The default implementation for passports.
+ * A Passport contains all security-related information that needs to be
+ * validated during authentication.
+ *
+ * A passport badge can be used to add any additional information to the
+ * passport.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class Passport implements UserPassportInterface
+class Passport
 {
     protected $user;
 
-    private $badges = [];
-    private $attributes = [];
+    private array $badges = [];
+    private array $attributes = [];
 
     /**
      * @param CredentialsInterface $credentials the credentials to check for this authentication, use
@@ -42,9 +46,6 @@ class Passport implements UserPassportInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUser(): UserInterface
     {
         if (null === $this->user) {
@@ -59,9 +60,15 @@ class Passport implements UserPassportInterface
     }
 
     /**
+     * Adds a new security badge.
+     *
+     * A passport can hold only one instance of the same security badge.
+     * This method replaces the current badge if it is already set on this
+     * passport.
+     *
      * @return $this
      */
-    public function addBadge(BadgeInterface $badge): PassportInterface
+    public function addBadge(BadgeInterface $badge): static
     {
         $this->badges[\get_class($badge)] = $badge;
 
@@ -73,6 +80,13 @@ class Passport implements UserPassportInterface
         return isset($this->badges[$badgeFqcn]);
     }
 
+    /**
+     * @template TBadge of BadgeInterface
+     *
+     * @param class-string<TBadge> $badgeFqcn
+     *
+     * @return TBadge|null
+     */
     public function getBadge(string $badgeFqcn): ?BadgeInterface
     {
         return $this->badges[$badgeFqcn] ?? null;
@@ -86,20 +100,12 @@ class Passport implements UserPassportInterface
         return $this->badges;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setAttribute(string $name, $value): void
+    public function setAttribute(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
-    /**
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    public function getAttribute(string $name, $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return $this->attributes[$name] ?? $default;
     }

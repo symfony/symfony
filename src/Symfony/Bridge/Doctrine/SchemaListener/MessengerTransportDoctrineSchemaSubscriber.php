@@ -28,7 +28,7 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
 {
     private const PROCESSING_TABLE_FLAG = self::class.':processing';
 
-    private $transports;
+    private iterable $transports;
 
     /**
      * @param iterable<mixed, TransportInterface> $transports

@@ -18,7 +18,6 @@ use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
- * @requires PHP 8
  */
 final class CssColorTest extends TestCase
 {

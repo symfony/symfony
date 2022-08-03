@@ -26,10 +26,9 @@ class MemcachedStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $memcached;
-    private $initialTtl;
-    /** @var bool */
-    private $useExtendedReturn;
+    private \Memcached $memcached;
+    private int $initialTtl;
+    private bool $useExtendedReturn;
 
     public static function isSupported()
     {
@@ -134,7 +133,7 @@ class MemcachedStore implements PersistingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         return $this->memcached->get((string) $key) === $this->getUniqueToken($key);
     }
@@ -151,11 +150,7 @@ class MemcachedStore implements PersistingStoreInterface
 
     private function getValueAndCas(Key $key): array
     {
-        if (null === $this->useExtendedReturn) {
-            $this->useExtendedReturn = version_compare(phpversion('memcached'), '2.9.9', '>');
-        }
-
-        if ($this->useExtendedReturn) {
+        if ($this->useExtendedReturn ??= version_compare(phpversion('memcached'), '2.9.9', '>')) {
             $extendedReturn = $this->memcached->get((string) $key, null, \Memcached::GET_EXTENDED);
             if (\Memcached::GET_ERROR_RETURN_VALUE === $extendedReturn) {
                 return [$extendedReturn, 0.0];

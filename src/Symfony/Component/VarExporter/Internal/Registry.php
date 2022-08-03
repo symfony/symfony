@@ -58,9 +58,9 @@ class Registry
 
     public static function f($class)
     {
-        $reflector = self::$reflectors[$class] ?? self::getClassReflector($class, true, false);
+        $reflector = self::$reflectors[$class] ??= self::getClassReflector($class, true, false);
 
-        return self::$factories[$class] = \Closure::fromCallable([$reflector, 'newInstanceWithoutConstructor']);
+        return self::$factories[$class] = [$reflector, 'newInstanceWithoutConstructor'](...);
     }
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
@@ -75,17 +75,17 @@ class Registry
         } elseif (!$isClass || $reflector->isAbstract()) {
             throw new NotInstantiableTypeException($class);
         } elseif ($reflector->name !== $class) {
-            $reflector = self::$reflectors[$name = $reflector->name] ?? self::getClassReflector($name, false, $cloneable);
+            $reflector = self::$reflectors[$name = $reflector->name] ??= self::getClassReflector($name, false, $cloneable);
             self::$cloneable[$class] = self::$cloneable[$name];
             self::$instantiableWithoutConstructor[$class] = self::$instantiableWithoutConstructor[$name];
             self::$prototypes[$class] = self::$prototypes[$name];
 
-            return self::$reflectors[$class] = $reflector;
+            return $reflector;
         } else {
             try {
                 $proto = $reflector->newInstanceWithoutConstructor();
                 $instantiableWithoutConstructor = true;
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 $proto = $reflector->implementsInterface('Serializable') && !method_exists($class, '__unserialize') ? 'C:' : 'O:';
                 if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
                     $proto = null;
@@ -103,7 +103,7 @@ class Registry
                     }
                 }
             }
-            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !method_exists($class, '__sleep') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__serialize'))) {
+            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !method_exists($class, '__sleep') && !method_exists($class, '__serialize')) {
                 try {
                     serialize($proto);
                 } catch (\Exception $e) {
@@ -113,7 +113,7 @@ class Registry
         }
 
         if (null === $cloneable) {
-            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !method_exists($proto, '__wakeup') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__unserialize')))) {
+            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !method_exists($proto, '__wakeup') && !method_exists($class, '__unserialize'))) {
                 throw new NotInstantiableTypeException($class);
             }
 
@@ -132,15 +132,13 @@ class Registry
                     new \ReflectionProperty(\Error::class, 'trace'),
                     new \ReflectionProperty(\Exception::class, 'trace'),
                 ];
-                $setTrace[0]->setAccessible(true);
-                $setTrace[1]->setAccessible(true);
-                $setTrace[0] = \Closure::fromCallable([$setTrace[0], 'setValue']);
-                $setTrace[1] = \Closure::fromCallable([$setTrace[1], 'setValue']);
+                $setTrace[0] = $setTrace[0]->setValue(...);
+                $setTrace[1] = $setTrace[1]->setValue(...);
             }
 
             $setTrace[$proto instanceof \Exception]($proto, []);
         }
 
-        return self::$reflectors[$class] = $reflector;
+        return $reflector;
     }
 }

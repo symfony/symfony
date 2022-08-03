@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\MessageMedia;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Adrian Nguyen <vuphuong87@gmail.com>
  */
 final class MessageMediaTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return MessageMediaTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MessageMediaTransport
     {
         $scheme = $dsn->getScheme();
 

@@ -27,16 +27,14 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  */
 class LazyChoiceList implements ChoiceListInterface
 {
-    private $loader;
+    private ChoiceLoaderInterface $loader;
 
     /**
      * The callable creating string values for each choice.
      *
      * If null, choices are cast to strings.
-     *
-     * @var callable|null
      */
-    private $value;
+    private ?\Closure $value;
 
     /**
      * Creates a lazily-loaded list using the given loader.
@@ -50,13 +48,13 @@ class LazyChoiceList implements ChoiceListInterface
     public function __construct(ChoiceLoaderInterface $loader, callable $value = null)
     {
         $this->loader = $loader;
-        $this->value = $value;
+        $this->value = null === $value ? null : $value(...);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getChoices()
+    public function getChoices(): array
     {
         return $this->loader->loadChoiceList($this->value)->getChoices();
     }
@@ -64,7 +62,7 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->loader->loadChoiceList($this->value)->getValues();
     }
@@ -72,7 +70,7 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      */
-    public function getStructuredValues()
+    public function getStructuredValues(): array
     {
         return $this->loader->loadChoiceList($this->value)->getStructuredValues();
     }
@@ -80,7 +78,7 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      */
-    public function getOriginalKeys()
+    public function getOriginalKeys(): array
     {
         return $this->loader->loadChoiceList($this->value)->getOriginalKeys();
     }
@@ -88,7 +86,7 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      */
-    public function getChoicesForValues(array $values)
+    public function getChoicesForValues(array $values): array
     {
         return $this->loader->loadChoicesForValues($values, $this->value);
     }
@@ -96,7 +94,7 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      */
-    public function getValuesForChoices(array $choices)
+    public function getValuesForChoices(array $choices): array
     {
         return $this->loader->loadValuesForChoices($choices, $this->value);
     }

@@ -12,8 +12,10 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -21,6 +23,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
@@ -39,7 +42,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @group time-sensitive
@@ -64,8 +67,23 @@ class WorkerTest extends TestCase
                 return $envelopes[] = $envelope;
             });
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+        $dispatcher = new class() implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
 
         $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
         $worker->run();
@@ -96,6 +114,54 @@ class WorkerTest extends TestCase
 
         $this->assertSame(1, $receiver->getRejectCount());
         $this->assertSame(0, $receiver->getAcknowledgeCount());
+    }
+
+    public function testWorkerResetsConnectionIfReceiverIsResettable()
+    {
+        $resettableReceiver = new ResettableDummyReceiver([]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ResetServicesListener(new ServicesResetter(new \ArrayIterator([$resettableReceiver]), ['reset'])));
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker->stop();
+        $worker->run();
+        $this->assertTrue($resettableReceiver->hasBeenReset());
+    }
+
+    public function testWorkerResetsTransportsIfResetServicesListenerIsCalled()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $resettableReceiver = new ResettableDummyReceiver([[$envelope]]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ResetServicesListener(new ServicesResetter(new \ArrayIterator([$resettableReceiver]), ['reset'])));
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker->run();
+        $this->assertTrue($resettableReceiver->hasBeenReset());
+    }
+
+    public function testWorkerDoesNotResetTransportsIfResetServicesListenerIsNotCalled()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $resettableReceiver = new ResettableDummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $worker = new Worker([$resettableReceiver], $bus, $dispatcher);
+        $worker->run();
+        $this->assertFalse($resettableReceiver->hasBeenReset());
     }
 
     public function testWorkerDoesNotSendNullMessagesToTheBus()
@@ -143,6 +209,25 @@ class WorkerTest extends TestCase
             });
 
         $worker = new Worker([$receiver], $bus, $eventDispatcher);
+        $worker->run();
+    }
+
+    public function testWorkerWithoutDispatcher()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $worker = new Worker([$receiver], $bus);
+
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(static function () use ($worker, $envelope) {
+                $worker->stop();
+
+                return $envelope;
+            });
+
         $worker->run();
     }
 
@@ -524,7 +609,7 @@ class DummyBatchHandler implements BatchHandlerInterface
         return $this->handle($message, $ack);
     }
 
-    private function shouldFlush()
+    private function shouldFlush(): bool
     {
         return 2 <= \count($this->jobs);
     }
@@ -536,5 +621,20 @@ class DummyBatchHandler implements BatchHandlerInterface
         foreach ($jobs as [$job, $ack]) {
             $ack->ack($job);
         }
+    }
+}
+
+class ResettableDummyReceiver extends DummyReceiver implements ResetInterface
+{
+    private $hasBeenReset = false;
+
+    public function reset()
+    {
+        $this->hasBeenReset = true;
+    }
+
+    public function hasBeenReset(): bool
+    {
+        return $this->hasBeenReset;
     }
 }

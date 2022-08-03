@@ -26,8 +26,8 @@ final class TokenBucketLimiter implements LimiterInterface
 {
     use ResetLimiterTrait;
 
-    private $maxBurst;
-    private $rate;
+    private int $maxBurst;
+    private Rate $rate;
 
     public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, LockInterface $lock = null)
     {
@@ -67,7 +67,8 @@ final class TokenBucketLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
-            if ($availableTokens >= $tokens) {
+
+            if ($availableTokens >= max(1, $tokens)) {
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
                 $bucket->setTimer($now);
@@ -92,7 +93,9 @@ final class TokenBucketLimiter implements LimiterInterface
                 $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
             }
 
-            $this->storage->save($bucket);
+            if (0 < $tokens) {
+                $this->storage->save($bucket);
+            }
         } finally {
             $this->lock->release();
         }

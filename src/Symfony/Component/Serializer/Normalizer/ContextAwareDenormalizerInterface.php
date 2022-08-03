@@ -15,6 +15,8 @@ namespace Symfony\Component\Serializer\Normalizer;
  * Adds the support of an extra $context parameter for the supportsDenormalization method.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since symfony/serializer 6.1, use DenormalizerInterface instead
  */
 interface ContextAwareDenormalizerInterface extends DenormalizerInterface
 {
@@ -23,5 +25,5 @@ interface ContextAwareDenormalizerInterface extends DenormalizerInterface
      *
      * @param array $context options that denormalizers have access to
      */
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []);
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool;
 }

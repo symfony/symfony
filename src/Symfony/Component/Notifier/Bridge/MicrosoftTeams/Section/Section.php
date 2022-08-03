@@ -24,12 +24,12 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field\Image;
  */
 final class Section implements SectionInterface
 {
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function title(string $title): self
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 
@@ -39,7 +39,7 @@ final class Section implements SectionInterface
     /**
      * @return $this
      */
-    public function text(string $text): self
+    public function text(string $text): static
     {
         $this->options['text'] = $text;
 
@@ -49,7 +49,7 @@ final class Section implements SectionInterface
     /**
      * @return $this
      */
-    public function action(ActionInterface $action): self
+    public function action(ActionInterface $action): static
     {
         $this->options['potentialAction'][] = $action->toArray();
 
@@ -59,7 +59,7 @@ final class Section implements SectionInterface
     /**
      * @return $this
      */
-    public function activity(Activity $activity): self
+    public function activity(Activity $activity): static
     {
         foreach ($activity->toArray() as $key => $element) {
             $this->options[$key] = $element;
@@ -71,7 +71,7 @@ final class Section implements SectionInterface
     /**
      * @return $this
      */
-    public function image(Image $image): self
+    public function image(Image $image): static
     {
         $this->options['images'][] = $image->toArray();
 
@@ -81,7 +81,7 @@ final class Section implements SectionInterface
     /**
      * @return $this
      */
-    public function fact(Fact $fact): self
+    public function fact(Fact $fact): static
     {
         $this->options['facts'][] = $fact->toArray();
 
@@ -91,7 +91,7 @@ final class Section implements SectionInterface
     /**
      * @return $this
      */
-    public function markdown(bool $markdown): self
+    public function markdown(bool $markdown): static
     {
         $this->options['markdown'] = $markdown;
 

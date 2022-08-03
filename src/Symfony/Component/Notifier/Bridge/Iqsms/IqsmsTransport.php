@@ -28,11 +28,11 @@ final class IqsmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.iqsms.ru';
 
-    private $login;
-    private $password;
-    private $from;
+    private string $login;
+    private string $password;
+    private string $from;
 
-    public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, #[\SensitiveParameter] string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;
@@ -57,13 +57,15 @@ final class IqsmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/messages/v2/send.json', [
             'json' => [
                 'messages' => [
                     [
                         'phone' => $message->getPhone(),
                         'text' => $message->getSubject(),
-                        'sender' => $this->from,
+                        'sender' => $from,
                         'clientId' => uniqid(),
                     ],
                 ],

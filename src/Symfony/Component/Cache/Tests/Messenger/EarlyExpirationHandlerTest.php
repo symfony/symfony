@@ -21,9 +21,6 @@ use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @requires function Symfony\Component\DependencyInjection\ReverseContainer::__construct
- */
 class EarlyExpirationHandlerTest extends TestCase
 {
     public static function tearDownAfterClass(): void
@@ -62,7 +59,7 @@ class EarlyExpirationHandlerTest extends TestCase
 
         $handler($msg);
 
-        $this->assertSame(123, $pool->get('foo', [$this, 'fail'], 0.0, $metadata));
+        $this->assertSame(123, $pool->get('foo', $this->fail(...), 0.0, $metadata));
 
         $this->assertGreaterThan(25, $metadata['ctime']);
         $this->assertGreaterThan(time(), $metadata['expiry']);

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Tests;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -194,6 +195,43 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame(0, $response->getStatusCode());
     }
 
+    public function testFixContentLength()
+    {
+        $client = new MockHttpClient();
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+            'headers' => ['Content-Length: 4'],
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('Content-Length: 7', $requestOptions['headers'][0]);
+        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('Content-Length: 7', $requestOptions['headers'][1]);
+        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => "8\r\nSymfony \r\n5\r\nis aw\r\n6\r\nesome!\r\n0\r\n\r\n",
+            'headers' => ['Transfer-Encoding: chunked'],
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame(['Content-Length: 19'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => '',
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertFalse(isset($requestOptions['normalized_headers']['content-length']));
+    }
+
     public function testThrowExceptionInBodyGenerator()
     {
         $mockHttpClient = new MockHttpClient([
@@ -223,6 +261,52 @@ class MockHttpClientTest extends HttpClientTestCase
             $this->fail();
         } catch (TransportException $e) {
             $this->assertEquals(new \RuntimeException('bar ccc'), $e->getPrevious());
+            $this->assertSame('bar ccc', $e->getMessage());
+        }
+
+        $this->assertCount(3, $chunks);
+        $this->assertEquals(new FirstChunk(0, ''), $chunks[0]);
+        $this->assertEquals(new DataChunk(0, 'bar'), $chunks[1]);
+        $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
+        $this->assertSame(3, $chunks[2]->getOffset());
+        $this->assertSame('bar ccc', $chunks[2]->getError());
+    }
+
+    public function testMergeDefaultOptions()
+    {
+        $mockHttpClient = new MockHttpClient(null, 'https://example.com');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: scheme is missing');
+        $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
+    }
+
+    public function testExceptionDirectlyInBody()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse(['foo', new \RuntimeException('foo ccc')]),
+            new MockResponse((static function (): \Generator {
+                yield 'bar';
+                yield new TransportException('bar ccc');
+            })()),
+        ]);
+
+        try {
+            $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new \RuntimeException('foo ccc'), $e->getPrevious());
+            $this->assertSame('foo ccc', $e->getMessage());
+        }
+
+        $chunks = [];
+        try {
+            foreach ($mockHttpClient->stream($mockHttpClient->request('GET', 'https://symfony.com', [])) as $chunk) {
+                $chunks[] = $chunk;
+            }
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new TransportException('bar ccc'), $e->getPrevious());
             $this->assertSame('bar ccc', $e->getMessage());
         }
 

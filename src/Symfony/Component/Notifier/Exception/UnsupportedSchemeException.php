@@ -28,9 +28,17 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
             'package' => 'symfony/clickatell-notifier',
         ],
+        'contact-everyone' => [
+            'class' => Bridge\ContactEveryone\ContactEveryoneTransportFactory::class,
+            'package' => 'symfony/contact-everyone-notifier',
+        ],
         'discord' => [
             'class' => Bridge\Discord\DiscordTransportFactory::class,
             'package' => 'symfony/discord-notifier',
+        ],
+        'engagespot' => [
+            'class' => Bridge\Engagespot\EngagespotTransportFactory::class,
+            'package' => 'symfony/engagespot-notifier',
         ],
         'esendex' => [
             'class' => Bridge\Esendex\EsendexTransportFactory::class,
@@ -51,6 +59,10 @@ class UnsupportedSchemeException extends LogicException
         'firebase' => [
             'class' => Bridge\Firebase\FirebaseTransportFactory::class,
             'package' => 'symfony/firebase-notifier',
+        ],
+        'forty-six-elks' => [
+            'class' => Bridge\FortySixElks\FortySixElksTransportFactory::class,
+            'package' => 'symfony/forty-six-elks-notifier',
         ],
         'freemobile' => [
             'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
@@ -112,10 +124,6 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mobyt\MobytTransportFactory::class,
             'package' => 'symfony/mobyt-notifier',
         ],
-        'nexmo' => [
-            'class' => Bridge\Nexmo\NexmoTransportFactory::class,
-            'package' => 'symfony/nexmo-notifier',
-        ],
         'octopush' => [
             'class' => Bridge\Octopush\OctopushTransportFactory::class,
             'package' => 'symfony/octopush-notifier',
@@ -124,6 +132,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\OneSignal\OneSignalTransportFactory::class,
             'package' => 'symfony/one-signal-notifier',
         ],
+        'orange-sms' => [
+            'class' => Bridge\OrangeSms\OrangeSmsTransportFactory::class,
+            'package' => 'symfony/orange-sms-notifier',
+        ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',
@@ -131,6 +143,10 @@ class UnsupportedSchemeException extends LogicException
         'rocketchat' => [
             'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
             'package' => 'symfony/rocket-chat-notifier',
+        ],
+        'sendberry' => [
+            'class' => Bridge\Sendberry\SendberryTransportFactory::class,
+            'package' => 'symfony/sendberry-notifier',
         ],
         'sendinblue' => [
             'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,
@@ -159,6 +175,10 @@ class UnsupportedSchemeException extends LogicException
         'smsc' => [
             'class' => Bridge\Smsc\SmscTransportFactory::class,
             'package' => 'symfony/smsc-notifier',
+        ],
+        'sms-factor' => [
+            'class' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
+            'package' => 'symfony/sms-factor-notifier',
         ],
         'sns' => [
             'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,
@@ -191,6 +211,10 @@ class UnsupportedSchemeException extends LogicException
         'yunpian' => [
             'class' => Bridge\Yunpian\YunpianTransportFactory::class,
             'package' => 'symfony/yunpian-notifier',
+        ],
+        'zendesk' => [
+            'class' => Bridge\Zendesk\ZendeskTransportFactory::class,
+            'package' => 'symfony/zendesk-notifier',
         ],
         'zulip' => [
             'class' => Bridge\Zulip\ZulipTransportFactory::class,

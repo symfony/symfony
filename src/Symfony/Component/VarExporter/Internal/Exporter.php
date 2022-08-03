@@ -31,9 +31,11 @@ class Exporter
      * @param int               &$objectsCount
      * @param bool              &$valuesAreStatic
      *
+     * @return array
+     *
      * @throws NotInstantiableTypeException When a value cannot be serialized
      */
-    public static function prepare($values, $objectsPool, &$refsPool, &$objectsCount, &$valuesAreStatic): array
+    public static function prepare($values, $objectsPool, &$refsPool, &$objectsCount, &$valuesAreStatic)
     {
         $refs = $values;
         foreach ($values as $k => $value) {
@@ -72,7 +74,7 @@ class Exporter
             }
 
             $class = \get_class($value);
-            $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
+            $reflector = Registry::$reflectors[$class] ??= Registry::getClassReflector($class);
 
             if ($reflector->hasMethod('__serialize')) {
                 if (!$reflector->getMethod('__serialize')->isPublic()) {
@@ -106,7 +108,10 @@ class Exporter
                 }
                 $properties = ['SplObjectStorage' => ["\0" => $properties]];
                 $arrayValue = (array) $value;
-            } elseif ($value instanceof \Serializable || $value instanceof \__PHP_Incomplete_Class) {
+            } elseif ($value instanceof \Serializable
+                || $value instanceof \__PHP_Incomplete_Class
+                || \PHP_VERSION_ID < 80200 && $value instanceof \DatePeriod
+            ) {
                 ++$objectsCount;
                 $objectsPool[$value] = [$id = \count($objectsPool), serialize($value), [], 0];
                 $value = new Reference($id);
@@ -130,7 +135,7 @@ class Exporter
                 $i = 0;
                 $n = (string) $name;
                 if ('' === $n || "\0" !== $n[0]) {
-                    $c = 'stdClass';
+                    $c = $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
                 } elseif ('*' === $n[1]) {
                     $n = substr($n, 3);
                     $c = $reflector->getProperty($n)->class;
@@ -182,15 +187,16 @@ class Exporter
         return $values;
     }
 
-    public static function export($value, string $indent = '')
+    public static function export($value, $indent = '')
     {
         switch (true) {
-            case \is_int($value) || \is_float($value) || $value instanceof \UnitEnum: return var_export($value, true);
+            case \is_int($value) || \is_float($value): return var_export($value, true);
             case [] === $value: return '[]';
             case false === $value: return 'false';
             case true === $value: return 'true';
             case null === $value: return 'null';
             case '' === $value: return "''";
+            case $value instanceof \UnitEnum: return ltrim(var_export($value, true), '\\');
         }
 
         if ($value instanceof Reference) {
@@ -220,7 +226,7 @@ class Exporter
                     return substr($m[1], 0, -2);
                 }
 
-                if ('n".\'' === substr($m[1], -4)) {
+                if (str_ends_with($m[1], 'n".\'')) {
                     return substr_replace($m[1], "\n".$subIndent.".'".$m[2], -2);
                 }
 
@@ -368,7 +374,7 @@ class Exporter
     private static function getArrayObjectProperties($value, $proto): array
     {
         $reflector = $value instanceof \ArrayIterator ? 'ArrayIterator' : 'ArrayObject';
-        $reflector = Registry::$reflectors[$reflector] ?? Registry::getClassReflector($reflector);
+        $reflector = Registry::$reflectors[$reflector] ??= Registry::getClassReflector($reflector);
 
         $properties = [
             $arrayValue = (array) $value,

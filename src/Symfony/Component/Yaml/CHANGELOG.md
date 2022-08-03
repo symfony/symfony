@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support for `!php/enum` and `!php/enum *->value`
+
+6.1
+---
+
+ * In cases where it will likely improve readability, strings containing single quotes will be double-quoted
+
 5.4
 ---
 

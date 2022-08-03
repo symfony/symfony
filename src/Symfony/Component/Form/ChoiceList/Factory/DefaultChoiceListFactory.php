@@ -20,7 +20,7 @@ use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
@@ -32,20 +32,16 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @param callable|null $filter
      */
-    public function createListFromChoices(iterable $choices, callable $value = null/*, callable $filter = null*/)
+    public function createListFromChoices(iterable $choices, callable $value = null, callable $filter = null): ChoiceListInterface
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if ($filter) {
             // filter the choice list lazily
             return $this->createListFromLoader(new FilterChoiceLoaderDecorator(
                 new CallbackChoiceLoader(static function () use ($choices) {
                     return $choices;
                 }
-            ), $filter), $value);
+                ), $filter), $value);
         }
 
         return new ArrayChoiceList($choices, $value);
@@ -53,13 +49,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param callable|null $filter
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/*, callable $filter = null*/)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null, callable $filter = null): ChoiceListInterface
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if ($filter) {
             $loader = new FilterChoiceLoaderDecorator($loader, $filter);
         }
@@ -69,12 +61,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param array|callable $labelTranslationParameters The parameters used to translate the choice labels
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
+    public function createView(ChoiceListInterface $list, array|callable $preferredChoices = null, callable|false $label = null, callable $index = null, callable $groupBy = null, array|callable $attr = null, array|callable $labelTranslationParameters = []): ChoiceListView
     {
-        $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];
         $preferredViews = [];
         $preferredViewsOrder = [];
         $otherViews = [];
@@ -186,7 +175,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             if (false === $dynamicLabel) {
                 $label = false;
-            } elseif ($dynamicLabel instanceof TranslatableMessage) {
+            } elseif ($dynamicLabel instanceof TranslatableInterface) {
                 $label = $dynamicLabel;
             } else {
                 $label = (string) $dynamicLabel;

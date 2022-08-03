@@ -13,23 +13,19 @@ namespace Symfony\Component\Form;
 
 class CallbackTransformer implements DataTransformerInterface
 {
-    private $transform;
-    private $reverseTransform;
+    private \Closure $transform;
+    private \Closure $reverseTransform;
 
-    /**
-     * @param callable $transform        The forward transform callback
-     * @param callable $reverseTransform The reverse transform callback
-     */
     public function __construct(callable $transform, callable $reverseTransform)
     {
-        $this->transform = $transform;
-        $this->reverseTransform = $reverseTransform;
+        $this->transform = $transform(...);
+        $this->reverseTransform = $reverseTransform(...);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function transform($data)
+    public function transform(mixed $data): mixed
     {
         return ($this->transform)($data);
     }
@@ -37,7 +33,7 @@ class CallbackTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($data)
+    public function reverseTransform(mixed $data): mixed
     {
         return ($this->reverseTransform)($data);
     }

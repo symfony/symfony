@@ -29,31 +29,27 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
-    private $conn;
+    private Connection $conn;
     private static $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection a Doctrine DBAL Connection
      * or a URL that will be used to connect to the database.
      *
-     * @param Connection|string $connOrUrl A Connection instance or Doctrine URL
-     *
      * @throws InvalidArgumentException When first argument is not Connection nor string
      */
-    public function __construct($connOrUrl)
+    public function __construct(Connection|string $connOrUrl)
     {
         if ($connOrUrl instanceof Connection) {
             if (!$connOrUrl->getDatabasePlatform() instanceof PostgreSQLPlatform) {
                 throw new InvalidArgumentException(sprintf('The adapter "%s" does not support the "%s" platform.', __CLASS__, \get_class($connOrUrl->getDatabasePlatform())));
             }
             $this->conn = $connOrUrl;
-        } elseif (\is_string($connOrUrl)) {
+        } else {
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrUrl));
             }
             $this->conn = DriverManager::getConnection(['url' => $this->filterDsn($connOrUrl)]);
-        } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', Connection::class, __METHOD__, get_debug_type($connOrUrl)));
         }
     }
 
@@ -145,14 +141,14 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             // If lock acquired = there is no other ReadLock
             $store->save($key);
             $this->unlockShared($key);
-        } catch (LockConflictedException $e) {
+        } catch (LockConflictedException) {
             // an other key exists in this ReadLock
         }
 
         $store->delete($key);
     }
 
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $sql = "SELECT count(*) FROM pg_locks WHERE locktype='advisory' AND objid=:key AND pid=pg_backend_pid()";
         $result = $this->conn->executeQuery($sql, [
@@ -173,10 +169,18 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
         $this->getInternalStore()->save($key);
 
+        $lockAcquired = false;
         $sql = 'SELECT pg_advisory_lock(:key)';
-        $this->conn->executeStatement($sql, [
-            'key' => $this->getHashedKey($key),
-        ]);
+        try {
+            $this->conn->executeStatement($sql, [
+                'key' => $this->getHashedKey($key),
+            ]);
+            $lockAcquired = true;
+        } finally {
+            if (!$lockAcquired) {
+                $this->getInternalStore()->delete($key);
+            }
+        }
 
         // release lock in case of promotion
         $this->unlockShared($key);
@@ -188,10 +192,18 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
         $this->getInternalStore()->saveRead($key);
 
+        $lockAcquired = false;
         $sql = 'SELECT pg_advisory_lock_shared(:key)';
-        $this->conn->executeStatement($sql, [
-            'key' => $this->getHashedKey($key),
-        ]);
+        try {
+            $this->conn->executeStatement($sql, [
+                'key' => $this->getHashedKey($key),
+            ]);
+            $lockAcquired = true;
+        } finally {
+            if (!$lockAcquired) {
+                $this->getInternalStore()->delete($key);
+            }
+        }
 
         // release lock in case of demotion
         $this->unlock($key);

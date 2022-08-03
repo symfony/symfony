@@ -33,7 +33,7 @@ class Isbn extends Constraint
     public const CHECKSUM_FAILED_ERROR = '2881c032-660f-46b6-8153-d352d9706640';
     public const TYPE_NOT_RECOGNIZED_ERROR = 'fa54a457-f042-441f-89c4-066ee5bdd3e1';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
@@ -41,25 +41,25 @@ class Isbn extends Constraint
         self::TYPE_NOT_RECOGNIZED_ERROR => 'TYPE_NOT_RECOGNIZED_ERROR',
     ];
 
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
+
     public $isbn10Message = 'This value is not a valid ISBN-10.';
     public $isbn13Message = 'This value is not a valid ISBN-13.';
     public $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';
     public $type;
     public $message;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|array|null $type The ISBN standard to validate or a set of options
-     */
     public function __construct(
-        $type = null,
+        string|array $type = null,
         string $message = null,
         string $isbn10Message = null,
         string $isbn13Message = null,
         string $bothIsbnMessage = null,
         array $groups = null,
-        $payload = null,
+        mixed $payload = null,
         array $options = []
     ) {
         if (\is_array($type)) {
@@ -79,7 +79,7 @@ class Isbn extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'type';
     }

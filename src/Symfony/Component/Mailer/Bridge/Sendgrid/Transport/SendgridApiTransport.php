@@ -34,7 +34,7 @@ class SendgridApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.sendgrid.com';
 
-    private $key;
+    private string $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -133,7 +133,7 @@ class SendgridApiTransport extends AbstractApiTransport
             } elseif ($header instanceof MetadataHeader) {
                 $customArguments[$header->getKey()] = $header->getValue();
             } else {
-                $payload['headers'][$name] = $header->getBodyAsString();
+                $payload['headers'][$header->getName()] = $header->getBodyAsString();
             }
         }
 

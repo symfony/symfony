@@ -40,10 +40,8 @@ abstract class AbstractSurrogate implements SurrogateInterface
 
     /**
      * Returns a new cache strategy instance.
-     *
-     * @return ResponseCacheStrategyInterface
      */
-    public function createCacheStrategy()
+    public function createCacheStrategy(): ResponseCacheStrategyInterface
     {
         return new ResponseCacheStrategy();
     }
@@ -51,7 +49,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
     /**
      * {@inheritdoc}
      */
-    public function hasSurrogateCapability(Request $request)
+    public function hasSurrogateCapability(Request $request): bool
     {
         if (null === $value = $request->headers->get('Surrogate-Capability')) {
             return false;
@@ -74,7 +72,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
     /**
      * {@inheritdoc}
      */
-    public function needsParsing(Response $response)
+    public function needsParsing(Response $response): bool
     {
         if (!$control = $response->headers->get('Surrogate-Control')) {
             return false;
@@ -88,14 +86,14 @@ abstract class AbstractSurrogate implements SurrogateInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(HttpCache $cache, string $uri, string $alt, bool $ignoreErrors)
+    public function handle(HttpCache $cache, string $uri, string $alt, bool $ignoreErrors): string
     {
         $subRequest = Request::create($uri, Request::METHOD_GET, [], $cache->getRequest()->cookies->all(), [], $cache->getRequest()->server->all());
 
         try {
             $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
 
-            if (!$response->isSuccessful()) {
+            if (!$response->isSuccessful() && Response::HTTP_NOT_MODIFIED !== $response->getStatusCode()) {
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %d).', $subRequest->getUri(), $response->getStatusCode()));
             }
 

@@ -38,7 +38,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     /**
      * @var list<string>
      */
-    private $resourceLocales;
+    private array $resourceLocales;
 
     /**
      * Holds parameters from addResource() calls so we can defer the actual
@@ -46,22 +46,22 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @var array[]
      */
-    private $resources = [];
+    private array $resources = [];
 
     /**
      * @var string[][]
      */
-    private $resourceFiles;
+    private array $resourceFiles;
 
     /**
      * @var string[]
      */
-    private $scannedDirectories;
+    private array $scannedDirectories;
 
     /**
      * @var string[]
      */
-    private $enabledLocales;
+    private array $enabledLocales;
 
     /**
      * Constructor.
@@ -99,7 +99,7 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @return string[]
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         // skip warmUp when translator doesn't use cache
         if (null === $this->options['cache_dir']) {
@@ -120,7 +120,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         return [];
     }
 
-    public function addResource(string $format, $resource, string $locale, string $domain = null)
+    public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();

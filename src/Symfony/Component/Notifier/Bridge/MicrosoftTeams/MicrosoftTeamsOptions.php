@@ -28,7 +28,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
 {
     private const MAX_ACTIONS = 4;
 
-    private $options = [];
+    private array $options = [];
 
     public function __construct(array $options = [])
     {
@@ -79,10 +79,10 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
      *
      * @return $this
      */
-    public function recipient(string $path): self
+    public function recipient(string $path): static
     {
-        if (!preg_match('/^\/webhook\//', $path)) {
-            throw new InvalidArgumentException(sprintf('"%s" require recipient id format to be "/webhook/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', __CLASS__, $path));
+        if (!preg_match('/^\/webhookb2\//', $path)) {
+            throw new InvalidArgumentException(sprintf('"%s" require recipient id format to be "/webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', __CLASS__, $path));
         }
 
         $this->options['recipient_id'] = $path;
@@ -95,7 +95,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
      *
      * @return $this
      */
-    public function summary(string $summary): self
+    public function summary(string $summary): static
     {
         $this->options['summary'] = $summary;
 
@@ -105,7 +105,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function title(string $title): self
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 
@@ -115,7 +115,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function text(string $text): self
+    public function text(string $text): static
     {
         $this->options['text'] = $text;
 
@@ -125,7 +125,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function themeColor(string $themeColor): self
+    public function themeColor(string $themeColor): static
     {
         $this->validateThemeColor($themeColor);
 
@@ -137,7 +137,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function section(SectionInterface $section): self
+    public function section(SectionInterface $section): static
     {
         $this->options['sections'][] = $section->toArray();
 
@@ -147,7 +147,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function action(ActionInterface $action): self
+    public function action(ActionInterface $action): static
     {
         $this->validateNumberOfActions();
 
@@ -159,7 +159,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function expectedActor(string $actor): self
+    public function expectedActor(string $actor): static
     {
         $this->options['expectedActors'][] = $actor;
 

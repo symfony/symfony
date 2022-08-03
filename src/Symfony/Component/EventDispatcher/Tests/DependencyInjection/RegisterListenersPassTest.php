@@ -247,15 +247,8 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedInvokableEventListener()
     {
-        if (!class_exists(AttributeAutoconfigurationPass::class)) {
-            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
-        }
-
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute): void {
             $definition->addTag('kernel.event_listener', get_object_vars($attribute));
@@ -281,26 +274,18 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedMultiEventListener()
     {
-        if (!class_exists(AttributeAutoconfigurationPass::class)) {
-            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
-        }
-
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsEventListener::class, eval(<<<'PHP'
-            return static function (\Symfony\Component\DependencyInjection\ChildDefinition $definition, \Symfony\Component\EventDispatcher\Attribute\AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class,
+            static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
                 $tagAttributes = get_object_vars($attribute);
                 if ($reflector instanceof \ReflectionMethod) {
                     $tagAttributes['method'] = $reflector->getName();
                 }
                 $definition->addTag('kernel.event_listener', $tagAttributes);
-            };
-PHP
-        ));
+            }
+        );
 
         $container->register('foo', TaggedMultiListener::class)->setAutoconfigured(true);
         $container->register('event_dispatcher', \stdClass::class);

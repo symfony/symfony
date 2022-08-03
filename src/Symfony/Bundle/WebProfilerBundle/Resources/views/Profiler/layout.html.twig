@@ -105,7 +105,7 @@
                         <a class="btn btn-sm" href="{{ path('_profiler', { token: 'latest' }|merge(request.query.all)) }}">Latest</a>
 
                         <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search" {% if tokens is defined or about is defined %}data-toggle-initial="display"{% endif %}>
-                            {{ include('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>
+                            {{ source('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>
                         </a>
 
                         {{ render(controller('web_profiler.controller.profiler::searchBarAction', request.query.all)) }}

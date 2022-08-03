@@ -16,14 +16,11 @@ use Symfony\Component\Mime\Exception\LogicException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RawMessage implements \Serializable
+class RawMessage
 {
     private $message;
 
-    /**
-     * @param iterable|string $message
-     */
-    public function __construct($message)
+    public function __construct(iterable|string $message)
     {
         $this->message = $message;
     }
@@ -61,22 +58,6 @@ class RawMessage implements \Serializable
      */
     public function ensureValidity()
     {
-    }
-
-    /**
-     * @internal
-     */
-    final public function serialize(): string
-    {
-        return serialize($this->__serialize());
-    }
-
-    /**
-     * @internal
-     */
-    final public function unserialize($serialized)
-    {
-        $this->__unserialize(unserialize($serialized));
     }
 
     public function __serialize(): array

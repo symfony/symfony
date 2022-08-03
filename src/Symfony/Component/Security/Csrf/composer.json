@@ -16,15 +16,14 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/polyfill-php80": "^1.16",
-        "symfony/security-core": "^4.4|^5.0|^6.0"
+        "php": ">=8.1",
+        "symfony/security-core": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "^5.3|^6.0"
+        "symfony/http-foundation": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/http-foundation": "<5.3"
+        "symfony/http-foundation": "<5.4"
     },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."

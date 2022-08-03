@@ -25,6 +25,12 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     public const NORMALIZATION_FORMAT_BASE58 = 'base58';
     public const NORMALIZATION_FORMAT_BASE32 = 'base32';
     public const NORMALIZATION_FORMAT_RFC4122 = 'rfc4122';
+    public const NORMALIZATION_FORMATS = [
+        self::NORMALIZATION_FORMAT_CANONICAL,
+        self::NORMALIZATION_FORMAT_BASE58,
+        self::NORMALIZATION_FORMAT_BASE32,
+        self::NORMALIZATION_FORMAT_RFC4122,
+    ];
 
     private $defaultContext = [
         self::NORMALIZATION_FORMAT_KEY => self::NORMALIZATION_FORMAT_CANONICAL,
@@ -40,7 +46,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
      *
      * @param AbstractUid $object
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         switch ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
             case self::NORMALIZATION_FORMAT_CANONICAL:
@@ -59,7 +65,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof AbstractUid;
     }
@@ -67,13 +73,19 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         try {
-            return AbstractUid::class !== $type ? $type::fromString($data) : Uuid::fromString($data);
-        } catch (\InvalidArgumentException|\TypeError $exception) {
+            if (AbstractUid::class === $type) {
+                trigger_deprecation('symfony/serializer', '6.1', 'Denormalizing to an abstract class in "%s" is deprecated.', __CLASS__);
+
+                return Uuid::fromString($data);
+            }
+
+            return $type::fromString($data);
+        } catch (\InvalidArgumentException|\TypeError) {
             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The data is not a valid "%s" string representation.', $type), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
-        } catch (\Error $e) {
+        } catch (\Error $e) { // @deprecated remove this catch block in 7.0
             if (str_starts_with($e->getMessage(), 'Cannot instantiate abstract class')) {
                 return $this->denormalize($data, AbstractUid::class, $format, $context);
             }
@@ -85,9 +97,15 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
-        return is_a($type, AbstractUid::class, true);
+        if (AbstractUid::class === $type) {
+            trigger_deprecation('symfony/serializer', '6.1', 'Supporting denormalization for the "%s" type in "%s" is deprecated, use one of "%s" child class instead.', AbstractUid::class, __CLASS__, AbstractUid::class);
+
+            return true;
+        }
+
+        return is_subclass_of($type, AbstractUid::class, true);
     }
 
     /**

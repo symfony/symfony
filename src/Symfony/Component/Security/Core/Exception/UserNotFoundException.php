@@ -19,12 +19,12 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class UserNotFoundException extends AuthenticationException
 {
-    private $identifier;
+    private ?string $identifier = null;
 
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Username could not be found.';
     }
@@ -38,18 +38,6 @@ class UserNotFoundException extends AuthenticationException
     }
 
     /**
-     * @return string
-     *
-     * @deprecated
-     */
-    public function getUsername()
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->identifier;
-    }
-
-    /**
      * Set the user identifier (e.g. username or email address).
      */
     public function setUserIdentifier(string $identifier): void
@@ -58,19 +46,9 @@ class UserNotFoundException extends AuthenticationException
     }
 
     /**
-     * @deprecated
-     */
-    public function setUsername(string $username)
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use setUserIdentifier() instead.', __METHOD__);
-
-        $this->identifier = $username;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return ['{{ username }}' => $this->identifier, '{{ user_identifier }}' => $this->identifier];
     }
@@ -92,8 +70,4 @@ class UserNotFoundException extends AuthenticationException
         $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
-}
-
-if (!class_exists(UsernameNotFoundException::class, false)) {
-    class_alias(UserNotFoundException::class, UsernameNotFoundException::class);
 }

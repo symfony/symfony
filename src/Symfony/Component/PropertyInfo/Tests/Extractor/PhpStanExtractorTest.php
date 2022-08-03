@@ -12,14 +12,19 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type;
+
+require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
 
 /**
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
@@ -31,9 +36,15 @@ class PhpStanExtractorTest extends TestCase
      */
     private $extractor;
 
+    /**
+     * @var PhpDocExtractor
+     */
+    private $phpDocExtractor;
+
     protected function setUp(): void
     {
         $this->extractor = new PhpStanExtractor();
+        $this->phpDocExtractor = new PhpDocExtractor();
     }
 
     /**
@@ -376,12 +387,89 @@ class PhpStanExtractorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider pseudoTypesProvider
+     */
+    public function testPseudoTypes($property, array $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy', $property));
+    }
+
+    public function pseudoTypesProvider(): array
+    {
+        return [
+            ['classString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['classStringGeneric', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['htmlEscapedString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['lowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyLowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['numericString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['traitString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['interfaceString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['literalString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['positiveInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+            ['negativeInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+            ['nonEmptyArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
+            ['nonEmptyList', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))]],
+            ['scalar', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_BOOL)]],
+            ['number', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)]],
+            ['numeric', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['arrayKey', [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)]],
+            ['double', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
+        ];
+    }
+
     public function testDummyNamespace()
     {
         $this->assertEquals(
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')],
             $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy')
         );
+    }
+
+    public function testDummyNamespaceWithProperty()
+    {
+        $phpStanTypes = $this->extractor->getTypes(\B\Dummy::class, 'property');
+        $phpDocTypes = $this->phpDocExtractor->getTypes(\B\Dummy::class, 'property');
+
+        $this->assertEquals('A\Property', $phpStanTypes[0]->getClassName());
+        $this->assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
+    }
+
+    /**
+     * @dataProvider intRangeTypeProvider
+     */
+    public function testExtractorIntRangeType(string $property, ?array $types)
+    {
+        $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy', $property));
+    }
+
+    public function intRangeTypeProvider(): array
+    {
+        return [
+            ['a', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['b', [new Type(Type::BUILTIN_TYPE_INT, true)]],
+            ['c', [new Type(Type::BUILTIN_TYPE_INT)]],
+        ];
+    }
+
+    /**
+     * @dataProvider php80TypesProvider
+     */
+    public function testExtractPhp80Type(string $class, $property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
+    }
+
+    public function php80TypesProvider()
+    {
+        return [
+            [Php80Dummy::class, 'promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            [Php80Dummy::class, 'promoted', null],
+            [Php80Dummy::class, 'collection', [new Type(Type::BUILTIN_TYPE_ARRAY, collection: true, collectionValueType: new Type(Type::BUILTIN_TYPE_STRING))]],
+            [Php80PromotedDummy::class, 'promoted', null],
+        ];
     }
 }
 

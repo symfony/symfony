@@ -28,8 +28,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class TestContainer extends Container
 {
-    private $kernel;
-    private $privateServicesLocatorId;
+    private KernelInterface $kernel;
+    private string $privateServicesLocatorId;
 
     public function __construct(KernelInterface $kernel, string $privateServicesLocatorId)
     {
@@ -63,10 +63,8 @@ class TestContainer extends Container
 
     /**
      * {@inheritdoc}
-     *
-     * @return array|bool|float|int|string|null
      */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         return $this->getPublicContainer()->getParameter($name);
     }
@@ -82,7 +80,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function setParameter(string $name, $value)
+    public function setParameter(string $name, mixed $value)
     {
         $this->getPublicContainer()->setParameter($name, $value);
     }
@@ -90,7 +88,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function set(string $id, $service)
+    public function set(string $id, mixed $service)
     {
         $this->getPublicContainer()->set($id, $service);
     }
@@ -106,7 +104,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function get(string $id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object
     {
         return $this->getPrivateContainer()->has($id) ? $this->getPrivateContainer()->get($id) : $this->getPublicContainer()->get($id, $invalidBehavior);
     }

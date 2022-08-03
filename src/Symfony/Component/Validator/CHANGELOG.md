@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate the "loose" e-mail validation mode, use "html5" instead
+ * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
+
+6.1
+---
+
+ * Add the `fields` option to the `Unique` constraint, to define which collection keys should be checked for uniqueness
+ * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
+ * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
+ * Allow creating constraints with required arguments
+ * Add the `match` option to the `Choice` constraint
+
+6.0
+---
+
+ * Remove the `allowEmptyString` option from the `Length` constraint
+ * Remove the `NumberConstraintTrait` trait
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore
+
 5.4
 ---
 

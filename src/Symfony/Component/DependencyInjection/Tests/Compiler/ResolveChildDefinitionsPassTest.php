@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 
 class ResolveChildDefinitionsPassTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -119,6 +116,31 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $def = $container->getDefinition('child');
         $this->assertEquals([], $def->getTags());
+    }
+
+    public function testProcessCopiesTagsProxy()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+            ->addTag('proxy', ['a' => 'b'])
+        ;
+
+        $container
+            ->setDefinition('child1', new ChildDefinition('parent'))
+        ;
+        $container
+            ->setDefinition('child2', (new ChildDefinition('parent'))->addTag('proxy', ['c' => 'd']))
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child1');
+        $this->assertSame(['proxy' => [['a' => 'b']]], $def->getTags());
+
+        $def = $container->getDefinition('child2');
+        $this->assertSame(['proxy' => [['c' => 'd']]], $def->getTags());
     }
 
     public function testProcessDoesNotCopyDecoratedService()
@@ -312,28 +334,6 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDecoratedServiceCanOverwriteDeprecatedParentStatus()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Passing a null message to un-deprecate a node is deprecated.');
-
-        $container = new ContainerBuilder();
-        $container->register('deprecated_parent')
-            ->setDeprecated(true)
-        ;
-
-        $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'))
-            ->setDeprecated(false)
-        ;
-
-        $this->process($container);
-
-        $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
-    }
-
     public function testProcessResolvesAliases()
     {
         $container = new ContainerBuilder();
@@ -420,5 +420,22 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $container->setDefinition('a', new ChildDefinition('c'));
 
         $this->process($container);
+    }
+
+    public function testProcessCopiesSyntheticStatus()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent');
+
+        $container
+            ->setDefinition('child', new ChildDefinition('parent'))
+            ->setSynthetic(true)
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child');
+        $this->assertTrue($def->isSynthetic());
     }
 }

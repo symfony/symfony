@@ -34,8 +34,8 @@ final class TurboSmsTransport extends AbstractTransport
     private const SUBJECT_CYRILLIC_LIMIT = 661;
     private const SENDER_LIMIT = 20;
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -65,12 +65,20 @@ final class TurboSmsTransport extends AbstractTransport
 
         $this->assertValidSubject($message->getSubject());
 
+        $fromMessage = $message->getFrom();
+        if (null !== $fromMessage) {
+            $this->assertValidFrom($fromMessage);
+            $from = $fromMessage;
+        } else {
+            $from = $this->from;
+        }
+
         $endpoint = sprintf('https://%s/message/send.json', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
                 'sms' => [
-                    'sender' => $this->from,
+                    'sender' => $from,
                     'recipients' => [$message->getPhone()],
                     'text' => $message->getSubject(),
                 ],

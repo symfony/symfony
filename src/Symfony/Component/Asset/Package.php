@@ -23,8 +23,8 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class Package implements PackageInterface
 {
-    private $versionStrategy;
-    private $context;
+    private VersionStrategyInterface $versionStrategy;
+    private ContextInterface $context;
 
     public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
@@ -35,7 +35,7 @@ class Package implements PackageInterface
     /**
      * {@inheritdoc}
      */
-    public function getVersion(string $path)
+    public function getVersion(string $path): string
     {
         return $this->versionStrategy->getVersion($path);
     }
@@ -43,7 +43,7 @@ class Package implements PackageInterface
     /**
      * {@inheritdoc}
      */
-    public function getUrl(string $path)
+    public function getUrl(string $path): string
     {
         if ($this->isAbsoluteUrl($path)) {
             return $path;
@@ -52,27 +52,18 @@ class Package implements PackageInterface
         return $this->versionStrategy->applyVersion($path);
     }
 
-    /**
-     * @return ContextInterface
-     */
-    protected function getContext()
+    protected function getContext(): ContextInterface
     {
         return $this->context;
     }
 
-    /**
-     * @return VersionStrategyInterface
-     */
-    protected function getVersionStrategy()
+    protected function getVersionStrategy(): VersionStrategyInterface
     {
         return $this->versionStrategy;
     }
 
-    /**
-     * @return bool
-     */
-    protected function isAbsoluteUrl(string $url)
+    protected function isAbsoluteUrl(string $url): bool
     {
-        return str_contains($url, '://') || '//' === substr($url, 0, 2);
+        return str_contains($url, '://') || str_starts_with($url, '//');
     }
 }

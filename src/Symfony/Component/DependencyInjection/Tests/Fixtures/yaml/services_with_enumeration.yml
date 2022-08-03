@@ -1,3 +1,6 @@
+parameters:
+    unit_enum: !php/const Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR
+    enum_array: [!php/const Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR, !php/const Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO]
 
 services:
     service_container:

@@ -24,6 +24,7 @@ class UndefinedCallableHandler
     private const FILTER_COMPONENTS = [
         'humanize' => 'form',
         'trans' => 'translation',
+        'sanitize_html' => 'html-sanitizer',
         'yaml_encode' => 'yaml',
         'yaml_dump' => 'yaml',
     ];
@@ -61,6 +62,7 @@ class UndefinedCallableHandler
     ];
 
     private const FULL_STACK_ENABLE = [
+        'html-sanitizer' => 'enable "framework.html_sanitizer"',
         'form' => 'enable "framework.form"',
         'security-core' => 'add the "SecurityBundle"',
         'security-http' => 'add the "SecurityBundle"',
@@ -68,10 +70,7 @@ class UndefinedCallableHandler
         'workflow' => 'enable "framework.workflows"',
     ];
 
-    /**
-     * @return TwigFilter|false
-     */
-    public static function onUndefinedFilter(string $name)
+    public static function onUndefinedFilter(string $name): TwigFilter|false
     {
         if (!isset(self::FILTER_COMPONENTS[$name])) {
             return false;
@@ -80,10 +79,7 @@ class UndefinedCallableHandler
         throw new SyntaxError(self::onUndefined($name, 'filter', self::FILTER_COMPONENTS[$name]));
     }
 
-    /**
-     * @return TwigFunction|false
-     */
-    public static function onUndefinedFunction(string $name)
+    public static function onUndefinedFunction(string $name): TwigFunction|false
     {
         if (!isset(self::FUNCTION_COMPONENTS[$name])) {
             return false;

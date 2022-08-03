@@ -166,11 +166,13 @@ EOTXT;
 
     public function testCastArrayObject()
     {
-        $var = new \ArrayObject([123]);
+        $var = new
+            #[\AllowDynamicProperties]
+            class([123]) extends \ArrayObject {};
         $var->foo = 234;
 
         $expected = <<<EOTXT
-ArrayObject {
+ArrayObject@anonymous {
   +"foo": 234
   -storage: array:1 [
     0 => 123
@@ -180,9 +182,6 @@ ArrayObject {
   iteratorClass: "ArrayIterator"
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -200,9 +199,6 @@ Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {
   flag::ARRAY_AS_PROPS: false
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 

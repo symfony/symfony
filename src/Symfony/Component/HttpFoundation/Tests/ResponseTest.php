@@ -20,18 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseTest extends ResponseTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = Response::create('foo', 301, ['Foo' => 'bar']);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('bar', $response->headers->get('foo'));
-    }
-
     public function testToString()
     {
         $response = new Response();
@@ -62,13 +50,13 @@ class ResponseTest extends ResponseTestCase
     public function testSend()
     {
         $response = new Response();
-        $responseSend = $response->send();
-        $this->assertObjectHasAttribute('headers', $responseSend);
-        $this->assertObjectHasAttribute('content', $responseSend);
-        $this->assertObjectHasAttribute('version', $responseSend);
-        $this->assertObjectHasAttribute('statusCode', $responseSend);
-        $this->assertObjectHasAttribute('statusText', $responseSend);
-        $this->assertObjectHasAttribute('charset', $responseSend);
+        $responseSent = $response->send();
+        $this->assertObjectHasAttribute('headers', $responseSent);
+        $this->assertObjectHasAttribute('content', $responseSent);
+        $this->assertObjectHasAttribute('version', $responseSent);
+        $this->assertObjectHasAttribute('statusCode', $responseSent);
+        $this->assertObjectHasAttribute('statusText', $responseSent);
+        $this->assertObjectHasAttribute('charset', $responseSent);
     }
 
     public function testGetCharset()
@@ -287,6 +275,20 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isNotModified($request));
     }
 
+    public function testIfNoneMatchWithoutETag()
+    {
+        $request = new Request();
+        $request->headers->set('If-None-Match', 'randomly_generated_etag');
+
+        $this->assertFalse((new Response())->isNotModified($request));
+
+        // Test wildcard
+        $request = new Request();
+        $request->headers->set('If-None-Match', '*');
+
+        $this->assertFalse((new Response())->isNotModified($request));
+    }
+
     public function testIsValidateable()
     {
         $response = new Response('', 200, ['Last-Modified' => $this->createDateTimeOneHourAgo()->format(\DATE_RFC2822)]);
@@ -354,6 +356,44 @@ class ResponseTest extends ResponseTestCase
 
         $cacheControl = $response->headers->get('Cache-Control');
         $this->assertEquals('public, s-maxage=20', $cacheControl);
+    }
+
+    public function testSetStaleIfError()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-if-error=86400', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidate()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-while-revalidate=300', $cacheControl);
+    }
+
+    public function testSetStaleIfErrorWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-if-error=86400, private', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidateWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-while-revalidate=300, private', $cacheControl);
     }
 
     public function testIsPrivate()
@@ -844,7 +884,6 @@ class ResponseTest extends ResponseTestCase
         $response->setStatusCode($code, $text);
 
         $statusText = new \ReflectionProperty($response, 'statusText');
-        $statusText->setAccessible(true);
 
         $this->assertEquals($expectedText, $statusText->getValue($response));
     }

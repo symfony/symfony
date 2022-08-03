@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Bridge\Clickatell\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -10,16 +19,12 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ClickatellTransportTest extends TransportTestCase
 {
-    /**
-     * @return ClickatellTransport
-     */
-    public function createTransport(HttpClientInterface $client = null, string $from = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $from = null): ClickatellTransport
     {
         return new ClickatellTransport('authToken', $from, $client ?? $this->createMock(HttpClientInterface::class));
     }

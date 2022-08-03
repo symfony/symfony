@@ -5,7 +5,7 @@
 
     {% if events.messages|length %}
         {% set icon %}
-            {% include('@WebProfiler/Icon/mailer.svg') %}
+            {{ source('@WebProfiler/Icon/mailer.svg') }}
             <span class="sf-toolbar-value">{{ events.messages|length }}</span>
         {% endset %}
 
@@ -65,7 +65,7 @@
     {% set events = collector.events %}
 
     <span class="label {{ events.messages is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/mailer.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/mailer.svg') }}</span>
 
         <strong>E-mails</strong>
         {% if events.messages|length > 0 %}
@@ -129,6 +129,13 @@
 
                                                             <span class="label">To</span>
                                                             <pre class="prewrap">{{ (message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</pre>
+
+                                                            {% if event.envelope.recipients|length > 0 %}
+                                                                <span class="label">Recipients</span>
+                                                                {% for recipient in event.envelope.recipients %}
+                                                                    <pre class="prewrap">{{ recipient.address }}</pre>
+                                                                {% endfor %}
+                                                            {% endif %}
                                                         </div>
                                                         <div class="col">
                                                             <span class="label">Headers</span>
@@ -187,6 +194,15 @@
                                                     <div class="tab">
                                                         <h3 class="tab-title">Attachment #{{ loop.index }}</h3>
                                                         <div class="tab-content">
+                                                            <p>
+                                                                <a href="data:{{ attachment.contentType|default('application/octet-stream') }};base64,{{ collector.base64Encode(attachment.body) }}" download="{{ attachment.filename|default('attachment') }}">
+                                                                    {% if attachment.filename|default %}
+                                                                        {{ attachment.filename }}
+                                                                    {% else %}
+                                                                        <em>(no filename)</em>
+                                                                    {% endif %}
+                                                                </a>
+                                                            </p>
                                                             <pre class="prewrap" style="max-height: 600px">{{ attachment.toString() }}</pre>
                                                         </div>
                                                     </div>

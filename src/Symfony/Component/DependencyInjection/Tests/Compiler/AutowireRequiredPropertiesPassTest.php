@@ -18,14 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
+require_once __DIR__.'/../Fixtures/includes/autowiring_classes_74.php';
 
-if (\PHP_VERSION_ID >= 70400) {
-    require_once __DIR__.'/../Fixtures/includes/autowiring_classes_74.php';
-}
-
-/**
- * @requires PHP 7.4
- */
 class AutowireRequiredPropertiesPassTest extends TestCase
 {
     public function testInjection()
@@ -45,9 +39,6 @@ class AutowireRequiredPropertiesPassTest extends TestCase
         $this->assertEquals(Bar::class, (string) $properties['plop']);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttribute()
     {
         if (!class_exists(Required::class)) {

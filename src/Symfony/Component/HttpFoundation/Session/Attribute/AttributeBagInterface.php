@@ -22,33 +22,25 @@ interface AttributeBagInterface extends SessionBagInterface
 {
     /**
      * Checks if an attribute is defined.
-     *
-     * @return bool
      */
-    public function has(string $name);
+    public function has(string $name): bool;
 
     /**
      * Returns an attribute.
-     *
-     * @param mixed $default The default value if not found
-     *
-     * @return mixed
      */
-    public function get(string $name, $default = null);
+    public function get(string $name, mixed $default = null): mixed;
 
     /**
      * Sets an attribute.
-     *
-     * @param mixed $value
      */
-    public function set(string $name, $value);
+    public function set(string $name, mixed $value);
 
     /**
      * Returns attributes.
      *
      * @return array<string, mixed>
      */
-    public function all();
+    public function all(): array;
 
     public function replace(array $attributes);
 
@@ -57,5 +49,5 @@ interface AttributeBagInterface extends SessionBagInterface
      *
      * @return mixed The removed value or null when it does not exist
      */
-    public function remove(string $name);
+    public function remove(string $name): mixed;
 }

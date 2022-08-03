@@ -33,10 +33,8 @@ abstract class Helper implements HelperInterface
 
     /**
      * Gets the default charset.
-     *
-     * @return string
      */
-    public function getCharset()
+    public function getCharset(): string
     {
         return $this->charset;
     }

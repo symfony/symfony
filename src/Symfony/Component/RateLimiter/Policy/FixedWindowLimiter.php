@@ -27,12 +27,8 @@ final class FixedWindowLimiter implements LimiterInterface
 {
     use ResetLimiterTrait;
 
-    private $limit;
-
-    /**
-     * @var int seconds
-     */
-    private $interval;
+    private int $limit;
+    private int $interval;
 
     public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
     {
@@ -63,12 +59,13 @@ final class FixedWindowLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $window->getAvailableTokens($now);
-            if ($availableTokens >= $tokens) {
+
+            if ($availableTokens >= max(1, $tokens)) {
                 $window->add($tokens, $now);
 
                 $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
             } else {
-                $waitDuration = $window->calculateTimeForTokens($tokens);
+                $waitDuration = $window->calculateTimeForTokens(max(1, $tokens));
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
@@ -79,7 +76,10 @@ final class FixedWindowLimiter implements LimiterInterface
 
                 $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
             }
-            $this->storage->save($window);
+
+            if (0 < $tokens) {
+                $this->storage->save($window);
+            }
         } finally {
             $this->lock->release();
         }

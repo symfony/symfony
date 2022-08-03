@@ -45,19 +45,15 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         '::/128',
     ];
 
-    private $client;
-    private $subnets;
+    private HttpClientInterface $client;
+    private string|array|null $subnets;
 
     /**
      * @param string|array|null $subnets String or array of subnets using CIDR notation that will be used by IpUtils.
      *                                   If null is passed, the standard private subnets will be used.
      */
-    public function __construct(HttpClientInterface $client, $subnets = null)
+    public function __construct(HttpClientInterface $client, string|array $subnets = null)
     {
-        if (!(\is_array($subnets) || \is_string($subnets) || null === $subnets)) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be of the type array, string or null. "%s" given.', __METHOD__, get_debug_type($subnets)));
-        }
-
         if (!class_exists(IpUtils::class)) {
             throw new \LogicException(sprintf('You cannot use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
         }
@@ -97,7 +93,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     /**
      * {@inheritdoc}
      */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         return $this->client->stream($responses, $timeout);
     }
@@ -115,7 +111,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     /**
      * {@inheritdoc}
      */
-    public function withOptions(array $options): self
+    public function withOptions(array $options): static
     {
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);

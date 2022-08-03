@@ -32,12 +32,16 @@ class EmailValidator extends ConstraintValidator
         Email::VALIDATION_MODE_HTML5 => self::PATTERN_HTML5,
     ];
 
-    private $defaultMode;
+    private string $defaultMode;
 
     public function __construct(string $defaultMode = Email::VALIDATION_MODE_LOOSE)
     {
-        if (!\in_array($defaultMode, Email::$validationModes, true)) {
+        if (!\in_array($defaultMode, Email::VALIDATION_MODES, true)) {
             throw new \InvalidArgumentException('The "defaultMode" parameter value is not valid.');
+        }
+
+        if (Email::VALIDATION_MODE_LOOSE === $defaultMode) {
+            trigger_deprecation('symfony/validator', '6.2', 'The "%s" mode is deprecated. The default mode will be changed to "%s" in 7.0.', Email::VALIDATION_MODE_LOOSE, Email::VALIDATION_MODE_HTML5);
         }
 
         $this->defaultMode = $defaultMode;
@@ -46,7 +50,7 @@ class EmailValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Email) {
             throw new UnexpectedTypeException($constraint, Email::class);
@@ -56,7 +60,7 @@ class EmailValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -73,7 +77,7 @@ class EmailValidator extends ConstraintValidator
             $constraint->mode = $this->defaultMode;
         }
 
-        if (!\in_array($constraint->mode, Email::$validationModes, true)) {
+        if (!\in_array($constraint->mode, Email::VALIDATION_MODES, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s::$mode" parameter value is not valid.', get_debug_type($constraint)));
         }
 

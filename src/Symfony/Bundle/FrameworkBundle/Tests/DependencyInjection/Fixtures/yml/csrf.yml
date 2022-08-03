@@ -1,7 +1,6 @@
 framework:
+    http_method_override: false
     secret: s3cr3t
     csrf_protection: ~
-    form:
-        legacy_error_messages: false
     session:
         storage_factory_id: session.storage.factory.native

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
@@ -35,13 +36,14 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ClassExistsMock::register(__CLASS__);
         ClassExistsMock::withMockedClasses([
             GmailTransportFactory::class => false,
+            InfobipTransportFactory::class => false,
             MailgunTransportFactory::class => false,
             MailjetTransportFactory::class => false,
             MandrillTransportFactory::class => false,
+            OhMySmtpTransportFactory::class => false,
             PostmarkTransportFactory::class => false,
             SendgridTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
-            OhMySmtpTransportFactory::class => false,
             SesTransportFactory::class => false,
         ]);
     }
@@ -62,13 +64,14 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield ['gmail', 'symfony/google-mailer'];
+        yield ['infobip', 'symfony/infobip-mailer'];
         yield ['mailgun', 'symfony/mailgun-mailer'];
         yield ['mailjet', 'symfony/mailjet-mailer'];
         yield ['mandrill', 'symfony/mailchimp-mailer'];
+        yield ['ohmysmtp', 'symfony/oh-my-smtp-mailer'];
         yield ['postmark', 'symfony/postmark-mailer'];
         yield ['sendgrid', 'symfony/sendgrid-mailer'];
         yield ['sendinblue', 'symfony/sendinblue-mailer'];
-        yield ['ohmysmtp', 'symfony/oh-my-smtp-mailer'];
         yield ['ses', 'symfony/amazon-mailer'];
     }
 

@@ -31,7 +31,7 @@
         <?php
         $isFirstUserCode = true;
         foreach ($exception['trace'] as $i => $trace) {
-            $isVendorTrace = $trace['file'] && (false !== mb_strpos($trace['file'], '/vendor/') || false !== mb_strpos($trace['file'], '/var/cache/'));
+            $isVendorTrace = $trace['file'] && (str_contains($trace['file'], '/vendor/') || str_contains($trace['file'], '/var/cache/'));
             $displayCodeSnippet = $isFirstUserCode && !$isVendorTrace;
             if ($displayCodeSnippet) {
                 $isFirstUserCode = false;

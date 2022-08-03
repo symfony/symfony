@@ -17,7 +17,7 @@ use Symfony\Component\Mime\RawMessage;
 
 final class EmailTextBodyContains extends Constraint
 {
-    private $expectedText;
+    private string $expectedText;
 
     public function __construct(string $expectedText)
     {
@@ -43,7 +43,7 @@ final class EmailTextBodyContains extends Constraint
             throw new \LogicException('Unable to test a message text body on a RawMessage or Message instance.');
         }
 
-        return false !== mb_strpos($message->getTextBody(), $this->expectedText);
+        return str_contains($message->getTextBody(), $this->expectedText);
     }
 
     /**

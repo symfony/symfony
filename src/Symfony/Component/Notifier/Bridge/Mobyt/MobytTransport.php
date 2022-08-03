@@ -29,10 +29,10 @@ final class MobytTransport extends AbstractTransport
 {
     protected const HOST = 'app.mobyt.fr';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
-    private $typeQuality;
+    private string $accountSid;
+    private string $authToken;
+    private string $from;
+    private string $typeQuality;
 
     public function __construct(string $accountSid, string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -40,7 +40,7 @@ final class MobytTransport extends AbstractTransport
         $this->authToken = $authToken;
         $this->from = $from;
 
-        $typeQuality = $typeQuality ?? MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
+        $typeQuality ??= MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
         MobytOptions::validateMessageType($typeQuality);
 
         $this->typeQuality = $typeQuality;
@@ -69,12 +69,16 @@ final class MobytTransport extends AbstractTransport
         }
 
         $options = $message->getOptions() ? $message->getOptions()->toArray() : [];
-        $options['message_type'] = $options['message_type'] ?? $this->typeQuality;
+        $options['message_type'] ??= $this->typeQuality;
 
-        $options['message'] = $options['message'] ?? $message->getSubject();
+        $options['message'] ??= $message->getSubject();
         $options['recipient'] = [$message->getPhone()];
 
-        $options['sender'] = $options['sender'] ?? $this->from;
+        if ('' !== $message->getFrom()) {
+            $options['sender'] = $message->getFrom();
+        } else {
+            $options['sender'] ??= $this->from;
+        }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/API/v1.0/REST/sms', [
             'headers' => [

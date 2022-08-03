@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
@@ -20,8 +19,6 @@ use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
         $this->expectException(InvalidTypeException::class);
@@ -71,11 +68,9 @@ class ArrayNodeTest extends TestCase
     }
 
     /**
-     * @param array|\Exception $expected
-     *
      * @dataProvider ignoreAndRemoveMatrixProvider
      */
-    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, $expected, string $message = '')
+    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, array|\Exception $expected, string $message = '')
     {
         if ($expected instanceof \Exception) {
             $this->expectException(\get_class($expected));
@@ -95,7 +90,6 @@ class ArrayNodeTest extends TestCase
         $node = new ArrayNode('foo');
 
         $r = new \ReflectionMethod($node, 'preNormalize');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($node, $denormalized));
     }
@@ -137,7 +131,6 @@ class ArrayNodeTest extends TestCase
         $rootNode->addChild($fiveNode);
         $rootNode->addChild(new ScalarNode('string_key'));
         $r = new \ReflectionMethod($rootNode, 'normalizeValue');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($rootNode, $denormalized));
     }
@@ -184,7 +177,6 @@ class ArrayNodeTest extends TestCase
         $node->addChild($scalar2);
 
         $r = new \ReflectionMethod($node, 'normalizeValue');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($node, $prenormalized));
     }
@@ -271,37 +263,6 @@ class ArrayNodeTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testUnDeprecateANode()
-    {
-        $this->expectDeprecation('Since symfony/config 5.1: The signature of method "Symfony\Component\Config\Definition\BaseNode::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-        $this->expectDeprecation('Since symfony/config 5.1: Passing a null message to un-deprecate a node is deprecated.');
-
-        $node = new ArrayNode('foo');
-        $node->setDeprecated('"%node%" is deprecated');
-        $node->setDeprecated(null);
-
-        $this->assertFalse($node->isDeprecated());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/config 5.1: The signature of method "Symfony\Component\Config\Definition\BaseNode::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $node = new ArrayNode('foo');
-        $node->setDeprecated('"%node%" is deprecated');
-
-        $deprecation = $node->getDeprecation($node->getName(), $node->getPath());
-        $this->assertSame('"foo" is deprecated', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
-    }
-
-    /**
      * @dataProvider getDataWithIncludedExtraKeys
      */
     public function testMergeWithoutIgnoringExtraKeys(array $prenormalizeds)
@@ -314,7 +275,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(false);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $r->invoke($node, ...$prenormalizeds);
     }
@@ -332,7 +292,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(true);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $r->invoke($node, ...$prenormalizeds);
     }
@@ -348,7 +307,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(true, false);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $this->assertEquals($merged, $r->invoke($node, ...$prenormalizeds));
     }

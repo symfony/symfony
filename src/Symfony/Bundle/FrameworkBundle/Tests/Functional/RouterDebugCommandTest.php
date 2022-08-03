@@ -62,6 +62,23 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('/test', $tester->getDisplay());
     }
 
+    public function testSearchMultipleRoutesWithoutInteraction()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'routerdebug'], ['interactive' => false]);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringNotContainsString('Select one of the matching routes:', $tester->getDisplay());
+        $this->assertStringContainsString('routerdebug_session_welcome', $tester->getDisplay());
+        $this->assertStringContainsString('/session', $tester->getDisplay());
+        $this->assertStringContainsString('routerdebug_session_welcome_name', $tester->getDisplay());
+        $this->assertStringContainsString('/session/{name} ', $tester->getDisplay());
+        $this->assertStringContainsString('routerdebug_session_logout', $tester->getDisplay());
+        $this->assertStringContainsString('/session_logout', $tester->getDisplay());
+        $this->assertStringContainsString('routerdebug_test', $tester->getDisplay());
+        $this->assertStringContainsString('/test', $tester->getDisplay());
+    }
+
     public function testSearchWithThrow()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -75,10 +92,6 @@ class RouterDebugCommandTest extends AbstractWebTestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $tester = new CommandCompletionTester($this->application->get('debug:router'));
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }

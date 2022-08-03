@@ -21,30 +21,17 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddValidatorInitializersPass implements CompilerPassInterface
 {
-    private $builderService;
-    private $initializerTag;
-
-    public function __construct(string $builderService = 'validator.builder', string $initializerTag = 'validator.initializer')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/validator', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->builderService = $builderService;
-        $this->initializerTag = $initializerTag;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->builderService)) {
+        if (!$container->hasDefinition('validator.builder')) {
             return;
         }
 
         $initializers = [];
-        foreach ($container->findTaggedServiceIds($this->initializerTag, true) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('validator.initializer', true) as $id => $attributes) {
             $initializers[] = new Reference($id);
         }
 
-        $container->getDefinition($this->builderService)->addMethodCall('addObjectInitializers', [$initializers]);
+        $container->getDefinition('validator.builder')->addMethodCall('addObjectInitializers', [$initializers]);
     }
 }

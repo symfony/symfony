@@ -17,7 +17,6 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
 use Symfony\Component\Form\FormTypeGuesserChain;
-use Symfony\Component\Form\FormTypeGuesserInterface;
 
 class DependencyInjectionExtensionTest extends TestCase
 {
@@ -58,7 +57,7 @@ class DependencyInjectionExtensionTest extends TestCase
 
     public function testGetTypeGuesser()
     {
-        $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [$this->createMock(FormTypeGuesserInterface::class)]);
+        $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [new FormTypeGuesserChain([])]);
 
         $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }

@@ -26,12 +26,12 @@ class FileLoaderTest extends TestCase
 
         $locatorMockForAdditionalLoader = $this->createMock(FileLocatorInterface::class);
         $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
-                ['path/to/file1'],                    // Default
-                ['path/to/file1', 'path/to/file2'],   // First is imported
-                ['path/to/file1', 'path/to/file2'],   // Second is imported
-                ['path/to/file1'],                    // Exception
-                ['path/to/file1', 'path/to/file2']    // Exception
-                ));
+            ['path/to/file1'],                    // Default
+            ['path/to/file1', 'path/to/file2'],   // First is imported
+            ['path/to/file1', 'path/to/file2'],   // Second is imported
+            ['path/to/file1'],                    // Exception
+            ['path/to/file1', 'path/to/file2']    // Exception
+        ));
 
         $fileLoader = new TestFileLoader($locatorMock);
         $fileLoader->setSupports(false);
@@ -155,12 +155,12 @@ class TestFileLoader extends FileLoader
 {
     private $supports = true;
 
-    public function load($resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         return $resource;
     }
 
-    public function supports($resource, string $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return $this->supports;
     }

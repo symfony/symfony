@@ -6,7 +6,7 @@
     {% if collector.messages|length > 0 %}
         {% set status_color = collector.exceptionsCount ? 'red' %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/messenger.svg') }}
+            {{ source('@WebProfiler/Icon/messenger.svg') }}
             <span class="sf-toolbar-value">{{ collector.messages|length }}</span>
         {% endset %}
 
@@ -31,7 +31,7 @@
 
 {% block menu %}
     <span class="label{{ collector.exceptionsCount ? ' label-status-error' }}{{ collector.messages is empty ? ' disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/messenger.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/messenger.svg') }}</span>
         <strong>Messages</strong>
         {% if collector.exceptionsCount > 0 %}
             <span class="count">
@@ -119,8 +119,8 @@
                         <span class="label status-error">exception</span>
                     {% endif %}
                     <a class="toggle-button">
-                        <span class="icon icon-close">{{ include('@WebProfiler/images/icon-minus-square.svg') }}</span>
-                        <span class="icon icon-open">{{ include('@WebProfiler/images/icon-plus-square.svg') }}</span>
+                        <span class="icon icon-close">{{ source('@WebProfiler/images/icon-minus-square.svg') }}</span>
+                        <span class="icon icon-open">{{ source('@WebProfiler/images/icon-plus-square.svg') }}</span>
                     </a>
                 </th>
             </tr>

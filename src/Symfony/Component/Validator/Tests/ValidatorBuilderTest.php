@@ -15,7 +15,6 @@ use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -25,8 +24,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @var ValidatorBuilder
      */
@@ -84,27 +81,9 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($this->builder, $this->builder->addMethodMappings([]));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testEnableAnnotationMapping()
-    {
-        $this->expectDeprecation('Since symfony/validator 5.2: Not passing true as first argument to "Symfony\Component\Validator\ValidatorBuilder::enableAnnotationMapping" is deprecated. Pass true and call "addDefaultDoctrineAnnotationReader()" if you want to enable annotation mapping with Doctrine Annotations.');
-        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
-
-        $loaders = $this->builder->getLoaders();
-        $this->assertCount(1, $loaders);
-        $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
-
-        $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
-        $r->setAccessible(true);
-
-        $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
-    }
-
     public function testEnableAnnotationMappingWithDefaultDoctrineAnnotationReader()
     {
-        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping(true));
+        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
         $this->assertSame($this->builder, $this->builder->addDefaultDoctrineAnnotationReader());
 
         $loaders = $this->builder->getLoaders();
@@ -112,36 +91,15 @@ class ValidatorBuilderTest extends TestCase
         $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
 
         $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
-        $r->setAccessible(true);
 
         $this->assertInstanceOf(PsrCachedReader::class, $r->getValue($loaders[0]));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEnableAnnotationMappingWithCustomDoctrineAnnotationReaderLegacy()
-    {
-        $reader = $this->createMock(Reader::class);
-
-        $this->expectDeprecation('Since symfony/validator 5.2: Passing an instance of "'.\get_class($reader).'" as first argument to "Symfony\Component\Validator\ValidatorBuilder::enableAnnotationMapping" is deprecated. Pass true instead and call setDoctrineAnnotationReader() if you want to enable annotation mapping with Doctrine Annotations.');
-        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping($reader));
-
-        $loaders = $this->builder->getLoaders();
-        $this->assertCount(1, $loaders);
-        $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
-
-        $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
-        $r->setAccessible(true);
-
-        $this->assertSame($reader, $r->getValue($loaders[0]));
     }
 
     public function testEnableAnnotationMappingWithCustomDoctrineAnnotationReader()
     {
         $reader = $this->createMock(Reader::class);
 
-        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping(true));
+        $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
         $this->assertSame($this->builder, $this->builder->setDoctrineAnnotationReader($reader));
 
         $loaders = $this->builder->getLoaders();
@@ -149,7 +107,6 @@ class ValidatorBuilderTest extends TestCase
         $this->assertInstanceOf(AnnotationLoader::class, $loaders[0]);
 
         $r = new \ReflectionProperty(AnnotationLoader::class, 'reader');
-        $r->setAccessible(true);
 
         $this->assertSame($reader, $r->getValue($loaders[0]));
     }

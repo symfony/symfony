@@ -30,7 +30,7 @@ class Uuid extends Constraint
     public const INVALID_VERSION_ERROR = '21ba13b4-b185-4882-ac6f-d147355987eb';
     public const INVALID_VARIANT_ERROR = '164ef693-2b9d-46de-ad7f-836201f0c2db';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
@@ -38,6 +38,11 @@ class Uuid extends Constraint
         self::INVALID_VERSION_ERROR => 'INVALID_VERSION_ERROR',
         self::INVALID_VARIANT_ERROR => 'INVALID_VARIANT_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     // Possible versions defined by RFC 4122
     public const V1_MAC = 1;
@@ -95,7 +100,7 @@ class Uuid extends Constraint
         bool $strict = null,
         callable $normalizer = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 

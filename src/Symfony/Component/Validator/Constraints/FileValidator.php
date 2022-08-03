@@ -41,7 +41,7 @@ class FileValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof File) {
             throw new UnexpectedTypeException($constraint, File::class);
@@ -116,7 +116,7 @@ class FileValidator extends ConstraintValidator
             }
         }
 
-        if (!is_scalar($value) && !$value instanceof FileObject && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof FileObject && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -214,10 +214,8 @@ class FileValidator extends ConstraintValidator
     /**
      * Convert the limit to the smallest possible number
      * (i.e. try "MB", then "kB", then "bytes").
-     *
-     * @param int|float $limit
      */
-    private function factorizeSizes(int $size, $limit, bool $binaryFormat): array
+    private function factorizeSizes(int $size, int|float $limit, bool $binaryFormat): array
     {
         if ($binaryFormat) {
             $coef = self::MIB_BYTES;
@@ -225,6 +223,13 @@ class FileValidator extends ConstraintValidator
         } else {
             $coef = self::MB_BYTES;
             $coefFactor = self::KB_BYTES;
+        }
+
+        // If $limit < $coef, $limitAsString could be < 1 with less than 3 decimals.
+        // In this case, we would end up displaying an allowed size < 1 (eg: 0.1 MB).
+        // It looks better to keep on factorizing (to display 100 kB for example).
+        while ($limit < $coef) {
+            $coef /= $coefFactor;
         }
 
         $limitAsString = (string) ($limit / $coef);

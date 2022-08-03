@@ -12,7 +12,7 @@ MICROSOFT_TEAMS_DSN=microsoftteams://default/PATH
 ```
 
 where:
- - `PATH` has the following format: `webhook/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}`
+ - `PATH` has the following format: `webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}`
 
 Resources
 ---------

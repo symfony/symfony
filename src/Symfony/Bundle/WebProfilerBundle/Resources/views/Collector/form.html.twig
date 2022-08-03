@@ -6,7 +6,7 @@
     {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
         {% set status_color = collector.data.nb_errors ? 'red' %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/form.svg') }}
+            {{ source('@WebProfiler/Icon/form.svg') }}
             <span class="sf-toolbar-value">
                 {{ collector.data.nb_errors ?: collector.data.forms|length }}
             </span>
@@ -29,7 +29,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.data.nb_errors ? 'error' }} {{ collector.data.forms is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/form.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
         {% if collector.data.nb_errors > 0 %}
             <span class="count">

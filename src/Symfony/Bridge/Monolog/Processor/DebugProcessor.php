@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Processor;
 
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -19,16 +20,18 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
-    private $records = [];
-    private $errorCount = [];
-    private $requestStack;
+    use CompatibilityProcessor;
+
+    private array $records = [];
+    private array $errorCount = [];
+    private ?RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
     {
         $this->requestStack = $requestStack;
     }
 
-    public function __invoke(array $record)
+    private function doInvoke(array|LogRecord $record): array|LogRecord
     {
         $hash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 
@@ -68,7 +71,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs(Request $request = null)
+    public function getLogs(Request $request = null): array
     {
         if (null !== $request) {
             return $this->records[spl_object_hash($request)] ?? [];
@@ -84,7 +87,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function countErrors(Request $request = null)
+    public function countErrors(Request $request = null): int
     {
         if (null !== $request) {
             return $this->errorCount[spl_object_hash($request)] ?? 0;

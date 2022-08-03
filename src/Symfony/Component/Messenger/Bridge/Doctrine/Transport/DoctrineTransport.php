@@ -26,10 +26,10 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
-    private $connection;
-    private $serializer;
-    private $receiver;
-    private $sender;
+    private Connection $connection;
+    private SerializerInterface $serializer;
+    private DoctrineReceiver $receiver;
+    private DoctrineSender $sender;
 
     public function __construct(Connection $connection, SerializerInterface $serializer)
     {
@@ -42,7 +42,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
      */
     public function get(): iterable
     {
-        return ($this->receiver ?? $this->getReceiver())->get();
+        return $this->getReceiver()->get();
     }
 
     /**
@@ -50,7 +50,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
      */
     public function ack(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->ack($envelope);
+        $this->getReceiver()->ack($envelope);
     }
 
     /**
@@ -58,7 +58,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
      */
     public function reject(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->reject($envelope);
+        $this->getReceiver()->reject($envelope);
     }
 
     /**
@@ -66,7 +66,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
      */
     public function getMessageCount(): int
     {
-        return ($this->receiver ?? $this->getReceiver())->getMessageCount();
+        return $this->getReceiver()->getMessageCount();
     }
 
     /**
@@ -74,15 +74,15 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
      */
     public function all(int $limit = null): iterable
     {
-        return ($this->receiver ?? $this->getReceiver())->all($limit);
+        return $this->getReceiver()->all($limit);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($id): ?Envelope
+    public function find(mixed $id): ?Envelope
     {
-        return ($this->receiver ?? $this->getReceiver())->find($id);
+        return $this->getReceiver()->find($id);
     }
 
     /**
@@ -90,7 +90,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
      */
     public function send(Envelope $envelope): Envelope
     {
-        return ($this->sender ?? $this->getSender())->send($envelope);
+        return $this->getSender()->send($envelope);
     }
 
     /**
@@ -121,15 +121,11 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
 
     private function getReceiver(): DoctrineReceiver
     {
-        return $this->receiver = new DoctrineReceiver($this->connection, $this->serializer);
+        return $this->receiver ??= new DoctrineReceiver($this->connection, $this->serializer);
     }
 
     private function getSender(): DoctrineSender
     {
-        return $this->sender = new DoctrineSender($this->connection, $this->serializer);
+        return $this->sender ??= new DoctrineSender($this->connection, $this->serializer);
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport::class, false)) {
-    class_alias(DoctrineTransport::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport::class);
 }

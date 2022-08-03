@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -32,17 +33,20 @@ use Twig\Loader\FilesystemLoader;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
+#[AsCommand(name: 'debug:twig', description: 'Show a list of twig functions, filters, globals and tests')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:twig';
-    protected static $defaultDescription = 'Show a list of twig functions, filters, globals and tests';
+    private Environment $twig;
+    private ?string $projectDir;
+    private array $bundlesMetadata;
+    private ?string $twigDefaultPath;
 
-    private $twig;
-    private $projectDir;
-    private $bundlesMetadata;
-    private $twigDefaultPath;
-    private $filesystemLoaders;
-    private $fileLinkFormatter;
+    /**
+     * @var FilesystemLoader[]
+     */
+    private array $filesystemLoaders;
+
+    private ?FileLinkFormatter $fileLinkFormatter;
 
     public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, FileLinkFormatter $fileLinkFormatter = null)
     {
@@ -63,7 +67,6 @@ class DebugCommand extends Command
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command outputs a list of twig functions,
 filters, globals and tests.
@@ -88,7 +91,7 @@ EOF
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
@@ -291,7 +294,7 @@ EOF
             }
 
             foreach ($namespaces as $namespace) {
-                $paths = array_map([$this, 'getRelativePath'], $loader->getPaths($namespace));
+                $paths = array_map($this->getRelativePath(...), $loader->getPaths($namespace));
 
                 if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
                     $namespace = '(None)';
@@ -306,7 +309,7 @@ EOF
         return $loaderPaths;
     }
 
-    private function getMetadata(string $type, $entity)
+    private function getMetadata(string $type, mixed $entity)
     {
         if ('globals' === $type) {
             return $entity;
@@ -364,7 +367,7 @@ EOF
         return null;
     }
 
-    private function getPrettyMetadata(string $type, $entity, bool $decorated): ?string
+    private function getPrettyMetadata(string $type, mixed $entity, bool $decorated): ?string
     {
         if ('tests' === $type) {
             return '';
@@ -570,7 +573,7 @@ EOF
      */
     private function getFilesystemLoaders(): array
     {
-        if (null !== $this->filesystemLoaders) {
+        if (isset($this->filesystemLoaders)) {
             return $this->filesystemLoaders;
         }
         $this->filesystemLoaders = [];

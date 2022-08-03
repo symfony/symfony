@@ -328,7 +328,7 @@ return [
         'Europe/Helsinki' => 'Ngonga ya Filandɛ (Helsinki)',
         'Europe/Istanbul' => 'Ngonga ya Tiliki (Istanbul)',
         'Europe/Kaliningrad' => 'Ngonga ya Risí (Kaliningrad)',
-        'Europe/Kiev' => 'Ngonga ya Ikrɛni (Kiev)',
+        'Europe/Kiev' => 'Ngonga ya Ikrɛni (Kyiv)',
         'Europe/Kirov' => 'Ngonga ya Risí (Kirov)',
         'Europe/Lisbon' => 'Ngonga ya Putúlugɛsi (Lisbon)',
         'Europe/Ljubljana' => 'Ngonga ya Siloveni (Ljubljana)',

@@ -22,7 +22,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateIntervalToStringTransformer implements DataTransformerInterface
 {
-    private $format;
+    private string $format;
 
     /**
      * Transforms a \DateInterval instance to a string.
@@ -41,11 +41,9 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param \DateInterval|null $value A DateInterval object
      *
-     * @return string
-     *
      * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */
-    public function transform($value)
+    public function transform(mixed $value): string
     {
         if (null === $value) {
             return '';
@@ -62,12 +60,10 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param string $value An ISO 8601 or date string like date interval presentation
      *
-     * @return \DateInterval|null
-     *
      * @throws UnexpectedTypeException       if the given value is not a string
      * @throws TransformationFailedException if the date interval could not be parsed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): ?\DateInterval
     {
         if (null === $value) {
             return null;

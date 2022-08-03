@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('debug');
 
@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
                     ->values(['dark', 'light'])
                     ->defaultValue('dark')
                 ->end()
-            ;
+        ;
 
         return $treeBuilder;
     }

@@ -17,9 +17,9 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Bundle\SecurityBundle\Security\Security;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -33,13 +33,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -47,6 +43,7 @@ use Symfony\Component\Security\Core\User\MissingUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
+use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -62,17 +59,13 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('security.authorization_checker', AuthorizationChecker::class)
-            ->public()
             ->args([
                 service('security.token_storage'),
                 service('security.access.decision_manager'),
-                param('security.access.always_authenticate_before_granting'),
             ])
-            ->tag('container.private', ['package' => 'symfony/security-bundle', 'version' => '5.3'])
         ->alias(AuthorizationCheckerInterface::class, 'security.authorization_checker')
 
         ->set('security.token_storage', UsageTrackingTokenStorage::class)
-            ->public()
             ->args([
                 service('security.untracked_token_storage'),
                 service_locator([
@@ -81,17 +74,27 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.reset', ['method' => 'disableUsageTracking'])
             ->tag('kernel.reset', ['method' => 'setToken'])
-            ->tag('container.private', ['package' => 'symfony/security-bundle', 'version' => '5.3'])
         ->alias(TokenStorageInterface::class, 'security.token_storage')
 
         ->set('security.untracked_token_storage', TokenStorage::class)
 
         ->set('security.helper', Security::class)
-            ->args([service_locator([
-                'security.token_storage' => service('security.token_storage'),
-                'security.authorization_checker' => service('security.authorization_checker'),
-            ])])
+            ->args([
+                service_locator([
+                    'security.token_storage' => service('security.token_storage'),
+                    'security.authorization_checker' => service('security.authorization_checker'),
+                    'security.user_authenticator' => service('security.user_authenticator')->ignoreOnInvalid(),
+                    'request_stack' => service('request_stack'),
+                    'security.firewall.map' => service('security.firewall.map'),
+                    'security.user_checker' => service('security.user_checker'),
+                    'security.firewall.event_dispatcher_locator' => service('security.firewall.event_dispatcher_locator'),
+                    'security.csrf.token_manager' => service('security.csrf.token_manager')->ignoreOnInvalid(),
+                ]),
+                abstract_arg('authenticators'),
+            ])
         ->alias(Security::class, 'security.helper')
+        ->alias(LegacySecurity::class, 'security.helper')
+            ->deprecate('symfony/security-bundle', '6.2', 'The "%alias_id%" service alias is deprecated, use "'.Security::class.'" instead.')
 
         ->set('security.user_value_resolver', UserValueResolver::class)
             ->args([
@@ -108,25 +111,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authentication.session_strategy_noop', SessionAuthenticationStrategy::class)
             ->args(['none'])
-
-        ->set('security.encoder_factory.generic', EncoderFactory::class)
-            ->args([
-                [],
-            ])
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use "security.password_hasher_factory" instead.')
-        ->alias('security.encoder_factory', 'security.encoder_factory.generic')
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "security.password_hasher_factory" instead.')
-        ->alias(EncoderFactoryInterface::class, 'security.encoder_factory')
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "'.PasswordHasherFactoryInterface::class.'" instead.')
-
-        ->set('security.user_password_encoder.generic', UserPasswordEncoder::class)
-            ->args([service('security.encoder_factory')])
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use "security.user_password_hasher" instead.')
-        ->alias('security.password_encoder', 'security.user_password_encoder.generic')
-            ->public()
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "security.password_hasher"" instead.')
-        ->alias(UserPasswordEncoderInterface::class, 'security.password_encoder')
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "'.UserPasswordHasherInterface::class.'" instead.')
 
         ->set('security.user_checker', InMemoryUserChecker::class)
 
@@ -225,6 +209,7 @@ return static function (ContainerConfigurator $container) {
                 null,
                 [], // listeners
                 null, // switch_user
+                null, // logout
             ])
 
         ->set('security.logout_url_generator', LogoutUrlGenerator::class)
@@ -289,5 +274,19 @@ return static function (ContainerConfigurator $container) {
                 service('security.expression_language'),
             ])
             ->tag('kernel.cache_warmer')
+
+        ->set('controller.is_granted_attribute_listener', IsGrantedAttributeListener::class)
+            ->args([
+                service('security.authorization_checker'),
+                service('security.is_granted_attribute_expression_language')->nullOnInvalid(),
+            ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('security.is_granted_attribute_expression_language', BaseExpressionLanguage::class)
+            ->args([service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid()])
+
+        ->set('cache.security_is_granted_attribute_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
     ;
 };

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\IdGenerator;
 
+use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Factory\UuidFactory;
@@ -18,14 +19,11 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV6;
 
-/**
- * @requires function \Symfony\Component\Uid\Factory\UuidFactory::create
- */
 class UuidGeneratorTest extends TestCase
 {
     public function testUuidCanBeGenerated()
     {
-        $em = new EntityManager();
+        $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
         $generator = new UuidGenerator();
         $uuid = $generator->generate($em, new Entity());
 
@@ -35,7 +33,7 @@ class UuidGeneratorTest extends TestCase
     public function testCustomUuidfactory()
     {
         $uuid = new UuidV4();
-        $em = new EntityManager();
+        $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
         $factory = $this->createMock(UuidFactory::class);
         $factory->expects($this->any())
             ->method('create')
@@ -47,7 +45,7 @@ class UuidGeneratorTest extends TestCase
 
     public function testUuidfactory()
     {
-        $em = new EntityManager();
+        $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
         $generator = new UuidGenerator();
         $this->assertInstanceOf(UuidV6::class, $generator->generate($em, new Entity()));
 

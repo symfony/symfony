@@ -27,15 +27,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FormTypeValidatorExtension extends BaseValidatorExtension
 {
-    private $validator;
-    private $violationMapper;
-    private $legacyErrorMessages;
+    private ValidatorInterface $validator;
+    private ViolationMapper $violationMapper;
+    private bool $legacyErrorMessages;
 
     public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {
         $this->validator = $validator;
         $this->violationMapper = new ViolationMapper($formRenderer, $translator);
-        $this->legacyErrorMessages = $legacyErrorMessages;
     }
 
     /**
@@ -63,20 +62,10 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'constraints' => [],
             'invalid_message' => 'This value is not valid.',
             'invalid_message_parameters' => [],
-            'legacy_error_messages' => $this->legacyErrorMessages,
             'allow_extra_fields' => false,
             'extra_fields_message' => 'This form should not contain extra fields.',
         ]);
         $resolver->setAllowedTypes('constraints', [Constraint::class, Constraint::class.'[]']);
-        $resolver->setAllowedTypes('legacy_error_messages', 'bool');
-        $resolver->setDeprecated('legacy_error_messages', 'symfony/form', '5.2', function (Options $options, $value) {
-            if (true === $value) {
-                return 'Setting the "legacy_error_messages" option to "true" is deprecated. It will be disabled in Symfony 6.0.';
-            }
-
-            return '';
-        });
-
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }
 

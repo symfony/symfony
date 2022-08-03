@@ -15,6 +15,7 @@ use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -28,18 +29,18 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DoctrineDataCollector extends DataCollector
 {
-    private $registry;
-    private $connections;
-    private $managers;
+    private array $connections;
+    private array $managers;
 
     /**
-     * @var DebugStack[]
+     * @var array<string, DebugStack>
      */
-    private $loggers = [];
+    private array $loggers = [];
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private ManagerRegistry $registry,
+        private ?DebugDataHolder $debugDataHolder = null,
+    ) {
         $this->connections = $registry->getConnectionNames();
         $this->managers = $registry->getManagerNames();
     }
@@ -57,21 +58,41 @@ class DoctrineDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $queries = [];
-        foreach ($this->loggers as $name => $logger) {
-            $queries[$name] = $this->sanitizeQueries($name, $logger->queries);
-        }
-
         $this->data = [
-            'queries' => $queries,
+            'queries' => $this->collectQueries(),
             'connections' => $this->connections,
             'managers' => $this->managers,
         ];
     }
 
+    private function collectQueries(): array
+    {
+        $queries = [];
+
+        if (null !== $this->debugDataHolder) {
+            foreach ($this->debugDataHolder->getData() as $name => $data) {
+                $queries[$name] = $this->sanitizeQueries($name, $data);
+            }
+
+            return $queries;
+        }
+
+        foreach ($this->loggers as $name => $logger) {
+            $queries[$name] = $this->sanitizeQueries($name, $logger->queries);
+        }
+
+        return $queries;
+    }
+
     public function reset()
     {
         $this->data = [];
+
+        if (null !== $this->debugDataHolder) {
+            $this->debugDataHolder->reset();
+
+            return;
+        }
 
         foreach ($this->loggers as $logger) {
             $logger->queries = [];
@@ -114,7 +135,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'db';
     }
@@ -122,7 +143,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         return parent::getCasters() + [
             ObjectParameter::class => static function (ObjectParameter $o, array $a, Stub $s): array {
@@ -213,7 +234,7 @@ class DoctrineDataCollector extends DataCollector
      * indicating if the original value was kept (allowing to use the sanitized
      * value to explain the query).
      */
-    private function sanitizeParam($var, ?\Throwable $error): array
+    private function sanitizeParam(mixed $var, ?\Throwable $error): array
     {
         if (\is_object($var)) {
             return [$o = new ObjectParameter($var, $error), false, $o->isStringable() && !$error];

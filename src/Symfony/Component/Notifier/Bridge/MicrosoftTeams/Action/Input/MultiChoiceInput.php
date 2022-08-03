@@ -26,12 +26,12 @@ final class MultiChoiceInput extends AbstractInput
         'normal',
     ];
 
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function choice(string $display, string $value): self
+    public function choice(string $display, string $value): static
     {
         $this->options['choices'][] = ['display' => $display, 'value' => $value];
 
@@ -41,7 +41,7 @@ final class MultiChoiceInput extends AbstractInput
     /**
      * @return $this
      */
-    public function isMultiSelect(bool $multiSelect): self
+    public function isMultiSelect(bool $multiSelect): static
     {
         $this->options['isMultiSelect'] = $multiSelect;
 
@@ -51,7 +51,7 @@ final class MultiChoiceInput extends AbstractInput
     /**
      * @return $this
      */
-    public function style(string $style): self
+    public function style(string $style): static
     {
         if (!\in_array($style, self::STYLES)) {
             throw new InvalidArgumentException(sprintf('Supported styles for "%s" method are: "%s".', __METHOD__, implode('", "', self::STYLES)));

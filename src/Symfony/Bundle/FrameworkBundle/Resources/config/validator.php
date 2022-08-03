@@ -29,9 +29,7 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('validator', ValidatorInterface::class)
-            ->public()
             ->factory([service('validator.builder'), 'getValidator'])
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
         ->alias(ValidatorInterface::class, 'validator')
 
         ->set('validator.builder', ValidatorBuilder::class)
@@ -104,5 +102,5 @@ return static function (ContainerConfigurator $container) {
                 service('property_info'),
             ])
             ->tag('validator.auto_mapper')
-        ;
+    ;
 };

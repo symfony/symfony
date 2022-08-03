@@ -21,6 +21,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 /*
 Tests for HTTP2 Push need a recent version of both PHP and curl. This docker command should run them:
@@ -321,7 +322,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
         $process->start();
 
-        register_shutdown_function([$process, 'stop']);
+        register_shutdown_function($process->stop(...));
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
 
         if (!$process->isRunning()) {
@@ -353,7 +354,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             unset($e);
 
             $r = new \ReflectionProperty($client, 'multi');
-            $r->setAccessible(true);
             /** @var ClientState $clientState */
             $clientState = $r->getValue($client);
 
@@ -372,5 +372,129 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }]);
 
         $this->assertNotEmpty($traceInfo['debug']);
+    }
+
+    public function testFixContentLength()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+            'headers' => ['Content-Length: 4'],
+        ]);
+
+        $body = $response->toArray();
+
+        $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $body);
+    }
+
+    public function testDropContentRelatedHeadersWhenFollowingRequestIsUsingGet()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/302', [
+            'body' => 'foo',
+            'headers' => ['Content-Length: 3'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testNegativeTimeout()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->assertSame(200, $client->request('GET', 'http://localhost:8057', [
+            'timeout' => -1,
+        ])->getStatusCode());
+    }
+
+    public function testRedirectAfterPost()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/302/relative', [
+            'body' => '',
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsStringIgnoringCase("\r\nContent-Length: 0", $response->getInfo('debug'));
+    }
+
+    public function testEmptyPut()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('PUT', 'http://localhost:8057/post', [
+            'headers' => ['Content-Length' => '0'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
+    }
+
+    public function testNullBody()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $client->request('POST', 'http://localhost:8057/post', [
+            'body' => null,
+        ]);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * @dataProvider getRedirectWithAuthTests
+     */
+    public function testRedirectWithAuth(string $url, bool $redirectWithAuth)
+    {
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'cookie' => 'foo=bar',
+                ],
+            ]);
+            $body = $response->toArray();
+        } finally {
+            $p->stop();
+        }
+
+        if ($redirectWithAuth) {
+            $this->assertArrayHasKey('HTTP_COOKIE', $body);
+        } else {
+            $this->assertArrayNotHasKey('HTTP_COOKIE', $body);
+        }
+    }
+
+    public function getRedirectWithAuthTests()
+    {
+        return [
+            'same host and port' => ['url' => 'http://localhost:8057/302', 'redirectWithAuth' => true],
+            'other port' => ['url' => 'http://localhost:8067/302', 'redirectWithAuth' => false],
+            'other host' => ['url' => 'http://127.0.0.1:8057/302', 'redirectWithAuth' => false],
+        ];
+    }
+
+    public function testDefaultContentType()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = $client->withOptions(['headers' => ['Content-Type: application/json']]);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => ['abc' => 'def'],
+        ]);
+
+        $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => '{"abc": "def"}',
+        ]);
+
+        $this->assertSame(['abc' => 'def', 'content-type' => 'application/json', 'REQUEST_METHOD' => 'POST'], $response->toArray());
     }
 }

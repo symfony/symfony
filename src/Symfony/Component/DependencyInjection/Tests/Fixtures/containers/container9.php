@@ -189,4 +189,12 @@ $container->register('preload_sidekick', 'stdClass')
     ->addTag('container.preload', ['class' => 'Some\Sidekick1'])
     ->addTag('container.preload', ['class' => 'Some\Sidekick2']);
 
+$container->register('a_factory', 'Bar');
+$container->register('a_service', 'Bar')
+    ->setFactory([new Reference('a_factory'), 'getBar'])
+    ->setPublic(true);
+$container->register('b_service', 'Bar')
+    ->setFactory([new Reference('a_factory'), 'getBar'])
+    ->setPublic(true);
+
 return $container;

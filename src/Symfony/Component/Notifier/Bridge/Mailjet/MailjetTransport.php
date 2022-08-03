@@ -28,8 +28,8 @@ final class MailjetTransport extends AbstractTransport
 {
     protected const HOST = 'api.mailjet.com';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -55,12 +55,14 @@ final class MailjetTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/v4/sms-send', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
-                'From' => $this->from,
+                'From' => $from,
                 'To' => $message->getPhone(),
                 'Text' => $message->getSubject(),
             ],

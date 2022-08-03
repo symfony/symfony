@@ -1419,9 +1419,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : $this->envPlaceholders;
 
         $completed = false;
+        preg_match_all('/env[_(][\w)]*/i', $value, $matches);
+        $usedPlaceHolders = array_flip($matches[0]);
         foreach ($envPlaceholders as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
-                if (false !== stripos($value, $placeholder)) {
+                if (isset($usedPlaceHolders[$placeholder]) || false !== stripos($value, $placeholder)) {
                     if (true === $format) {
                         $resolved = $bag->escapeValue($this->getEnv($env));
                     } else {

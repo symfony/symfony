@@ -153,6 +153,19 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame(['scalar_node' => $expected], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
+    public function testSurroundedEnvInConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', [
+            'scalar_node' => $expected = 'foo%env(BAR)%baz',
+        ]);
+
+        $this->doProcess($container);
+
+        $this->assertSame(['scalar_node' => $expected], $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
     public function testEnvIsIncompatibleWithArrayNode()
     {
         $this->expectException(InvalidConfigurationException::class);

@@ -117,9 +117,15 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
         // serialize config and container to catch env vars nested in object graphs
         $config = serialize($config).serialize($container->getDefinitions()).serialize($container->getAliases()).serialize($container->getParameterBag()->all());
 
+        if (false === stripos($config, 'env_')) {
+            return;
+        }
+
+        preg_match_all('/env_[a-f0-9]{16}_\w+_[a-f0-9]{32}/Ui', $config, $matches);
+        $usedPlaceholders = array_flip($matches[0]);
         foreach (parent::getEnvPlaceholders() as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
-                if (false !== stripos($config, $placeholder)) {
+                if (isset($usedPlaceholders[$placeholder])) {
                     $this->processedEnvPlaceholders[$env] = $placeholders;
                     break;
                 }

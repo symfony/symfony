@@ -123,8 +123,12 @@ final class LocoProvider implements ProviderInterface
                     $this->logger->info(sprintf('No modifications found for locale "%s" and domain "%s" in Loco.', $locale, $domain));
 
                     $catalogue = new MessageCatalogue($locale);
+                    $previousMessages = $previousCatalogue->all($domain);
 
-                    foreach ($previousCatalogue->all($domain) as $key => $message) {
+                    if (!str_ends_with($domain, $catalogue::INTL_DOMAIN_SUFFIX)) {
+                        $previousMessages = array_diff_key($previousMessages, $previousCatalogue->all($domain.$catalogue::INTL_DOMAIN_SUFFIX));
+                    }
+                    foreach ($previousMessages as $key => $message) {
                         $catalogue->set($this->retrieveKeyFromId($key, $domain), $message, $domain);
                     }
 

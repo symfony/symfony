@@ -15,7 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
-use Symfony\Component\Messenger\Stamp\ViaSenderStamp;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 /**
  * Maps a message to a list of senders.
@@ -42,10 +42,8 @@ class SendersLocator implements SendersLocatorInterface
      */
     public function getSenders(Envelope $envelope): iterable
     {
-        if (\count($envelope->all(ViaSenderStamp::class)) > 0) {
-            $viaSenderStamp = $envelope->last(ViaSenderStamp::class);
-
-            foreach ($viaSenderStamp->getSenders() as $senderAlias) {
+        if ($envelope->all(TransportNamesStamp::class)) {
+            foreach ($envelope->last(TransportNamesStamp::class)->getTransportNames() as $senderAlias) {
                 yield from $this->getSenderFromAlias($senderAlias);
             }
 

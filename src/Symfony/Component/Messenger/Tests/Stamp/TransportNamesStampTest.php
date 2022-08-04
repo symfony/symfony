@@ -12,15 +12,15 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Stamp\ViaSenderStamp;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
-class ViaSenderStampTest extends TestCase
+class TransportNamesStampTest extends TestCase
 {
     public function testGetSenders()
     {
         $configuredSenders = ['first_transport', 'second_transport', 'other_transport'];
-        $stamp = new ViaSenderStamp($configuredSenders);
-        $stampSenders = $stamp->getSenders();
+        $stamp = new TransportNamesStamp($configuredSenders);
+        $stampSenders = $stamp->getTransportNames();
         $this->assertEquals(\count($configuredSenders), \count($stampSenders));
 
         foreach ($configuredSenders as $key => $sender) {

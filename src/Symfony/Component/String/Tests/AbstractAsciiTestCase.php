@@ -1041,6 +1041,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     {
         return [
             ['', ''],
+            ['xY', 'x_y'],
             ['symfonyIsGreat', 'symfony_is_great'],
             ['symfony5IsGreat', 'symfony_5_is_great'],
             ['symfonyIsGreat', 'Symfony is great'],
@@ -1063,6 +1064,8 @@ abstract class AbstractAsciiTestCase extends TestCase
     {
         return [
             ['', ''],
+            ['x_y', 'x_y'],
+            ['x_y', 'X_Y'],
             ['symfony_is_great', 'symfonyIsGreat'],
             ['symfony5_is_great', 'symfony5IsGreat'],
             ['symfony5is_great', 'symfony5isGreat'],

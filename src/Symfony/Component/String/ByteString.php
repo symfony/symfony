@@ -347,7 +347,7 @@ class ByteString extends AbstractString
 
     public function snake(): static
     {
-        $str = $this->camel()->title();
+        $str = $this->camel();
         $str->string = strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], '\1_\2', $str->string));
 
         return $str;

@@ -68,24 +68,29 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
+        $statusCode = Command::SUCCESS;
         if ($this->registrationErrors) {
+            $statusCode = Command::FAILURE;
+
             $this->renderRegistrationErrors($input, $output);
         }
 
         $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
 
-        return parent::doRun($input, $output);
+        return max($statusCode, parent::doRun($input, $output));
     }
 
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         if (!$command instanceof ListCommand) {
+            $statusCode = Command::SUCCESS;
             if ($this->registrationErrors) {
+                $statusCode = Command::FAILURE;
                 $this->renderRegistrationErrors($input, $output);
                 $this->registrationErrors = [];
             }
 
-            return parent::doRunCommand($command, $input, $output);
+            return max($statusCode, parent::doRunCommand($command, $input, $output));
         }
 
         $returnCode = parent::doRunCommand($command, $input, $output);

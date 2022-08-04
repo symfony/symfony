@@ -123,7 +123,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($newCommand, $application->get('example'));
     }
 
-    public function testRunOnlyWarnsOnUnregistrableCommand()
+    public function testUnregistrableCommandsAreConsideredFailure()
     {
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
@@ -147,7 +147,7 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'fine']);
         $output = $tester->getDisplay();
 
-        $tester->assertCommandIsSuccessful();
+        $this->assertSame(1, $tester->getStatusCode());
         $this->assertStringContainsString('Some commands could not be registered:', $output);
         $this->assertStringContainsString('throwing', $output);
         $this->assertStringContainsString('fine', $output);
@@ -180,7 +180,7 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Command "fine" is not defined.', $output);
     }
 
-    public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()
+    public function testRunFailsOnUnregistrableCommandAtTheEnd()
     {
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
@@ -204,7 +204,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'list']);
 
-        $tester->assertCommandIsSuccessful();
+        $this->assertSame(1, $tester->getStatusCode());
         $display = explode('List commands', $tester->getDisplay());
 
         $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));

@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use LogicException;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Define some ExpressionLanguage functions.
@@ -23,26 +21,16 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
-    private ExecutionContextInterface $context;
-
-    public function __construct(ExecutionContextInterface $context)
-    {
-        $this->context = $context;
-    }
-
     public function getFunctions(): array
     {
         return [
-            new ExpressionFunction('is_valid', function () {
-                throw new LogicException('The "is_valid" function cannot be compiled.');
+            new ExpressionFunction('is_valid', function (...$arguments) {
+                return sprintf(
+                    '0 === $context->getValidator()->inContext($context)->validate(%s)->getViolations()->count()',
+                    implode(', ', $arguments)
+                );
             }, function (array $variables, ...$arguments): bool {
-                $context = $this->context;
-
-                $validator = $context->getValidator()->inContext($context);
-
-                $violations = $validator->validate(...$arguments)->getViolations();
-
-                return 0 === $violations->count();
+                return 0 === $variables['context']->getValidator()->inContext($variables['context'])->validate(...$arguments)->getViolations()->count();
             }),
         ];
     }

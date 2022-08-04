@@ -41,6 +41,7 @@ class ExpressionValidator extends ConstraintValidator
         $variables = $constraint->values;
         $variables['value'] = $value;
         $variables['this'] = $this->context->getObject();
+        $variables['context'] = $this->context;
 
         if ($constraint->negate xor $this->getExpressionLanguage()->evaluate($constraint->expression, $variables)) {
             $this->context->buildViolation($constraint->message)
@@ -57,7 +58,7 @@ class ExpressionValidator extends ConstraintValidator
         }
 
         if (false === $this->expressionLanguage->hasFunctionByName('is_valid')) {
-            $this->expressionLanguage->registerProvider(new ExpressionLanguageProvider($this->context));
+            $this->expressionLanguage->registerProvider(new ExpressionLanguageProvider());
         }
 
         return $this->expressionLanguage;

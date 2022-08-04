@@ -11,7 +11,6 @@
 
 namespace Constraints;
 
-use LogicException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
@@ -24,19 +23,35 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ExpressionLanguageProviderTest extends TestCase
 {
-    public function testCompile(): void
+    /**
+     * @dataProvider dataProviderCompile
+     */
+    public function testCompile(string $expression, array $names, string $expected): void
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "is_valid" function cannot be compiled.');
-
-        $context = $this->createMock(ExecutionContextInterface::class);
-
-        $provider = new ExpressionLanguageProvider($context);
+        $provider = new ExpressionLanguageProvider();
 
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->registerProvider($provider);
 
-        $expressionLanguage->compile('is_valid()');
+        $result = $expressionLanguage->compile($expression, $names);
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function dataProviderCompile(): array
+    {
+        return [
+            [
+                'is_valid("foo", constraints)',
+                ['constraints'],
+                '0 === $context->getValidator()->inContext($context)->validate("foo", $constraints)->getViolations()->count()',
+            ],
+            [
+                'is_valid(this.data, constraints, groups)',
+                ['this', 'constraints', 'groups'],
+                '0 === $context->getValidator()->inContext($context)->validate($this->data, $constraints, $groups)->getViolations()->count()',
+            ]
+        ];
     }
 
     /**
@@ -80,12 +95,15 @@ class ExpressionLanguageProviderTest extends TestCase
             ->with($context)
             ->willReturn($contextualValidator);
 
-        $provider = new ExpressionLanguageProvider($context);
+        $provider = new ExpressionLanguageProvider();
 
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->registerProvider($provider);
 
-        $this->assertSame($expected, $expressionLanguage->evaluate('is_valid("foo", a)', ['a' => $constraints]));
+        $this->assertSame(
+            $expected,
+            $expressionLanguage->evaluate('is_valid("foo", a)', ['a' => $constraints, 'context' => $context])
+        );
     }
 
     public function dataProviderEvaluate(): array

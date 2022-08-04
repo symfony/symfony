@@ -527,7 +527,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
                     $childContext = $this->createChildContext($context, $attribute, $format);
                     if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
-                        return $this->serializer->denormalize($data, $class, $format, $childContext);
+                        return $this->serializer->denormalize($data, $class, $format, array_merge($childContext, ['current_attribute' => $attribute, 'current_class' => $currentClass]));
                     }
                 }
 

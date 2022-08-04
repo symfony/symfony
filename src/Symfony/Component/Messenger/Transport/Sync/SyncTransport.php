@@ -37,11 +37,6 @@ class SyncTransport implements TransportInterface
         throw new InvalidArgumentException('You cannot receive messages from the Messenger SyncTransport.');
     }
 
-    public function stop(): void
-    {
-        throw new InvalidArgumentException('You cannot call stop() on the Messenger SyncTransport.');
-    }
-
     public function ack(Envelope $envelope): void
     {
         throw new InvalidArgumentException('You cannot call ack() on the Messenger SyncTransport.');

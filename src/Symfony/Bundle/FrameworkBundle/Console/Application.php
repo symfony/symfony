@@ -24,6 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
+use function max;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -68,13 +69,16 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
+        $statusCode = Command::SUCCESS;
         if ($this->registrationErrors) {
+            $statusCode = Command::FAILURE;
+
             $this->renderRegistrationErrors($input, $output);
         }
 
         $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
 
-        return parent::doRun($input, $output);
+        return max($statusCode, parent::doRun($input, $output));
     }
 
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
@@ -83,7 +87,9 @@ class Application extends BaseApplication
         $renderRegistrationErrors = true;
 
         if (!$command instanceof ListCommand) {
+            $statusCode = Command::SUCCESS;
             if ($this->registrationErrors) {
+                $statusCode = Command::FAILURE;
                 $this->renderRegistrationErrors($input, $output);
                 $this->registrationErrors = [];
                 $renderRegistrationErrors = false;
@@ -120,7 +126,7 @@ class Application extends BaseApplication
         }
 
         try {
-            $returnCode = parent::doRunCommand($command, $input, $output);
+            $returnCode = max($statusCode ?? 0, parent::doRunCommand($command, $input, $output));
         } finally {
             $requestStack?->pop();
         }

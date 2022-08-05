@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by flack at 2022-08-05T09:02:33Z
+
+I tested this patch against my 4.4 app, and it fixes the issue mentioned in #47186

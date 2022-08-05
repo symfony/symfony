@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\DataMapper;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -100,6 +101,10 @@ class PropertyPathMapper implements DataMapperInterface
         try {
             return $this->propertyAccessor->getValue($data, $propertyPath);
         } catch (AccessException $e) {
+            if (\is_array($data) && $e instanceof NoSuchIndexException) {
+                return null;
+            }
+
             if (!$e instanceof UninitializedPropertyException
                 // For versions without UninitializedPropertyException check the exception message
                 && (class_exists(UninitializedPropertyException::class) || !str_contains($e->getMessage(), 'You should initialize it'))

@@ -195,13 +195,13 @@
         "docker-build": "docker build --tag symfony-tests .docker/",
         "docker-run": "docker run --rm --tty --user $(id --user):$(id --group) --volume $(pwd):/symfony symfony-tests",
         "docker-composer": "@docker-run env COMPOSER_ROOT_VERSION=6.2.x-dev composer update",
-        "docker-tests": "@docker-run ./phpunit src/Symfony/"
+        "docker-tests": "@docker-run ./phpunit"
     },
     "scripts-descriptions": {
         "docker-build": "Build the Docker image",
         "docker-run": "Base command to run Docker",
         "docker-composer": "Install dependencies through Composer",
-        "docker-tests": "Run tests, you can pass arguments, e.g. “composer docker-tests -- --debug src/Symfony/Component/Yaml/”."
+        "docker-tests": "Run tests, you should pass arguments, e.g. “composer docker-tests src/Symfony/Component/Yaml/” for testing a specific folder or “composer docker-tests src/Symfony/” to run the whole test suite in parallel. Options for PHPUnit must be prepend with --, e.g. “composer docker-tests -- --verbose --debug src/Symfony/Component/Yaml/”"
     },
     "repositories": [
         {

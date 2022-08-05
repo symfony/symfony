@@ -1,0 +1,230 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-04T08:16:03Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by asilelik at 2020-12-05T11:26:26Z
+
+> BusNameStamp and using middleware to insert Stamp
+
+Wouldn't it add an overhead? In current way, Envelope will not include OverrideStamp if not necessary. What do you think?
+
+---------------------------------------------------------------------------
+
+by diimpp at 2020-12-05T12:03:35Z
+
+On naming note, public stamp name shouldn't be derived from this moment internal implementation, so something like `SendersOverride` is not very suitable in my opinion.
+
+As library user, who is not privy to all the internals, first naming choice would be `TransportRouteStamp`, but I do see that the  `routing` is the framework-bundle config concept, rather than messenger concept, so maybe `TransportSendersStamp`
+
+---------------------------------------------------------------------------
+
+by asilelik at 2020-12-07T08:02:53Z
+
+> On naming note, public stamp name shouldn't be derived from this moment internal implementation, so something like `SendersOverride` is not very suitable in my opinion.
+>
+> As library user, who is not privy to all the internals, first naming choice would be `TransportRouteStamp`, but I do see that the `routing` is the framework-bundle config concept, rather than messenger concept, so maybe `TransportSendersStamp`
+
+@diimpp , thanks for your input, I will change the name, what do you think about the implementation?
+
+---------------------------------------------------------------------------
+
+by diimpp at 2020-12-07T16:31:21Z
+
+@asilelik looks alright to me, but I'm not a messenger specialist.
+
+One more thing, I don't why there are multiple senders routing in the messenger and what is the use case, but maybe you will want to allow to have both behaviors to override/extend senders config with bool flag at Stamp class.
+
+---------------------------------------------------------------------------
+
+by asilelik at 2020-12-07T16:34:41Z
+
+> @asilelik looks alright to me, but I'm not a messenger specialist.
+>
+> One more thing, I don't why there are multiple senders routing in the messenger and what is the use case, but maybe you will want to allow to have both behaviors to override/extends senders config with bool flag at Stamp class.
+
+Do you mean to send envelope to both configured transport and overridden one?
+
+---------------------------------------------------------------------------
+
+by diimpp at 2020-12-07T16:40:59Z
+
+> > @asilelik looks alright to me, but I'm not a messenger specialist.
+> > One more thing, I don't why there are multiple senders routing in the messenger and what is the use case, but maybe you will want to allow to have both behaviors to override/extends senders config with bool flag at Stamp class.
+>
+> Do you mean to send envelope to both configured transport and overridden one?
+
+For example if somebody already have their transports setup, but want conditionally to specify `audit` transport for certain messages.
+
+Then they will want to keep their original transports list and just add another one, e.g. `new TransportSendersStamp(['audit'], $extendSenders = true)`
+
+My personal use case is quite different, I need to conditionally send messeges to sync or async transports, so I will need to override original transports routing if preset, e.g. `new TransportSendersStamp(['async'], $overrideSenders = true)`
+
+---------------------------------------------------------------------------
+
+by asilelik at 2020-12-07T16:48:06Z
+
+> > > @asilelik looks alright to me, but I'm not a messenger specialist.
+> > > One more thing, I don't why there are multiple senders routing in the messenger and what is the use case, but maybe you will want to allow to have both behaviors to override/extends senders config with bool flag at Stamp class.
+> >
+> >
+> > Do you mean to send envelope to both configured transport and overridden one?
+>
+> For example if somebody already have their transports setup, but want conditionally to specify `audit` transport for certain messages.
+>
+> Then they will want to keep their original transports list and just add another one, e.g. `new TransportSendersStamp(['audit'], $extendSenders = true)`
+>
+> My personal use case is quite different, I need to conditionally send messeges to sync or async transports, so I will need to override original transports routing if preset, e.g. `new TransportSendersStamp(['async'], $overrideSenders = true)`
+
+Good point. It will make SendersLocator class a bit complex but I guess it will add a great value to the Stamp.
+
+---------------------------------------------------------------------------
+
+by asilelik at 2021-01-13T13:42:56Z
+
+@jderusse , can you take a second look at this PR and comment on suggestions? If you are fine with current implementation, I will create the tests to finalize PR.
+
+---------------------------------------------------------------------------
+
+by r6rob at 2021-08-02T12:01:26Z
+
+My use case is very similar to @diimpp. Building a job queue and would love to specify whether a job will be handled as sync or async programatically.
+
+This would be very helpful, eagerly awaiting PR.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-29T11:23:26Z
+
+@asilelik Thank you for the PR. Please go ahead with the missing tests, this looks good to me.
+
+---------------------------------------------------------------------------
+
+by asilelik at 2022-03-30T08:31:48Z
+
+@chalasr I've added the test. Apart from `git rebase` error, how can I fix other failures? They don't seem like related errors to my PR.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-30T10:01:08Z
+
+Yes, the failing test is unrelated.
+
+---------------------------------------------------------------------------
+
+by asilelik at 2022-03-30T10:37:43Z
+
+@chalasr what is the preferred way for getting rid of merge commit? Can I force push or is there any other suggestion?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-31T13:37:16Z
+
+> if we only look at the stamp, it's less clear to me that adding one ViaSenderStamp is going to erase all senders set via the framework config
+
+This maps to @jderusse's comment:
+> What if people want keeping the original senders?.
+
+What about conflicting when both are sent? Aka throw if a sender is configured while the stamp is also used? That'd make the situation impossible.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-31T23:54:51Z
+
+I missed that Jérémy's comment, thanks.
+
+> What about conflicting when both are sent?
+
+Given the originally proposed name, I suppose one may want to configure the sender the regular way and use the stamp to change the sender under certain circumstances only.
+Maybe the stamp could take a flag controlling whether to replace existing senders or not?
+
+---------------------------------------------------------------------------
+
+by tg-mvooges at 2022-07-18T14:35:06Z
+
+> > if we only look at the stamp, it's less clear to me that adding one ViaSenderStamp is going to erase all senders set via the framework config
+>
+> This maps to @jderusse's comment:
+>
+> > What if people want keeping the original senders?.
+>
+> What about conflicting when both are sent? Aka throw if a sender is configured while the stamp is also used? That'd make the situation impossible.
+
+I've not read the full thread (just the last few messages) but I would not for for a "when both are set". I would expect an either/or situation: You either use the default symfony-sender-decider-logic, OR the specified ones. If you would override the default configed target queue via a Stamp I think that could be made obvious with a clear name.
+
+To add a little insight on how we would like to use this: We have a few microservices which listen to the queue via the normal config. The failed messages all get send to a central located microservice which has logic to place them back on their respective queues.
+But that could be any queue, the central micro doesnt perse know everything. It has to now, which is inconvinient
+
+---------------------------------------------------------------------------
+
+by TCM-dev at 2022-08-04T14:35:31Z
+
+I'm also of the opinion that this should either use the default configured ones OR the specified ones (which I believe makes sense with the stamp name **OverrideSendersStamp**)
+
+I personnaly need this because in my application, I need to have the same message/handler to have a different priority depending on some context. (I can provide real world example if needed)
+
+Unless I'm mistaken, the only way I could do this right now would require me to duplicate the message/handlers with another name and configure them with another transport which is not ideal.
+
+Adding one stamp to decide if a message has an higher priority than another on the fly makes perfect sense to me and I was persuaded that it was actually a feature in messenger.
+
+Are the unsuccessful checks the only things preventing this to be merged or is this still open to discussion?
+
+---------------------------------------------------------------------------
+
+by tg-mvooges at 2022-08-04T15:17:45Z
+
+> I've rebased this PR and made some naming changes to finish it.
+
+I'm not 100% sure, but does this now ADD senders instead of overwriting? That might be slightly limiting. Not for my case, but supose you have a message default send to queueA and you want to CHANGE that to queueB. If you can only ADD, that might be problematic. Using an Override of some kind might be a more broad solution. Or some other method to reset the current senders.
+
+Again, doesnt bother me, I'm looking forward for this feature either way ^_^
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-04T16:43:01Z
+
+@tg-mvooges That's the case. See https://github.com/symfony/symfony/pull/39306/files#diff-357beebf345f58f777f74eb1127331b8107de09438ff78435093085a531c52beR52, if the stamp is set, we return and bypass the default configuration. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by TCM-dev at 2022-08-04T17:30:10Z
+
+> @tg-mvooges That's the case. See https://github.com/symfony/symfony/pull/39306/files#diff-357beebf345f58f777f74eb1127331b8107de09438ff78435093085a531c52beR52, if the stamp is set, we return and bypass the default configuration. Did I miss something?
+
+Looks perfect to me and more consistent with other stamp names.
+I'm just wondering if "sender" is the correct word, the documentation talks about "transport", this issue talk about being able to change "transport" and yet we name it sender.
+I may be wrong but wouldn't it be even better if it was named TransportsStamp/TransportNamesStamp ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-04T18:43:18Z
+
+> > @tg-mvooges That's the case. See https://github.com/symfony/symfony/pull/39306/files#diff-357beebf345f58f777f74eb1127331b8107de09438ff78435093085a531c52beR52, if the stamp is set, we return and bypass the default configuration. Did I miss something?
+>
+> Looks perfect to me and more consistent with other stamp names. I'm just wondering if "sender" is the correct word, the documentation talks about "transport", this issue talk about being able to change "transport" and yet we name it sender. I may be wrong but wouldn't it be even better if it was named TransportsStamp/TransportNamesStamp ?
+
+Even if Sender is the right word, I think you're right that using Transport is easier to understand. Updated accordingly.

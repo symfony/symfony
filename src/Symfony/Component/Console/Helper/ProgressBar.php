@@ -49,7 +49,7 @@ final class ProgressBar
     private float $maxSecondsBetweenRedraws = 1;
     private OutputInterface $output;
     private int $step = 0;
-    private int $resumedStep = 0;
+    private int $startingStep = 0;
     private ?int $max = null;
     private int $startTime;
     private int $stepWidth;
@@ -200,11 +200,11 @@ final class ProgressBar
 
     public function getEstimated(): float
     {
-        if (0 === $this->step || $this->step === $this->resumedStep) {
+        if (0 === $this->step || $this->step === $this->startingStep) {
             return 0;
         }
 
-        return round((time() - $this->startTime) / ($this->step - $this->resumedStep) * $this->max);
+        return round((time() - $this->startTime) / ($this->step - $this->startingStep) * $this->max);
     }
 
     public function getRemaining(): float
@@ -213,7 +213,7 @@ final class ProgressBar
             return 0;
         }
 
-        return round((time() - $this->startTime) / ($this->step - $this->resumedStep) * ($this->max - $this->step));
+        return round((time() - $this->startTime) / ($this->step - $this->startingStep) * ($this->max - $this->step));
     }
 
     public function setBarWidth(int $size)
@@ -303,17 +303,16 @@ final class ProgressBar
     /**
      * Starts the progress output.
      *
-     * @param int|null $max      Number of steps to complete the bar (0 if indeterminate), null to leave unchanged
-     * @param int      $resumeAt when restarting a previously started progress, set on what step we are restarting so that time estimations are calculated correctly, and the
-     *                           progress is automatically set to the appropriate step
+     * @param int|null $max     Number of steps to complete the bar (0 if indeterminate), null to leave unchanged
+     * @param int      $startAt The starting point of the bar (useful e.g. when resuming a previously started bar)
      */
-    public function start(int $max = null, int $resumeAt = 0): void
+    public function start(int $max = null, int $startAt = 0): void
     {
         $this->startTime = time();
-        $this->step = $resumeAt;
-        $this->resumedStep = $resumeAt;
+        $this->step = $startAt;
+        $this->startingStep = $startAt;
 
-        $resumeAt > 0 ? $this->setProgress($resumeAt) : $this->percent = 0.0;
+        $startAt > 0 ? $this->setProgress($startAt) : $this->percent = 0.0;
 
         if (null !== $max) {
             $this->setMaxSteps($max);

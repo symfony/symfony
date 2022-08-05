@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-08-04T16:37:30Z
+
+What about also performing this check in the configuration itself?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2022-08-05T11:21:17Z
+
+That might throw the exception also when the `strict` setting is only set in configuration, but never actually used. We might do it that way, but it would behave different from setting `strict` as an option only... which is why I chose to do it that way here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-08-05T11:31:28Z
+
+Yeah, you are right. Probably it's better play safe here and not do that as a bugfix.

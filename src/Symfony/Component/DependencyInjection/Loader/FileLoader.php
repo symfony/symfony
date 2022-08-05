@@ -120,7 +120,7 @@ abstract class FileLoader extends BaseFileLoader
             if (null === $errorMessage && $autoconfigureAttributes && $this->env) {
                 $r = $this->container->getReflectionClass($class);
                 $attribute = null;
-                foreach ($r->getAttributes(When::class) as $attribute) {
+                foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                     if ($this->env === $attribute->newInstance()->env) {
                         $attribute = null;
                         break;

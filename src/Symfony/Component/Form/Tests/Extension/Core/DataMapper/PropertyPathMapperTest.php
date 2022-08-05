@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\Tests\Fixtures\TypehintedPropertiesCar;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -361,6 +363,30 @@ class PropertyPathMapperTest extends TestCase
             [new \DateTime()],
             [new \DateTimeImmutable()],
         ];
+    }
+
+    public function testMapFormsToDataMapsDateTimeInstanceToArrayIfNotSetBefore()
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+        $form = (new FormFactoryBuilder())->getFormFactory()->createBuilder()
+            ->setDataMapper(new PropertyPathMapper($propertyAccessor))
+            ->add('date', DateType::class, [
+                'auto_initialize' => false,
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => 'UTC',
+                'widget' => 'single_text',
+            ])
+            ->getForm();
+
+        $form->submit([
+            'date' => '04/08/2022',
+        ]);
+
+        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 }
 

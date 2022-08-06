@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
+use Symfony\Component\Form\Extension\Validator\ValidatorFormEvents;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -73,13 +74,18 @@ class ValidationListenerTest extends TestCase
         $this->params = ['foo' => 'bar'];
     }
 
-    private function createForm($name = '', $compound = false)
+    private function createForm($name = '', $compound = false, $listener = null)
     {
         $config = new FormBuilder($name, null, new EventDispatcher(), (new FormFactoryBuilder())->getFormFactory());
         $config->setCompound($compound);
 
         if ($compound) {
             $config->setDataMapper(new DataMapper());
+        }
+
+        if ($listener) {
+            $config->addEventListener(ValidatorFormEvents::PRE_VALIDATE, [$listener, 'preValidate']);
+            $config->addEventListener(ValidatorFormEvents::POST_VALIDATE, [$listener, 'postValidate']);
         }
 
         return new Form($config);
@@ -132,6 +138,26 @@ class ValidationListenerTest extends TestCase
         $form = $this->createForm();
         $form->submit(null);
 
+        $this->listener->validateForm(new FormEvent($form, null));
+
+        $this->assertTrue($form->isValid());
+    }
+
+    public function testEventsAreDispatched()
+    {
+        $listenerMock = $this->getMockBuilder(\stdClass::class)->setMethods(['preValidate', 'postValidate'])->getMock();
+
+        $childForm = $this->createForm('child', false, $listenerMock);
+        $form = $this->createForm('', true, $listenerMock);
+        $form->add($childForm);
+
+        $form->submit(['child' => null]);
+
+        $this->listener->validateForm(new FormEvent($childForm, null));
+
+        // Events are triggered only when the root form is validated
+        $listenerMock->expects($this->exactly(2))->method('preValidate');
+        $listenerMock->expects($this->exactly(2))->method('postValidate');
         $this->listener->validateForm(new FormEvent($form, null));
 
         $this->assertTrue($form->isValid());

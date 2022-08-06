@@ -6,6 +6,7 @@ CHANGELOG
 
 * Allow passing `TranslatableInterface` objects to the `ChoiceView` label
 * Allow passing `TranslatableInterface` objects to the `help` option
+* Add `form.pre_validate` and `form.post_validate` events
 
 6.1
 ---

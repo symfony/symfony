@@ -33,8 +33,6 @@ final class PostgreSqlConnection extends Connection
         'get_notify_timeout' => 0,
     ];
 
-    private $listening = false;
-
     public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
@@ -62,12 +60,9 @@ final class PostgreSqlConnection extends Connection
             return parent::get();
         }
 
-        if (!$this->listening) {
-            // This is secure because the table name must be a valid identifier:
-            // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-            $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
-            $this->listening = true;
-        }
+        // This is secure because the table name must be a valid identifier:
+        // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+        $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
 
         if (method_exists($this->driverConnection, 'getNativeConnection')) {
             $wrappedConnection = $this->driverConnection->getNativeConnection();
@@ -150,11 +145,6 @@ SQL
 
     private function unlisten()
     {
-        if (!$this->listening) {
-            return;
-        }
-
         $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
-        $this->listening = false;
     }
 }

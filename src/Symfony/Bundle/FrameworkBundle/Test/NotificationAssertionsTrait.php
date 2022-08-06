@@ -22,14 +22,14 @@ use Symfony\Component\Notifier\Test\Constraint as NotifierConstraint;
  */
 trait NotificationAssertionsTrait
 {
-    public static function assertNotificationCount(int $count, string $transport = null, string $message = ''): void
+    public static function assertNotificationCount(int $count, string $transportName = null, string $message = ''): void
     {
-        self::assertThat(self::getNotificationEvents(), new NotifierConstraint\NotificationCount($count, $transport), $message);
+        self::assertThat(self::getNotificationEvents(), new NotifierConstraint\NotificationCount($count, $transportName), $message);
     }
 
-    public static function assertQueuedNotificationCount(int $count, string $transport = null, string $message = ''): void
+    public static function assertQueuedNotificationCount(int $count, string $transportName = null, string $message = ''): void
     {
-        self::assertThat(self::getMessageMailerEvents(), new NotifierConstraint\NotificationCount($count, $transport, true), $message);
+        self::assertThat(self::getMessageMailerEvents(), new NotifierConstraint\NotificationCount($count, $transportName, true), $message);
     }
 
     public static function assertNotificationIsQueued(MessageEvent $event, string $message = ''): void
@@ -42,50 +42,50 @@ trait NotificationAssertionsTrait
         self::assertThat($event, new LogicalNot(new NotifierConstraint\NotificationIsQueued()), $message);
     }
 
-    public static function assertNotificationSubjectContains(MessageInterface $messageObject, string $text, string $message = ''): void
+    public static function assertNotificationSubjectContains(MessageInterface $notification, string $text, string $message = ''): void
     {
-        self::assertThat($messageObject, new NotifierConstraint\NotificationSubjectContains($text), $message);
+        self::assertThat($notification, new NotifierConstraint\NotificationSubjectContains($text), $message);
     }
 
-    public static function assertNotificationSubjectNotContains(MessageInterface $messageObject, string $text, string $message = ''): void
+    public static function assertNotificationSubjectNotContains(MessageInterface $notification, string $text, string $message = ''): void
     {
-        self::assertThat($messageObject, new LogicalNot(new NotifierConstraint\NotificationSubjectContains($text)), $message);
+        self::assertThat($notification, new LogicalNot(new NotifierConstraint\NotificationSubjectContains($text)), $message);
     }
 
-    public static function assertNotificationTransportIsEqual(MessageInterface $messageObject, string $text, string $message = ''): void
+    public static function assertNotificationTransportIsEqual(MessageInterface $notification, string $transportName, string $message = ''): void
     {
-        self::assertThat($messageObject, new NotifierConstraint\NotificationTransportIsEqual($text), $message);
+        self::assertThat($notification, new NotifierConstraint\NotificationTransportIsEqual($transportName), $message);
     }
 
-    public static function assertNotificationTransportIsNotEqual(MessageInterface $messageObject, string $text, string $message = ''): void
+    public static function assertNotificationTransportIsNotEqual(MessageInterface $notification, string $transportName, string $message = ''): void
     {
-        self::assertThat($messageObject, new LogicalNot(new NotifierConstraint\NotificationTransportIsEqual($text)), $message);
+        self::assertThat($notification, new LogicalNot(new NotifierConstraint\NotificationTransportIsEqual($transportName)), $message);
     }
 
     /**
      * @return MessageEvent[]
      */
-    public static function getNotifierEvents(string $transport = null): array
+    public static function getNotifierEvents(string $transportName = null): array
     {
-        return self::getNotificationEvents()->getEvents($transport);
+        return self::getNotificationEvents()->getEvents($transportName);
     }
 
-    public static function getNotifierEvent(int $index = 0, string $transport = null): ?MessageEvent
+    public static function getNotifierEvent(int $index = 0, string $transportName = null): ?MessageEvent
     {
-        return self::getNotifierEvents($transport)[$index] ?? null;
+        return self::getNotifierEvents($transportName)[$index] ?? null;
     }
 
     /**
      * @return MessageInterface[]
      */
-    public static function getNotifierMessages(string $transport = null): array
+    public static function getNotifierMessages(string $transportName = null): array
     {
-        return self::getNotificationEvents()->getMessages($transport);
+        return self::getNotificationEvents()->getMessages($transportName);
     }
 
-    public static function getNotifierMessage(int $index = 0, string $transport = null): ?MessageInterface
+    public static function getNotifierMessage(int $index = 0, string $transportName = null): ?MessageInterface
     {
-        return self::getNotifierMessages($transport)[$index] ?? null;
+        return self::getNotifierMessages($transportName)[$index] ?? null;
     }
 
     public static function getNotificationEvents(): NotificationEvents

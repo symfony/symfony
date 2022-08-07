@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator\Event;
 use Symfony\Component\Form\FormEvent;
 
 /**
- * This event is dispatched after the root form validation.
+ * This event is dispatched after (root form) validation completes.
  */
 final class PostValidateEvent extends FormEvent
 {

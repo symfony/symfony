@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator\Event;
 use Symfony\Component\Form\FormEvent;
 
 /**
- * This event is dispatched before the root form validation.
+ * This event is dispatched before (root form) validation starts.
  */
 final class PreValidateEvent extends FormEvent
 {

@@ -17,14 +17,14 @@ use Symfony\Component\Form\Extension\Validator\Event\PreValidateEvent;
 final class ValidatorFormEvents
 {
     /**
-     * This event is dispatched before validation starts.
+     * This event is dispatched before (root form) validation starts.
      *
      * @Event("Symfony\Component\Form\Extension\Validator\Event\PreValidateEvent")
      */
     public const PRE_VALIDATE = 'form.pre_validate';
 
     /**
-     * This event is dispatched after validation completes.
+     * This event is dispatched after (root form) validation completes.
      *
      * @Event("Symfony\Component\Form\Extension\Validator\Event\PostValidateEvent")
      */

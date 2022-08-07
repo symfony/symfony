@@ -102,6 +102,7 @@ use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
+use Symfony\Component\Mailer\EventListener\MessengerTransportListener;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -2485,6 +2486,10 @@ class FrameworkExtension extends Extension
             $messageListener->setArgument(0, $headers);
         } else {
             $container->removeDefinition('mailer.message_listener');
+        }
+
+        if (!class_exists(MessengerTransportListener::class)) {
+            $container->removeDefinition('mailer.messenger_transport_listener');
         }
     }
 

@@ -47,7 +47,7 @@
         "symfony/html-sanitizer": "^6.1",
         "symfony/http-client": "^5.4|^6.0",
         "symfony/lock": "^5.4|^6.0",
-        "symfony/mailer": "^5.4|^6.0",
+        "symfony/mailer": "^6.2",
         "symfony/messenger": "^6.1",
         "symfony/mime": "^5.4|^6.0",
         "symfony/notifier": "^5.4|^6.0",

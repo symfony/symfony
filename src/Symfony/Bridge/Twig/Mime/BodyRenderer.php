@@ -11,9 +11,12 @@
 
 namespace Symfony\Bridge\Twig\Mime;
 
-use League\HTMLToMarkdown\HtmlConverter;
+use League\HTMLToMarkdown\HtmlConverterInterface;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\HtmlToTextConverter\DefaultHtmlToTextConverter;
+use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
+use Symfony\Component\Mime\HtmlToTextConverter\LeagueHtmlToMarkdownConverter;
 use Symfony\Component\Mime\Message;
 use Twig\Environment;
 
@@ -24,19 +27,13 @@ final class BodyRenderer implements BodyRendererInterface
 {
     private Environment $twig;
     private array $context;
-    private HtmlConverter $converter;
+    private HtmlToTextConverterInterface $converter;
 
-    public function __construct(Environment $twig, array $context = [])
+    public function __construct(Environment $twig, array $context = [], HtmlToTextConverterInterface $converter = null)
     {
         $this->twig = $twig;
         $this->context = $context;
-        if (class_exists(HtmlConverter::class)) {
-            $this->converter = new HtmlConverter([
-                'hard_break' => true,
-                'strip_tags' => true,
-                'remove_nodes' => 'head style',
-            ]);
-        }
+        $this->converter = $converter ?: (interface_exists(HtmlConverterInterface::class) ? new LeagueHtmlToMarkdownConverter() : new DefaultHtmlToTextConverter());
     }
 
     public function render(Message $message): void
@@ -74,16 +71,8 @@ final class BodyRenderer implements BodyRendererInterface
 
         // if text body is empty, compute one from the HTML body
         if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
-            $message->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
+            $text = $this->converter->convert(\is_resource($html) ? stream_get_contents($html) : $html, $message->getHtmlCharset());
+            $message->text($text, $message->getHtmlCharset());
         }
-    }
-
-    private function convertHtmlToText(string $html): string
-    {
-        if (isset($this->converter)) {
-            return $this->converter->convert($html);
-        }
-
-        return strip_tags(preg_replace('{<(head|style)\b.*?</\1>}is', '', $html));
     }
 }

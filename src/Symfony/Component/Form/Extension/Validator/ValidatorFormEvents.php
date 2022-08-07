@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Validator\Event\PreValidateEvent;
 final class ValidatorFormEvents
 {
     /**
-     * This event is dispatched after validation completes.
+     * This event is dispatched before validation starts.
      *
      * @Event("Symfony\Component\Form\Extension\Validator\Event\PreValidateEvent")
      */

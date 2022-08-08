@@ -228,8 +228,8 @@ final class CrowdinProvider implements ProviderInterface
         $storageId = $this->addStorage($domain, $content);
 
         /**
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.files.getMany (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.files.getMany (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.files.getMany (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.getMany (Crowdin Enterprise API)
          */
         $response = $this->client->request('POST', 'files', [
             'json' => [
@@ -252,8 +252,8 @@ final class CrowdinProvider implements ProviderInterface
         $storageId = $this->addStorage($domain, $content);
 
         /**
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.files.put (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.files.put (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.files.put (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.put (Crowdin Enterprise API)
          */
         $response = $this->client->request('PUT', 'files/'.$fileId, [
             'json' => [
@@ -275,8 +275,8 @@ final class CrowdinProvider implements ProviderInterface
         $storageId = $this->addStorage($domain, $content);
 
         /*
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.translations.postOnLanguage (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin Enterprise API)
          */
         return $this->client->request('POST', 'translations/'.str_replace('_', '-', $locale), [
             'json' => [
@@ -289,8 +289,8 @@ final class CrowdinProvider implements ProviderInterface
     private function exportProjectTranslations(string $languageId, int $fileId): ResponseInterface
     {
         /*
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.translations.exports.post (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.translations.exports.post (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.exports.post (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.exports.post (Crowdin Enterprise API)
          */
         return $this->client->request('POST', 'translations/exports', [
             'json' => [
@@ -303,8 +303,8 @@ final class CrowdinProvider implements ProviderInterface
     private function downloadSourceFile(int $fileId): ResponseInterface
     {
         /*
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.files.download.get (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.files.download.get (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.files.download.get (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.download.get (Crowdin Enterprise API)
          */
         return $this->client->request('GET', sprintf('files/%d/download', $fileId));
     }
@@ -312,8 +312,8 @@ final class CrowdinProvider implements ProviderInterface
     private function listStrings(int $fileId, int $limit, int $offset): array
     {
         /**
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.strings.getMany (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.strings.getMany (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.strings.getMany (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.strings.getMany (Crowdin Enterprise API)
          */
         $response = $this->client->request('GET', 'strings', [
             'query' => [
@@ -335,8 +335,8 @@ final class CrowdinProvider implements ProviderInterface
     private function deleteString(int $stringId): ResponseInterface
     {
         /*
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.strings.delete (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.strings.delete (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.strings.delete (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2#operation/api.projects.strings.delete (Crowdin Enterprise API)
          */
         return $this->client->request('DELETE', 'strings/'.$stringId);
     }
@@ -344,8 +344,8 @@ final class CrowdinProvider implements ProviderInterface
     private function addStorage(string $domain, string $content): int
     {
         /**
-         * @see https://support.crowdin.com/api/v2/#operation/api.storages.post (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.storages.post (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.storages.post (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.storages.post (Crowdin Enterprise API)
          */
         $response = $this->client->request('POST', '../../storages', [
             'headers' => [
@@ -367,8 +367,8 @@ final class CrowdinProvider implements ProviderInterface
         $result = [];
 
         /**
-         * @see https://support.crowdin.com/api/v2/#operation/api.projects.files.getMany (Crowdin API)
-         * @see https://support.crowdin.com/enterprise/api/#operation/api.projects.files.getMany (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.files.getMany (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.getMany (Crowdin Enterprise API)
          */
         $response = $this->client->request('GET', 'files');
 

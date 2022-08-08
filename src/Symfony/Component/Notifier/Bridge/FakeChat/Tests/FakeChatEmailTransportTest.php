@@ -119,7 +119,7 @@ final class FakeChatEmailTransportTest extends TransportTestCase
         $this->assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBodyAsString());
+        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 
     public function testSendWithCustomTransportAndWithoutRecipient()
@@ -143,6 +143,6 @@ final class FakeChatEmailTransportTest extends TransportTestCase
         $this->assertSame('New Chat message without specified recipient!', $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBodyAsString());
+        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 }

@@ -96,6 +96,6 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBodyAsString());
+        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 }

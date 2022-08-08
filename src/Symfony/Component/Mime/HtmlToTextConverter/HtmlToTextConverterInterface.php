@@ -17,7 +17,7 @@ namespace Symfony\Component\Mime\HtmlToTextConverter;
 interface HtmlToTextConverterInterface
 {
     /**
-     * Converts and HTML representation of a Message to a text representation.
+     * Converts an HTML representation of a Message to a text representation.
      *
      * The output must use the same charset as the HTML one.
      */

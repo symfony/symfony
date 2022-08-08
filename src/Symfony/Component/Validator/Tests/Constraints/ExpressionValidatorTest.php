@@ -326,21 +326,4 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
-
-    public function testExistingIsValidFunctionIsNotOverridden(): void
-    {
-        $used = false;
-
-        $expressionLanguage = new ExpressionLanguage();
-        $expressionLanguage->register('is_valid', function () {}, function () use (&$used) {
-            $used = true;
-        });
-
-        $validator = new ExpressionValidator($expressionLanguage);
-        $validator->initialize($this->context);
-
-        $validator->validate('foo', new Expression('is_valid()'));
-
-        $this->assertTrue($used);
-    }
 }

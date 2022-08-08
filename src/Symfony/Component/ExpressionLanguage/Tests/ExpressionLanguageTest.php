@@ -384,28 +384,4 @@ class ExpressionLanguageTest extends TestCase
             ],
         ];
     }
-
-    public function testHasFunction(): void
-    {
-        $expressionLanguage = new ExpressionLanguage();
-
-        $function = new ExpressionFunction('foo', function () {}, function () {});
-
-        $this->assertFalse($expressionLanguage->hasFunction($function));
-
-        $expressionLanguage->addFunction($function);
-
-        $this->assertTrue($expressionLanguage->hasFunction($function));
-    }
-
-    public function testHasFunctionByName(): void
-    {
-        $expressionLanguage = new ExpressionLanguage();
-
-        $this->assertFalse($expressionLanguage->hasFunctionByName('foo'));
-
-        $expressionLanguage->register('foo', function () {}, function () {});
-
-        $this->assertTrue($expressionLanguage->hasFunctionByName('foo'));
-    }
 }

@@ -128,16 +128,6 @@ class ExpressionLanguage
         $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
     }
 
-    public function hasFunction(ExpressionFunction $function): bool
-    {
-        return $this->hasFunctionByName($function->getName());
-    }
-
-    public function hasFunctionByName(string $functionName): bool
-    {
-        return isset($this->functions[$functionName]);
-    }
-
     public function registerProvider(ExpressionFunctionProviderInterface $provider)
     {
         foreach ($provider->getFunctions() as $function) {

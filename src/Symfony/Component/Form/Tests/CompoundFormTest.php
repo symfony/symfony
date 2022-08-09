@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
+use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -1079,13 +1080,40 @@ class CompoundFormTest extends TestCase
         $this->assertNull($this->form->get('bar')->getData());
     }
 
-    public function testMapDateTimeObjectsWithEmptyArrayData()
+    /**
+     * @group legacy
+     */
+    public function testMapDateTimeObjectsWithEmptyArrayDataUsingPropertyPathMapper()
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
         $form = $this->factory->createBuilder()
             ->setDataMapper(new PropertyPathMapper($propertyAccessor))
+            ->add('date', DateType::class, [
+                'auto_initialize' => false,
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => 'UTC',
+                'widget' => 'single_text',
+            ])
+            ->getForm();
+
+        $form->submit([
+            'date' => '04/08/2022',
+        ]);
+
+        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
+    }
+
+    public function testMapDateTimeObjectsWithEmptyArrayDataUsingDataMapper()
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+        $form = $this->factory->createBuilder()
+            ->setDataMapper(new DataMapper(new PropertyPathAccessor($propertyAccessor)))
             ->add('date', DateType::class, [
                 'auto_initialize' => false,
                 'format' => 'dd/MM/yyyy',

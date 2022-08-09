@@ -14,10 +14,14 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataMapper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\Tests\Fixtures\TypehintedPropertiesCar;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DataMapperTest extends TestCase
@@ -381,6 +385,33 @@ class DataMapperTest extends TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $person);
 
         self::assertSame('Jane Doe', $person->myName());
+    }
+
+    public function testMapFormsToDataMapsDateTimeInstanceToArrayIfNotSetBefore()
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+        $form = (new FormFactoryBuilder())->getFormFactory()->createBuilder()
+            ->setDataMapper(new DataMapper(new PropertyPathAccessor($propertyAccessor)))
+            ->add('date', DateType::class, [
+                'auto_initialize' => false,
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => 'UTC',
+                'widget' => 'single_text',
+            ])
+            ->getForm();
+
+        $form->submit([
+            'date' => '04/08/2022',
+        ]);
+
+        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 }
 

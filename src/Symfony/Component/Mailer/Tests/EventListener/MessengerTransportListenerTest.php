@@ -44,7 +44,7 @@ class MessengerTransportListenerTest extends TestCase
         /* @var TransportNamesStamp $stamp */
         $this->assertInstanceOf(TransportNamesStamp::class, $stamp = $event->getStamps()[0]);
         $this->assertSame(['async'], $stamp->getTransportNames());
-        $this->assertTrue($headers->has('X-Bus-Transport'));
+        $this->assertFalse($message->getHeaders()->has('X-Bus-Transport'));
     }
 
     public function testMessengerTransportStampsViaHeader()
@@ -60,5 +60,6 @@ class MessengerTransportListenerTest extends TestCase
         /* @var TransportNamesStamp $stamp */
         $this->assertInstanceOf(TransportNamesStamp::class, $stamp = $event->getStamps()[0]);
         $this->assertSame(['async', 'async1', $name], $stamp->getTransportNames());
+        $this->assertFalse($message->getHeaders()->has('X-Bus-Transport'));
     }
 }

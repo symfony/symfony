@@ -959,9 +959,8 @@ class Application implements ResetInterface
 
         if ($this->signalsToDispatchEvent) {
             $commandSignals = $command instanceof SignalableCommandInterface ? $command->getSubscribedSignals() : [];
-            $dispatchSignals = $this->dispatcher && $this->dispatcher->hasListeners(ConsoleEvents::SIGNAL);
 
-            if ($commandSignals || $dispatchSignals) {
+            if ($commandSignals || null !== $this->dispatcher) {
                 if (!$this->signalRegistry) {
                     throw new RuntimeException('Unable to subscribe to signal events. Make sure that the `pcntl` extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
                 }
@@ -981,7 +980,7 @@ class Application implements ResetInterface
                 }
             }
 
-            if ($dispatchSignals) {
+            if (null !== $this->dispatcher) {
                 foreach ($this->signalsToDispatchEvent as $signal) {
                     $event = new ConsoleSignalEvent($command, $input, $output, $signal);
 

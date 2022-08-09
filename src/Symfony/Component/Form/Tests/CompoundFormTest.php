@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
+use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -1079,13 +1079,13 @@ class CompoundFormTest extends TestCase
         $this->assertNull($this->form->get('bar')->getData());
     }
 
-    public function testMapDateTimeObjectsWithEmptyArrayData()
+    public function testMapDateTimeObjectsWithEmptyArrayDataUsingDataMapper()
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
         $form = $this->factory->createBuilder()
-            ->setDataMapper(new PropertyPathMapper($propertyAccessor))
+            ->setDataMapper(new DataMapper(new PropertyPathAccessor($propertyAccessor)))
             ->add('date', DateType::class, [
                 'auto_initialize' => false,
                 'format' => 'dd/MM/yyyy',

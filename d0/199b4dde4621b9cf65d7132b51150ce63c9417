@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by goetas at 2022-08-06T06:46:11Z
+
+I've also added a test but i'm not sure it is worth the effort
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-08-07T09:42:08Z
+
+If we're sure that it's safe to call `LISTEN` multiple times (I didn't find any information about that in the manual), then +1 on my side!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-07T09:48:44Z
+
+@goetas Can you have a look at the tests, https://github.com/symfony/symfony/runs/7711529784?check_suite_focus=true might be related to this change.
+
+---------------------------------------------------------------------------
+
+by goetas at 2022-08-07T19:46:35Z
+
+> Can you have a look at the tests, https://github.com/symfony/symfony/runs/7711529784?check_suite_focus=true might be related to this change.
+
+I have fixed the test, it was because i had locally dbal 3.x instlled while on CI 2.x is runing. https://github.com/symfony/symfony/pull/47209/files#r939714144 does a different mocking by trying to detect which dbal is running

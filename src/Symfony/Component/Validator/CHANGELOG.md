@@ -53,6 +53,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Add `AtLeastOneOf` constraint that is considered to be valid if at least one of the nested constraints is valid
  * added the `Hostname` constraint and validator
  * added the `alpha3` option to the `Country` and `Language` constraints
  * allow to define a reusable set of constraints by extending the `Compound` constraint

@@ -49,6 +49,9 @@ use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\TaggedDummyHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\TaggedDummyHandlerWithUnionTypes;
+use Symfony\Component\Messenger\Tests\Fixtures\UnionTypeOneMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\UnionTypeTwoMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class MessengerPassTest extends TestCase
@@ -177,6 +180,54 @@ class MessengerPassTest extends TestCase
             $handlerDescriptionMapping,
             SecondMessage::class,
             [[TaggedDummyHandler::class, 'handleSecondMessage']]
+        );
+    }
+
+    public function testTaggedMessageHandlerWithUnionTypes()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+            $tagAttributes = get_object_vars($attribute);
+            $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
+            unset($tagAttributes['fromTransport']);
+            if ($reflector instanceof \ReflectionMethod) {
+                if (isset($tagAttributes['method'])) {
+                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                }
+                $tagAttributes['method'] = $reflector->getName();
+            }
+
+            $definition->addTag('messenger.message_handler', $tagAttributes);
+        });
+        $container
+            ->register(TaggedDummyHandlerWithUnionTypes::class, TaggedDummyHandlerWithUnionTypes::class)
+            ->setAutoconfigured(true)
+        ;
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $handlersLocatorDefinition = $container->getDefinition($busId.'.messenger.handlers_locator');
+        $this->assertSame(HandlersLocator::class, $handlersLocatorDefinition->getClass());
+
+        $handlerDescriptionMapping = $handlersLocatorDefinition->getArgument(0);
+
+        $this->assertCount(4, $handlerDescriptionMapping);
+
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [TaggedDummyHandlerWithUnionTypes::class], [[]]);
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, SecondMessage::class, [TaggedDummyHandlerWithUnionTypes::class], [[]]);
+        $this->assertHandlerDescriptor(
+            $container,
+            $handlerDescriptionMapping,
+            UnionTypeOneMessage::class,
+            [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']]
+        );
+        $this->assertHandlerDescriptor(
+            $container,
+            $handlerDescriptionMapping,
+            UnionTypeTwoMessage::class,
+            [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']]
         );
     }
 

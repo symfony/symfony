@@ -231,7 +231,7 @@ class MessengerPass implements CompilerPassInterface
             }
 
             if ($types) {
-                return $types;
+                return ('__invoke' === $methodName) ? $types : array_fill_keys($types, $methodName);
             }
         }
 

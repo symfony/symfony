@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\ToString;
@@ -316,7 +317,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         );
 
         $object = new Entity();
-        $object->data = '7';
+        $object->data = 7;
 
         $this->setObject($object);
 
@@ -325,5 +326,39 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($object, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public function testIsValidExpressionInvalid(): void
+    {
+        $constraints = [new Range(['min' => 2, 'max' => 5])];
+
+        $constraint = new Expression(
+            ['expression' => 'is_valid(this.data, a)', 'values' => ['a' => $constraints]]
+        );
+
+        $object = new Entity();
+        $object->data = 7;
+
+        $this->setObject($object);
+
+        $this->expectFailingValueValidation(
+            0,
+            7,
+            $constraints,
+            null,
+            new ConstraintViolation(
+                'error_range',
+                null, [],
+                null,
+                '',
+                null,
+                null,
+                'range'
+            )
+        );
+
+        $this->validator->validate($object, $constraint);
+
+        $this->assertCount(2, $this->context->getViolations());
     }
 }

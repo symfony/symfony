@@ -10,6 +10,7 @@ CHANGELOG
  * Add `Security::login()` to login programmatically
  * Add `Security::logout()` to logout programmatically
  * Add `security.firewalls.logout.enable_csrf` to enable CSRF protection using the default CSRF token generator
+ * Add RFC6750 Access Token support to allow token-based authentication
 
 6.1
 ---

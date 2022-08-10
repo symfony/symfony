@@ -113,6 +113,7 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
+use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -651,18 +652,30 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsController::class, static function (ChildDefinition $definition, AsController $attribute): void {
             $definition->addTag('controller.service_arguments');
         });
-        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
-            $tagAttributes = get_object_vars($attribute);
-            $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
-            unset($tagAttributes['fromTransport']);
-            if ($reflector instanceof \ReflectionMethod) {
-                if (isset($tagAttributes['method'])) {
-                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+
+        if (class_exists(SerializedMessageStamp::class)) {
+            // symfony/messenger >= 6.1
+            $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
+                unset($tagAttributes['fromTransport']);
+                if ($reflector instanceof \ReflectionMethod) {
+                    if (isset($tagAttributes['method'])) {
+                        throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                    }
+                    $tagAttributes['method'] = $reflector->getName();
                 }
-                $tagAttributes['method'] = $reflector->getName();
-            }
-            $definition->addTag('messenger.message_handler', $tagAttributes);
-        });
+                $definition->addTag('messenger.message_handler', $tagAttributes);
+            });
+        } else {
+            // symfony/messenger < 6.1
+            $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute): void {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
+                unset($tagAttributes['fromTransport']);
+                $definition->addTag('messenger.message_handler', $tagAttributes);
+            });
+        }
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers

@@ -28,7 +28,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Tests\ResettableDummyReceiver;
-use Symfony\Component\Messenger\Transport\Receiver\BlockingReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueBlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class ConsumeMessagesCommandTest extends TestCase
@@ -77,8 +77,8 @@ class ConsumeMessagesCommandTest extends TestCase
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
-        $receiver = $this->createMock(BlockingReceiverInterface::class);
-        $receiver->expects($this->once())->method('pull')->willReturnCallback(function (callable $callback) use ($envelope) {
+        $receiver = $this->createMock(QueueBlockingReceiverInterface::class);
+        $receiver->expects($this->once())->method('pullFromQueues')->willReturnCallback(function (array $queueNames, callable $callback) use ($envelope) {
             call_user_func($callback, $envelope);
         });
 
@@ -102,6 +102,7 @@ class ConsumeMessagesCommandTest extends TestCase
             'receivers' => ['dummy-receiver'],
             '--limit' => 1,
             '--blocking-mode' => true,
+            '--queues' => ['foo'],
         ]);
 
         $tester->assertCommandIsSuccessful();

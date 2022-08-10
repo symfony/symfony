@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\BlockingReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueBlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -99,8 +100,14 @@ class Worker
         if ($queueNames) {
             // if queue names are specified, all receivers must implement the QueueReceiverInterface
             foreach ($this->receivers as $transportName => $receiver) {
-                if (!$receiver instanceof QueueReceiverInterface) {
-                    throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueReceiverInterface::class));
+                if ($blockingMode) {
+                    if (!$receiver instanceof QueueBlockingReceiverInterface) {
+                        throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueBlockingReceiverInterface::class));
+                    }
+                } else {
+                    if (!$receiver instanceof QueueReceiverInterface) {
+                        throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueReceiverInterface::class));
+                    }
                 }
             }
         }
@@ -110,9 +117,7 @@ class Worker
             $envelopeHandledStart = $this->clock->now();
             foreach ($this->receivers as $transportName => $receiver) {
                 if ($blockingMode) {
-                    /** @var BlockingReceiverInterface $receiver */
-
-                    $receiver->pull(function (Envelope $envelope) use ($transportName, &$envelopeHandled) {
+                    $callback = function (Envelope $envelope) use ($transportName, &$envelopeHandled) {
                         $envelopeHandled = true;
 
                         $this->rateLimit($transportName);
@@ -122,7 +127,15 @@ class Worker
                         if ($this->shouldStop) {
                             return false;
                         }
-                    });
+                    };
+
+                    if ($queueNames) {
+                        /** @var QueueBlockingReceiverInterface $receiver */
+                        $receiver->pullFromQueues($queueNames, $callback);
+                    } else {
+                        /** @var BlockingReceiverInterface $receiver */
+                        $receiver->pull($callback);
+                    }
                 } else {
                     if ($queueNames) {
                         $envelopes = $receiver->getFromQueues($queueNames);

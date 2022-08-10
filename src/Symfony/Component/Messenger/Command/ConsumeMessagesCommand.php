@@ -124,7 +124,6 @@ Use the --no-reset option to prevent services resetting after each message (may 
 
 Use the --blocking-mode option to force receiver to work in blocking mode
 ("consume" method will be used instead of "get" in RabbitMQ for example).
---queues option will be ignored.
 Only supported by some receivers, and you should pass only one receiver:
 
     <info>php %command.full_name% <receiver-name> --blocking-mode</info>

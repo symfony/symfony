@@ -15,8 +15,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Transport\Receiver\BlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueBlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class AmqpReceiver implements QueueReceiverInterface, BlockingReceiverInterface, MessageCountAwareInterface
+class AmqpReceiver implements QueueReceiverInterface, QueueBlockingReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
     private Connection $connection;
@@ -47,11 +47,17 @@ class AmqpReceiver implements QueueReceiverInterface, BlockingReceiverInterface,
      */
     public function pull(callable $callback): void
     {
-        if (0 === count($this->connection->getQueueNames())) {
+        $this->pullFromQueues($this->connection->getQueueNames(), $callback);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function pullFromQueues(array $queueNames, callable $callback): void
+    {
+        if (0 === count($queueNames)) {
             return;
         }
-
-        $queueNames = $this->connection->getQueueNames();
 
         // Pop last queue to send callback
         $firstQueue = array_pop($queueNames);

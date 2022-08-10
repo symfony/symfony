@@ -25,7 +25,7 @@
         "symfony/http-kernel": "^6.2",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/password-hasher": "^5.4|^6.0",
-        "symfony/security-core": "^5.4|^6.0",
+        "symfony/security-core": "^6.2",
         "symfony/security-csrf": "^5.4|^6.0",
         "symfony/security-http": "^6.2"
     },

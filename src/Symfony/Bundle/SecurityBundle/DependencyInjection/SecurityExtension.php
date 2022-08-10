@@ -98,6 +98,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $loader->load('security_authenticator.php');
+        $loader->load('security_authenticator_access_token.php');
 
         if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'])) {
             $loader->load('templating_twig.php');

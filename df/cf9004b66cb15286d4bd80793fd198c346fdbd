@@ -1,0 +1,133 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-05-21T17:20:24Z
+
+I like this approach.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2022-05-21T19:48:49Z
+
+* `Static analysis / Psalm (pull_request)`: does not seem relevant
+* `continuous-integration/appveyor/pr`: the error seems to be related to a timeout issue
+* `PHPUnit / Tests (8.2) (pull_request)`: the error reported here: https://github.com/symfony/symfony/runs/6538975401?check_suite_focus=true#step:8:2110 is related to another (unchanged) component. **Should I fix it?**
+* `PHPUnit / Tests (8.1, low-deps) (pull_request)`: *Error: Class "Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator" not found* I don't understand this issue. The class is present in the PR
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-05-22T11:47:09Z
+
+Thanks for checking all tests! (btw, I'll look at the PR somewhere after 6.1 is released)
+
+> `PHPUnit / Tests (8.2) (pull_request)`: the error reported here: https://github.com/symfony/symfony/runs/6538975401?check_suite_focus=true#step:8:2110 is related to another (unchanged) component. Should I fix it?
+
+We'll ignore it for this PR (but if you want, a separate PR with a fix is always welcome :wink: )
+
+> `PHPUnit / Tests (8.1, low-deps) (pull_request)`: Error: Class "Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator" not found I don't understand this issue. The class is present in the PR
+
+See https://symfony.com/doc/current/contributing/code/pull_requests.html#automated-tests You must update the minimum versions in e.g. the SecurityBundle.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2022-05-23T19:28:46Z
+
+Hi,
+
+Many thanks for your comments.
+I updated the authenticator that is now based on token "extractors".
+
+```yaml
+security:
+    firewalls:
+        main:
+            pattern: ^/
+            access_token:
+                token_handler: access_token.access_token_handler
+#                token_extractors:
+#                    header: 'security.access_token_extractor.header' # This extrator is set by default
+```
+
+You can add any extractor you want. Three already exist:
+
+* `security.access_token_extractor.header`
+* `security.access_token_extractor.query_string`
+* `security.access_token_extractor.request_body`
+
+You can create as many extractors you need. They shall implement `Symfony\Component\Security\Http\Authenticator\AccessToken\AccessTokenExtractorInterface` and the method `extractToken`.
+
+Other parameters are also present:
+
+```yaml
+security:
+    firewalls:
+        main:
+            pattern: ^/
+            access_token:
+                token_handler: access_token.access_token_handler
+                success_handler: access_token.success_handler
+                failure_handler: access_token.failure_handler
+                user_provider: 'another.user_provider'
+                token_extractors:
+                    - 'security.access_token_extractor.header'
+                    - 'security.access_token_extractor.query_string'
+                    - 'security.access_token_extractor.request_body'
+                    - 'App\Security\CustomExtractor'
+```
+
+I have not created Exceptions. I revised my mind as the existing ones seem sufficient.
+WDYT?
+
+Best regards.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2022-07-16T14:55:51Z
+
+Hi all,
+
+Would you mind to review the changes I made and if the comments you raised have correctly been addressed?
+Let me know if you see other modifications I should consider.
+
+Many thanks.
+Regards.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-07-16T16:23:19Z
+
+@Spomky if you click on the "load more ...", you'll see a review from me. I guess GitHub immediately hid it, so it got lost 🙂
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-07-16T17:48:20Z
+
+Ah, regarding https://github.com/symfony/symfony/pull/46428#discussion_r878912749 I don't feel like we should remove these extractors now that they are there, it's spec compliant after all.
+However maybe could we at least add a some phpdoc to mention these are not recommended with the principal reasons and/or a link to the relevant part of the spec?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-01T16:31:46Z
+
+Super feature 👍🏼 Thanks for the work 👏🏼 . I let some comments
+
+---------------------------------------------------------------------------
+
+by Spomky at 2022-08-01T20:48:44Z
+
+Many thanks for the review and comments.
+I think I addressed all of them (including those hidden by github).
+Let me know if you have any others.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2022-08-09T17:06:40Z
+
+> Hi there! I finally got the chance to review this a bit more in-depth and I'm really liking the feature :)
+>
+> I've pushed 2 commits to your branch that fix the last 2 big remaining comments. It would be nice if you could squash all your commits into one and after that, it's ready to be merged in my opinion.
+>
+> Thanks a lot for all the work!
+
+Excellent! Many thanks to you and all the other reviewers.
+I edited the few things you spotted and squashed the PR.
+This is a big step for me and I really hope it will help many developers to integrate token-based authentication.

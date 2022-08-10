@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Doctrine\Tests\ArgumentResolver;
 
 use Doctrine\DBAL\Types\ConversionException;
@@ -214,6 +223,21 @@ class EntityValueResolverTest extends TestCase
         $this->assertYieldEquals([$object], $ret);
     }
 
+    public function testApplyWithNullId()
+    {
+        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $converter = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('id', null);
+
+        $argument = $this->createArgument(isNullable: true);
+
+        $ret = $converter->resolve($request, $argument);
+
+        $this->assertYieldEquals([null], $ret);
+    }
+
     public function testApplyWithConversionFailedException()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
@@ -276,7 +300,7 @@ class EntityValueResolverTest extends TestCase
         $converter = new EntityValueResolver($registry);
 
         $request = new Request();
-        $request->attributes->set('arg', null);
+        $request->attributes->set('guess', null);
 
         $argument = $this->createArgument('stdClass', new MapEntity(), 'arg', true);
 

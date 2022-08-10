@@ -20,6 +20,9 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
  */
 class JsonEncode implements EncoderInterface
 {
+    /**
+     * Configure the JSON flags bitmask.
+     */
     public const OPTIONS = 'json_encode_options';
 
     private $defaultContext = [

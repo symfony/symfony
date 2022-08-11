@@ -28,7 +28,6 @@ use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\RuntimeException;
-use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\BatchHandlerTrait;
@@ -694,7 +693,7 @@ class WorkerTest extends TestCase
         $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
         $worker->run([
             'blocking-mode' => true,
-            'queues' => ['foo']
+            'queues' => ['foo'],
         ]);
 
         $this->assertSame($apiMessage, $envelopes[0]->getMessage());
@@ -782,7 +781,7 @@ class BlockingDummyReceiver extends DummyReceiver implements BlockingReceiverInt
         foreach ($envelopes as $envelope) {
             $shouldContinue = $callback($envelope);
 
-            if ($shouldContinue === false) {
+            if (false === $shouldContinue) {
                 return;
             }
         }

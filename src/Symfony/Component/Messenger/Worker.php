@@ -84,8 +84,8 @@ class Worker
         $this->metadata->set(['queueNames' => $queueNames]);
 
         if ($blockingMode) {
-            if (count($this->receivers) > 1) {
-                throw new RuntimeException('In blocking mode only one receiver is supported');
+            if (\count($this->receivers) > 1) {
+                throw new RuntimeException('In blocking mode only one receiver is supported.');
             }
 
             foreach ($this->receivers as $transportName => $receiver) {
@@ -130,10 +130,10 @@ class Worker
                     };
 
                     if ($queueNames) {
-                        /** @var QueueBlockingReceiverInterface $receiver */
+                        /* @var QueueBlockingReceiverInterface $receiver */
                         $receiver->pullFromQueues($queueNames, $callback);
                     } else {
-                        /** @var BlockingReceiverInterface $receiver */
+                        /* @var BlockingReceiverInterface $receiver */
                         $receiver->pull($callback);
                     }
                 } else {

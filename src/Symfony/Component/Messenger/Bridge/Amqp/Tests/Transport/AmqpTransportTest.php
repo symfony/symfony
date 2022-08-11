@@ -74,7 +74,7 @@ class AmqpTransportTest extends TestCase
         $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
         $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->method('pull')->willReturnCallback(function (string $queueName, callable $callback) use ($amqpQueue, $amqpEnvelope) {
-            call_user_func($callback, $amqpEnvelope, $amqpQueue);
+            \call_user_func($callback, $amqpEnvelope, $amqpQueue);
         });
 
         $transport->pull(function (Envelope $envelope) use ($decodedMessage) {

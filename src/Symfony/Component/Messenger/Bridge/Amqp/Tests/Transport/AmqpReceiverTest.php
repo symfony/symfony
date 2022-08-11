@@ -63,7 +63,7 @@ class AmqpReceiverTest extends TestCase
 
         $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->method('pull')->willReturnCallback(function (string $queueName, callable $callback) use ($amqpQueue, $amqpEnvelope) {
-            call_user_func($callback, $amqpEnvelope, $amqpQueue);
+            \call_user_func($callback, $amqpEnvelope, $amqpQueue);
         });
 
         $receiver = new AmqpReceiver($connection, $serializer);

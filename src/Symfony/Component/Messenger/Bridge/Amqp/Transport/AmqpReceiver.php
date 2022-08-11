@@ -55,7 +55,7 @@ class AmqpReceiver implements QueueReceiverInterface, QueueBlockingReceiverInter
      */
     public function pullFromQueues(array $queueNames, callable $callback): void
     {
-        if (0 === count($queueNames)) {
+        if (0 === \count($queueNames)) {
             return;
         }
 
@@ -71,7 +71,7 @@ class AmqpReceiver implements QueueReceiverInterface, QueueBlockingReceiverInter
 
     private function pullEnvelope(string $queueName, ?callable $callback): void
     {
-        if ($callback !== null) {
+        if (null !== $callback) {
             $callback = function (\AMQPEnvelope $amqpEnvelope, \AMQPQueue $queue) use ($callback) {
                 $queueName = $queue->getName();
                 $body = $amqpEnvelope->getBody();

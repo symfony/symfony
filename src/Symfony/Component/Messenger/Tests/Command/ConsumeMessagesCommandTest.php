@@ -79,7 +79,7 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $receiver = $this->createMock(QueueBlockingReceiverInterface::class);
         $receiver->expects($this->once())->method('pullFromQueues')->willReturnCallback(function (array $queueNames, callable $callback) use ($envelope) {
-            call_user_func($callback, $envelope);
+            \call_user_func($callback, $envelope);
         });
 
         $receiverLocator = $this->createMock(ContainerInterface::class);

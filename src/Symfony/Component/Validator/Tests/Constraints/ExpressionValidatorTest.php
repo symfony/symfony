@@ -308,7 +308,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testIsValidExpression(): void
+    public function testIsValidExpression()
     {
         $constraints = [new NotNull(), new Range(['min' => 2])];
 
@@ -328,7 +328,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testIsValidExpressionInvalid(): void
+    public function testIsValidExpressionInvalid()
     {
         $constraints = [new Range(['min' => 2, 'max' => 5])];
 
@@ -346,15 +346,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             7,
             $constraints,
             null,
-            new ConstraintViolation(
-                'error_range',
-                null, [],
-                null,
-                '',
-                null,
-                null,
-                'range'
-            )
+            new ConstraintViolation('error_range', '', [], '', '', 7, null, 'range')
         );
 
         $this->validator->validate($object, $constraint);

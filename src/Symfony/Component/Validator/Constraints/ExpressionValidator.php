@@ -27,7 +27,6 @@ class ExpressionValidator extends ConstraintValidator
     public function __construct(ExpressionLanguage $expressionLanguage = null)
     {
         $this->expressionLanguage = $expressionLanguage;
-
         $this->expressionLanguage?->registerProvider(new ExpressionLanguageProvider());
     }
 

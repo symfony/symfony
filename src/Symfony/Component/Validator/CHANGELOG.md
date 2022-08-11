@@ -6,7 +6,7 @@ CHANGELOG
 
  * Deprecate the "loose" e-mail validation mode, use "html5" instead
  * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
- * Add `is_valid` function to the `Expression` constraint, api the same as `ValidatorInterface::validate`
+ * Add `is_valid` function to the `Expression` constraint, its behavior is the same as `ValidatorInterface::validate`
 
 6.1
 ---

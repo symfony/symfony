@@ -26,7 +26,7 @@ class ExpressionLanguageProviderTest extends TestCase
     /**
      * @dataProvider dataProviderCompile
      */
-    public function testCompile(string $expression, array $names, string $expected): void
+    public function testCompile(string $expression, array $names, string $expected)
     {
         $provider = new ExpressionLanguageProvider();
 
@@ -50,27 +50,23 @@ class ExpressionLanguageProviderTest extends TestCase
                 'is_valid(this.data, constraints, groups)',
                 ['this', 'constraints', 'groups'],
                 '0 === $context->getValidator()->inContext($context)->validate($this->data, $constraints, $groups)->getViolations()->count()',
-            ]
+            ],
         ];
     }
 
     /**
      * @dataProvider dataProviderEvaluate
      */
-    public function testEvaluate(bool $expected, int $errorsCount): void
+    public function testEvaluate(bool $expected, int $errorsCount)
     {
         $constraints = [new NotNull(), new Range(['min' => 2])];
 
-        $violationList = $this->getMockBuilder(ConstraintViolationListInterface::class)
-            ->onlyMethods(['count'])
-            ->getMockForAbstractClass();
+        $violationList = $this->createMock(ConstraintViolationListInterface::class);
         $violationList->expects($this->once())
             ->method('count')
             ->willReturn($errorsCount);
 
-        $contextualValidator = $this->getMockBuilder(ContextualValidatorInterface::class)
-            ->onlyMethods(['getViolations', 'validate'])
-            ->getMockForAbstractClass();
+        $contextualValidator = $this->createMock(ContextualValidatorInterface::class);
         $contextualValidator->expects($this->once())
             ->method('validate')
             ->with('foo', $constraints)
@@ -79,13 +75,9 @@ class ExpressionLanguageProviderTest extends TestCase
             ->method('getViolations')
             ->willReturn($violationList);
 
-        $validator = $this->getMockBuilder(ValidatorInterface::class)
-            ->onlyMethods(['inContext'])
-            ->getMockForAbstractClass();
+        $validator = $this->createMock(ValidatorInterface::class);
 
-        $context = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->onlyMethods(['getValidator'])
-            ->getMockForAbstractClass();
+        $context = $this->createMock(ExecutionContextInterface::class);
         $context->expects($this->once())
             ->method('getValidator')
             ->willReturn($validator);

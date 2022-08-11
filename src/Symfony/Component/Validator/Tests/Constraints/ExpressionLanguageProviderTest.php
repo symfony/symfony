@@ -11,18 +11,20 @@
 
 namespace Constraints;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
-use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ExpressionLanguageProviderTest extends TestCase
+class ExpressionLanguageProviderTest extends ConstraintValidatorTestCase
 {
+    protected function createValidator()
+    {
+        return new ExpressionValidator();
+    }
+
     /**
      * @dataProvider dataProviderCompile
      */
@@ -54,56 +56,33 @@ class ExpressionLanguageProviderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataProviderEvaluate
-     */
-    public function testEvaluate(bool $expected, int $errorsCount)
+    public function testEvaluateValid()
     {
-        $constraints = [new NotNull(), new Range(['min' => 2])];
+        $constraints = [new Length(['min' => 2, 'max' => 12])];
 
-        $violationList = $this->createMock(ConstraintViolationListInterface::class);
-        $violationList->expects($this->once())
-            ->method('count')
-            ->willReturn($errorsCount);
-
-        $contextualValidator = $this->createMock(ContextualValidatorInterface::class);
-        $contextualValidator->expects($this->once())
-            ->method('validate')
-            ->with('foo', $constraints)
-            ->willReturnSelf();
-        $contextualValidator->expects($this->once())
-            ->method('getViolations')
-            ->willReturn($violationList);
-
-        $validator = $this->createMock(ValidatorInterface::class);
-
-        $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->once())
-            ->method('getValidator')
-            ->willReturn($validator);
-
-        $validator->expects($this->once())
-            ->method('inContext')
-            ->with($context)
-            ->willReturn($contextualValidator);
-
-        $provider = new ExpressionLanguageProvider();
+        $this->expectValidateValue(0, 'foo', $constraints);
 
         $expressionLanguage = new ExpressionLanguage();
-        $expressionLanguage->registerProvider($provider);
+        $expressionLanguage->registerProvider(new ExpressionLanguageProvider());
 
-        $this->assertSame(
-            $expected,
-            $expressionLanguage->evaluate('is_valid("foo", a)', ['a' => $constraints, 'context' => $context])
-        );
+        $this->assertTrue($expressionLanguage->evaluate('is_valid("foo", a)', ['a' => $constraints, 'context' => $this->context]));
     }
 
-    public function dataProviderEvaluate(): array
+    public function testEvaluateInvalid()
     {
-        return [
-            [true, 0],
-            [false, 1],
-            [false, 12],
-        ];
+        $constraints = [new Length(['min' => 7, 'max' => 12])];
+
+        $this->expectFailingValueValidation(
+            0,
+            'foo',
+            $constraints,
+            null,
+            new ConstraintViolation('error_length', '', [], '', '', 'foo', null, 'range')
+        );
+
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->registerProvider(new ExpressionLanguageProvider());
+
+        $this->assertFalse($expressionLanguage->evaluate('is_valid("foo", a)', ['a' => $constraints, 'context' => $this->context]));
     }
 }

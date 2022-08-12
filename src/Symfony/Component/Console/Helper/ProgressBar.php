@@ -209,7 +209,7 @@ final class ProgressBar
 
     public function getRemaining(): float
     {
-        if (!$this->step) {
+        if (!$this->step || $this->step === $this->startingStep) {
             return 0;
         }
 

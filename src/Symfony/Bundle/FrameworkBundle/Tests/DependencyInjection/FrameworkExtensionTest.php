@@ -295,6 +295,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertArrayHasKey('index_4', $args);
         $this->assertNull($args['index_4'], 'Workflows has eventsToDispatch=null');
 
+        $this->assertSame(['workflow' => [['name' => 'article']], 'workflow.workflow' => [['name' => 'article']]], $container->getDefinition('workflow.article')->getTags());
+
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
@@ -323,6 +325,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
         $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
+
+        $this->assertSame(['workflow' => [['name' => 'pull_request']], 'workflow.state_machine' => [['name' => 'pull_request']]], $container->getDefinition('state_machine.pull_request')->getTags());
 
         $stateMachineDefinition = $container->getDefinition('state_machine.pull_request.definition');
 
@@ -371,8 +375,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(Reference::class, $markingStoreRef);
         $this->assertEquals('workflow_service', (string) $markingStoreRef);
 
-        $this->assertTrue($container->hasDefinition('workflow.registry'), 'Workflow registry is registered as a service');
-        $registryDefinition = $container->getDefinition('workflow.registry');
+        $this->assertTrue($container->hasDefinition('.workflow.registry'), 'Workflow registry is registered as a service');
+        $registryDefinition = $container->getDefinition('.workflow.registry');
         $this->assertGreaterThan(0, \count($registryDefinition->getMethodCalls()));
     }
 

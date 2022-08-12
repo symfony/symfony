@@ -883,9 +883,9 @@ class FrameworkExtension extends Extension
 
         $loader->load('workflow.php');
 
-        $registryDefinition = $container->getDefinition('workflow.registry');
+        $registryDefinition = $container->getDefinition('.workflow.registry');
 
-        $workflows = [];
+        $workflow = [];
 
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
@@ -994,6 +994,13 @@ class FrameworkExtension extends Extension
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 
+            $workflowDefinition->addTag('workflow', ['name' => $name]);
+            if ('workflow' === $type) {
+                $workflowDefinition->addTag('workflow.workflow', ['name' => $name]);
+            } elseif ('state_machine' === $type) {
+                $workflowDefinition->addTag('workflow.state_machine', ['name' => $name]);
+            }
+
             // Store to container
             $container->setDefinition($workflowId, $workflowDefinition);
             $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
@@ -1063,9 +1070,6 @@ class FrameworkExtension extends Extension
                 $container->setParameter('workflow.has_guard_listeners', true);
             }
         }
-
-        $commandDumpDefinition = $container->getDefinition('console.command.workflow_dump');
-        $commandDumpDefinition->setArgument(0, $workflows);
     }
 
     private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

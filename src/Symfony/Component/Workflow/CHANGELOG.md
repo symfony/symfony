@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Mark `Symfony\Component\Workflow\Registry` as internal
+
 6.0
 ---
 

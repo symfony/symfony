@@ -18,4 +18,8 @@ class IgnoreDummyAdditionalGetter
     {
         return $parameter;
     }
+
+    public function setExtraValue2(string $parameter)
+    {
+    }
 }

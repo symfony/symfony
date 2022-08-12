@@ -95,8 +95,12 @@ final class CrowdinProvider implements ProviderInterface
         }
 
         foreach ($responses as $response) {
-            if (200 !== $response->getStatusCode()) {
+            if (200 !== $statusCode = $response->getStatusCode()) {
                 $this->logger->error(sprintf('Unable to upload translations to Crowdin: "%s".', $response->getContent(false)));
+
+                if (500 <= $statusCode) {
+                    throw new ProviderException('Unable to upload translations to Crowdin.', $response);
+                }
             }
         }
     }
@@ -135,8 +139,12 @@ final class CrowdinProvider implements ProviderInterface
                 continue;
             }
 
-            if (200 !== $response->getStatusCode()) {
+            if (200 !== $statusCode = $response->getStatusCode()) {
                 $this->logger->error(sprintf('Unable to export file: "%s".', $response->getContent(false)));
+
+                if (500 <= $statusCode) {
+                    throw new ProviderException('Unable to export file.', $response);
+                }
 
                 continue;
             }
@@ -146,8 +154,12 @@ final class CrowdinProvider implements ProviderInterface
         }
 
         foreach ($downloads as [$response, $locale, $domain]) {
-            if (200 !== $response->getStatusCode()) {
+            if (200 !== $statusCode = $response->getStatusCode()) {
                 $this->logger->error(sprintf('Unable to download file content: "%s".', $response->getContent(false)));
+
+                if (500 <= $statusCode) {
+                    throw new ProviderException('Unable to download file content.', $response);
+                }
 
                 continue;
             }
@@ -192,8 +204,12 @@ final class CrowdinProvider implements ProviderInterface
                 continue;
             }
 
-            if (204 !== $response->getStatusCode()) {
+            if (204 !== $statusCode = $response->getStatusCode()) {
                 $this->logger->warning(sprintf('Unable to delete string: "%s".', $response->getContent(false)));
+
+                if (500 <= $statusCode) {
+                    throw new ProviderException('Unable to delete string.', $response);
+                }
             }
         }
     }
@@ -238,8 +254,12 @@ final class CrowdinProvider implements ProviderInterface
             ],
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        if (201 !== $statusCode = $response->getStatusCode()) {
             $this->logger->error(sprintf('Unable to create a File in Crowdin for domain "%s": "%s".', $domain, $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException(sprintf('Unable to create a File in Crowdin for domain "%s".', $domain), $response);
+            }
 
             return null;
         }
@@ -261,8 +281,12 @@ final class CrowdinProvider implements ProviderInterface
             ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        if (200 !== $statusCode = $response->getStatusCode()) {
             $this->logger->error(sprintf('Unable to update file in Crowdin for file ID "%d" and domain "%s": "%s".', $fileId, $domain, $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException(sprintf('Unable to update file in Crowdin for file ID "%d" and domain "%s".', $fileId, $domain), $response);
+            }
 
             return null;
         }
@@ -324,9 +348,7 @@ final class CrowdinProvider implements ProviderInterface
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to list strings for file %d: "%s".', $fileId, $response->getContent()));
-
-            return [];
+            throw new ProviderException(sprintf('Unable to list strings for file "%d".', $fileId), $response);
         }
 
         return $response->toArray()['data'];

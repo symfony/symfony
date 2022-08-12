@@ -16,7 +16,7 @@ if (\PHP_VERSION_ID >= 80200) {
     {
         use EmojiTransliteratorTrait;
 
-        private const QUICK_CHECK = "\xE2\xE3\xF0";
+        private const QUICK_CHECK = "\x23\x2A0123456789\xC2\xE2\xE3\xF0";
 
         public readonly string $id;
     }
@@ -25,7 +25,7 @@ if (\PHP_VERSION_ID >= 80200) {
     {
         use EmojiTransliteratorTrait;
 
-        private const QUICK_CHECK = "\xE2\xE3\xF0";
+        private const QUICK_CHECK = "\x23\x2A0123456789\xC2\xE2\xE3\xF0";
     }
 }
 

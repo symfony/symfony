@@ -44,6 +44,16 @@ class EmojiTransliteratorTest extends TestCase
             $specialArrowInput,
             'flèche gauche droite - flèche gauche droite️',
         ];
+        yield [
+            'en_github',
+            $specialArrowInput,
+            ':left_right_arrow: - :left_right_arrow:️',
+        ];
+        yield [
+            'en_slack',
+            $specialArrowInput,
+            '↔ - :left_right_arrow:',
+        ];
     }
 
     /** @dataProvider provideTransliterateTests */

@@ -19,6 +19,8 @@ use Symfony\Component\VarExporter\VarExporter;
 Builder::cleanTarget();
 $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
+Builder::saveRules(Builder::buildGitHubRules($emojisCodePoints));
+Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
 
 final class Builder
 {
@@ -104,6 +106,57 @@ final class Builder
 
             yield strtolower($locale) => self::createRules($maps);
         }
+    }
+
+    public static function buildGitHubRules(array $emojisCodePoints): iterable
+    {
+        $emojis = json_decode(file_get_contents(__DIR__.'/vendor/github-emojis.json'), true);
+
+        $ignored = [];
+        $maps = [];
+
+        foreach ($emojis as $shortCode => $url) {
+            $emojiCodePoints = str_replace('-', ' ', strtolower(basename(parse_url($url, \PHP_URL_PATH), '.png')));
+            if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
+                $ignored[] = [
+                    'emojiCodePoints' => $emojiCodePoints,
+                    'shortCode' => $shortCode,
+                ];
+                continue;
+            }
+            $emoji = $emojisCodePoints[$emojiCodePoints];
+            self::testEmoji($emoji, 'en_github');
+            $codePointsCount = mb_strlen($emoji);
+            $maps[$codePointsCount][$emoji] = ":$shortCode:";
+        }
+
+        return ['en_github' => self::createRules($maps)];
+    }
+
+    public static function buildSlackRules(array $emojisCodePoints): iterable
+    {
+        $emojis = json_decode(file_get_contents(__DIR__.'/vendor/slack-emojis.json'), true);
+
+        $ignored = [];
+        $maps = [];
+
+        foreach ($emojis as $data) {
+            $emojiCodePoints = str_replace('-', ' ', strtolower($data['unified']));
+            $shortCode = $data['short_name'];
+            if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
+                $ignored[] = [
+                    'emojiCodePoints' => $emojiCodePoints,
+                    'shortCode' => $shortCode,
+                ];
+                continue;
+            }
+            $emoji = $emojisCodePoints[$emojiCodePoints];
+            self::testEmoji($emoji, 'en_slack');
+            $codePointsCount = mb_strlen($emoji);
+            $maps[$codePointsCount][$emoji] = ":$shortCode:";
+        }
+
+        return ['en_slack' => self::createRules($maps)];
     }
 
     public static function cleanTarget(): void

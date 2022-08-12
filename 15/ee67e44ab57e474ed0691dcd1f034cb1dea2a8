@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-20T15:59:41Z
+
+@lyrixx Do you have time to finish this one?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-07-20T16:13:48Z
+
+Yes, I'll do that ASAP, But I'm on holidays for 2 weeks. I'll do that after!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-12T10:22:09Z
+
+Hello,
+
+I pushed a new version without the service locator. I also updated the PR description with the new usage

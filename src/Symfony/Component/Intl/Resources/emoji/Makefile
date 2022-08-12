@@ -3,6 +3,8 @@
 
 update: ## Update sources
 	@composer update
+	@curl https://api.github.com/emojis > vendor/github-emojis.json
+	@curl https://raw.githubusercontent.com/iamcal/emoji-data/master/emoji.json > vendor/slack-emojis.json
 
 build: ## Build rules
 	@./build.php

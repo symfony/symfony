@@ -32,9 +32,9 @@ class AsciiSluggerTest extends TestCase
         yield ['a', 'ä', '-', 'fr'];
         yield ['ae', 'ä', '-', 'de'];
         yield ['ae', 'ä', '-', 'de_fr']; // Ensure we get the parent locale
-        yield ['g', 'ғ', '-'];
-        yield ['gh', 'ғ', '-', 'uz'];
-        yield ['gh', 'ғ', '-', 'uz_fr']; // Ensure we get the parent locale
+        yield [\function_exists('transliterator_transliterate') ? 'g' : '', 'ғ', '-'];
+        yield [\function_exists('transliterator_transliterate') ? 'gh' : '', 'ғ', '-', 'uz'];
+        yield [\function_exists('transliterator_transliterate') ? 'gh' : '', 'ғ', '-', 'uz_fr']; // Ensure we get the parent locale
     }
 
     /** @dataProvider provideSlugTests */

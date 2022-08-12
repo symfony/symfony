@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\Expression;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\Language;
@@ -234,6 +235,28 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(2, $violations);
         $this->assertSame('custom message foo', $violations->get(0)->getMessage());
         $this->assertSame('This value should satisfy at least one of the following constraints: [1] custom message bar', $violations->get(1)->getMessage());
+    }
+
+    public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch()
+    {
+        $validator = Validation::createValidator();
+
+        $violations = $validator->validate(50, new AtLeastOneOf([
+            'constraints' => [
+                new Range([
+                    'groups' => 'adult',
+                    'min' => 18,
+                    'max' => 55,
+                ]),
+                new GreaterThan([
+                    'groups' => 'senior',
+                    'value' => 55,
+                ]),
+            ],
+            'groups' => ['adult', 'senior'],
+        ]), 'senior');
+
+        $this->assertCount(1, $violations);
     }
 }
 

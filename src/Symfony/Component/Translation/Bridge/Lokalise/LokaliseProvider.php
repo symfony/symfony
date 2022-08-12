@@ -198,8 +198,12 @@ final class LokaliseProvider implements ProviderInterface
         $createdKeys = [];
 
         foreach ($responses as $response) {
-            if (200 !== $response->getStatusCode()) {
+            if (200 !== $statusCode = $response->getStatusCode()) {
                 $this->logger->error(sprintf('Unable to create keys to Lokalise: "%s".', $response->getContent(false)));
+
+                if (500 <= $statusCode) {
+                    throw new ProviderException('Unable to create keys to Lokalise.', $response);
+                }
 
                 continue;
             }
@@ -254,8 +258,12 @@ final class LokaliseProvider implements ProviderInterface
             'json' => ['keys' => $keysToUpdate],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        if (200 !== $statusCode = $response->getStatusCode()) {
             $this->logger->error(sprintf('Unable to create/update translations to Lokalise: "%s".', $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException('Unable to create/update translations to Lokalise.', $response);
+            }
         }
     }
 
@@ -270,8 +278,12 @@ final class LokaliseProvider implements ProviderInterface
             ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        if (200 !== $statusCode = $response->getStatusCode()) {
             $this->logger->error(sprintf('Unable to get keys ids from Lokalise: "%s".', $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException('Unable to get keys ids from Lokalise.', $response);
+            }
         }
 
         $result = [];
@@ -320,8 +332,12 @@ final class LokaliseProvider implements ProviderInterface
     {
         $response = $this->client->request('GET', 'languages');
 
-        if (200 !== $response->getStatusCode()) {
+        if (200 !== $statusCode = $response->getStatusCode()) {
             $this->logger->error(sprintf('Unable to get languages from Lokalise: "%s".', $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException('Unable to get languages from Lokalise.', $response);
+            }
 
             return [];
         }
@@ -345,8 +361,12 @@ final class LokaliseProvider implements ProviderInterface
             ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        if (200 !== $statusCode = $response->getStatusCode()) {
             $this->logger->error(sprintf('Unable to create languages on Lokalise: "%s".', $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException('Unable to create languages on Lokalise.', $response);
+            }
         }
     }
 

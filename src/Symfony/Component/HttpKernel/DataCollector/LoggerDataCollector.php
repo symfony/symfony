@@ -144,7 +144,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
         $allChannels = [];
         foreach ($this->getProcessedLogs() as $log) {
-            if ('' === trim($log['channel'])) {
+            if ('' === trim($log['channel'] ?? '')) {
                 continue;
             }
 

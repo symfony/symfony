@@ -159,6 +159,7 @@ abstract class AnnotationLoaderTest extends TestCase
 
         $attributes = $classMetadata->getAttributesMetadata();
         self::assertArrayNotHasKey('extraValue', $attributes);
+        self::assertArrayHasKey('extraValue2', $attributes);
     }
 
     public function testIgnoreGetterWirhRequiredParameterIfIgnoreAnnotationIsNotUsed()
@@ -168,6 +169,7 @@ abstract class AnnotationLoaderTest extends TestCase
 
         $attributes = $classMetadata->getAttributesMetadata();
         self::assertArrayNotHasKey('extraValue', $attributes);
+        self::assertArrayHasKey('extraValue2', $attributes);
     }
 
     abstract protected function createLoader(): AnnotationLoader;

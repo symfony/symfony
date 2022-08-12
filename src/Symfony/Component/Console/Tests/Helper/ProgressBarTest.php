@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -1035,6 +1036,23 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('    2 [============================]'),
             stream_get_contents($output->getStream())
         );
+    }
+
+    public function testEmptyInputWithDebugFormat()
+    {
+        try {
+            $bar = new ProgressBar($output = $this->getOutputStream());
+            $bar->setFormat("%elapsed%/%estimated%");
+
+            $input = [];
+            foreach ($bar->iterate($input) as $item)
+                var_dump($item);
+
+            // succeed the test if we reach this code (no exception happened)
+            $this->assertTrue(true);
+        } catch(Exception $e) {
+            $this->fail();
+        }
     }
 
     protected function getOutputStream($decorated = true, $verbosity = StreamOutput::VERBOSITY_NORMAL)

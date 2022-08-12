@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String\Slugger;
 
+use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -58,6 +59,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     private \Closure|array $symbolsMap = [
         'en' => ['@' => 'at', '&' => 'and'],
     ];
+    private bool|string $emoji = false;
 
     /**
      * Cache of transliterators per locale.
@@ -89,6 +91,23 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     }
 
     /**
+     * @param bool|string $emoji true will use the same locale,
+     *                           false will disable emoji,
+     *                           and a string to use a specific locale
+     */
+    public function withEmoji(bool|string $emoji = true): static
+    {
+        if (false !== $emoji && !class_exists(EmojiTransliterator::class)) {
+            throw new \LogicException(sprintf('You cannot use the "%s()" method as the "symfony/intl" package is not installed. Try running "composer require symfony/intl".', __METHOD__));
+        }
+
+        $new = clone $this;
+        $new->emoji = $emoji;
+
+        return $new;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function slug(string $string, string $separator = '-', string $locale = null): AbstractUnicodeString
@@ -101,6 +120,12 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
             $transliterator = ['de-ASCII'];
         } elseif (\function_exists('transliterator_transliterate') && $locale) {
             $transliterator = (array) $this->createTransliterator($locale);
+        }
+
+        if (\is_string($this->emoji)) {
+            $transliterator[] = EmojiTransliterator::create("emoji-{$this->emoji}");
+        } elseif ($this->emoji && null !== $locale) {
+            $transliterator[] = EmojiTransliterator::create("emoji-{$locale}");
         }
 
         if ($this->symbolsMap instanceof \Closure) {

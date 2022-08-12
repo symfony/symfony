@@ -141,7 +141,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('translation.extractor', ['alias' => 'twig'])
 
         ->set('workflow.twig_extension', WorkflowExtension::class)
-            ->args([service('workflow.registry')])
+            ->args([service('.workflow.registry')])
 
         ->set('twig.configurator.environment', EnvironmentConfigurator::class)
             ->args([

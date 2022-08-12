@@ -12,6 +12,9 @@ CHANGELOG
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Add service usages list to the `debug:container` command output
  * Add service and alias deprecation message to `debug:container [<name>]` output
+ * Tag all workflows services with `workflow`, those with type=workflow are
+   tagged with `workflow.workflow`, and those with type=state_machine with
+   `workflow.state_machine`
 
 6.1
 ---

@@ -39,8 +39,11 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
         ->set('workflow.marking_store.method', MethodMarkingStore::class)
             ->abstract()
-        ->set('workflow.registry', Registry::class)
-        ->alias(Registry::class, 'workflow.registry')
+        ->set('.workflow.registry', Registry::class)
+        ->alias(Registry::class, '.workflow.registry')
+            ->deprecate('symfony/workflow', '6.2', 'The "%alias_id%" alias is deprecated since Symfony 6.2 and will be removed in Symfony 7.0. Inject the workflow directly.')
+        ->alias('workflow.registry', '.workflow.registry')
+            ->deprecate('symfony/workflow', '6.2', 'The "%alias_id%" service is deprecated since Symfony 6.2 and will be removed in Symfony 7.0. Inject the workflow directly.')
         ->set('workflow.security.expression_language', ExpressionLanguage::class)
     ;
 };

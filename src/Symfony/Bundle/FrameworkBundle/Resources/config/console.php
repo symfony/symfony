@@ -282,6 +282,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command', ['command' => 'translation:push'])
 
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
+            ->args([
+                tagged_locator('workflow', 'name'),
+            ])
             ->tag('console.command')
 
         ->set('console.command.xliff_lint', XliffLintCommand::class)

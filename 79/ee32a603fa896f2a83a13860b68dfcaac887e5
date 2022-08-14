@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-14T08:28:22Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by enumag at 2022-03-03T09:43:43Z
+
+Can I get some feedback on this feature?
+
+---------------------------------------------------------------------------
+
+by enumag at 2022-08-08T07:33:53Z
+
+@fabpot Thanks for the review. I changed the code according to your comments and added a test.
+
+The CI failure seems unrelated.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by enumag at 2022-08-14T18:20:37Z
+
+@fabpot Updated. Is it okay to keep the promoted property or should I use the non-promoted syntax?
+
+---------------------------------------------------------------------------
+
+by enumag at 2022-08-14T18:32:38Z
+
+Tests are failing but once again I don't think it's related to my code.
+
+I squashed everything into a single commit.
+
+Also added a documentation PR.

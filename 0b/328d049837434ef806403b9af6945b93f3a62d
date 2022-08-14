@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-07-28T09:06:32Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-28T09:12:12Z
+
+Thanks for the PR, that's always the best way to start a conversation on this repo :)
+
+Now that I double checked xxh3, it's not cryptographically secure, isn't it? Since we're using this hash as the key to the cached response payload, this means we could open the storage to hash collisions attacks, provided the hacker can somehow control the response content. WDYT? Doesn't this disqualify xxh3 for this use case?
+
+---------------------------------------------------------------------------
+
+by pascalwoerde at 2022-07-28T10:02:14Z
+
+That's right the whole xxh family isn't cryptographically secure, so it's easier for someone to recalculate a potential collision. I don't think that a hacker can have any benefit from this, since it is a oneway direction to retrieve data. xxh is great for change detection, which is ideal for this situation IMO. While I'm typing the only thing that I can imaging now is a collision by the number of responses, because xxh3 is 64 bit. Which means that when there are over a bilion of responses cached there will be a small change resulting in identical hash. I will suggest to use the xxh128 instead to extend the range.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-07-29T10:25:51Z
+
+This is a great performance optimization. I shared some references on https://github.com/twigphp/Twig/pull/3588.
+
+Regarding security: the hashed contents comes from an external input. An attacker could manipulate the query string so that the hash of a request URI would colite with an other. This is a cache poisoning attack: you could make the content of the page https://connect.symfony.com/profile/pascalwoerde appear under the URI https://connect.symfony.com/profile/fabpot. I don't have the skills to do so, but we have to trust the experts that flagged this algorithm as non-cryptographically safe.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-07-29T10:45:30Z
+
+> Regarding security: the hashed contents comes from an external input. An attacker could manipulate the query string so that the hash of a request URI would colite with an other.
+
+In this PR, the hash is not on the URL but on `$response->getContent()`, so an attacker would have to alter the content of the resulting HTML?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-07-29T11:20:17Z
+
+Oh exact. So at most the attacker could update a page without invalidate the cache. That seems safe.

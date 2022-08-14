@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * The HTTP cache store uses the `xxh128` algorithm
+
 6.1
 ---
 

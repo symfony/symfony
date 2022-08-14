@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -261,11 +262,52 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $this->assertSame([$message], $handler->processedMessages);
     }
+
+    public function testHandlerArgumentsStamp()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $envelope = $envelope->with(new HandlerArgumentsStamp(['additional argument']));
+
+        $handler = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        $handler->expects($this->once())->method('__invoke')->with($message, 'additional argument');
+
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testHandlerArgumentsStampNamedArgument()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $envelope = $envelope->with(new HandlerArgumentsStamp(['namedArgument' => 'additional named argument']));
+
+        $handler = $this->createPartialMock(HandleMessageMiddlewareNamedArgumentTestCallable::class, ['__invoke']);
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        $handler->expects($this->once())->method('__invoke')->with($message, 'additional named argument');
+
+        $middleware->handle($envelope, $this->getStackMock());
+    }
 }
 
 class HandleMessageMiddlewareTestCallable
 {
     public function __invoke()
+    {
+    }
+}
+
+class HandleMessageMiddlewareNamedArgumentTestCallable
+{
+    public function __invoke(object $message, $namedArgument)
     {
     }
 }

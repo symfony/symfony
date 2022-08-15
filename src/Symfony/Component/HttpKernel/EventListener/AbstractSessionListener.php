@@ -158,6 +158,11 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
 
                 $isSessionEmpty = $session->isEmpty() && empty($_SESSION); // checking $_SESSION to keep compatibility with native sessions
                 if ($requestSessionCookieId && $isSessionEmpty) {
+                    // PHP internally sets the session cookie value to "deleted" when setcookie() is called with empty string $value argument
+                    // which happens in \Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler::destroy
+                    // when the session gets invalidated (for example on logout) so we must handle this case here too
+                    // otherwise we would send two Set-Cookie headers back with the response
+                    SessionUtils::popSessionCookie($sessionName, 'deleted');
                     $response->headers->clearCookie(
                         $sessionName,
                         $sessionCookiePath,

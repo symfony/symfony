@@ -121,15 +121,18 @@ class Profiler implements ResetInterface
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param int|null    $limit The maximum number of tokens to return
-     * @param string|null $start The start date to search from
-     * @param string|null $end   The end date to search to
+     * @param int|null      $limit The maximum number of tokens to return
+     * @param string|null   $start The start date to search from
+     * @param string|null   $end   The end date to search to
+     * @param \Closure|null $filter A filter to apply on the list of tokens
      *
      * @see https://php.net/datetime.formats for the supported date/time formats
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?string $start, ?string $end, string $statusCode = null): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?string $start, ?string $end, string $statusCode = null/* , \Closure $filter = null */): array
     {
-        return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode);
+        $filter = 7 < \func_num_args() ? func_get_arg(7) : null;
+
+        return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode, $filter);
     }
 
     /**
@@ -150,6 +153,10 @@ class Profiler implements ResetInterface
             $profile->setIp($request->getClientIp());
         } catch (ConflictingHeadersException) {
             $profile->setIp('Unknown');
+        }
+
+        if ($request->attributes->has('_virtual_type')) {
+            $profile->setVirtualType($request->attributes->get('_virtual_type'));
         }
 
         if ($prevToken = $response->headers->get('X-Debug-Token')) {

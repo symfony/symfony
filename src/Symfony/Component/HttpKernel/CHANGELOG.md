@@ -16,6 +16,7 @@ CHANGELOG
  * Deprecate `UriSigner`, use `UriSigner` from the HttpFoundation component instead
  * Deprecate `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
  * Add argument `$buildDir` to `WarmableInterface`
+ * Add argument `$filter` to `Profiler::find()` and `FileProfilerStorage::find()`
 
 6.3
 ---

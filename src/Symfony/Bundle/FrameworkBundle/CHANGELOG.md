@@ -33,6 +33,7 @@ CHANGELOG
  * Add parameters deprecations to the output of `debug:container` command
  * Change `framework.asset_mapper.importmap_polyfill` from a URL to the name of an item in the importmap
  * Provide `$buildDir` when running `CacheWarmer` to build read-only resources
+ * Add the global `--profile` option to the console to enable profiling commands
 
 6.3
 ---

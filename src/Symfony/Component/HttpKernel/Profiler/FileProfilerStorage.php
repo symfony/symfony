@@ -170,13 +170,14 @@ class FileProfilerStorage implements ProfilerStorageInterface
         ];
 
         $context = stream_context_create();
+        $wrapper = '';
 
         if (\function_exists('gzcompress')) {
-            $file = 'compress.zlib://'.$file;
+            $wrapper = 'compress.zlib://';
             stream_context_set_option($context, 'zlib', 'level', 3);
         }
 
-        if (false === file_put_contents($file, serialize($data), 0, $context)) {
+        if (false === file_put_contents($wrapper.$file.'.tmp', serialize($data), 0, $context) || false === rename($file.'.tmp', $file)) {
             return false;
         }
 

@@ -27,7 +27,8 @@
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4.12|^6.0.12|^6.1.4",
         "symfony/mime": "^4.4|^5.0|^6.0",
-        "symfony/expression-language": "^4.4|^5.0|^6.0"
+        "symfony/expression-language": "^4.4|^5.0|^6.0",
+        "symfony/rate-limiter": "^5.2|^6.0"
     },
     "suggest" : {
         "symfony/mime": "To use the file extension guesser"

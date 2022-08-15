@@ -1,6 +1,11 @@
 UPGRADE FROM 6.2 to 6.3
 =======================
 
+Config
+------
+
+* Deprecate `ArrayNodeDefinition::ignoreExtraKeys()`, use `ArrayNodeDefinition::setIgnoreExtraKeys(true)` and `ArrayNodeDefinition::setRemoveExtraKeys()` instead
+
 Console
 -------
 

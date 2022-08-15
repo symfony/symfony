@@ -23,7 +23,8 @@ class ArrayExtraKeys implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('foo')
-                    ->ignoreExtraKeys(false)
+                    ->setIgnoreExtraKeys(true)
+                    ->setRemoveExtraKeys(false)
                     ->children()
                         ->scalarNode('baz')->end()
                         ->scalarNode('qux')->end()
@@ -31,7 +32,8 @@ class ArrayExtraKeys implements ConfigurationInterface
                 ->end()
                 ->arrayNode('bar')
                     ->prototype('array')
-                        ->ignoreExtraKeys(false)
+                        ->setIgnoreExtraKeys(true)
+                        ->setRemoveExtraKeys(false)
                         ->children()
                             ->scalarNode('corge')->end()
                             ->scalarNode('grault')->end()
@@ -39,7 +41,8 @@ class ArrayExtraKeys implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('baz')
-                    ->ignoreExtraKeys(false)
+                    ->setIgnoreExtraKeys(true)
+                    ->setRemoveExtraKeys(false)
                 ->end()
             ;
 

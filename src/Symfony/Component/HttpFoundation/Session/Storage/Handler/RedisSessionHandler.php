@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Predis\Response\ErrorInterface;
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
 
 /**
  * Redis based session storage handler based on the Redis class
@@ -23,8 +21,6 @@ use Symfony\Component\Cache\Traits\RedisProxy;
  */
 class RedisSessionHandler extends AbstractSessionHandler
 {
-    private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis;
-
     /**
      * Key prefix for shared environments.
      */
@@ -42,13 +38,14 @@ class RedisSessionHandler extends AbstractSessionHandler
      *
      * @throws \InvalidArgumentException When unsupported client or options are passed
      */
-    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis, array $options = [])
-    {
+    public function __construct(
+        private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+        array $options = [],
+    ) {
         if ($diff = array_diff(array_keys($options), ['prefix', 'ttl'])) {
             throw new \InvalidArgumentException(sprintf('The following options are not supported "%s".', implode(', ', $diff)));
         }
 
-        $this->redis = $redis;
         $this->prefix = $options['prefix'] ?? 'sf_s';
         $this->ttl = $options['ttl'] ?? null;
     }

@@ -21,7 +21,7 @@ jobs:
     name: Tests
 
     env:
-      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis-5.3.4
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
 
     strategy:
       matrix:

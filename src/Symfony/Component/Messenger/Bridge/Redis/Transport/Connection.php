@@ -51,7 +51,7 @@ class Connection
         'ssl' => null, // see https://php.net/context.ssl
     ];
 
-    private \Redis|\RedisCluster|RedisProxy|RedisClusterProxy $connection;
+    private \Redis|\RedisCluster|\Closure $redis;
     private string $stream;
     private string $queue;
     private string $group;
@@ -87,10 +87,9 @@ class Connection
 
         if (\is_array($host) || $redis instanceof \RedisCluster) {
             $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
-            $initializer = static function ($redis) use ($hosts, $auth, $options) {
+            $this->redis = static function () use ($redis, $hosts, $auth, $options) {
                 return self::initializeRedisCluster($redis, $hosts, $auth, $options);
             };
-            $redis = $options['lazy'] ? new RedisClusterProxy($redis, $initializer) : $initializer($redis);
         } else {
             if (null !== $sentinelMaster) {
                 $sentinelClient = new \RedisSentinel($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
@@ -102,14 +101,14 @@ class Connection
                 [$host, $port] = $address;
             }
 
-            $redis = $redis ?? new \Redis();
-            $initializer = static function ($redis) use ($host, $port, $auth, $options) {
-                return self::initializeRedis($redis, $host, $port, $auth, $options);
+            $this->redis = static function () use ($redis, $host, $port, $auth, $options) {
+                return self::initializeRedis($redis ?? new \Redis(), $host, $port, $auth, $options);
             };
-            $redis = $options['lazy'] ? new RedisProxy($redis, $initializer) : $initializer($redis);
         }
 
-        $this->connection = $redis;
+        if (!$options['lazy']) {
+            $this->getRedis();
+        }
 
         foreach (['stream', 'group', 'consumer'] as $key) {
             if ('' === $options[$key]) {
@@ -250,7 +249,7 @@ class Connection
         try {
             // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
             // https://github.com/antirez/redis/issues/6256
-            $pendingMessages = $this->connection->xpending($this->stream, $this->group, '-', '+', 1);
+            $pendingMessages = $this->getRedis()->xpending($this->stream, $this->group, '-', '+', 1);
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -270,7 +269,7 @@ class Connection
 
         if (\count($claimableIds) > 0) {
             try {
-                $this->connection->xclaim(
+                $this->getRedis()->xclaim(
                     $this->stream,
                     $this->group,
                     $this->consumer,
@@ -329,9 +328,10 @@ class Connection
         if ($this->couldHavePendingMessages) {
             $messageId = '0'; // will receive consumers pending messages
         }
+        $redis = $this->getRedis();
 
         try {
-            $messages = $this->connection->xreadgroup(
+            $messages = $redis->xreadgroup(
                 $this->group,
                 $this->consumer,
                 [$this->stream => $messageId],
@@ -342,8 +342,8 @@ class Connection
         }
 
         if (false === $messages) {
-            if ($error = $this->connection->getLastError() ?: null) {
-                $this->connection->clearLastError();
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
             }
 
             throw new TransportException($error ?? 'Could not read messages from the redis stream.');
@@ -368,18 +368,20 @@ class Connection
 
     public function ack(string $id): void
     {
+        $redis = $this->getRedis();
+
         try {
-            $acknowledged = $this->connection->xack($this->stream, $this->group, [$id]);
+            $acknowledged = $redis->xack($this->stream, $this->group, [$id]);
             if ($this->deleteAfterAck) {
-                $acknowledged = $this->connection->xdel($this->stream, [$id]);
+                $acknowledged = $redis->xdel($this->stream, [$id]);
             }
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
         if (!$acknowledged) {
-            if ($error = $this->connection->getLastError() ?: null) {
-                $this->connection->clearLastError();
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
             }
             throw new TransportException($error ?? sprintf('Could not acknowledge redis message "%s".', $id));
         }
@@ -387,18 +389,20 @@ class Connection
 
     public function reject(string $id): void
     {
+        $redis = $this->getRedis();
+
         try {
-            $deleted = $this->connection->xack($this->stream, $this->group, [$id]);
+            $deleted = $redis->xack($this->stream, $this->group, [$id]);
             if ($this->deleteAfterReject) {
-                $deleted = $this->connection->xdel($this->stream, [$id]) && $deleted;
+                $deleted = $redis->xdel($this->stream, [$id]) && $deleted;
             }
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
         if (!$deleted) {
-            if ($error = $this->connection->getLastError() ?: null) {
-                $this->connection->clearLastError();
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
             }
             throw new TransportException($error ?? sprintf('Could not delete message "%s" from the redis stream.', $id));
         }
@@ -409,6 +413,7 @@ class Connection
         if ($this->autoSetup) {
             $this->setup();
         }
+        $redis = $this->getRedis();
 
         try {
             if ($delayInMs > 0) { // the delay is <= 0 for queued messages
@@ -447,23 +452,23 @@ class Connection
                 }
 
                 if ($this->maxEntries) {
-                    $added = $this->connection->xadd($this->stream, '*', ['message' => $message], $this->maxEntries, true);
+                    $added = $redis->xadd($this->stream, '*', ['message' => $message], $this->maxEntries, true);
                 } else {
-                    $added = $this->connection->xadd($this->stream, '*', ['message' => $message]);
+                    $added = $redis->xadd($this->stream, '*', ['message' => $message]);
                 }
 
                 $id = $added;
             }
         } catch (\RedisException $e) {
-            if ($error = $this->connection->getLastError() ?: null) {
-                $this->connection->clearLastError();
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
             }
             throw new TransportException($error ?? $e->getMessage(), 0, $e);
         }
 
         if (!$added) {
-            if ($error = $this->connection->getLastError() ?: null) {
-                $this->connection->clearLastError();
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
             }
             throw new TransportException($error ?? 'Could not add a message to the redis stream.');
         }
@@ -473,19 +478,21 @@ class Connection
 
     public function setup(): void
     {
+        $redis = $this->getRedis();
+
         try {
-            $this->connection->xgroup('CREATE', $this->stream, $this->group, 0, true);
+            $redis->xgroup('CREATE', $this->stream, $this->group, 0, true);
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
         // group might already exist, ignore
-        if ($this->connection->getLastError()) {
-            $this->connection->clearLastError();
+        if ($redis->getLastError()) {
+            $redis->clearLastError();
         }
 
         if ($this->deleteAfterAck || $this->deleteAfterReject) {
-            $groups = $this->connection->xinfo('GROUPS', $this->stream);
+            $groups = $redis->xinfo('GROUPS', $this->stream);
             if (
                 // support for Redis extension version 5+
                 (\is_array($groups) && 1 < \count($groups))
@@ -507,23 +514,25 @@ class Connection
     public function cleanup(): void
     {
         static $unlink = true;
+        $redis = $this->getRedis();
 
         if ($unlink) {
             try {
-                $unlink = false !== $this->connection->unlink($this->stream, $this->queue);
+                $unlink = false !== $redis->unlink($this->stream, $this->queue);
             } catch (\Throwable) {
                 $unlink = false;
             }
         }
 
         if (!$unlink) {
-            $this->connection->del($this->stream, $this->queue);
+            $redis->del($this->stream, $this->queue);
         }
     }
 
     public function getMessageCount(): int
     {
-        $groups = $this->connection->xinfo('GROUPS', $this->stream) ?: [];
+        $redis = $this->getRedis();
+        $groups = $redis->xinfo('GROUPS', $this->stream) ?: [];
 
         $lastDeliveredId = null;
         foreach ($groups as $group) {
@@ -551,40 +560,51 @@ class Connection
         // Iterate through the stream. See https://redis.io/commands/xrange/#iterating-a-stream.
         $useExclusiveRangeInterval = version_compare(phpversion('redis'), '6.2.0', '>=');
         $total = 0;
-        do {
-            if (!$range = $this->connection->xRange($this->stream, $lastDeliveredId, '+', 100)) {
+        while (true) {
+            if (!$range = $redis->xRange($this->stream, $lastDeliveredId, '+', 100)) {
                 return $total;
             }
 
             $total += \count($range);
 
             if ($useExclusiveRangeInterval) {
-                $lastDeliveredId = preg_replace_callback('#\d+$#', static fn(array $matches) => (int) $matches[0] + 1, array_key_last($range));
+                $lastDeliveredId = preg_replace_callback('#\d+$#', static fn (array $matches) => (int) $matches[0] + 1, array_key_last($range));
             } else {
                 $lastDeliveredId = '('.array_key_last($range);
             }
-        } while (true);
+        }
     }
 
     private function rawCommand(string $command, ...$arguments): mixed
     {
+        $redis = $this->getRedis();
+
         try {
-            if ($this->connection instanceof \RedisCluster || $this->connection instanceof RedisClusterProxy) {
-                $result = $this->connection->rawCommand($this->queue, $command, $this->queue, ...$arguments);
+            if ($redis instanceof \RedisCluster) {
+                $result = $redis->rawCommand($this->queue, $command, $this->queue, ...$arguments);
             } else {
-                $result = $this->connection->rawCommand($command, $this->queue, ...$arguments);
+                $result = $redis->rawCommand($command, $this->queue, ...$arguments);
             }
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
         if (false === $result) {
-            if ($error = $this->connection->getLastError() ?: null) {
-                $this->connection->clearLastError();
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
             }
             throw new TransportException($error ?? sprintf('Could not run "%s" on Redis queue.', $command));
         }
 
         return $result;
+    }
+
+    private function getRedis(): \Redis|\RedisCluster
+    {
+        if ($this->redis instanceof \Closure) {
+            $this->redis = ($this->redis)();
+        }
+
+        return $this->redis;
     }
 }

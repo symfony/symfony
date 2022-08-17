@@ -36,7 +36,7 @@ final class ApplicationDescriptionTest extends TestCase
         return [
             [['_global'], ['foobar']],
             [['a', 'b'], ['b:foo', 'a:foo', 'b:bar']],
-            [['_global', 'b', 'z', 22, 33], ['z:foo', '1', '33:foo', 'b:foo', '22:foo:bar']],
+            [['_global', 22, 33, 'b', 'z'], ['z:foo', '1', '33:foo', 'b:foo', '22:foo:bar']],
         ];
     }
 }

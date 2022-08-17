@@ -16,7 +16,13 @@ if (\PHP_VERSION_ID >= 80200) {
     {
         use EmojiTransliteratorTrait;
 
-        private const QUICK_CHECK = "\xE2\xE3\xF0";
+        private const QUICK_CHECK = "\xA9\xAE\xE2\xE3\xF0";
+        private const REVERSEABLE_IDS = [
+            'emoji-github' => 'github-emoji',
+            'emoji-slack' => 'slack-emoji',
+            'github-emoji' => 'emoji-github',
+            'slack-emoji' => 'emoji-slack',
+        ];
 
         public readonly string $id;
     }
@@ -25,7 +31,13 @@ if (\PHP_VERSION_ID >= 80200) {
     {
         use EmojiTransliteratorTrait;
 
-        private const QUICK_CHECK = "\xE2\xE3\xF0";
+        private const QUICK_CHECK = "\xA9\xAE\xE2\xE3\xF0";
+        private const REVERSEABLE_IDS = [
+            'emoji-github' => 'github-emoji',
+            'emoji-slack' => 'slack-emoji',
+            'github-emoji' => 'emoji-github',
+            'slack-emoji' => 'emoji-slack',
+        ];
     }
 }
 
@@ -39,16 +51,24 @@ trait EmojiTransliteratorTrait
 
     public static function create(string $id, int $direction = self::FORWARD): ?\Transliterator
     {
-        if (self::REVERSE === $direction) {
-            // Create a failing reverse-transliterator to populate intl_get_error_*()
-            \Transliterator::createFromRules('A > B')->createInverse();
-
-            throw new \IntlException(intl_get_error_message(), intl_get_error_code());
-        }
         $id = strtolower($id);
 
+        if (!isset(self::REVERSEABLE_IDS[$id]) && !str_starts_with($id, 'emoji-')) {
+            $id = 'emoji-'.$id;
+        }
+
+        if (self::REVERSE === $direction) {
+            if (!isset(self::REVERSEABLE_IDS[$id])) {
+                // Create a failing reverse-transliterator to populate intl_get_error_*()
+                \Transliterator::createFromRules('A > B')->createInverse();
+
+                throw new \IntlException(intl_get_error_message(), intl_get_error_code());
+            }
+            $id = self::REVERSEABLE_IDS[$id];
+        }
+
         if (!preg_match('/^[a-z0-9@_\\.\\-]*$/', $id) || !is_file(\dirname(__DIR__)."/Resources/data/transliterator/emoji/{$id}.php")) {
-            \Transliterator::create('Emoji: '.$id); // Populate intl_get_error_*()
+            \Transliterator::create($id); // Populate intl_get_error_*()
 
             throw new \IntlException(intl_get_error_message(), intl_get_error_code());
         }
@@ -71,8 +91,7 @@ trait EmojiTransliteratorTrait
 
     public function createInverse(): ?self
     {
-        // Create a failing reverse-transliterator to populate intl_get_error_*()
-        return \Transliterator::createFromRules('A > B')->createInverse();
+        return self::create($this->id, self::REVERSE);
     }
 
     public function getErrorCode(): int|false
@@ -102,8 +121,10 @@ trait EmojiTransliteratorTrait
 
     public function transliterate(string $string, int $start = 0, int $end = -1): string|false
     {
+        $quickCheck = ':' === array_key_first($this->map)[0] ? ':' : self::QUICK_CHECK;
+
         if (0 === $start && -1 === $end && preg_match('//u', $string)) {
-            return \strlen($string) === strcspn($string, self::QUICK_CHECK) ? $string : strtr($string, $this->map);
+            return \strlen($string) === strcspn($string, $quickCheck) ? $string : strtr($string, $this->map);
         }
 
         // Here we rely on intl to validate the $string, $start and $end arguments
@@ -126,6 +147,6 @@ trait EmojiTransliteratorTrait
         $length = -\strlen($parts[1]) ?: null;
         $string = substr($string, $start, $length);
 
-        return $parts[0].(\strlen($string) === strcspn($string, self::QUICK_CHECK) ? $string : strtr($string, $this->map)).$parts[1];
+        return $parts[0].(\strlen($string) === strcspn($string, $quickCheck) ? $string : strtr($string, $this->map)).$parts[1];
     }
 }

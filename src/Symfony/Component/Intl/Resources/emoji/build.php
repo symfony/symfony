@@ -19,6 +19,8 @@ use Symfony\Component\VarExporter\VarExporter;
 Builder::cleanTarget();
 $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
+Builder::saveRules(Builder::buildGitHubRules($emojisCodePoints));
+Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
 
 final class Builder
 {
@@ -106,6 +108,57 @@ final class Builder
         }
     }
 
+    public static function buildGitHubRules(array $emojisCodePoints): iterable
+    {
+        $emojis = json_decode(file_get_contents(__DIR__.'/vendor/github-emojis.json'), true);
+
+        $ignored = [];
+        $maps = [];
+
+        foreach ($emojis as $shortCode => $url) {
+            $emojiCodePoints = str_replace('-', ' ', strtolower(basename(parse_url($url, \PHP_URL_PATH), '.png')));
+            if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
+                $ignored[] = [
+                    'emojiCodePoints' => $emojiCodePoints,
+                    'shortCode' => $shortCode,
+                ];
+                continue;
+            }
+            $emoji = $emojisCodePoints[$emojiCodePoints];
+            self::testEmoji($emoji, 'github');
+            $codePointsCount = mb_strlen($emoji);
+            $maps[$codePointsCount][$emoji] = ":$shortCode:";
+        }
+
+        return ['github' => self::createRules($maps)];
+    }
+
+    public static function buildSlackRules(array $emojisCodePoints): iterable
+    {
+        $emojis = json_decode(file_get_contents(__DIR__.'/vendor/slack-emojis.json'), true);
+
+        $ignored = [];
+        $maps = [];
+
+        foreach ($emojis as $data) {
+            $emojiCodePoints = str_replace('-', ' ', strtolower($data['unified']));
+            $shortCode = $data['short_name'];
+            if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
+                $ignored[] = [
+                    'emojiCodePoints' => $emojiCodePoints,
+                    'shortCode' => $shortCode,
+                ];
+                continue;
+            }
+            $emoji = $emojisCodePoints[$emojiCodePoints];
+            self::testEmoji($emoji, 'slack');
+            $codePointsCount = mb_strlen($emoji);
+            $maps[$codePointsCount][$emoji] = ":$shortCode:";
+        }
+
+        return ['slack' => self::createRules($maps)];
+    }
+
     public static function cleanTarget(): void
     {
         $fs = new Filesystem();
@@ -117,10 +170,19 @@ final class Builder
     {
         $firstChars = [];
         foreach ($rulesByLocale as $locale => $rules) {
-            file_put_contents(self::TARGET_DIR."/$locale.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
+            file_put_contents(self::TARGET_DIR."/emoji-$locale.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
 
             foreach ($rules as $k => $v) {
-                $firstChars[$k[0]] = $k[0];
+                for ($i = 0; \ord($k[$i]) < 128 || "\xC2" === $k[$i]; ++$i) {
+                }
+                for ($j = $i; isset($k[$j]) && !isset($firstChars[$k[$j]]); ++$j) {
+                }
+                $c = $k[$j] ?? $k[$i];
+                $firstChars[$c] = $c;
+            }
+
+            if (':' === $v[0]) {
+                file_put_contents(self::TARGET_DIR."/$locale-emoji.php", "<?php\n\nreturn ".VarExporter::export(array_flip($rules)).";\n");
             }
         }
         sort($firstChars);

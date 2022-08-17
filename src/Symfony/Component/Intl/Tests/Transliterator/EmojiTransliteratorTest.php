@@ -20,6 +20,16 @@ use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
  */
 class EmojiTransliteratorTest extends TestCase
 {
+    /**
+     * @dataProvider provideTransliterateTests
+     */
+    public function testTransliterate(string $locale, string $input, string $expected)
+    {
+        $tr = EmojiTransliterator::create('emoji-'.$locale);
+
+        $this->assertSame($expected, $tr->transliterate($input));
+    }
+
     public function provideTransliterateTests(): iterable
     {
         yield [
@@ -44,14 +54,26 @@ class EmojiTransliteratorTest extends TestCase
             $specialArrowInput,
             'flèche gauche droite - flèche gauche droite️',
         ];
+        yield [
+            'github',
+            $specialArrowInput,
+            ':left_right_arrow: - :left_right_arrow:️',
+        ];
+        yield [
+            'slack',
+            $specialArrowInput,
+            '↔ - :left_right_arrow:',
+        ];
     }
 
-    /** @dataProvider provideTransliterateTests */
-    public function testTransliterate(string $locale, string $input, string $expected)
+    /**
+     * @dataProvider provideLocaleTest
+     */
+    public function testAllTransliterator(string $locale)
     {
         $tr = EmojiTransliterator::create($locale);
 
-        $this->assertSame($expected, $tr->transliterate($input));
+        $this->assertNotEmpty($tr->transliterate('😀'));
     }
 
     public function provideLocaleTest(): iterable
@@ -67,37 +89,29 @@ class EmojiTransliteratorTest extends TestCase
         }
     }
 
-    /** @dataProvider provideLocaleTest */
-    public function testAllTransliterator(string $locale)
-    {
-        $tr = EmojiTransliterator::create($locale);
-
-        $this->assertNotEmpty($tr->transliterate('😀'));
-    }
-
     public function testTransliterateWithInvalidLocale()
     {
         $this->expectException(\IntlException::class);
-        $this->expectExceptionMessage('transliterator_create: unable to open ICU transliterator with id "Emoji: invalid"');
+        $this->expectExceptionMessage('transliterator_create: unable to open ICU transliterator with id "emoji-invalid"');
 
         EmojiTransliterator::create('invalid');
     }
 
     public function testListIds()
     {
-        $this->assertContains('en_ca', EmojiTransliterator::listIDs());
+        $this->assertContains('emoji-en_ca', EmojiTransliterator::listIDs());
         $this->assertNotContains('..', EmojiTransliterator::listIDs());
     }
 
     public function testSlice()
     {
-        $tr = EmojiTransliterator::create('en');
+        $tr = EmojiTransliterator::create('emoji-en');
         $this->assertSame('😀grinning face', $tr->transliterate('😀😀', 2));
     }
 
     public function testNotUtf8()
     {
-        $tr = EmojiTransliterator::create('en');
+        $tr = EmojiTransliterator::create('emoji-en');
 
         $this->iniSet('intl.use_exceptions', 0);
 
@@ -114,7 +128,7 @@ class EmojiTransliteratorTest extends TestCase
 
     public function testBadOffsets()
     {
-        $tr = EmojiTransliterator::create('en');
+        $tr = EmojiTransliterator::create('emoji-en');
 
         $this->iniSet('intl.use_exceptions', 0);
 
@@ -127,5 +141,23 @@ class EmojiTransliteratorTest extends TestCase
         $this->expectExceptionMessage('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3)');
 
         $this->assertFalse($tr->transliterate('Abc', 1, 5));
+    }
+
+    public function testReverse()
+    {
+        $tr = EmojiTransliterator::create('emoji-github', EmojiTransliterator::REVERSE);
+        $this->assertSame('github-emoji', $tr->id);
+        $this->assertSame('🎉', $tr->transliterate(':tada:'));
+
+        $tr = EmojiTransliterator::create('emoji-slack');
+        $this->assertSame('emoji-slack', $tr->id);
+        $this->assertSame(':tada:', $tr->transliterate('🎉'));
+
+        $tr = $tr->createInverse();
+        $this->assertSame('slack-emoji', $tr->id);
+        $this->assertSame('🎉', $tr->transliterate(':tada:'));
+
+        $this->expectException(\IntlException::class);
+        EmojiTransliterator::create('emoji-en', EmojiTransliterator::REVERSE);
     }
 }

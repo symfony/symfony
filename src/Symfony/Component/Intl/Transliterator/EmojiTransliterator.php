@@ -49,7 +49,7 @@ trait EmojiTransliteratorTrait
     private array $map;
     private \Transliterator $transliterator;
 
-    public static function create(string $id, int $direction = self::FORWARD): ?\Transliterator
+    public static function create(string $id, int $direction = self::FORWARD): self
     {
         $id = strtolower($id);
 
@@ -89,7 +89,7 @@ trait EmojiTransliteratorTrait
         return $instance;
     }
 
-    public function createInverse(): ?self
+    public function createInverse(): self
     {
         return self::create($this->id, self::REVERSE);
     }
@@ -104,11 +104,13 @@ trait EmojiTransliteratorTrait
         return $this->transliterator?->getErrorMessage() ?? false;
     }
 
-    public static function listIDs(): array|false
+    public static function listIDs(): array
     {
-        static $ids;
+        static $ids = [];
 
-        $ids = [];
+        if ($ids) {
+            return $ids;
+        }
 
         foreach (scandir(\dirname(__DIR__).'/Resources/data/transliterator/emoji/') as $file) {
             if (str_ends_with($file, '.php')) {

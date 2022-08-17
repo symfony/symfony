@@ -28,9 +28,9 @@ final class MonotonicClock implements ClockInterface
             throw new \RuntimeException('hrtime() returned false: the runtime environment does not provide access to a monotonic timer.');
         }
 
-        $time = gettimeofday();
-        $this->sOffset = $time['sec'] - $offset[0];
-        $this->usOffset = $time['usec'] - (int) ($offset[1] / 1000);
+        $time = explode(' ', microtime(), 2);
+        $this->sOffset = $time[1] - $offset[0];
+        $this->usOffset = (int) ($time[0] * 1000000) - (int) ($offset[1] / 1000);
 
         if (\is_string($timezone ??= date_default_timezone_get())) {
             $this->timezone = new \DateTimeZone($timezone);

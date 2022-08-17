@@ -37,7 +37,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null): bool
     {
         return $data instanceof \BackedEnum;
     }

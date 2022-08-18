@@ -74,7 +74,7 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
             if (null === $object = $this->findViaExpression($class, $request, $options->expr, $options)) {
                 $errorMessage = sprintf('The expression "%s" returned null', $options->expr);
             }
-            // find by identifier?
+        // find by identifier?
         } elseif (false === $object = $this->find($class, $request, $options, $name)) {
             // find by criteria
             if (false === $object = $this->findOneBy($class, $request, $options)) {
@@ -123,7 +123,7 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
 
         $id = $this->getIdentifier($request, $options, $name);
         if (false === $id || null === $id) {
-            return false;
+            return $id;
         }
 
         $objectManager = $this->getManager($options->objectManager, $class);

@@ -100,7 +100,7 @@ class ClockMock
             return PHP_INT_SIZE === 8 ? (int) $number : (float) $number;
         }
 
-        return [(int) $ns, (int) self::$now];
+        return [(int) self::$now, (int) $ns];
     }
 
     public static function register($class)

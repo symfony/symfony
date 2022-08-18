@@ -156,7 +156,8 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $receivers = [];
-        foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
+        $receiverNames = $this->reorderReceivers($input->getArgument('receivers'));
+        foreach ($receiverNames as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
                 $message = sprintf('The receiver "%s" does not exist.', $receiverName);
                 if ($this->receiverNames) {
@@ -261,5 +262,27 @@ EOF
         }
 
         return $max;
+    }
+
+    private function reorderReceivers(array $receiversArgument): array
+    {
+        $receiverPriorities = [];
+        $receiverDefault = [];
+
+        foreach ($receiversArgument as $receiverInput) {
+            $split = explode('^', $receiverInput);
+            if (2 === \count($split)) {
+                $receiverPriorities[(int) ($split[1])][] = $split[0];
+            } else {
+                $receiverDefault[] = $receiverInput;
+            }
+        }
+
+        ksort($receiverPriorities);
+        $receiverPriorities = array_reduce($receiverPriorities, function ($carry, $array) {
+            return array_merge($carry, $array);
+        }, []);
+
+        return array_merge($receiverPriorities, $receiverDefault);
     }
 }

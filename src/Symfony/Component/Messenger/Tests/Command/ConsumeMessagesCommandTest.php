@@ -162,6 +162,38 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
+    public function testBasicRunWithPriority()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->expects($this->once())->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch');
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+        $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
+        $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver^1'],
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
+
     public function provideCompletionSuggestions()
     {
         yield 'receiver' => [[''], ['async', 'async_high', 'failed']];

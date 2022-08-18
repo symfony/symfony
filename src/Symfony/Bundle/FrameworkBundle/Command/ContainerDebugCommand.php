@@ -145,6 +145,7 @@ EOF
         } elseif ($input->getOption('tags')) {
             $options = ['group_by' => 'tags'];
         } elseif ($tag = $input->getOption('tag')) {
+            $tag = $this->findProperTagName($input, $errorIo, $object, $tag);
             $options = ['tag' => $tag];
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
@@ -287,6 +288,24 @@ EOF
         return $io->choice('Select one of the following services to display its information', $matchingServices);
     }
 
+    private function findProperTagName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $tagName): string
+    {
+        if (\in_array($tagName, $builder->findTags(), true) || !$input->isInteractive()) {
+            return $tagName;
+        }
+
+        $matchingTags = $this->findTagsContaining($builder, $tagName);
+        if (!$matchingTags) {
+            throw new InvalidArgumentException(sprintf('No tags found that match "%s".', $tagName));
+        }
+
+        if (1 === \count($matchingTags)) {
+            return $matchingTags[0];
+        }
+
+        return $io->choice('Select one of the following tags to display its information', $matchingTags);
+    }
+
     private function findServiceIdsContaining(ContainerBuilder $builder, string $name, bool $showHidden): array
     {
         $serviceIds = $builder->getServiceIds();
@@ -304,6 +323,19 @@ EOF
         }
 
         return $foundServiceIds ?: $foundServiceIdsIgnoringBackslashes;
+    }
+
+    private function findTagsContaining(ContainerBuilder $builder, string $tagName): array
+    {
+        $tags = $builder->findTags();
+        $foundTags = [];
+        foreach ($tags as $tag) {
+            if (str_contains($tag, $tagName)) {
+                $foundTags[] = $tag;
+            }
+        }
+
+        return $foundTags;
     }
 
     /**

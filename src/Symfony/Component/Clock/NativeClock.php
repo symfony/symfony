@@ -31,7 +31,7 @@ final class NativeClock implements ClockInterface
 
     public function now(): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6f', microtime(true)))->setTimezone($this->timezone);
+        return new \DateTimeImmutable('now', $this->timezone);
     }
 
     public function sleep(float|int $seconds): void

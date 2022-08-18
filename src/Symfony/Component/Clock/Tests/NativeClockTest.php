@@ -14,9 +14,6 @@ namespace Symfony\Component\Clock\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\NativeClock;
 
-/**
- * @group time-sensitive
- */
 class NativeClockTest extends TestCase
 {
     public function testConstruct()
@@ -35,14 +32,14 @@ class NativeClockTest extends TestCase
     public function testNow()
     {
         $clock = new NativeClock();
-        $before = microtime(true);
+        $before = new \DateTimeImmutable();
         usleep(10);
         $now = $clock->now();
         usleep(10);
-        $after = microtime(true);
+        $after = new \DateTimeImmutable();
 
-        $this->assertGreaterThan($before, (float) $now->format('U.u'));
-        $this->assertLessThan($after, (float) $now->format('U.u'));
+        $this->assertGreaterThan($before, $now);
+        $this->assertLessThan($after, $now);
     }
 
     public function testSleep()
@@ -56,7 +53,7 @@ class NativeClockTest extends TestCase
         usleep(10);
         $after = microtime(true);
 
-        $this->assertSame($before + 1.5, $now);
+        $this->assertGreaterThan($before + 1.5, $now);
         $this->assertLessThan($after, $now);
         $this->assertLessThan(1.9, $now - $before);
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());

@@ -60,7 +60,7 @@ class Ulid extends AbstractUid
     }
 
     /**
-     * {@inheritdoc}
+     * @return static
      */
     public static function fromString(string $ulid): parent
     {

@@ -490,8 +490,8 @@ class Email extends Message
             $html = $htmlPart->getBody();
 
             $regexes = [
-                '<img\s+[^>]*src\s*=\s*(?:([\'"])cid:([^"]+)\\1|cid:([^>\s]+))',
-                '<\w+\s+[^>]*background\s*=\s*(?:([\'"])cid:([^"]+)\\1|cid:([^>\s]+))',
+                '<img\s+[^>]*src\s*=\s*(?:([\'"])cid:(.+?)\\1|cid:([^>\s]+))',
+                '<\w+\s+[^>]*background\s*=\s*(?:([\'"])cid:(.+?)\\1|cid:([^>\s]+))',
             ];
             $tmpMatches = [];
             foreach ($regexes as $regex) {

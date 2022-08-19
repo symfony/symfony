@@ -88,8 +88,9 @@ class BackedEnumNormalizerTest extends TestCase
 
     public function testDenormalizeBadBackingValueThrowsException()
     {
-        $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage('"POST" is not a valid backing value for enum "'.StringBackedEnumDummy::class.'"');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class);
+
         $this->normalizer->denormalize('POST', StringBackedEnumDummy::class);
     }
 

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-08-15T21:14:58Z
+
+@wouterj thanks! What should I do to make my test pass? Seems my changes are missing from them :thinking:
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-08-16T12:08:00Z
+
+See https://symfony.com/doc/current/contributing/code/pull_requests.html#automated-tests for more information about our test suite.
+
+The failing checks are checking each individual package, rather than the monorepo. So it'll download rate limiter in the current  available version, rather than the version of your PR.
+
+Ideally, we would have a test for this abstract class' behavior in the HttpFoundation component itself. If you have some time, it would be great to create a `MockRequestRateLimiter` and add this specific test case there (based on the test that you've added).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-08-16T13:46:53Z
+
+Okay, remaining failures seem unrelated :ok_hand:

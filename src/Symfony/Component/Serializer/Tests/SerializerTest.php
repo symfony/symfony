@@ -36,6 +36,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -58,6 +59,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
@@ -1179,6 +1181,69 @@ class SerializerTest extends TestCase
         ];
 
         $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testCollectDenormalizationErrorsWithEnumConstructor()
+    {
+        $serializer = new Serializer(
+            [
+                new BackedEnumNormalizer(),
+                new ObjectNormalizer(),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize('{"invalid": "GET"}', DummyObjectWithEnumConstructor::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'array',
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "get" property.',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testNoCollectDenormalizationErrorsWithWrongEnum()
+    {
+        $serializer = new Serializer(
+            [
+                new BackedEnumNormalizer(),
+                new ObjectNormalizer(),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize('{"get": "invalid"}', DummyObjectWithEnumConstructor::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+        } catch (\Throwable $th) {
+            $this->assertNotInstanceOf(PartialDenormalizationException::class, $th);
+            $this->assertInstanceOf(InvalidArgumentException::class, $th);
+        }
     }
 
     public function provideCollectDenormalizationErrors()

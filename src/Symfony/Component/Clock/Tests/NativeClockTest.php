@@ -53,9 +53,8 @@ class NativeClockTest extends TestCase
         usleep(10);
         $after = microtime(true);
 
-        $this->assertGreaterThan($before + 1.5, $now);
+        $this->assertGreaterThanOrEqual($before + 1.5, $now);
         $this->assertLessThan($after, $now);
-        $this->assertLessThan(1.9, $now - $before);
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 

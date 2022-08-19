@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-12T08:10:21Z
+
+Hey!
+
+I had a quick look at this PR, I think it is alright.
+
+I think @ruudk has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-11-30T11:39:12Z
+
+@ruudk `sendersLocator->getSenders()` returns `iterable` (sometimes a `\Generator`). I tried your suggestion, but loading all the senders and aliases into an array got a bit complex. I agree that there's still some improvement to gain here though.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-09T14:25:13Z
+
+What's the status of this PR? @Jeroeny Are you still interested in moving it forward?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-08-09T14:33:19Z
+
+Yes I'd be willing to move this forward. The last time I hit kind of a dead-end in which approach to take. Would ruudk's suggestion be desired for example?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-09T14:40:30Z
+
+I think @ruudk's suggestion makes a lot of sense.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-08-09T14:56:12Z
+
+In their snippet, `$senders` is usually a `\Generator`. To pass it to `SendMessageToTransportsEvent`, should this be converted to an array (losing the `aliases` or risk of losing entries due to duplicate array-keys which Generators allow) ? Or be passed as-is, which will cause problems when reading the variable, because the sending logic will not get those values from the Generator too ? Or call `getSenders()` twice, which also seems undesirable.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-14T13:56:30Z
+
+What would be the use case for having two entries with the same alias?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-08-16T15:48:26Z
+
+I don't think there is, but I thought it was technically supported and could cause issues. Anyway, I've implemented the suggested approach 👍 .

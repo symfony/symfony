@@ -159,6 +159,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('max delay ms'),
             ])
 
+        // rate limiter
+        ->set('messenger.rate_limiter_locator', ServiceLocator::class)
+            ->args([[]])
+            ->tag('container.service_locator')
+
         // worker event listener
         ->set('messenger.retry.send_failed_message_for_retry_listener', SendFailedMessageForRetryListener::class)
             ->args([

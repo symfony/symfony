@@ -2102,6 +2102,7 @@ class FrameworkExtension extends Extension
 
         $senderAliases = [];
         $transportRetryReferences = [];
+        $transportRateLimiterReferences = [];
         foreach ($config['transports'] as $name => $transport) {
             $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
             $transportDefinition = (new Definition(TransportInterface::class))
@@ -2129,6 +2130,14 @@ class FrameworkExtension extends Extension
                 $container->setDefinition($retryServiceId, $retryDefinition);
 
                 $transportRetryReferences[$name] = new Reference($retryServiceId);
+            }
+
+            if ($transport['rate_limiter']) {
+                if (!interface_exists(LimiterInterface::class)) {
+                    throw new LogicException('Rate limiter cannot be used within Messenger as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
+                }
+
+                $transportRateLimiterReferences[$name] = new Reference('limiter.'.$transport['rate_limiter']);
             }
         }
 
@@ -2183,6 +2192,13 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
+
+        if (!$transportRateLimiterReferences) {
+            $container->removeDefinition('messenger.rate_limiter_locator');
+        } else {
+            $container->getDefinition('messenger.rate_limiter_locator')
+                ->replaceArgument(0, $transportRateLimiterReferences);
+        }
 
         if (\count($failureTransports) > 0) {
             $container->getDefinition('console.command.messenger_failed_messages_retry')

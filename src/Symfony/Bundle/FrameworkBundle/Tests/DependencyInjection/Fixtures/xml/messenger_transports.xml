@@ -10,7 +10,7 @@
         <framework:messenger failure-transport="failed">
             <framework:serializer default-serializer="messenger.transport.symfony_serializer" />
             <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
-            <framework:transport name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name" serializer="messenger.transport.native_php_serializer">
+            <framework:transport name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name" serializer="messenger.transport.native_php_serializer" rate-limiter="customised_worker">
                 <framework:options>
                     <framework:queue>
                         <framework:name>Queue</framework:name>

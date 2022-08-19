@@ -160,6 +160,7 @@ return static function (ContainerConfigurator $container) {
                 [], // Receiver names
                 service('messenger.listener.reset_services')->nullOnInvalid(),
                 [], // Bus names
+                service('messenger.rate_limiter_locator')->nullOnInvalid(),
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])

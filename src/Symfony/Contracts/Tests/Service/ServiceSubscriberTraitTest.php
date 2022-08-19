@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Component1\Dir1\Service1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Component1\Dir2\Service2;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -27,6 +28,7 @@ class ServiceSubscriberTraitTest extends TestCase
         $expected = [
             TestService::class.'::aService' => Service2::class,
             TestService::class.'::nullableService' => '?'.Service2::class,
+            new SubscribedService(TestService::class.'::withAttribute', Service2::class, true, new Required()),
         ];
 
         $this->assertEquals($expected, ChildTestService::getSubscribedServices());
@@ -91,6 +93,11 @@ class TestService extends ParentTestService implements ServiceSubscriberInterfac
 
     #[SubscribedService]
     public function nullableService(): ?Service2
+    {
+    }
+
+    #[SubscribedService(attributes: new Required())]
+    public function withAttribute(): ?Service2
     {
     }
 }

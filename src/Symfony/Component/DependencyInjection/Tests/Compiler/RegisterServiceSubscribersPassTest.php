@@ -14,6 +14,13 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
@@ -398,6 +405,65 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'some.service' => new ServiceClosureArgument(new TypedReference('some.service', 'stdClass')),
             'some_service' => new ServiceClosureArgument(new TypedReference('stdClass $some_service', 'stdClass')),
             'another_service' => new ServiceClosureArgument(new TypedReference('stdClass $anotherService', 'stdClass')),
+        ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    public function testSubscribedServiceWithAttributes()
+    {
+        if (!property_exists(SubscribedService::class, 'attributes')) {
+            $this->markTestSkipped('Requires symfony/service-contracts 3.2+');
+        }
+
+        $container = new ContainerBuilder();
+
+        $subscriber = new class() implements ServiceSubscriberInterface {
+            public static function getSubscribedServices(): array
+            {
+                return [
+                    new SubscribedService('tagged.iterator', 'iterable', attributes: new TaggedIterator('tag')),
+                    new SubscribedService('tagged.locator', PsrContainerInterface::class, attributes: new TaggedLocator('tag')),
+                    new SubscribedService('autowired', 'stdClass', attributes: new Autowire(service: 'service.id')),
+                    new SubscribedService('autowired.nullable', 'stdClass', nullable: true, attributes: new Autowire(service: 'service.id')),
+                    new SubscribedService('autowired.parameter', 'string', attributes: new Autowire('%parameter.1%')),
+                    new SubscribedService('map.decorated', \stdClass::class, attributes: new MapDecorated()),
+                    new SubscribedService('target', \stdClass::class, attributes: new Target('someTarget')),
+                ];
+            }
+        };
+
+        $container->setParameter('parameter.1', 'foobar');
+        $container->register('foo', \get_class($subscriber))
+            ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
+            ->addTag('container.service_subscriber');
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $expected = [
+            'tagged.iterator' => new ServiceClosureArgument(new TypedReference('iterable', 'iterable', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'tagged.iterator', [new TaggedIterator('tag')])),
+            'tagged.locator' => new ServiceClosureArgument(new TypedReference(PsrContainerInterface::class, PsrContainerInterface::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'tagged.locator', [new TaggedLocator('tag')])),
+            'autowired' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired', [new Autowire(service: 'service.id')])),
+            'autowired.nullable' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'autowired.nullable', [new Autowire(service: 'service.id')])),
+            'autowired.parameter' => new ServiceClosureArgument(new TypedReference('string', 'string', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired.parameter', [new Autowire(service: '%parameter.1%')])),
+            'map.decorated' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'map.decorated', [new MapDecorated()])),
+            'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'target', [new Target('someTarget')])),
+        ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+
+        (new AutowirePass())->process($container);
+
+        $expected = [
+            'tagged.iterator' => new ServiceClosureArgument(new TaggedIteratorArgument('tag')),
+            'tagged.locator' => new ServiceClosureArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('tag', 'tag', needsIndexes: true))),
+            'autowired' => new ServiceClosureArgument(new Reference('service.id')),
+            'autowired.nullable' => new ServiceClosureArgument(new Reference('service.id', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            'autowired.parameter' => new ServiceClosureArgument('foobar'),
+            'map.decorated' => new ServiceClosureArgument(new Reference('.service_locator.oZHAdom.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'someTarget')),
         ];
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }

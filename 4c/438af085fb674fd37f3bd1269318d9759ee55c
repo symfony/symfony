@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-12T04:49:36Z
+
+Hey!
+
+I think @tienvx has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by kamil-karkus at 2021-10-09T18:36:21Z
+
+Any update on this?
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2022-01-06T13:17:09Z
+
+👍 on rate limiting for messenger transports 🙂
+
+When using the Messenger component in order to asynchronously send emails via the Mailer component being able to limit the total amount of emails per time unit would be really helpful in hosting environments that impose a limit on how many emails you can send via their SMTP per hour or day for instance.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2022-01-06T14:58:59Z
+
+I just rebased the changed on the latest 6.1 branch, but I'm really looking for some input on whether these changes are actually going in the right direction (and will be accepted) before I will be spending some time on tests.
+
+---------------------------------------------------------------------------
+
+by mtaylor567 at 2022-02-15T18:20:10Z
+
+any news on this?
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2022-02-28T11:22:59Z
+
+@nicolas-grekas Requested adjustments have been made, and I added two tests.
+
+(the failed checks do not seem to be related to this change)

@@ -503,7 +503,7 @@ class Email extends Message
                 $html = stream_get_contents($html);
             }
             $htmlPart = new TextPart($html, $this->htmlCharset, 'html');
-            preg_match_all('(<img\s+[^>]*src\s*=\s*(?:([\'"])cid:([^"]+)\\1|cid:([^>\s]+)))i', $html, $names);
+            preg_match_all('(<img\s+[^>]*src\s*=\s*(?:([\'"])cid:(.+?)\\1|cid:([^>\s]+)))i', $html, $names);
             $names = array_filter(array_unique(array_merge($names[2], $names[3])));
         }
 

@@ -33,6 +33,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public const NO_HEADERS_KEY = 'no_headers';
     public const END_OF_LINE = 'csv_end_of_line';
     public const OUTPUT_UTF8_BOM_KEY = 'output_utf8_bom';
+    public const AUTO_DETECT_DELIMITER = 'auto_detect_delimiter';
 
     private const UTF8_BOM = "\xEF\xBB\xBF";
 
@@ -49,6 +50,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         self::NO_HEADERS_KEY => false,
         self::AS_COLLECTION_KEY => true,
         self::OUTPUT_UTF8_BOM_KEY => false,
+        self::AUTO_DETECT_DELIMITER => false,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -150,7 +152,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $headerCount = [];
         $result = [];
 
-        [$delimiter, $enclosure, $escapeChar, $keySeparator, , , , $asCollection] = $this->getCsvOptions($context);
+        [$delimiter, $enclosure, $escapeChar, $keySeparator, , , , $asCollection] = $this->getCsvOptions($context, $data);
 
         while (false !== ($cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar))) {
             $nbCols = \count($cols);
@@ -239,9 +241,20 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
     }
 
-    private function getCsvOptions(array $context): array
+    private function getCsvOptions(array $context, string $data = null): array
     {
-        $delimiter = $context[self::DELIMITER_KEY] ?? $this->defaultContext[self::DELIMITER_KEY];
+        if ($this->defaultContext[self::AUTO_DETECT_DELIMITER] && false !== $this->defaultContext[self::DELIMITER_KEY]) {
+            throw new InvalidArgumentException(sprintf('To use "%s" in default context, please set "%s" to "false".', self::AUTO_DETECT_DELIMITER, self::DELIMITER_KEY));
+        }
+
+        if (!\array_key_exists(self::DELIMITER_KEY, $context)
+            && ($context[self::AUTO_DETECT_DELIMITER] ?? $this->defaultContext[self::AUTO_DETECT_DELIMITER])
+            && $data) {
+            $delimiter = $this->detectDelimiter($data);
+        } else {
+            $delimiter = $context[self::DELIMITER_KEY] ?? $this->defaultContext[self::DELIMITER_KEY];
+        }
+
         $enclosure = $context[self::ENCLOSURE_KEY] ?? $this->defaultContext[self::ENCLOSURE_KEY];
         $escapeChar = $context[self::ESCAPE_CHAR_KEY] ?? $this->defaultContext[self::ESCAPE_CHAR_KEY];
         $keySeparator = $context[self::KEY_SEPARATOR_KEY] ?? $this->defaultContext[self::KEY_SEPARATOR_KEY];
@@ -291,5 +304,21 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
 
         return $headers;
+    }
+
+    private function detectDelimiter(string $data): ?string
+    {
+        $headers = explode("\n", $data, 1)[0];
+        $delimiters = [',' => 0, ';' => 0, '\t' => 0, '|' => 0];
+
+        foreach ($delimiters as $delimiter => &$count) {
+            $count = \count(str_getcsv($headers, $delimiter));
+        }
+
+        if (($max = max($delimiters)) > 0) {
+            return array_search($max, $delimiters, true);
+        }
+
+        return null;
     }
 }

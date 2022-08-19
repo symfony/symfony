@@ -20,10 +20,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class CsvEncoderTest extends TestCase
 {
-    /**
-     * @var CsvEncoder
-     */
-    private $encoder;
+    private CsvEncoder $encoder;
 
     protected function setUp(): void
     {
@@ -649,6 +646,58 @@ CSV
             , 'csv', [
                 CsvEncoder::NO_HEADERS_KEY => true,
             ]));
+    }
+
+    public function testDecodeWithDelimiterDetection()
+    {
+        $expected = [
+            ['foo' => 'a', 'bar' => 'b', 'baz;qux' => 'e'],
+            ['foo' => 'c', 'bar' => 'd', 'baz;qux' => 'f'],
+        ];
+
+        $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
+foo;bar;"baz;qux"
+a;b;e
+c;d;f
+
+CSV
+            , 'csv', [CsvEncoder::AUTO_DETECT_DELIMITER => true]));
+
+        $encoder = new CsvEncoder([CsvEncoder::AUTO_DETECT_DELIMITER => true, CsvEncoder::DELIMITER_KEY => false]);
+        $this->assertEquals($expected, $encoder->decode(<<<'CSV'
+foo;bar;"baz;qux"
+a;b;e
+c;d;f
+
+CSV
+            , 'csv'));
+
+        $this->expectExceptionMessage('To use "auto_detect_delimiter" in default context, please set "csv_delimiter" to "false".');
+
+        $encoder = new CsvEncoder([CsvEncoder::AUTO_DETECT_DELIMITER => true]);
+        $this->assertEquals($expected, $encoder->decode(<<<'CSV'
+foo;bar
+a;b
+c;d
+
+CSV
+            , 'csv'));
+    }
+
+    public function testDecodeWithDelimiterDetectionPassedInContextHasNoEffectIfDelimiterKeyIsSetToo()
+    {
+        $expected = [
+            ['foo;bar' => 'a;b'],
+            ['foo;bar' => 'c;d'],
+        ];
+
+        $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
+foo;bar
+a;b
+c;d
+
+CSV
+            , 'csv', [CsvEncoder::DELIMITER_KEY => ',', CsvEncoder::AUTO_DETECT_DELIMITER => true]));
     }
 
     public function testBOMIsAddedOnDemand()

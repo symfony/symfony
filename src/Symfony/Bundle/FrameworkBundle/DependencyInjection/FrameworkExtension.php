@@ -885,8 +885,6 @@ class FrameworkExtension extends Extension
 
         $registryDefinition = $container->getDefinition('.workflow.registry');
 
-        $workflow = [];
-
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
             $workflowId = sprintf('%s.%s', $type, $name);
@@ -973,8 +971,6 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
             $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
-
-            $workflows[$workflowId] = $definitionDefinition;
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {

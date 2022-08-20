@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Allow to update Slack messages
+
 6.0
 ---
 

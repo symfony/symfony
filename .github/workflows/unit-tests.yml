@@ -141,6 +141,8 @@ jobs:
           echo "::group::install phpunit"
           ./phpunit install
           echo "::endgroup::"
+        env:
+          COMPOSER_NO_AUDIT: 1
 
       - name: Patch return types
         if: "matrix.php == '8.1' && ! matrix.mode"

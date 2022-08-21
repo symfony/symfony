@@ -65,6 +65,8 @@ jobs:
           echo "::group::install phpunit"
           ./phpunit install
           echo "::endgroup::"
+        env:
+          COMPOSER_NO_AUDIT: 1
 
       - name: Report the ICU version
         run: uconv -V && php -i | grep 'ICU version'

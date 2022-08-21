@@ -115,6 +115,8 @@ jobs:
           echo "::group::install phpunit"
           ./phpunit install
           echo "::endgroup::"
+        env:
+          COMPOSER_NO_AUDIT: 1
 
       - name: Run tests
         run: ./phpunit --group integration -v

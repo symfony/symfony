@@ -43,6 +43,8 @@ jobs:
           export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
           composer require --no-progress --ansi psalm/phar phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
+        env:
+          COMPOSER_NO_AUDIT: 1
 
       - name: Generate Psalm baseline
         run: |

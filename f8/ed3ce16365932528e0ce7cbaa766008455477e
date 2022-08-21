@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-02T10:56:25Z
+
+> Since this interface is useful to discriminate the cache/no-cache situations, we have to undeprecate it.
+
+I'm not sure about this given these interfaces were just about surcharging the method signatures with an extra `$context` argument, which has been moved to the parent interfaces when deprecating them so normalizers/encoders methods always take care of the context. Undeprecating would be one step backward regarding the component API. I think we need something else for the issue at hand, as we do want to get rid of these interfaces.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T11:25:10Z
+
+If we pass a context to supports method, we have to consider that context can be taken into account, aka we have to remove the cache. Adding yet another interface for cacheable supports feels like renaming interface for the sake of it. Until 6.1, supports method were expected to receive only one argument, the format. That made them cacheable. ContextAware interfaces were here to tell that the context could be used, and we forgot to make those instances uncacheable. I feel like we already have everything in place to properly deal with the issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T11:30:00Z
+
+(Note that I would go one step further in 6.2 and deprecate passing the `$context` argument to implementations that don't declare `ContextAware*Interface`.)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-02T12:28:13Z
+
+That would be a big code smell to me, really. `ContextAware*Interface` don't include a single word about caching, it's not its purpose but a side effect. Undeprecating these interfaces 3 months later for that abused usage does not feel right.
+
+> Adding yet another interface for cacheable supports feels like renaming interface for the sake of it
+
+Caching support is a different feature, making it explicit would not be a bad thing imho.
+
+> (Note that I would go one step further in 6.2 and deprecate passing the $context argument to implementations that don't declare ContextAware*Interface.)
+
+But we did that change for a reason, mainly usability. Pretty much all implementations want the context (not always for caching, I'd even say it's the minority), and they end up implementing those interfaces for that just because we weren't able to add a new method parameter to an existing interface at that time, which added some extra complexity for the developer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T12:49:38Z
+
+> That would be a big code smell to me, really. ContextAware*Interface don't include a single word about caching, it's not its purpose but a side effect. Undeprecating these interfaces 3 months later for that abused usage does not feel right.
+
+On the contrary: the possibilty of caching is a consequence of the design. A design should not be tailored to any specific use case  (eg caching). Instead, proper design should lead to abstractions that empower end users to do what they need. Eg caching.
+
+> Caching support is a different feature, making it explicit would not be a bad thing imho.
+
+See my previous note.
+
+> But we did that change for a reason, mainly usability. Pretty much all implementations want the context (not always for caching, I'd even say it's the minority), and they end up implementing those interfaces for that just because we weren't able to add a new method parameter to an existing interface at that time, which added some extra complexity for the developer.
+
+None of the core encoders use the context to decide in `supportsEncoding`.
+The reason we did it was ignoring a design reason, exactly like we ignored #43231 for so long while the issue was valid.
+Planning for a less capable abstraction is not an improvement...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-02T13:08:32Z
+
+I'm sorry but I disagree. These interfaces were not meant to add any behavior but to allow some various metadata to transit, which is something that almost any encoder/normalizer need hence it is not worth such a dedicated abstraction which appears to be annoying to most.  Applications using the serializer usually have custom encoders and normalizers so it's not only impacting the built-in ones.
+I would really prefer an other approach such as the one mentioned in the linked PR so I'm -1 here
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T13:13:38Z
+
+Relying on `ContextAware*Interface` is the legit way to fix #38270, thus it's how we should fix it in 4.4+. Not fixing this issue in 4.4 because we'd like another API in 6.2 doesn't sound reasonable to me. If these interfaces are used in 4.4 to deal with the caching issue (as enabled by the abstraction), then the deprecation in 6.1 is plain broken since it deprecates an API without providing any viable alternative. This is certainly not the desired outcome as that puts ppl into a dead-end.
+
+Undeprecating in 6.1 is a must to me.
+
+If we like to re-deprecate in 6.2, we must do so while providing a viable alternative.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-02T13:34:33Z
+
+> Undeprecating in 6.1 is a must to me.
+
+And deprecating is a must to me... which I'd prefer not doing twice for obvious reasons.
+The bug at hand does not seem to impact much people given the small number of reactions on the issue so maybe it's part of why no one provided  a fix.
+Anyway, please consider putting this PR on hold so that we can look for alternatives that do not involve to rollback on a good deprecation we all agreed on just because it eventually allows us to fix a bug. I'll be back from vacation next week so I'm going to try finding one.
+
+Linking to https://github.com/symfony/symfony/pull/43982 btw to know about these interfaces purpose and the motivation behind removing them.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-08-02T16:35:43Z
+
+I also prefer introducing a new dedicated interface instead of re-introducing this hacky interface that I introduced initially to fix an older bad design choice that was annoying for many use cases.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-21T13:51:40Z
+
+Thanks for your patience and your consideration on the fact that deprecating these interfaces comes with relevant motivations.
+I'm ok to merge this as long as we agree it is only temporary, for the time needed to implement a proper solution for encoders to opt-in into caching, which could be the same as the one we have for normalizers (and potentially just use the very same interface modulo the `\Normalizer` sub-namespace). I will work on this, hopefully for 6.2.

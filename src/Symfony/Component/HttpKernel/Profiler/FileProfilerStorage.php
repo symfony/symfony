@@ -165,11 +165,15 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getIp(),
                 $profile->getMethod(),
                 $profile->getUrl(),
-                $profile->getTime(),
+                $profile->getTime() ?: time(),
                 $profile->getParentToken(),
                 $profile->getStatusCode(),
             ]);
             fclose($file);
+
+            if (1 === mt_rand(1, 10)) {
+                $this->removeExpiredProfiles();
+            }
         }
 
         return true;
@@ -288,5 +292,30 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         return $this->createProfileFromData($token, $data, $profile);
+    }
+
+    private function removeExpiredProfiles()
+    {
+        $minimalProfileTimestamp = time() - 2 * 86400;
+        $file = $this->getIndexFilename();
+        $handle = fopen($file, 'r');
+
+        if ($offset = is_file($file.'.offset') ? (int) file_get_contents($file.'.offset') : 0) {
+            fseek($handle, $offset);
+        }
+
+        while ($line = fgets($handle)) {
+            [$csvToken, , , , $csvTime] = str_getcsv($line);
+
+            if ($csvTime >= $minimalProfileTimestamp) {
+                break;
+            }
+
+            @unlink($this->getFilename($csvToken));
+            $offset += \strlen($line);
+        }
+        fclose($handle);
+
+        file_put_contents($file.'.offset', $offset);
     }
 }

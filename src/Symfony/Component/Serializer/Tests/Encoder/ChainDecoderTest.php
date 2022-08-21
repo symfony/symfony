@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
+use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
@@ -28,7 +29,7 @@ class ChainDecoderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->decoder1 = $this->createMock(DecoderInterface::class);
+        $this->decoder1 = $this->createMock(ContextAwareDecoderInterface::class);
         $this->decoder1
             ->method('supportsDecoding')
             ->willReturnMap([

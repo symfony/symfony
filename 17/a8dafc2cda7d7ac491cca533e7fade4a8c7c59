@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Warxcell at 2022-08-22T15:17:52Z
+
+Added tests, tho I'm not quite sure what's the best way to throw Throwable.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-08-22T15:26:37Z
+
+Instead of a test requiring a file with a syntax error, it would be simpler to make a function trigger a `Error` here.
+
+---------------------------------------------------------------------------
+
+by Warxcell at 2022-08-22T15:29:53Z
+
+> Error
+
+Ah yes, totally forgot about it. Thanks!

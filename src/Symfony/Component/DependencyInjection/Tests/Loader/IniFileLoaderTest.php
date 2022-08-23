@@ -88,6 +88,8 @@ class IniFileLoaderTest extends TestCase
             ['-120.0', -1.2E2, false], // not supported by INI_SCANNER_TYPED
             ['-10100.1', -10100.1, false], // not supported by INI_SCANNER_TYPED
             ['-10,100.1', '-10,100.1', true],
+            ['list', [1, 2], true],
+            ['map', ['one' => 1, 'two' => 2], true],
         ];
     }
 

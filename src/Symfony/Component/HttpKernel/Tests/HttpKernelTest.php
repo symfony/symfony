@@ -39,6 +39,45 @@ class HttpKernelTest extends TestCase
         $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
     }
 
+    public function testRequestStackIsNotBrokenWhenControllerThrowsAnExceptionAndCatchIsTrue()
+    {
+        $requestStack = new RequestStack();
+        $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); }, $requestStack);
+
+        try {
+            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+        } catch (\Throwable $exception) {
+        }
+
+        self::assertNull($requestStack->getCurrentRequest());
+    }
+
+    public function testRequestStackIsNotBrokenWhenControllerThrowsAnExceptionAndCatchIsFalse()
+    {
+        $requestStack = new RequestStack();
+        $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); }, $requestStack);
+
+        try {
+            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+        } catch (\Throwable $exception) {
+        }
+
+        self::assertNull($requestStack->getCurrentRequest());
+    }
+
+    public function testRequestStackIsNotBrokenWhenControllerThrowsAnThrowable()
+    {
+        $requestStack = new RequestStack();
+        $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \Error(); }, $requestStack);
+
+        try {
+            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+        } catch (\Throwable $exception) {
+        }
+
+        self::assertNull($requestStack->getCurrentRequest());
+    }
+
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsFalseAndNoListenerIsRegistered()
     {
         $this->expectException(\RuntimeException::class);

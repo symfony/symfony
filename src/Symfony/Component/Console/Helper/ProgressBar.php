@@ -50,7 +50,7 @@ final class ProgressBar
     private OutputInterface $output;
     private int $step = 0;
     private int $startingStep = 0;
-    private ?int $max = null;
+    private int $max = 0;
     private int $startTime;
     private int $stepWidth;
     private float $percent = 0.0;

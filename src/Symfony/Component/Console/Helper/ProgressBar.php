@@ -51,6 +51,7 @@ final class ProgressBar
     private int $step = 0;
     private int $startingStep = 0;
     private int $max = 0;
+    private bool $isMaxKnown = false;
     private int $startTime;
     private int $stepWidth;
     private float $percent = 0.0;
@@ -289,6 +290,8 @@ final class ProgressBar
      */
     public function iterate(iterable $iterable, int $max = null): iterable
     {
+        $this->isMaxKnown = is_countable($iterable);
+
         $this->start($max ?? (is_countable($iterable) ? \count($iterable) : 0));
 
         foreach ($iterable as $key => $value) {
@@ -377,6 +380,7 @@ final class ProgressBar
         $this->format = null;
         $this->max = max(0, $max);
         $this->stepWidth = $this->max ? Helper::width((string) $this->max) : 4;
+        $this->isMaxKnown = $this->isMaxKnown || 0 < $this->max;
     }
 
     /**
@@ -519,14 +523,14 @@ final class ProgressBar
                 return Helper::formatTime(time() - $bar->getStartTime());
             },
             'remaining' => function (self $bar) {
-                if (!isset($bar->max)) {
+                if (!$bar->isMaxKnown && !$bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
 
                 return Helper::formatTime($bar->getRemaining());
             },
             'estimated' => function (self $bar) {
-                if (!isset($bar->max)) {
+                if (!$bar->isMaxKnown && !$bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
 

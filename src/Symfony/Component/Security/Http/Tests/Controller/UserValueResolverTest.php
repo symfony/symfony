@@ -27,21 +27,33 @@ use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 class UserValueResolverTest extends TestCase
 {
+    /**
+     * In Symfony 7, keep this test case but remove the call to supports()
+     *
+     * @group legacy
+     */
     public function testSupportsFailsWithNoType()
     {
         $tokenStorage = new TokenStorage();
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', null, false, false, null);
 
+        $this->assertSame([], $resolver->resolve(Request::create('/'), $metadata));
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
+    /**
+     * In Symfony 7, keep this test case but remove the call to supports()
+     *
+     * @group legacy
+     */
     public function testSupportsFailsWhenDefaultValAndNoUser()
     {
         $tokenStorage = new TokenStorage();
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, true, new InMemoryUser('username', 'password'));
 
+        $this->assertSame([], $resolver->resolve(Request::create('/'), $metadata));
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
@@ -55,8 +67,7 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
-        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+        $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
     public function testResolveSucceedsWithSubclassType()
@@ -69,8 +80,7 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
-        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+        $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
     public function testResolveSucceedsWithNullableParamAndNoUser()
@@ -82,8 +92,7 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, true, [new CurrentUser()]);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
-        $this->assertSame([null], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+        $this->assertSame([null], $resolver->resolve(Request::create('/'), $metadata));
     }
 
     public function testResolveSucceedsWithNullableAttribute()
@@ -97,8 +106,7 @@ class UserValueResolverTest extends TestCase
         $metadata = $this->createMock(ArgumentMetadata::class);
         $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
-        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+        $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
     public function testResolveSucceedsWithTypedAttribute()
@@ -112,8 +120,7 @@ class UserValueResolverTest extends TestCase
         $metadata = $this->createMock(ArgumentMetadata::class);
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
-        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+        $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
     public function testResolveThrowsAccessDeniedWithWrongUserClass()
@@ -126,10 +133,9 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessageMatches('/^The logged-in user is an instance of "Mock_UserInterface[^"]+" but a user of type "Symfony\\\\Component\\\\Security\\\\Core\\\\User\\\\InMemoryUser" is expected.$/');
-        iterator_to_array($resolver->resolve(Request::create('/'), $metadata));
+        $resolver->resolve(Request::create('/'), $metadata);
     }
 
     public function testResolveThrowsAccessDeniedWithAttributeAndNoUser()
@@ -139,10 +145,9 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null, false, [new CurrentUser()]);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('There is no logged-in user to pass to $foo, make the argument nullable if you want to allow anonymous access to the action.');
-        iterator_to_array($resolver->resolve(Request::create('/'), $metadata));
+        $resolver->resolve(Request::create('/'), $metadata);
     }
 
     public function testResolveThrowsAcessDeniedWithNoToken()
@@ -151,9 +156,8 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->expectException(AccessDeniedException::class);
-        iterator_to_array($resolver->resolve(Request::create('/'), $metadata));
+        $resolver->resolve(Request::create('/'), $metadata);
     }
 
     public function testIntegration()

@@ -17,17 +17,10 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * Responsible for resolving the value of an argument based on its metadata.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
- *
- * @deprecated since Symfony 6.2, implement ValueResolverInterface instead
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-interface ArgumentValueResolverInterface
+interface ValueResolverInterface
 {
-    /**
-     * Whether this resolver can resolve the value for the given ArgumentMetadata.
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool;
-
     /**
      * Returns the possible value(s).
      */

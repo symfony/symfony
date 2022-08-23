@@ -19,7 +19,7 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-final class EntityValueResolver implements ArgumentValueResolverInterface
+final class EntityValueResolver implements ValueResolverInterface
 {
     public function __construct(
         private ManagerRegistry $registry,
@@ -41,66 +41,36 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
-        if (!$this->registry->getManagerNames()) {
-            return false;
-        }
-
         $options = $this->getMapEntityAttribute($argument);
         if (!$options->class || $options->disabled) {
-            return false;
+            return [];
+        }
+        if (!$manager = $this->getManager($options->objectManager, $options->class)) {
+            return [];
         }
 
-        if (null === $options->expr && !($options->mapping || $options->exclude) && null === $this->getIdentifier($request, $options, $argument->getName())) {
-            return false;
-        }
-
-        // Doctrine Entity?
-        if (!$objectManager = $this->getManager($options->objectManager, $options->class)) {
-            return false;
-        }
-
-        if ($objectManager->getMetadataFactory()->isTransient($options->class)) {
-            return false;
-        }
-
-        return null !== $options->expr || $this->getCriteria($request, $options, $objectManager);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
-    {
-        $options = $this->getMapEntityAttribute($argument);
-        $name = $argument->getName();
-        $objectManager = $this->getManager($options->objectManager, $options->class);
-
-        $errorMessage = null;
+        $message = '';
         if (null !== $options->expr) {
-            if (null === $object = $this->findViaExpression($objectManager, $request, $options)) {
-                $errorMessage = sprintf('The expression "%s" returned null', $options->expr);
+            if (null === $object = $this->findViaExpression($manager, $request, $options)) {
+                $message = sprintf(' The expression "%s" returned null.', $options->expr);
             }
         // find by identifier?
-        } elseif (false === $object = $this->find($objectManager, $request, $options, $name)) {
+        } elseif (false === $object = $this->find($manager, $request, $options, $argument->getName())) {
             // find by criteria
-            if (false === $object = $this->findOneBy($objectManager, $request, $options)) {
-                if (!$argument->isNullable()) {
-                    throw new \LogicException(sprintf('Unable to guess how to get a Doctrine instance from the request information for parameter "%s".', $name));
-                }
-
+            if (!$criteria = $this->getCriteria($request, $options, $manager)) {
+                return [];
+            }
+            try {
+                $object = $manager->getRepository($options->class)->findOneBy($criteria);
+            } catch (NoResultException|ConversionException) {
                 $object = null;
             }
         }
 
         if (null === $object && !$argument->isNullable()) {
-            $message = sprintf('"%s" object not found by the "%s" Argument Resolver.', $options->class, self::class);
-            if ($errorMessage) {
-                $message .= ' '.$errorMessage;
-            }
-
-            throw new NotFoundHttpException($message);
+            throw new NotFoundHttpException(sprintf('"%s" object not found by "%s".', $options->class, self::class).$message);
         }
 
         return [$object];
@@ -112,18 +82,16 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
             return $this->registry->getManagerForClass($class);
         }
 
-        if (!isset($this->registry->getManagerNames()[$name])) {
-            return null;
-        }
-
         try {
-            return $this->registry->getManager($name);
+            $manager = $this->registry->getManager($name);
         } catch (\InvalidArgumentException) {
             return null;
         }
+
+        return $manager->getMetadataFactory()->isTransient($class) ? null : $manager;
     }
 
-    private function find(ObjectManager $objectManager, Request $request, MapEntity $options, string $name): false|object|null
+    private function find(ObjectManager $manager, Request $request, MapEntity $options, string $name): false|object|null
     {
         if ($options->mapping || $options->exclude) {
             return false;
@@ -134,15 +102,15 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
             return $id;
         }
 
-        if ($options->evictCache && $objectManager instanceof EntityManagerInterface) {
-            $cacheProvider = $objectManager->getCache();
+        if ($options->evictCache && $manager instanceof EntityManagerInterface) {
+            $cacheProvider = $manager->getCache();
             if ($cacheProvider && $cacheProvider->containsEntity($options->class, $id)) {
                 $cacheProvider->evictEntity($options->class, $id);
             }
         }
 
         try {
-            return $objectManager->getRepository($options->class)->find($id);
+            return $manager->getRepository($options->class)->find($id);
         } catch (NoResultException|ConversionException) {
             return null;
         }
@@ -179,20 +147,7 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
         return false;
     }
 
-    private function findOneBy(ObjectManager $objectManager, Request $request, MapEntity $options): false|object|null
-    {
-        if (!$criteria = $this->getCriteria($request, $options, $objectManager)) {
-            return false;
-        }
-
-        try {
-            return $objectManager->getRepository($options->class)->findOneBy($criteria);
-        } catch (NoResultException|ConversionException) {
-            return null;
-        }
-    }
-
-    private function getCriteria(Request $request, MapEntity $options, ObjectManager $objectManager): array
+    private function getCriteria(Request $request, MapEntity $options, ObjectManager $manager): array
     {
         if (null === $mapping = $options->mapping) {
             $mapping = $request->attributes->keys();
@@ -217,7 +172,7 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
         }
 
         $criteria = [];
-        $metadata = $objectManager->getClassMetadata($options->class);
+        $metadata = $manager->getClassMetadata($options->class);
 
         foreach ($mapping as $attribute => $field) {
             if (!$metadata->hasField($field) && (!$metadata->hasAssociation($field) || !$metadata->isSingleValuedAssociation($field))) {
@@ -234,13 +189,13 @@ final class EntityValueResolver implements ArgumentValueResolverInterface
         return $criteria;
     }
 
-    private function findViaExpression(ObjectManager $objectManager, Request $request, MapEntity $options): ?object
+    private function findViaExpression(ObjectManager $manager, Request $request, MapEntity $options): ?object
     {
         if (!$this->expressionLanguage) {
             throw new \LogicException(sprintf('You cannot use the "%s" if the ExpressionLanguage component is not available. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
-        $repository = $objectManager->getRepository($options->class);
+        $repository = $manager->getRepository($options->class);
         $variables = array_merge($request->attributes->all(), ['repository' => $repository]);
 
         try {

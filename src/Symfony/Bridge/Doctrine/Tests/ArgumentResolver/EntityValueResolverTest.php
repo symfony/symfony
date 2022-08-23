@@ -138,7 +138,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertFalse($converter->supports($request, $argument));
     }
 
-    public function testApplyWithNoIdAndData()
+    public function testResolveWithNoIdAndData()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry->expects($this->once())
@@ -155,7 +155,7 @@ class EntityValueResolverTest extends TestCase
         $converter->resolve($request, $argument);
     }
 
-    public function testApplyWithNoIdAndDataOptional()
+    public function testResolveWithNoIdAndDataOptional()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry->expects($this->once())
@@ -172,14 +172,14 @@ class EntityValueResolverTest extends TestCase
         $this->assertYieldEquals([null], $ret);
     }
 
-    public function testApplyWithStripNulls()
+    public function testResolveWithStripNulls()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $converter = new EntityValueResolver($registry);
 
         $request = new Request();
         $request->attributes->set('arg', null);
-        $argument = $this->createArgument('stdClass', new MapEntity(mapping: ['arg' => 'arg'], stripNull: true), 'arg', true);
+        $argument = $this->createArgument('stdClass', new MapEntity(stripNull: true), 'arg', true);
 
         $classMetadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
         $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -209,7 +209,7 @@ class EntityValueResolverTest extends TestCase
     /**
      * @dataProvider idsProvider
      */
-    public function testApplyWithId(string|int $id)
+    public function testResolveWithId(string|int $id)
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $converter = new EntityValueResolver($registry);
@@ -241,7 +241,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertYieldEquals([$object], $ret);
     }
 
-    public function testApplyWithNullId()
+    public function testResolveWithNullId()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry->expects($this->once())
@@ -260,7 +260,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertYieldEquals([null], $ret);
     }
 
-    public function testApplyWithConversionFailedException()
+    public function testResolveWithConversionFailedException()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $converter = new EntityValueResolver($registry);
@@ -320,7 +320,7 @@ class EntityValueResolverTest extends TestCase
         yield ['foo'];
     }
 
-    public function testApplyGuessOptional()
+    public function testResolveGuessOptional()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $converter = new EntityValueResolver($registry);
@@ -353,7 +353,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertYieldEquals([null], $ret);
     }
 
-    public function testApplyWithMappingAndExclude()
+    public function testResolveWithMappingAndExclude()
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $converter = new EntityValueResolver($registry);

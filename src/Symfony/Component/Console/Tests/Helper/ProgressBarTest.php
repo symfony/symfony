@@ -1042,15 +1042,21 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     {
         try {
             $bar = new ProgressBar($output = $this->getOutputStream());
-            $bar->setFormat("%elapsed%/%estimated%");
+            $bar->setFormat('%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
 
             $input = [];
-            foreach ($bar->iterate($input) as $item)
+            foreach ($bar->iterate($input) as $item) {
                 var_dump($item);
+            }
 
             // succeed the test if we reach this code (no exception happened)
-            $this->assertTrue(true);
-        } catch(Exception $e) {
+            rewind($output->getStream());
+            $this->assertEquals(
+                '   0/0 [>---------------------------]   0% < 1 sec/< 1 sec' .
+                $this->generateOutput('   0/0 [============================] 100% < 1 sec/< 1 sec'),
+                stream_get_contents($output->getStream())
+            );
+        } catch (Exception $e) {
             $this->fail();
         }
     }

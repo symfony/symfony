@@ -196,7 +196,7 @@ final class ProgressBar
 
     public function getBarOffset(): float
     {
-        return floor($this->max ? $this->percent * $this->barWidth : (null === $this->redrawFreq ? (int) (min(5, $this->barWidth / 15) * $this->writeCount) : $this->step) % $this->barWidth);
+        return floor($this->isMaxKnown || $this->max ? $this->percent * $this->barWidth : (null === $this->redrawFreq ? (int) (min(5, $this->barWidth / 15) * $this->writeCount) : $this->step) % $this->barWidth);
     }
 
     public function getEstimated(): float
@@ -234,7 +234,7 @@ final class ProgressBar
 
     public function getBarCharacter(): string
     {
-        return $this->barChar ?? ($this->max ? '=' : $this->emptyBarChar);
+        return $this->barChar ?? ($this->isMaxKnown || $this->max ? '=' : $this->emptyBarChar);
     }
 
     public function setEmptyBarCharacter(string $char)
@@ -355,6 +355,8 @@ final class ProgressBar
         $currPeriod = (int) ($step / $redrawFreq);
         $this->step = $step;
         $this->percent = $this->max ? (float) $this->step / $this->max : 0;
+        if ($this->isMaxKnown && 0 == $this->max)
+            $this->percent = 1.0;
         $timeInterval = microtime(true) - $this->lastWriteTime;
 
         // Draw regardless of other limits

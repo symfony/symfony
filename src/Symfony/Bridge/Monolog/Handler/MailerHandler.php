@@ -65,7 +65,7 @@ class MailerHandler extends AbstractProcessingHandler
             }
         }
 
-        if (!empty($messages)) {
+        if ($messages) {
             $this->send((string) $this->getFormatter()->formatBatch($messages), $messages);
         }
     }

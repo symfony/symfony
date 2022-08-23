@@ -72,7 +72,7 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
                 'errors' => $this->convertFormErrorsToArray($child),
             ];
 
-            if (!empty($child->all())) {
+            if ($child->all()) {
                 $childData['children'] = $this->convertFormChildrenToArray($child);
             }
 

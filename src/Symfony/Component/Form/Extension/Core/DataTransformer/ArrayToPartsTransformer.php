@@ -39,7 +39,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
         $result = [];
 
         foreach ($this->partMapping as $partKey => $originalKeys) {
-            if (empty($array)) {
+            if (!$array) {
                 $result[$partKey] = null;
             } else {
                 $result[$partKey] = array_intersect_key($array, array_flip($originalKeys));

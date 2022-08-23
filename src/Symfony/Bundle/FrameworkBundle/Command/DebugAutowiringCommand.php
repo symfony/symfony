@@ -87,7 +87,7 @@ EOF
                 return false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && !str_starts_with($serviceId, '.');
             });
 
-            if (empty($serviceIds)) {
+            if (!$serviceIds) {
                 $errorIo->error(sprintf('No autowirable classes or interfaces found matching "%s"', $search));
 
                 return 1;

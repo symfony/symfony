@@ -220,7 +220,7 @@ class Translator implements TranslatorInterface
         foreach ($this->shortcutParsers as $shortcut) {
             $tokens = $shortcut->parse($css);
 
-            if (!empty($tokens)) {
+            if ($tokens) {
                 return $tokens;
             }
         }

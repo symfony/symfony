@@ -71,7 +71,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         $keys = $list->getOriginalKeys();
 
         if (!\is_callable($preferredChoices)) {
-            if (empty($preferredChoices)) {
+            if (!$preferredChoices) {
                 $preferredChoices = null;
             } else {
                 // make sure we have keys that reflect order

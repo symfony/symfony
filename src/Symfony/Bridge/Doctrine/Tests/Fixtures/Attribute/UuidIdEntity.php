@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\Id;
 class UuidIdEntity
 {
     #[Id]
-    #[Column("uuid")]
+    #[Column('uuid')]
     protected $id;
 
     public function __construct($id)

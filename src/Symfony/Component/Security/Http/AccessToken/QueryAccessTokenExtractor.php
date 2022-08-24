@@ -32,8 +32,7 @@ final class QueryAccessTokenExtractor implements AccessTokenExtractorInterface
 
     public function __construct(
         private readonly string $parameter = self::PARAMETER,
-    )
-    {
+    ) {
     }
 
     public function extractAccessToken(Request $request): ?string

@@ -146,7 +146,6 @@ class JsonLoginAuthenticatorTest extends TestCase
     {
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "notempty"}');
         yield [$request];
-
     }
 
     public function testAuthenticationFailureWithoutTranslator()

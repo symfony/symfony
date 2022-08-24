@@ -21,12 +21,18 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 class BackedEnumValueResolverTest extends TestCase
 {
     /**
+     * In Symfony 7, keep this test case but remove the call to supports().
+     *
+     * @group legacy
      * @dataProvider provideTestSupportsData
      */
     public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport)
     {
         $resolver = new BackedEnumValueResolver();
 
+        if (!$expectedSupport) {
+            $this->assertSame([], $resolver->resolve($request, $metadata));
+        }
         self::assertSame($expectedSupport, $resolver->supports($request, $metadata));
     }
 
@@ -76,7 +82,7 @@ class BackedEnumValueResolverTest extends TestCase
         /** @var \Generator $results */
         $results = $resolver->resolve($request, $metadata);
 
-        self::assertSame($expected, iterator_to_array($results));
+        self::assertSame($expected, $results);
     }
 
     public function provideTestResolveData(): iterable
@@ -112,9 +118,7 @@ class BackedEnumValueResolverTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Could not resolve the "Symfony\Component\HttpKernel\Tests\Fixtures\Suit $suit" controller argument: "foo" is not a valid backing value for enum');
 
-        /** @var \Generator $results */
-        $results = $resolver->resolve($request, $metadata);
-        iterator_to_array($results);
+        $resolver->resolve($request, $metadata);
     }
 
     public function testResolveThrowsOnUnexpectedType()
@@ -124,11 +128,9 @@ class BackedEnumValueResolverTest extends TestCase
         $metadata = self::createArgumentMetadata('suit', Suit::class);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Could not resolve the "Symfony\Component\HttpKernel\Tests\Fixtures\Suit $suit" controller argument: expecting an int or string, got bool.');
+        $this->expectExceptionMessage('Could not resolve the "Symfony\Component\HttpKernel\Tests\Fixtures\Suit $suit" controller argument: expecting an int or string, got "bool".');
 
-        /** @var \Generator $results */
-        $results = $resolver->resolve($request, $metadata);
-        iterator_to_array($results);
+        $resolver->resolve($request, $metadata);
     }
 
     private static function createRequest(array $attributes = []): Request

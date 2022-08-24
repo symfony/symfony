@@ -14,6 +14,11 @@ HttpFoundation
 
  * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
 
+HttpKernel
+----------
+
+ * Deprecate `ArgumentValueResolverInterface`, use `ValueResolverInterface` instead
+
 Ldap
 ----
 

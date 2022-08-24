@@ -39,6 +39,9 @@ class DateTimeValueResolverTest extends TestCase
         yield ['Etc/GMT-14'];
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupports()
     {
         $resolver = new DateTimeValueResolver();
@@ -56,6 +59,15 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertFalse($resolver->supports($request, $argument));
     }
 
+    public function testUnsupportedArgument()
+    {
+        $resolver = new DateTimeValueResolver();
+
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
+        $request = self::requestWithAttributes(['dummy' => 'now']);
+        $this->assertSame([], $resolver->resolve($request, $argument));
+    }
+
     /**
      * @dataProvider getTimeZones
      */
@@ -67,9 +79,7 @@ class DateTimeValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00']);
 
-        /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
-        $results = iterator_to_array($results);
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(\DateTime::class, $results[0]);
@@ -88,9 +98,7 @@ class DateTimeValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '989541720']);
 
-        /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
-        $results = iterator_to_array($results);
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(\DateTime::class, $results[0]);
@@ -105,9 +113,7 @@ class DateTimeValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null, true);
         $request = self::requestWithAttributes(['dummy' => '']);
 
-        /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
-        $results = iterator_to_array($results);
 
         $this->assertCount(1, $results);
         $this->assertNull($results[0]);
@@ -120,9 +126,7 @@ class DateTimeValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null, true);
         $request = self::requestWithAttributes(['dummy' => $datetime = new \DateTime()]);
 
-        /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
-        $results = iterator_to_array($results);
 
         $this->assertCount(1, $results);
         $this->assertSame($datetime, $results[0]);
@@ -136,9 +140,7 @@ class DateTimeValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', FooDateTime::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '2016-09-08 00:00:00']);
 
-        /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
-        $results = iterator_to_array($results);
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(FooDateTime::class, $results[0]);
@@ -156,9 +158,7 @@ class DateTimeValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '2016-09-08 00:00:00 +05:00']);
 
-        /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
-        $results = iterator_to_array($results);
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(\DateTimeImmutable::class, $results[0]);
@@ -179,9 +179,7 @@ class DateTimeValueResolverTest extends TestCase
         ]);
         $request = self::requestWithAttributes(['dummy' => '09-08-16 12:34:56']);
 
-        /** @var \Generator $results */
         $results = $resolver->resolve($request, $argument);
-        $results = iterator_to_array($results);
 
         $this->assertCount(1, $results);
         $this->assertInstanceOf(\DateTimeImmutable::class, $results[0]);
@@ -217,9 +215,7 @@ class DateTimeValueResolverTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Invalid date given for parameter "dummy".');
 
-        /** @var \Generator $results */
-        $results = $resolver->resolve($request, $argument);
-        iterator_to_array($results);
+        $resolver->resolve($request, $argument);
     }
 
     private static function requestWithAttributes(array $attributes): Request

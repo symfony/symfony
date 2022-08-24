@@ -124,6 +124,7 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
@@ -2564,6 +2565,7 @@ class FrameworkExtension extends Extension
         $classToServices = [
             AllMySmsTransportFactory::class => 'notifier.transport_factory.all-my-sms',
             AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazon-sns',
+            ChatworkTransportFactory::class => 'notifier.transport_factory.chatwork',
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
             ContactEveryoneTransportFactory::class => 'notifier.transport_factory.contact-everyone',
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',

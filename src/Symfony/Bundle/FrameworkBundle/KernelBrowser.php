@@ -18,6 +18,7 @@ use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
@@ -33,6 +34,7 @@ class KernelBrowser extends HttpKernelBrowser
     private bool $hasPerformedRequest = false;
     private bool $profiler = false;
     private bool $reboot = true;
+    private SessionInterface $session;
 
     /**
      * {@inheritdoc}
@@ -131,19 +133,35 @@ class KernelBrowser extends HttpKernelBrowser
             return $this;
         }
 
-        $session = $container->get('session.factory')->createSession();
-        $session->set('_security_'.$firewallContext, serialize($token));
-        $session->save();
+        $this->session = $container->get('session.factory')->createSession();
+        $this->setLoginSessionValue('_security_'.$firewallContext, serialize($token));
 
-        $domains = array_unique(array_map(function (Cookie $cookie) use ($session) {
-            return $cookie->getName() === $session->getName() ? $cookie->getDomain() : '';
+        $domains = array_unique(array_map(function (Cookie $cookie) {
+            return $cookie->getName() === $this->session->getName() ? $cookie->getDomain() : '';
         }, $this->getCookieJar()->all())) ?: [''];
         foreach ($domains as $domain) {
-            $cookie = new Cookie($session->getName(), $session->getId(), null, null, $domain);
+            $cookie = new Cookie($this->session->getName(), $this->session->getId(), null, null, $domain);
             $this->getCookieJar()->set($cookie);
         }
 
         return $this;
+    }
+
+    /**
+     * Set value on session initialized by loginUser().
+     *
+     * @param mixed $value
+     *
+     * @return $this
+     */
+    protected function setLoginSessionValue(string $name, $value): self
+    {
+        if (isset($this->session)) {
+            $this->session->set($name, $value);
+            $this->session->save();
+            return $this;
+        }
+        throw new \LogicException("loginUser() must be called to initialize session");
     }
 
     /**

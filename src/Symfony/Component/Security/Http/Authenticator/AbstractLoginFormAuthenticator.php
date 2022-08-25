@@ -31,8 +31,6 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
     abstract protected function getLoginUrl(Request $request): string;
 
     /**
-     * {@inheritdoc}
-     *
      * Override to change the request conditions that have to be
      * matched in order to handle the login form submit.
      *

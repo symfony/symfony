@@ -29,8 +29,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 abstract class Composite extends Constraint
 {
     /**
-     * {@inheritdoc}
-     *
      * The groups of the composite and its nested constraints are made
      * consistent using the following strategy:
      *
@@ -111,8 +109,6 @@ abstract class Composite extends Constraint
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Implicit group names are forwarded to nested constraints.
      */
     public function addImplicitGroupName(string $group)

@@ -34,8 +34,6 @@ class GraphvizDumper implements DumperInterface
     ];
 
     /**
-     * {@inheritdoc}
-     *
      * Dumps the workflow as a graphviz graph.
      *
      * Available options:

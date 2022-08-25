@@ -36,9 +36,6 @@ class DependencyInjectionExtension implements FormExtensionInterface
         $this->guesserServices = $guesserServices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getType(string $name): FormTypeInterface
     {
         if (!$this->typeContainer->has($name)) {
@@ -48,17 +45,11 @@ class DependencyInjectionExtension implements FormExtensionInterface
         return $this->typeContainer->get($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasType(string $name): bool
     {
         return $this->typeContainer->has($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeExtensions(string $name): array
     {
         $extensions = [];
@@ -82,17 +73,11 @@ class DependencyInjectionExtension implements FormExtensionInterface
         return $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasTypeExtensions(string $name): bool
     {
         return isset($this->typeExtensionServices[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         if (!$this->guesserLoaded) {

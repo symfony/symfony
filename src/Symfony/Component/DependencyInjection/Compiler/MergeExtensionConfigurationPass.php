@@ -29,9 +29,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class MergeExtensionConfigurationPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $parameters = $container->getParameterBag()->all();
@@ -130,9 +127,6 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEnvPlaceholders(): array
     {
         return $this->processedEnvPlaceholders ?? parent::getEnvPlaceholders();
@@ -160,33 +154,21 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
         $this->extensionClass = \get_class($extension);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addCompilerPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): static
     {
         throw new LogicException(sprintf('You cannot add compiler pass "%s" from extension "%s". Compiler passes must be registered before the container is compiled.', get_debug_type($pass), $this->extensionClass));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerExtension(ExtensionInterface $extension)
     {
         throw new LogicException(sprintf('You cannot register extension "%s" from "%s". Extensions must be registered before the container is compiled.', get_debug_type($extension), $this->extensionClass));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile(bool $resolveEnvPlaceholders = false)
     {
         throw new LogicException(sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveEnvPlaceholders(mixed $value, string|bool $format = null, array &$usedEnvs = null): mixed
     {
         if (true !== $format || !\is_string($value)) {

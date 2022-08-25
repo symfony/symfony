@@ -32,8 +32,6 @@ class RouterDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
@@ -92,9 +90,6 @@ class RouterDataCollector extends DataCollector
         return $this->data['route'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'router';

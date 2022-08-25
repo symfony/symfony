@@ -139,9 +139,6 @@ class RequestMatcher implements RequestMatcherInterface
         $this->attributes[$key] = $regexp;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function matches(Request $request): bool
     {
         if ($this->schemes && !\in_array($request->getScheme(), $this->schemes, true)) {

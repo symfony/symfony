@@ -57,8 +57,6 @@ class StreamedResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
-     *
      * This method only sends the headers once.
      *
      * @return $this
@@ -75,8 +73,6 @@ class StreamedResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
-     *
      * This method only sends the content once.
      *
      * @return $this
@@ -99,8 +95,6 @@ class StreamedResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException when the content is not null
      *
      * @return $this
@@ -116,9 +110,6 @@ class StreamedResponse extends Response
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent(): string|false
     {
         return false;

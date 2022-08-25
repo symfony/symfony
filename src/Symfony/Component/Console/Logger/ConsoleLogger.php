@@ -59,9 +59,6 @@ class ConsoleLogger extends AbstractLogger
         $this->formatLevelMap = $formatLevelMap + $this->formatLevelMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function log($level, $message, array $context = []): void
     {
         if (!isset($this->verbosityLevelMap[$level])) {

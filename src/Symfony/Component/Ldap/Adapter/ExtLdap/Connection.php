@@ -56,17 +56,12 @@ class Connection extends AbstractConnection
         $this->disconnect();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isBound(): bool
     {
         return $this->bound;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
      */
     public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)

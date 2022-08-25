@@ -22,9 +22,6 @@ use Twig\TwigFilter;
  */
 final class YamlExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFilters(): array
     {
         return [

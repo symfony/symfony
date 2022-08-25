@@ -26,9 +26,6 @@ use Symfony\Component\Uid\UuidV6;
 #[AsCommand(name: 'uuid:inspect', description: 'Inspect a UUID')]
 class InspectUuidCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -46,9 +43,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);

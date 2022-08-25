@@ -48,9 +48,6 @@ class SodiumMarshaller implements MarshallerInterface
         return \function_exists('sodium_crypto_box_seal');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function marshall(array $values, ?array &$failed): array
     {
         $encryptionKey = sodium_crypto_box_publickey($this->decryptionKeys[0]);
@@ -63,9 +60,6 @@ class SodiumMarshaller implements MarshallerInterface
         return $encryptedValues;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unmarshall(string $value): mixed
     {
         foreach ($this->decryptionKeys as $k) {

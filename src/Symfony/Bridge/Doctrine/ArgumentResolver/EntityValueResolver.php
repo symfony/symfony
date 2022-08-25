@@ -38,9 +38,6 @@ final class EntityValueResolver implements ValueResolverInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         $options = $this->getMapEntityAttribute($argument);

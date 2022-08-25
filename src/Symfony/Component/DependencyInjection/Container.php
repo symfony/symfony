@@ -269,9 +269,6 @@ class Container implements ContainerInterface, ResetInterface
         return isset($this->services[$id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $services = $this->services + $this->privates;

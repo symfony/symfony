@@ -120,9 +120,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $conn->exec($sql);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prune(): bool
     {
         $deleteSql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= :time";
@@ -150,9 +147,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids): iterable
     {
         $connection = $this->getConnection();
@@ -196,9 +190,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id): bool
     {
         $connection = $this->getConnection();
@@ -213,9 +204,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return (bool) $stmt->fetchColumn();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace): bool
     {
         $conn = $this->getConnection();
@@ -238,9 +226,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids): bool
     {
         $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
@@ -254,9 +239,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

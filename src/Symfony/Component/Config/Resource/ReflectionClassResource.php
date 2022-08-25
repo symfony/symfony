@@ -35,9 +35,6 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         $this->excludedVendors = $excludedVendors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFresh(int $timestamp): bool
     {
         if (!isset($this->hash)) {

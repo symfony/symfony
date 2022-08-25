@@ -57,9 +57,6 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
      */
     abstract protected function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void;
 
-    /**
-     * {@inheritdoc}
-     */
     public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
     {
         try {
@@ -79,9 +76,6 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearRememberMeCookie(): void
     {
         $this->logger?->debug('Clearing remember-me cookie.', ['name' => $this->options['name']]);

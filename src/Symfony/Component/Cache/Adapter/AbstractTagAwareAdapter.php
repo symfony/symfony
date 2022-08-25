@@ -165,9 +165,6 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         $this->doDelete($ids);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): bool
     {
         $ok = true;
@@ -229,9 +226,6 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteItems(array $keys): bool
     {
         if (!$keys) {
@@ -281,9 +275,6 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function invalidateTags(array $tags): bool
     {
         if (empty($tags)) {

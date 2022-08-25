@@ -23,9 +23,6 @@ abstract class AbstractUidType extends Type
      */
     abstract protected function getUidClass(): string;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         if ($this->hasNativeGuidType($platform)) {
@@ -39,8 +36,6 @@ abstract class AbstractUidType extends Type
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?AbstractUid
@@ -61,8 +56,6 @@ abstract class AbstractUidType extends Type
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
@@ -88,9 +81,6 @@ abstract class AbstractUidType extends Type
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;

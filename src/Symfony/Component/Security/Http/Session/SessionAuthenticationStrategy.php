@@ -37,9 +37,6 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
         $this->strategy = $strategy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function onAuthentication(Request $request, TokenInterface $token)
     {
         switch ($this->strategy) {

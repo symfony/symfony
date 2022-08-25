@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Mapping;
 
 /**
- * {@inheritdoc}
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class AttributeMetadata implements AttributeMetadataInterface
@@ -82,17 +80,11 @@ class AttributeMetadata implements AttributeMetadataInterface
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addGroup(string $group)
     {
         if (!\in_array($group, $this->groups)) {
@@ -100,73 +92,46 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getGroups(): array
     {
         return $this->groups;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMaxDepth(?int $maxDepth)
     {
         $this->maxDepth = $maxDepth;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMaxDepth(): ?int
     {
         return $this->maxDepth;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setSerializedName(string $serializedName = null)
     {
         $this->serializedName = $serializedName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSerializedName(): ?string
     {
         return $this->serializedName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setIgnore(bool $ignore)
     {
         $this->ignore = $ignore;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isIgnored(): bool
     {
         return $this->ignore;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNormalizationContexts(): array
     {
         return $this->normalizationContexts;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNormalizationContextForGroups(array $groups): array
     {
         $contexts = [];
@@ -177,9 +142,6 @@ class AttributeMetadata implements AttributeMetadataInterface
         return array_merge($this->normalizationContexts['*'] ?? [], ...$contexts);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setNormalizationContextForGroups(array $context, array $groups = []): void
     {
         if (!$groups) {
@@ -191,17 +153,11 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDenormalizationContexts(): array
     {
         return $this->denormalizationContexts;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDenormalizationContextForGroups(array $groups): array
     {
         $contexts = [];
@@ -212,9 +168,6 @@ class AttributeMetadata implements AttributeMetadataInterface
         return array_merge($this->denormalizationContexts['*'] ?? [], ...$contexts);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDenormalizationContextForGroups(array $context, array $groups = []): void
     {
         if (!$groups) {
@@ -226,9 +179,6 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {

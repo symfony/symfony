@@ -24,15 +24,10 @@ use Psr\Container\ContainerInterface;
 interface ServiceProviderInterface extends ContainerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return T
      */
     public function get(string $id): mixed;
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $id): bool;
 
     /**

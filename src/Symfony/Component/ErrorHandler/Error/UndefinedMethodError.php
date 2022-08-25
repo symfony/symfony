@@ -13,9 +13,6 @@ namespace Symfony\Component\ErrorHandler\Error;
 
 class UndefinedMethodError extends \Error
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $message, \Throwable $previous)
     {
         parent::__construct($message, $previous->getCode(), $previous->getPrevious());

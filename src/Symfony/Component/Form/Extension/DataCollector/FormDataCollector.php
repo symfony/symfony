@@ -89,17 +89,11 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function associateFormWithView(FormInterface $form, FormView $view)
     {
         $this->formsByView[spl_object_hash($view)] = spl_object_hash($form);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collectConfiguration(FormInterface $form)
     {
         $hash = spl_object_hash($form);
@@ -118,9 +112,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collectDefaultData(FormInterface $form)
     {
         $hash = spl_object_hash($form);
@@ -140,9 +131,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collectSubmittedData(FormInterface $form)
     {
         $hash = spl_object_hash($form);
@@ -174,9 +162,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collectViewVariables(FormView $view)
     {
         $hash = spl_object_hash($view);
@@ -195,33 +180,21 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildPreliminaryFormTree(FormInterface $form)
     {
         $this->data['forms'][$form->getName()] = &$this->recursiveBuildPreliminaryFormTree($form, $this->data['forms_by_hash']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildFinalFormTree(FormInterface $form, FormView $view)
     {
         $this->data['forms'][$form->getName()] = &$this->recursiveBuildFinalFormTree($form, $view, $this->data['forms_by_hash']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'form';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getData(): array|Data
     {
         return $this->data;
@@ -243,9 +216,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         return parent::__sleep();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getCasters(): array
     {
         return parent::getCasters() + [

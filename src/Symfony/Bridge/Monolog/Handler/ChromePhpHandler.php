@@ -50,9 +50,6 @@ class ChromePhpHandler extends BaseChromePhpHandler
         $this->headers = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sendHeader($header, $content): void
     {
         if (!self::$sendHeaders) {

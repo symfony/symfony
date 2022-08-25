@@ -40,9 +40,6 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $this->resourceCheckers = $resourceCheckers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath(): string
     {
         return $this->file;

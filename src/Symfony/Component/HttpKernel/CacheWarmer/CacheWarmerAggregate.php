@@ -46,9 +46,6 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->onlyOptionalsEnabled = $this->optionalsEnabled = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function warmUp(string $cacheDir): array
     {
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
@@ -116,9 +113,6 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         return array_values(array_unique(array_merge([], ...$preload)));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional(): bool
     {
         return false;

@@ -26,17 +26,12 @@ final class NotificationTransportIsEqual extends Constraint
         $this->expectedText = $expectedText;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('is "%s"', $this->expectedText);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param MessageInterface $message
      */
     protected function matches($message): bool
@@ -45,8 +40,6 @@ final class NotificationTransportIsEqual extends Constraint
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param MessageInterface $message
      */
     protected function failureDescription($message): string

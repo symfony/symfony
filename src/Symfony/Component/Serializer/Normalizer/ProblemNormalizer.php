@@ -40,9 +40,6 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
         $this->defaultContext = $defaultContext + $this->defaultContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         if (!$object instanceof FlattenException) {
@@ -67,8 +64,6 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
@@ -76,9 +71,6 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
         return $data instanceof FlattenException;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

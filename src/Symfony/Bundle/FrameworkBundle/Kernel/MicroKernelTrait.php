@@ -104,9 +104,6 @@ trait MicroKernelTrait
         return $this->getConfigDir().'/bundles.php';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCacheDir(): string
     {
         if (isset($_SERVER['APP_CACHE_DIR'])) {
@@ -116,17 +113,11 @@ trait MicroKernelTrait
         return parent::getCacheDir();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLogDir(): string
     {
         return $_SERVER['APP_LOG_DIR'] ?? parent::getLogDir();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles(): iterable
     {
         $contents = require $this->getBundlesPath();
@@ -137,9 +128,6 @@ trait MicroKernelTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {

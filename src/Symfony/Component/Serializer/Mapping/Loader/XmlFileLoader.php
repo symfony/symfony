@@ -31,9 +31,6 @@ class XmlFileLoader extends FileLoader
      */
     private $classes;
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         if (null === $this->classes) {

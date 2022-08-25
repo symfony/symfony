@@ -128,9 +128,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function extract(string|iterable $resource, MessageCatalogue $catalog)
     {
         $files = $this->extractFiles($resource);
@@ -141,9 +138,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
@@ -314,9 +308,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         return $this->isFile($file) && 'php' === pathinfo($file, \PATHINFO_EXTENSION);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractFromDirectory(string|array $directory): iterable
     {
         if (!class_exists(Finder::class)) {

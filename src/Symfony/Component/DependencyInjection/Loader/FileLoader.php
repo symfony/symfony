@@ -48,8 +48,6 @@ abstract class FileLoader extends BaseFileLoader
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
     public function import(mixed $resource, string $type = null, bool|string $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed

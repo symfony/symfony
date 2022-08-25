@@ -20,9 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CachePoolClearerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $container->getParameterBag()->remove('cache.prefix.seed');

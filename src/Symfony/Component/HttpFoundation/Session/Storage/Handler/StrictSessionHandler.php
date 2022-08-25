@@ -47,9 +47,6 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->handler->open($savePath, $sessionName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doRead(string $sessionId): string
     {
         return $this->handler->read($sessionId);
@@ -60,9 +57,6 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->write($sessionId, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $sessionId, string $data): bool
     {
         return $this->handler->write($sessionId, $data);
@@ -76,9 +70,6 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->doDestroy ? $this->doDestroy($sessionId) : $destroyed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDestroy(string $sessionId): bool
     {
         $this->doDestroy = false;

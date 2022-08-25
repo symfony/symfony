@@ -22,17 +22,11 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return $object->normalize($this->serializer, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         $object = $this->extractObjectToPopulate($type, $context) ?? new $type();
@@ -66,9 +60,6 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
         return is_subclass_of($type, DenormalizableInterface::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

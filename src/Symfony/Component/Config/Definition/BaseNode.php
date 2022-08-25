@@ -222,9 +222,6 @@ abstract class BaseNode implements NodeInterface
         $this->finalValidationClosures = $closures;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRequired(): bool
     {
         return $this->required;
@@ -251,17 +248,11 @@ abstract class BaseNode implements NodeInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath(): string
     {
         if (null !== $this->parent) {
@@ -271,9 +262,6 @@ abstract class BaseNode implements NodeInterface
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function merge(mixed $leftSide, mixed $rightSide): mixed
     {
         if (!$this->allowOverwrite) {
@@ -312,9 +300,6 @@ abstract class BaseNode implements NodeInterface
         return $this->mergeValues($leftSide, $rightSide);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function normalize(mixed $value): mixed
     {
         $value = $this->preNormalize($value);
@@ -368,9 +353,6 @@ abstract class BaseNode implements NodeInterface
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function finalize(mixed $value): mixed
     {
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {

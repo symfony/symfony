@@ -18,17 +18,11 @@ namespace Symfony\Component\Lock\Strategy;
  */
 class ConsensusStrategy implements StrategyInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function isMet(int $numberOfSuccess, int $numberOfItems): bool
     {
         return $numberOfSuccess > ($numberOfItems / 2);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function canBeMet(int $numberOfFailure, int $numberOfItems): bool
     {
         return $numberOfFailure < ($numberOfItems / 2);

@@ -69,9 +69,6 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function title(string $message)
     {
         $this->autoPrependBlock();
@@ -82,9 +79,6 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function section(string $message)
     {
         $this->autoPrependBlock();
@@ -95,9 +89,6 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function listing(array $elements)
     {
         $this->autoPrependText();
@@ -109,9 +100,6 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function text(string|array $message)
     {
         $this->autoPrependText();
@@ -130,33 +118,21 @@ class SymfonyStyle extends OutputStyle
         $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function success(string|array $message)
     {
         $this->block($message, 'OK', 'fg=black;bg=green', ' ', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function error(string|array $message)
     {
         $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function warning(string|array $message)
     {
         $this->block($message, 'WARNING', 'fg=black;bg=yellow', ' ', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function note(string|array $message)
     {
         $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
@@ -170,17 +146,11 @@ class SymfonyStyle extends OutputStyle
         $this->block($message, 'INFO', 'fg=green', ' ', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function caution(string|array $message)
     {
         $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function table(array $headers, array $rows)
     {
         $this->createTable()
@@ -240,9 +210,6 @@ class SymfonyStyle extends OutputStyle
         $this->horizontalTable($headers, [$row]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ask(string $question, string $default = null, callable $validator = null): mixed
     {
         $question = new Question($question, $default);
@@ -251,9 +218,6 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion($question);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function askHidden(string $question, callable $validator = null): mixed
     {
         $question = new Question($question);
@@ -264,17 +228,11 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion($question);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function confirm(string $question, bool $default = true): bool
     {
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function choice(string $question, array $choices, mixed $default = null, bool $multiSelect = false): mixed
     {
         if (null !== $default) {
@@ -288,26 +246,17 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion($questionChoice);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function progressStart(int $max = 0)
     {
         $this->progressBar = $this->createProgressBar($max);
         $this->progressBar->start();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function progressAdvance(int $step = 1)
     {
         $this->getProgressBar()->advance($step);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function progressFinish()
     {
         $this->getProgressBar()->finish();
@@ -315,9 +264,6 @@ class SymfonyStyle extends OutputStyle
         unset($this->progressBar);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createProgressBar(int $max = 0): ProgressBar
     {
         $progressBar = parent::createProgressBar($max);
@@ -359,9 +305,6 @@ class SymfonyStyle extends OutputStyle
         return $answer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
     {
         if (!is_iterable($messages)) {
@@ -374,9 +317,6 @@ class SymfonyStyle extends OutputStyle
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write(string|iterable $messages, bool $newline = false, int $type = self::OUTPUT_NORMAL)
     {
         if (!is_iterable($messages)) {
@@ -389,9 +329,6 @@ class SymfonyStyle extends OutputStyle
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function newLine(int $count = 1)
     {
         parent::newLine($count);

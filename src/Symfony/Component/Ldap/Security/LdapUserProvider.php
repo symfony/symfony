@@ -117,9 +117,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         return $this->loadUser($identifier, $entry);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof LdapUser) {
@@ -130,8 +127,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
@@ -153,9 +148,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class): bool
     {
         return LdapUser::class === $class;

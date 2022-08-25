@@ -45,8 +45,6 @@ class UniqueEntity extends Constraint
     protected static $errorNames = self::ERROR_NAMES;
 
     /**
-     * {@inheritdoc}
-     *
      * @param array|string $fields the combination of fields that must contain unique values or a set of options
      */
     public function __construct(
@@ -92,9 +90,6 @@ class UniqueEntity extends Constraint
         return $this->service;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

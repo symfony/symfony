@@ -34,9 +34,6 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function warmUp(string $cacheDir): array
     {
         $router = $this->container->get('router');
@@ -48,17 +45,11 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
         throw new \LogicException(sprintf('The router "%s" cannot be warmed up because it does not implement "%s".', get_debug_type($router), WarmableInterface::class));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices(): array
     {
         return [

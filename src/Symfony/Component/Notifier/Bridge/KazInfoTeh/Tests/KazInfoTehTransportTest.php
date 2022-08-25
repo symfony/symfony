@@ -31,25 +31,16 @@ final class KazInfoTehTransportTest extends TransportTestCase
         return (new KazInfoTehTransport('username', 'password', 'sender', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toStringProvider(): iterable
     {
         yield ['kaz-info-teh://test.host?sender=sender', $this->createTransport()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('77000000000', 'KazInfoTeh!')];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('420000000000', 'KazInfoTeh!')];

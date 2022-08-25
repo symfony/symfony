@@ -81,9 +81,6 @@ class Button implements \IteratorAggregate, FormInterface
         throw new BadMethodCallException('Buttons cannot have children.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParent(FormInterface $parent = null): static
     {
         if ($this->submitted) {
@@ -95,9 +92,6 @@ class Button implements \IteratorAggregate, FormInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent(): ?FormInterface
     {
         return $this->parent;
@@ -147,17 +141,11 @@ class Button implements \IteratorAggregate, FormInterface
         throw new BadMethodCallException('Buttons cannot have children.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getErrors(bool $deep = false, bool $flatten = true): FormErrorIterator
     {
         return new FormErrorIterator($this, []);
@@ -266,9 +254,6 @@ class Button implements \IteratorAggregate, FormInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDisabled(): bool
     {
         if ($this->parent?->isDisabled()) {
@@ -340,25 +325,16 @@ class Button implements \IteratorAggregate, FormInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoot(): FormInterface
     {
         return $this->parent ? $this->parent->getRoot() : $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRoot(): bool
     {
         return null === $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(FormView $parent = null): FormView
     {
         if (null === $parent && $this->parent) {

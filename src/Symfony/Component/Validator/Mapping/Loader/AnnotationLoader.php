@@ -34,9 +34,6 @@ class AnnotationLoader implements LoaderInterface
         $this->reader = $reader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $reflClass = $metadata->getReflectionClass();

@@ -68,9 +68,6 @@ class Logger extends AbstractLogger
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function log($level, $message, array $context = []): void
     {
         if (!isset(self::LEVELS[$level])) {

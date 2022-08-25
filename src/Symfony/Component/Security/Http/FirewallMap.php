@@ -37,9 +37,6 @@ class FirewallMap implements FirewallMapInterface
         $this->map[] = [$requestMatcher, $listeners, $exceptionListener, $logoutListener];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getListeners(Request $request): array
     {
         foreach ($this->map as $elements) {

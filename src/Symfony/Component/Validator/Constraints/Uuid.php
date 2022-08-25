@@ -89,8 +89,6 @@ class Uuid extends Constraint
     public $normalizer;
 
     /**
-     * {@inheritdoc}
-     *
      * @param int[]|null $versions
      */
     public function __construct(

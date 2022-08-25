@@ -30,9 +30,6 @@ final class NotificationCount extends Constraint
         $this->queued = $queued;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('%shas %s "%d" emails', $this->transport ? $this->transport.' ' : '', $this->queued ? 'queued' : 'sent', $this->expectedValue);
@@ -40,8 +37,6 @@ final class NotificationCount extends Constraint
 
     /**
      * @param NotificationEvents $events
-     *
-     * {@inheritdoc}
      */
     protected function matches($events): bool
     {
@@ -50,8 +45,6 @@ final class NotificationCount extends Constraint
 
     /**
      * @param NotificationEvents $events
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($events): string
     {

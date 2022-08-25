@@ -34,9 +34,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE);
@@ -75,9 +72,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->data = [];
@@ -239,9 +233,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['sapi_name'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'config';

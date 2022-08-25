@@ -50,9 +50,6 @@ trait FilesystemCommonTrait
         $this->directory = $directory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace): bool
     {
         $ok = true;
@@ -68,9 +65,6 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids): bool
     {
         $ok = true;

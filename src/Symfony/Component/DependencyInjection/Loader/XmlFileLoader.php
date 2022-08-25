@@ -40,9 +40,6 @@ class XmlFileLoader extends FileLoader
 
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(mixed $resource, string $type = null): mixed
     {
         $path = $this->locator->locate($resource);
@@ -95,9 +92,6 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(mixed $resource, string $type = null): bool
     {
         if (!\is_string($resource)) {

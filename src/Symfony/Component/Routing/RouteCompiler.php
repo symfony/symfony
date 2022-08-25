@@ -35,8 +35,6 @@ class RouteCompiler implements RouteCompilerInterface
     public const VARIABLE_MAXIMUM_LENGTH = 32;
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \InvalidArgumentException if a path variable is named _fragment
      * @throws \LogicException           if a variable is referenced more than once
      * @throws \DomainException          if a variable name starts with a digit or if it is too long to be successfully used as

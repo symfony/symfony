@@ -26,9 +26,6 @@ final class EmailAttachmentCount extends Constraint
         $this->transport = $transport;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('has sent "%d" attachment(s)', $this->expectedValue);
@@ -36,8 +33,6 @@ final class EmailAttachmentCount extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function matches($message): bool
     {
@@ -50,8 +45,6 @@ final class EmailAttachmentCount extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($message): string
     {

@@ -34,9 +34,6 @@ class RedisStore implements PersistingStoreInterface
         $this->redis = $redis;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key, float $ttlInSecond)
     {
         if (0 > $ttlInSecond) {
@@ -100,9 +97,6 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttlInSecond)
     {
         if (0 > $ttlInSecond) {
@@ -145,9 +139,6 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         $script = '
@@ -163,9 +154,6 @@ class RedisStore implements PersistingStoreInterface
         $this->evaluate($script, sprintf('{%s}', $key), [$this->getUniqueToken($key)]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         return (bool) $this->redis->zScore(sprintf('{%s}:weight', $key), $this->getUniqueToken($key));

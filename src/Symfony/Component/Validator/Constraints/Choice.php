@@ -49,9 +49,6 @@ class Choice extends Constraint
     public $maxMessage = 'You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.';
     public bool $match = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption(): ?string
     {
         return 'choices';

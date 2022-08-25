@@ -150,9 +150,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return false;

@@ -33,17 +33,11 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
         $this->collected = [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         // Everything is collected during the request, and formatted on kernel terminate.
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName(): string
     {
         return 'serializer';
@@ -164,9 +158,6 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
         $this->collected[$traceId]['encoding'][] = compact('encoder', 'method', 'time');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function lateCollect(): void
     {
         $this->data = [

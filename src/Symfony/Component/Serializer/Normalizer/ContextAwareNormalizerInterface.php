@@ -21,8 +21,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 interface ContextAwareNormalizerInterface extends NormalizerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param array $context options that normalizers have access to
      */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool;

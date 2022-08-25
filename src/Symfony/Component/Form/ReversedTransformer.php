@@ -28,17 +28,11 @@ class ReversedTransformer implements DataTransformerInterface
         $this->reversedTransformer = $reversedTransformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform(mixed $value): mixed
     {
         return $this->reversedTransformer->reverseTransform($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverseTransform(mixed $value): mixed
     {
         return $this->reversedTransformer->transform($value);

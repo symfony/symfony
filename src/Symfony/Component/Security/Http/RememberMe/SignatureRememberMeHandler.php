@@ -41,9 +41,6 @@ final class SignatureRememberMeHandler extends AbstractRememberMeHandler
         $this->signatureHasher = $signatureHasher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createRememberMeCookie(UserInterface $user): void
     {
         $expires = time() + $this->options['lifetime'];
@@ -53,9 +50,6 @@ final class SignatureRememberMeHandler extends AbstractRememberMeHandler
         $this->createCookie($details);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void
     {
         try {

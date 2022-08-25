@@ -29,9 +29,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CachePoolPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if ($container->hasParameter('cache.prefix.seed')) {

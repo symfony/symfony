@@ -134,8 +134,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
@@ -143,9 +141,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return \is_object($data) && !$data instanceof \Traversable;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -226,9 +221,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
     {
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
@@ -301,8 +293,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
@@ -310,9 +300,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -687,8 +674,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * Overwritten to update the cache key for the child.
      *
      * We must not mix up the attribute cache between parent and children.
-     *
-     * {@inheritdoc}
      *
      * @internal
      */

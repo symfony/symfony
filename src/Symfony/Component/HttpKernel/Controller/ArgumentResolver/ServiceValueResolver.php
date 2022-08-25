@@ -58,9 +58,6 @@ final class ServiceValueResolver implements ArgumentValueResolverInterface, Valu
         return $this->container->has($controller) && $this->container->get($controller)->has($argument->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         $controller = $request->attributes->get('_controller');

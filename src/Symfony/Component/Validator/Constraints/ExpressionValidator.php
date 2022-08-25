@@ -29,9 +29,6 @@ class ExpressionValidator extends ConstraintValidator
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Expression) {

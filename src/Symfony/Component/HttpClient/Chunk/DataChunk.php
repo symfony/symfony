@@ -29,57 +29,36 @@ class DataChunk implements ChunkInterface
         $this->content = $content;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isTimeout(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFirst(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isLast(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInformationalStatus(): ?array
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOffset(): int
     {
         return $this->offset;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getError(): ?string
     {
         return null;

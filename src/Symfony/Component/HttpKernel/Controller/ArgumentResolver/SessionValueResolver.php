@@ -43,9 +43,6 @@ final class SessionValueResolver implements ArgumentValueResolverInterface, Valu
         return $request->getSession() instanceof $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         if (!$request->hasSession()) {

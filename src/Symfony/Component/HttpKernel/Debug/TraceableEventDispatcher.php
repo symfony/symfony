@@ -23,9 +23,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class TraceableEventDispatcher extends BaseTraceableEventDispatcher
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function beforeDispatch(string $eventName, object $event)
     {
         switch ($eventName) {
@@ -58,9 +55,6 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function afterDispatch(string $eventName, object $event)
     {
         switch ($eventName) {

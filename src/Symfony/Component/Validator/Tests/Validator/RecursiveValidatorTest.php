@@ -2362,9 +2362,6 @@ final class TestConstraintHashesDoNotCollide extends Constraint
 
 final class TestConstraintHashesDoNotCollideValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, Constraint $constraint)
     {
         if (!$value instanceof Entity) {

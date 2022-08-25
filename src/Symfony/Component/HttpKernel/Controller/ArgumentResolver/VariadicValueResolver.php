@@ -33,9 +33,6 @@ final class VariadicValueResolver implements ArgumentValueResolverInterface, Val
         return $argument->isVariadic() && $request->attributes->has($argument->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         if (!$argument->isVariadic() || !$request->attributes->has($argument->getName())) {

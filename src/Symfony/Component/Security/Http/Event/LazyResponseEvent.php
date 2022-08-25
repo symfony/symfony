@@ -31,9 +31,6 @@ final class LazyResponseEvent extends RequestEvent
         $this->event = $event;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setResponse(Response $response)
     {
         $this->stopPropagation();
@@ -42,33 +39,21 @@ final class LazyResponseEvent extends RequestEvent
         throw new LazyResponseException($response);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getKernel(): HttpKernelInterface
     {
         return $this->event->getKernel();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequest(): Request
     {
         return $this->event->getRequest();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequestType(): int
     {
         return $this->event->getRequestType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMainRequest(): bool
     {
         return $this->event->isMainRequest();

@@ -56,9 +56,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(mixed $data, string $format, array $context = []): string
     {
         $handle = fopen('php://temp,', 'w+');
@@ -123,8 +120,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsEncoding(string $format /* , array $context = [] */): bool
@@ -132,9 +127,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return self::FORMAT === $format;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(string $data, string $format, array $context = []): mixed
     {
         $handle = fopen('php://temp', 'r+');
@@ -211,8 +203,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsDecoding(string $format /* , array $context = [] */): bool

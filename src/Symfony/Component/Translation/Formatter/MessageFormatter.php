@@ -34,9 +34,6 @@ class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterf
         $this->intlFormatter = $intlFormatter ?? new IntlFormatter();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function format(string $message, string $locale, array $parameters = []): string
     {
         if ($this->translator instanceof TranslatorInterface) {
@@ -46,9 +43,6 @@ class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterf
         return strtr($message, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function formatIntl(string $message, string $locale, array $parameters = []): string
     {
         return $this->intlFormatter->formatIntl($message, $locale, $parameters);

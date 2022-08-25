@@ -88,9 +88,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed
     {
         $doSave = true;
@@ -125,9 +122,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $wrap();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(mixed $key): CacheItem
     {
         $syncItem = self::$syncItem;
@@ -150,9 +144,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $item;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItems(array $keys = []): iterable
     {
         return $this->generateItems($this->adapters[0]->getItems($keys), 0);
@@ -189,9 +180,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasItem(mixed $key): bool
     {
         foreach ($this->adapters as $adapter) {
@@ -203,9 +191,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(string $prefix = ''): bool
     {
         $cleared = true;
@@ -222,9 +207,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $cleared;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteItem(mixed $key): bool
     {
         $deleted = true;
@@ -237,9 +219,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $deleted;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteItems(array $keys): bool
     {
         $deleted = true;
@@ -252,9 +231,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $deleted;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(CacheItemInterface $item): bool
     {
         $saved = true;
@@ -267,9 +243,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $saved;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveDeferred(CacheItemInterface $item): bool
     {
         $saved = true;
@@ -282,9 +255,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $saved;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): bool
     {
         $committed = true;
@@ -297,9 +267,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $committed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prune(): bool
     {
         $pruned = true;
@@ -313,9 +280,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $pruned;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         foreach ($this->adapters as $adapter) {

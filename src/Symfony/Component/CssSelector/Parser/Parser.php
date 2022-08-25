@@ -34,9 +34,6 @@ class Parser implements ParserInterface
         $this->tokenizer = $tokenizer ?? new Tokenizer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function parse(string $source): array
     {
         $reader = new Reader($source);

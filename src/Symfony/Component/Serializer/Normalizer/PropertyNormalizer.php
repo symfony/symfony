@@ -55,8 +55,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
@@ -65,8 +63,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
@@ -74,9 +70,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;
@@ -101,9 +94,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
@@ -137,9 +127,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
         $reflectionObject = new \ReflectionObject($object);
@@ -158,9 +145,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return array_unique($attributes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
         try {
@@ -187,9 +171,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         return $reflectionProperty->getValue($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         try {

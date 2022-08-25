@@ -36,9 +36,6 @@ class LoaderResolver implements LoaderResolverInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(mixed $resource, string $type = null): LoaderInterface|false
     {
         foreach ($this->loaders as $loader) {

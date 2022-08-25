@@ -26,9 +26,6 @@ class XliffFileDumper extends FileDumper
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = []): string
     {
         $xliffVersion = '1.2';
@@ -52,9 +49,6 @@ class XliffFileDumper extends FileDumper
         throw new InvalidArgumentException(sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtension(): string
     {
         return $this->extension;

@@ -45,9 +45,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
         $this->mimeTypeGuesser = $mimeTypeGuesser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): string
     {
         if (!$object instanceof \SplFileInfo) {
@@ -72,8 +69,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
@@ -82,8 +77,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Regex adapted from Brian Grinstead code.
      *
      * @see https://gist.github.com/bgrins/6194623
@@ -118,8 +111,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
@@ -127,9 +118,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
         return isset(self::SUPPORTED_TYPES[$type]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

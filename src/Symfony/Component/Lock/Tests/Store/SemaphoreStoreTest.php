@@ -25,9 +25,6 @@ class SemaphoreStoreTest extends AbstractStoreTest
     use BlockingStoreTestTrait;
     use UnserializableTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getStore(): PersistingStoreInterface
     {
         return new SemaphoreStore();

@@ -37,9 +37,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $nodeBuilder;
     protected $normalizeKeys = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(?string $name, NodeParentInterface $parent = null)
     {
         parent::__construct($name, $parent);
@@ -48,17 +45,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $this->trueEquivalent = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setBuilder(NodeBuilder $builder)
     {
         $this->nodeBuilder = $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function children(): NodeBuilder
     {
         return $this->getNodeBuilder();
@@ -335,9 +326,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function append(NodeDefinition $node): static
     {
         $this->children[$node->name] = $node->setParent($this);
@@ -357,9 +345,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this->nodeBuilder->setParent($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createNode(): NodeInterface
     {
         if (null === $this->prototype) {

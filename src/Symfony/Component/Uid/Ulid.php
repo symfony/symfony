@@ -59,9 +59,6 @@ class Ulid extends AbstractUid
         return $ulid[0] <= '7';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function fromString(string $ulid): static
     {
         if (36 === \strlen($ulid) && Uuid::isValid($ulid)) {

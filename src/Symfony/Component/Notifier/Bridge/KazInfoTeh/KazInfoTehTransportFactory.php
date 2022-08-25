@@ -21,9 +21,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class KazInfoTehTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * {@inheritdoc}
-     */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
@@ -41,9 +38,6 @@ final class KazInfoTehTransportFactory extends AbstractTransportFactory
         return (new KazInfoTehTransport($username, $password, $sender, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getSupportedSchemes(): array
     {
         return ['kaz-info-teh'];

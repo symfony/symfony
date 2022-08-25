@@ -46,9 +46,6 @@ class PathPackage extends Package
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUrl(string $path): string
     {
         $versionedPath = parent::getUrl($path);

@@ -27,9 +27,6 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
     private ?TokenInterface $token = null;
     private ?\Closure $initializer = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToken(): ?TokenInterface
     {
         if ($initializer = $this->initializer) {
@@ -40,9 +37,6 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
         return $this->token;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setToken(TokenInterface $token = null)
     {
         if ($token) {

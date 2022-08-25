@@ -27,9 +27,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class ScalarNode extends VariableNode
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function validateType(mixed $value)
     {
         if (!\is_scalar($value) && null !== $value) {
@@ -43,9 +40,6 @@ class ScalarNode extends VariableNode
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isValueEmpty(mixed $value): bool
     {
         // assume environment variables are never empty (which in practice is likely to be true during runtime)
@@ -57,9 +51,6 @@ class ScalarNode extends VariableNode
         return null === $value || '' === $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValidPlaceholderTypes(): array
     {
         return ['bool', 'int', 'float', 'string'];

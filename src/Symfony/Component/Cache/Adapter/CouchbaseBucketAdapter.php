@@ -156,9 +156,6 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         return $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids): iterable
     {
         $resultsCouchbase = $this->bucket->get($ids);
@@ -174,17 +171,11 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         return $results;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id): bool
     {
         return false !== $this->bucket->get($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace): bool
     {
         if ('' === $namespace) {
@@ -196,9 +187,6 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids): bool
     {
         $results = $this->bucket->remove(array_values($ids));
@@ -213,9 +201,6 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         return 0 === \count($results);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

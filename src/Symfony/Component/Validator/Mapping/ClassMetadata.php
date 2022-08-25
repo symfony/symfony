@@ -120,9 +120,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __sleep(): array
     {
         $parentProperties = parent::__sleep();
@@ -141,9 +138,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClassName(): string
     {
         return $this->name;
@@ -168,8 +162,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * If the constraint {@link Cascade} is added, the cascading strategy will be
      * changed to {@link CascadingStrategy::CASCADE}.
      *
@@ -363,25 +355,16 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasPropertyMetadata(string $property): bool
     {
         return \array_key_exists($property, $this->members);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPropertyMetadata(string $property): array
     {
         return $this->members[$property] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConstrainedProperties(): array
     {
         return array_keys($this->members);
@@ -419,17 +402,11 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasGroupSequence(): bool
     {
         return isset($this->groupSequence) && \count($this->groupSequence->groups) > 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getGroupSequence(): ?GroupSequence
     {
         return $this->groupSequence;
@@ -461,17 +438,11 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         $this->groupSequenceProvider = $active;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isGroupSequenceProvider(): bool
     {
         return $this->groupSequenceProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCascadingStrategy(): int
     {
         return $this->cascadingStrategy;

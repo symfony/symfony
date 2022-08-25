@@ -22,9 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddMimeTypeGuesserPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if ($container->has('mime_types')) {

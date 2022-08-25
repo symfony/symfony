@@ -44,9 +44,6 @@ class ContainerAwareEventManager extends EventManager
         $this->subscribers = $subscriberIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dispatchEvent($eventName, EventArgs $eventArgs = null): void
     {
         if (!$this->initializedSubscribers) {
@@ -68,8 +65,6 @@ class ContainerAwareEventManager extends EventManager
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return object[][]
      */
     public function getListeners($event = null): array
@@ -94,9 +89,6 @@ class ContainerAwareEventManager extends EventManager
         return $this->listeners;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasListeners($event): bool
     {
         if (!$this->initializedSubscribers) {
@@ -106,9 +98,6 @@ class ContainerAwareEventManager extends EventManager
         return isset($this->listeners[$event]) && $this->listeners[$event];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addEventListener($events, $listener): void
     {
         if (!$this->initializedSubscribers) {
@@ -130,9 +119,6 @@ class ContainerAwareEventManager extends EventManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function removeEventListener($events, $listener): void
     {
         if (!$this->initializedSubscribers) {

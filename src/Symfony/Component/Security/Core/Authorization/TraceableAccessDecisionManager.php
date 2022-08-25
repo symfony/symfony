@@ -45,9 +45,6 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {
         $currentDecisionLog = [

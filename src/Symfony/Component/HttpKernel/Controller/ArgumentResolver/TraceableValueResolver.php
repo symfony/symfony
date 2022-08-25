@@ -54,9 +54,6 @@ final class TraceableValueResolver implements ArgumentValueResolverInterface, Va
         return $return;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $method = \get_class($this->inner).'::'.__FUNCTION__;

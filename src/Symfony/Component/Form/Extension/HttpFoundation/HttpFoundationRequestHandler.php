@@ -35,9 +35,6 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $this->serverParams = $serverParams ?? new ServerParams();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handleRequest(FormInterface $form, mixed $request = null)
     {
         if (!$request instanceof Request) {
@@ -109,9 +106,6 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $form->submit($data, 'PATCH' !== $method);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFileUpload(mixed $data): bool
     {
         return $data instanceof File;

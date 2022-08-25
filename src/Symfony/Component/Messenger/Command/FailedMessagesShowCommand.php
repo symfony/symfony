@@ -29,9 +29,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 #[AsCommand(name: 'messenger:failed:show', description: 'Show one or more messages from the failure transport')]
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -55,9 +52,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);

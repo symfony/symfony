@@ -40,9 +40,6 @@ class PreloadedExtension implements FormExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getType(string $name): FormTypeInterface
     {
         if (!isset($this->types[$name])) {
@@ -52,34 +49,22 @@ class PreloadedExtension implements FormExtensionInterface
         return $this->types[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasType(string $name): bool
     {
         return isset($this->types[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeExtensions(string $name): array
     {
         return $this->typeExtensions[$name]
             ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasTypeExtensions(string $name): bool
     {
         return !empty($this->typeExtensions[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         return $this->typeGuesser;

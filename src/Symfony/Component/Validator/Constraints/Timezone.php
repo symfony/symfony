@@ -79,9 +79,6 @@ class Timezone extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption(): ?string
     {
         return 'zone';

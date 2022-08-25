@@ -33,9 +33,6 @@ class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->handler->onAuthenticationFailure($request, $exception);

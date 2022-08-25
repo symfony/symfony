@@ -89,9 +89,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $pruned;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids): iterable
     {
         if ($this->appendOnly) {
@@ -165,9 +162,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         goto begin;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id): bool
     {
         if ($this->appendOnly && isset($this->values[$id])) {
@@ -205,9 +199,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $now < $expiresAt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime): array|bool
     {
         $ok = true;
@@ -267,9 +258,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace): bool
     {
         $this->values = [];
@@ -277,9 +265,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $this->doCommonClear($namespace);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids): bool
     {
         foreach ($ids as $id) {

@@ -28,18 +28,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class BaseType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setDisabled($options['disabled']);
         $builder->setAutoInitialize($options['auto_initialize']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $name = $form->getName();
@@ -118,9 +112,6 @@ abstract class BaseType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

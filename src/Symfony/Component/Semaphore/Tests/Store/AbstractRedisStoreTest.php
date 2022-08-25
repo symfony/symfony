@@ -21,9 +21,6 @@ abstract class AbstractRedisStoreTest extends AbstractStoreTest
 {
     abstract protected function getRedisConnection(): \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new RedisStore($this->getRedisConnection());

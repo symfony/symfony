@@ -28,9 +28,6 @@ class NullSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doRead(string $sessionId): string
     {
         return '';
@@ -41,17 +38,11 @@ class NullSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $sessionId, string $data): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDestroy(string $sessionId): bool
     {
         return true;

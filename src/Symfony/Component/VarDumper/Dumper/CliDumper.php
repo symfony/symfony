@@ -61,9 +61,6 @@ class CliDumper extends AbstractDumper
 
     private bool $handlesHrefGracefully;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($output = null, string $charset = null, int $flags = 0)
     {
         parent::__construct($output, $charset, $flags);
@@ -122,9 +119,6 @@ class CliDumper extends AbstractDumper
         $this->displayOptions = $displayOptions + $this->displayOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value)
     {
         $this->dumpKey($cursor);
@@ -185,9 +179,6 @@ class CliDumper extends AbstractDumper
         $this->endValue($cursor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
     {
         $this->dumpKey($cursor);
@@ -273,9 +264,6 @@ class CliDumper extends AbstractDumper
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
     {
         if (null === $this->colors) {
@@ -314,9 +302,6 @@ class CliDumper extends AbstractDumper
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
     {
         if (empty($cursor->attr['cut_hash'])) {
@@ -545,9 +530,6 @@ class CliDumper extends AbstractDumper
         return static::$defaultColors = $this->hasColorSupport($h);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dumpLine(int $depth, bool $endOfValue = false)
     {
         if ($this->colors) {

@@ -69,9 +69,6 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user): UserInterface
     {
         $class = $this->getClass();
@@ -103,17 +100,12 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $refreshedUser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class): bool
     {
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void

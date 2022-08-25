@@ -68,17 +68,11 @@ class Regex extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption(): ?string
     {
         return 'pattern';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredOptions(): array
     {
         return ['pattern'];

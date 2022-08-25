@@ -55,9 +55,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->hasVarDumper = class_exists(ClassStub::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         if (null === $this->tokenStorage) {
@@ -205,9 +202,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->data = [];
@@ -350,9 +344,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['authenticators'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'security';

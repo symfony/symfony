@@ -111,8 +111,6 @@ final class LazyCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      */
     public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null /* array|\Closure $suggestedValues = [] */): static
@@ -124,8 +122,6 @@ final class LazyCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      */
     public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null /* array|\Closure $suggestedValues = [] */): static

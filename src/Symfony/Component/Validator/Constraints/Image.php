@@ -93,9 +93,6 @@ class Image extends File
     public $allowPortraitMessage = 'The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.';
     public $corruptedMessage = 'The image file is corrupted.';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         array $options = null,
         int|string $maxSize = null,

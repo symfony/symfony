@@ -204,9 +204,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInfo(string $type = null): mixed
     {
         if (!$info = $this->finalInfo) {
@@ -235,9 +232,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         return null !== $type ? $info[$type] ?? null : $info;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent(bool $throw = true): string
     {
         $performing = self::$performing;
@@ -265,9 +259,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private static function schedule(self $response, array &$runningResponses): void
     {
         if (isset($runningResponses[$i = (int) $response->multi->handle])) {
@@ -284,8 +275,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param CurlClientState $multi
      */
     private static function perform(ClientState $multi, array &$responses = null): void
@@ -343,8 +332,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param CurlClientState $multi
      */
     private static function select(ClientState $multi, float $timeout): int

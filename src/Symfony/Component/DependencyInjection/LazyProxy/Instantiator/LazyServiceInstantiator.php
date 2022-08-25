@@ -23,9 +23,6 @@ use Symfony\Component\VarExporter\LazyGhostObjectTrait;
  */
 final class LazyServiceInstantiator implements InstantiatorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object
     {
         $dumper = new LazyServiceDumper();

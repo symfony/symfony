@@ -37,6 +37,7 @@ class ChainDecoderTest extends TestCase
                 [self::FORMAT_2, [], false],
                 [self::FORMAT_3, [], false],
                 [self::FORMAT_3, ['foo' => 'bar'], true],
+                [self::FORMAT_3, ['foo' => 'bar2'], false],
             ]);
 
         $this->decoder2 = $this->createMock(DecoderInterface::class);
@@ -46,6 +47,8 @@ class ChainDecoderTest extends TestCase
                 [self::FORMAT_1, [], false],
                 [self::FORMAT_2, [], true],
                 [self::FORMAT_3, [], false],
+                [self::FORMAT_3, ['foo' => 'bar'], false],
+                [self::FORMAT_3, ['foo' => 'bar2'], true],
             ]);
 
         $this->chainDecoder = new ChainDecoder([$this->decoder1, $this->decoder2]);
@@ -53,10 +56,26 @@ class ChainDecoderTest extends TestCase
 
     public function testSupportsDecoding()
     {
+        $this->decoder1
+            ->method('decode')
+            ->willReturn('result1');
+        $this->decoder2
+            ->method('decode')
+            ->willReturn('result2');
+
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_1));
+        $this->assertEquals('result1', $this->chainDecoder->decode('', self::FORMAT_1, []));
+
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_2));
+        $this->assertEquals('result2', $this->chainDecoder->decode('', self::FORMAT_2, []));
+
         $this->assertFalse($this->chainDecoder->supportsDecoding(self::FORMAT_3));
+
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar']));
+        $this->assertEquals('result1', $this->chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar']));
+
+        $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar2']));
+        $this->assertEquals('result2', $this->chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar2']));
     }
 
     public function testDecode()

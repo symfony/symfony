@@ -7,6 +7,24 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.45 (2022-08-26)
+
+ * bug #47358 Fix broken request stack state if throwable is thrown. (Warxcell)
+ * bug #47304 [Serializer] Fix caching context-aware encoders/decoders in ChainEncoder/ChainDecoder (Guite)
+ * bug #47329 Email image parts: regex for single closing quote (rr-it)
+ * bug #47200 [Form] ignore missing keys when mapping DateTime objects to uninitialized arrays (xabbuh)
+ * bug #47189 [Validator] Add additional hint when `egulias/email-validator` needs to be installed (mpdude)
+ * bug #47195 [FrameworkBundle] fix writes to static $kernel property (xabbuh)
+ * bug #47175 [DowCrawler] Fix locale-sensitivity of whitespace normalization (nicolas-grekas)
+ * bug #47171 [TwigBridge] suggest to install the Twig bundle when the required component is already installed (xabbuh)
+ * bug #47161 [Mailer] Fix logic (fabpot)
+ * bug #47157 [Messenger] Fix Doctrine transport on MySQL (nicolas-grekas)
+ * bug #46190 [Translation] Fix translator overlapse (Xavier RENAUDIN)
+ * bug #47142 [Mailer] Fix error message in case of an STMP error (fabpot)
+ * bug #47145 [HttpClient] Fix shared connections not being freed on PHP < 8 (nicolas-grekas)
+ * bug #47143 [HttpClient] Fix memory leak when using StreamWrapper (nicolas-grekas)
+ * bug #47130 [HttpFoundation] Fix invalid ID not regenerated with native PHP file sessions (BrokenSourceCode)
+
 * 4.4.44 (2022-07-29)
 
  * bug #47069 [Security] Allow redirect after login to absolute URLs (Tim Ward)

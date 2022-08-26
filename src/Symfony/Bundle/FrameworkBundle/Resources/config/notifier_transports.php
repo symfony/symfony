@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
@@ -281,5 +282,10 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.zendesk', ZendeskTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
+
+        ->set('notifier.transport_factory.chatwork', ChatworkTransportFactory::class)
+        ->parent('notifier.transport_factory.abstract')
+        ->tag('chatter.transport_factory')
+
     ;
 };

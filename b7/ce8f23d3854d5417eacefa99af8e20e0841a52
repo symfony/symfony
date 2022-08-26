@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-25T14:42:07Z
+
+Is there a php-cs-fixer rule that we could enable to enforce this?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-25T14:48:29Z
+
+> Is there a php-cs-fixer rule that we could enable to enforce this?
+
+[yes](https://cs.symfony.com/doc/rules/phpdoc/phpdoc_no_useless_inheritdoc.html). And it's already in the `Symfony` package, and we already [enable it](https://github.com/symfony/symfony/blob/6.2/.php-cs-fixer.dist.php#L29).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-25T14:50:04Z
+
+Really? I've never seen fabbot generate a patch to remove inheritdoc :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-25T14:50:25Z
+
+This should target 6.2 btw!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-25T14:52:28Z
+
+Seems like yes! https://github.com/FriendsOfPHP/PHP-CS-Fixer/blob/master/doc/rules/phpdoc/no_superfluous_phpdoc_tags.rst#remove_inheritdoc (late submit sorry^^)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-25T14:53:48Z
+
+> remove_inheritdoc: Default value: false
+
+So we need to enable this
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-25T14:57:51Z
+
+But:
+
+>@Symfony
+Using the [@Symfony](https://cs.symfony.com/doc/ruleSets/Symfony.html) rule set will enable the phpdoc_no_useless_inheritdoc rule.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-25T14:59:49Z
+
+Not with the `remove_inheritdoc` setting:
+<img width="796" alt="Screenshot 2022-08-25 at 16 59 25" src="https://user-images.githubusercontent.com/7502063/186699913-c851e187-88f5-4eab-9e41-0d3ad88f8618.png">
+https://github.com/FriendsOfPHP/PHP-CS-Fixer/blob/master/doc/ruleSets/Symfony.rst
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-25T15:00:25Z
+
+`phpdoc_no_useless_inheritdoc` is a different thing https://cs.symfony.com/doc/rules/phpdoc/phpdoc_no_useless_inheritdoc.html
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-25T15:07:05Z
+
+ok, I added
+```
+'no_superfluous_phpdoc_tags' => ['remove_inheritdoc' => true],
+```
+in the configuration of php-cs-fixer
+
+And I also changed the base branch to 6.2
+
+---
+
+```
+>…regoire/dev/github.com/lyrixx/symfony(inherit) rg inheritdoc
+src/Symfony/Component/DependencyInjection/Compiler/AutowireRequiredMethodsPass.php
+67:                    if (false === stripos($doc, '@inheritdoc') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+(?:\{@inheritdoc\}|@inheritdoc)(?:\s|\*/$)#i', $doc)) {
+
+src/Symfony/Component/DependencyInjection/Tests/Fixtures/includes/autowiring_classes.php
+244:    /** @inheritdoc*/ // <- brackets are missing on purpose
+250:    /** {@inheritdoc} */
+309:        // @required should be ignored when the child does not add @inheritdoc
+```
+
+the last remaining occurrences seems legit.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-08-25T17:39:56Z
+
+it should be noted `@inheritdoc` does not exists (it's implicit): https://docs.phpdoc.org/guide/references/phpdoc/tags/index.html#tag-reference
+
+only _inline_ variant exists, which serves a "description decoration" purpose: https://docs.phpdoc.org/guide/guides/inheritance.html#the-inheritdoc-tag
+
+>  The inline tag {@inheritDoc} is used in a description to import the description of a parent element

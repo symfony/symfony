@@ -906,11 +906,11 @@ index 5014b9bd51..757c76f546 100644
 +    public function decode(string $data, string $format, array $context = []): mixed;
  
      /**
-@@ -45,4 +45,4 @@ interface DecoderInterface
+@@ -44,4 +44,4 @@ interface DecoderInterface
       * @return bool
       */
--    public function supportsDecoding(string $format /* , array $context = [] */);
-+    public function supportsDecoding(string $format /* , array $context = [] */): bool;
+-    public function supportsDecoding(string $format);
++    public function supportsDecoding(string $format): bool;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 index 391cdcb39c..f637687e74 100644

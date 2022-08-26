@@ -699,10 +699,12 @@ class LokaliseProviderTest extends ProviderTestCase
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
             'messages' => ['a' => 'trans_en_a'],
             'validators' => ['post.num_comments' => '{count, plural, one {# comment} other {# comments}}'],
+            'domain_without_missing_messages' => [],
         ]));
         $translatorBag->addCatalogue(new MessageCatalogue('fr', [
             'messages' => ['a' => 'trans_fr_a'],
             'validators' => ['post.num_comments' => '{count, plural, one {# commentaire} other {# commentaires}}'],
+            'domain_without_missing_messages' => [],
         ]));
 
         $provider = $this->createProvider(

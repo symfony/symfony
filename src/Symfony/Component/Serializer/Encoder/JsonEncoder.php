@@ -39,18 +39,12 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
         return $this->decodingImpl->decode($data, self::FORMAT, $context);
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsEncoding(string $format /* , array $context = [] */): bool
+    public function supportsEncoding(string $format): bool
     {
         return self::FORMAT === $format;
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDecoding(string $format /* , array $context = [] */): bool
+    public function supportsDecoding(string $format): bool
     {
         return self::FORMAT === $format;
     }

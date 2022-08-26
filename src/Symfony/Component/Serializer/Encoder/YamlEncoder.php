@@ -62,10 +62,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
         return $this->dumper->dump($data, $context[self::YAML_INLINE], $context[self::YAML_INDENT], $context[self::YAML_FLAGS]);
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsEncoding(string $format /* , array $context = [] */): bool
+    public function supportsEncoding(string $format): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
@@ -77,10 +74,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
         return $this->parser->parse($data, $context[self::YAML_FLAGS]);
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDecoding(string $format /* , array $context = [] */): bool
+    public function supportsDecoding(string $format): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }

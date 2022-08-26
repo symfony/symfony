@@ -120,10 +120,12 @@ final class LokaliseProvider implements ProviderInterface
         $keysIds = [];
 
         foreach ($catalogue->getDomains() as $domain) {
-            $keysToDelete = [];
-            foreach (array_keys($catalogue->all($domain)) as $key) {
-                $keysToDelete[] = $key;
+            $keysToDelete = array_keys($catalogue->all($domain));
+
+            if (!$keysToDelete) {
+                continue;
             }
+
             $keysIds += $this->getKeysIds($keysToDelete, $domain);
         }
 

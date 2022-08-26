@@ -36,7 +36,7 @@ final class EmailHeaderSame extends Constraint
      */
     protected function matches($message): bool
     {
-        if (RawMessage::class === \get_class($message)) {
+        if (RawMessage::class === $message::class) {
             throw new \LogicException('Unable to test a message header on a RawMessage instance.');
         }
 

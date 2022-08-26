@@ -143,7 +143,7 @@ EOF
         $hashedPassword = $hasher->hash($password, $salt);
 
         $rows = [
-            ['Hasher used', \get_class($hasher)],
+            ['Hasher used', $hasher::class],
             ['Password hash', $hashedPassword],
         ];
         if (!$emptySalt) {

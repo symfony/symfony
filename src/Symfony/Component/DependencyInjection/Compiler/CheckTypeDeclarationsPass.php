@@ -258,7 +258,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $class = ServiceLocator::class;
             } elseif (\is_object($value)) {
-                $class = \get_class($value);
+                $class = $value::class;
             } else {
                 $class = \gettype($value);
                 $class = ['integer' => 'int', 'double' => 'float', 'boolean' => 'bool'][$class] ?? $class;

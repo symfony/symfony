@@ -156,7 +156,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $data = [];
         $stack = [];
         $attributes = $this->getAttributes($object, $format, $context);
-        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
+        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
         $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($class)->getAttributesMetadata();
         if (isset($context[self::MAX_DEPTH_HANDLER])) {
             $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER];
@@ -248,7 +248,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function getAttributes(object $object, ?string $format, array $context): array
     {
-        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
+        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
         $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {
@@ -318,7 +318,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $reflectionClass = new \ReflectionClass($type);
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
-        $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
+        $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
 
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {

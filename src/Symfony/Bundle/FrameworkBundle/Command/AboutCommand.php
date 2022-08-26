@@ -67,7 +67,7 @@ EOT
             new TableSeparator(),
             ['<info>Kernel</>'],
             new TableSeparator(),
-            ['Type', \get_class($kernel)],
+            ['Type', $kernel::class],
             ['Environment', $kernel->getEnvironment()],
             ['Debug', $kernel->isDebug() ? 'true' : 'false'],
             ['Charset', $kernel->getCharset()],

@@ -98,7 +98,7 @@ class TextDescriptor extends Descriptor
             ['Scheme', $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY'],
             ['Method', $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'],
             ['Requirements', $route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'],
-            ['Class', \get_class($route)],
+            ['Class', $route::class],
             ['Defaults', $this->formatRouterConfig($defaults)],
             ['Options', $this->formatRouterConfig($route->getOptions())],
         ];
@@ -156,7 +156,7 @@ class TextDescriptor extends Descriptor
             $options['output']->table(
                 ['Service ID', 'Class'],
                 [
-                    [$options['id'] ?? '-', \get_class($service)],
+                    [$options['id'] ?? '-', $service::class],
                 ]
             );
         }
@@ -244,7 +244,7 @@ class TextDescriptor extends Descriptor
                 $alias = $definition;
                 $tableRows[] = array_merge([$styledServiceId, sprintf('alias for "%s"', $alias)], $tagsCount ? array_fill(0, $tagsCount, '') : []);
             } else {
-                $tableRows[] = array_merge([$styledServiceId, \get_class($definition)], $tagsCount ? array_fill(0, $tagsCount, '') : []);
+                $tableRows[] = array_merge([$styledServiceId, $definition::class], $tagsCount ? array_fill(0, $tagsCount, '') : []);
             }
         }
 
@@ -625,7 +625,7 @@ class TextDescriptor extends Descriptor
         }
 
         if (method_exists($callable, '__invoke')) {
-            return sprintf('%s::__invoke()', \get_class($callable));
+            return sprintf('%s::__invoke()', $callable::class);
         }
 
         throw new \InvalidArgumentException('Callable is not describable.');

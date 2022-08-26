@@ -70,7 +70,7 @@ class Passport
      */
     public function addBadge(BadgeInterface $badge): static
     {
-        $this->badges[\get_class($badge)] = $badge;
+        $this->badges[$badge::class] = $badge;
 
         return $this;
     }

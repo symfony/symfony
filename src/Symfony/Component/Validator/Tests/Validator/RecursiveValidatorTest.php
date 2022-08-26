@@ -1258,7 +1258,7 @@ class RecursiveValidatorTest extends TestCase
             $context->addViolation('Violation in Group 3');
         };
 
-        $metadata = new ClassMetadata(\get_class($entity));
+        $metadata = new ClassMetadata($entity::class);
         $metadata->addConstraint(new Callback([
             'callback' => function () {},
             'groups' => 'Group 1',

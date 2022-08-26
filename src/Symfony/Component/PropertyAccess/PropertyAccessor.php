@@ -381,7 +381,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $result = self::RESULT_PROTO;
         $object = $zval[self::VALUE];
-        $class = \get_class($object);
+        $class = $object::class;
         $access = $this->getReadInfo($class, $property);
 
         if (null !== $access) {
@@ -502,7 +502,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $object = $zval[self::VALUE];
-        $class = \get_class($object);
+        $class = $object::class;
         $mutator = $this->getWriteInfo($class, $property, $value);
 
         if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
@@ -597,13 +597,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function isPropertyWritable(object $object, string $property): bool
     {
-        $mutatorForArray = $this->getWriteInfo(\get_class($object), $property, []);
+        $mutatorForArray = $this->getWriteInfo($object::class, $property, []);
 
         if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType() || ($object instanceof \stdClass && property_exists($object, $property))) {
             return true;
         }
 
-        $mutator = $this->getWriteInfo(\get_class($object), $property, '');
+        $mutator = $this->getWriteInfo($object::class, $property, '');
 
         return PropertyWriteInfo::TYPE_NONE !== $mutator->getType() || ($object instanceof \stdClass && property_exists($object, $property));
     }

@@ -65,7 +65,7 @@ class GhostObjectState
         }
 
         if (self::STATUS_UNINITIALIZED_FULL === $this->status) {
-            if ($defaultProperties = array_diff_key(GhostObjectRegistry::$defaultProperties[\get_class($instance)], (array) $instance)) {
+            if ($defaultProperties = array_diff_key(GhostObjectRegistry::$defaultProperties[$instance::class], (array) $instance)) {
                 Hydrator::hydrate($instance, $defaultProperties);
             }
 
@@ -77,7 +77,7 @@ class GhostObjectState
 
         $value = ($this->initializer)(...[$instance, $propertyName, $propertyScope]);
 
-        $propertyScope ??= \get_class($instance);
+        $propertyScope ??= $instance::class;
         $accessor = GhostObjectRegistry::$classAccessors[$propertyScope] ??= GhostObjectRegistry::getClassAccessors($propertyScope);
 
         $accessor['set']($instance, $propertyName, $value);

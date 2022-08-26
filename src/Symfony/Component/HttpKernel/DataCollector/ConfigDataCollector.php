@@ -62,7 +62,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = new ClassStub(\get_class($bundle));
+                $this->data['bundles'][$name] = new ClassStub($bundle::class);
             }
         }
 

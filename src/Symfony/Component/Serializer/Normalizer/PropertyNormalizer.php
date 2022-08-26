@@ -59,7 +59,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
-        return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
+        return parent::supportsNormalization($data, $format) && $this->supports($data::class);
     }
 
     /**
@@ -164,7 +164,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
                 || ($reflectionProperty->isProtected() && !\array_key_exists("\0*\0{$reflectionProperty->name}", $propertyValues))
                 || ($reflectionProperty->isPrivate() && !\array_key_exists("\0{$reflectionProperty->class}\0{$reflectionProperty->name}", $propertyValues))
             ) {
-                throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', \get_class($object), $reflectionProperty->name));
+                throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $object::class, $reflectionProperty->name));
             }
         }
 

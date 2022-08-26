@@ -45,7 +45,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
 
         $this->objectClassResolver = $objectClassResolver ?? function ($class) {
-            return \is_object($class) ? \get_class($class) : $class;
+            return \is_object($class) ? $class::class : $class;
         };
     }
 
@@ -56,7 +56,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
-        if (\stdClass::class === \get_class($object)) {
+        if (\stdClass::class === $object::class) {
             return array_keys((array) $object);
         }
 
@@ -119,7 +119,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
-        $cacheKey = \get_class($object);
+        $cacheKey = $object::class;
         if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {
             $this->discriminatorCache[$cacheKey] = null;
             if (null !== $this->classDiscriminatorResolver) {
@@ -147,7 +147,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         if (null !== $this->classDiscriminatorResolver) {
-            $class = \is_object($classOrObject) ? \get_class($classOrObject) : $classOrObject;
+            $class = \is_object($classOrObject) ? $classOrObject::class : $classOrObject;
             if (null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForMappedObject($classOrObject)) {
                 $allowedAttributes[] = $attributesAsString ? $discriminatorMapping->getTypeProperty() : new AttributeMetadata($discriminatorMapping->getTypeProperty());
             }

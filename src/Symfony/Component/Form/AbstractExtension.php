@@ -137,7 +137,7 @@ abstract class AbstractExtension implements FormExtensionInterface
                 throw new UnexpectedTypeException($type, FormTypeInterface::class);
             }
 
-            $this->types[\get_class($type)] = $type;
+            $this->types[$type::class] = $type;
         }
     }
 

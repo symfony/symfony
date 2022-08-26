@@ -126,7 +126,7 @@ class CacheClearCommandTest extends TestCase
         \Closure::bind(function (Container $class) {
             unset($class->loadedDynamicParameters['kernel.build_dir']);
             unset($class->parameters['kernel.build_dir']);
-        }, null, \get_class($container))($container);
+        }, null, $container::class)($container);
 
         $input = new ArrayInput(['cache:clear']);
         $application = new Application($kernel);

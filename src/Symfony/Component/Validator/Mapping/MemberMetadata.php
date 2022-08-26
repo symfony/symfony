@@ -132,7 +132,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      */
     public function getReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
-        $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
+        $className = \is_string($objectOrClassName) ? $objectOrClassName : $objectOrClassName::class;
         if (!isset($this->reflMember[$className])) {
             $this->reflMember[$className] = $this->newReflectionMember($objectOrClassName);
         }

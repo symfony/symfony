@@ -135,7 +135,7 @@ EOF
     {
         foreach ($classMetadata->getConstraints() as $constraint) {
             yield [
-                'class' => \get_class($constraint),
+                'class' => $constraint::class,
                 'groups' => $constraint->groups,
                 'options' => $this->getConstraintOptions($constraint),
             ];
@@ -161,7 +161,7 @@ EOF
         foreach ($propertyMetadata as $metadata) {
             foreach ($metadata->getConstraints() as $constraint) {
                 $data[] = [
-                    'class' => \get_class($constraint),
+                    'class' => $constraint::class,
                     'groups' => $constraint->groups,
                     'options' => $this->getConstraintOptions($constraint),
                 ];

@@ -37,6 +37,6 @@ trait ClassResolverTrait
             return ltrim($value, '\\');
         }
 
-        return \get_class($value);
+        return $value::class;
     }
 }

@@ -293,7 +293,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertSame('parentClass', $factory[0]->getClass());
 
         $argument = $container->getDefinition('sibling')->getArgument(0);
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($argument));
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', $argument::class);
         $this->assertSame('parentClass', $argument->getClass());
 
         $properties = $container->getDefinition('sibling')->getProperties();

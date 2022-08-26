@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-23T14:14:00Z
+
+Looks like a new feature to me.
+
+---------------------------------------------------------------------------
+
+by lpd-au at 2022-08-23T14:14:56Z
+
+> Looks like a new feature to me.
+
+In what way? It's fixing a regression in 3.2.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-23T14:17:19Z
+
+It's not supported today, so that's a new feature.
+
+---------------------------------------------------------------------------
+
+by lpd-au at 2022-08-23T14:19:01Z
+
+Strange perspective, not throwing a TypeError on valid input is a feature?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-23T14:21:42Z
+
+> Strange perspective, not throwing a TypeError on valid input is a feature?
+
+But then, everything is a bug fix.
+Anyway, we favor stability over everything else in our maintained branches, so we're very strict in what we consider a bug.
+
+---------------------------------------------------------------------------
+
+by lpd-au at 2022-08-23T14:30:25Z
+
+> But then, everything is a bug fix.
+> Anyway, we favor stability over everything else in our maintained branches, so we're very strict in what we consider a bug.
+
+I don't understand the point you're trying to make, there's a great scope between fixing a thrown `Error` and adding new functionality. Nonetheless, this should have little to no backwards compatibility impact; if your code was working beforehand, it'll still work now.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-08-23T21:20:17Z
+
+> It's not supported today, so that's a new feature.
+
+But it was at some point 🤔 I don't know how Symfony handles regressions though ([Wikipedia says regressions are bugs](https://en.wikipedia.org/wiki/Software_regression)).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-26T08:54:39Z
+
+Symfony 3.2 EOLed was 5 years ago. Nobody reported this since then. So, that's a new feature.
+As I said, we have a very strict definition of what is considered a new feature vs a bug.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Ippey at 2022-08-26T07:16:32Z
+
+@fabpot Thank you, I applied those suggestions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-26T07:37:42Z
+
+@Ippey Can you open a PR on symfony/recipes (like this [one](https://github.com/symfony/recipes/pull/1108/files) for instance).

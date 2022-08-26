@@ -29,7 +29,7 @@ class FFICasterTest extends TestCase
         if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && 'preload' === \ini_get('ffi.enable')) {
             return;
         }
-        if (!filter_var(\ini_get('ffi.enable'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (!filter_var(\ini_get('ffi.enable'), \FILTER_VALIDATE_BOOL)) {
             $this->markTestSkipped('FFI not enabled for CLI SAPI');
         }
     }

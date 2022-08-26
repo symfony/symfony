@@ -26,9 +26,6 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     private static int $counter = 0;
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name): array|bool|string|int|float|null
     {
         if (str_starts_with($name, 'env(') && str_ends_with($name, ')') && 'env()' !== $name) {
@@ -135,9 +132,6 @@ class EnvPlaceholderParameterBag extends ParameterBag
         return $this->providedTypes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve()
     {
         if ($this->resolved) {

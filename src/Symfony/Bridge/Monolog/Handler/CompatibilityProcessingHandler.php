@@ -26,9 +26,6 @@ if (Logger::API >= 3) {
     {
         abstract private function doWrite(array|LogRecord $record): void;
 
-        /**
-         * {@inheritdoc}
-         */
         protected function write(LogRecord $record): void
         {
             $this->doWrite($record);
@@ -46,9 +43,6 @@ if (Logger::API >= 3) {
     {
         abstract private function doWrite(array|LogRecord $record): void;
 
-        /**
-         * {@inheritdoc}
-         */
         protected function write(array $record): void
         {
             $this->doWrite($record);

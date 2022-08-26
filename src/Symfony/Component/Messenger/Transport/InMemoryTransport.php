@@ -52,17 +52,11 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         return array_values($this->decode($this->queue));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         $this->acknowledged[] = $this->encode($envelope);
@@ -74,9 +68,6 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $this->rejected[] = $this->encode($envelope);
@@ -88,9 +79,6 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         $id = $this->nextId++;

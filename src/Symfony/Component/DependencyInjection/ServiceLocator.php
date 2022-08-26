@@ -33,9 +33,6 @@ class ServiceLocator implements ServiceProviderInterface, \Countable
     private ?string $externalId = null;
     private ?Container $container = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $id): mixed
     {
         if (!$this->externalId) {

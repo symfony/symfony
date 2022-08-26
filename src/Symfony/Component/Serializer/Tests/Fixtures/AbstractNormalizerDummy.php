@@ -20,39 +20,24 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class AbstractNormalizerDummy extends AbstractNormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
     {
         return parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return true;

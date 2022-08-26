@@ -43,17 +43,12 @@ final class HttplugPromise implements HttplugPromiseInterface
         $this->promise->cancel();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getState(): string
     {
         return $this->promise->getState();
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return Psr7ResponseInterface|mixed
      */
     public function wait($unwrap = true): mixed

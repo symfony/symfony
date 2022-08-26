@@ -183,9 +183,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $this->surrogate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
@@ -239,9 +236,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $response;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function terminate(Request $request, Response $response)
     {
         // Do not call any listeners in case of a cache hit.

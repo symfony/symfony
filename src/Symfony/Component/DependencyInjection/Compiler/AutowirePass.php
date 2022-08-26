@@ -61,9 +61,6 @@ class AutowirePass extends AbstractRecursivePass
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->populateCombinedAliases($container);
@@ -84,9 +81,6 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         try {

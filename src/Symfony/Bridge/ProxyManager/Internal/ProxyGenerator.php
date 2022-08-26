@@ -21,9 +21,6 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class ProxyGenerator implements ProxyGeneratorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function generate(\ReflectionClass $originalClass, ClassGenerator $classGenerator, array $proxyOptions = []): void
     {
         (new LazyLoadingValueHolderGenerator())->generate($originalClass, $classGenerator, $proxyOptions);

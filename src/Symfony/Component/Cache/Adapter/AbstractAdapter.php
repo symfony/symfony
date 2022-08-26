@@ -129,9 +129,6 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): bool
     {
         $ok = true;

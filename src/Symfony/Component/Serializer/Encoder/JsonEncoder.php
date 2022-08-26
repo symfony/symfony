@@ -29,25 +29,17 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
         $this->decodingImpl = $decodingImpl ?? new JsonDecode([JsonDecode::ASSOCIATIVE => true]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(mixed $data, string $format, array $context = []): string
     {
         return $this->encodingImpl->encode($data, self::FORMAT, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(string $data, string $format, array $context = []): mixed
     {
         return $this->decodingImpl->decode($data, self::FORMAT, $context);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsEncoding(string $format /* , array $context = [] */): bool
@@ -56,8 +48,6 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsDecoding(string $format /* , array $context = [] */): bool

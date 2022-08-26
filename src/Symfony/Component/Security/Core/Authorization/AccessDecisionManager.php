@@ -48,8 +48,6 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
 
     /**
      * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
-     *
-     * {@inheritdoc}
      */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {

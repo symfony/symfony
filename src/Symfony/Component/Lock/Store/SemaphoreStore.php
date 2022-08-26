@@ -40,17 +40,11 @@ class SemaphoreStore implements BlockingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $this->lock($key, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function waitAndSave(Key $key)
     {
         $this->lock($key, true);
@@ -79,9 +73,6 @@ class SemaphoreStore implements BlockingStoreInterface
         $key->markUnserializable();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         // The lock is maybe not acquired.
@@ -96,17 +87,11 @@ class SemaphoreStore implements BlockingStoreInterface
         $key->removeState(__CLASS__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, the semaphore locks forever.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         return $key->hasState(__CLASS__);

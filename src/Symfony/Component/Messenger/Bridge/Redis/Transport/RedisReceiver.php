@@ -34,9 +34,6 @@ class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         $message = $this->connection->get();
@@ -69,25 +66,16 @@ class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
         return [$envelope->with(new RedisReceivedStamp($message['id']))];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         $this->connection->ack($this->findRedisReceivedStamp($envelope)->getId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $this->connection->reject($this->findRedisReceivedStamp($envelope)->getId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         return $this->connection->getMessageCount();

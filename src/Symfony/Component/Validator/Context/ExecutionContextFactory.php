@@ -32,9 +32,6 @@ class ExecutionContextFactory implements ExecutionContextFactoryInterface
         $this->translationDomain = $translationDomain;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createContext(ValidatorInterface $validator, mixed $root): ExecutionContextInterface
     {
         return new ExecutionContext(

@@ -58,9 +58,6 @@ class Serializer implements SerializerInterface
         return new self($serializer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
@@ -90,9 +87,6 @@ class Serializer implements SerializerInterface
         return new Envelope($message, $stamps);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(Envelope $envelope): array
     {
         $context = $this->context;

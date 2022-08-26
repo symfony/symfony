@@ -20,9 +20,6 @@ trait ResetLimiterTrait
     private StorageInterface $storage;
     private string $id;
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset(): void
     {
         try {

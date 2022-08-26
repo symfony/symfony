@@ -64,9 +64,6 @@ class StreamOutput extends Output
         return $this->stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $message, bool $newline)
     {
         if ($newline) {

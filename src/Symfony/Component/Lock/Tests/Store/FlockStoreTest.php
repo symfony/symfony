@@ -25,9 +25,6 @@ class FlockStoreTest extends AbstractStoreTest
     use SharedLockStoreTestTrait;
     use UnserializableTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getStore(): PersistingStoreInterface
     {
         return new FlockStore();

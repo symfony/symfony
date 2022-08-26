@@ -50,9 +50,6 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
         parent::__construct($globalReceiverName, $failureTransports);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -83,9 +80,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));

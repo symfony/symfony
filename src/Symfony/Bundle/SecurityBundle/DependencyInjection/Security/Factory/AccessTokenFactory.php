@@ -64,9 +64,6 @@ final class AccessTokenFactory extends AbstractFactory
         return self::PRIORITY;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getKey(): string
     {
         return 'access_token';

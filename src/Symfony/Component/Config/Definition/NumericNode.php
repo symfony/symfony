@@ -30,9 +30,6 @@ class NumericNode extends ScalarNode
         $this->max = $max;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function finalizeValue(mixed $value): mixed
     {
         $value = parent::finalizeValue($value);
@@ -53,9 +50,6 @@ class NumericNode extends ScalarNode
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isValueEmpty(mixed $value): bool
     {
         // a numeric value cannot be empty

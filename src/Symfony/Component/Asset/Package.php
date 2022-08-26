@@ -32,17 +32,11 @@ class Package implements PackageInterface
         $this->context = $context ?? new NullContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVersion(string $path): string
     {
         return $this->versionStrategy->getVersion($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUrl(string $path): string
     {
         if ($this->isAbsoluteUrl($path)) {

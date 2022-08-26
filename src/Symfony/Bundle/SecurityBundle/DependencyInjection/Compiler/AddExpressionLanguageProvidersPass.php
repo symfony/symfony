@@ -22,9 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddExpressionLanguageProvidersPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if ($container->has('security.expression_language')) {

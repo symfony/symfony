@@ -55,9 +55,6 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         return $this->decoratedFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         if (\is_string($value)) {
@@ -89,9 +86,6 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         return $this->decoratedFactory->createListFromChoices($choices, $value, $filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         if (\is_string($value)) {
@@ -123,9 +117,6 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         return $this->decoratedFactory->createListFromLoader($loader, $value, $filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
     {
         $accessor = $this->propertyAccessor;

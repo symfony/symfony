@@ -36,9 +36,6 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface, Val
         return is_a($argument->getType(), \DateTimeInterface::class, true) && $request->attributes->has($argument->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         if (!is_a($argument->getType(), \DateTimeInterface::class, true) || !$request->attributes->has($argument->getName())) {

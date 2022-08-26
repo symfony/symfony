@@ -46,9 +46,6 @@ final class PersistentToken implements PersistentTokenInterface
         $this->lastUsed = $lastUsed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): string
     {
         return $this->class;
@@ -59,25 +56,16 @@ final class PersistentToken implements PersistentTokenInterface
         return $this->userIdentifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSeries(): string
     {
         return $this->series;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTokenValue(): string
     {
         return $this->tokenValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastUsed(): \DateTime
     {
         return $this->lastUsed;

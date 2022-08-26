@@ -52,9 +52,6 @@ class FirePHPHandler extends BaseFirePHPHandler
         $this->headers = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sendHeader($header, $content): void
     {
         if (!self::$sendHeaders) {

@@ -31,9 +31,6 @@ class UserPasswordValidator extends ConstraintValidator
         $this->hasherFactory = $hasherFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $password, Constraint $constraint)
     {
         if (!$constraint instanceof UserPassword) {

@@ -16,25 +16,16 @@ use Doctrine\DBAL\Types\StringType;
 
 class StringWrapperType extends StringType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         return $value instanceof StringWrapper ? $value->getString() : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         return new StringWrapper($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'string_wrapper';

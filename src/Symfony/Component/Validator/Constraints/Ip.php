@@ -86,9 +86,6 @@ class Ip extends Constraint
 
     public $normalizer;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         array $options = null,
         string $version = null,

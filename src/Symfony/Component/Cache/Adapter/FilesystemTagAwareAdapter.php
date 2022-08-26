@@ -41,9 +41,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         $this->init($namespace, $directory);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace): bool
     {
         $ok = $this->doClearCache($namespace);
@@ -90,9 +87,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime, array $addTagData = [], array $removeTagData = []): array
     {
         $failed = $this->doSaveCache($values, $lifetime);
@@ -129,9 +123,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         return $failed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDeleteYieldTags(array $ids): iterable
     {
         foreach ($ids as $id) {
@@ -168,9 +159,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDeleteTagRelations(array $tagData): bool
     {
         foreach ($tagData as $tagId => $idList) {
@@ -183,9 +171,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doInvalidate(array $tagIds): bool
     {
         foreach ($tagIds as $tagId) {

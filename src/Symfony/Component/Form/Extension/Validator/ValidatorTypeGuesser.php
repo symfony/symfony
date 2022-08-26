@@ -64,9 +64,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         $this->metadataFactory = $metadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function guessType(string $class, string $property): ?TypeGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
@@ -74,9 +71,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function guessRequired(string $class, string $property): ?ValueGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
@@ -86,9 +80,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         }, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
@@ -96,9 +87,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function guessPattern(string $class, string $property): ?ValueGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {

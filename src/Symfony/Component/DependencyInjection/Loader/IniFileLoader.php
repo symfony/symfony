@@ -21,9 +21,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class IniFileLoader extends FileLoader
 {
-    /**
-     * {@inheritdoc}
-     */
     public function load(mixed $resource, string $type = null): mixed
     {
         $path = $this->locator->locate($resource);
@@ -54,9 +51,6 @@ class IniFileLoader extends FileLoader
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(mixed $resource, string $type = null): bool
     {
         if (!\is_string($resource)) {

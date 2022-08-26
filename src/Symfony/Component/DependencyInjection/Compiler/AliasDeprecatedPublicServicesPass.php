@@ -19,9 +19,6 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
 {
     private array $aliases = [];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof Reference && isset($this->aliases[$id = (string) $value])) {
@@ -31,9 +28,6 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
         return parent::processValue($value, $isRoot);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         foreach ($container->findTaggedServiceIds('container.private') as $id => $tags) {

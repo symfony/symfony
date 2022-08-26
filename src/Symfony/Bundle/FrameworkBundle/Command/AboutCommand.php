@@ -31,9 +31,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 #[AsCommand(name: 'about', description: 'Display information about the current project')]
 class AboutCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -47,9 +44,6 @@ EOT
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

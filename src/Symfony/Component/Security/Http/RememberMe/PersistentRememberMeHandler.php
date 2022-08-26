@@ -48,9 +48,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $this->secret = $secret;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createRememberMeCookie(UserInterface $user): void
     {
         $series = base64_encode(random_bytes(64));
@@ -61,9 +58,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $this->createCookie(RememberMeDetails::fromPersistentToken($token, time() + $this->options['lifetime']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void
     {
         if (!str_contains($rememberMeDetails->getValue(), ':')) {
@@ -99,9 +93,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearRememberMeCookie(): void
     {
         parent::clearRememberMeCookie();

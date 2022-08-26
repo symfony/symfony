@@ -35,9 +35,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!$this->normalizer instanceof NormalizerInterface) {
@@ -55,9 +52,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $normalized;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         if (!$this->normalizer instanceof NormalizerInterface) {
@@ -67,9 +61,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $this->normalizer->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         if (!$this->normalizer instanceof DenormalizerInterface) {
@@ -87,9 +78,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $denormalized;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         if (!$this->normalizer instanceof DenormalizerInterface) {
@@ -99,9 +87,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $this->normalizer->supportsDenormalization($data, $type, $format, $context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setSerializer(SerializerInterface $serializer)
     {
         if (!$this->normalizer instanceof SerializerAwareInterface) {
@@ -111,9 +96,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $this->normalizer->setSerializer($serializer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setNormalizer(NormalizerInterface $normalizer)
     {
         if (!$this->normalizer instanceof NormalizerAwareInterface) {
@@ -123,9 +105,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $this->normalizer->setNormalizer($normalizer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setDenormalizer(DenormalizerInterface $denormalizer)
     {
         if (!$this->normalizer instanceof DenormalizerAwareInterface) {
@@ -135,9 +114,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $this->normalizer->setDenormalizer($denormalizer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->normalizer instanceof CacheableSupportsMethodInterface && $this->normalizer->hasCacheableSupportsMethod();

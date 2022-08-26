@@ -53,33 +53,21 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $this->lockPath = $lockPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $this->lock($key, false, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveRead(Key $key)
     {
         $this->lock($key, true, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function waitAndSave(Key $key)
     {
         $this->lock($key, false, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function waitAndSaveRead(Key $key)
     {
         $this->lock($key, true, true);
@@ -135,17 +123,11 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $key->markUnserializable();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, the flock locks forever.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         // The lock is maybe not acquired.
@@ -161,9 +143,6 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $key->removeState(__CLASS__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         return $key->hasState(__CLASS__);

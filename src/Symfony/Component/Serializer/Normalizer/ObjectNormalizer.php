@@ -49,17 +49,11 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
         if (\stdClass::class === \get_class($object)) {
@@ -123,9 +117,6 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         return array_keys($attributes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
         $cacheKey = \get_class($object);
@@ -140,9 +131,6 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         return $attribute === $this->discriminatorCache[$cacheKey] ? $this->classDiscriminatorResolver->getTypeForMappedObject($object) : $this->propertyAccessor->getValue($object, $attribute);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         try {
@@ -152,9 +140,6 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
     {
         if (false === $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString)) {

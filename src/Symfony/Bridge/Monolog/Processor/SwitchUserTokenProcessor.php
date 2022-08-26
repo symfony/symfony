@@ -23,17 +23,11 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SwitchUserTokenProcessor extends AbstractTokenProcessor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getKey(): string
     {
         return 'impersonator_token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getToken(): ?TokenInterface
     {
         $token = $this->tokenStorage->getToken();

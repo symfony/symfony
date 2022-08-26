@@ -38,9 +38,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function serialize(mixed $data, string $format, array $context = []): string
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
@@ -56,9 +53,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
@@ -74,9 +68,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
@@ -92,9 +83,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
@@ -110,9 +98,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(mixed $data, string $format, array $context = []): string
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
@@ -128,9 +113,6 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(string $data, string $format, array $context = []): mixed
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
@@ -146,33 +128,21 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $this->serializer->supportsNormalization($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return $this->serializer->supportsDenormalization($data, $type, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsEncoding(string $format, array $context = []): bool
     {
         return $this->serializer->supportsEncoding($format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDecoding(string $format, array $context = []): bool
     {
         return $this->serializer->supportsDecoding($format, $context);

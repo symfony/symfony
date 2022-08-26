@@ -53,8 +53,6 @@ final class LokaliseProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Lokalise API recommends sending payload in chunks of up to 500 keys per request.
      *
      * @see https://app.lokalise.com/api2docs/curl/#transition-create-keys-post

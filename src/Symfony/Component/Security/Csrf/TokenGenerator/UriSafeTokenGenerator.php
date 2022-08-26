@@ -30,9 +30,6 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
         $this->entropy = $entropy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generateToken(): string
     {
         // Generate an URI safe base64 encoded string that does not contain "+",

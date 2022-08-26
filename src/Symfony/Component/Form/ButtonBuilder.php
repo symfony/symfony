@@ -173,9 +173,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
         throw new BadMethodCallException('Buttons do not support data transformers.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAttribute(string $name, mixed $value): static
     {
         $this->attributes[$name] = $value;
@@ -183,9 +180,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAttributes(array $attributes): static
     {
         $this->attributes = $attributes;
@@ -415,9 +409,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
         throw new BadMethodCallException('Buttons do not support event dispatching.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return $this->name;

@@ -43,9 +43,6 @@ class CouchbaseBucketAdapterTest extends AdapterTestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         $client = $defaultLifetime

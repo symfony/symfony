@@ -34,33 +34,21 @@ class FrozenParameterBag extends ParameterBag
         $this->resolved = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         throw new LogicException('Impossible to call clear() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(array $parameters)
     {
         throw new LogicException('Impossible to call add() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove(string $name)
     {
         throw new LogicException('Impossible to call remove() on a frozen ParameterBag.');

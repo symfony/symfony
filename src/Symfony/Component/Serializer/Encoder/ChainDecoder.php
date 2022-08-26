@@ -32,17 +32,11 @@ class ChainDecoder implements ContextAwareDecoderInterface
         $this->decoders = $decoders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function decode(string $data, string $format, array $context = []): mixed
     {
         return $this->getDecoder($format, $context)->decode($data, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDecoding(string $format, array $context = []): bool
     {
         try {

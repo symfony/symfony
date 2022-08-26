@@ -46,9 +46,6 @@ trait TransportResponseTrait
     private ?array $finalInfo = null;
     private ?LoggerInterface $logger = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStatusCode(): int
     {
         if ($this->initializer) {
@@ -58,9 +55,6 @@ trait TransportResponseTrait
         return $this->info['http_code'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHeaders(bool $throw = true): array
     {
         if ($this->initializer) {
@@ -74,9 +68,6 @@ trait TransportResponseTrait
         return $this->headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cancel(): void
     {
         $this->info['canceled'] = true;

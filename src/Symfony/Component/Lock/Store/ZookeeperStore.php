@@ -56,9 +56,6 @@ class ZookeeperStore implements PersistingStoreInterface
         return new \Zookeeper(implode(',', $hosts));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         if ($this->exists($key)) {
@@ -74,9 +71,6 @@ class ZookeeperStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         if (!$this->exists($key)) {
@@ -92,9 +86,6 @@ class ZookeeperStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         $resource = $this->getKeyResource($key);
@@ -105,9 +96,6 @@ class ZookeeperStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, zookeeper locks forever.

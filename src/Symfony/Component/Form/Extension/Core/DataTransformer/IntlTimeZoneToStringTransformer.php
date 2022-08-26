@@ -28,9 +28,6 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
         $this->multiple = $multiple;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform(mixed $intlTimeZone): mixed
     {
         if (null === $intlTimeZone) {
@@ -52,9 +49,6 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
         return $intlTimeZone->getID();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverseTransform(mixed $value): mixed
     {
         if (null === $value) {

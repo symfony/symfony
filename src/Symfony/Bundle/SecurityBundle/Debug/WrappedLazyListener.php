@@ -38,9 +38,6 @@ final class WrappedLazyListener extends AbstractListener
         return $this->listener->supports($request);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticate(RequestEvent $event)
     {
         $startTime = microtime(true);

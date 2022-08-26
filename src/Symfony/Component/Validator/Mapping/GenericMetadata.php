@@ -186,9 +186,6 @@ class GenericMetadata implements MetadataInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConstraints(): array
     {
         return $this->constraints;
@@ -203,8 +200,6 @@ class GenericMetadata implements MetadataInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Aware of the global group (* group).
      */
     public function findConstraints(string $group): array
@@ -212,17 +207,11 @@ class GenericMetadata implements MetadataInterface
         return $this->constraintsByGroup[$group] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCascadingStrategy(): int
     {
         return $this->cascadingStrategy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTraversalStrategy(): int
     {
         return $this->traversalStrategy;

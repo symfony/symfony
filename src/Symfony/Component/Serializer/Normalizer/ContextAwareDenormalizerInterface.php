@@ -21,8 +21,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 interface ContextAwareDenormalizerInterface extends DenormalizerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param array $context options that denormalizers have access to
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool;

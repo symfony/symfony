@@ -42,9 +42,6 @@ class ClassNode extends AbstractNode
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSpecificity(): Specificity
     {
         return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));

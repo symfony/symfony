@@ -61,8 +61,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \InvalidArgumentException if the template does not exist
      */
     public function render(string|TemplateReferenceInterface $name, array $parameters = []): string
@@ -93,9 +91,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         return $content;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(string|TemplateReferenceInterface $name): bool
     {
         try {
@@ -107,9 +102,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(string|TemplateReferenceInterface $name): bool
     {
         $template = $this->parser->parse($name);

@@ -26,9 +26,6 @@ if (Logger::API >= 3) {
     {
         abstract private function doFormat(array|LogRecord $record): mixed;
 
-        /**
-         * {@inheritdoc}
-         */
         public function format(LogRecord $record): mixed
         {
             return $this->doFormat($record);
@@ -46,9 +43,6 @@ if (Logger::API >= 3) {
     {
         abstract private function doFormat(array|LogRecord $record): mixed;
 
-        /**
-         * {@inheritdoc}
-         */
         public function format(array $record): mixed
         {
             return $this->doFormat($record);

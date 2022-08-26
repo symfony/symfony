@@ -197,8 +197,6 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws LockExpiredException when save is called on an expired lock
      */
     public function save(Key $key)
@@ -222,8 +220,6 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws LockStorageException
      * @throws LockExpiredException
      */
@@ -243,9 +239,6 @@ class MongoDbStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         $this->getCollection()->deleteOne([ // filter
@@ -254,9 +247,6 @@ class MongoDbStore implements PersistingStoreInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         return null !== $this->getCollection()->findOne([ // filter

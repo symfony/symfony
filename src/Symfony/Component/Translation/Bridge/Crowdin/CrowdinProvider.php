@@ -53,9 +53,6 @@ final class CrowdinProvider implements ProviderInterface
         return sprintf('crowdin://%s', $this->endpoint);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $fileList = $this->getFileList();

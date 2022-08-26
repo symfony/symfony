@@ -53,8 +53,6 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \ReflectionException when a parent class/interface/trait is not found
      */
     public function isFresh(int $timestamp): bool

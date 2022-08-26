@@ -47,25 +47,16 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->entry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         return $this->roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): ?string
     {
         return null;
@@ -84,9 +75,6 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->identifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials()
     {
         $this->password = null;
@@ -102,9 +90,6 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         $this->password = $password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof self) {

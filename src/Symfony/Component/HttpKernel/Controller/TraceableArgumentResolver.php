@@ -28,9 +28,6 @@ class TraceableArgumentResolver implements ArgumentResolverInterface
         $this->stopwatch = $stopwatch;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getArguments(Request $request, callable $controller): array
     {
         $e = $this->stopwatch->start('controller.get_arguments');

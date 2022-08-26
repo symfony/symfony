@@ -20,9 +20,6 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class PhpSerializer implements SerializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body'])) {
@@ -38,9 +35,6 @@ class PhpSerializer implements SerializerInterface
         return $this->safelyUnserialize($serializeEnvelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(Envelope $envelope): array
     {
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);

@@ -56,8 +56,6 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * If the method was called with the same class name (or an object of that
      * class) before, the same metadata instance is returned.
      *
@@ -135,9 +133,6 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasMetadataFor(mixed $value): bool
     {
         if (!\is_object($value) && !\is_string($value)) {

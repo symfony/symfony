@@ -19,9 +19,6 @@ use Symfony\Component\HttpClient\TraceableHttpClient;
 
 final class HttpClientPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('data_collector.http_client')) {

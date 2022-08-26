@@ -29,9 +29,6 @@ class ActivationMiddleware implements MiddlewareInterface
         $this->activated = \is_bool($activated) ? $activated : $activated(...);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if (\is_callable($this->activated) ? ($this->activated)($envelope) : $this->activated) {

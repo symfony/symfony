@@ -71,9 +71,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         $this->release();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquire(bool $blocking = false): bool
     {
         $this->key->resetLifetime();
@@ -127,9 +124,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquireRead(bool $blocking = false): bool
     {
         $this->key->resetLifetime();
@@ -188,9 +182,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refresh(float $ttl = null)
     {
         if (null === $ttl) {
@@ -225,17 +216,11 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function release()
     {
         try {
@@ -257,17 +242,11 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isExpired(): bool
     {
         return $this->key->isExpired();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemainingLifetime(): ?float
     {
         return $this->key->getRemainingLifetime();

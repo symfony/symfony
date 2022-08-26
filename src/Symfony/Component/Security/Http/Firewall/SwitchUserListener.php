@@ -72,9 +72,6 @@ class SwitchUserListener extends AbstractListener
         $this->targetUrl = $targetUrl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         // usernames can be falsy

@@ -31,9 +31,6 @@ class JsonEncode implements EncoderInterface
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(mixed $data, string $format, array $context = []): string
     {
         $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
@@ -56,8 +53,6 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $context
      */
     public function supportsEncoding(string $format /* , array $context = [] */): bool

@@ -26,9 +26,6 @@ final class EmailHeaderSame extends Constraint
         $this->expectedValue = $expectedValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('has header "%s" with value "%s"', $this->headerName, $this->expectedValue);
@@ -36,8 +33,6 @@ final class EmailHeaderSame extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function matches($message): bool
     {
@@ -50,8 +45,6 @@ final class EmailHeaderSame extends Constraint
 
     /**
      * @param RawMessage $message
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($message): string
     {

@@ -56,17 +56,11 @@ class RememberMeToken extends AbstractToken
         return $this->secret;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         return [$this->secret, $this->firewallName, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         [$this->secret, $this->firewallName, $parentData] = $data;

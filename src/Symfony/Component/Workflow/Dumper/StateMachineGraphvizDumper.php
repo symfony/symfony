@@ -17,8 +17,6 @@ use Symfony\Component\Workflow\Marking;
 class StateMachineGraphvizDumper extends GraphvizDumper
 {
     /**
-     * {@inheritdoc}
-     *
      * Dumps the workflow as a graphviz graph.
      *
      * Available options:

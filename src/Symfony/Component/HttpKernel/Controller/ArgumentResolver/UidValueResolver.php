@@ -33,9 +33,6 @@ final class UidValueResolver implements ArgumentValueResolverInterface, ValueRes
             && is_subclass_of($argument->getType(), AbstractUid::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         if ($argument->isVariadic()

@@ -25,9 +25,6 @@ final class TestRepositoryFactory implements RepositoryFactory
      */
     private array $repositoryList = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRepository(EntityManagerInterface $entityManager, $entityName): ObjectRepository
     {
         $repositoryHash = $this->getRepositoryHash($entityManager, $entityName);

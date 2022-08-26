@@ -51,9 +51,6 @@ class Bic extends Constraint
     public $iban;
     public $ibanPropertyPath;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(array $options = null, string $message = null, string $iban = null, string $ibanPropertyPath = null, string $ibanMessage = null, array $groups = null, mixed $payload = null)
     {
         if (!class_exists(Countries::class)) {

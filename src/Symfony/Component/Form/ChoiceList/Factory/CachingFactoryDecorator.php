@@ -77,9 +77,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->decoratedFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         if ($choices instanceof \Traversable) {
@@ -113,9 +110,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         $cache = true;
@@ -151,9 +145,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
     {
         $cache = true;

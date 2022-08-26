@@ -36,9 +36,6 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
         $this->instances[$name] = $instance;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $empty = ['calls' => [], 'adapters' => [], 'config' => [], 'options' => [], 'statistics' => []];
@@ -65,9 +62,6 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
         $this->data['instances']['calls'] = $this->cloneVar($this->data['instances']['calls']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'cache';

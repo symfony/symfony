@@ -45,9 +45,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
         parent::__construct($name, $metaBag);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start(): bool
     {
         if ($this->started) {
@@ -65,9 +62,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function regenerate(bool $destroy = false, int $lifetime = null): bool
     {
         if (!$this->started) {
@@ -81,9 +75,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
         return parent::regenerate($destroy, $lifetime);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save()
     {
         if (!$this->started) {

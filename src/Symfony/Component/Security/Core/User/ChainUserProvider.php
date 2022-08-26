@@ -69,9 +69,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         throw $ex;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user): UserInterface
     {
         $supportedUserFound = false;
@@ -101,9 +98,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class): bool
     {
         foreach ($this->providers as $provider) {
@@ -115,9 +109,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         foreach ($this->providers as $provider) {

@@ -26,9 +26,6 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
         return new Positive();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisons(): array
     {
         return [
@@ -39,9 +36,6 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideInvalidComparisons(): array
     {
         return [

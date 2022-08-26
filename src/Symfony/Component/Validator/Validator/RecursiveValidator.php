@@ -46,9 +46,6 @@ class RecursiveValidator implements ValidatorInterface
         $this->objectInitializers = $objectInitializers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function startContext(mixed $root = null): ContextualValidatorInterface
     {
         return new RecursiveContextualValidator(
@@ -59,9 +56,6 @@ class RecursiveValidator implements ValidatorInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function inContext(ExecutionContextInterface $context): ContextualValidatorInterface
     {
         return new RecursiveContextualValidator(
@@ -72,25 +66,16 @@ class RecursiveValidator implements ValidatorInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadataFor(mixed $object): MetadataInterface
     {
         return $this->metadataFactory->getMetadataFor($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasMetadataFor(mixed $object): bool
     {
         return $this->metadataFactory->hasMetadataFor($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
     {
         return $this->startContext($value)
@@ -98,9 +83,6 @@ class RecursiveValidator implements ValidatorInterface
             ->getViolations();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
     {
         return $this->startContext($object)
@@ -108,9 +90,6 @@ class RecursiveValidator implements ValidatorInterface
             ->getViolations();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): ConstraintViolationListInterface
     {
         // If a class name is passed, take $value as root

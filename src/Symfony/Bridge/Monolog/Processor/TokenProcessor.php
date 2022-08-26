@@ -23,17 +23,11 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class TokenProcessor extends AbstractTokenProcessor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getKey(): string
     {
         return 'token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getToken(): ?TokenInterface
     {
         return $this->tokenStorage->getToken();

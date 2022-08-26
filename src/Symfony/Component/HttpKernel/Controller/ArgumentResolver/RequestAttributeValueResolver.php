@@ -33,9 +33,6 @@ final class RequestAttributeValueResolver implements ArgumentValueResolverInterf
         return !$argument->isVariadic() && $request->attributes->has($argument->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         return !$argument->isVariadic() && $request->attributes->has($argument->getName()) ? [$request->attributes->get($argument->getName())] : [];

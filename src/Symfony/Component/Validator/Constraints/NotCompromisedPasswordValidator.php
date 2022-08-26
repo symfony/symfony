@@ -49,8 +49,6 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ExceptionInterface
      */
     public function validate(mixed $value, Constraint $constraint)

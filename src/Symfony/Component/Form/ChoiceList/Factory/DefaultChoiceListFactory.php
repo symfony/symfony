@@ -30,9 +30,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromChoices(iterable $choices, callable $value = null, callable $filter = null): ChoiceListInterface
     {
         if ($filter) {
@@ -47,9 +44,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ArrayChoiceList($choices, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null, callable $filter = null): ChoiceListInterface
     {
         if ($filter) {
@@ -59,9 +53,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new LazyChoiceList($loader, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(ChoiceListInterface $list, array|callable $preferredChoices = null, callable|false $label = null, callable $index = null, callable $groupBy = null, array|callable $attr = null, array|callable $labelTranslationParameters = []): ChoiceListView
     {
         $preferredViews = [];

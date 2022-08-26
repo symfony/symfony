@@ -19,9 +19,6 @@ use Symfony\Component\Uid\AbstractUid;
 
 final class RegisterUidTypePass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!class_exists(AbstractUid::class)) {

@@ -26,17 +26,12 @@ final class NotificationSubjectContains extends Constraint
         $this->expectedText = $expectedText;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('contains "%s"', $this->expectedText);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param MessageInterface $message
      */
     protected function matches($message): bool
@@ -45,8 +40,6 @@ final class NotificationSubjectContains extends Constraint
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param MessageInterface $message
      */
     protected function failureDescription($message): string

@@ -52,9 +52,6 @@ final class SlidingWindowLimiter implements LimiterInterface
         throw new ReserveNotSupportedException(__CLASS__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(int $tokens = 1): RateLimit
     {
         $this->lock->acquire(true);

@@ -20,9 +20,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class IntegerNode extends NumericNode
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function validateType(mixed $value)
     {
         if (!\is_int($value)) {
@@ -36,9 +33,6 @@ class IntegerNode extends NumericNode
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValidPlaceholderTypes(): array
     {
         return ['int'];

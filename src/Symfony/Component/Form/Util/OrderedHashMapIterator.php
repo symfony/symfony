@@ -78,17 +78,11 @@ class OrderedHashMapIterator implements \Iterator
         array_splice($this->managedCursors, $this->cursorId, 1);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function current(): mixed
     {
         return $this->current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next(): void
     {
         ++$this->cursor;
@@ -102,9 +96,6 @@ class OrderedHashMapIterator implements \Iterator
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function key(): mixed
     {
         if (null === $this->key) {
@@ -114,17 +105,11 @@ class OrderedHashMapIterator implements \Iterator
         return $this->key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function valid(): bool
     {
         return null !== $this->key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rewind(): void
     {
         $this->cursor = 0;

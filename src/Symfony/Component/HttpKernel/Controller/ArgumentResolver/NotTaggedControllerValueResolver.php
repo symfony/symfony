@@ -58,9 +58,6 @@ final class NotTaggedControllerValueResolver implements ArgumentValueResolverInt
         return false === $this->container->has($controller);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         $controller = $request->attributes->get('_controller');

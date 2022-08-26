@@ -32,9 +32,6 @@ final class RoutingExtension extends AbstractExtension
         $this->generator = $generator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [

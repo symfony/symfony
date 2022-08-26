@@ -34,9 +34,6 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         $this->loaders = $loaders ?? new \ArrayIterator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getProvidedTypes(): array
     {
         return [
@@ -62,9 +59,6 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         $i = strpos($name, ':');

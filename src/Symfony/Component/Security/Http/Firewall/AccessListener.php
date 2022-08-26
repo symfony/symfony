@@ -45,9 +45,6 @@ class AccessListener extends AbstractListener
         $this->map = $map;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): ?bool
     {
         [$attributes] = $this->map->getPatterns($request);

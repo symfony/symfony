@@ -123,9 +123,6 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         return $this->info + $this->response->getInfo();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toStream(bool $throw = true)
     {
         if ($throw) {
@@ -146,9 +143,6 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         return $stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cancel(): void
     {
         if ($this->info['canceled']) {

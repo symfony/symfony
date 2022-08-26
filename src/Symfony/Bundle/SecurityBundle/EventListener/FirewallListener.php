@@ -56,9 +56,6 @@ class FirewallListener extends Firewall
         parent::onKernelFinishRequest($event);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

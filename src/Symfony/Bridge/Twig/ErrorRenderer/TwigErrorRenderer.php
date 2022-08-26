@@ -39,9 +39,6 @@ class TwigErrorRenderer implements ErrorRendererInterface
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function render(\Throwable $exception): FlattenException
     {
         $exception = $this->fallbackErrorRenderer->render($exception);

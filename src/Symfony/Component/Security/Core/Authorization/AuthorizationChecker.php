@@ -38,9 +38,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         $this->accessDecisionManager = $accessDecisionManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     final public function isGranted(mixed $attribute, mixed $subject = null): bool
     {
         $token = $this->tokenStorage->getToken();

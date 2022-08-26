@@ -33,9 +33,6 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function encode(mixed $data, string $format, array $context = []): string
     {
         if (!$this->encoder instanceof EncoderInterface) {
@@ -53,9 +50,6 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         return $encoded;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function supportsEncoding(string $format, array $context = []): bool
     {
         if (!$this->encoder instanceof EncoderInterface) {
@@ -65,9 +59,6 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         return $this->encoder->supportsEncoding($format, $context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function decode(string $data, string $format, array $context = []): mixed
     {
         if (!$this->encoder instanceof DecoderInterface) {
@@ -85,9 +76,6 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         return $encoded;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function supportsDecoding(string $format, array $context = []): bool
     {
         if (!$this->encoder instanceof DecoderInterface) {
@@ -97,9 +85,6 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         return $this->encoder->supportsDecoding($format, $context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setSerializer(SerializerInterface $serializer)
     {
         if (!$this->encoder instanceof SerializerAwareInterface) {

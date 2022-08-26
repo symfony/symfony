@@ -52,9 +52,6 @@ class MessageBus implements MessageBusInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dispatch(object $message, array $stamps = []): Envelope
     {
         $envelope = Envelope::wrap($message, $stamps);

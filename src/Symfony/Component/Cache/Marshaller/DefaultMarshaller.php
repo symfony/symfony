@@ -34,9 +34,6 @@ class DefaultMarshaller implements MarshallerInterface
         $this->throwOnSerializationFailure = $throwOnSerializationFailure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function marshall(array $values, ?array &$failed): array
     {
         $serialized = $failed = [];
@@ -59,9 +56,6 @@ class DefaultMarshaller implements MarshallerInterface
         return $serialized;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unmarshall(string $value): mixed
     {
         if ('b:0;' === $value) {

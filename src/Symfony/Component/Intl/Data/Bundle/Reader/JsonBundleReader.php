@@ -23,9 +23,6 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class JsonBundleReader implements BundleReaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function read(string $path, string $locale): mixed
     {
         $fileName = $path.'/'.$locale.'.json';

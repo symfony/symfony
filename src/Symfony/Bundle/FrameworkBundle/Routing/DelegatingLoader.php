@@ -40,9 +40,6 @@ class DelegatingLoader extends BaseDelegatingLoader
         parent::__construct($resolver);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(mixed $resource, string $type = null): RouteCollection
     {
         if ($this->loading) {

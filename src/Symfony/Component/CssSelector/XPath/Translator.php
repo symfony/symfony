@@ -87,9 +87,6 @@ class Translator implements TranslatorInterface
         return sprintf('concat(%s)', implode(', ', $parts));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cssToXPath(string $cssExpr, string $prefix = 'descendant-or-self::'): string
     {
         $selectors = $this->parseSelectors($cssExpr);
@@ -106,9 +103,6 @@ class Translator implements TranslatorInterface
         return implode(' | ', $selectors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function selectorToXPath(SelectorNode $selector, string $prefix = 'descendant-or-self::'): string
     {
         return ($prefix ?: '').$this->nodeToXPath($selector);

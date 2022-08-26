@@ -19,9 +19,6 @@ use Symfony\Component\Notifier\Event\MessageEvent;
  */
 final class NotificationIsQueued extends Constraint
 {
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'is queued';
@@ -29,8 +26,6 @@ final class NotificationIsQueued extends Constraint
 
     /**
      * @param MessageEvent $event
-     *
-     * {@inheritdoc}
      */
     protected function matches($event): bool
     {
@@ -39,8 +34,6 @@ final class NotificationIsQueued extends Constraint
 
     /**
      * @param MessageEvent $event
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($event): string
     {

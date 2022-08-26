@@ -81,9 +81,6 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         $this->namespace = $namespace;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime, array $addTagData = [], array $delTagData = []): array
     {
         $eviction = $this->getRedisEvictionPolicy();
@@ -135,9 +132,6 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         return $failed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDeleteYieldTags(array $ids): iterable
     {
         $lua = <<<'EOLUA'
@@ -176,9 +170,6 @@ EOLUA;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDeleteTagRelations(array $tagData): bool
     {
         $results = $this->pipeline(static function () use ($tagData) {
@@ -194,9 +185,6 @@ EOLUA;
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doInvalidate(array $tagIds): bool
     {
         // This script scans the set of items linked to tag: it empties the set

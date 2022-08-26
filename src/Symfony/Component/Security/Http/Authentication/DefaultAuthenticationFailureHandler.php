@@ -64,9 +64,6 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         $this->options = array_merge($this->defaultOptions, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         $options = $this->options;

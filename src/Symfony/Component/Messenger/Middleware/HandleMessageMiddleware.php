@@ -44,8 +44,6 @@ class HandleMessageMiddleware implements MiddlewareInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NoHandlerForMessageException When no handler is found and $allowNoHandlers is false
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

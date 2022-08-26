@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-08-24T06:30:54Z
+
+if we want to enforce it by rule, we should update psalm.xml
+
+```
+    <forbiddenFunctions>
+        <function name="empty"/>
+    </forbiddenFunctions>
+```
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-08-25T19:33:12Z
+
+Rule added to `psalm.xml`

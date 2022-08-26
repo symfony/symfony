@@ -199,7 +199,7 @@ class Connection
         $queuesOptions = $amqpOptions['queues'];
         unset($amqpOptions['queues'], $amqpOptions['exchange']);
         if (isset($amqpOptions['auto_setup'])) {
-            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
+            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL);
         }
 
         $queuesOptions = array_map(function ($queueOptions) {

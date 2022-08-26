@@ -654,7 +654,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $version);
-        if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+        if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL)) {
             $apcu->setLogger(new NullLogger());
         } elseif (null !== $logger) {
             $apcu->setLogger($logger);

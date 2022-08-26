@@ -199,7 +199,7 @@ class MailjetApiTransport extends AbstractApiTransport
     private function castCustomHeader(string $value, string $type)
     {
         return match ($type) {
-            'bool' => filter_var($value, \FILTER_VALIDATE_BOOLEAN),
+            'bool' => filter_var($value, \FILTER_VALIDATE_BOOL),
             'int' => (int) $value,
             'json' => json_decode($value, true, 2, \JSON_THROW_ON_ERROR),
             'string' => $value,

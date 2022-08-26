@@ -197,7 +197,7 @@ class Connection
         foreach (self::DEFAULT_OPTIONS as $k => $v) {
             $options[$k] = match (\gettype($v)) {
                 'integer' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_INT),
-                'boolean' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_BOOLEAN),
+                'boolean' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_BOOL),
                 'double' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_FLOAT),
                 default => $options[$k] ?? $v,
             };

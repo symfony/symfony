@@ -33,7 +33,7 @@ final class OvhCloudTransportFactory extends AbstractTransportFactory
         $consumerKey = $dsn->getRequiredOption('consumer_key');
         $serviceName = $dsn->getRequiredOption('service_name');
         $sender = $dsn->getOption('sender');
-        $noStopClause = filter_var($dsn->getOption('no_stop_clause', false), \FILTER_VALIDATE_BOOLEAN);
+        $noStopClause = filter_var($dsn->getOption('no_stop_clause', false), \FILTER_VALIDATE_BOOL);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

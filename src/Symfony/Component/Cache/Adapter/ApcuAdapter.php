@@ -49,7 +49,7 @@ class ApcuAdapter extends AbstractAdapter
 
     public static function isSupported()
     {
-        return \function_exists('apcu_fetch') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN);
+        return \function_exists('apcu_fetch') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL);
     }
 
     protected function doFetch(array $ids): iterable
@@ -78,7 +78,7 @@ class ApcuAdapter extends AbstractAdapter
 
     protected function doClear(string $namespace): bool
     {
-        return isset($namespace[0]) && class_exists(\APCUIterator::class, false) && ('cli' !== \PHP_SAPI || filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN))
+        return isset($namespace[0]) && class_exists(\APCUIterator::class, false) && ('cli' !== \PHP_SAPI || filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL))
             ? apcu_delete(new \APCUIterator(sprintf('/^%s/', preg_quote($namespace, '/')), \APC_ITER_KEY))
             : apcu_clear_cache();
     }

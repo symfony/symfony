@@ -342,7 +342,7 @@ class Connection
             ]);
         }
 
-        if (!empty($specialHeaders)) {
+        if ($specialHeaders) {
             $parameters['MessageAttributes'][self::MESSAGE_ATTRIBUTE_NAME] = new MessageAttributeValue([
                 'DataType' => 'String',
                 'StringValue' => json_encode($specialHeaders),

@@ -180,7 +180,7 @@ class Table
     public function setHeaders(array $headers): static
     {
         $headers = array_values($headers);
-        if (!empty($headers) && !\is_array($headers[0])) {
+        if ($headers && !\is_array($headers[0])) {
             $headers = [$headers];
         }
 

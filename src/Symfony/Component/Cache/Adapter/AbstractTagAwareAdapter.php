@@ -286,7 +286,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      */
     public function invalidateTags(array $tags): bool
     {
-        if (empty($tags)) {
+        if (!$tags) {
             return false;
         }
 

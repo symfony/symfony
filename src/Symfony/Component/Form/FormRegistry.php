@@ -152,7 +152,7 @@ class FormRegistry implements FormRegistryInterface
                 }
             }
 
-            $this->guesser = !empty($guessers) ? new FormTypeGuesserChain($guessers) : null;
+            $this->guesser = $guessers ? new FormTypeGuesserChain($guessers) : null;
         }
 
         return $this->guesser;

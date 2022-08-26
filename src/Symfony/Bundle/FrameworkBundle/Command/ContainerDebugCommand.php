@@ -276,7 +276,7 @@ EOF
         }
 
         $matchingServices = $this->findServiceIdsContaining($builder, $name, $showHidden);
-        if (empty($matchingServices)) {
+        if (!$matchingServices) {
             throw new InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 

@@ -1,0 +1,65 @@
+{
+    "signature": {
+        "token": "fafa24ab7699395ccfce2847b87dce8a29f6696a79127ee77c",
+        "timestamp": "1661621361",
+        "signature": "4328a8ea0818dcb218382cf70ccee285c45a8755f5f5616be90b887b67d84593"
+    },
+    "event-data": {
+        "id": "Fs7-5t81S2ispqxqDw2U4Q",
+        "timestamp": 1521472262.908181,
+        "log-level": "warn",
+        "event": "failed",
+        "reason": "generic",
+        "severity": "temporary",
+        "delivery-status": {
+            "attempt-no": 1,
+            "certificate-verified": true,
+            "code": 452,
+            "description": "",
+            "enhanced-code": "4.2.2",
+            "message": "4.2.2 The email account that you tried to reach is over quota. Please direct\n4.2.2 the recipient to\n4.2.2  https://support.example.com/mail/?p=422",
+            "mx-host": "smtp-in.example.com",
+            "retry-seconds": 600,
+            "session-seconds": 0.1281740665435791,
+            "tls": true,
+            "utf8": true
+        },
+        "flags": {
+            "is-authenticated": true,
+            "is-routed": false,
+            "is-system-test": false,
+            "is-test-mode": false
+        },
+        "envelope": {
+            "sender": "bob@app.symfony.com",
+            "transport": "smtp",
+            "targets": "alice@example.com",
+            "sending-ip": "209.61.154.250"
+        },
+        "message": {
+            "attachments": [],
+            "headers": {
+                "message-id": "20130503182626.18666.16540@app.symfony.com",
+                "from": "Bob <bob@app.symfony.com>",
+                "to": "Alice <alice@example.com>",
+                "subject": "Test delivered webhook"
+            },
+            "size": 111
+        },
+        "recipient": "alice@example.com",
+        "recipient-domain": "example.com",
+        "storage": {
+            "key": "message_key",
+            "url": "https://se.api.mailgun.net/v3/domains/app.symfony.com/messages/message_key"
+        },
+        "campaigns": [],
+        "tags": [
+            "my_tag_1",
+            "my_tag_2"
+        ],
+        "user-variables": {
+            "my_var_1": "Mailgun Variable #1",
+            "my-var-2": "awesome"
+        }
+    }
+}

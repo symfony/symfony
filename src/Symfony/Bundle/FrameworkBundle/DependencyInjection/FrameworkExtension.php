@@ -102,10 +102,12 @@ use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory as
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
 use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
@@ -210,6 +212,8 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
+use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
+use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -244,6 +248,7 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\WorkflowInterface;
@@ -403,7 +408,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
-            $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+            $this->registerMailerConfiguration($config['mailer'], $container, $loader, $this->readConfigEnabled('webhook', $container, $config['webhook']));
 
             if (!$this->hasConsole() || !class_exists(MailerTestCommand::class)) {
                 $container->removeDefinition('console.command.mailer_test');
@@ -558,11 +563,19 @@ class FrameworkExtension extends Extension
 
         // notifier depends on messenger, mailer being registered
         if ($this->readConfigEnabled('notifier', $container, $config['notifier'])) {
-            $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
+            $this->registerNotifierConfiguration($config['notifier'], $container, $loader, $this->readConfigEnabled('webhook', $container, $config['webhook']));
         }
 
         // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier, serializer being registered
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+
+        if ($this->readConfigEnabled('webhook', $container, $config['webhook'])) {
+            $this->registerWebhookConfiguration($config['webhook'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('remote-event', $container, $config['remote-event'])) {
+            $this->registerRemoteEventConfiguration($config['remote-event'], $container, $loader);
+        }
 
         if ($this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer'])) {
             if (!class_exists(HtmlSanitizerConfig::class)) {
@@ -678,7 +691,9 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsController::class, static function (ChildDefinition $definition, AsController $attribute): void {
             $definition->addTag('controller.service_arguments');
         });
-
+        $container->registerAttributeForAutoconfiguration(AsRemoteEventConsumer::class, static function (ChildDefinition $definition, AsRemoteEventConsumer $attribute): void {
+            $definition->addTag('remote_event.consumer', ['consumer' => $attribute->name]);
+        });
         $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
             $tagAttributes = get_object_vars($attribute);
             $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
@@ -2467,7 +2482,7 @@ class FrameworkExtension extends Extension
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }
 
-    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $webhookEnabled): void
     {
         if (!class_exists(Mailer::class)) {
             throw new LogicException('Mailer support cannot be enabled as the component is not installed. Try running "composer require symfony/mailer".');
@@ -2512,6 +2527,19 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $webhookRequestParsers = [
+            MailgunRequestParser::class => 'mailer.webhook.request_parser.mailgun',
+            PostmarkRequestParser::class => 'mailer.webhook.request_parser.postmark',
+        ];
+
+        foreach ($webhookRequestParsers as $class => $service) {
+            $package = substr($service, \strlen('mailer.transport_factory.'));
+
+            if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
+                $container->removeDefinition($service);
+            }
+        }
+
         $envelopeListener = $container->getDefinition('mailer.envelope_listener');
         $envelopeListener->setArgument(0, $config['envelope']['sender'] ?? null);
         $envelopeListener->setArgument(1, $config['envelope']['recipients'] ?? null);
@@ -2534,9 +2562,13 @@ class FrameworkExtension extends Extension
         if (!class_exists(MessengerTransportListener::class)) {
             $container->removeDefinition('mailer.messenger_transport_listener');
         }
+
+        if ($webhookEnabled) {
+            $loader->load('mailer_webhook.php');
+        }
     }
 
-    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $webhookEnabled): void
     {
         if (!class_exists(Notifier::class)) {
             throw new LogicException('Notifier support cannot be enabled as the component is not installed. Try running "composer require symfony/notifier".');
@@ -2701,6 +2733,40 @@ class FrameworkExtension extends Extension
                 $notifier->addMethodCall('addAdminRecipient', [new Reference($id)]);
             }
         }
+
+        if ($webhookEnabled) {
+            $loader->load('notifier_webhook.php');
+        }
+    }
+
+    private function registerWebhookConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        if (!class_exists(WebhookController::class)) {
+            throw new LogicException('Webhook support cannot be enabled as the component is not installed. Try running "composer require symfony/webhook".');
+        }
+
+        $loader->load('webhook.php');
+
+        $parsers = [];
+        foreach ($config['routing'] as $type => $cfg) {
+            $parsers[$type] = [
+                'parser' => new Reference($cfg['service']),
+                'secret' => $cfg['secret'],
+            ];
+        }
+
+        $controller = $container->getDefinition('webhook.controller');
+        $controller->replaceArgument(0, $parsers);
+        $controller->replaceArgument(1, new Reference($config['message_bus']));
+    }
+
+    private function registerRemoteEventConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        if (!class_exists(RemoteEvent::class)) {
+            throw new LogicException('RemoteEvent support cannot be enabled as the component is not installed. Try running "composer require symfony/remote-event".');
+        }
+
+        $loader->load('remote_event.php');
     }
 
     private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

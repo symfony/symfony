@@ -42,6 +42,8 @@
             <xsd:element name="notifier" type="notifier" minOccurs="0" maxOccurs="1" />
             <xsd:element name="html-sanitizer" type="html-sanitizer" minOccurs="0" maxOccurs="1" />
             <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="webhook" type="webhook" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="remote-event" type="remote-event" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -915,5 +917,24 @@
             </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="webhook">
+        <xsd:sequence>
+            <xsd:element name="routing" type="webhook_routing" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="message-bus" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="webhook_routing" mixed="true">
+        <xsd:sequence>
+            <xsd:element name="service" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="secret" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="remote-event">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 </xsd:schema>

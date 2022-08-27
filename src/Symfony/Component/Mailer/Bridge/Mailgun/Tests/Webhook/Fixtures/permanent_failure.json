@@ -1,0 +1,59 @@
+{
+    "signature": {
+        "token": "fff0ebc59c0516f4ce0823212a2f45e5c67814420b99fe558b",
+        "timestamp": "1661590666",
+        "signature": "a0cd251821d8fd56a2130b541becc8e441023574e602fe9829a9ab9fbfdea33f"
+    },
+    "event-data": {
+        "id": "G9Bn5sl1TC6nu79C8C0bwg",
+        "timestamp": 1521233195.375624,
+        "log-level": "error",
+        "event": "failed",
+        "severity": "permanent",
+        "reason": "suppress-bounce",
+        "delivery-status": {
+            "attempt-no": 1,
+            "message": "",
+            "code": 605,
+            "enhanced-code": "",
+            "description": "Not delivering to previously bounced address",
+            "session-seconds": 0
+        },
+        "flags": {
+            "is-routed": false,
+            "is-authenticated": true,
+            "is-system-test": false,
+            "is-test-mode": false
+        },
+        "envelope": {
+            "sender": "bob@app.symfony.com",
+            "transport": "smtp",
+            "targets": "alice@example.com"
+        },
+        "message": {
+            "headers": {
+                "to": "Alice <alice@example.com>",
+                "message-id": "20130503192659.13651.20287@app.symfony.com",
+                "from": "Bob <bob@app.symfony.com>",
+                "subject": "Test permanent_fail webhook"
+            },
+            "attachments": [],
+            "size": 111
+        },
+        "recipient": "alice@example.com",
+        "recipient-domain": "example.com",
+        "storage": {
+            "url": "https://se.api.mailgun.net/v3/domains/app.symfony.com/messages/message_key",
+            "key": "message_key"
+        },
+        "campaigns": [],
+        "tags": [
+            "my_tag_1",
+            "my_tag_2"
+        ],
+        "user-variables": {
+            "my_var_1": "Mailgun Variable #1",
+            "my-var-2": "awesome"
+        }
+    }
+}

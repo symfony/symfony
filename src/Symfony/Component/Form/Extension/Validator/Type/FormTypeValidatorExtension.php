@@ -27,19 +27,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FormTypeValidatorExtension extends BaseValidatorExtension
 {
-    private ValidatorInterface $validator;
-    private ViolationMapper $violationMapper;
-    private bool $legacyErrorMessages;
+    private ValidationListener $validationListener;
 
     public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {
-        $this->validator = $validator;
-        $this->violationMapper = new ViolationMapper($formRenderer, $translator);
+        $this->validationListener = new ValidationListener($validator, new ViolationMapper($formRenderer, $translator));
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper));
+        $builder->addEventSubscriber($this->validationListener);
     }
 
     public function configureOptions(OptionsResolver $resolver)

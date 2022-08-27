@@ -29,7 +29,7 @@ class ValidationListener implements EventSubscriberInterface
     private ViolationMapperInterface $violationMapper;
 
     /** @var FormInterface[][] */
-    private static array $dispatchEvents = [];
+    private array $dispatchEvents = [];
 
     public static function getSubscribedEvents(): array
     {
@@ -49,7 +49,7 @@ class ValidationListener implements EventSubscriberInterface
         // Register events to dispatch during (root form) validation
         foreach (ValidatorFormEvents::ALIASES as $eventName) {
             if ($form->getConfig()->getEventDispatcher()->hasListeners($eventName)) {
-                self::$dispatchEvents[$eventName][] = $form;
+                $this->dispatchEvents[$eventName][] = $form;
             }
         }
 
@@ -71,17 +71,17 @@ class ValidationListener implements EventSubscriberInterface
 
     private function dispatchEvents(string $eventName)
     {
-        if (!isset(self::$dispatchEvents[$eventName])) {
+        if (!isset($this->dispatchEvents[$eventName])) {
             return;
         }
 
         $event = array_flip(ValidatorFormEvents::ALIASES)[$eventName];
 
-        foreach (self::$dispatchEvents[$eventName] as $form) {
+        foreach ($this->dispatchEvents[$eventName] as $form) {
             $event = new $event($form, $form->getData());
             $form->getConfig()->getEventDispatcher()->dispatch($event, $eventName);
         }
 
-        unset(self::$dispatchEvents[$eventName]);
+        unset($this->dispatchEvents[$eventName]);
     }
 }

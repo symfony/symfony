@@ -20,6 +20,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @implements DataTransformerInterface<int|float, string>
  */
 class PercentToLocalizedStringTransformer implements DataTransformerInterface
 {

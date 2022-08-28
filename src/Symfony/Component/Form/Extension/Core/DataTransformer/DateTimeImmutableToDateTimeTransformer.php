@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * Transforms between a DateTimeImmutable object and a DateTime object.
  *
  * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
+ *
+ * @implements DataTransformerInterface<\DateTimeImmutable, \DateTime>
  */
 final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInterface
 {

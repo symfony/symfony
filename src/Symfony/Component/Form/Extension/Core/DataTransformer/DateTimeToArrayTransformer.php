@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @extends BaseDateTimeTransformer<array>
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {

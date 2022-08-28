@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @implements DataTransformerInterface<numeric-string, float>
+ */
 class StringToFloatTransformer implements DataTransformerInterface
 {
     private ?int $scale;

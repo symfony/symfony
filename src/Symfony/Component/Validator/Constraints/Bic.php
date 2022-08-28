@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\LogicException;
  *
  * @author Michael Hirschler <michael.vhirsch@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
 class Bic extends Constraint
 {
     public const INVALID_LENGTH_ERROR = '66dad313-af0b-4214-8566-6c799be9789c';

@@ -17,7 +17,7 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
 class AtLeastOneOf extends Composite
 {
     public const AT_LEAST_ONE_OF_ERROR = 'f27e6d6c-261a-4056-b391-6673a623531c';

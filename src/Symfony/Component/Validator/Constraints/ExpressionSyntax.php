@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Andrey Sevastianov <mrpkmail@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
 class ExpressionSyntax extends Constraint
 {
     public const EXPRESSION_SYNTAX_ERROR = 'e219aa22-8b11-48ec-81a0-fc07cdb0e13f';

@@ -845,8 +845,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!$userProvider) {
             throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "switch_user" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
         }
-        if ($stateless && null !== $config['target_url']) {
-            throw new InvalidConfigurationException(sprintf('Cannot set a "target_url" for the "switch_user" listener on the "%s" firewall as it is stateless.', $id));
+        if ($stateless && null !== $config['target_route']) {
+            throw new InvalidConfigurationException(sprintf('Cannot set a "target_route" for the "switch_user" listener on the "%s" firewall as it is stateless.', $id));
         }
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
@@ -857,7 +857,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);
         $listener->replaceArgument(9, $stateless);
-        $listener->replaceArgument(10, $config['target_url']);
+        $listener->replaceArgument(11, $config['target_route']);
 
         return $switchUserListenerId;
     }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
@@ -132,6 +133,35 @@ class SmtpTransportTest extends TestCase
         $this->assertContains("MAIL FROM:<sender@xn--exmple-cua.org>\r\n", $stream->getCommands());
         $this->assertContains("RCPT TO:<recipient@xn--exmple-cua.org>\r\n", $stream->getCommands());
         $this->assertContains("RCPT TO:<recipient2@example.org>\r\n", $stream->getCommands());
+    }
+
+    public function testAssertResponseCodeNoCodes()
+    {
+        $this->expectException(LogicException::class);
+        $this->invokeAssertResponseCode('response', []);
+    }
+
+    public function testAssertResponseCodeWithEmptyResponse()
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Expected response code "220" but got empty code.');
+        $this->invokeAssertResponseCode('', [220]);
+    }
+
+    public function testAssertResponseCodeWithNotValidCode()
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Expected response code "220" but got code "550", with message "550 Access Denied".');
+        $this->expectExceptionCode(550);
+        $this->invokeAssertResponseCode('550 Access Denied', [220]);
+    }
+
+    private function invokeAssertResponseCode(string $response, array $codes): void
+    {
+        $transport = new SmtpTransport($this->getMockForAbstractClass(AbstractStream::class));
+        $m = new \ReflectionMethod($transport, 'assertResponseCode');
+        $m->setAccessible(true);
+        $m->invoke($transport, $response, $codes);
     }
 }
 

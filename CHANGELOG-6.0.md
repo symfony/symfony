@@ -799,4 +799,3 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #41298 [Notifier] Remove deprecation in slack-notifier (jschaedl)
  * feature #41203 [FrameworkBundle] Add autowiring alias for `HttpCache\StoreInterface` (nicolas-grekas)
  * feature #41282 Bump Symfony 6 to PHP 8 (nicolas-grekas)
-

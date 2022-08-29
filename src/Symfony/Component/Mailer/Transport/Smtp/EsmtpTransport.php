@@ -100,7 +100,9 @@ class EsmtpTransport extends SmtpTransport
 
     protected function doHeloCommand(): void
     {
-        $capabilities = $this->callHeloCommand();
+        if (!$capabilities = $this->callHeloCommand()) {
+            return;
+        }
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
@@ -129,6 +131,8 @@ class EsmtpTransport extends SmtpTransport
         } catch (TransportExceptionInterface $e) {
             try {
                 parent::doHeloCommand();
+
+                return [];
             } catch (TransportExceptionInterface $ex) {
                 if (!$ex->getCode()) {
                     throw $e;

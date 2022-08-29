@@ -29,10 +29,11 @@ class ServerDumper implements DataDumperInterface
      * @param string                     $host             The server host
      * @param DataDumperInterface|null   $wrappedDumper    A wrapped instance used whenever we failed contacting the server
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
+     * @param bool                       $asyncClient      Create async connection to TCP-server
      */
-    public function __construct(string $host, DataDumperInterface $wrappedDumper = null, array $contextProviders = [])
+    public function __construct(string $host, DataDumperInterface $wrappedDumper = null, array $contextProviders = [], bool $asyncClient = true)
     {
-        $this->connection = new Connection($host, $contextProviders);
+        $this->connection = new Connection($host, $contextProviders, $asyncClient);
         $this->wrappedDumper = $wrappedDumper;
     }
 

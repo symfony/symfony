@@ -25,6 +25,11 @@ class Connection
     private array $contextProviders;
 
     /**
+     * @var bool Make connection async
+     */
+    private bool $asyncClient;
+
+    /**
      * @var resource|null
      */
     private $socket;
@@ -33,13 +38,14 @@ class Connection
      * @param string                     $host             The server host
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
      */
-    public function __construct(string $host, array $contextProviders = [])
+    public function __construct(string $host, array $contextProviders = [], bool $asyncClient = true)
     {
         if (!str_contains($host, '://')) {
             $host = 'tcp://'.$host;
         }
 
         $this->host = $host;
+        $this->asyncClient = $asyncClient;
         $this->contextProviders = $contextProviders;
     }
 
@@ -91,7 +97,7 @@ class Connection
     {
         set_error_handler([self::class, 'nullErrorHandler']);
         try {
-            return stream_socket_client($this->host, $errno, $errstr, 3, \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT);
+            return stream_socket_client($this->host, $errno, $errstr, 3, $this->asyncClient ? \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT : \STREAM_CLIENT_CONNECT);
         } finally {
             restore_error_handler();
         }

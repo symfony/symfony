@@ -26,7 +26,8 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
-        ->set('validator.mapping.cache.file', param('kernel.cache_dir').'/validation.php');
+        ->set('validator.mapping.cache.file', param('kernel.cache_dir').'/validation.php')
+    ;
 
     $container->services()
         ->set('validator', ValidatorInterface::class)
@@ -104,7 +105,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('validator.auto_mapper')
 
-        ->set('controller.is_granted_attribute_listener', ConstraintAttributeListener::class)
+        ->set('controller.constraint_attribute_listener', ConstraintAttributeListener::class)
             ->args([
                 service('validator'),
             ])

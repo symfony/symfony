@@ -312,7 +312,8 @@ class SmtpTransport extends AbstractTransport
         if (!$valid || !$response) {
             $codeStr = $code ? sprintf('code "%s"', $code) : 'empty code';
             $responseStr = $response ? sprintf(', with message "%s"', trim($response)) : '';
-            throw new TransportException(sprintf('Expected response code "%s" but got ', implode('/', $codes), $codeStr).$codeStr.$responseStr.'.', $code);
+
+            throw new TransportException(sprintf('Expected response code "%s" but got ', implode('/', $codes)).$codeStr.$responseStr.'.', $code ?: 0);
         }
     }
 

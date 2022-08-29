@@ -379,6 +379,7 @@
 {%- endblock form_rows -%}
 
 {%- block widget_attributes -%}
+    {{- " " -}}
     id="{{ id }}" name="{{ full_name }}"
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
@@ -386,11 +387,13 @@
 {%- endblock widget_attributes -%}
 
 {%- block widget_container_attributes -%}
+    {{- " " -}}
     {%- if id is not empty %}id="{{ id }}"{% endif -%}
     {{ block('attributes') }}
 {%- endblock widget_container_attributes -%}
 
 {%- block button_attributes -%}
+    {{- " " -}}
     id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%}
     {{ block('attributes') }}
 {%- endblock button_attributes -%}

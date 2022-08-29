@@ -490,6 +490,11 @@ class Filesystem
         // Construct $endPath from traversing to the common path, then to the remaining $endPath
         $relativePath = $traverser.('' !== $endPathRemainder ? $endPathRemainder.'/' : '');
 
+        // Remove ending "/" if $endPath points to existing file
+        if (file_exists($endPath) && !is_dir($endPath) && '/' === substr($relativePath, -1)) {
+            $relativePath = substr($relativePath, 0, \strlen($relativePath) - 1);
+        }
+
         return '' === $relativePath ? './' : $relativePath;
     }
 

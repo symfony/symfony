@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -21,23 +23,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @author Dynèsh Hassanaly <artyum@protonmail.com>
  */
-class ConstraintAttributeListener
+class ConstraintAttributeListener implements EventSubscriberInterface
 {
     public function __construct(private readonly ValidatorInterface $validator) {
-    }
-
-    private function getReflectionMethod(callable $controller): \ReflectionMethod
-    {
-        if (is_array($controller)) {
-            $class = $controller[0];
-            $method = $controller[1];
-        } else {
-            /** @var object $controller */
-            $class = $controller;
-            $method = '__invoke';
-        }
-
-        return new \ReflectionMethod($class, $method);
     }
 
     public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
@@ -65,5 +53,24 @@ class ConstraintAttributeListener
                 }
             }
         }
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 10]];
+    }
+
+    private function getReflectionMethod(callable $controller): \ReflectionMethod
+    {
+        if (is_array($controller)) {
+            $class = $controller[0];
+            $method = $controller[1];
+        } else {
+            /** @var object $controller */
+            $class = $controller;
+            $method = '__invoke';
+        }
+
+        return new \ReflectionMethod($class, $method);
     }
 }

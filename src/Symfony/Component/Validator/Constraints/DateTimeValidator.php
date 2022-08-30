@@ -48,7 +48,7 @@ class DateTimeValidator extends DateValidator
 
         \DateTime::createFromFormat($constraint->format, $value);
 
-        $errors = \DateTime::getLastErrors();
+        $errors = \DateTime::getLastErrors() ?: ['error_count' => 0, 'warnings' => []];
 
         if (0 < $errors['error_count']) {
             $this->context->buildViolation($constraint->message)

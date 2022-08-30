@@ -16,7 +16,6 @@ use Symfony\Component\Form\Exception\AccessException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\Exception\AccessException as PropertyAccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -64,9 +63,7 @@ class PropertyPathAccessor implements DataAccessorInterface
             try {
                 $this->propertyAccessor->setValue($data, $propertyPath, $value);
             } catch (NoSuchPropertyException $e) {
-                throw new NoSuchPropertyException(
-                    $e->getMessage() . ' Make the property public, add a setter, or set the "mapped" field option in the form type to be false.'
-                );
+                throw new NoSuchPropertyException($e->getMessage().' Make the property public, add a setter, or set the "mapped" field option in the form type to be false.');
             }
         }
     }
@@ -87,9 +84,7 @@ class PropertyPathAccessor implements DataAccessorInterface
             return $this->propertyAccessor->getValue($data, $propertyPath);
         } catch (PropertyAccessException $e) {
             if ($e instanceof NoSuchPropertyException) {
-                throw new NoSuchPropertyException(
-                    $e->getMessage() . ' Make the property public, add a getter, or set the "mapped" field option in the form type to be false.'
-                );
+                throw new NoSuchPropertyException($e->getMessage().' Make the property public, add a getter, or set the "mapped" field option in the form type to be false.');
             }
 
             if (!$e instanceof UninitializedPropertyException

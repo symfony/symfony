@@ -42,17 +42,11 @@ class AmqpReceiver implements QueueReceiverInterface, QueueBlockingReceiverInter
         yield from $this->getFromQueues($this->connection->getQueueNames());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pull(callable $callback): void
     {
         $this->pullFromQueues($this->connection->getQueueNames(), $callback);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pullFromQueues(array $queueNames, callable $callback): void
     {
         if (0 === \count($queueNames)) {
@@ -88,9 +82,6 @@ class AmqpReceiver implements QueueReceiverInterface, QueueBlockingReceiverInter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFromQueues(array $queueNames): iterable
     {
         foreach ($queueNames as $queueName) {

@@ -15,6 +15,7 @@ use Symfony\Component\Form\DataAccessorInterface;
 use Symfony\Component\Form\Exception\AccessException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\Exception\AccessException as PropertyAccessException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -60,7 +61,13 @@ class PropertyPathAccessor implements DataAccessorInterface
         // If the data is identical to the value in $data, we are
         // dealing with a reference
         if (!\is_object($data) || !$form->getConfig()->getByReference() || $value !== $this->getPropertyValue($data, $propertyPath)) {
-            $this->propertyAccessor->setValue($data, $propertyPath, $value);
+            try {
+                $this->propertyAccessor->setValue($data, $propertyPath, $value);
+            } catch (NoSuchPropertyException $e) {
+                throw new NoSuchPropertyException(
+                    $e->getMessage() . ' Make the property public, add a setter, or set the "mapped" field option in the form type to be false.'
+                );
+            }
         }
     }
 
@@ -79,8 +86,10 @@ class PropertyPathAccessor implements DataAccessorInterface
         try {
             return $this->propertyAccessor->getValue($data, $propertyPath);
         } catch (PropertyAccessException $e) {
-            if (\is_array($data) && $e instanceof NoSuchIndexException) {
-                return null;
+            if ($e instanceof NoSuchPropertyException) {
+                throw new NoSuchPropertyException(
+                    $e->getMessage() . ' Make the property public, add a getter, or set the "mapped" field option in the form type to be false.'
+                );
             }
 
             if (!$e instanceof UninitializedPropertyException

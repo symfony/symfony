@@ -294,7 +294,7 @@ class XmlDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $factoryXML->setAttribute('service', (string) $factory[0]);
                 } elseif ($factory[0] instanceof Definition) {
-                    throw new \InvalidArgumentException('Factory is not describable.');
+                    $factoryXML->setAttribute('class', $factory[0]->getClass() ?? 'not configured');
                 } else {
                     $factoryXML->setAttribute('class', $factory[0]);
                 }

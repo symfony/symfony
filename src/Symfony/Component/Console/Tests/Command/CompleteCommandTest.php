@@ -102,10 +102,12 @@ class CompleteCommandTest extends TestCase
 
     public function provideCompleteCommandNameInputs()
     {
-        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy']];
-        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy']];
-        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello', 'ahoy']];
-        yield 'complete-aliases' => [['bin/console', 'ah'], ['hello', 'ahoy']];
+        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy', 'h', 'ahah']];
+        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy', 'h', 'ahah']];
+        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello']];
+        yield 'complete-aliases' => [['bin/console', 'ah'], ['ahoy']];
+        yield 'short-alias-completes-to-name' => [['bin/console', 'h'], ['hello']];
+        yield 'ambiguous-of-same-command-completes-to-first-match' => [['bin/console', 'ah'], ['ahoy']];
     }
 
     /**
@@ -123,6 +125,7 @@ class CompleteCommandTest extends TestCase
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
         yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
+        yield 'custom-aliased-input' => [['bin/console', 'ahoy', 'Fa'], ['Fabien', 'Robin', 'Wouter']];
     }
 
     private function execute(array $input)
@@ -137,7 +140,7 @@ class CompleteCommandTest_HelloCommand extends Command
     public function configure(): void
     {
         $this->setName('hello')
-             ->setAliases(['ahoy'])
+             ->setAliases(['ahoy', 'h', 'ahah'])
              ->addArgument('name', InputArgument::REQUIRED)
         ;
     }

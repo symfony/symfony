@@ -87,6 +87,7 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/TestAmbiguousCommandRegistering2.php';
         require_once self::$fixturesPath.'/FooHiddenCommand.php';
         require_once self::$fixturesPath.'/BarHiddenCommand.php';
+        require_once self::$fixturesPath.'/ManyAliasesCommand.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -398,6 +399,18 @@ class ApplicationTest extends TestCase
         $application->add(new \FooSameCaseUppercaseCommand());
 
         $this->assertInstanceOf(\FooSameCaseLowercaseCommand::class, $application->find('FoO:BaR'), '->find() will find two suggestions with case insensitivity');
+    }
+
+    public function testFindSingleWithAmbiguousAliases()
+    {
+        $application = new Application();
+        $application->add(new \ManyAliasesCommand());
+        $application->add(new \AlternativeCommand());
+
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('a'), '->find() will find the correct command using a short alias');
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('alias'), '->find() will find the correct command using a long alias');
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('aliased'), '->find() will find the correct command using the right name');
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('ali'), '->find() will find the correct command using an ambiguous shortened version');
     }
 
     public function testFindWithCommandLoader()

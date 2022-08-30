@@ -4,6 +4,7 @@ CHANGELOG
 6.3
 ---
 
+ * Add `--blocking-mode` option to `messenger:consume` (will use more efficient `consume` method instead of `get` method in amqp transport)
  * Add support for namespace wildcards in the HandlersLocator to allow routing multiple messages within the same namespace
  * Deprecate `Symfony\Component\Messenger\Transport\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of

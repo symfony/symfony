@@ -52,6 +52,36 @@ class AmqpTransportTest extends TestCase
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
+    public function testReceivesMessagesInBlockingMode()
+    {
+        $transport = $this->getTransport(
+            $serializer = $this->createMock(SerializerInterface::class),
+            $connection = $this->getMockBuilder(Connection::class)
+                ->disableOriginalConstructor()
+                ->onlyMethods(['getQueueNames', 'pull'])
+                ->getMock(),
+        );
+
+        $decodedMessage = new DummyMessage('Decoded.');
+
+        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getBody')->willReturn('body');
+        $amqpEnvelope->method('getHeaders')->willReturn(['my' => 'header']);
+
+        $amqpQueue = $this->createMock(\AMQPQueue::class);
+        $amqpQueue->method('getName')->willReturn('queueName');
+
+        $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('pull')->willReturnCallback(function (string $queueName, callable $callback) use ($amqpQueue, $amqpEnvelope) {
+            call_user_func($callback, $amqpEnvelope, $amqpQueue);
+        });
+
+        $transport->pull(function (Envelope $envelope) use ($decodedMessage) {
+            $this->assertSame($decodedMessage, $envelope->getMessage());
+        });
+    }
+
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): AmqpTransport
     {
         $serializer ??= $this->createMock(SerializerInterface::class);

@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Transport\Receiver\BlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -77,8 +78,21 @@ class Worker
             'sleep' => 1000000,
         ], $options);
         $queueNames = $options['queues'] ?? null;
+        $blockingMode = $options['blocking-mode'] ?? false;
 
         $this->metadata->set(['queueNames' => $queueNames]);
+
+        if ($blockingMode) {
+            if (count($this->receivers) > 1) {
+                throw new RuntimeException('In blocking mode only one receiver is supported');
+            }
+
+            foreach ($this->receivers as $transportName => $receiver) {
+                if (!$receiver instanceof BlockingReceiverInterface) {
+                    throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, BlockingReceiverInterface::class));
+                }
+            }
+        }
 
         $this->eventDispatcher?->dispatch(new WorkerStartedEvent($this));
 
@@ -95,21 +109,37 @@ class Worker
             $envelopeHandled = false;
             $envelopeHandledStart = $this->clock->now();
             foreach ($this->receivers as $transportName => $receiver) {
-                if ($queueNames) {
-                    $envelopes = $receiver->getFromQueues($queueNames);
+                if ($blockingMode) {
+                    /** @var BlockingReceiverInterface $receiver */
+
+                    $receiver->pull(function (Envelope $envelope) use ($transportName, &$envelopeHandled) {
+                        $envelopeHandled = true;
+
+                        $this->rateLimit($transportName);
+                        $this->handleMessage($envelope, $transportName);
+                        $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+
+                        if ($this->shouldStop) {
+                            return false;
+                        }
+                    });
                 } else {
-                    $envelopes = $receiver->get();
-                }
+                    if ($queueNames) {
+                        $envelopes = $receiver->getFromQueues($queueNames);
+                    } else {
+                        $envelopes = $receiver->get();
+                    }
 
-                foreach ($envelopes as $envelope) {
-                    $envelopeHandled = true;
+                    foreach ($envelopes as $envelope) {
+                        $envelopeHandled = true;
 
-                    $this->rateLimit($transportName);
-                    $this->handleMessage($envelope, $transportName);
-                    $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+                        $this->rateLimit($transportName);
+                        $this->handleMessage($envelope, $transportName);
+                        $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
 
-                    if ($this->shouldStop) {
-                        break 2;
+                        if ($this->shouldStop) {
+                            break 2;
+                        }
                     }
                 }
 

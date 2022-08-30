@@ -33,6 +33,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\RoutableMessageBus;
+use Symfony\Component\Messenger\Transport\Receiver\BlockingReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 
 /**
@@ -79,6 +80,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
+                new InputOption('blocking-mode', null, InputOption::VALUE_NONE, 'Consume messages in blocking mode. If option is specified only one receiver is supported'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -119,6 +121,13 @@ Use the --queues option to limit a receiver to only certain queues (only support
 Use the --no-reset option to prevent services resetting after each message (may lead to leaking services' state between messages):
 
     <info>php %command.full_name% <receiver-name> --no-reset</info>
+
+Use the --blocking-mode option to force receiver to work in blocking mode
+("consume" method will be used instead of "get" in RabbitMQ for example).
+--queues option will be ignored.
+Only supported by some receivers, and you should pass only one receiver:
+
+    <info>php %command.full_name% <receiver-name> --blocking-mode</info>
 EOF
             )
         ;
@@ -225,6 +234,7 @@ EOF
         $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
+            'blocking-mode' => (bool) $input->getOption('blocking-mode'),
         ];
         if ($queues = $input->getOption('queues')) {
             $options['queues'] = $queues;

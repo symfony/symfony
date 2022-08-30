@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Receiver\BlockingReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -22,7 +24,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class AmqpTransport implements QueueReceiverInterface, TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
+class AmqpTransport implements QueueReceiverInterface, BlockingReceiverInterface, TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
     private Connection $connection;
@@ -40,6 +42,17 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
         return $this->getReceiver()->get();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function pull(callable $callback): void
+    {
+        $this->getReceiver()->pull($callback);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFromQueues(array $queueNames): iterable
     {
         return $this->getReceiver()->getFromQueues($queueNames);

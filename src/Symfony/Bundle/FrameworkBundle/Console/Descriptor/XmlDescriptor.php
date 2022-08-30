@@ -59,17 +59,17 @@ class XmlDescriptor extends Descriptor
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
-        $this->writeDocument($this->getContainerServiceDocument($service, $options['id'], $container, isset($options['show_arguments']) && $options['show_arguments']));
+        $this->writeDocument($this->getContainerServiceDocument($service, $options['id'], $container, isset($options['show_arguments']) && $options['show_arguments'], isset($options['with_aliases']) && $options['with_aliases']));
     }
 
     protected function describeContainerServices(ContainerBuilder $container, array $options = []): void
     {
-        $this->writeDocument($this->getContainerServicesDocument($container, $options['tag'] ?? null, isset($options['show_hidden']) && $options['show_hidden'], isset($options['show_arguments']) && $options['show_arguments'], $options['filter'] ?? null, $options['id'] ?? null));
+        $this->writeDocument($this->getContainerServicesDocument($container, $options['tag'] ?? null, isset($options['show_hidden']) && $options['show_hidden'], isset($options['show_arguments']) && $options['show_arguments'], $options['filter'] ?? null, $options['id'] ?? null, isset($options['with_aliases']) && $options['with_aliases']));
     }
 
     protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
     {
-        $this->writeDocument($this->getContainerDefinitionDocument($definition, $options['id'] ?? null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container));
+        $this->writeDocument($this->getContainerDefinitionDocument($definition, $options['id'] ?? null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, isset($options['with_aliases']) && $options['with_aliases']));
     }
 
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
@@ -254,17 +254,17 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function getContainerServiceDocument(object $service, string $id, ContainerBuilder $container = null, bool $showArguments = false): \DOMDocument
+    private function getContainerServiceDocument(object $service, string $id, ContainerBuilder $container = null, bool $showArguments = false, bool $withAliases = false): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
 
         if ($service instanceof Alias) {
             $dom->appendChild($dom->importNode($this->getContainerAliasDocument($service, $id)->childNodes->item(0), true));
             if ($container) {
-                $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->getDefinition((string) $service), (string) $service, false, $showArguments, $container)->childNodes->item(0), true));
+                $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->getDefinition((string) $service), (string) $service, false, $showArguments, $container, $withAliases)->childNodes->item(0), true));
             }
         } elseif ($service instanceof Definition) {
-            $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($service, $id, false, $showArguments, $container)->childNodes->item(0), true));
+            $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($service, $id, false, $showArguments, $container, $withAliases)->childNodes->item(0), true));
         } else {
             $dom->appendChild($serviceXML = $dom->createElement('service'));
             $serviceXML->setAttribute('id', $id);
@@ -274,7 +274,7 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function getContainerServicesDocument(ContainerBuilder $container, string $tag = null, bool $showHidden = false, bool $showArguments = false, callable $filter = null, string $id = null): \DOMDocument
+    private function getContainerServicesDocument(ContainerBuilder $container, string $tag = null, bool $showHidden = false, bool $showArguments = false, callable $filter = null, string $id = null, bool $withAliases = false): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($containerXML = $dom->createElement('container'));
@@ -297,14 +297,14 @@ class XmlDescriptor extends Descriptor
                 continue;
             }
 
-            $serviceXML = $this->getContainerServiceDocument($service, $serviceId, null, $showArguments);
+            $serviceXML = $this->getContainerServiceDocument($service, $serviceId, null, $showArguments, $withAliases);
             $containerXML->appendChild($containerXML->ownerDocument->importNode($serviceXML->childNodes->item(0), true));
         }
 
         return $dom;
     }
 
-    private function getContainerDefinitionDocument(Definition $definition, string $id = null, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null): \DOMDocument
+    private function getContainerDefinitionDocument(Definition $definition, string $id = null, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null, bool $withAliases = false): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($serviceXML = $dom->createElement('definition'));
@@ -365,7 +365,7 @@ class XmlDescriptor extends Descriptor
         }
 
         if ($showArguments) {
-            foreach ($this->getArgumentNodes($definition->getArguments(), $dom, $container) as $node) {
+            foreach ($this->getArgumentNodes($definition->getArguments(), $dom, $container, $withAliases) as $node) {
                 $serviceXML->appendChild($node);
             }
         }
@@ -404,7 +404,7 @@ class XmlDescriptor extends Descriptor
     /**
      * @return \DOMNode[]
      */
-    private function getArgumentNodes(array $arguments, \DOMDocument $dom, ContainerBuilder $container = null): array
+    private function getArgumentNodes(array $arguments, \DOMDocument $dom, ContainerBuilder $container = null, bool $withAliases = false): array
     {
         $nodes = [];
 
@@ -420,23 +420,29 @@ class XmlDescriptor extends Descriptor
             }
 
             if ($argument instanceof Reference) {
+                $node = $container?->getCompiler()?->getServiceReferenceGraph()?->getNode((string) $argument);
+
+                if ($withAliases && $node?->getValue()?->getClass()) {
+                    $argumentXML->setAttribute('alias', $node->getValue()->getClass());
+                }
+
                 $argumentXML->setAttribute('type', 'service');
                 $argumentXML->setAttribute('id', (string) $argument);
             } elseif ($argument instanceof IteratorArgument || $argument instanceof ServiceLocatorArgument) {
                 $argumentXML->setAttribute('type', $argument instanceof IteratorArgument ? 'iterator' : 'service_locator');
 
-                foreach ($this->getArgumentNodes($argument->getValues(), $dom, $container) as $childArgumentXML) {
+                foreach ($this->getArgumentNodes($argument->getValues(), $dom, $container, $withAliases) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);
                 }
             } elseif ($argument instanceof Definition) {
-                $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true, $container)->childNodes->item(0), true));
+                $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true, $container, $withAliases)->childNodes->item(0), true));
             } elseif ($argument instanceof AbstractArgument) {
                 $argumentXML->setAttribute('type', 'abstract');
                 $argumentXML->appendChild(new \DOMText($argument->getText()));
             } elseif (\is_array($argument)) {
                 $argumentXML->setAttribute('type', 'collection');
 
-                foreach ($this->getArgumentNodes($argument, $dom, $container) as $childArgumentXML) {
+                foreach ($this->getArgumentNodes($argument, $dom, $container, $withAliases) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);
                 }
             } elseif ($argument instanceof \UnitEnum) {

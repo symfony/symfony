@@ -328,6 +328,7 @@ class TextDescriptor extends Descriptor
         }
 
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
+        $withAliases = isset($options['with_aliases']) && $options['with_aliases'];
         $argumentsInformation = [];
         if ($showArguments && ($arguments = $definition->getArguments())) {
             foreach ($arguments as $argument) {
@@ -335,7 +336,16 @@ class TextDescriptor extends Descriptor
                     $argument = $argument->getValues()[0];
                 }
                 if ($argument instanceof Reference) {
-                    $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
+                    $node = $container?->getCompiler()?->getServiceReferenceGraph()?->getNode((string) $argument);
+
+                    if ($withAliases && $node?->getValue()?->getClass()) {
+                        $argumentsInformation[] = vsprintf('Alias(%s, Service(%s))', [
+                            $node->getValue()->getClass(),
+                            (string) $argument,
+                        ]);
+                    } else {
+                        $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
+                    }
                 } elseif ($argument instanceof IteratorArgument) {
                     if ($argument instanceof TaggedIteratorArgument) {
                         $argumentsInformation[] = sprintf('Tagged Iterator for "%s"%s', $argument->getTag(), $options['is_debug'] ? '' : sprintf(' (%d element(s))', \count($argument->getValues())));

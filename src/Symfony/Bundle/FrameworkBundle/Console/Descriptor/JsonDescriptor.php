@@ -76,7 +76,7 @@ class JsonDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $options, $container);
         } elseif ($service instanceof Definition) {
-            $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id']), $options);
+            $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id'], isset($options['with_aliases']) && $options['with_aliases']), $options);
         } else {
             $this->writeData($service::class, $options);
         }
@@ -90,6 +90,7 @@ class JsonDescriptor extends Descriptor
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
+        $withAliases = isset($options['with_aliases']) && $options['with_aliases'];
         $data = ['definitions' => [], 'aliases' => [], 'services' => []];
 
         if (isset($options['filter'])) {
@@ -109,7 +110,7 @@ class JsonDescriptor extends Descriptor
                 if ($service->hasTag('container.excluded')) {
                     continue;
                 }
-                $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments, $container, $serviceId);
+                $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments, $container, $serviceId, $withAliases);
             } else {
                 $data['services'][$serviceId] = $service::class;
             }
@@ -120,7 +121,7 @@ class JsonDescriptor extends Descriptor
 
     protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
     {
-        $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id'] ?? null), $options);
+        $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id'] ?? null, isset($options['with_aliases']) && $options['with_aliases']), $options);
     }
 
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
@@ -132,7 +133,7 @@ class JsonDescriptor extends Descriptor
         }
 
         $this->writeData(
-            [$this->getContainerAliasData($alias), $this->getContainerDefinitionData($container->getDefinition((string) $alias), isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, (string) $alias)],
+            [$this->getContainerAliasData($alias), $this->getContainerDefinitionData($container->getDefinition((string) $alias), isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, (string) $alias, isset($options['with_aliases']) && $options['with_aliases'])],
             array_merge($options, ['id' => (string) $alias])
         );
     }
@@ -220,7 +221,7 @@ class JsonDescriptor extends Descriptor
         return $data;
     }
 
-    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null, string $id = null): array
+    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null, string $id = null, bool $withAliases = false): array
     {
         $data = [
             'class' => (string) $definition->getClass(),
@@ -245,7 +246,7 @@ class JsonDescriptor extends Descriptor
         }
 
         if ($showArguments) {
-            $data['arguments'] = $this->describeValue($definition->getArguments(), $omitTags, $showArguments, $container, $id);
+            $data['arguments'] = $this->describeValue($definition->getArguments(), $omitTags, $showArguments, $container, $id, $withAliases);
         }
 
         $data['file'] = $definition->getFile();
@@ -393,12 +394,12 @@ class JsonDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    private function describeValue($value, bool $omitTags, bool $showArguments, ContainerBuilder $container = null, string $id = null): mixed
+    private function describeValue($value, bool $omitTags, bool $showArguments, ContainerBuilder $container = null, string $id = null, bool $withAliases = false): mixed
     {
         if (\is_array($value)) {
             $data = [];
             foreach ($value as $k => $v) {
-                $data[$k] = $this->describeValue($v, $omitTags, $showArguments, $container, $id);
+                $data[$k] = $this->describeValue($v, $omitTags, $showArguments, $container, $id, $withAliases);
             }
 
             return $data;
@@ -409,10 +410,27 @@ class JsonDescriptor extends Descriptor
         }
 
         if ($value instanceof Reference) {
-            return [
-                'type' => 'service',
-                'id' => (string) $value,
-            ];
+            try {
+                $node = $container?->getCompiler()?->getServiceReferenceGraph()?->getNode((string) $value);
+
+                if ($withAliases && $node?->getValue()?->getClass()) {
+                    return [
+                        'alias' => $node->getValue()->getClass(),
+                        'type' => 'service',
+                        'id' => (string) $value,
+                    ];
+                } else {
+                    return [
+                        'type' => 'service',
+                        'id' => (string) $value,
+                    ];
+                }
+            } catch (\Throwable $throwable) {
+                return [
+                    'type' => 'service',
+                    'id' => (string) $value,
+                ];
+            }
         }
 
         if ($value instanceof AbstractArgument) {
@@ -424,7 +442,7 @@ class JsonDescriptor extends Descriptor
         }
 
         if ($value instanceof Definition) {
-            return $this->getContainerDefinitionData($value, $omitTags, $showArguments, $container, $id);
+            return $this->getContainerDefinitionData($value, $omitTags, $showArguments, $container, $id, $withAliases);
         }
 
         return $value;

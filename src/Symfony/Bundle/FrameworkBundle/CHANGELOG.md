@@ -11,6 +11,7 @@ CHANGELOG
  * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextContains(string $selector, string $text)`
  * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextSame(string $selector, string $text)`
  * Add `DomCrawlerAssertionsTrait::assertAnySelectorTextNotContains(string $selector, string $text)`
+ * Display aliases in debug:container command
  * Deprecate `EnableLoggerDebugModePass`, use argument `$debug` of HttpKernel's `Logger` instead
  * Deprecate `AddDebugLogProcessorPass::configureLogger()`, use HttpKernel's `DebugLoggerConfigurator` instead
  * Deprecate not setting the `framework.handle_all_throwables` config option; it will default to `true` in 7.0

@@ -39,9 +39,9 @@ class JsonDescriptor extends Descriptor
         }
     }
 
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '')
     {
-        $this->writeData($this->getInputDefinitionData($definition), $options);
+        $this->writeData($this->getInputDefinitionData($definition, $prefix), $options);
     }
 
     protected function describeCommand(Command $command, array $options = [])
@@ -120,7 +120,7 @@ class JsonDescriptor extends Descriptor
         ];
     }
 
-    private function getInputDefinitionData(InputDefinition $definition): array
+    private function getInputDefinitionData(InputDefinition $definition, string $prefix = ''): array
     {
         $inputArguments = [];
         foreach ($definition->getArguments() as $name => $argument) {
@@ -135,7 +135,7 @@ class JsonDescriptor extends Descriptor
             }
         }
 
-        return ['arguments' => $inputArguments, 'options' => $inputOptions];
+        return ["$prefix arguments" => $inputArguments, "$prefix options" => $inputOptions];
     }
 
     private function getCommandData(Command $command, bool $short = false): array
@@ -150,12 +150,15 @@ class JsonDescriptor extends Descriptor
                 'usage' => $command->getAliases(),
             ];
         } else {
-            $command->mergeApplicationDefinition(false);
+            $command->mergeApplicationDefinition(false, false);
 
             $data += [
                 'usage' => array_merge([$command->getSynopsis()], $command->getUsages(), $command->getAliases()),
                 'help' => $command->getProcessedHelp(),
-                'definition' => $this->getInputDefinitionData($command->getDefinition()),
+                'definition' => array_merge(
+                    $this->getInputDefinitionData($command->getApplication()->getDefinition(), 'application-level'),
+                    $this->getInputDefinitionData($command->getDefinition(), 'command-level')
+                ),
             ];
         }
 

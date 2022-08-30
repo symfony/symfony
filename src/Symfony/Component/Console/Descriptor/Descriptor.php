@@ -77,7 +77,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes an InputDefinition instance.
      */
-    abstract protected function describeInputDefinition(InputDefinition $definition, array $options = []);
+    abstract protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '');
 
     /**
      * Describes a Command instance.

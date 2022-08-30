@@ -26,17 +26,17 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class XmlDescriptor extends Descriptor
 {
-    public function getInputDefinitionDocument(InputDefinition $definition): \DOMDocument
+    public function getInputDefinitionDocument(InputDefinition $definition, string $prefix = ''): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
 
-        $definitionXML->appendChild($argumentsXML = $dom->createElement('arguments'));
+        $definitionXML->appendChild($argumentsXML = $dom->createElement("$prefix-arguments"));
         foreach ($definition->getArguments() as $argument) {
             $this->appendDocument($argumentsXML, $this->getInputArgumentDocument($argument));
         }
 
-        $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
+        $definitionXML->appendChild($optionsXML = $dom->createElement("$prefix-options"));
         foreach ($definition->getOptions() as $option) {
             $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
         }
@@ -63,7 +63,7 @@ class XmlDescriptor extends Descriptor
                 $usagesXML->appendChild($dom->createElement('usage', $usage));
             }
         } else {
-            $command->mergeApplicationDefinition(false);
+            $command->mergeApplicationDefinition(false, false);
 
             foreach (array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()) as $usage) {
                 $usagesXML->appendChild($dom->createElement('usage', $usage));
@@ -72,7 +72,10 @@ class XmlDescriptor extends Descriptor
             $commandXML->appendChild($helpXML = $dom->createElement('help'));
             $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
 
-            $definitionXML = $this->getInputDefinitionDocument($command->getDefinition());
+            $definitionXML = $this->getInputDefinitionDocument($command->getApplication()->getDefinition(), 'application-level');
+            $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+
+            $definitionXML = $this->getInputDefinitionDocument($command->getDefinition(), 'command-level');
             $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
         }
 
@@ -130,9 +133,9 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '')
     {
-        $this->writeDocument($this->getInputDefinitionDocument($definition));
+        $this->writeDocument($this->getInputDefinitionDocument($definition, $prefix));
     }
 
     protected function describeCommand(Command $command, array $options = [])

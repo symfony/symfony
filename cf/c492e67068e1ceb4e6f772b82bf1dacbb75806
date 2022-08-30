@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-08-30T10:34:47Z
+
+Access to `$errors['warnings']` should indeed also be guarded there.
+
+---------------------------------------------------------------------------
+
+by derickr at 2022-08-30T10:36:46Z
+
+On 30 August 2022 11:25:46 BST, Nicolas Grekas ***@***.***> wrote:
+>| Q             | A
+>| ------------- | ---
+>| Branch?       | 4.4
+>| Bug fix?      | yes
+>| New feature?  | no
+>| Deprecations? | no
+>| Tickets       | -
+>| License       | MIT
+>| Doc PR        | -
+>
+>Spotted by our CI on PHP 8.2
+>
+>This returns an array on PHP &lt; 8.2 and `false` on 8.2:
+>```php
+>DateTime::createFromFormat(&#39;Y&#39;, &#39;2022&#39;);
+>var_dump(DateTime::getLastErrors());
+>```
+>
+>
+>/cc @derickr FYI as this might also be considered as a BC break on PHP 8.2
+>You can view, comment on, or merge this pull request online at:
+>
+>  https://github.com/symfony/symfony/pull/47428
+>
+>-- Commit Summary --
+>
+>  * Fix checking result of DateTime::getLastErrors
+>
+>-- File Changes --
+>
+>    M src/Symfony/Component/Form/Extension/Core/DataTransformer/DateTimeToStringTransformer.php (2)
+>    M src/Symfony/Component/Validator/Constraints/DateTimeValidator.php (2)
+>
+>-- Patch Links --
+>
+>https://github.com/symfony/symfony/pull/47428.patch
+>https://github.com/symfony/symfony/pull/47428.diff
+>
+
+This is a bug fix as the new 8.2 behaviour is how it has been documented for over a decade. I didn't merge it to 8.0 and 8.1 because it does change BC.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-08-30T10:38:19Z
+
+> This is a bug fix as the new 8.2 behaviour is how it has been documented for over a decade. I didn't merge it to 8.0 and 8.1 because it does change BC.
+
+Well, I would say that code is a lot more likely to expect the behavior that exists since a decade than the documented code that was never implemented until now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-30T11:57:15Z
+
+> looks like (at least) the DateTimeValidator needs some more changes
+
+yup, fixed

@@ -11,7 +11,7 @@ command åèä description
 
 command åèä help
 
-### Arguments
+### Command-level Arguments
 
 #### `argument_åèä`
 
@@ -19,7 +19,7 @@ command åèä help
 * Is array: no
 * Default: `NULL`
 
-### Options
+### Command-level Options
 
 #### `--option_åèä|-o`
 

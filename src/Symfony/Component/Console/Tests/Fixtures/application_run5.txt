@@ -4,18 +4,23 @@ Description:
 Usage:
   help [options] [--] [<command_name>]
 
-Arguments:
-  command_name          The command name [default: "help"]
+Application-level Arguments:
+  command               The command to execute [default: "list"]
 
-Options:
-      --format=FORMAT   The output format (txt, xml, json, or md) [default: "txt"]
-      --raw             To output raw command help
+Application-level Options:
   -h, --help            Display help for the given command. When no command is given display help for the list command
   -q, --quiet           Do not output any message
   -V, --version         Display this application version
       --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
   -n, --no-interaction  Do not ask any interactive question
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+Command-level Arguments:
+  command_name         The command name [default: "help"]
+
+Command-level Options:
+      --format=FORMAT  The output format (txt, xml, json, or md) [default: "txt"]
+      --raw            To output raw command help
 
 Help:
   The help command displays help for a given command:

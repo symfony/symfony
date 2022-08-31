@@ -9,7 +9,7 @@
     "description": "command 2 description",
     "help": "command 2 help",
     "definition": {
-        "arguments": {
+        "command-level arguments": {
             "argument_name": {
                 "name": "argument_name",
                 "is_required": true,
@@ -18,7 +18,7 @@
                 "default": null
             }
         },
-        "options": {
+        "command-level options": {
             "option_name": {
                 "name": "--option_name",
                 "shortcut": "-o",

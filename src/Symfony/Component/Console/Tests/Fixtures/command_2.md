@@ -11,7 +11,7 @@ command 2 description
 
 command 2 help
 
-### Arguments
+### Command-level Arguments
 
 #### `argument_name`
 
@@ -19,7 +19,7 @@ command 2 help
 * Is array: no
 * Default: `NULL`
 
-### Options
+### Command-level Options
 
 #### `--option_name|-o`
 

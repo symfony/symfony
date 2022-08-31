@@ -26,20 +26,26 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class XmlDescriptor extends Descriptor
 {
-    public function getInputDefinitionDocument(InputDefinition $definition, string $prefix = ''): \DOMDocument
+    public function getInputDefinitionDocument(InputDefinition $definition, string $type = ''): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
 
         if ($definition->getArguments()) {
-            $definitionXML->appendChild($argumentsXML = $dom->createElement($prefix . 'arguments'));
+            $definitionXML->appendChild($argumentsXML = $dom->createElement('arguments'));
+            if ($type) {
+                $argumentsXML->setAttribute('type', $type);
+            }
             foreach ($definition->getArguments() as $argument) {
                 $this->appendDocument($argumentsXML, $this->getInputArgumentDocument($argument));
             }
         }
 
         if ($definition->getOptions()) {
-            $definitionXML->appendChild($optionsXML = $dom->createElement($prefix . 'options'));
+            $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
+            if ($type) {
+                $optionsXML->setAttribute('type', $type);
+            }
             foreach ($definition->getOptions() as $option) {
                 $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
             }
@@ -78,13 +84,13 @@ class XmlDescriptor extends Descriptor
 
             $definition = $command->getApplication()?->getDefinition();
             if ($definition?->getOptions() || $definition?->getArguments()) {
-                $definitionXML = $this->getInputDefinitionDocument($definition, 'application-level-');
+                $definitionXML = $this->getInputDefinitionDocument($definition, 'application-level');
                 $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
             }
 
             $definition = $command->getDefinition();
             if ($definition?->getOptions() || $definition?->getArguments()) {
-                $definitionXML = $this->getInputDefinitionDocument($definition, 'command-level-');
+                $definitionXML = $this->getInputDefinitionDocument($definition, 'command-level');
                 $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
             }
 
@@ -144,9 +150,9 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '')
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $type = '')
     {
-        $this->writeDocument($this->getInputDefinitionDocument($definition, $prefix));
+        $this->writeDocument($this->getInputDefinitionDocument($definition, $type));
     }
 
     protected function describeCommand(Command $command, array $options = [])

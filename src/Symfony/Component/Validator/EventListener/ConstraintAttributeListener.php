@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\ControllerArgument;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -25,8 +26,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ConstraintAttributeListener implements EventSubscriberInterface
 {
-    public function __construct(private readonly ValidatorInterface $validator) {
-    }
+    public function __construct(private readonly ValidatorInterface $validator) {}
 
     public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
     {
@@ -35,7 +35,7 @@ class ConstraintAttributeListener implements EventSubscriberInterface
         $reflectionMethod = $this->getReflectionMethod($controller);
 
         foreach ($reflectionMethod->getParameters() as $index => $reflectionParameter) {
-            $reflectionAttributes = $reflectionParameter->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF);
+            $reflectionAttributes = $reflectionParameter->getAttributes(ControllerArgument::class);
 
             if (!$reflectionAttributes) {
                 continue;
@@ -45,7 +45,6 @@ class ConstraintAttributeListener implements EventSubscriberInterface
                 /** @var Constraint $constraint */
                 $constraint = $reflectionAttribute->newInstance();
                 $value = $arguments[$index];
-
                 $violations = $this->validator->validate($value, $constraint);
 
                 if ($violations->count() > 0) {

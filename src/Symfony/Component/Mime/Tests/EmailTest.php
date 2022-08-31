@@ -504,7 +504,9 @@ class EmailTest extends TestCase
         $expected = clone $e;
         $n = unserialize(serialize($e));
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());
-        $this->assertEquals($e->getBody(), $n->getBody());
+        $a = preg_replace(["{boundary=.+\r\n}", "{^\-\-.+\r\n}m"], ['boundary=x', '--x'], $e->getBody()->toString());
+        $b = preg_replace(["{boundary=.+\r\n}", "{^\-\-.+\r\n}m"], ['boundary=x', '--x'], $n->getBody()->toString());
+        $this->assertSame($a, $b);
     }
 
     public function testSymfonySerialize()
@@ -525,10 +527,16 @@ class EmailTest extends TestCase
     "htmlCharset": "utf-8",
     "attachments": [
         {
+            "filename": "test.txt",
+            "mediaType": "application",
             "body": "Some Text file",
+            "charset": null,
+            "subtype": "octet-stream",
+            "disposition": "attachment",
             "name": "test.txt",
-            "content-type": null,
-            "inline": false
+            "encoding": "base64",
+            "headers": [],
+            "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
         }
     ],
     "headers": {
@@ -587,7 +595,7 @@ EOF;
     public function testAttachBodyExpectStringOrResource()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The body must be a string or a resource (got "bool").');
+        $this->expectExceptionMessage('The body of "Symfony\Component\Mime\Part\TextPart" must be a string, a resource, or an instance of "Symfony\Component\Mime\Part\BodyFile" (got "bool").');
 
         (new Email())->attach(false);
     }
@@ -595,7 +603,7 @@ EOF;
     public function testEmbedBodyExpectStringOrResource()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The body must be a string or a resource (got "bool").');
+        $this->expectExceptionMessage('The body of "Symfony\Component\Mime\Part\TextPart" must be a string, a resource, or an instance of "Symfony\Component\Mime\Part\BodyFile" (got "bool").');
 
         (new Email())->embed(false);
     }

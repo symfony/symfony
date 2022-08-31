@@ -27,7 +27,7 @@
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/property-access": "^5.4|^6.0",
         "symfony/property-info": "^5.4|^6.0",
-        "symfony/serializer": "^5.4|^6.0"
+        "symfony/serializer": "^6.2"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",

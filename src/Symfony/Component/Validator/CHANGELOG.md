@@ -6,17 +6,6 @@ CHANGELOG
 
  * Deprecate the "loose" e-mail validation mode, use "html5" instead
  * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
- * Allow the following constraints to be used in method parameters:
-   `All`, `AtLeastOneOf`, `Bic`, `Blank`, `Callback`, `CardScheme`, `Choice`,
-   `Cidr`, `Collection`, `Count`, `Country`, `CssColor`, `Currency`, `Date`,
-   `DateTime`, `DivisibleBy`, `Email`, `EqualTo`, `Expression`, `ExpressionSyntax`,
-   `File`, `GreaterThan`, `GreaterThanOrEqual`, `Hostname`, `Iban`, `IdenticalTo`,
-   `Image`, `Ip`, `Isbn`, `IsFalse`, `Isin`, `IsNull`, `Issn`, `IsTrue`, `Json`,
-   `Language`, `Length`, `LessThan`, `LessThanOrEqual`, `Locale`, `Luhn`, `Negative`,
-   `NegativeOrZero`, `NotBlank`, `NotCompromisedPassword`, `NotEqualTo`, `NotIdenticalTo`,
-   `NotNull`, `Positive`, `PositiveOrZero`, `Range`, `Regex`, `Sequentially`, `Time`,
-   `Timezone`, `Type`, `Ulid`, `Unique`, `Url`, `Uuid`, `Valid`
- * Add the `ConstraintAttributeListener` to validate the controller arguments
 
 6.1
 ---

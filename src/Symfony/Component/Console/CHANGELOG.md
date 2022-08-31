@@ -6,6 +6,7 @@ CHANGELOG
 
 * Improve truecolor terminal detection in some cases
 * Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+* Show Application-level console options when showing synopsis or when error occured
 
 6.1
 ---

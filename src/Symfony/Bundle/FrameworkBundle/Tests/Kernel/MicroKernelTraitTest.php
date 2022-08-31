@@ -101,7 +101,7 @@ class MicroKernelTraitTest extends TestCase
 
     public function testAnonymousMicroKernel()
     {
-        $kernel = new class('anonymous_kernel') extends MinimalKernel {
+        $kernel = $this->kernel = new class('anonymous_kernel') extends MinimalKernel {
             public function helloAction(): Response
             {
                 return new Response('Hello World!');

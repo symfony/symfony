@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
-use Symfony\Component\Validator\EventListener\ConstraintAttributeListener;
+use Symfony\Component\Validator\EventListener\ControllerArgumentConstraintAttributeListener;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -105,7 +105,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('validator.auto_mapper')
 
-        ->set('controller.constraint_attribute_listener', ConstraintAttributeListener::class)
+        ->set('controller.constraint_attribute_listener', ControllerArgumentConstraintAttributeListener::class)
             ->args([
                 service('validator'),
             ])

@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @author Dynèsh Hassanaly <artyum@protonmail.com>
  */
-class ConstraintAttributeListener implements EventSubscriberInterface
+class ControllerArgumentConstraintAttributeListener implements EventSubscriberInterface
 {
     public function __construct(private readonly ValidatorInterface $validator) {}
 

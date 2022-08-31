@@ -108,7 +108,7 @@
                             {{ source('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>
                         </a>
 
-                        {{ render(controller('web_profiler.controller.profiler::searchBarAction', request.query.all)) }}
+                        {{ render(controller('web_profiler.controller.profiler::searchBarAction', query=request.query.all)) }}
                     </div>
                 </div>
 

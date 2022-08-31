@@ -142,6 +142,7 @@ class ObjectsProvider
     {
         $definition1 = new Definition('Full\\Qualified\\Class1');
         $definition2 = new Definition('Full\\Qualified\\Class2');
+        $definition3 = new Definition('Full\\Qualified\\Class3');
 
         return [
             'definition_1' => $definition1
@@ -174,6 +175,9 @@ class ObjectsProvider
                 ->addTag('tag2')
                 ->addMethodCall('setMailer', [new Reference('mailer')])
                 ->setFactory([new Reference('factory.service'), 'get']),
+            '.definition_3' => $definition3
+                ->setFile('/path/to/file')
+                ->setFactory([new Definition('Full\\Qualified\\FactoryClass'), 'get']),
             'definition_without_class' => new Definition(),
         ];
     }

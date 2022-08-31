@@ -224,7 +224,7 @@ class MarkdownDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $output .= "\n".'- Factory Service: `'.$factory[0].'`';
                 } elseif ($factory[0] instanceof Definition) {
-                    throw new \InvalidArgumentException('Factory is not describable.');
+                    $output .= "\n".'- Factory Class: `'.($factory[0]->getClass() ?? 'not configured').'`';
                 } else {
                     $output .= "\n".'- Factory Class: `'.$factory[0].'`';
                 }

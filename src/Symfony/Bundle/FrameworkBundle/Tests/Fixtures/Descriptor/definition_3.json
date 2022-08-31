@@ -1,0 +1,14 @@
+{
+    "class": "Full\\Qualified\\Class3",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "file": "\/path\/to\/file",
+    "factory_class": "Full\\Qualified\\FactoryClass",
+    "factory_method": "get",
+    "tags": []
+}

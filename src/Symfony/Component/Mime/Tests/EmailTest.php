@@ -309,12 +309,41 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($html, $filePart), $e->getBody());
     }
 
+    public function testGenerateBodyWithHtmlContentAndInlineImageNotreferenced()
+    {
+        [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
+        $imagePart = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'));
+        $imagePart->asInline();
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->embed($image);
+        $e->html('html content');
+        $this->assertEquals(new MixedPart($html, $imagePart), $e->getBody());
+    }
+
     public function testGenerateBodyWithAttachedFileOnly()
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->attach($file);
         $this->assertEquals(new MixedPart($filePart), $e->getBody());
+    }
+
+    public function testGenerateBodyWithInlineImageOnly()
+    {
+        $imagePart = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'));
+        $imagePart->asInline();
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->embed($image);
+        $this->assertEquals(new MixedPart($imagePart), $e->getBody());
+    }
+
+    public function testGenerateBodyWithEmbeddedImageOnly()
+    {
+        $imagePart = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'));
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->embed($image);
+        $imagePart->asInline();
+        $this->assertEquals(new MixedPart($imagePart), $e->getBody());
     }
 
     public function testGenerateBodyWithTextAndHtmlContentAndAttachedFile()

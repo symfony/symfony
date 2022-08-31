@@ -41,15 +41,16 @@ class ControllerArgumentConstraintAttributeListener implements EventSubscriberIn
                 continue;
             }
 
-            foreach ($reflectionAttributes as $reflectionAttribute) {
-                /** @var Constraint $constraint */
-                $constraint = $reflectionAttribute->newInstance();
-                $value = $arguments[$index];
-                $violations = $this->validator->validate($value, $constraint);
+            // this attribute cannot be repeated, so we will always one item in this array
+            $reflectionAttribute = $reflectionAttributes[0];
 
-                if ($violations->count() > 0) {
-                    throw new ValidationFailedException($value, $violations);
-                }
+            /** @var Constraint $constraint */
+            $constraint = $reflectionAttribute->newInstance();
+            $value = $arguments[$index];
+            $violations = $this->validator->validate($value, $constraint);
+
+            if ($violations->count() > 0) {
+                throw new ValidationFailedException($value, $violations);
             }
         }
     }

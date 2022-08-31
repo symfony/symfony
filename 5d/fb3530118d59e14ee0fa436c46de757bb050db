@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by DennisBirkholz at 2022-08-31T08:05:39Z
+
+I don't understand why there needs to be a 30+ lines change when a three line change is sufficient. Avoiding a lock if possible is always preferable over an unnecessary lock. The dump file is only ever written once and renaming a file on the same file system is atomic on all relevant file systems. This change touches two code points, which need to be kept in sync and the additional code increases the cognitive load when reasoning about this code in the future and will increase the barrier for new people to understand and contribute.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-31T08:09:18Z
+
+The reason is developer experience: with the atomic write approach, the race condition will lead to a "no-profile" state in the toolbar. With the lock, the profile will pause until the write is done and then load seamlessly.
+
+The fact that the change is bigger is because I factorized some lines of code.

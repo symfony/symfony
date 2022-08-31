@@ -31,14 +31,18 @@ class XmlDescriptor extends Descriptor
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
 
-        $definitionXML->appendChild($argumentsXML = $dom->createElement("$prefix-arguments"));
-        foreach ($definition->getArguments() as $argument) {
-            $this->appendDocument($argumentsXML, $this->getInputArgumentDocument($argument));
+        if ($definition->getArguments()) {
+            $definitionXML->appendChild($argumentsXML = $dom->createElement($prefix . 'arguments'));
+            foreach ($definition->getArguments() as $argument) {
+                $this->appendDocument($argumentsXML, $this->getInputArgumentDocument($argument));
+            }
         }
 
-        $definitionXML->appendChild($optionsXML = $dom->createElement("$prefix-options"));
-        foreach ($definition->getOptions() as $option) {
-            $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
+        if ($definition->getOptions()) {
+            $definitionXML->appendChild($optionsXML = $dom->createElement($prefix . 'options'));
+            foreach ($definition->getOptions() as $option) {
+                $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
+            }
         }
 
         return $dom;
@@ -72,11 +76,18 @@ class XmlDescriptor extends Descriptor
             $commandXML->appendChild($helpXML = $dom->createElement('help'));
             $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
 
-            $definitionXML = $this->getInputDefinitionDocument($command->getApplication()->getDefinition(), 'application-level');
-            $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+            $definition = $command->getApplication()?->getDefinition();
+            if ($definition?->getOptions() || $definition?->getArguments()) {
+                $definitionXML = $this->getInputDefinitionDocument($definition, 'application-level-');
+                $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+            }
 
-            $definitionXML = $this->getInputDefinitionDocument($command->getDefinition(), 'command-level');
-            $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+            $definition = $command->getDefinition();
+            if ($definition?->getOptions() || $definition?->getArguments()) {
+                $definitionXML = $this->getInputDefinitionDocument($definition, 'command-level-');
+                $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+            }
+
         }
 
         return $dom;

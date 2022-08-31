@@ -91,7 +91,7 @@ class TextDescriptor extends Descriptor
         }
 
         if ($definition->getArguments()) {
-            $this->writeText("<comment>$prefix Arguments:</comment>", $options);
+            $this->writeText("<comment>{$prefix}Arguments:</comment>", $options);
             $this->writeText("\n");
             foreach ($definition->getArguments() as $argument) {
                 $this->describeInputArgument($argument, array_merge($options, ['total_width' => $totalWidth]));
@@ -106,7 +106,7 @@ class TextDescriptor extends Descriptor
         if ($definition->getOptions()) {
             $laterOptions = [];
 
-            $this->writeText("<comment>$prefix Options:</comment>", $options);
+            $this->writeText("<comment>{$prefix}Options:</comment>", $options);
             foreach ($definition->getOptions() as $option) {
                 if (\strlen($option->getShortcut() ?? '') > 1) {
                     $laterOptions[] = $option;
@@ -142,17 +142,17 @@ class TextDescriptor extends Descriptor
 
         $command->mergeApplicationDefinition(false, false);
 
-        $definition = $command->getApplication()->getDefinition();
-        if ($definition->getOptions() || $definition->getArguments()) {
+        $definition = $command->getApplication()?->getDefinition();
+        if ($definition?->getOptions() || $definition?->getArguments()) {
             $this->writeText("\n");
-            $this->describeInputDefinition($definition, $options, 'Application-level');
+            $this->describeInputDefinition($definition, $options, 'Application-level ');
             $this->writeText("\n");
         }
 
         $definition = $command->getDefinition();
         if ($definition->getOptions() || $definition->getArguments()) {
             $this->writeText("\n");
-            $this->describeInputDefinition($definition, $options, 'Command-level');
+            $this->describeInputDefinition($definition, $options, 'Command-level ');
             $this->writeText("\n");
         }
 

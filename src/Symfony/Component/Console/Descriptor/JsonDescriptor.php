@@ -123,19 +123,23 @@ class JsonDescriptor extends Descriptor
     private function getInputDefinitionData(InputDefinition $definition, string $prefix = ''): array
     {
         $inputArguments = [];
-        foreach ($definition->getArguments() as $name => $argument) {
-            $inputArguments[$name] = $this->getInputArgumentData($argument);
-        }
-
-        $inputOptions = [];
-        foreach ($definition->getOptions() as $name => $option) {
-            $inputOptions[$name] = $this->getInputOptionData($option);
-            if ($option->isNegatable()) {
-                $inputOptions['no-'.$name] = $this->getInputOptionData($option, true);
+        if ($definition->getArguments()) {
+            foreach ($definition->getArguments() as $name => $argument) {
+                $inputArguments[$name] = $this->getInputArgumentData($argument);
             }
         }
 
-        return ["$prefix arguments" => $inputArguments, "$prefix options" => $inputOptions];
+        $inputOptions = [];
+        if ($definition->getOptions()) {
+            foreach ($definition->getOptions() as $name => $option) {
+                $inputOptions[$name] = $this->getInputOptionData($option);
+                if ($option->isNegatable()) {
+                    $inputOptions['no-'.$name] = $this->getInputOptionData($option, true);
+                }
+            }
+        }
+
+        return ["{$prefix}arguments" => $inputArguments, "{$prefix}options" => $inputOptions];
     }
 
     private function getCommandData(Command $command, bool $short = false): array
@@ -155,11 +159,18 @@ class JsonDescriptor extends Descriptor
             $data += [
                 'usage' => array_merge([$command->getSynopsis()], $command->getUsages(), $command->getAliases()),
                 'help' => $command->getProcessedHelp(),
-                'definition' => array_merge(
-                    $this->getInputDefinitionData($command->getApplication()->getDefinition(), 'application-level'),
-                    $this->getInputDefinitionData($command->getDefinition(), 'command-level')
-                ),
+                'definition' => [],
             ];
+
+            $definition = $command->getApplication()?->getDefinition();
+            if ($definition?->getOptions() || $definition?->getArguments()) {
+                $data['definition'] = $this->getInputDefinitionData($command->getApplication()->getDefinition(), 'application-level ');
+            }
+
+            $definition = $command->getDefinition();
+            if ($definition->getOptions() || $definition->getArguments()) {
+                $data['definition'] += $this->getInputDefinitionData($command->getDefinition(), 'command-level ');
+            }
         }
 
         $data['hidden'] = $command->isHidden();

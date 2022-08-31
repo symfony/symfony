@@ -78,7 +78,7 @@ class MarkdownDescriptor extends Descriptor
     protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '')
     {
         if ($showArguments = \count($definition->getArguments()) > 0) {
-            $this->write("### $prefix Arguments");
+            $this->write("### {$prefix}Arguments");
             foreach ($definition->getArguments() as $argument) {
                 $this->write("\n\n");
                 if (null !== $describeInputArgument = $this->describeInputArgument($argument)) {
@@ -92,7 +92,7 @@ class MarkdownDescriptor extends Descriptor
                 $this->write("\n\n");
             }
 
-            $this->write("### $prefix Options");
+            $this->write("### {$prefix}Options");
             foreach ($definition->getOptions() as $option) {
                 $this->write("\n\n");
                 if (null !== $describeInputOption = $this->describeInputOption($option)) {
@@ -135,8 +135,8 @@ class MarkdownDescriptor extends Descriptor
             $this->write($help);
         }
 
-        $definition = $command->getApplication()->getDefinition();
-        if ($definition->getOptions() || $definition->getArguments()) {
+        $definition = $command->getApplication()?->getDefinition();
+        if ($definition?->getOptions() || $definition?->getArguments()) {
             $this->write("\n\n");
             $this->describeInputDefinition($definition, prefix: 'Application-level');
         }

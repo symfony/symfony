@@ -93,7 +93,6 @@ class XmlDescriptor extends Descriptor
                 $definitionXML = $this->getInputDefinitionDocument($definition, 'command-level');
                 $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
             }
-
         }
 
         return $dom;

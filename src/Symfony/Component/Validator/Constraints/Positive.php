@@ -17,7 +17,7 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Positive extends GreaterThan
 {
     use ZeroComparisonConstraintTrait;

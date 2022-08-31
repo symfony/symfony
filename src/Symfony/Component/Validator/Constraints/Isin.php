@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Laurent Masforné <l.masforne@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Isin extends Constraint
 {
     public const VALIDATION_LENGTH = 12;

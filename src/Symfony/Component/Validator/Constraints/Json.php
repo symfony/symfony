@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Imad ZAIRIG <imadzairig@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Json extends Constraint
 {
     public const INVALID_JSON_ERROR = '0789c8ad-2d2b-49a4-8356-e2ce63998504';

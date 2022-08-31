@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Url extends Constraint
 {
     public const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';

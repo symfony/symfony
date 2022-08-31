@@ -18,7 +18,7 @@ namespace Symfony\Component\Validator\Constraints;
  * @author Daniel Holmes <daniel@danielholmes.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class LessThan extends AbstractComparison
 {
     public const TOO_HIGH_ERROR = '079d7420-2d13-460c-8756-de810eeb37d2';

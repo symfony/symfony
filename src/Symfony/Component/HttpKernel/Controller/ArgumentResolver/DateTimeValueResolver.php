@@ -65,7 +65,7 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
         if (null !== $format) {
             $date = $class::createFromFormat($format, $value);
 
-            if ($class::getLastErrors()['warning_count']) {
+            if (($class::getLastErrors() ?: ['warning_count' => 0])['warning_count']) {
                 $date = false;
             }
         } else {

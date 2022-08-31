@@ -211,7 +211,7 @@
 {%- block checkbox_widget -%}
     {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {%- set row_class = 'form-check' -%}
+    {%- set row_class = row_class|default('form-check') -%}
     {%- if 'checkbox-inline' in parent_label_class %}
         {% set row_class = row_class ~ ' form-check-inline' %}
     {% endif -%}

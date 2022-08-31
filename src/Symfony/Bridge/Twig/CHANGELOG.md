@@ -6,6 +6,7 @@ CHANGELOG
 
 * Add `github` format & autodetection to render errors as annotations when
   running the Twig linter command in a Github Actions environment.
+* Add opportunity to set custom parent `div` class in checkbox widget  
 
 5.3
 ---

@@ -105,7 +105,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('validator.auto_mapper')
 
-        ->set('controller.constraint_attribute_listener', ControllerArgumentConstraintAttributeListener::class)
+        ->set('controller.controller_argument_constraint_attribute_listener', ControllerArgumentConstraintAttributeListener::class)
             ->args([
                 service('validator'),
             ])

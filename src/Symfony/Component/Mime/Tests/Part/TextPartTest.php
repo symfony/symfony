@@ -87,6 +87,8 @@ class TextPartTest extends TestCase
         $p = new TextPart($r);
         $p->getHeaders()->addTextHeader('foo', 'bar');
         $expected = clone $p;
-        $this->assertEquals($expected->toString(), unserialize(serialize($p))->toString());
+        $n = unserialize(serialize($p));
+        $this->assertEquals($expected->toString(), $p->toString());
+        $this->assertEquals($expected->toString(), $n->toString());
     }
 }

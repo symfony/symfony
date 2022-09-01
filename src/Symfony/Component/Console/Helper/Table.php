@@ -180,12 +180,14 @@ class Table
     public function setOptionalColumns(array $columns): static
     {
         $this->optionalColumns = $columns;
+
         return $this;
     }
 
     public function setMaxWidth(int $maxWidth): static
     {
         $this->maxWidth = $maxWidth;
+
         return $this;
     }
 
@@ -422,7 +424,7 @@ class Table
 
                 if ($this->droppedColumns) {
                     foreach ($this->droppedColumns as $column) {
-                        if ($this->numberOfColumns < count($row)) {
+                        if ($this->numberOfColumns < \count($row)) {
                             unset($row[$column]);
                         }
                     }
@@ -816,7 +818,7 @@ class Table
      */
     private function calculateColumnsWidth(iterable $groups)
     {
-        $pass2 = count($this->effectiveColumnWidths);
+        $pass2 = \count($this->effectiveColumnWidths);
         for ($column = 0; $column < $this->numberOfColumns; ++$column) {
             $lengths = [];
             foreach ($groups as $group) {
@@ -896,7 +898,7 @@ class Table
                 );
             }
 
-            $this->numberOfColumns -= count($this->droppedColumns);
+            $this->numberOfColumns -= \count($this->droppedColumns);
         }
     }
 

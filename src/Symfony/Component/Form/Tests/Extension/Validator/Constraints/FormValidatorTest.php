@@ -736,7 +736,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     private function getCompoundForm($data, array $options = [])
     {
-        return $this->getBuilder('name', \is_object($data) ? \get_class($data) : null, $options)
+        return $this->getBuilder('name', \is_object($data) ? $data::class : null, $options)
             ->setData($data)
             ->setCompound(true)
             ->setDataMapper(new DataMapper())

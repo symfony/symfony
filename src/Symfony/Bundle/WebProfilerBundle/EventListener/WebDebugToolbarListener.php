@@ -85,7 +85,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
-                $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
+                $response->headers->set('X-Debug-Error', $e::class.': '.preg_replace('/\s+/', ' ', $e->getMessage()));
             }
         }
 

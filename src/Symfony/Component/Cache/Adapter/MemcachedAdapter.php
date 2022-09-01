@@ -58,7 +58,7 @@ class MemcachedAdapter extends AbstractAdapter
         if (!static::isSupported()) {
             throw new CacheException('Memcached > 3.1.5 is required.');
         }
-        if ('Memcached' === \get_class($client)) {
+        if ('Memcached' === $client::class) {
             $opt = $client->getOption(\Memcached::OPT_SERIALIZER);
             if (\Memcached::SERIALIZER_PHP !== $opt && \Memcached::SERIALIZER_IGBINARY !== $opt) {
                 throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');

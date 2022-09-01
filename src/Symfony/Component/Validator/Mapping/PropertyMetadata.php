@@ -69,7 +69,7 @@ class PropertyMetadata extends MemberMetadata
 
     protected function newReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
-        $originalClass = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
+        $originalClass = \is_string($objectOrClassName) ? $objectOrClassName : $objectOrClassName::class;
 
         while (!property_exists($objectOrClassName, $this->getName())) {
             $objectOrClassName = get_parent_class($objectOrClassName);

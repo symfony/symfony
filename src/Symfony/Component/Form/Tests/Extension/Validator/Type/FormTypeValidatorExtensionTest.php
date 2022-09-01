@@ -113,7 +113,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
                     return $formMetadata;
                 }
 
-                return new ClassMetadata(\is_string($classOrObject) ? $classOrObject : \get_class($classOrObject));
+                return new ClassMetadata(\is_string($classOrObject) ? $classOrObject : $classOrObject::class);
             })
         ;
 

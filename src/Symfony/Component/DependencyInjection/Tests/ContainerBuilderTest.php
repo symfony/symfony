@@ -381,7 +381,7 @@ class ContainerBuilderTest extends TestCase
         $foo1 = $builder->get('foo1');
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
-        $this->assertSame('Bar\FooClass', \get_class($foo1));
+        $this->assertSame('Bar\FooClass', $foo1::class);
     }
 
     public function testCreateLazyProxy()

@@ -56,7 +56,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
         $message = $envelope->getMessage();
         $context = [
-            'class' => \get_class($message),
+            'class' => $message::class,
         ];
 
         $shouldRetry = $retryStrategy && $this->shouldRetry($throwable, $envelope, $retryStrategy);
@@ -89,7 +89,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
     private function withLimitedHistory(Envelope $envelope, StampInterface ...$stamps): Envelope
     {
         foreach ($stamps as $stamp) {
-            $history = $envelope->all(\get_class($stamp));
+            $history = $envelope->all($stamp::class);
             if (\count($history) < $this->historySize) {
                 $envelope = $envelope->with($stamp);
                 continue;
@@ -101,7 +101,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
                 [$stamp]
             );
 
-            $envelope = $envelope->withoutAll(\get_class($stamp))->with(...$history);
+            $envelope = $envelope->withoutAll($stamp::class)->with(...$history);
         }
 
         return $envelope;

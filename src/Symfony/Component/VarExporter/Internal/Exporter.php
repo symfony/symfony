@@ -73,7 +73,7 @@ class Exporter
                 goto handle_value;
             }
 
-            $class = \get_class($value);
+            $class = $value::class;
             $reflector = Registry::$reflectors[$class] ??= Registry::getClassReflector($class);
 
             if ($reflector->hasMethod('__serialize')) {
@@ -364,7 +364,7 @@ class Exporter
             self::export($value->wakeups, $subIndent),
         ];
 
-        return '\\'.\get_class($value)."::hydrate(\n".$subIndent.implode(",\n".$subIndent, $code)."\n".$indent.')';
+        return '\\'.$value::class."::hydrate(\n".$subIndent.implode(",\n".$subIndent, $code)."\n".$indent.')';
     }
 
     /**

@@ -90,7 +90,7 @@ class FormRegistry implements FormRegistryInterface
     private function resolveType(FormTypeInterface $type): ResolvedFormTypeInterface
     {
         $parentType = $type->getParent();
-        $fqcn = \get_class($type);
+        $fqcn = $type::class;
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));

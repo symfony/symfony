@@ -127,7 +127,7 @@ class JsonResponse extends Response
         try {
             $data = json_encode($data, $this->encodingOptions);
         } catch (\Exception $e) {
-            if ('Exception' === \get_class($e) && str_starts_with($e->getMessage(), 'Failed calling ')) {
+            if ('Exception' === $e::class && str_starts_with($e->getMessage(), 'Failed calling ')) {
                 throw $e->getPrevious() ?: $e;
             }
             throw $e;

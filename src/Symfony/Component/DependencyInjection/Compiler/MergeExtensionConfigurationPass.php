@@ -151,7 +151,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     {
         parent::__construct($parameterBag);
 
-        $this->extensionClass = \get_class($extension);
+        $this->extensionClass = $extension::class;
     }
 
     public function addCompilerPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): static

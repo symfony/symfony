@@ -86,7 +86,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
             $keyAttributes[] = \is_string($attribute) ? $attribute : null;
         }
         // use `get_class` to handle anonymous classes
-        $keyObject = \is_object($object) ? \get_class($object) : get_debug_type($object);
+        $keyObject = \is_object($object) ? $object::class : get_debug_type($object);
         foreach ($this->voters as $key => $voter) {
             if (!$voter instanceof CacheableVoterInterface) {
                 yield $voter;

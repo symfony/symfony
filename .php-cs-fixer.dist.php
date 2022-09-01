@@ -34,6 +34,7 @@ return (new PhpCsFixer\Config())
         'no_superfluous_phpdoc_tags' => ['remove_inheritdoc' => true],
         'header_comment' => ['header' => $fileHeaderComment],
         'modernize_strpos' => true,
+        'get_class_to_class_keyword' => true,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

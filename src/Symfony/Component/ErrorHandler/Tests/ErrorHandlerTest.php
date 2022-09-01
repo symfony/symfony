@@ -327,7 +327,7 @@ class ErrorHandlerTest extends TestCase
 
         $handler = ErrorHandler::register();
         try {
-            trigger_error('foo '.\get_class($anonymousObject).' bar', \E_USER_WARNING);
+            trigger_error('foo '.$anonymousObject::class.' bar', \E_USER_WARNING);
             $this->fail('Exception expected.');
         } catch (\ErrorException $e) {
         } finally {
@@ -372,7 +372,7 @@ class ErrorHandlerTest extends TestCase
             $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception) {
                 $this->assertSame($expectedMessage, $message);
                 $this->assertArrayHasKey('exception', $context);
-                $this->assertInstanceOf(\get_class($exception), $context['exception']);
+                $this->assertInstanceOf($exception::class, $context['exception']);
             };
 
             $logger

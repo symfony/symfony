@@ -63,7 +63,7 @@ class UidValueResolverTest extends TestCase
     {
         $this->assertEquals([$expected], (new UidValueResolver())->resolve(
             new Request([], [], ['id' => $requestUid]),
-            new ArgumentMetadata('id', \get_class($expected), false, false, null)
+            new ArgumentMetadata('id', $expected::class, false, false, null)
         ));
     }
 

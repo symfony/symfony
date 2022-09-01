@@ -107,8 +107,8 @@ trait CallbacksTestTrait
             }
         };
 
-        $obj = $normalizer->denormalize(['foo' => $valueBar], \get_class($objWithNoConstructorArgument), 'any', ['callbacks' => $callbacks]);
-        $this->assertInstanceof(\get_class($objWithNoConstructorArgument), $obj);
+        $obj = $normalizer->denormalize(['foo' => $valueBar], $objWithNoConstructorArgument::class, 'any', ['callbacks' => $callbacks]);
+        $this->assertInstanceof($objWithNoConstructorArgument::class, $obj);
         $this->assertEquals($result->getBar(), $obj->getBar());
     }
 

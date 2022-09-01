@@ -88,7 +88,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
             'stamps' => $tracedMessage['stamps'] ?? null,
             'stamps_after_dispatch' => $tracedMessage['stamps_after_dispatch'] ?? null,
             'message' => [
-                'type' => new ClassStub(\get_class($message)),
+                'type' => new ClassStub($message::class),
                 'value' => $message,
             ],
             'caller' => $tracedMessage['caller'],
@@ -98,7 +98,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
             $exception = $tracedMessage['exception'];
 
             $debugRepresentation['exception'] = [
-                'type' => \get_class($exception),
+                'type' => $exception::class,
                 'value' => $exception,
             ];
         }

@@ -57,7 +57,7 @@ final class Hydrator
     public static function hydrate(object $instance, array $properties = [], array $scopedProperties = []): object
     {
         if ($properties) {
-            $class = \get_class($instance);
+            $class = $instance::class;
             $propertyScopes = InternalHydrator::$propertyScopes[$class] ??= InternalHydrator::getPropertyScopes($class);
 
             foreach ($properties as $name => &$value) {

@@ -85,7 +85,7 @@ set_exception_handler(function (Throwable $exception) {
             echo "Caused by\n";
         }
 
-        echo get_class($cause).': '.$cause->getMessage()."\n";
+        echo $cause::class.': '.$cause->getMessage()."\n";
         echo "\n";
         echo $cause->getFile().':'.$cause->getLine()."\n";
         echo $cause->getTraceAsString()."\n";

@@ -392,6 +392,9 @@ class Table
         $rowGroups = $this->buildTableRows($rows);
         $this->calculateColumnsWidth($rowGroups);
 
+        $this->dropColumn($rowGroups);
+        $this->calculateColumnsWidth($rowGroups);
+
         $isHeader = !$horizontal;
         $isFirstRow = $horizontal;
         $hasTitle = (bool) $this->headerTitle;
@@ -840,7 +843,10 @@ class Table
 
             $this->effectiveColumnWidths[$column] = max($lengths) + Helper::width($this->style->getCellRowContentFormat()) - 2;
         }
+    }
 
+    private function dropColumn(iterable $groups)
+    {
         $effectiveColumnWidths = $this->effectiveColumnWidths;
 
         for ($column = $this->numberOfColumns; $this->numberOfColumns > 0; --$column) {
@@ -855,6 +861,16 @@ class Table
 
         if ($this->droppedColumns) {
             foreach ($this->droppedColumns as $column) {
+                foreach ($groups as $group) {
+                    foreach ($group as $row) {
+                        foreach ($row as $index => $cell) {
+                            if ($cell instanceof TableCell && $index + $cell->getColspan() >= $column) {
+                                $cell->reduceColspan();
+                            }
+                        }
+                    }
+                }
+
                 unset(
                     $this->effectiveColumnWidths[$column],
                     $this->columnMaxWidths[$column],

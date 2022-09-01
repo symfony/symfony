@@ -69,6 +69,10 @@ class GetAttrNode extends Node
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
+                if ($this->nodes['node'] instanceof GetAttrNode) {
+                    $this->nodes['node']->attributes['is_null_coalesce'] = $this->attributes['is_null_coalesce'];
+                }
+
                 $obj = $this->nodes['node']->evaluate($functions, $values);
                 if (null === $obj && ($this->nodes['attribute']->isNullSafe || $this->attributes['is_null_coalesce'])) {
                     $this->attributes['is_short_circuited'] = true;

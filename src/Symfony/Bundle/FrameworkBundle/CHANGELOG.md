@@ -16,6 +16,7 @@ CHANGELOG
    tagged with `workflow.workflow`, and those with type=state_machine with
    `workflow.state_machine`
  * Add `rate_limiter` configuration option to `messenger.transport` to allow rate limited transports using the RateLimiter component
+ * Remove `@internal` tag from secret vaults to allow them to be used directly outside the framework bundle and custom vaults to be added
 
 6.1
 ---

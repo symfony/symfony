@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-08-26T15:11:38Z
+
+I'm really not convinced that `$object::class` is more readable than `get_class($object)`. I would be in favor of keeping the usage of `get_class`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-26T15:45:21Z
+
+I like the change personally. It gives a consistent syntax to get the class of something. Once used to it, we won't want to get back :)

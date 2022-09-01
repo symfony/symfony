@@ -150,7 +150,7 @@ EOF
                     break;
                 }
 
-                $this->retrySpecificEnvelops($envelopes, $failureTransportName, $io, $shouldForce);
+                $this->retrySpecificEnvelopes($envelopes, $failureTransportName, $io, $shouldForce);
             }
         } else {
             // get() and ask messages one-by-one
@@ -227,7 +227,7 @@ EOF
         }
     }
 
-    private function retrySpecificEnvelops(array $envelopes, string $failureTransportName, SymfonyStyle $io, bool $shouldForce)
+    private function retrySpecificEnvelopes(array $envelopes, string $failureTransportName, SymfonyStyle $io, bool $shouldForce)
     {
         $receiver = $this->getReceiver($failureTransportName);
 

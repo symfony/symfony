@@ -10,6 +10,7 @@ CHANGELOG
  * Change the signature of `FormConfigBuilderInterface::setDataMapper()` to `setDataMapper(?DataMapperInterface)`
  * Change the signature of `FormInterface::setParent()` to `setParent(?self)`
  * Add `PasswordHasherExtension` with support for `hash_property_path` option in `PasswordType`
+ * Add a type guesser that uses reflection information
 
 6.1
 ---

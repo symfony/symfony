@@ -17,6 +17,7 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
+use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -85,5 +86,10 @@ class CoreExtension extends AbstractExtension
         return [
             new TransformationFailureExtension($this->translator),
         ];
+    }
+
+    protected function loadTypeGuesser(): ?FormTypeGuesserInterface
+    {
+        return new ReflectionTypeGuesser();
     }
 }

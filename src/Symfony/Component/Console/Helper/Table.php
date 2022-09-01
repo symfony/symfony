@@ -816,6 +816,7 @@ class Table
      */
     private function calculateColumnsWidth(iterable $groups)
     {
+        $pass2 = count($this->effectiveColumnWidths);
         for ($column = 0; $column < $this->numberOfColumns; ++$column) {
             $lengths = [];
             foreach ($groups as $group) {
@@ -843,20 +844,36 @@ class Table
 
             $this->effectiveColumnWidths[$column] = max($lengths) + Helper::width($this->style->getCellRowContentFormat()) - 2;
         }
+
+        if ($pass2) {
+            $this->effectiveColumnWidths = array_values($this->effectiveColumnWidths);
+            $this->columnMaxWidths = array_values($this->columnMaxWidths);
+            $this->columnStyles = array_values($this->columnStyles);
+            $this->columnWidths = array_values($this->columnWidths);
+        }
     }
 
     private function dropColumn(iterable $groups)
     {
         $effectiveColumnWidths = $this->effectiveColumnWidths;
+        $optionalColumns = [];
+
+        foreach ($this->optionalColumns as $column) {
+            $optionalColumns[$column] = $effectiveColumnWidths[$column];
+        }
 
         for ($column = $this->numberOfColumns; $this->numberOfColumns > 0; --$column) {
             if ($this->maxWidth && $this->maxWidth > array_sum($effectiveColumnWidths)) {
                 break;
             }
 
-            $droppedColumn = array_pop($this->optionalColumns);
-            unset($effectiveColumnWidths[$droppedColumn]);
-            $this->droppedColumns[] = $droppedColumn;
+            $largestOptionalColumn = array_keys($optionalColumns, max($optionalColumns))[0];
+            unset($effectiveColumnWidths[$largestOptionalColumn], $optionalColumns[$largestOptionalColumn]);
+            $this->droppedColumns[] = $largestOptionalColumn;
+
+            if (empty($optionalColumns)) {
+                break;
+            }
         }
 
         if ($this->droppedColumns) {
@@ -864,7 +881,7 @@ class Table
                 foreach ($groups as $group) {
                     foreach ($group as $row) {
                         foreach ($row as $index => $cell) {
-                            if ($cell instanceof TableCell && $index + $cell->getColspan() >= $column) {
+                            if ($cell instanceof TableCell && $index + $cell->getColspan() > $column) {
                                 $cell->reduceColspan();
                             }
                         }
@@ -878,11 +895,6 @@ class Table
                     $this->columnWidths[$column],
                 );
             }
-
-            $this->effectiveColumnWidths = array_values($this->effectiveColumnWidths);
-            $this->columnMaxWidths = array_values($this->columnMaxWidths);
-            $this->columnStyles = array_values($this->columnStyles);
-            $this->columnWidths = array_values($this->columnWidths);
 
             $this->numberOfColumns -= count($this->droppedColumns);
         }

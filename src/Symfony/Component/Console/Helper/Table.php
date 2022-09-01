@@ -50,6 +50,9 @@ class Table
     private array $columnStyles = [];
     private array $columnWidths = [];
     private array $columnMaxWidths = [];
+    private array $optionalColumns = [];
+    private array $droppedColumns = [];
+    private int $maxWidth = 0;
     private bool $rendered = false;
     private string $displayOrientation = self::DISPLAY_ORIENTATION_DEFAULT;
 
@@ -171,6 +174,18 @@ class Table
 
         $this->columnMaxWidths[$columnIndex] = $width;
 
+        return $this;
+    }
+
+    public function setOptionalColumns(array $columns): static
+    {
+        $this->optionalColumns = $columns;
+        return $this;
+    }
+
+    public function setMaxWidth(int $maxWidth): static
+    {
+        $this->maxWidth = $maxWidth;
         return $this;
     }
 
@@ -400,6 +415,16 @@ class Table
 
                 if (!$row) {
                     continue;
+                }
+
+                if ($this->droppedColumns) {
+                    foreach ($this->droppedColumns as $column) {
+                        if ($this->numberOfColumns < count($row)) {
+                            unset($row[$column]);
+                        }
+                    }
+
+                    $row = array_values($row);
                 }
 
                 if ($isHeader && !$isHeaderSeparatorRendered) {
@@ -814,6 +839,36 @@ class Table
             }
 
             $this->effectiveColumnWidths[$column] = max($lengths) + Helper::width($this->style->getCellRowContentFormat()) - 2;
+        }
+
+        $effectiveColumnWidths = $this->effectiveColumnWidths;
+
+        for ($column = $this->numberOfColumns; $this->numberOfColumns > 0; --$column) {
+            if ($this->maxWidth && $this->maxWidth > array_sum($effectiveColumnWidths)) {
+                break;
+            }
+
+            $droppedColumn = array_pop($this->optionalColumns);
+            unset($effectiveColumnWidths[$droppedColumn]);
+            $this->droppedColumns[] = $droppedColumn;
+        }
+
+        if ($this->droppedColumns) {
+            foreach ($this->droppedColumns as $column) {
+                unset(
+                    $this->effectiveColumnWidths[$column],
+                    $this->columnMaxWidths[$column],
+                    $this->columnStyles[$column],
+                    $this->columnWidths[$column],
+                );
+            }
+
+            $this->effectiveColumnWidths = array_values($this->effectiveColumnWidths);
+            $this->columnMaxWidths = array_values($this->columnMaxWidths);
+            $this->columnStyles = array_values($this->columnStyles);
+            $this->columnWidths = array_values($this->columnWidths);
+
+            $this->numberOfColumns -= count($this->droppedColumns);
         }
     }
 

@@ -22,7 +22,7 @@ class PhpSerializerTest extends TestCase
 {
     public function testEncodedIsDecodable()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $envelope = new Envelope(new DummyMessage('Hello'));
 
@@ -36,7 +36,7 @@ class PhpSerializerTest extends TestCase
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessage('Encoded envelope should have at least a "body", or maybe you should implement your own serializer');
 
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $serializer->decode([]);
     }
@@ -46,7 +46,7 @@ class PhpSerializerTest extends TestCase
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/Could not decode/');
 
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $serializer->decode([
             'body' => '{"message": "bar"}',
@@ -58,7 +58,7 @@ class PhpSerializerTest extends TestCase
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/Could not decode/');
 
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $serializer->decode([
             'body' => 'x',
@@ -70,7 +70,7 @@ class PhpSerializerTest extends TestCase
         $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessageMatches('/class "ReceivedSt0mp" not found/');
 
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $serializer->decode([
             'body' => 'O:13:"ReceivedSt0mp":0:{}',
@@ -79,7 +79,7 @@ class PhpSerializerTest extends TestCase
 
     public function testEncodedSkipsNonEncodeableStamps()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $envelope = new Envelope(new DummyMessage('Hello'), [
             new DummyPhpSerializerNonSendableStamp(),
@@ -91,13 +91,18 @@ class PhpSerializerTest extends TestCase
 
     public function testNonUtf8IsBase64Encoded()
     {
-        $serializer = new PhpSerializer();
+        $serializer = $this->createPhpSerializer();
 
         $envelope = new Envelope(new DummyMessage("\xE9"));
 
         $encoded = $serializer->encode($envelope);
         $this->assertTrue((bool) preg_match('//u', $encoded['body']), 'Encodes non-UTF8 payloads');
         $this->assertEquals($envelope, $serializer->decode($encoded));
+    }
+
+    protected function createPhpSerializer(): PhpSerializer
+    {
+        return new PhpSerializer();
     }
 }
 

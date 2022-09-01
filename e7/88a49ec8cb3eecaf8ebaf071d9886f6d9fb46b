@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-05-10T14:46:39Z
+
+ping @symfony/mergers : What do you think about this PR? IMHO this is really needed to be able to explore "dead" messages.
+
+And what do you think about the new `MessageDecodingFailedStamp` class. IMHO, this is cleaner than before and more flexible.
+
+Should I address comments and add some tests, or we gonna close it anyway?
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2021-05-19T07:50:04Z
+
+Indeed, this could be very useful
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-06T16:45:57Z
+
+before reviewing, do you still want this in core? can you please rebase + fix review comments if yes?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-06T17:28:15Z
+
+Yes it would be very useful!
+
+I'll rebase it ASAP 👍🏼
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-13T09:40:35Z
+
+I rebased the PR. and added some tests.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-08-30T14:33:07Z
+
+@nicolas-grekas I addressed your comments, replay all examples, and updated the PR description. I think it's OK

@@ -162,7 +162,7 @@ abstract class AbstractUnicodeString extends AbstractString
     public function camel(): parent
     {
         $str = clone $this;
-        $str->string = str_replace(' ', '', preg_replace_callback('/\b./u', static function ($m) use (&$i) {
+        $str->string = str_replace(' ', '', preg_replace_callback('/\b.(?![A-Z]{2,})/u', static function ($m) use (&$i) {
             return 1 === ++$i ? ('İ' === $m[0] ? 'i̇' : mb_strtolower($m[0], 'UTF-8')) : mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8');
         }, preg_replace('/[^\pL0-9]++/u', ' ', $this->string)));
 

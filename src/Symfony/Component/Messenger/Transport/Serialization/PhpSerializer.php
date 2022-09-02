@@ -21,11 +21,22 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class PhpSerializer implements SerializerInterface
 {
-    private bool $createClassNotFound = false;
+    private bool $acceptPhpIncompleteClass = false;
 
-    public function enableClassNotFoundCreation(bool $enable = true): void
+    /**
+     * @internal
+     */
+    public function acceptPhpIncompleteClass(): void
     {
-        $this->createClassNotFound = $enable;
+        $this->acceptPhpIncompleteClass = true;
+    }
+
+    /**
+     * @internal
+     */
+    public function rejectPhpIncompleteClass(): void
+    {
+        $this->acceptPhpIncompleteClass = false;
     }
 
     public function decode(array $encodedEnvelope): Envelope
@@ -66,7 +77,7 @@ class PhpSerializer implements SerializerInterface
 
         $signalingException = new MessageDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $contents));
 
-        if ($this->createClassNotFound) {
+        if ($this->acceptPhpIncompleteClass) {
             $prevUnserializeHandler = ini_set('unserialize_callback_func', null);
         } else {
             $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');

@@ -35,7 +35,7 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
             $this->headers[] = $response['headers'];
         }
 
-        parent::__construct(new EventDispatcher(), $this, null, $this, true);
+        parent::__construct(new EventDispatcher(), $this, null, $this);
     }
 
     public function getBackendRequest()

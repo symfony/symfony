@@ -119,6 +119,6 @@ class TraceableEventDispatcherTest extends TestCase
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
 
-        return new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver, true);
+        return new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
     }
 }

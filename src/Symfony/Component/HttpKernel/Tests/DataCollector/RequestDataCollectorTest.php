@@ -396,7 +396,7 @@ class RequestDataCollectorTest extends TestCase
     protected function injectController($collector, $controller, $request)
     {
         $resolver = $this->createMock(ControllerResolverInterface::class);
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class), true);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
         $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST);
         $collector->onKernelController($event);
     }

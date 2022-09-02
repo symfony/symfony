@@ -36,7 +36,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         $this->headers = $headers;
         $this->customizer = $customizer;
 
-        parent::__construct($eventDispatcher ?? new EventDispatcher(), $this, null, $this, true);
+        parent::__construct($eventDispatcher ?? new EventDispatcher(), $this, null, $this);
     }
 
     public function assert(\Closure $callback)

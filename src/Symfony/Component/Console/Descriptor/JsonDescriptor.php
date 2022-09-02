@@ -163,7 +163,7 @@ class JsonDescriptor extends Descriptor
             ];
 
             $definition = $command->getApplication()?->getDefinition();
-            if ($definition?->getOptions() || $definition?->getArguments()) {
+            if ($definition && ($definition->getOptions() || $definition->getArguments())) {
                 $data['definition'] = $this->getInputDefinitionData($command->getApplication()->getDefinition(), 'application-level ');
             }
 

@@ -83,13 +83,13 @@ class XmlDescriptor extends Descriptor
             $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
 
             $definition = $command->getApplication()?->getDefinition();
-            if ($definition?->getOptions() || $definition?->getArguments()) {
+            if ($definition && ($definition->getOptions() || $definition->getArguments())) {
                 $definitionXML = $this->getInputDefinitionDocument($definition, 'application-level');
                 $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
             }
 
             $definition = $command->getDefinition();
-            if ($definition?->getOptions() || $definition?->getArguments()) {
+            if ($definition->getOptions() || $definition->getArguments()) {
                 $definitionXML = $this->getInputDefinitionDocument($definition, 'command-level');
                 $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
             }
@@ -149,9 +149,9 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $type = '')
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '')
     {
-        $this->writeDocument($this->getInputDefinitionDocument($definition, $type));
+        $this->writeDocument($this->getInputDefinitionDocument($definition, $prefix));
     }
 
     protected function describeCommand(Command $command, array $options = [])

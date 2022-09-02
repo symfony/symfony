@@ -136,7 +136,7 @@ class MarkdownDescriptor extends Descriptor
         }
 
         $definition = $command->getApplication()?->getDefinition();
-        if ($definition?->getOptions() || $definition?->getArguments()) {
+        if ($definition && ($definition->getOptions() || $definition->getArguments())) {
             $this->write("\n\n");
             $this->describeInputDefinition($definition, prefix: 'Application-level ');
         }

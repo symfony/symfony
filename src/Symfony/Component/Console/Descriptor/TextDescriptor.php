@@ -143,7 +143,7 @@ class TextDescriptor extends Descriptor
         $command->mergeApplicationDefinition(false, false);
 
         $definition = $command->getApplication()?->getDefinition();
-        if ($definition?->getOptions() || $definition?->getArguments()) {
+        if ($definition && ($definition->getOptions() || $definition->getArguments())) {
             $this->writeText("\n");
             $this->describeInputDefinition($definition, $options, 'Application-level ');
             $this->writeText("\n");

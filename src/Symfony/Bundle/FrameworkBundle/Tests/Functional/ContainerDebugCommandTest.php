@@ -109,7 +109,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
         $tester = new ApplicationTester($application);
         $tester->setInputs(['0']);
-        $tester->run(['command' => 'debug:container', '--tag' => 'kernel.']);
+        $tester->run(['command' => 'debug:container', '--tag' => 'kernel.'], ['decorated' => false]);
 
         $this->assertStringContainsString('Select one of the following tags to display its information', $tester->getDisplay());
         $this->assertStringContainsString('[0] kernel.event_subscriber', $tester->getDisplay());

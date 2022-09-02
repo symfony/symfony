@@ -9,7 +9,7 @@ function _sf_{{ COMMAND_NAME }}
     set sf_cmd (commandline -o)
     set c (count (commandline -oc))
 
-    set completecmd "$sf_cmd[1]" "_complete" "-sfish" "-S{{ VERSION }}"
+    set completecmd "$sf_cmd[1]" "_complete" "--no-interaction" "-sfish" "-S{{ VERSION }}"
 
     for i in $sf_cmd
         if [ $i != "" ]

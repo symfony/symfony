@@ -289,6 +289,7 @@ class Connection
 
                 $auth['pass'] = $m['password'];
             }
+
             return 'file:'.($m[1] ?? '');
         }, $url);
 
@@ -296,13 +297,13 @@ class Connection
             throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
         }
 
-        if ($auth !== null) {
+        if (null !== $auth) {
             unset($parsedUrl['user']); // parse_url thinks //0@localhost/ is a password of "0"! doh!
             $parsedUrl = $parsedUrl + ($auth ?? []); // But don't worry as $auth array will have user, user/pass or pass as needed
         }
 
         // revert scheme now we are finished using PHP parse_url
-        if ($parsedUrl['scheme'] == 'file') {
+        if ('file' == $parsedUrl['scheme']) {
             $parsedUrl['scheme'] = $scheme;
         }
 

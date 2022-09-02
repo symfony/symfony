@@ -111,11 +111,11 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         $request = new Request(implode('', $url), $method);
 
         if ($options['http_version']) {
-            switch ((float) $options['http_version']) {
-                case 1.0: $request->setProtocolVersions(['1.0']); break;
-                case 1.1: $request->setProtocolVersions(['1.1', '1.0']); break;
-                default: $request->setProtocolVersions(['2', '1.1', '1.0']); break;
-            }
+            $request->setProtocolVersions(match ((float) $options['http_version']) {
+                1.0 => ['1.0'],
+                1.1 => $request->setProtocolVersions(['1.1', '1.0']),
+                default => ['2', '1.1', '1.0'],
+            });
         }
 
         foreach ($options['headers'] as $v) {

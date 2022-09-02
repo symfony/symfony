@@ -147,17 +147,12 @@ class CliDumper extends AbstractDumper
                     $style = 'float';
                 }
 
-                switch (true) {
-                    case \INF === $value:  $value = 'INF'; break;
-                    case -\INF === $value: $value = '-INF'; break;
-                    case is_nan($value):  $value = 'NAN'; break;
-                    default:
-                        $value = (string) $value;
-                        if (!str_contains($value, $this->decimalPoint)) {
-                            $value .= $this->decimalPoint.'0';
-                        }
-                        break;
-                }
+                $value = match (true) {
+                    \INF === $value => 'INF',
+                    -\INF === $value => '-INF',
+                    is_nan($value) => 'NAN',
+                    default => !str_contains($value = (string) $value, $this->decimalPoint) ? $value .= $this->decimalPoint.'0' : $value,
+                };
                 break;
 
             case 'NULL':

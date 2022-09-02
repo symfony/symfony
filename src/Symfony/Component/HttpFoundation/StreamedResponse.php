@@ -95,9 +95,9 @@ class StreamedResponse extends Response
     }
 
     /**
-     * @throws \LogicException when the content is not null
-     *
      * @return $this
+     *
+     * @throws \LogicException when the content is not null
      */
     public function setContent(?string $content): static
     {

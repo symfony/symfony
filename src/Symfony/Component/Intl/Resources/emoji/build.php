@@ -173,7 +173,7 @@ final class Builder
             file_put_contents(self::TARGET_DIR."/emoji-$locale.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
 
             foreach ($rules as $k => $v) {
-                for ($i = 0; \ord($k[$i]) < 128 || "\xC2" === $k[$i]; ++$i) {
+                for ($i = 0; ord($k[$i]) < 128 || "\xC2" === $k[$i]; ++$i) {
                 }
                 for ($j = $i; isset($k[$j]) && !isset($firstChars[$k[$j]]); ++$j) {
                 }
@@ -189,7 +189,7 @@ final class Builder
 
         $quickCheck = '"'.str_replace('%', '\\x', rawurlencode(implode('', $firstChars))).'"';
 
-        $file = \dirname(__DIR__, 2).'/Transliterator/EmojiTransliterator.php';
+        $file = dirname(__DIR__, 2).'/Transliterator/EmojiTransliterator.php';
         file_put_contents($file, preg_replace('/QUICK_CHECK = .*;/m', "QUICK_CHECK = {$quickCheck};", file_get_contents($file)));
     }
 

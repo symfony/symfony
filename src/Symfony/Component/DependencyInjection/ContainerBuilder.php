@@ -291,7 +291,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         if ($this->trackResources) {
             if (\is_object($object)) {
-                $object = \get_class($object);
+                $object = $object::class;
             }
             if (!isset($this->classReflectors[$object])) {
                 $this->classReflectors[$object] = new \ReflectionClass($object);
@@ -1037,7 +1037,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (null !== $factory) {
             $service = $factory(...$arguments);
 
-            if (\is_object($tryProxy) && \get_class($service) !== $parameterBag->resolveValue($definition->getClass())) {
+            if (\is_object($tryProxy) && $service::class !== $parameterBag->resolveValue($definition->getClass())) {
                 throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', $definition->getClass(), get_debug_type($service)));
             }
 

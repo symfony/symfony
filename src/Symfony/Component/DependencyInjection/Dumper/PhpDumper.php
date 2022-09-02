@@ -1665,7 +1665,7 @@ EOF;
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain expressions. Expression "%s" found in "%s".', $value, $path.'/'.$key));
             } elseif ($value instanceof \UnitEnum) {
                 $hasEnum = true;
-                $value = sprintf('\%s::%s', \get_class($value), $value->name);
+                $value = sprintf('\%s::%s', $value::class, $value->name);
             } else {
                 $value = $this->export($value);
             }
@@ -1917,7 +1917,7 @@ EOF;
                 return $code;
             }
         } elseif ($value instanceof \UnitEnum) {
-            return sprintf('\%s::%s', \get_class($value), $value->name);
+            return sprintf('\%s::%s', $value::class, $value->name);
         } elseif ($value instanceof AbstractArgument) {
             throw new RuntimeException($value->getTextWithContext());
         } elseif (\is_object($value) || \is_resource($value)) {

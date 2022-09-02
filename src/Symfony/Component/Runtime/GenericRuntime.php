@@ -122,7 +122,7 @@ class GenericRuntime implements RuntimeInterface
         }
 
         if (!$application instanceof \Closure) {
-            if ($runtime = $this->resolveRuntime(\get_class($application))) {
+            if ($runtime = $this->resolveRuntime($application::class)) {
                 return $runtime->getRunner($application);
             }
 

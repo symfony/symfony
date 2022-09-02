@@ -41,7 +41,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
-        return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
+        return parent::supportsNormalization($data, $format) && $this->supports($data::class);
     }
 
     /**

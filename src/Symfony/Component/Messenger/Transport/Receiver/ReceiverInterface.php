@@ -39,9 +39,9 @@ interface ReceiverInterface
      * be retried again (e.g. if there's a queue, it should be removed)
      * and a MessageDecodingFailedException should be thrown.
      *
-     * @throws TransportException If there is an issue communicating with the transport
-     *
      * @return Envelope[]
+     *
+     * @throws TransportException If there is an issue communicating with the transport
      */
     public function get(): iterable;
 

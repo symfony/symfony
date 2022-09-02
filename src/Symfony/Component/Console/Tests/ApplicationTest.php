@@ -2086,7 +2086,7 @@ class BaseSignableCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->emitsSignal) {
-            posix_kill(posix_getpid(), SIGUSR1);
+            posix_kill(posix_getpid(), \SIGUSR1);
         }
 
         for ($i = 0; $i < $this->loop; ++$i) {

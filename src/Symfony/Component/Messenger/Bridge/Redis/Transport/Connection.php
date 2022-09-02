@@ -256,9 +256,14 @@ class Connection
                 $connectionCredentials['host'] = 'tls://'.$connectionCredentials['host'];
             }
         } else {
+            $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
+            $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
+
             $connectionCredentials = [
                 'host' => $parsedUrl['path'],
                 'port' => 0,
+                // See: https://github.com/phpredis/phpredis/#auth
+                'auth' => $redisOptions['auth'] ?? (null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user)),
             ];
         }
 
@@ -274,9 +279,30 @@ class Connection
             $url = str_replace($scheme.':', 'file:', $dsn);
         }
 
+        $url = preg_replace_callback('#^' . $scheme . ':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
+            if (isset($m['password'])) {
+                if (!\in_array($m['user'], ['', 'default'], true)) {
+                    $auth['user']=$m['user'];
+                }
+
+                $auth['pass'] = $m['password'];
+            }
+
+            return 'file:' . ($m[1] ?? '');
+        }, $url);
+
         if (false === $parsedUrl = parse_url($url)) {
             throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
         }
+
+        $parsedUrl = $parsedUrl + ($auth ?? []);
+
+        if (array_key_exists('host', $parsedUrl)){
+            $parsedUrl = ['scheme' => $scheme, 'host' => $parsedUrl['host'], 'port' => $parsedUrl['port'] ?? '6379'] + $parsedUrl;
+        } else {
+            $parsedUrl = ['scheme' => 'unix', 'path' => $parsedUrl['path']] + $parsedUrl;
+        }
+
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $dsnOptions);
             $redisOptions = array_merge($redisOptions, $dsnOptions);

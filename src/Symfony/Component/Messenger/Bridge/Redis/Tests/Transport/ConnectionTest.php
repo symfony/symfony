@@ -53,6 +53,61 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnOnUnixSocketWithUserAndPassword()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with(['user','password'])
+            ->willReturn(true);
+
+        $this->assertEquals(
+            new Connection(['stream' => 'queue', 'delete_after_ack' => true], [
+                'host' => '/var/run/redis/redis.sock',
+                'port' => 0,
+                'user'=> 'user',
+                'pass'=> 'password'
+            ], [], $redis),
+            Connection::fromDsn('redis://user:password@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
+        );
+    }
+
+    public function testFromDsnOnUnixSocketWithPassword()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password')
+            ->willReturn(true);
+
+        $this->assertEquals(
+            new Connection(['stream' => 'queue', 'delete_after_ack' => true], [
+                'host' => '/var/run/redis/redis.sock',
+                'port' => 0,
+                'pass'=>'password'
+            ], [], $redis),
+            Connection::fromDsn('redis://password@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
+        );
+    }
+
+    public function testFromDsnOnUnixSocketWithUser()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('user')
+            ->willReturn(true);
+
+        $this->assertEquals(
+            new Connection(['stream' => 'queue', 'delete_after_ack' => true], [
+                'host' => '/var/run/redis/redis.sock',
+                'port' => 0,
+                'user' => 'user',
+            ], [], $redis),
+            Connection::fromDsn('redis://user:@/var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
+        );
+    }
+
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(

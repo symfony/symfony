@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-08-26T14:19:28Z
+
+this should bump the completion version, to make users regenerate their completion script.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-08-26T14:24:24Z
+
+I'm not sure, it's not really an API change, and the last bugfixes did not bump the version either?
+
+---------------------------------------------------------------------------
+
+by PowerKiKi at 2022-08-26T20:47:03Z
+
+I might be wrong but if we run non-interactively would this not potentially run untrusted code from plugins as root during completion ? would this not open up a security hole ?
+
+Or is there no plugin possible during autocompletion workflow, now and in the foreseeable future  ?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-08-27T13:58:54Z
+
+Which plugins are you talking about ?
+
+---------------------------------------------------------------------------
+
+by PowerKiKi at 2022-08-28T19:00:50Z
+
+Sorry I was not very clear. I am coming from https://github.com/composer/composer/issues/11024, so I was referring to composer plugins.
+
+I am not aware of whether composer plugins run or not during bash completion. But I know that the fact that composer warns against running as root is, partly, because plugins are third party code that might/should be considered dangerous.
+
+So I was wondering if this patch, which will allow running bash completion as root, might indirectly allow untrusted plugin code to also be run as root without warnings?
+
+I realize this is specific to composer, and this might be up to composer to implement something to prevent that, if necessary. But I thought it might be interesting to consider before this merging third PR nonetheless.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-08-28T19:31:19Z
+
+Yes it is a valid point however indeed something to handle on the composer end. Right now plug-ins are loaded during completion. I thought of disabling them for perf reason initially but then figured this might also cause things to break depending on the plug-in. Disabling them for root probably makes sense tho, unless COMPOSER_ALLOW_ROOT (or whatever the env was called) is set.

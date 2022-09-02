@@ -439,9 +439,9 @@ class Command
      * @param $default The default value (for InputArgument::OPTIONAL mode only)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
-     * @throws InvalidArgumentException When argument mode is not valid
-     *
      * @return $this
+     *
+     * @throws InvalidArgumentException When argument mode is not valid
      */
     public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null /* array|\Closure $suggestedValues = null */): static
     {
@@ -463,9 +463,9 @@ class Command
      * @param $default  The default value (must be null for InputOption::VALUE_NONE)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
-     * @throws InvalidArgumentException If option mode is invalid or incompatible
-     *
      * @return $this
+     *
+     * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
     public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null /* array|\Closure $suggestedValues = [] */): static
     {

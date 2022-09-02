@@ -42,7 +42,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
             $this->data['instances']['calls'][$name] = $instance->getCalls();
-            $this->data['instances']['adapters'][$name] = \get_debug_type($instance->getPool());
+            $this->data['instances']['adapters'][$name] = get_debug_type($instance->getPool());
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();

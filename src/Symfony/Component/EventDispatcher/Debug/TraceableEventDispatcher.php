@@ -108,7 +108,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
 
     public function dispatch(object $event, string $eventName = null): object
     {
-        $eventName ??= \get_class($event);
+        $eventName ??= $event::class;
 
         if (null === $this->callStack) {
             $this->callStack = new \SplObjectStorage();

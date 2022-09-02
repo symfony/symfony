@@ -47,9 +47,9 @@ interface CacheInterface
      *
      * @param string $key The key to delete
      *
-     * @throws InvalidArgumentException When $key is not valid
-     *
      * @return bool True if the item was successfully removed, false if there was any error
+     *
+     * @throws InvalidArgumentException When $key is not valid
      */
     public function delete(string $key): bool;
 }

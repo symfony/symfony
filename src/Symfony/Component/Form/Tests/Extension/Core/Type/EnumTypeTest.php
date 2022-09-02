@@ -91,13 +91,13 @@ class EnumTypeTest extends BaseTypeTest
 
         yield 'string backed' => [
             Suit::class,
-            (Suit::Spades)->value,
+            Suit::Spades->value,
             Suit::Spades,
         ];
 
         yield 'integer backed' => [
             Number::class,
-            (string) (Number::Two)->value,
+            (string) Number::Two->value,
             Number::Two,
         ];
     }
@@ -131,7 +131,7 @@ class EnumTypeTest extends BaseTypeTest
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
     {
-        $emptyData = (Suit::Hearts)->value;
+        $emptyData = Suit::Hearts->value;
 
         $form = $this->factory->create($this->getTestedType(), null, [
             'class' => Suit::class,
@@ -151,7 +151,7 @@ class EnumTypeTest extends BaseTypeTest
             'multiple' => true,
             'expanded' => false,
             'class' => Suit::class,
-            'empty_data' => [(Suit::Diamonds)->value],
+            'empty_data' => [Suit::Diamonds->value],
         ]);
 
         $form->submit(null);
@@ -165,7 +165,7 @@ class EnumTypeTest extends BaseTypeTest
             'multiple' => false,
             'expanded' => true,
             'class' => Suit::class,
-            'empty_data' => (Suit::Hearts)->value,
+            'empty_data' => Suit::Hearts->value,
         ]);
 
         $form->submit(null);
@@ -179,7 +179,7 @@ class EnumTypeTest extends BaseTypeTest
             'multiple' => true,
             'expanded' => true,
             'class' => Suit::class,
-            'empty_data' => [(Suit::Spades)->value],
+            'empty_data' => [Suit::Spades->value],
         ]);
 
         $form->submit(null);
@@ -233,13 +233,13 @@ class EnumTypeTest extends BaseTypeTest
 
         yield 'string backed' => [
             Suit::class,
-            [(Suit::Hearts)->value, (Suit::Spades)->value],
+            [Suit::Hearts->value, Suit::Spades->value],
             [Suit::Hearts, Suit::Spades],
         ];
 
         yield 'integer backed' => [
             Number::class,
-            [(string) (Number::Two)->value, (string) (Number::Three)->value],
+            [(string) Number::Two->value, (string) Number::Three->value],
             [Number::Two, Number::Three],
         ];
     }

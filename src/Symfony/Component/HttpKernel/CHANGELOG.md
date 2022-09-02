@@ -9,6 +9,7 @@ CHANGELOG
  * Add `#[Cache]` to describe the default HTTP cache headers on controllers
  * Add `absolute_uri` option to surrogate fragment renderers
  * Add `ValueResolverInterface` and deprecate `ArgumentValueResolverInterface`
+ * Add argument `$reflector` to `ArgumentResolverInterface` and `ArgumentMetadataFactoryInterface`
 
 6.1
 ---

@@ -40,12 +40,11 @@ final class ArgumentResolver implements ArgumentResolverInterface
         $this->argumentValueResolvers = $argumentValueResolvers ?: self::getDefaultArgumentValueResolvers();
     }
 
-    public function getArguments(Request $request, callable $controller): array
+    public function getArguments(Request $request, callable $controller, \ReflectionFunctionAbstract $reflector = null): array
     {
         $arguments = [];
-        $reflectors = $request->attributes->get('_controller_reflectors') ?? [];
 
-        foreach ($this->argumentMetadataFactory->createArgumentMetadata($controller, ...$reflectors) as $metadata) {
+        foreach ($this->argumentMetadataFactory->createArgumentMetadata($controller, $reflector) as $metadata) {
             foreach ($this->argumentValueResolvers as $resolver) {
                 if ((!$resolver instanceof ValueResolverInterface || $resolver instanceof TraceableValueResolver) && !$resolver->supports($request, $metadata)) {
                     continue;

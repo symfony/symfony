@@ -21,27 +21,12 @@ use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
 class ControllerEventTest extends TestCase
 {
-    public function testSetAttributes()
-    {
-        $request = new Request();
-        $request->attributes->set('_controller_reflectors', [1, 2]);
-        $controller = [new AttributeController(), 'action'];
-        $event = new ControllerEvent(new TestHttpKernel(), $controller, $request, HttpKernelInterface::MAIN_REQUEST);
-        $event->setController($controller, []);
-
-        $this->assertSame([], $event->getAttributes());
-    }
-
     /**
      * @dataProvider provideGetAttributes
      */
     public function testGetAttributes(callable $controller)
     {
-        $request = new Request();
-        $reflector = new \ReflectionFunction($controller(...));
-        $request->attributes->set('_controller_reflectors', [str_contains($reflector->name, '{closure}') ? null : $reflector->getClosureScopeClass(), $reflector]);
-
-        $event = new ControllerEvent(new TestHttpKernel(), $controller, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerEvent(new TestHttpKernel(), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);
 
         $expected = [
             Bar::class => [

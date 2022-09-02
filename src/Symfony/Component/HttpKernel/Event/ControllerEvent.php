@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 final class ControllerEvent extends KernelEvent
 {
     private string|array|object $controller;
+    private \ReflectionFunctionAbstract $controllerReflector;
     private array $attributes;
 
     public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, ?int $requestType)
@@ -40,6 +41,11 @@ final class ControllerEvent extends KernelEvent
     public function getController(): callable
     {
         return $this->controller;
+    }
+
+    public function getControllerReflector(): \ReflectionFunctionAbstract
+    {
+        return $this->controllerReflector;
     }
 
     /**
@@ -62,17 +68,13 @@ final class ControllerEvent extends KernelEvent
         }
 
         if (\is_array($controller) && method_exists(...$controller)) {
-            $action = new \ReflectionMethod(...$controller);
-            $class = new \ReflectionClass($controller[0]);
+            $this->controllerReflector = new \ReflectionMethod(...$controller);
         } elseif (\is_string($controller) && false !== $i = strpos($controller, '::')) {
-            $action = new \ReflectionMethod($controller);
-            $class = new \ReflectionClass(substr($controller, 0, $i));
+            $this->controllerReflector = new \ReflectionMethod($controller);
         } else {
-            $action = new \ReflectionFunction($controller(...));
-            $class = str_contains($action->name, '{closure}') ? null : $action->getClosureScopeClass();
+            $this->controllerReflector = new \ReflectionFunction($controller(...));
         }
 
-        $this->getRequest()->attributes->set('_controller_reflectors', [$class, $action]);
         $this->controller = $controller;
     }
 
@@ -81,13 +83,20 @@ final class ControllerEvent extends KernelEvent
      */
     public function getAttributes(): array
     {
-        if (isset($this->attributes) || ![$class, $action] = $this->getRequest()->attributes->get('_controller_reflectors')) {
-            return $this->attributes ??= [];
+        if (isset($this->attributes)) {
+            return $this->attributes;
         }
 
+        if (\is_array($this->controller) && method_exists(...$this->controller)) {
+            $class = new \ReflectionClass($this->controller[0]);
+        } elseif (\is_string($this->controller) && false !== $i = strpos($this->controller, '::')) {
+            $class = new \ReflectionClass(substr($this->controller, 0, $i));
+        } else {
+            $class = str_contains($this->controllerReflector->name, '{closure}') ? null : $this->controllerReflector->getClosureScopeClass();
+        }
         $this->attributes = [];
 
-        foreach (array_merge($class?->getAttributes() ?? [], $action->getAttributes()) as $attribute) {
+        foreach (array_merge($class?->getAttributes() ?? [], $this->controllerReflector->getAttributes()) as $attribute) {
             if (class_exists($attribute->getName())) {
                 $this->attributes[$attribute->getName()][] = $attribute->newInstance();
             }

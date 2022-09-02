@@ -21,10 +21,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     public function createArgumentMetadata(string|object|array $controller, \ReflectionClass $class = null, \ReflectionFunctionAbstract $reflection = null): array
     {
         $arguments = [];
-        if (\is_array($controller)) {
-            $reflection = new \ReflectionMethod($controller[0], $controller[1]);
-            $class = $reflection->class;
-        }
 
         if (null === $reflection) {
             $reflection = new \ReflectionFunction($controller(...));

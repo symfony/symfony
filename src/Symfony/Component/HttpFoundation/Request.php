@@ -983,7 +983,7 @@ class Request
         $scheme = $this->getScheme();
         $port = $this->getPort();
 
-        if (('http' == $scheme && 80 == $port) || ('https' == $scheme && 443 == $port)) {
+        if (('http' === $scheme && 80 == $port) || ('https' === $scheme && 443 == $port)) {
             return $this->getHost();
         }
 

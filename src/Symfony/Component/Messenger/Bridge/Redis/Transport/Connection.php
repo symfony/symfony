@@ -275,10 +275,12 @@ class Connection
         $url = $dsn;
         $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
 
+        // if scheme:///...
         if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
             $url = str_replace($scheme.':', 'file:', $dsn);
         }
 
+        // if scheme://...
         $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (!\in_array($m['user'], ['', 'default'], true)) {
@@ -287,7 +289,6 @@ class Connection
 
                 $auth['pass'] = $m['password'];
             }
-
             return 'file:'.($m[1] ?? '');
         }, $url);
 
@@ -295,12 +296,14 @@ class Connection
             throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
         }
 
-        $parsedUrl = $parsedUrl + ($auth ?? []);
+        if ($auth !== null) {
+            unset($parsedUrl['user']); // parse_url thinks //0@localhost/ is a password of "0"! doh!
+            $parsedUrl = $parsedUrl + ($auth ?? []); // But don't worry as $auth array will have user, user/pass or pass as needed
+        }
 
-        if (\array_key_exists('host', $parsedUrl)) {
-            $parsedUrl = ['scheme' => $scheme, 'host' => $parsedUrl['host'], 'port' => $parsedUrl['port'] ?? '6379'] + $parsedUrl;
-        } else {
-            $parsedUrl = ['scheme' => 'unix', 'path' => $parsedUrl['path']] + $parsedUrl;
+        // revert scheme now we are finished using PHP parse_url
+        if ($parsedUrl['scheme'] == 'file') {
+            $parsedUrl['scheme'] = $scheme;
         }
 
         if (isset($parsedUrl['query'])) {

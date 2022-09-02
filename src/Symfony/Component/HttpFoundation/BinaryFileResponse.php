@@ -206,6 +206,10 @@ class BinaryFileResponse extends Response
      */
     public function prepare(Request $request)
     {
+        if (\in_array($this->getStatusCode(), [self::HTTP_NO_CONTENT, self::HTTP_NOT_MODIFIED])) {
+            return $this;
+        }
+        
         if (!$this->headers->has('Content-Type')) {
             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');
         }

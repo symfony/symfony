@@ -62,25 +62,26 @@ trait PriorityTaggedServiceTrait
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
             $checkTaggedItem = !$definition->hasTag(80000 <= \PHP_VERSION_ID && $definition->isAutoconfigured() ? 'container.ignore_attributes' : $tagName);
 
+            if ($class) {
+                $defaultPriority = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultPriorityMethod, $tagName, 'priority', $checkTaggedItem);
+                $defaultIndex = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute, $checkTaggedItem);
+            }
+
             foreach ($attributes as $attribute) {
                 $index = $priority = null;
 
                 if (isset($attribute['priority'])) {
                     $priority = $attribute['priority'];
-                } elseif (null === $defaultPriority && $defaultPriorityMethod && $class) {
-                    $defaultPriority = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultPriorityMethod, $tagName, 'priority', $checkTaggedItem);
                 }
                 $priority = $priority ?? $defaultPriority ?? $defaultPriority = 0;
 
-                if (null === $indexAttribute && !$defaultIndexMethod && !$needsIndexes) {
+                if (null === $indexAttribute && null === $defaultIndex && !$needsIndexes) {
                     $services[] = [$priority, ++$i, null, $serviceId, null];
                     continue 2;
                 }
 
                 if (null !== $indexAttribute && isset($attribute[$indexAttribute])) {
                     $index = $attribute[$indexAttribute];
-                } elseif (null === $defaultIndex && $defaultPriorityMethod && $class) {
-                    $defaultIndex = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute, $checkTaggedItem);
                 }
                 $index = $index ?? $defaultIndex ?? $defaultIndex = $serviceId;
 
@@ -119,13 +120,13 @@ class PriorityTaggedServiceUtil
     /**
      * @return string|int|null
      */
-    public static function getDefault(ContainerBuilder $container, string $serviceId, string $class, string $defaultMethod, string $tagName, ?string $indexAttribute, bool $checkTaggedItem)
+    public static function getDefault(ContainerBuilder $container, string $serviceId, string $class, ?string $defaultMethod, string $tagName, ?string $indexAttribute, bool $checkTaggedItem)
     {
         if (!($r = $container->getReflectionClass($class)) || (!$checkTaggedItem && !$r->hasMethod($defaultMethod))) {
             return null;
         }
 
-        if ($checkTaggedItem && !$r->hasMethod($defaultMethod)) {
+        if ($checkTaggedItem && (!$defaultMethod || !$r->hasMethod($defaultMethod))) {
             foreach ($r->getAttributes(AsTaggedItem::class) as $attribute) {
                 return 'priority' === $indexAttribute ? $attribute->newInstance()->priority : $attribute->newInstance()->index;
             }

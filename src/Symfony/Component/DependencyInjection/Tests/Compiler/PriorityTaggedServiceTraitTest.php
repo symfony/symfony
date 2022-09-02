@@ -214,14 +214,26 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+
+        // Test TaggedIteratorArgument
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $expected = [
             'service3' => new TypedReference('service3', HelloNamedService2::class),
             'hello' => new TypedReference('service2', HelloNamedService::class),
             'service1' => new TypedReference('service1', FooTagClass::class),
         ];
-        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));
-        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+        $this->assertEquals($expected, $services);
+
+        // Test string
+        $services = $priorityTaggedServiceTraitImplementation->test($tag->getTag(), $container);
+        $expected = [
+            0 => new Reference('service3'),
+            'hello' => new TypedReference('service2', HelloNamedService::class),
+            1 => new Reference('service1'),
+        ];
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $services);
     }
 }
 

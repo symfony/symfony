@@ -298,7 +298,7 @@ class Connection
         }
 
         if (null !== $auth) {
-            unset($parsedUrl['user']); // parse_url thinks //0@localhost/ is a password of "0"! doh!
+            unset($parsedUrl['user']); // parse_url thinks //0@localhost/ is a username of "0"! doh!
             $parsedUrl = $parsedUrl + ($auth ?? []); // But don't worry as $auth array will have user, user/pass or pass as needed
         }
 

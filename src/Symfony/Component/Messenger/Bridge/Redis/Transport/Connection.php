@@ -279,16 +279,16 @@ class Connection
             $url = str_replace($scheme.':', 'file:', $dsn);
         }
 
-        $url = preg_replace_callback('#^' . $scheme . ':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
+        $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (!\in_array($m['user'], ['', 'default'], true)) {
-                    $auth['user']=$m['user'];
+                    $auth['user'] = $m['user'];
                 }
 
                 $auth['pass'] = $m['password'];
             }
 
-            return 'file:' . ($m[1] ?? '');
+            return 'file:'.($m[1] ?? '');
         }, $url);
 
         if (false === $parsedUrl = parse_url($url)) {
@@ -297,7 +297,7 @@ class Connection
 
         $parsedUrl = $parsedUrl + ($auth ?? []);
 
-        if (array_key_exists('host', $parsedUrl)){
+        if (\array_key_exists('host', $parsedUrl)) {
             $parsedUrl = ['scheme' => $scheme, 'host' => $parsedUrl['host'], 'port' => $parsedUrl['port'] ?? '6379'] + $parsedUrl;
         } else {
             $parsedUrl = ['scheme' => 'unix', 'path' => $parsedUrl['path']] + $parsedUrl;

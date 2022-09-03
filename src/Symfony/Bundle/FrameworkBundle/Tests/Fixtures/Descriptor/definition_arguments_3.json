@@ -10,7 +10,7 @@
     "deprecated": false,
     "arguments": [],
     "file": "\/path\/to\/file",
-    "factory_class": "Full\\Qualified\\FactoryClass",
+    "factory_service": "inline factory service (Full\\Qualified\\FactoryClass)",
     "factory_method": "get",
     "tags": [],
     "usages": []

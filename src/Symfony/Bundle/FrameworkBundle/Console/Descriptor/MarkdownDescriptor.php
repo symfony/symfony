@@ -231,7 +231,7 @@ class MarkdownDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $output .= "\n".'- Factory Service: `'.$factory[0].'`';
                 } elseif ($factory[0] instanceof Definition) {
-                    $output .= "\n".'- Factory Class: `'.($factory[0]->getClass() ?? 'not configured').'`';
+                    $output .= "\n".sprintf('- Factory Service: inline factory service (%s)', $factory[0]->getClass() ? sprintf('`%s`', $factory[0]->getClass()) : 'not configured');
                 } else {
                     $output .= "\n".'- Factory Class: `'.$factory[0].'`';
                 }

@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\LazyProxy\PhpDumper;
 
-use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\VarExporter\LazyGhostObjectInterface;
-use Symfony\Component\VarExporter\LazyGhostObjectTrait;
+use Symfony\Component\VarExporter\Exception\LogicException;
+use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -48,18 +46,19 @@ final class LazyServiceDumper implements DumperInterface
             return false;
         }
 
-        $class = new \ReflectionClass($class);
-
-        if ($class->isFinal()) {
-            throw new InvalidArgumentException(sprintf('Cannot make service of class "%s" lazy because the class is final.', $definition->getClass()));
+        if ($definition->getFactory()) {
+            return true;
         }
 
-        if ($asGhostObject = !$class->isAbstract() && !$class->isInterface() && (\stdClass::class === $class->name || !$class->isInternal())) {
-            while ($class = $class->getParentClass()) {
-                if (!$asGhostObject = \stdClass::class === $class->name || !$class->isInternal()) {
-                    break;
-                }
+        foreach ($definition->getMethodCalls() as $call) {
+            if ($call[2] ?? false) {
+                return true;
             }
+        }
+
+        try {
+            $asGhostObject = (bool) ProxyHelper::generateLazyGhost(new \ReflectionClass($class));
+        } catch (LogicException) {
         }
 
         return true;
@@ -67,10 +66,6 @@ final class LazyServiceDumper implements DumperInterface
 
     public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode): string
     {
-        if ($dumper = $this->useProxyManager($definition)) {
-            return $dumper->getProxyFactoryCode($definition, $id, $factoryCode);
-        }
-
         $instantiation = 'return';
 
         if ($definition->isShared()) {
@@ -79,66 +74,75 @@ final class LazyServiceDumper implements DumperInterface
 
         $proxyClass = $this->getProxyClass($definition);
 
+        if (!str_contains($factoryCode, '$proxy')) {
+            return <<<EOF
+                    if (true === \$lazyLoad) {
+                        $instantiation \$this->createProxy('$proxyClass', fn () => \\$proxyClass::createLazyProxy(fn () => $factoryCode));
+                    }
+
+
+            EOF;
+        }
+
         if (preg_match('/^\$this->\w++\(\$proxy\)$/', $factoryCode)) {
             $factoryCode = substr_replace($factoryCode, '(...)', -8);
         } else {
-            $factoryCode = sprintf('function ($proxy) { return %s; }', $factoryCode);
+            $factoryCode = sprintf('fn ($proxy) => %s', $factoryCode);
         }
 
         return <<<EOF
-        if (true === \$lazyLoad) {
-            $instantiation \$this->createProxy('$proxyClass', function () {
-                return \\$proxyClass::createLazyGhostObject($factoryCode);
-            });
-        }
+                if (true === \$lazyLoad) {
+                    $instantiation \$this->createProxy('$proxyClass', fn () => \\$proxyClass::createLazyGhost($factoryCode));
+                }
 
 
-EOF;
+        EOF;
     }
 
     public function getProxyCode(Definition $definition): string
     {
-        if ($dumper = $this->useProxyManager($definition)) {
-            return $dumper->getProxyCode($definition);
-        }
-
-        $proxyClass = $this->getProxyClass($definition);
-
-        return sprintf(<<<EOF
-            class %s extends \%s implements \%s
-            {
-                use \%s;
-            }
-
-            EOF,
-            $proxyClass,
-            $definition->getClass(),
-            LazyGhostObjectInterface::class,
-            LazyGhostObjectTrait::class
-        );
-    }
-
-    public function getProxyClass(Definition $definition): string
-    {
-        $class = (new \ReflectionClass($definition->getClass()))->name;
-
-        return preg_replace('/^.*\\\\/', '', $class).'_'.substr(hash('sha256', $this->salt.'+'.$class), -7);
-    }
-
-    public function useProxyManager(Definition $definition): ?ProxyDumper
-    {
         if (!$this->isProxyCandidate($definition, $asGhostObject)) {
             throw new InvalidArgumentException(sprintf('Cannot instantiate lazy proxy for service of class "%s".', $definition->getClass()));
         }
+        $proxyClass = $this->getProxyClass($definition, $class);
 
         if ($asGhostObject) {
-            return null;
+            try {
+                return 'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
+            } catch (LogicException $e) {
+                throw new InvalidArgumentException(sprintf('Cannot generate lazy ghost for service of class "%s" lazy.', $definition->getClass()), 0, $e);
+            }
         }
 
-        if (!class_exists(ProxyDumper::class)) {
-            throw new LogicException('You cannot use virtual proxies for lazy services as the ProxyManager bridge is not installed. Try running "composer require symfony/proxy-manager-bridge".');
+        if ($definition->hasTag('proxy')) {
+            $interfaces = [];
+            foreach ($definition->getTag('proxy') as $tag) {
+                if (!isset($tag['interface'])) {
+                    throw new InvalidArgumentException(sprintf('Invalid definition for service of class "%s": the "interface" attribute is missing on a "proxy" tag.', $definition->getClass()));
+                }
+                if (!interface_exists($tag['interface']) && !class_exists($tag['interface'], false)) {
+                    throw new InvalidArgumentException(sprintf('Invalid definition for service of class "%s": several "proxy" tags found but "%s" is not an interface.', $definition->getClass(), $tag['interface']));
+                }
+                $interfaces[] = new \ReflectionClass($tag['interface']);
+            }
+        } else {
+            $interfaces = [$class];
+        }
+        if (1 === \count($interfaces) && !$interfaces[0]->isInterface()) {
+            $class = array_pop($interfaces);
         }
 
-        return new ProxyDumper($this->salt);
+        try {
+            return (\PHP_VERSION_ID >= 80200 && $class->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyProxy($class, $interfaces);
+        } catch (LogicException $e) {
+            throw new InvalidArgumentException(sprintf('Cannot generate lazy proxy for service of class "%s" lazy.', $definition->getClass()), 0, $e);
+        }
+    }
+
+    public function getProxyClass(Definition $definition, \ReflectionClass &$class = null): string
+    {
+        $class = new \ReflectionClass($definition->getClass());
+
+        return preg_replace('/^.*\\\\/', '', $class->name).'_'.substr(hash('sha256', $this->salt.'+'.$class->name), -7);
     }
 }

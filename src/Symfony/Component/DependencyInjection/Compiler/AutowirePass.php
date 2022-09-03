@@ -24,9 +24,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\VarExporter\ProxyHelper;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 /**
@@ -276,7 +276,7 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
+            $type = ProxyHelper::exportType($parameter, true);
 
             if ($checkAttributes) {
                 foreach ($parameter->getAttributes() as $attribute) {
@@ -306,8 +306,8 @@ class AutowirePass extends AbstractRecursivePass
                         --$index;
                         break;
                     }
-                    $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, false);
-                    $type = $type ? sprintf('is type-hinted "%s"', ltrim($type, '\\')) : 'has no type-hint';
+                    $type = ProxyHelper::exportType($parameter);
+                    $type = $type ? sprintf('is type-hinted "%s"', preg_replace('/(^|[(|&])\\\\|^\?\\\\?/', '\1', $type)) : 'has no type-hint';
 
                     throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" %s, you should configure its value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method, $type));
                 }

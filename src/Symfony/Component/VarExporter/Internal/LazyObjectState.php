@@ -14,41 +14,47 @@ namespace Symfony\Component\VarExporter\Internal;
 use Symfony\Component\VarExporter\Hydrator;
 
 /**
- * Keeps the state of lazy ghost objects.
+ * Keeps the state of lazy objects.
  *
  * As a micro-optimization, this class uses no type declarations.
  *
  * @internal
  */
-class GhostObjectState
+class LazyObjectState
 {
     public const STATUS_INITIALIZED_PARTIAL = 1;
     public const STATUS_UNINITIALIZED_FULL = 2;
     public const STATUS_INITIALIZED_FULL = 3;
 
-    public \Closure $initializer;
-
     /**
      * @var array<class-string|'*', array<string, true>>
      */
-    public $preInitUnsetProperties;
+    public array $preInitUnsetProperties;
 
     /**
      * @var array<string, true>
      */
-    public $preInitSetProperties = [];
+    public array $preInitSetProperties;
 
     /**
      * @var array<class-string|'*', array<string, true>>
      */
-    public $unsetProperties = [];
+    public array $unsetProperties;
 
     /**
-     * One of self::STATUS_*.
-     *
-     * @var int
+     * @var array<string, true>
      */
-    public $status;
+    public array $skippedProperties;
+
+    /**
+     * @var self::STATUS_*
+     */
+    public int $status = 0;
+
+    public function __construct(public \Closure $initializer, $skippedProperties = [])
+    {
+        $this->skippedProperties = $this->preInitSetProperties = $skippedProperties;
+    }
 
     /**
      * @return bool Returns true when fully-initializing, false when partial-initializing
@@ -57,7 +63,15 @@ class GhostObjectState
     {
         if (!$this->status) {
             $this->status = 1 < (new \ReflectionFunction($this->initializer))->getNumberOfRequiredParameters() ? self::STATUS_INITIALIZED_PARTIAL : self::STATUS_UNINITIALIZED_FULL;
-            $this->preInitUnsetProperties ??= $this->unsetProperties;
+            $this->preInitUnsetProperties = $this->unsetProperties ??= [];
+
+            if (\count($this->preInitSetProperties) !== \count($properties = $this->preInitSetProperties + (array) $instance)) {
+                $this->preInitSetProperties = array_fill_keys(array_keys($properties), true);
+            }
+
+            if (null === $propertyName) {
+                return self::STATUS_INITIALIZED_PARTIAL !== $this->status;
+            }
         }
 
         if (self::STATUS_INITIALIZED_FULL === $this->status) {
@@ -65,7 +79,7 @@ class GhostObjectState
         }
 
         if (self::STATUS_UNINITIALIZED_FULL === $this->status) {
-            if ($defaultProperties = array_diff_key(GhostObjectRegistry::$defaultProperties[$instance::class], (array) $instance)) {
+            if ($defaultProperties = array_diff_key(LazyObjectRegistry::$defaultProperties[$instance::class], $this->preInitSetProperties)) {
                 Hydrator::hydrate($instance, $defaultProperties);
             }
 
@@ -78,7 +92,7 @@ class GhostObjectState
         $value = ($this->initializer)(...[$instance, $propertyName, $propertyScope]);
 
         $propertyScope ??= $instance::class;
-        $accessor = GhostObjectRegistry::$classAccessors[$propertyScope] ??= GhostObjectRegistry::getClassAccessors($propertyScope);
+        $accessor = LazyObjectRegistry::$classAccessors[$propertyScope] ??= LazyObjectRegistry::getClassAccessors($propertyScope);
 
         $accessor['set']($instance, $propertyName, $value);
 

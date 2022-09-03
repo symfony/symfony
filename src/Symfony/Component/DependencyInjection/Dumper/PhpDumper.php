@@ -673,9 +673,6 @@ EOF;
 
         $return = '';
         if ($isSimpleInstance) {
-            if ($asGhostObject && null !== $definition->getFactory()) {
-                $instantiation .= '$this->hydrateProxy($lazyLoad, ';
-            }
             $return = 'return ';
         } else {
             $instantiation .= ' = ';
@@ -893,9 +890,7 @@ EOF;
                     $code .= sprintf('        %s ??= ', $factory);
 
                     if ($asFile) {
-                        $code .= "function () {\n";
-                        $code .= "            return self::do(\$container);\n";
-                        $code .= "        };\n\n";
+                        $code .= "fn () => self::do(\$container);\n\n";
                     } else {
                         $code .= sprintf("\$this->%s(...);\n\n", $methodName);
                     }
@@ -1076,11 +1071,7 @@ EOTXT
             return $code;
         }
 
-        if (!$asGhostObject) {
-            return $code."\n        return \$instance;\n";
-        }
-
-        return $code."\n        return \$this->hydrateProxy(\$lazyLoad, \$instance);\n";
+        return $code."\n        return \$instance;\n";
     }
 
     private function addServices(array &$services = null): string
@@ -1324,19 +1315,6 @@ EOF;
     protected function createProxy(\$class, \Closure \$factory)
     {
         {$proxyLoader}return \$factory();
-    }
-
-    protected function hydrateProxy(\$proxy, \$instance)
-    {
-        if (\$proxy === \$instance) {
-            return \$proxy;
-        }
-
-        if (!\in_array(\get_class(\$instance), [\get_class(\$proxy), get_parent_class(\$proxy)], true)) {
-            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1\$s".', get_parent_class(\$proxy), get_debug_type(\$instance)));
-        }
-
-        return \Symfony\Component\VarExporter\Hydrator::hydrate(\$proxy, (array) \$instance);
     }
 
 EOF;

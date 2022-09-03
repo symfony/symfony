@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarExporter\Internal;
+namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy;
 
-/**
- * @internal
- */
-enum EmptyScope
+readonly class ReadOnlyClass
 {
+    public function __construct(
+        public int $foo
+    ) {
+    }
 }

@@ -1452,7 +1452,7 @@ PHP
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
-        $this->assertTrue($wither->resetLazyGhostObject());
+        $this->assertTrue($wither->resetLazyObject());
     }
 
     public function testWitherWithStaticReturnType()

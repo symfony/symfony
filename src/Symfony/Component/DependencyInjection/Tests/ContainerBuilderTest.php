@@ -1696,7 +1696,8 @@ class ContainerBuilderTest extends TestCase
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
-        $this->assertTrue($wither->resetLazyGhostObject());
+        $this->assertTrue($wither->resetLazyObject());
+        $this->assertInstanceOf(Wither::class, $wither->withFoo1($wither->foo));
     }
 
     public function testWitherWithStaticReturnType()

@@ -46,7 +46,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
-use Symfony\Component\VarExporter\Hydrator;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -1037,10 +1036,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (null !== $factory) {
             $service = $factory(...$arguments);
 
-            if (\is_object($tryProxy) && $service::class !== $parameterBag->resolveValue($definition->getClass())) {
-                throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', $definition->getClass(), get_debug_type($service)));
-            }
-
             if (!$definition->isDeprecated() && \is_array($factory) && \is_string($factory[0])) {
                 $r = new \ReflectionClass($factory[0]);
 
@@ -1108,10 +1103,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             $callable($service);
-        }
-
-        if (\is_object($tryProxy) && $tryProxy !== $service) {
-            return Hydrator::hydrate($tryProxy, (array) $service);
         }
 
         return $service;

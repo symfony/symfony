@@ -48,19 +48,6 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
         return $factory();
     }
 
-    protected function hydrateProxy($proxy, $instance)
-    {
-        if ($proxy === $instance) {
-            return $proxy;
-        }
-
-        if (!\in_array(\get_class($instance), [\get_class($proxy), get_parent_class($proxy)], true)) {
-            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', get_parent_class($proxy), get_debug_type($instance)));
-        }
-
-        return \Symfony\Component\VarExporter\Hydrator::hydrate($proxy, (array) $instance);
-    }
-
     /**
      * Gets the public 'wither' shared autowired service.
      *
@@ -69,12 +56,10 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
     protected function getWitherService($lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $this->services['wither'] = $this->createProxy('Wither_94fa281', function () {
-                return \Wither_94fa281::createLazyGhostObject($this->getWitherService(...));
-            });
+            return $this->services['wither'] = $this->createProxy('Wither_94fa281', fn () => \Wither_94fa281::createLazyProxy(fn () => $this->getWitherService(false)));
         }
 
-        $instance = $lazyLoad;
+        $instance = new \Symfony\Component\DependencyInjection\Tests\Compiler\Wither();
 
         $a = new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo();
 
@@ -82,11 +67,25 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
         $instance = $instance->withFoo2($a);
         $instance->setFoo($a);
 
-        return $this->hydrateProxy($lazyLoad, $instance);
+        return $instance;
     }
 }
 
-class Wither_94fa281 extends \Symfony\Component\DependencyInjection\Tests\Compiler\Wither implements \Symfony\Component\VarExporter\LazyGhostObjectInterface
+class Wither_94fa281 extends \Symfony\Component\DependencyInjection\Tests\Compiler\Wither implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
-    use \Symfony\Component\VarExporter\LazyGhostObjectTrait;
+    use \Symfony\Component\VarExporter\LazyProxyTrait;
+
+    private int $lazyObjectId;
+    private parent $lazyObjectReal;
+
+    private const LAZY_OBJECT_PROPERTY_SCOPES = [
+        'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
+        "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],
+        'foo' => [parent::class, 'foo', null],
+    ];
 }
+
+// Help opcache.preload discover always-needed symbols
+class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);

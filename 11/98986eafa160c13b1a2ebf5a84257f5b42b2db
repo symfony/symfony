@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-08-11T14:23:22Z
+
+This looks very interesting. While we are using the `Messenger` middlewares a lot and so a lot of services are initialized as all `middlewares` are always loaded in your our sync bus. I was thinking about making `arguments` lazy.
+
+I currently workaround it by using `getSubscribedServices` as that seems only initialize the service when being used but not so a fan of it: https://github.com/sulu/messenger/pull/3/files#diff-f24c4e9e2f4ac12bb6ca919142c7689d57ebe7eb12024b46cc8bacbd9ff03e9a
+
+So I thought if it would be possible to set something lazy only for a specific service:
+
+```xml
+<service id="sulu_messenger.lock_middleware" class="LockMiddleware">
+      <argument type="service" id="lock.factory" lazy="true" />
+</service>
+```
+
+Or what would be your recommendation in this kind of case?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-11T14:34:55Z
+
+> a lot of services are initialized as all middlewares are always loaded in your our sync bus.
+
+IIRC, we read the middleware stack iteratively, aka we instantiate individual middleware layers on demand. Is this broken?
+
+> I currently workaround it by using getSubscribedServices
+
+That's *The* use case for this interface so it's perfectly fine.
+
+> `<argument type="service" id="lock.factory" lazy="true" />`
+
+Yes, that's the kind of innovations that having this in core would allow!
+This would require the argument to be typed and we'd inject a virtual proxy instead of the real instance (unless the target service is already lazy). PR welcome as a follow up ;)
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-08-11T14:42:28Z
+
+> IIRC, we read the middleware stack iteratively, aka we instantiate individual middleware layers on demand. Is this broken?
+
+Definitly not broken if the middleware is not used it's not initialized. The middleware is just accessing a service which is only required to be accessed when a specific `Stamp` is set: https://github.com/sulu/messenger/blob/d859d47201712fef3b4cf9b8ba53b81aa5f2e659/src/Infrastructure/Symfony/Messenger/LockMiddleware/LockMiddleware.php#L26
+
+If the stamp is not there the service currently still initialized via constructor injection but actually would not be needed to be initialized. (workaround currently via getSubscribedServices)
+
+> That's The use case for this interface so it's perfectly fine.
+
+Thx good to know :)
+
+> Yes, that's the kind of innovations that having this in core would allow!
+
+Sounds very promising :)
+
+> This would require the argument to be typed
+
+Yeah maybe something like:
+
+```xml
+<argument type="lazy_service" id="lock.factory" />
+```
+
+Would make more sense. Not sure about the `yaml` syntax.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-16T17:10:27Z
+
+I get that nobody is going to review the code in depth :exploding_head: :wink:
+Apart from that, does anybody have any comments on the PR before merging?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-01T07:15:41Z
+
+For the record I had a look to split lazy-traits from var-exporter and honestly there's too much code is common. Splitting would double the maintenance effort and bugs would need to be solved twice. Making one depend on the other would require opening APIs that are currently internal. I tried I promise, but technically, this is not sound to me.

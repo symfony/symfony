@@ -36,7 +36,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - File: `/path/to/file`
-- Factory Class: `Full\Qualified\FactoryClass`
+- Factory Service: inline factory service (`Full\Qualified\FactoryClass`)
 - Factory Method: `get`
 
 

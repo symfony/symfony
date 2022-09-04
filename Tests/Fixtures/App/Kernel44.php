@@ -48,6 +48,7 @@ class Kernel44 extends SymfonyKernel
         $container->loadFromExtension('framework', [
             'secret' => 'for your eyes only',
             'test' => true,
+            'http_method_override' => false,
         ]);
 
         $container->register('nyholm.psr_factory', Psr17Factory::class);

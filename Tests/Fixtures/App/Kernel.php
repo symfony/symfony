@@ -50,6 +50,7 @@ class Kernel extends SymfonyKernel
             'router' => ['utf8' => true],
             'secret' => 'for your eyes only',
             'test' => true,
+            'http_method_override' => false,
         ]);
 
         $container->services()

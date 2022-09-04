@@ -74,7 +74,6 @@
         "doctrine/persistence": "<1.3",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
-        "phpunit/phpunit": "<5.4.3",
         "symfony/asset": "<5.4",
         "symfony/console": "<5.4",
         "symfony/dotenv": "<5.4",

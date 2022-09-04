@@ -156,8 +156,7 @@
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<5.2",
         "phpdocumentor/type-resolver": "<1.5.1",
-        "ocramius/proxy-manager": "<2.1",
-        "phpunit/phpunit": "<5.4.3"
+        "ocramius/proxy-manager": "<2.1"
     },
     "config": {
         "allow-plugins": {

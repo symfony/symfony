@@ -43,6 +43,7 @@ class MockClockTest extends TestCase
     {
         $before = new \DateTimeImmutable();
         $clock = new MockClock();
+        usleep(1);
         $after = new \DateTimeImmutable();
 
         $this->assertGreaterThan($before, $clock->now());

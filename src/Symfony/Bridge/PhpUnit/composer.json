@@ -28,7 +28,7 @@
         "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },
     "conflict": {
-        "phpunit/phpunit": "<7.5|9.1.2"
+        "phpunit/phpunit": "9.1.2"
     },
     "autoload": {
         "files": [ "bootstrap.php" ],

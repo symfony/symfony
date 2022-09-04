@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-28T22:17:11Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-29T16:11:46Z
+
+This doesn't seem legit to me. [The HTTP 1.1 specification](https://datatracker.ietf.org/doc/html/rfc7230) doesn't allow spaces before names.
+
+---------------------------------------------------------------------------
+
+by nuryagdym at 2022-08-29T16:47:00Z
+
+This is true, normally it must not be space. But I am sending a request to the payment gateway of the old State Bank. And they have this issue in their header response. As this trimming is done on other HTTP client libraries, I thought we could also add it in symfony client
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-29T16:52:09Z
+
+Can you share a raw response from this server? (after removing any confidential info of course)
+Can you read the field if you add the space yourself when accessing it?
+
+---------------------------------------------------------------------------
+
+by nuryagdym at 2022-08-29T17:40:21Z
+
+This is the example curl command:
+
+```php
+curl_setopt_array($curl, [
+    CURLOPT_HEADER => true,
+    CURLOPT_URL            => 'https://3dsecure.vakifbank.com.tr:4443/MPIAPI/MPI_Enrollment.aspx',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING       => '',
+    CURLOPT_MAXREDIRS      => 10,
+    CURLOPT_TIMEOUT        => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST  => 'POST',
+    CURLOPT_POSTFIELDS     => 'MerchantId=000000000111111&MerchantPassword=3XTgER89as&MerchantType=0&PurchaseAmount=1.01&VerifyEnrollmentRequestId=ce7067e9ccd023889124a8dde4b5fd5b&Currency=949',
+    CURLOPT_HTTPHEADER     => [
+        'Host: 3dsecure.vakifbank.com.tr',
+        'User-Agent: Symfony HttpClient/Curl',
+        'Content-Type: application/x-www-form-urlencoded'
+    ],
+]);
+
+$response = curl_exec($curl);
+$header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+$header = substr($response, 0, $header_size);
+curl_close($curl);
+```
+you can also run it and check. Here is what I see when I dump this `$header`:
+![image](https://user-images.githubusercontent.com/26792980/187264031-8fe4fed6-869f-4db6-8f0c-583ee8b211ce.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-29T18:21:57Z
+
+Do browsers understand this header? Any link that tells about that?
+
+---------------------------------------------------------------------------
+
+by nuryagdym at 2022-08-29T18:26:42Z
+
+This is an API call, browsers don't render the content received from this response. I just parse the XML response and use the data I get.
+On Postman it is working:
+```shell
+curl --location --request POST 'https://3dsecure.vakifbank.com.tr:4443/MPIAPI/MPI_Enrollment.aspx' \
+--header 'Host: 3dsecure.vakifbank.com.tr' \
+--header 'User-Agent: Symfony HttpClient/Curl' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'MerchantId=000000000111111' \
+--data-urlencode 'MerchantPassword=3XTgER89as' \
+--data-urlencode 'MerchantType=0' \
+--data-urlencode 'PurchaseAmount=1.01' \
+--data-urlencode 'VerifyEnrollmentRequestId=ce7067e9ccd023889124a8dde4b5fd5b' \
+--data-urlencode 'Currency=949'
+```
+
+![image](https://user-images.githubusercontent.com/26792980/187271898-d0a22d83-b5ff-424f-8c90-89f92c5147ac.png)
+![image](https://user-images.githubusercontent.com/26792980/187272020-7a00e51f-3dbb-4b08-9aa4-05f5c19ffd4a.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-29T20:41:22Z
+
+OK understood. Let's do as postman, aka ignore invalid headers.
+That means the `foreach ($value)` should be wrapped in a try/catch(\InvalidArgumentException).
+Can you please update the PR and add a test case?
+
+---------------------------------------------------------------------------
+
+by nuryagdym at 2022-08-30T06:24:14Z
+
+All right, I will do necessary changes within this week.
+Thanks
+
+---------------------------------------------------------------------------
+
+by nuryagdym at 2022-09-04T17:42:00Z
+
+Hi @nicolas-grekas, I did the changes you asked

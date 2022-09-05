@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Use lazy-loading ghost objects and virtual proxies out of the box
- * Add argument `&$asGhostObject` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
+ * Add arguments `&$asGhostObject` and `$id` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
  * Add `enum` env var processor
  * Add `shuffle` env var processor
  * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration

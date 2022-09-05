@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+# 2.1.3 (2022-09-05)
+
+* Ignore invalid HTTP headers when creating PSR7 objects
+* Fix for wrong type passed to `moveTo()`
+
 # 2.1.2 (2021-11-05)
 
 * Allow Symfony 6

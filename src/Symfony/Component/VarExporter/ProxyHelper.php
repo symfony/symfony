@@ -176,7 +176,7 @@ final class ProxyHelper
             $methods[$lcName] = "    {$signature}\n    {\n{$body}\n    }";
         }
 
-        $readonly = \PHP_VERSION_ID >= 80200 && $class && $class->isReadOnly() ? 'readonly ' : '';
+        $readonly = \PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '';
         $types = $interfaces = array_unique(array_column($interfaces, 'name'));
         $interfaces[] = LazyObjectInterface::class;
         $interfaces = implode(', \\', $interfaces);

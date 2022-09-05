@@ -181,4 +181,20 @@ class InMemoryTransportTest extends TestCase
         $this->assertEmpty($this->transport->getRejected(), 'Should be empty after reset');
         $this->assertEmpty($this->transport->getSent(), 'Should be empty after reset');
     }
+
+    public function testResetWhenResetDisabled()
+    {
+        $transport = new InMemoryTransport(null, false);
+        $envelope = new Envelope(new \stdClass());
+        $envelope = $transport->send($envelope);
+        $transport->ack($envelope);
+        $transport->reject($envelope);
+
+        $transport->reset();
+
+        $this->assertEmpty($transport->get(), 'Should be empty after reset');
+        $this->assertNotEmpty($transport->getAcknowledged(), 'Should not be empty after reset');
+        $this->assertNotEmpty($transport->getRejected(), 'Should not be empty after reset');
+        $this->assertNotEmpty($transport->getSent(), 'Should not be empty after reset');
+    }
 }

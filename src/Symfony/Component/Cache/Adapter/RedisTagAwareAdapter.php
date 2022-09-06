@@ -60,13 +60,15 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
      */
     private $redisEvictionPolicy;
     private $namespace;
+    private $tagLifetime;
 
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis           The redis client
      * @param string                                                                                $namespace       The default namespace
      * @param int                                                                                   $defaultLifetime The default lifetime
+     * @param int|true|null                                                                         $tagLifetime     The tag life time to be used, can be either "null" for no lifetime, "true" for using the lifetime of the cache item or an int value that explicitly defines the lifetime
      */
-    public function __construct($redis, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
+    public function __construct($redis, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null, $tagLifetime = null)
     {
         if ($redis instanceof \Predis\ClientInterface && $redis->getConnection() instanceof ClusterInterface && !$redis->getConnection() instanceof PredisCluster) {
             throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, \get_class($redis->getConnection())));
@@ -82,8 +84,13 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             }
         }
 
+        if (true !== $tagLifetime && !is_numeric($tagLifetime) && null !== $tagLifetime) {
+            throw new InvalidArgumentException('Unsupported tag life time. Use either "null" for no tag life time, "true" for using the lifetime of the cache item or any int value that explicitly sets the tag life time.');
+        }
+
         $this->init($redis, $namespace, $defaultLifetime, new TagAwareMarshaller($marshaller));
         $this->namespace = $namespace;
+        $this->tagLifetime = $tagLifetime;
     }
 
     /**
@@ -101,13 +108,15 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             return $failed;
         }
 
+        $tagLifetime = $this->getTagLifetime($lifetime);
+        $itemLifetime = 0 >= $lifetime ? self::DEFAULT_CACHE_TTL : $lifetime;
         // While pipeline isn't supported on RedisCluster, other setups will at least benefit from doing this in one op
-        $results = $this->pipeline(static function () use ($serialized, $lifetime, $addTagData, $delTagData, $failed) {
+        $results = $this->pipeline(static function () use ($serialized, $itemLifetime, $addTagData, $delTagData, $failed, $tagLifetime) {
             // Store cache items, force a ttl if none is set, as there is no MSETEX we need to set each one
             foreach ($serialized as $id => $value) {
                 yield 'setEx' => [
                     $id,
-                    0 >= $lifetime ? self::DEFAULT_CACHE_TTL : $lifetime,
+                    $itemLifetime,
                     $value,
                 ];
             }
@@ -116,6 +125,9 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             foreach ($addTagData as $tagId => $ids) {
                 if (!$failed || $ids = array_diff($ids, $failed)) {
                     yield 'sAdd' => array_merge([$tagId], $ids);
+                    if (null !== $tagLifetime) {
+                        yield 'expire' => [$tagId, $tagLifetime];
+                    }
                 }
             }
 
@@ -317,5 +329,20 @@ EOLUA;
         }
 
         return $this->redisEvictionPolicy = '';
+    }
+
+    private function getTagLifetime(int $itemLifetime): ?int
+    {
+        $tagLifetime = $this->tagLifetime;
+        if (true === $tagLifetime) {
+            $tagLifetime = $itemLifetime;
+        }
+
+        // The tag should never have a lower life time than the item.
+        if (is_numeric($tagLifetime) && $tagLifetime < $itemLifetime) {
+            $tagLifetime = $itemLifetime;
+        }
+
+        return $tagLifetime;
     }
 }

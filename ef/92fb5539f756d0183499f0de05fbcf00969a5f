@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-09-03T17:02:26Z
+
+Hey!
+
+I think @keichinger has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-09-04T07:52:15Z
+
+Good catch, however adding `identical comparison` on 4.4 can be a BC break (method has only phpdoc and is not type hinted).
+
+This change cannot be done before 6.0 if it's considered as bugfix
+
+---------------------------------------------------------------------------
+
+by githubfromgui at 2022-09-05T10:20:01Z
+
+Thanks @alamirault for the fast feedback!
+
+In this case, should I close this PR and open a new one for `6.0` version or can I switch the base branch in this PR?
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-09-05T18:59:01Z
+
+You can switch target branch however i'm not sure if it must be on 6.0 ou 6.2
+
+---------------------------------------------------------------------------
+
+by githubfromgui at 2022-09-06T09:23:38Z
+
+@alamirault I have updated the base branch to `6.2` and switched the answer for `Bug fix?` to `yes`. Hopefully, that is enough :)

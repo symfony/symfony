@@ -13,10 +13,12 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Psr18NetworkException;
 use Symfony\Component\HttpClient\Psr18RequestException;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class Psr18ClientTest extends TestCase
@@ -80,5 +82,23 @@ class Psr18ClientTest extends TestCase
 
         $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:8057/404'));
         $this->assertSame(404, $response->getStatusCode());
+    }
+
+    public function testInvalidHeaderResponse()
+    {
+        $responseHeaders = [
+            // space in header name not allowed in RFC 7230
+            ' X-XSS-Protection' => '0',
+            'Cache-Control' => 'no-cache',
+        ];
+        $response = new MockResponse('body', ['response_headers' => $responseHeaders]);
+        $this->assertArrayHasKey(' x-xss-protection', $response->getHeaders());
+
+        $client = new Psr18Client(new MockHttpClient($response));
+        $request = $client->createRequest('POST', 'http://localhost:8057/post')
+            ->withBody($client->createStream('foo=0123456789'));
+
+        $resultResponse = $client->sendRequest($request);
+        $this->assertCount(1, $resultResponse->getHeaders());
     }
 }

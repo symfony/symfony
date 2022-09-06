@@ -84,19 +84,6 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     {
         $userIdentifier = $request->get('user');
 
-        try {
-            // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-            if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
-                $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
-            } else {
-                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
-
-                $user = $this->userProvider->loadUserByUsername($userIdentifier);
-            }
-        } catch (UserNotFoundException $exception) {
-            throw new InvalidLoginLinkException('User not found.', 0, $exception);
-        }
-
         if (!$hash = $request->get('hash')) {
             throw new InvalidLoginLinkException('Missing "hash" parameter.');
         }
@@ -105,7 +92,20 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         }
 
         try {
+            $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash);
+
+            // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+            if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
+                $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+            } else {
+                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+                $user = $this->userProvider->loadUserByUsername($userIdentifier);
+            }
+
             $this->signatureHasher->verifySignatureHash($user, $expires, $hash);
+        } catch (UserNotFoundException $e) {
+            throw new InvalidLoginLinkException('User not found.', 0, $e);
         } catch (ExpiredSignatureException $e) {
             throw new ExpiredLoginLinkException(ucfirst(str_ireplace('signature', 'login link', $e->getMessage())), 0, $e);
         } catch (InvalidSignatureException $e) {

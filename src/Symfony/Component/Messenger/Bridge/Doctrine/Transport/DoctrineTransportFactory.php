@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\Persistence\ConnectionRegistry;
+use Symfony\Component\Messenger\Bridge\Doctrine\EventListener\PostgreSqlWaitForPgNotifyOnIdleListener;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -24,15 +25,18 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 class DoctrineTransportFactory implements TransportFactoryInterface
 {
     private ConnectionRegistry $registry;
+    private PostgreSqlWaitForPgNotifyOnIdleListener $postgreSqlWaitForPgNotifyOnIdleListener;
 
-    public function __construct(ConnectionRegistry $registry)
+    public function __construct(ConnectionRegistry $registry, PostgreSqlWaitForPgNotifyOnIdleListener $postgreSqlWaitForPgNotifyOnIdleListener)
     {
         $this->registry = $registry;
+        $this->postgreSqlWaitForPgNotifyOnIdleListener = $postgreSqlWaitForPgNotifyOnIdleListener;
     }
 
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         $useNotify = ($options['use_notify'] ?? true);
+        $transportName = $options['transport_name'] ?? null;
         unset($options['transport_name'], $options['use_notify']);
         // Always allow PostgreSQL-specific keys, to be able to transparently fallback to the native driver when LISTEN/NOTIFY isn't available
         $configuration = PostgreSqlConnection::buildConfiguration($dsn, $options);
@@ -45,6 +49,10 @@ class DoctrineTransportFactory implements TransportFactoryInterface
 
         if ($useNotify && $driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             $connection = new PostgreSqlConnection($configuration, $driverConnection);
+
+            if ($transportName) {
+                $this->postgreSqlWaitForPgNotifyOnIdleListener->registerPostgreSqlConnectionCandidate($transportName, $connection);
+            }
         } else {
             $connection = new Connection($configuration, $driverConnection);
         }

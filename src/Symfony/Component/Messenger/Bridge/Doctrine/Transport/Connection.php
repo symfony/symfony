@@ -76,7 +76,6 @@ class Connection implements ResetInterface
 
     public function reset()
     {
-        $this->queueEmptiedAt = null;
     }
 
     public function getConfiguration(): array
@@ -211,13 +210,9 @@ class Connection implements ResetInterface
 
             if (false === $doctrineEnvelope) {
                 $this->driverConnection->commit();
-                $this->queueEmptiedAt = microtime(true) * 1000;
 
                 return null;
             }
-            // Postgres can "group" notifications having the same channel and payload
-            // We need to be sure to empty the queue before blocking again
-            $this->queueEmptiedAt = null;
 
             $doctrineEnvelope = $this->decodeEnvelopeHeaders($doctrineEnvelope);
 

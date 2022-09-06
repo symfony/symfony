@@ -532,6 +532,7 @@ class ConfigurationTest extends TestCase
                 'https_port' => 443,
                 'strict_requirements' => true,
                 'utf8' => true,
+                'cache_dir' => '%kernel.cache_dir%',
             ],
             'session' => [
                 'enabled' => false,

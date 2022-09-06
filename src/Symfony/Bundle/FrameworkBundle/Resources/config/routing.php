@@ -101,7 +101,7 @@ return static function (ContainerConfigurator $container) {
                 service(ContainerInterface::class),
                 param('router.resource'),
                 [
-                    'cache_dir' => param('kernel.cache_dir'),
+                    'cache_dir' => param('router.cache_dir'),
                     'debug' => param('kernel.debug'),
                     'generator_class' => CompiledUrlGenerator::class,
                     'generator_dumper_class' => CompiledUrlGeneratorDumper::class,

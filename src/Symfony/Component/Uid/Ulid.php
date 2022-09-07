@@ -21,6 +21,7 @@ namespace Symfony\Component\Uid;
 class Ulid extends AbstractUid implements TimeBasedUidInterface
 {
     protected const NIL = '00000000000000000000000000';
+    protected const MAX = '7ZZZZZZZZZZZZZZZZZZZZZZZZZ';
 
     private static string $time = '';
     private static array $rand = [];
@@ -29,21 +30,17 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
     {
         if (null === $ulid) {
             $this->uid = static::generate();
-
-            return;
-        }
-
-        if (self::NIL === $ulid) {
+        } elseif (self::NIL === $ulid) {
             $this->uid = $ulid;
+        } elseif (self::MAX === strtr($ulid, 'z', 'Z')) {
+            $this->uid = $ulid;
+        } else {
+            if (!self::isValid($ulid)) {
+                throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
+            }
 
-            return;
+            $this->uid = strtoupper($ulid);
         }
-
-        if (!self::isValid($ulid)) {
-            throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
-        }
-
-        $this->uid = strtoupper($ulid);
     }
 
     public static function isValid(string $ulid): bool
@@ -68,11 +65,11 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         }
 
         if (16 !== \strlen($ulid)) {
-            if (self::NIL === $ulid) {
-                return new NilUlid();
-            }
-
-            return new static($ulid);
+            return match (strtr($ulid, 'z', 'Z')) {
+                self::NIL => new NilUlid(),
+                self::MAX => new MaxUlid(),
+                default => new static($ulid),
+            };
         }
 
         $ulid = bin2hex($ulid);
@@ -90,8 +87,12 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             return new NilUlid();
         }
 
+        if (self::MAX === $ulid = strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ')) {
+            return new MaxUlid();
+        }
+
         $u = new static(self::NIL);
-        $u->uid = strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
+        $u->uid = $ulid;
 
         return $u;
     }

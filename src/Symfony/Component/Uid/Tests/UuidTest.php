@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\MaxUuid;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUuid;
 use Symfony\Component\Uid\Ulid;
@@ -236,6 +237,23 @@ class UuidTest extends TestCase
     public function testNewNilUuid()
     {
         $this->assertSame('00000000-0000-0000-0000-000000000000', (string) new NilUuid());
+    }
+
+    /**
+     * @testWith    ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
+     *              ["7zzzzzzzzzzzzzzzzzzzzzzzzz"]
+     */
+    public function testMaxUuid(string $uuid)
+    {
+        $uuid = Uuid::fromString($uuid);
+
+        $this->assertInstanceOf(MaxUuid::class, $uuid);
+        $this->assertSame('ffffffff-ffff-ffff-ffff-ffffffffffff', (string) $uuid);
+    }
+
+    public function testNewMaxUuid()
+    {
+        $this->assertSame('ffffffff-ffff-ffff-ffff-ffffffffffff', (string) new MaxUuid());
     }
 
     public function testFromBinary()

@@ -4,7 +4,8 @@ CHANGELOG
 6.2
 ---
 
- * Add `TimeBasedUidInterface` to `Ulid`, `UuidV1`, and `UuidV6` to describe that they present `getDateTime()` as an available method
+ * Add `TimeBasedUidInterface` to describe UIDs that embed a timestamp
+ * Add `MaxUuid` and `MaxUlid`
 
 5.4
 ---

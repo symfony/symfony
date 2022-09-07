@@ -25,6 +25,7 @@ class Uuid extends AbstractUid
 
     protected const TYPE = 0;
     protected const NIL = '00000000-0000-0000-0000-000000000000';
+    protected const MAX = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
     public function __construct(string $uuid, bool $checkVariant = false)
     {
@@ -66,6 +67,10 @@ class Uuid extends AbstractUid
 
         if (self::NIL === $uuid) {
             return new NilUuid();
+        }
+
+        if (self::MAX === $uuid = strtr($uuid, 'F', 'f')) {
+            return new MaxUuid();
         }
 
         if (!\in_array($uuid[19], ['8', '9', 'a', 'b', 'A', 'B'], true)) {

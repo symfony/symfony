@@ -79,7 +79,7 @@ class FormDataPartTest extends TestCase
                 ],
             ],
             ['quux2' => clone $p1],
-            ['quux2' => clone $p1],
+            ['quux2' => [clone $p1]],
             'quuz2' => [
                 ['corge' => clone $p1],
                 ['corge' => clone $p1],
@@ -93,6 +93,17 @@ class FormDataPartTest extends TestCase
             ['2[1]' => clone $p1],
             ['0[0]' => clone $p1],
             ['0[1]' => clone $p1],
+
+            'qux' => [
+                [
+                    'foo' => clone $p1,
+                    'bar' => clone $p1,
+                ],
+                [
+                    'foo' => clone $p1,
+                    'bar' => clone $p1,
+                ],
+            ],
         ]);
 
         $this->assertEquals('multipart', $f->getMediaType());
@@ -127,7 +138,7 @@ class FormDataPartTest extends TestCase
         $p9->setName('0');
 
         $parts[] = $p10 = clone $p1;
-        $p10->setName('bar2[baz]');
+        $p10->setName('bar2[0][baz]');
 
         $parts[] = $p11 = clone $p1;
         $p11->setName('bar2[baz][qux]');
@@ -135,12 +146,12 @@ class FormDataPartTest extends TestCase
         $parts[] = $p12 = clone $p1;
         $p12->setName('quux2');
         $parts[] = $p13 = clone $p1;
-        $p13->setName('quux2');
+        $p13->setName('quux2[0]');
 
         $parts[] = $p14 = clone $p1;
-        $p14->setName('quuz2[corge]');
+        $p14->setName('quuz2[0][corge]');
         $parts[] = $p15 = clone $p1;
-        $p15->setName('quuz2[corge]');
+        $p15->setName('quuz2[1][corge]');
 
         $parts[] = $p16 = clone $p1;
         $p16->setName('2');
@@ -162,6 +173,15 @@ class FormDataPartTest extends TestCase
         $parts[] = $p19 = clone $p1;
         $p19->setName('0[1]');
 
+        $parts[] = $p20 = clone $p1;
+        $p20->setName('qux[0][foo]');
+        $parts[] = $p21 = clone $p1;
+        $p21->setName('qux[0][bar]');
+        $parts[] = $p22 = clone $p1;
+        $p22->setName('qux[1][foo]');
+        $parts[] = $p23 = clone $p1;
+        $p23->setName('qux[1][bar]');
+
         $this->assertEquals($parts, $f->getParts());
     }
 
@@ -177,7 +197,6 @@ class FormDataPartTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Form field values with integer keys can only have one array element, the key being the field name and the value being the field value, 2 provided.');
-
         $f->getParts();
     }
 

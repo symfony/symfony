@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by julien-boudry at 2022-08-27T14:23:04Z
+
+Do you prefer as actually:
+```php
+Terminal::getTermColorMode();
+Terminal::setTermColorMode();
+(private) Terminal::$termColorMode;
+```
+
+Or?
+
+```php
+Terminal::getColorMode();
+Terminal::setColorMode();
+(private) Terminal::$colorMode;
+```
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-08-29T11:50:49Z
+
+> Do you prefer as actually:
+>
+> ```
+> Terminal::getTermColorMode();
+> Terminal::setTermColorMode();
+> (private) Terminal::$termColorMode;
+> ```
+>
+> Or?
+>
+> ```
+> Terminal::getColorMode();
+> Terminal::setColorMode();
+> (private) Terminal::$colorMode;
+> ```
+
+I prefer `Terminal::getColorMode();`
+
+---------------------------------------------------------------------------
+
+by julien-boudry at 2022-09-07T11:49:40Z
+
+I agree. I just push a new version with just theses naming changes.
+For me, it's ready to merge.
+
+---------------------------------------------------------------------------
+
+by julien-boudry at 2022-09-07T16:06:52Z
+
+About Psalm, which triggers some erros here. They are all false positives, because it is in fact impossible. The case is handled upstream in the getColorMode method, but Psalm is not smart enough for that.
+
+There is - I think - only one way to deal with it:
+- Add a static method like ` resetColorMode(): void {self::$colorMode = null;}`
+- Disallow null values as arguments to `Terminal::setColorMode(AnsiColorMode $colorMode)` instead of `Terminal::setColorMode(?AnsiColorMode $colorMode)`.
+
+However, this is an unnecessary burden on the public API to please psalm, when the code looks clean and logical to me.
+
+Original Psalm log, actually:
+```shell
+Error: src/Symfony/Component/Console/Terminal.php:29:44: InvalidNullableReturnType: The declared return type 'Symfony\Component\Console\Output\AnsiColorMode' for Symfony\Component\Console\Terminal::getColorMode is not nullable, but 'Symfony\Component\Console\Output\AnsiColorMode|null' contains null (see https://psalm.dev/144)
+Error: src/Symfony/Component/Console/Terminal.php:43:24: NullableReturnStatement: The declared return type 'Symfony\Component\Console\Output\AnsiColorMode' for Symfony\Component\Console\Terminal::getColorMode is not nullable, but the function returns 'null' (see https://psalm.dev/139)
+Error: src/Symfony/Component/Console/Terminal.php:49:24: NullableReturnStatement: The declared return type 'Symfony\Component\Console\Output\AnsiColorMode' for Symfony\Component\Console\Terminal::getColorMode is not nullable, but the function returns 'null' (see https://psalm.dev/139)
+Error: src/Symfony/Component/Console/Terminal.php:60:24: NullableReturnStatement: The declared return type 'Symfony\Component\Console\Output\AnsiColorMode' for Symfony\Component\Console\Terminal::getColorMode is not nullable, but the function returns 'null' (see https://psalm.dev/139)
+Error: src/Symfony/Component/Console/Terminal.php:66:24: NullableReturnStatement: The declared return type 'Symfony\Component\Console\Output\AnsiColorMode' for Symfony\Component\Console\Terminal::getColorMode is not nullable, but the function returns 'null' (see https://psalm.dev/139)
+Error: src/Symfony/Component/Console/Terminal.php:72:16: NullableReturnStatement: The declared return type 'Symfony\Component\Console\Output\AnsiColorMode' for Symfony\Component\Console\Terminal::getColorMode is not nullable, but the function returns 'null' (see https://psalm.dev/139)
+Error: Process completed with exit code 2.
+```

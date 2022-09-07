@@ -18,7 +18,7 @@ namespace Symfony\Component\Uid;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Ulid extends AbstractUid
+class Ulid extends AbstractUid implements TimeBasedUidInterface
 {
     protected const NIL = '00000000000000000000000000';
 

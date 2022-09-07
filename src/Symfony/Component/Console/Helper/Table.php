@@ -394,8 +394,10 @@ class Table
         $rowGroups = $this->buildTableRows($rows);
         $this->calculateColumnsWidth($rowGroups);
 
-        $this->dropColumn($rowGroups);
-        $this->calculateColumnsWidth($rowGroups);
+        if ($this->maxWidth && $this->optionalColumns) {
+            $this->dropColumn($rowGroups);
+            $this->calculateColumnsWidth($rowGroups);
+        }
 
         $isHeader = !$horizontal;
         $isFirstRow = $horizontal;

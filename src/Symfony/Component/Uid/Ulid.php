@@ -152,15 +152,15 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
 
         if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {
             randomize:
-            $r = unpack('nr1/nr2/nr3/nr4/nr', random_bytes(10));
-            $r['r1'] |= ($r['r'] <<= 4) & 0xF0000;
-            $r['r2'] |= ($r['r'] <<= 4) & 0xF0000;
-            $r['r3'] |= ($r['r'] <<= 4) & 0xF0000;
-            $r['r4'] |= ($r['r'] <<= 4) & 0xF0000;
-            unset($r['r']);
-            self::$rand = array_values($r);
+            $r = unpack('n*', random_bytes(10));
+            $r[1] |= ($r[5] <<= 4) & 0xF0000;
+            $r[2] |= ($r[5] <<= 4) & 0xF0000;
+            $r[3] |= ($r[5] <<= 4) & 0xF0000;
+            $r[4] |= ($r[5] <<= 4) & 0xF0000;
+            unset($r[5]);
+            self::$rand = $r;
             self::$time = $time;
-        } elseif ([0xFFFFF, 0xFFFFF, 0xFFFFF, 0xFFFFF] === self::$rand) {
+        } elseif ([1 => 0xFFFFF, 0xFFFFF, 0xFFFFF, 0xFFFFF] === self::$rand) {
             if (\PHP_INT_SIZE >= 8 || 10 > \strlen($time = self::$time)) {
                 $time = (string) (1 + $time);
             } elseif ('999999999' === $mtime = substr($time, -9)) {
@@ -171,7 +171,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
 
             goto randomize;
         } else {
-            for ($i = 3; $i >= 0 && 0xFFFFF === self::$rand[$i]; --$i) {
+            for ($i = 4; $i > 0 && 0xFFFFF === self::$rand[$i]; --$i) {
                 self::$rand[$i] = 0;
             }
 
@@ -192,10 +192,10 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
 
         return strtr(sprintf('%010s%04s%04s%04s%04s',
             $time,
-            base_convert(self::$rand[0], 10, 32),
             base_convert(self::$rand[1], 10, 32),
             base_convert(self::$rand[2], 10, 32),
-            base_convert(self::$rand[3], 10, 32)
+            base_convert(self::$rand[3], 10, 32),
+            base_convert(self::$rand[4], 10, 32)
         ), 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
     }
 }

@@ -7,6 +7,8 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.5 (2022-09-07)
+ *  feature #47492 [Messenger] Add resettable option for InMemoryTransport
 * 6.1.4 (2022-08-26)
 
  * bug #47372 [Console] Fix OutputFormatterStyleStack::getCurrent return type (alamirault)

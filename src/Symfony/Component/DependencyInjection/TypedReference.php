@@ -37,7 +37,10 @@ class TypedReference extends Reference
         $this->attributes = $attributes;
     }
 
-    public function getType(): string
+    /**
+     * @return string
+     */
+    public function getType()
     {
         return $this->type;
     }

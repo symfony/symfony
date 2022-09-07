@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-07T10:47:17Z
+
+What about adding `AbstractUid::getDateTime(): ?DateTimeImmutable` instead?
+
+---------------------------------------------------------------------------
+
+by shrikeh at 2022-09-07T11:02:40Z
+
+> What about adding `AbstractUid::getDateTime(): ?DateTimeImmutable` instead?
+
+Potentially, though personally it would feel like an anti-pattern to me as the behaviour is specific to only certain implementations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-07T11:57:55Z
+
+I'm not a fan of interfaces on value objects personally. I would prefer a new method on the abstract class because it keeps things simple, and it doesn't force any extra logic on consumers. Actually, nullable return values are easier to deal with thanks to nullsafe operators.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-09-07T12:07:16Z
+
+I like the interface, I must admit. It plays nicer with static analysis than a nullable type. We might want to find a better name though. `TimeBasedUidInterface`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-07T12:11:38Z
+
+~AbstractTimedUid extends AbstractUid?~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-07T12:15:54Z
+
+> AbstractTimedUid extends AbstractUid?
+
+Well, won't work since class `Uuid` already extends `AbstractUid` and not all UUIDs are time-based.
+
+`TimeBasedUidInterface` is the correct name since we already have `TimeBasedUuidFactory`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-07T12:18:08Z
+
+One more thing: we might want to declare `TimeBasedUuidFactory::create()` as returning `Uuid&TimeBasedUidInterface`
+
+---------------------------------------------------------------------------
+
+by shrikeh at 2022-09-07T14:34:59Z
+
+@nicolas-grekas is psalm failing on the intersection for `TimeBasedUuidFactory::create()`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-07T14:39:53Z
+
+Looks like so :shrug:
+We're going to ignore it then.

@@ -9,6 +9,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 6.1.5 (2022-09-07)
  *  feature #47492 [Messenger] Add resettable option for InMemoryTransport
+
 * 6.1.4 (2022-08-26)
 
  * bug #47372 [Console] Fix OutputFormatterStyleStack::getCurrent return type (alamirault)

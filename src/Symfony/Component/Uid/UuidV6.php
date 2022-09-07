@@ -18,7 +18,7 @@ namespace Symfony\Component\Uid;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class UuidV6 extends Uuid
+class UuidV6 extends Uuid implements TimeBasedUidInterface
 {
     protected const TYPE = 6;
 

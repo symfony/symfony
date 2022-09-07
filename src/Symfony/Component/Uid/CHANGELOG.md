@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `TimeBasedUidInterface` to `Ulid`, `UuidV1`, and `UuidV6` to describe that they present `getDateTime()` as an available method
+
 5.4
 ---
 

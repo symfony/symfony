@@ -198,7 +198,7 @@ class Terminal
         $info = stream_get_contents($pipes[1]);
         fclose($pipes[1]);
         fclose($pipes[2]);
-        proc_close($process);
+        \proc_close($process);
 
         return $info;
     }

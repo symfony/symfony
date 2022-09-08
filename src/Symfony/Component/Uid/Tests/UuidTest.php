@@ -44,6 +44,32 @@ class UuidTest extends TestCase
         yield ['these are just thirty-six characters'];
     }
 
+    /**
+     * @dataProvider provideInvalidVariant
+     */
+    public function testInvalidVariant(string $uuid)
+    {
+        $uuid = new Uuid($uuid);
+        $this->assertFalse(Uuid::isValid($uuid));
+
+        $uuid = (string) $uuid;
+        $class = Uuid::class.'V'.$uuid[14];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid UUIDv'.$uuid[14].': "'.$uuid.'".');
+
+        new $class($uuid);
+    }
+
+    public function provideInvalidVariant(): iterable
+    {
+        yield ['8dac64d3-937a-1e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-3e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-4e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-5e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-6e7c-fa1d-d5d6c06a61f5'];
+    }
+
     public function testConstructorWithValidUuid()
     {
         $uuid = new UuidV4(self::A_UUID_V4);

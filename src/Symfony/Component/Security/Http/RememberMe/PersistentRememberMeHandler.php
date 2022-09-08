@@ -75,7 +75,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 
         if ($this->tokenVerifier) {
             $isTokenValid = $this->tokenVerifier->verifyToken($persistentToken, $tokenValue);
-            $tokenValue = $persistentToken->getTokenValue();
         } else {
             $isTokenValid = hash_equals($persistentToken->getTokenValue(), $tokenValue);
         }
@@ -96,9 +95,9 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
                 $this->tokenVerifier->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
             }
             $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
-        }
 
-        $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
+            $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
+        }
     }
 
     /**

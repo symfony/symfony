@@ -103,7 +103,6 @@ class FormType extends BaseType
             'value' => $form->getViewData(),
             'data' => $form->getNormData(),
             'required' => $form->isRequired(),
-            'size' => null,
             'label_attr' => $options['label_attr'],
             'help' => $options['help'],
             'help_attr' => $options['help_attr'],

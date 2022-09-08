@@ -26,7 +26,7 @@ class Uuid extends AbstractUid
     protected const TYPE = 0;
     protected const NIL = '00000000-0000-0000-0000-000000000000';
 
-    public function __construct(string $uuid)
+    public function __construct(string $uuid, bool $checkVariant = false)
     {
         $type = preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uuid) ? (int) $uuid[14] : false;
 
@@ -35,6 +35,10 @@ class Uuid extends AbstractUid
         }
 
         $this->uid = strtolower($uuid);
+
+        if ($checkVariant && !\in_array($this->uid[19], ['8', '9', 'a', 'b'], true)) {
+            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+        }
     }
 
     public static function fromString(string $uuid): static
@@ -62,6 +66,10 @@ class Uuid extends AbstractUid
 
         if (self::NIL === $uuid) {
             return new NilUuid();
+        }
+
+        if (!\in_array($uuid[19], ['8', '9', 'a', 'b', 'A', 'B'], true)) {
+            return new self($uuid);
         }
 
         return match ((int) $uuid[14]) {
@@ -107,7 +115,7 @@ class Uuid extends AbstractUid
 
     public static function isValid(string $uuid): bool
     {
-        if (!preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uuid)) {
+        if (!preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){2}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$}Di', $uuid)) {
             return false;
         }
 

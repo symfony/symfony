@@ -24,7 +24,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 final class TraceableValueResolver implements ArgumentValueResolverInterface, ValueResolverInterface
 {
-    private ArgumentValueResolverInterface $inner;
+    private ArgumentValueResolverInterface|ValueResolverInterface $inner;
     private Stopwatch $stopwatch;
 
     public function __construct(ArgumentValueResolverInterface|ValueResolverInterface $inner, Stopwatch $stopwatch)

@@ -138,7 +138,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
     {
         if (null !== $after = $headers['retry-after'][0] ?? null) {
             if (is_numeric($after)) {
-                return (int) $after * 1000;
+                return (int) ($after * 1000);
             }
 
             if (false !== $time = strtotime($after)) {

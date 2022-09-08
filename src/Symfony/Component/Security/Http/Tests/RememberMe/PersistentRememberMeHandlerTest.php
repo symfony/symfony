@@ -125,18 +125,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'series1:oldTokenValue');
         $handler->consumeRememberMeCookie($rememberMeDetails);
 
-        // assert that the cookie has been updated with a new base64 encoded token value
-        $this->assertTrue($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
-
-        /** @var Cookie $cookie */
-        $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-
-        $cookieParts = explode(':', base64_decode($cookie->getValue()), 4);
-
-        $this->assertSame(InMemoryUser::class, $cookieParts[0]); // class
-        $this->assertSame(base64_encode('wouter'), $cookieParts[1]); // identifier
-        $this->assertSame('360', $cookieParts[2]); // expire
-        $this->assertSame('series1:tokenvalue', $cookieParts[3]); // value
+        $this->assertFalse($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
     }
 
     public function testConsumeRememberMeCookieInvalidToken()

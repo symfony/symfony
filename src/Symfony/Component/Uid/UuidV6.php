@@ -29,7 +29,7 @@ class UuidV6 extends Uuid
         if (null === $uuid) {
             $this->uid = static::generate();
         } else {
-            parent::__construct($uuid);
+            parent::__construct($uuid, true);
         }
     }
 

@@ -550,8 +550,8 @@ EOF;
         $strip = '' === $this->docStar && method_exists(Kernel::class, 'stripComments');
         $proxyDumper = $this->getProxyDumper();
         ksort($definitions);
-        foreach ($definitions as $definition) {
-            if (!$definition = $this->isProxyCandidate($definition)) {
+        foreach ($definitions as $id => $definition) {
+            if (!$definition = $this->isProxyCandidate($definition, $asGhostObject, $id)) {
                 continue;
             }
             if (isset($alreadyGenerated[$class = $definition->getClass()])) {
@@ -560,7 +560,7 @@ EOF;
             $alreadyGenerated[$class] = true;
             // register class' reflector for resource tracking
             $this->container->getReflectionClass($class);
-            if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition)) {
+            if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition, $id)) {
                 continue;
             }
 
@@ -655,7 +655,7 @@ EOF;
         }
 
         $asGhostObject = false;
-        $isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject);
+        $isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject, $id);
         $instantiation = '';
 
         $lastWitherIndex = null;
@@ -883,7 +883,7 @@ EOF;
             }
 
             $asGhostObject = false;
-            if ($isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject)) {
+            if ($isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject, $id)) {
                 $definition = $isProxyCandidate;
 
                 if (!$definition->isShared()) {
@@ -1041,7 +1041,7 @@ EOTXT
         }
 
         $asGhostObject = false;
-        $isProxyCandidate = $this->isProxyCandidate($inlineDef, $asGhostObject);
+        $isProxyCandidate = $this->isProxyCandidate($inlineDef, $asGhostObject, $id);
 
         if (isset($this->definitionVariables[$inlineDef])) {
             $isSimpleInstance = false;
@@ -2266,7 +2266,7 @@ EOF;
         return $classes;
     }
 
-    private function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): ?Definition
+    private function isProxyCandidate(Definition $definition, ?bool &$asGhostObject, string $id): ?Definition
     {
         $asGhostObject = false;
 
@@ -2279,6 +2279,6 @@ EOF;
             ->setClass($bag->resolveValue($definition->getClass()))
             ->setTags(($definition->hasTag('proxy') ? ['proxy' => $bag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags());
 
-        return $proxyDumper->isProxyCandidate($definition, $asGhostObject) ? $definition : null;
+        return $proxyDumper->isProxyCandidate($definition, $asGhostObject, $id) ? $definition : null;
     }
 }

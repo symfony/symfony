@@ -26,13 +26,13 @@ final class LazyServiceDumper implements DumperInterface
     ) {
     }
 
-    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): bool
+    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null, string $id = null): bool
     {
         $asGhostObject = false;
 
         if ($definition->hasTag('proxy')) {
             if (!$definition->isLazy()) {
-                throw new InvalidArgumentException(sprintf('Invalid definition for service of class "%s": setting the "proxy" tag on a service requires it to be "lazy".', $definition->getClass()));
+                throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": setting the "proxy" tag on a service requires it to be "lazy".', $id ?? $definition->getClass()));
             }
 
             return true;
@@ -99,10 +99,10 @@ final class LazyServiceDumper implements DumperInterface
         EOF;
     }
 
-    public function getProxyCode(Definition $definition): string
+    public function getProxyCode(Definition $definition, string $id = null): string
     {
-        if (!$this->isProxyCandidate($definition, $asGhostObject)) {
-            throw new InvalidArgumentException(sprintf('Cannot instantiate lazy proxy for service of class "%s".', $definition->getClass()));
+        if (!$this->isProxyCandidate($definition, $asGhostObject, $id)) {
+            throw new InvalidArgumentException(sprintf('Cannot instantiate lazy proxy for service "%s".', $id ?? $definition->getClass()));
         }
         $proxyClass = $this->getProxyClass($definition, $class);
 
@@ -110,32 +110,34 @@ final class LazyServiceDumper implements DumperInterface
             try {
                 return 'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
             } catch (LogicException $e) {
-                throw new InvalidArgumentException(sprintf('Cannot generate lazy ghost for service of class "%s" lazy.', $definition->getClass()), 0, $e);
+                throw new InvalidArgumentException(sprintf('Cannot generate lazy ghost for service "%s".', $id ?? $definition->getClass()), 0, $e);
             }
         }
+        $interfaces = [];
 
         if ($definition->hasTag('proxy')) {
-            $interfaces = [];
             foreach ($definition->getTag('proxy') as $tag) {
                 if (!isset($tag['interface'])) {
-                    throw new InvalidArgumentException(sprintf('Invalid definition for service of class "%s": the "interface" attribute is missing on a "proxy" tag.', $definition->getClass()));
+                    throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": the "interface" attribute is missing on a "proxy" tag.', $id ?? $definition->getClass()));
                 }
                 if (!interface_exists($tag['interface']) && !class_exists($tag['interface'], false)) {
-                    throw new InvalidArgumentException(sprintf('Invalid definition for service of class "%s": several "proxy" tags found but "%s" is not an interface.', $definition->getClass(), $tag['interface']));
+                    throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": several "proxy" tags found but "%s" is not an interface.', $id ?? $definition->getClass(), $tag['interface']));
                 }
                 $interfaces[] = new \ReflectionClass($tag['interface']);
             }
-        } else {
+
+            if (1 === \count($interfaces) && !$interfaces[0]->isInterface()) {
+                $class = array_pop($interfaces);
+            }
+        } elseif ($class->isInterface()) {
             $interfaces = [$class];
-        }
-        if (1 === \count($interfaces) && !$interfaces[0]->isInterface()) {
-            $class = array_pop($interfaces);
+            $class = null;
         }
 
         try {
-            return (\PHP_VERSION_ID >= 80200 && $class->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyProxy($class, $interfaces);
+            return (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyProxy($class, $interfaces);
         } catch (LogicException $e) {
-            throw new InvalidArgumentException(sprintf('Cannot generate lazy proxy for service of class "%s" lazy.', $definition->getClass()), 0, $e);
+            throw new InvalidArgumentException(sprintf('Cannot generate lazy proxy for service "%s".', $id ?? $definition->getClass()), 0, $e);
         }
     }
 

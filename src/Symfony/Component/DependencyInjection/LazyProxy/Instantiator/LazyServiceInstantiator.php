@@ -26,7 +26,7 @@ final class LazyServiceInstantiator implements InstantiatorInterface
         $dumper = new LazyServiceDumper();
 
         if (!class_exists($proxyClass = $dumper->getProxyClass($definition, $class), false)) {
-            eval($dumper->getProxyCode($definition));
+            eval($dumper->getProxyCode($definition, $id));
         }
 
         return isset(class_uses($proxyClass)[LazyGhostTrait::class]) ? $proxyClass::createLazyGhost($realInstantiator) : $proxyClass::createLazyProxy($realInstantiator);

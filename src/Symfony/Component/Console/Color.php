@@ -117,7 +117,7 @@ final class Color
         }
 
         if ('#' === $color[0]) {
-            return ($background ? '4' : '3').Terminal::getTermColorSupport()->convertFromHexToAnsiColorCode($color);
+            return ($background ? '4' : '3').Terminal::getColorMode()->convertFromHexToAnsiColorCode($color);
         }
 
         if (isset(self::COLORS[$color])) {

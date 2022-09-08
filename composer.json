@@ -155,8 +155,7 @@
         "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<5.2",
-        "phpdocumentor/type-resolver": "<1.5.1",
-        "ocramius/proxy-manager": "<2.1"
+        "phpdocumentor/type-resolver": "<1.5.1"
     },
     "config": {
         "allow-plugins": {

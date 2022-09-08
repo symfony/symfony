@@ -214,7 +214,7 @@ class RetryableHttpClientTest extends TestCase
                     $this->context = $context;
                     parent::log($level, $message, $context);
                 }
-            },
+            }
         );
 
         $client->request('GET', 'http://example.com/foo-bar')->getContent();

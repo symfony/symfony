@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * Interface to describe UIDs that contain a DateTimeImmutable as part of their behaviour.
  *
- * @author Barney Hanlon <symfony@shrikeh.net>
+ * @author Barney Hanlon <barney.hanlon@cushon.co.uk>
  */
 interface TimeBasedUidInterface
 {

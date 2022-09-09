@@ -15,26 +15,15 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\UuidToStringTransformer;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV1;
 
 class UuidToStringTransformerTest extends TestCase
 {
-    public function provideValidUuid()
-    {
-        return [
-            ['123e4567-e89b-12d3-a456-426655440000', new Uuid('123e4567-e89b-12d3-a456-426655440000')],
-        ];
-    }
-
-    /**
-     * @dataProvider provideValidUuid
-     */
-    public function testTransform($output, $input)
+    public function testTransform()
     {
         $transformer = new UuidToStringTransformer();
 
-        $input = new Uuid($input);
-
-        $this->assertEquals($output, $transformer->transform($input));
+        $this->assertEquals('123e4567-e89b-12d3-a456-426655440000', $transformer->transform(new UuidV1('123e4567-e89b-12d3-a456-426655440000')));
     }
 
     public function testTransformEmpty()
@@ -53,16 +42,11 @@ class UuidToStringTransformerTest extends TestCase
         $transformer->transform('1234');
     }
 
-    /**
-     * @dataProvider provideValidUuid
-     */
-    public function testReverseTransform($input, $output)
+    public function testReverseTransform()
     {
-        $reverseTransformer = new UuidToStringTransformer();
+        $transformer = new UuidToStringTransformer();
 
-        $output = new Uuid($output);
-
-        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
+        $this->assertEquals(new UuidV1('123e4567-e89b-12d3-a456-426655440000'), $transformer->reverseTransform('123e4567-e89b-12d3-a456-426655440000'));
     }
 
     public function testReverseTransformEmpty()
@@ -78,7 +62,7 @@ class UuidToStringTransformerTest extends TestCase
 
         $this->expectException(TransformationFailedException::class);
 
-        $reverseTransformer->reverseTransform(1234);
+        $reverseTransformer->reverseTransform(Uuid::fromString('123e4567-e89b-12d3-a456-426655440000')->toBase32());
     }
 
     public function testReverseTransformExpectsValidUuidString()

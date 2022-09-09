@@ -135,7 +135,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         }
 
         if (4 > \strlen($time)) {
-            $time = str_pad($time, 4, '0', \STR_PAD_LEFT);
+            $time = '000'.$time;
         }
 
         return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -3, 0));
@@ -143,25 +143,15 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
 
     public static function generate(\DateTimeInterface $time = null): string
     {
-        if (null === $time) {
-            return self::doGenerate();
-        }
-
-        if (0 > $time = substr($time->format('Uu'), 0, -3)) {
+        if (null === $mtime = $time) {
+            $time = microtime(false);
+            $time = substr($time, 11).substr($time, 2, 3);
+        } elseif (0 > $time = $time->format('Uv')) {
             throw new \InvalidArgumentException('The timestamp must be positive.');
         }
 
-        return self::doGenerate($time);
-    }
-
-    private static function doGenerate(string $mtime = null): string
-    {
-        if (null === $time = $mtime) {
-            $time = microtime(false);
-            $time = substr($time, 11).substr($time, 2, 3);
-        }
-
-        if ($time !== self::$time) {
+        if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {
+            randomize:
             $r = unpack('nr1/nr2/nr3/nr4/nr', random_bytes(10));
             $r['r1'] |= ($r['r'] <<= 4) & 0xF0000;
             $r['r2'] |= ($r['r'] <<= 4) & 0xF0000;
@@ -171,19 +161,22 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             self::$rand = array_values($r);
             self::$time = $time;
         } elseif ([0xFFFFF, 0xFFFFF, 0xFFFFF, 0xFFFFF] === self::$rand) {
-            if (null === $mtime) {
-                usleep(100);
+            if (\PHP_INT_SIZE >= 8 || 10 > \strlen($time = self::$time)) {
+                $time = (string) (1 + $time);
+            } elseif ('999999999' === $mtime = substr($time, -9)) {
+                $time = (1 + substr($time, 0, -9)).'000000000';
             } else {
-                self::$rand = [0, 0, 0, 0];
+                $time = substr_replace($time, str_pad(++$mtime, 9, '0', \STR_PAD_LEFT), -9);
             }
 
-            return self::doGenerate($mtime);
+            goto randomize;
         } else {
             for ($i = 3; $i >= 0 && 0xFFFFF === self::$rand[$i]; --$i) {
                 self::$rand[$i] = 0;
             }
 
             ++self::$rand[$i];
+            $time = self::$time;
         }
 
         if (\PHP_INT_SIZE >= 8) {

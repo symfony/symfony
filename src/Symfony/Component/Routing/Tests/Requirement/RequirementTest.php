@@ -272,6 +272,7 @@ class RequirementTest extends TestCase
      *              ["e55a29be-ba25-46e0-a5e5-85b78a6f9a1"]
      *              ["e55a29bh-ba25-46e0-a5e5-85b78a6f9a11"]
      *              ["e55a29beba2546e0a5e585b78a6f9a11"]
+     *              ["21902510-bc96-21ec-8422-0242ac120002"]
      */
     public function testUuidKO(string $uuid)
     {

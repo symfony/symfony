@@ -26,11 +26,16 @@ class UlidTest extends TestCase
     {
         $a = new Ulid();
         $b = new Ulid();
+        usleep(-10000);
+        $c = new Ulid();
 
         $this->assertSame(0, strncmp($a, $b, 20));
+        $this->assertSame(0, strncmp($a, $c, 20));
         $a = base_convert(strtr(substr($a, -6), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv'), 32, 10);
         $b = base_convert(strtr(substr($b, -6), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv'), 32, 10);
+        $c = base_convert(strtr(substr($c, -6), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv'), 32, 10);
         $this->assertSame(1, $b - $a);
+        $this->assertSame(1, $c - $b);
     }
 
     public function testWithInvalidUlid()

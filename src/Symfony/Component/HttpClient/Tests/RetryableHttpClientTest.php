@@ -207,14 +207,14 @@ class RetryableHttpClientTest extends TestCase
             new GenericRetryStrategy(),
             1,
             $logger = new class() extends TestLogger {
-                public array $context = [];
+                public $context = [];
 
                 public function log($level, $message, array $context = []): void
                 {
                     $this->context = $context;
                     parent::log($level, $message, $context);
                 }
-            },
+            }
         );
 
         $client->request('GET', 'http://example.com/foo-bar')->getContent();

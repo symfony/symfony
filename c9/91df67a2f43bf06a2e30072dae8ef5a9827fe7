@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-09-08T11:42:08Z
+
+Hey!
+
+I think @shrikeh has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-09T08:14:37Z
+
+> I don't really understand the use case for the max uuid. But as it is part of the spec, I'm fine with adding it.
+
+I don't have one either, but for completeness with the spec yes. Having it available might enable some use cases we'll know about one day :)

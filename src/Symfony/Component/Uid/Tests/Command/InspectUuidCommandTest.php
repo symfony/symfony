@@ -55,7 +55,7 @@ EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
+  Version                 0                                     
   toRfc4122 (canonical)   461cc9b9-2397-0dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6dw4oVPm5uT17um                
   toBase32                263K4VJ8WQ1PX93T9KNX667XZC            
@@ -71,7 +71,7 @@ EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
+  Version                 2                                     
   toRfc4122 (canonical)   461cc9b9-2397-2dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6fjLfNnvSAHMV7Z                
   toBase32                263K4VJ8WQ5PX93T9KNX667XZC            
@@ -87,7 +87,7 @@ EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
+  Version                 7                                     
   toRfc4122 (canonical)   461cc9b9-2397-7dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6kE2K6HpooNEQ83                
   toBase32                263K4VJ8WQFPX93T9KNX667XZC            
@@ -103,7 +103,7 @@ EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
+  Version                 12                                    
   toRfc4122 (canonical)   461cc9b9-2397-cdba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6pihxonjBST7K8X                
   toBase32                263K4VJ8WQSPX93T9KNX667XZC            

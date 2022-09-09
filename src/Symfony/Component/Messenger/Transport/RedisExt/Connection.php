@@ -93,8 +93,8 @@ class Connection
         $stream = $pathParts[1] ?? $redisOptions['stream'] ?? null;
         $group = $pathParts[2] ?? $redisOptions['group'] ?? null;
         $consumer = $pathParts[3] ?? $redisOptions['consumer'] ?? null;
-        $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
-        $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
+        $pass = '' !== ($parsedUrl['pass'] ?? '') ? urldecode($parsedUrl['pass']) : null;
+        $user = '' !== ($parsedUrl['user'] ?? '') ? urldecode($parsedUrl['user']) : null;
 
         $connectionCredentials = [
             'host' => $parsedUrl['host'] ?? '127.0.0.1',

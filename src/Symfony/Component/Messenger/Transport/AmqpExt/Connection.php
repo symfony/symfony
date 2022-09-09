@@ -126,11 +126,11 @@ class Connection
         ], $options, $parsedQuery);
 
         if (isset($parsedUrl['user'])) {
-            $amqpOptions['login'] = $parsedUrl['user'];
+            $amqpOptions['login'] = urldecode($parsedUrl['user']);
         }
 
         if (isset($parsedUrl['pass'])) {
-            $amqpOptions['password'] = $parsedUrl['pass'];
+            $amqpOptions['password'] = urldecode($parsedUrl['pass']);
         }
 
         if (!isset($amqpOptions['queues'])) {

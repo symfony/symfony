@@ -44,7 +44,7 @@ class UuidFactory
         $this->nameBasedNamespace = $nameBasedNamespace;
     }
 
-    public function create(): UuidV6|UuidV4|UuidV1
+    public function create(): Uuid
     {
         $class = $this->defaultClass;
 

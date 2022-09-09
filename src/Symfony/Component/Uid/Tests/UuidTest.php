@@ -22,11 +22,13 @@ use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\Uid\UuidV7;
 
 class UuidTest extends TestCase
 {
     private const A_UUID_V1 = 'd9e7a184-5d5b-11ea-a62a-3499710062d0';
     private const A_UUID_V4 = 'd6b3345b-2905-4048-a83c-b5988e765d98';
+    private const A_UUID_V7 = '017f22e2-79b0-7cc3-98c4-dc0c0c07398f';
 
     /**
      * @dataProvider provideInvalidUuids
@@ -69,6 +71,8 @@ class UuidTest extends TestCase
         yield ['8dac64d3-937a-4e7c-fa1d-d5d6c06a61f5'];
         yield ['8dac64d3-937a-5e7c-fa1d-d5d6c06a61f5'];
         yield ['8dac64d3-937a-6e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-7e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-8e7c-fa1d-d5d6c06a61f5'];
     }
 
     public function testConstructorWithValidUuid()
@@ -132,6 +136,28 @@ class UuidTest extends TestCase
         $uuidV6 = Uuid::v6();
 
         $this->assertNotSame(substr($uuidV1, 24), substr($uuidV6, 24));
+    }
+
+    public function testV7()
+    {
+        $uuid = Uuid::fromString(self::A_UUID_V7);
+
+        $this->assertInstanceOf(UuidV7::class, $uuid);
+        $this->assertSame(1645557742, $uuid->getDateTime()->getTimeStamp());
+
+        $prev = UuidV7::generate();
+
+        for ($i = 0; $i < 25; ++$i) {
+            $uuid = UuidV7::generate();
+            $now = gmdate('Y-m-d H:i');
+            $this->assertGreaterThan($prev, $uuid);
+            $prev = $uuid;
+        }
+
+        $this->assertTrue(Uuid::isValid($uuid));
+        $uuid = Uuid::fromString($uuid);
+        $this->assertInstanceOf(UuidV7::class, $uuid);
+        $this->assertSame($now, $uuid->getDateTime()->format('Y-m-d H:i'));
     }
 
     public function testBinary()

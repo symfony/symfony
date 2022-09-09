@@ -31,13 +31,13 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     private $urlGenerator;
     private $userProvider;
     private $options;
-    private $signatureHashUtil;
+    private $signatureHasher;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHashUtil, array $options)
+    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHasher, array $options)
     {
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;
-        $this->signatureHashUtil = $signatureHashUtil;
+        $this->signatureHasher = $signatureHasher;
         $this->options = array_merge([
             'route_name' => null,
             'lifetime' => 600,
@@ -53,7 +53,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
             'user' => method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),
             'expires' => $expires,
-            'hash' => $this->signatureHashUtil->computeSignatureHash($user, $expires),
+            'hash' => $this->signatureHasher->computeSignatureHash($user, $expires),
         ];
 
         if ($request) {
@@ -101,7 +101,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         $expires = $request->get('expires');
 
         try {
-            $this->signatureHashUtil->verifySignatureHash($user, $expires, $hash);
+            $this->signatureHasher->verifySignatureHash($user, $expires, $hash);
         } catch (ExpiredSignatureException $e) {
             throw new ExpiredLoginLinkException(ucfirst(str_ireplace('signature', 'login link', $e->getMessage())), 0, $e);
         } catch (InvalidSignatureException $e) {

@@ -53,7 +53,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
      * - Create a new remember-me cookie to be sent with the response (using {@see createCookie()});
      * - If you store the token somewhere else (e.g. in a database), invalidate the stored token.
      *
-     * @throws AuthenticationException throw this exception if the remember me details are not accepted
+     * @throws AuthenticationException If the remember-me details are not accepted
      */
     abstract protected function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void;
 

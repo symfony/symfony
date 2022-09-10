@@ -20,7 +20,8 @@
     },
     "require-dev": {
         "symfony/console": "^5.4|^6.0",
-        "symfony/process": "^5.4|^6.0"
+        "symfony/process": "^5.4|^6.0",
+        "mikey179/vfsstream": "^1.6"
     },
     "conflict": {
         "symfony/console": "<5.4"

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Dotenv\Tests;
 
+use bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
@@ -201,10 +202,10 @@ class DotenvTest extends TestCase
         putenv('FOO');
         putenv('BAR');
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $tmpdir = vfsStream::setup()->url();
 
-        $path1 = tempnam($tmpdir, 'sf-');
-        $path2 = tempnam($tmpdir, 'sf-');
+        $path1 = "$tmpdir/file1";
+        $path2 = "$tmpdir/file2";
 
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
@@ -216,9 +217,6 @@ class DotenvTest extends TestCase
 
         putenv('FOO');
         putenv('BAR');
-        unlink($path1);
-        unlink($path2);
-        rmdir($tmpdir);
 
         $this->assertSame('BAR', $foo);
         $this->assertSame('BAZ', $bar);
@@ -241,9 +239,7 @@ class DotenvTest extends TestCase
             putenv('EXISTING_KEY=EXISTING_VALUE');
         };
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
-
-        $path = tempnam($tmpdir, 'sf-');
+        $path = vfsStream::setup()->url().'/sf';
 
         // .env
         file_put_contents($path, "FOO=BAR\nEXISTING_KEY=NEW_VALUE");
@@ -347,7 +343,6 @@ class DotenvTest extends TestCase
         $resetContext();
         unset($_ENV['EXISTING_KEY'], $_SERVER['EXISTING_KEY']);
         putenv('EXISTING_KEY');
-        rmdir($tmpdir);
     }
 
     public function testOverload()
@@ -362,10 +357,10 @@ class DotenvTest extends TestCase
         $_ENV['FOO'] = 'initial_foo_value';
         $_ENV['BAR'] = 'initial_bar_value';
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $tmpdir = vfsStream::setup()->url();
 
-        $path1 = tempnam($tmpdir, 'sf-');
-        $path2 = tempnam($tmpdir, 'sf-');
+        $path1 = "$tmpdir/file1";
+        $path2 = "$tmpdir/file2";
 
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
@@ -377,9 +372,6 @@ class DotenvTest extends TestCase
 
         putenv('FOO');
         putenv('BAR');
-        unlink($path1);
-        unlink($path2);
-        rmdir($tmpdir);
 
         $this->assertSame('BAR', $foo);
         $this->assertSame('BAZ', $bar);
@@ -389,7 +381,7 @@ class DotenvTest extends TestCase
     {
         $this->expectException(PathException::class);
         $dotenv = new Dotenv();
-        $dotenv->load(__DIR__);
+        $dotenv->load(vfsStream::setup()->url());
     }
 
     public function testServerSuperglobalIsNotOverridden()
@@ -560,8 +552,7 @@ class DotenvTest extends TestCase
             $_ENV['EXISTING_KEY'] = $_SERVER['EXISTING_KEY'] = 'EXISTING_VALUE';
         };
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
-        $path = tempnam($tmpdir, 'sf-');
+        $path = vfsStream::setup()->url().'/file';
 
         file_put_contents($path, "FOO=BAR\nEXISTING_KEY=NEW_VALUE");
         $resetContext();
@@ -597,6 +588,5 @@ class DotenvTest extends TestCase
         unlink($path.'.local.php');
 
         $resetContext();
-        rmdir($tmpdir);
     }
 }

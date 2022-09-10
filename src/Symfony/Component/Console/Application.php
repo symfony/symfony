@@ -101,10 +101,7 @@ class Application implements ResetInterface
         }
     }
 
-    /**
-     * @final
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public final function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

@@ -59,8 +59,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         $this->maxItems = $maxItems;
         self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key, $value, $isHit, $tags) {
-                $item = new CacheItem();
-                $item->key = $key;
+                $item = new CacheItem($key);
                 $item->value = $value;
                 $item->isHit = $isHit;
                 if (null !== $tags) {

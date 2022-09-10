@@ -89,10 +89,7 @@ class CacheItemTest extends TestCase
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
-        $item = new CacheItem();
-        $r = new \ReflectionProperty($item, 'key');
-        $r->setValue($item, 'foo');
-
+        $item = new CacheItem('foo');
         $item->tag([]);
     }
 }

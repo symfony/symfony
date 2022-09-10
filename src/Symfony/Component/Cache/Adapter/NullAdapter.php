@@ -26,8 +26,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
     {
         self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key) {
-                $item = new CacheItem();
-                $item->key = $key;
+                $item = new CacheItem($key);
                 $item->isHit = false;
 
                 return $item;

@@ -48,8 +48,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         $this->defaultLifetime = $defaultLifetime;
         self::$createCacheItem ??= \Closure::bind(
             static function ($key, $innerItem, $poolHash) {
-                $item = new CacheItem();
-                $item->key = $key;
+                $item = new CacheItem($key);
 
                 if (null === $innerItem) {
                     return $item;

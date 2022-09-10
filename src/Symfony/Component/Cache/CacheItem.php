@@ -24,7 +24,6 @@ final class CacheItem implements ItemInterface
     private const METADATA_EXPIRY_OFFSET = 1527506807;
     private const VALUE_WRAPPER = "\xA9";
 
-    protected string $key;
     protected mixed $value = null;
     protected bool $isHit = false;
     protected float|int|null $expiry = null;
@@ -33,6 +32,10 @@ final class CacheItem implements ItemInterface
     protected ?ItemInterface $innerItem = null;
     protected ?string $poolHash = null;
     protected bool $isTaggable = false;
+
+    public function __construct(protected string $key = '')
+    {
+    }
 
     public function getKey(): string
     {

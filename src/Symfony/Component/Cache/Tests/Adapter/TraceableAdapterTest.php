@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
+use Symfony\Component\Cache\CacheItem;
 
 /**
  * @group time-sensitive
@@ -155,6 +156,13 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
+    }
+
+    public function testSaveWithoutFetchTrace()
+    {
+        $pool = $this->createCachePool();
+        $pool->save((new CacheItem('k'))->set('v'));
+        $this->assertCount(1, $pool->getCalls());
     }
 
     public function testSaveDeferredTrace()

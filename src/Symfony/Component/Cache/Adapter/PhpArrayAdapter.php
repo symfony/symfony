@@ -51,8 +51,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         $this->pool = $fallbackPool;
         self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key, $value, $isHit) {
-                $item = new CacheItem();
-                $item->key = $key;
+                $item = new CacheItem($key);
                 $item->value = $value;
                 $item->isHit = $isHit;
 

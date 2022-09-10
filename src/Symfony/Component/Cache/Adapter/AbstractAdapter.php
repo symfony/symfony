@@ -45,8 +45,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         }
         self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key, $value, $isHit) {
-                $item = new CacheItem();
-                $item->key = $key;
+                $item = new CacheItem($key);
                 $item->value = $v = $value;
                 $item->isHit = $isHit;
                 $item->unpack();

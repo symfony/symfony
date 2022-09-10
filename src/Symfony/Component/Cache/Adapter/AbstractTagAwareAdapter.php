@@ -46,8 +46,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         }
         self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key, $value, $isHit) {
-                $item = new CacheItem();
-                $item->key = $key;
+                $item = new CacheItem($key);
                 $item->isTaggable = true;
                 // If structure does not match what we expect return item as is (no value and not a hit)
                 if (!\is_array($value) || !\array_key_exists('value', $value)) {

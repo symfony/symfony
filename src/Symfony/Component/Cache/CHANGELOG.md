@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add support for saving cache item in PSR-6 pool without having to fetch it first
+
 6.1
 ---
 

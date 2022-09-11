@@ -8,7 +8,6 @@ CHANGELOG
  * Add arguments `&$asGhostObject` and `$id` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
  * Add `enum` env var processor
  * Add `shuffle` env var processor
- * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
  * Allow #[When] to be extended
 
 6.1

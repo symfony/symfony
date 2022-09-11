@@ -4,6 +4,7 @@ CHANGELOG
 6.2
 ---
 
+ * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
  * Add `NotificationAssertionsTrait`
  * Add option `framework.catch_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to catch all kinds of `Throwable`
  * Make `AbstractController::render()` able to deal with forms and deprecate `renderForm()`

@@ -159,16 +159,16 @@ class Connection extends AbstractConnection
             }
         }
 
-        $this->connection = ldap_connect($this->config['connection_string']);
+        if (false === $connection = ldap_connect($this->config['connection_string'])) {
+            throw new LdapException('Invalid connection string: '.$this->config['connection_string']);
+        } else {
+            $this->connection = $connection;
+        }
 
         foreach ($this->config['options'] as $name => $value) {
             if (!\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {
                 $this->setOption($name, $value);
             }
-        }
-
-        if (false === $this->connection) {
-            throw new LdapException('Could not connect to Ldap server: '.ldap_error($this->connection));
         }
 
         if ('tls' === $this->config['encryption'] && false === @ldap_start_tls($this->connection)) {

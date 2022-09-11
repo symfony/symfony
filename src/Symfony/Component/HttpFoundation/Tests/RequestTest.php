@@ -1629,6 +1629,20 @@ class RequestTest extends TestCase
         $this->assertEquals(['zh', 'cherokee'], $request->getLanguages());
     }
 
+    public function testGetAcceptHeadersReturnString()
+    {
+        $request = new Request();
+        $request->headers->set('Accept', '123');
+        $request->headers->set('Accept-Charset', '123');
+        $request->headers->set('Accept-Encoding', '123');
+        $request->headers->set('Accept-Language', '123');
+
+        $this->assertSame(['123'], $request->getAcceptableContentTypes());
+        $this->assertSame(['123'], $request->getCharsets());
+        $this->assertSame(['123'], $request->getEncodings());
+        $this->assertSame(['123'], $request->getLanguages());
+    }
+
     public function testGetRequestFormat()
     {
         $request = new Request();

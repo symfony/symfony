@@ -97,7 +97,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
         }
 
         if (\PHP_INT_SIZE >= 8) {
-            $time = base_convert($time, 10, 16);
+            $time = dechex($time);
         } else {
             $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
         }

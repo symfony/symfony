@@ -238,8 +238,8 @@ class Connection
         ];
 
         if (isset($parsedUrl['host'])) {
-            $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
-            $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
+            $pass = '' !== ($parsedUrl['pass'] ?? '') ? urldecode($parsedUrl['pass']) : null;
+            $user = '' !== ($parsedUrl['user'] ?? '') ? urldecode($parsedUrl['user']) : null;
             $connectionCredentials = [
                 'host' => $parsedUrl['host'] ?? '127.0.0.1',
                 'port' => $parsedUrl['port'] ?? 6379,

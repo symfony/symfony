@@ -45,12 +45,20 @@ class PropertyNormalizer extends AbstractObjectNormalizer
      */
     public const NORMALIZE_VISIBILITY = 'normalize_visibility';
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    private $allowNormalizationOfObjectsWithoutAnyProperties;
+
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [], bool $allowNormalizationOfObjectsWithoutAnyProperties = false)
     {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 
         if (!isset($this->defaultContext[self::NORMALIZE_VISIBILITY])) {
             $this->defaultContext[self::NORMALIZE_VISIBILITY] = self::NORMALIZE_PUBLIC | self::NORMALIZE_PROTECTED | self::NORMALIZE_PRIVATE;
+        }
+
+        $this->allowNormalizationOfObjectsWithoutAnyProperties = $allowNormalizationOfObjectsWithoutAnyProperties;
+
+        if (\func_num_args() < 7) {
+            trigger_deprecation('symfony/serializer', '6.2', '$allowNormalizationOfObjectsWithoutAnyProperties parameter of %s() should be explicitly provided since the default value will change to `true` in symfony/serializer >=7.0', __METHOD__);
         }
     }
 
@@ -80,6 +88,10 @@ class PropertyNormalizer extends AbstractObjectNormalizer
      */
     private function supports(string $class): bool
     {
+        if ($this->allowNormalizationOfObjectsWithoutAnyProperties) {
+            return true;
+        }
+
         $class = new \ReflectionClass($class);
 
         // We look for at least one non-static property

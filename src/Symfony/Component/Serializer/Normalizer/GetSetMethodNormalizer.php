@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+
 /**
  * Converts between objects with getter and setter methods and arrays.
  *
@@ -35,6 +40,25 @@ namespace Symfony\Component\Serializer\Normalizer;
 class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
     private static $setterAccessibleCache = [];
+
+    private $allowNormalizationOfObjectsWithoutAnyGetters;
+
+    public function __construct(
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
+        NameConverterInterface $nameConverter = null,
+        PropertyTypeExtractorInterface $propertyTypeExtractor = null,
+        ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        callable $objectClassResolver = null,
+        array $defaultContext = [],
+        bool $allowNormalizationOfObjectsWithoutAnyGetters = false,
+    ) {
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
+        $this->allowNormalizationOfObjectsWithoutAnyGetters = $allowNormalizationOfObjectsWithoutAnyGetters;
+
+        if (\func_num_args() < 7) {
+            trigger_deprecation('symfony/serializer', '6.2', '$allowNormalizationOfObjectsWithoutAnyGetters parameter of %s() should be explicitly provided since the default value will change to `true` in symfony/serializer >=7.0', __METHOD__);
+        }
+    }
 
     /**
      * @param array $context
@@ -62,6 +86,10 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     private function supports(string $class): bool
     {
+        if ($this->allowNormalizationOfObjectsWithoutAnyGetters) {
+            return true;
+        }
+
         $class = new \ReflectionClass($class);
         $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {

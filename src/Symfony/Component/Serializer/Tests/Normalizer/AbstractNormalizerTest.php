@@ -205,8 +205,8 @@ class AbstractNormalizerTest extends TestCase
     {
         $extractor = new PhpDocExtractor();
 
-        yield [new PropertyNormalizer()];
-        yield [new PropertyNormalizer(null, null, $extractor)];
+        yield [new PropertyNormalizer(null, null, null, null, null, [], true)];
+        yield [new PropertyNormalizer(null, null, $extractor, null, null, [], true)];
         yield [new ObjectNormalizer()];
         yield [new ObjectNormalizer(null, null, null, $extractor)];
     }
@@ -222,7 +222,7 @@ class AbstractNormalizerTest extends TestCase
         $dummy = new IgnoreDummy();
         $dummy->ignored1 = 'hello';
 
-        $normalizer = new PropertyNormalizer($this->classMetadata);
+        $normalizer = new PropertyNormalizer($this->classMetadata, null, null, null, null, [], true);
 
         $this->assertSame([], $normalizer->normalize($dummy));
     }

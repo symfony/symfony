@@ -77,7 +77,7 @@ class PropertyNormalizerTest extends TestCase
     private function createNormalizer(array $defaultContext = [])
     {
         $this->serializer = $this->createMock(SerializerInterface::class);
-        $this->normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
+        $this->normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext, true);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -234,17 +234,17 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getNormalizerForCallbacks(): PropertyNormalizer
     {
-        return new PropertyNormalizer();
+        return new PropertyNormalizer(null, null, null, null, null, [], true);
     }
 
     protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): PropertyNormalizer
     {
-        return new PropertyNormalizer(null, null, $this->getCallbackPropertyTypeExtractor());
+        return new PropertyNormalizer(null, null, $this->getCallbackPropertyTypeExtractor(), null, null, [], true);
     }
 
     protected function getNormalizerForCircularReference(array $defaultContext): PropertyNormalizer
     {
-        $normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
+        $normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext, true);
         new Serializer([$normalizer]);
 
         return $normalizer;
@@ -273,7 +273,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getDenormalizerForConstructArguments(): PropertyNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $denormalizer = new PropertyNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $denormalizer = new PropertyNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, null, null, [], true);
         $serializer = new Serializer([$denormalizer]);
         $denormalizer->setSerializer($serializer);
 
@@ -284,20 +284,42 @@ class PropertyNormalizerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        return new PropertyNormalizer($classMetadataFactory);
+        return new PropertyNormalizer($classMetadataFactory, null, null, null, null, [], true);
     }
 
     protected function getDenormalizerForGroups(): PropertyNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        return new PropertyNormalizer($classMetadataFactory);
+        return new PropertyNormalizer($classMetadataFactory, null, null, null, null, [], true);
+    }
+
+    public function testNormalizeObjectWithoutAnyProperties()
+    {
+        $obj = new StaticPropertyDummy();
+
+        $this->assertTrue($this->normalizer->supportsNormalization($obj));
+        $this->assertEquals(
+            [],
+            $this->normalizer->normalize($obj),
+        );
+    }
+
+    public function testDenormalizeObjectWithoutAnyProperties()
+    {
+        $obj = new StaticPropertyDummy();
+
+        $this->assertTrue($this->normalizer->supportsDenormalization($obj, \get_class($obj)));
+        $this->assertEquals(
+            $obj,
+            $this->normalizer->denormalize([], \get_class($obj)),
+        );
     }
 
     public function testGroupsNormalizeWithNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, null, [], true);
         $this->normalizer->setSerializer($this->serializer);
 
         $obj = new GroupDummy();
@@ -318,7 +340,7 @@ class PropertyNormalizerTest extends TestCase
     public function testGroupsDenormalizeWithNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, null, [], true);
         $this->normalizer->setSerializer($this->serializer);
 
         $obj = new GroupDummy();
@@ -338,7 +360,7 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getDenormalizerForIgnoredAttributes(): PropertyNormalizer
     {
-        $normalizer = new PropertyNormalizer();
+        $normalizer = new PropertyNormalizer(null, null, null, null, null, [], true);
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
         new Serializer([$normalizer]);
 
@@ -347,7 +369,7 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getNormalizerForIgnoredAttributes(): PropertyNormalizer
     {
-        $normalizer = new PropertyNormalizer();
+        $normalizer = new PropertyNormalizer(null, null, null, null, null, [], true);
         // instantiate a serializer with the normalizer to handle normalizing recursive structures
         new Serializer([$normalizer]);
 
@@ -362,7 +384,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getNormalizerForMaxDepth(): PropertyNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new PropertyNormalizer($classMetadataFactory);
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, null, null, [], true);
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
 
@@ -372,7 +394,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getDenormalizerForObjectToPopulate(): PropertyNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new PropertyNormalizer($classMetadataFactory, null, new PhpDocExtractor());
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, new PhpDocExtractor(), null, null, [], true);
         new Serializer([$normalizer]);
 
         return $normalizer;
@@ -381,7 +403,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getDenormalizerForTypeEnforcement(): DenormalizerInterface
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-        $normalizer = new PropertyNormalizer(null, null, $extractor);
+        $normalizer = new PropertyNormalizer(null, null, $extractor, null, null, [], true);
         $serializer = new Serializer([new ArrayDenormalizer(), $normalizer]);
         $normalizer->setSerializer($serializer);
 
@@ -425,7 +447,8 @@ class PropertyNormalizerTest extends TestCase
 
     public function testNoStaticPropertySupport()
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new StaticPropertyDummy()));
+        $normalizer = new PropertyNormalizer(null, null, null, null, null, [], false);
+        $this->assertFalse($normalizer->supportsNormalization(new StaticPropertyDummy()));
     }
 
     public function testInheritedPropertiesSupport()
@@ -495,12 +518,12 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getNormalizerForCacheableObjectAttributesTest(): AbstractObjectNormalizer
     {
-        return new PropertyNormalizer();
+        return new PropertyNormalizer(null, null, null, null, null, [], true);
     }
 
     protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface
     {
-        return new PropertyNormalizer(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        return new PropertyNormalizer(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())), null, null, null, null, [], true);
     }
 }
 

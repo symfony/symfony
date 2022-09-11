@@ -553,7 +553,7 @@ class EmailTest extends TestCase
 EOF;
 
         $extractor = new PhpDocExtractor();
-        $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
+        $propertyNormalizer = new PropertyNormalizer(null, null, $extractor, null, null, [], true);
         $serializer = new Serializer([
             new ArrayDenormalizer(),
             new MimeMessageNormalizer($propertyNormalizer),

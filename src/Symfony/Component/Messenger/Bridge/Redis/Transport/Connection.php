@@ -205,8 +205,8 @@ class Connection
         }
 
         if (isset($parsedUrl['host'])) {
-            $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
-            $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
+            $pass = '' !== ($parsedUrl['pass'] ?? '') ? urldecode($parsedUrl['pass']) : null;
+            $user = '' !== ($parsedUrl['user'] ?? '') ? urldecode($parsedUrl['user']) : null;
             $options['host'] = $parsedUrl['host'] ?? $options['host'];
             $options['port'] = $parsedUrl['port'] ?? $options['port'];
             // See: https://github.com/phpredis/phpredis/#auth

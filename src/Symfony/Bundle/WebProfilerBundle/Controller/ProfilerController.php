@@ -113,7 +113,7 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
-            'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
+            'profiler_markup_version' => 3, // 1 = original profiler, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
         ]);
     }
 
@@ -157,7 +157,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getNames($profile),
             'profiler_url' => $url,
             'token' => $token,
-            'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
+            'profiler_markup_version' => 3, // 1 = original toolbar, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
         ]);
     }
 
@@ -205,6 +205,7 @@ class ProfilerController
                 'end' => $end,
                 'limit' => $limit,
                 'request' => $request,
+                'render_hidden_by_default' => false,
             ]),
             200,
             ['Content-Type' => 'text/html']
@@ -360,7 +361,7 @@ class ProfilerController
         }
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/open.html.twig', [
-            'filename' => $filename,
+            'file_info' => new \SplFileInfo($filename),
             'file' => $file,
             'line' => $line,
         ]);

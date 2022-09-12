@@ -1,0 +1,311 @@
+---------------------------------------------------------------------------
+
+by Guikingone at 2022-08-02T07:09:13Z
+
+Hi @javiereguiluz 👋🏻
+
+I might be wrong but regarding the dark mode, could it be a better idea to keep the white color for the URL / status code / reason phrase as it could be hard for people with vision deficiencies to distinguish the main informations from the background color?
+
+Source: https://www.bdadyslexia.org.uk/advice/employers/creating-a-dyslexia-friendly-workplace/dyslexia-friendly-style-guide (Colors tab)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-08-02T07:15:26Z
+
+@Guikingone I was careful about that during the redesign, but I could have missed something. I've just checked with the browser tool and the contrast should be OK:
+
+| Contrast in light mode | Contrast in dark mode
+| --- | ---
+| <img width="564" alt="header-text-contrast-light" src="https://user-images.githubusercontent.com/73419/182314479-6d8a426a-fa86-4aae-a027-6634f8fba3fe.png"> | <img width="575" alt="header-text-contrast-dark" src="https://user-images.githubusercontent.com/73419/182314486-7244db0f-acf0-48eb-9624-14c09e8b976b.png">
+
+About other uses of color, I think everything has its own textual representation (e.g. the response HTTP status code) so nothing should depend exclusively on color to be fully understood. But again, let's review this together to find this kind of issues. Thanks!
+
+---------------------------------------------------------------------------
+
+by UtechtDustin at 2022-08-02T07:25:49Z
+
+Is there a way to keep the old design and make it selectable somehow ?
+I like the old one more, the new one looks like bootstrap without theming.
+But maybe I just have to get used to it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T07:40:52Z
+
+Kudos @javiereguiluz!
+
+I only have one note from the screenshots: the line height in the "File source viewer" looks a bit too high to me.
+
+> Is there a way to keep the old design and make it selectable somehow ?
+
+Not possible as that'd be too much maintenance work.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-08-02T07:45:00Z
+
+@javiereguiluz it could be great to document/show how to test this PR locally with a personal project running on sf6.1 for example :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-08-02T07:52:50Z
+
+@nicolas-grekas you are right! The line-height was too large. Here's the updated design:
+
+![file-viewer-line-height](https://user-images.githubusercontent.com/73419/182320864-cc1f00e2-0f0b-400a-b34b-3509108cdc83.png)
+
+@UtechtDustin when there's a big redesign, it's perfectly fine to not like it at first. We are so used to the current design, that even the slightest change can bother us. It happened the same in 2015 with the last redesign (https://symfony.com/blog/new-in-symfony-2-8-redesigned-profiler). I hope that you like it when you start using it in your own projects.
+
+@94noni the easiest way is to (1) clone this repository, (2) check out this PR and then (3) run `php link /path/to/your/project` This will create symlinks in the `vendor/` dir of your project so you can use the Symfony PR. See https://symfony.com/doc/current/contributing/code/pull_requests.html#use-your-branch-in-an-existing-project
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-08-02T07:55:06Z
+
+@94noni it'll be something along these lines:
+
+```
+git clone -b update_profiler https://github.com/javiereguiluz/symfony symfony-profiler
+cd symfony-profiler
+./link /path/to/your/6.x/symfony/project
+```
+
+(if you already have a clone of this repo locally, you can also add Javier's fork as a remote and fetch the branch that way)
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-08-02T07:57:36Z
+
+@wouterj @javiereguiluz yes I know I am already seeing it, but I commented for put this in the PR desc etc for devs to test on their side as well to gather more feedbacks :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-08-02T08:03:36Z
+
+@94noni that's a good idea! I've updated the description to add the instructions shared by Wouter. Thanks.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-08-02T17:43:00Z
+
+> (if you already have a clone of this repo locally, you can also add Javier's fork as a remote and fetch the branch that way)
+
+If you have the [Github CLI installed](https://cli.github.com/manual/gh_pr_checkout), you can also:
+
+```shell
+gh pr checkout 47148
+```
+
+from your local `symfony/symfony` clone
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-08-02T19:07:29Z
+
+This looks great!
+
+I have 2 suggestions:
+- can the dotted background be removed? It looks like a grid for design.
+- I like the old style with the big green and red headers, can we keep them at a small border on the left?
+
+Something like this:
+
+> ![image](https://user-images.githubusercontent.com/2071331/182453780-b67e5c1f-3af5-4419-a97a-fbc7424fd8b3.png)
+
+---------------------------------------------------------------------------
+
+by Wirone at 2022-08-03T07:57:36Z
+
+@javiereguiluz I am wondering how GET/POST params and uploaded files section will look like with actual data 🤔 Before these sections were stacked, now they are displayed as columns - will it be readable with significant amount of data?
+
+And what about responsiveness?
+
+---------------------------------------------------------------------------
+
+by quentint at 2022-08-03T08:56:56Z
+
+Thanks for such a great PR!
+
+I overall like it very much, but here are a few notes (of course this is highly personal):
+- the text looks a bit small, almost everything could use a 10% boost
+- probably a Windows/Chrome only issue, but the bold texts appears a bit blurry: https://imgur.com/58cYlaV (removing "Ubuntu Mono" from `--font-family-monospace` fixes that (it also happens that I don't like Ubuntu Mono very much 😉)
+- even though the dot grid looked awesome in your tweets screenshots, it might be a tad too much when seeing it "live"
+- the profile search form layout/spacing looks a bit odd
+- the top-left Symfony logo is a bit light, when using the light theme
+- the new toolbar is a big plus, but I'm not sure about the shadow on `.sf-toolbar-block:hover .sf-toolbar-icon`, removing it feels more modern
+
+But: the global feeling is clearly more modern and efficient, well done!
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-08-03T10:28:16Z
+
+Nice, looking forward to it 👍 what I must say what I was always missing on the `/_profiler` list was different colors for the HTTP Methods (POST, PUT, PATCH, DELETE, GET/HEAD/OPTONS, ...).
+
+---------------------------------------------------------------------------
+
+by danidoedel at 2022-08-04T07:12:36Z
+
+I really like the new design and already looking forward using it.
+
+One thing I am wondering about is why the header for errors has the response status above and for successful requests below the url.
+Looks a bit inconsistent to me, but maybe it has a valid reason I just can't see right now.
+
+---------------------------------------------------------------------------
+
+by ctrl-f5 at 2022-08-07T10:08:59Z
+
+I must agree with @UtechtDustin that it looks very flat and bland. It looks more like a mockup than a finished design. is this really the finished style?
+
+Also agree with others in that I dont like the dotted background.
+
+(I'm talking pure visual design, not the changes in information display)
+
+The toolbar itself does look fresher idd. but the outlined icons provide less of a separation between the different items than the filled icons did. does the new icon set also provide filled icons? or do we maybe need a border on the items?
+
+> when there's a big redesign, it's perfectly fine to not like it at first. We are so used to the current design, that even the slightest change can bother us. It happened the same in 2015 with the last redesign.
+
+This is an easy catch all argument to simply waive off all criticism as invalid. And it also works the other way round: if you've been involved in a redesign for a long time it's hard to see its flaws.
+
+---------------------------------------------------------------------------
+
+by Bilge at 2022-08-07T10:52:23Z
+
+Everything looks great except the line height (leading) of the code blocks (including the revised version).
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-08-07T13:13:12Z
+
+Awesome, nothing to say, it's super nice! On my side I really like the background, perfectly adapted in this situation.
+
+---------------------------------------------------------------------------
+
+by VincentFoulon80 at 2022-08-07T18:39:52Z
+
+The only thing that I don't like much about this is the sidebar's background color. The screen is either completely white or completely dark. I feel like there is a color missing, even a slight variation maybe.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-08-11T10:00:59Z
+
+In the latest commit, I've updated the "toolbar redirection intercept" page.
+
+Before it looked undesigned:
+
+![toolbar-intercept-redirect-before](https://user-images.githubusercontent.com/73419/184109469-2ee52b7f-60d0-4aed-bbcd-2c075a8e0416.png)
+
+Now it looks like this:
+
+![toolbar-intercept-redirect-after](https://user-images.githubusercontent.com/73419/184109508-4874c201-e940-4290-99e1-afd375c807a8.png)
+
+The main changes are that we now always display the absolute URL of the redirection and we also make the "click to action" (in this case, click to follow the redirection) more consistent (it always looks the same and it's on the same place ... whereas previously it changed depending on the redirected URL).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-08-11T18:55:30Z
+
+Thank you all for reviewing this. Here are some quick comments to your questions:
+
+* @alexislefebvre replaced `include()` by `source()` for icons
+* @VincentFoulon80 about the menu background, I tried a darker color but I don't like it because it's too distracting. This sidebar is just a secondary utility; the focus of the page must be the main content, so this sidebar menu can't bee too distracting. I'm going to try to give it a slightly darker border color
+* @Bilge the revised line-height of code is pretty tight already. Not sure it'd be comfortable to read it if we make it even more tight
+* @ctrl-f5 I'm sorry you don't like the redesign. According to user feedback most people like it, so I hope you end up liking it or at least tolerating it. About this --> _"It looks more like a mockup than a finished design"_ I hope you check out the deisgn in detail and you'll see it's full of little details here and there. It's not easy to make something look simple.
+* @danidoedel you are right that consistency is one of the keys of a good design. In this case, we consciously break consistency for this reason: the status code is a nice-to-have in 2xx/3xx responses, but a critical thing in 4xx/5xx responses. That's why I think it's better to show the error status code as soon as possible, to quickly be aware of the error that happened.
+* @alexander-schranz I'm going to think about using colors for HTTP methods. I'm aware of the tools that generate API docs applying different colors to them. However, to me it looks too distracting. But I'm going to test it
+* @quentint I'm going to test a slightly darker Symfony logo; the grid colors should be super subtle (especially in "dark mode") maybe you can send me some screenshot via Slack in a DM so I can check; I don't see anything weird in the search form layout (a screenshot could be gret in this case too); I tweaked the (subtle) shadow of the profiler panels
+* @Wirone the 3-column layout for GET/POST/Files is only used when the three of them are empty. If one or more is non-empty, then we show the normal stacked design
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2022-08-11T19:25:49Z
+
+@javiereguiluz thanks for the feedback. Please also review the suggestions in this comment which surprisingly received many 👍 https://github.com/symfony/symfony/pull/47148#issuecomment-1203107747
+
+My biggest concern is the dotted background, I find it too distracting.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-08-12T06:40:30Z
+
+@javiereguiluz as it is a bundle, [its views can be overridden](https://symfony.com/doc/current/bundles/override.html#templates) in some ways
+
+just asking here, perhaps if not so much work and maintenance, can it be tried to put such logic in distinct files or blocks to ease such overide ? the background, the dots, the colors etc?
+
+on my side it looks great so far
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-08-12T07:01:08Z
+
+@94noni I would vote against making it "easier" to override the profiler templates/styles.
+
+---------------------------------------------------------------------------
+
+by danidoedel at 2022-08-12T07:39:44Z
+
+@javiereguiluz
+Thank you for replying to my comment.
+I do agree that status codes other than 2xx are more interesting in this context.
+But does it really hurt to move them to the top as well?
+I have no idea how it would look like, but I assume it can't be that bad.
+
+Anyways, it's up to you guys, I'm just against inconsistency whenever possible. I won't hate the redesign just because of that.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-08-12T10:43:00Z
+
+@danidoedel I'm going to think about this, but I'm not convinced. Breaking/bending design consistency for danger/error/critical/destructive elements is a common practice. You can see it literally everywhere ... e.g. in the voting system used in the Sweden parliament (which consciously breaks consistency for the button to vote "NO"):
+
+![sweden-parliament-voting-system](https://user-images.githubusercontent.com/73419/184338482-cafda698-d169-4cdd-a964-cb6a1336fb8f.jpg)
+
+---------------------------------------------------------------------------
+
+by danidoedel at 2022-08-12T10:44:33Z
+
+@javiereguiluz doesn't look that distracting though as there's no other information in between ;)
+
+Also this is bound to user action and in the profiler case we are just displaying information.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-09T16:07:16Z
+
+@javiereguiluz the `profiler_markup_version` variable should be bumped to 3 in the controller, so that bundles providing custom panels can know that they should render content for the Symfony 6.2+ design rather than for the 2.8+ design (changing the icon to match the new icons for instance, or other kind of adjustements like that). This is exactly what this variable is about.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-12T15:10:59Z
+
+I think this PR is ready for merge. In the past weeks I've done most, but not all, changes requested by reviewers (including the recent changes requested by @stof; thanks for your review!).
+
+Thank you all!
+
+-----
+
+After this merge, I'll quickly submit PRs to fix/update some pending panels: exceptions, mailer, Doctrine bundles, etc.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-12T15:13:08Z
+
+@javiereguiluz is it expected that the Twig panel does not use the Twig logo anymore ? The new icon is neither the logo nor something that is clear that it is about templates.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-12T16:01:21Z
+
+@stof sorry, I forgot to reply that question.
+
+I thought that using this icon --> https://tabler-icons.io/i/seeding would be OK because it resembles (a bit remotely) to Twig.
+
+An added problem is that:
+
+* Twig in English means "small branch"
+* The Twig logo is in fact a "blade of grass" (https://www.google.com/search?q=blade+of+grass&source=lnms&tbm=isch&sa=X)
+
+Would you recommend using instead an icon related to "templates" instead of Twig? I can think of two candidates:
+
+* `template`: https://tabler-icons.io/i/template
+* `layout-dashboard`: https://tabler-icons.io/i/layout-dashboard

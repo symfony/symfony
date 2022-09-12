@@ -1026,7 +1026,7 @@ EOTXT
             }
         }
 
-        if (isset($this->definitionVariables[$inlineDef = $inlineDef ?: $definition])) {
+        if (isset($this->definitionVariables[$inlineDef ??= $definition])) {
             return $code;
         }
 

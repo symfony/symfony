@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
@@ -87,12 +85,7 @@ class Symfony51Store
 
     private function evaluate(string $script, string $resource, array $args)
     {
-        if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
-        ) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster) {
             return $this->redis->eval($script, array_merge([$resource], $args), 1);
         }
 

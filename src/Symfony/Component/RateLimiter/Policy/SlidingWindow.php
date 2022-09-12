@@ -89,6 +89,27 @@ final class SlidingWindow implements LimiterStateInterface
         return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $this->windowEndAt));
     }
 
+    public function calculateTimeForTokens(int $maxSize, int $tokens): int
+    {
+        $remaining = $maxSize - $this->getHitCount();
+        if ($remaining >= $tokens) {
+            return 0;
+        }
+
+        $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
+        $percentOfCurrentTimeFrame = min((microtime(true) - $startOfWindow) / $this->intervalInSeconds, 1);
+        $releasable = $maxSize - floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame));
+        $remainingWindow = (microtime(true) - $startOfWindow) - $this->intervalInSeconds;
+        $timePerToken = $remainingWindow / $releasable;
+        $needed = $tokens - $remaining;
+
+        if ($releasable <= $needed) {
+            return (int) ceil($needed * $timePerToken);
+        }
+
+        return (int) (($this->windowEndAt - microtime(true)) + ceil(($needed - $releasable) * ($this->intervalInSeconds / $maxSize)));
+    }
+
     public function __serialize(): array
     {
         return [

@@ -13,7 +13,6 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
-use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
@@ -66,14 +65,17 @@ class SlidingWindowLimiterTest extends TestCase
 
         $start = microtime(true);
         $rateLimit->wait(); // wait 12 seconds
-        $this->assertEqualsWithDelta($start + 12, microtime(true), 1);
+        $this->assertEqualsWithDelta($start + (12 / 5), microtime(true), 1);
+        $this->assertTrue($limiter->consume()->isAccepted());
     }
 
     public function testReserve()
     {
-        $this->expectException(ReserveNotSupportedException::class);
+        $limiter = $this->createLimiter();
+        $limiter->consume(8);
 
-        $this->createLimiter()->reserve();
+        // 2 over the limit, causing the WaitDuration to become 2/10th of the 12s interval
+        $this->assertEqualsWithDelta(12 / 5, $limiter->reserve(4)->getWaitDuration(), 1);
     }
 
     public function testPeekConsume()

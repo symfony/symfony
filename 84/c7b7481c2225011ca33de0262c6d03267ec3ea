@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-28T16:46:51Z
+
+Hey!
+
+I think @johnkrovitch has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-08-29T15:12:53Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-08-30T16:13:08Z
+
+@xabbuh thx for approving
+Regarding my comment on tests and arg position, do you have a preference for ordering? Or should I just fix related tests
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-09-12T05:35:17Z
+
+@xabbuh friendly ping, [requested change](https://github.com/symfony/symfony/pull/47343#discussion_r961524864) regarding `$urlGenerator` is done, please tell me if it's ok
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-09-12T13:37:20Z
+
+when merged I will update the already created document PR
+so feel free to close the autocreated PR or link it to https://github.com/symfony/symfony-docs/pull/17024
+thx !

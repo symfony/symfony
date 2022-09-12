@@ -58,6 +58,17 @@ class TableCell
     }
 
     /**
+     * Reduces number of colspan.
+     * Used by optional columns.
+     */
+    public function reduceColspan(): void
+    {
+        if ((int) $this->options['colspan'] > 1) {
+            --$this->options['colspan'];
+        }
+    }
+
+    /**
      * Gets number of rowspan.
      */
     public function getRowspan(): int

@@ -13,9 +13,11 @@ namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
+use Symfony\Component\Form\Extension\Validator\ValidatorFormEvents;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -25,6 +27,9 @@ class ValidationListener implements EventSubscriberInterface
 {
     private ValidatorInterface $validator;
     private ViolationMapperInterface $violationMapper;
+
+    /** @var FormInterface[][] */
+    private array $dispatchEvents = [];
 
     public static function getSubscribedEvents(): array
     {
@@ -41,7 +46,16 @@ class ValidationListener implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
+        // Register events to dispatch during (root form) validation
+        foreach (ValidatorFormEvents::ALIASES as $eventName) {
+            if ($form->getConfig()->getEventDispatcher()->hasListeners($eventName)) {
+                $this->dispatchEvents[$eventName][] = $form;
+            }
+        }
+
         if ($form->isRoot()) {
+            $this->dispatchEvents(ValidatorFormEvents::PRE_VALIDATE);
+
             // Form groups are validated internally (FormValidator). Here we don't set groups as they are retrieved into the validator.
             foreach ($this->validator->validate($form) as $violation) {
                 // Allow the "invalid" constraint to be put onto
@@ -50,6 +64,24 @@ class ValidationListener implements EventSubscriberInterface
 
                 $this->violationMapper->mapViolation($violation, $form, $allowNonSynchronized);
             }
+
+            $this->dispatchEvents(ValidatorFormEvents::POST_VALIDATE);
         }
+    }
+
+    private function dispatchEvents(string $eventName)
+    {
+        if (!isset($this->dispatchEvents[$eventName])) {
+            return;
+        }
+
+        $event = array_flip(ValidatorFormEvents::ALIASES)[$eventName];
+
+        foreach ($this->dispatchEvents[$eventName] as $form) {
+            $event = new $event($form, $form->getData());
+            $form->getConfig()->getEventDispatcher()->dispatch($event, $eventName);
+        }
+
+        unset($this->dispatchEvents[$eventName]);
     }
 }

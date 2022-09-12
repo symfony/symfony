@@ -178,6 +178,9 @@ class Question
      */
     public function setAutocompleterCallback(callable $callback = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if ($this->hidden && null !== $callback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
@@ -194,6 +197,9 @@ class Question
      */
     public function setValidator(callable $validator = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->validator = null === $validator ? null : $validator(...);
 
         return $this;

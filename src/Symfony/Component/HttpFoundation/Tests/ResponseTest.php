@@ -995,7 +995,7 @@ class ResponseTest extends ResponseTestCase
     public function testSetEtag()
     {
         $response = new Response('', 200, ['ETag' => '"12345"']);
-        $response->setEtag();
+        $response->setEtag(null);
 
         $this->assertNull($response->headers->get('Etag'), '->setEtag() removes Etags when call with null');
     }

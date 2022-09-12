@@ -149,6 +149,9 @@ class Command
 
     public function setApplication(Application $application = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->application = $application;
         if ($application) {
             $this->setHelperSet($application->getHelperSet());

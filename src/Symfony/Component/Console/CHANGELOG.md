@@ -4,8 +4,11 @@ CHANGELOG
 6.2
 ---
 
-* Improve truecolor terminal detection in some cases
-* Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+ * Improve truecolor terminal detection in some cases
+ * Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+ * Deprecate calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()`, `Question::setAutocompleterCallback/setValidator()`without any arguments
+ * Change the signature of `OutputFormatterStyleInterface::setForeground/setBackground()` to `setForeground/setBackground(?string)`
+ * Change the signature of `HelperInterface::setHelperSet()` to `setHelperSet(?HelperSet)`
 
 6.1
 ---

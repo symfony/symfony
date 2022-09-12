@@ -34,7 +34,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @throws Exception\LogicException            when trying to set a parent for a form with
      *                                             an empty name
      */
-    public function setParent(self $parent = null): static;
+    public function setParent(?self $parent): static;
 
     /**
      * Returns the parent form.

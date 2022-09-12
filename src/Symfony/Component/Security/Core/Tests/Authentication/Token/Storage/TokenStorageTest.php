@@ -27,11 +27,11 @@ class TokenStorageTest extends TestCase
     public function testGetSetTokenLegacy()
     {
         $tokenStorage = new TokenStorage();
-        $token = new UsernamePasswordToken('username', 'password', 'provider');
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password'), 'provider');
         $tokenStorage->setToken($token);
         $this->assertSame($token, $tokenStorage->getToken());
 
-        $this->expectDeprecation('Since symfony/security-core 6.2: Calling "Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::setToken()" without any arguments is deprecated. Please explicitly pass null if you want to unset the token.');
+        $this->expectDeprecation('Since symfony/security-core 6.2: Calling "Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::setToken()" without any arguments is deprecated, pass null explicitly instead.');
 
         $tokenStorage->setToken();
         $this->assertNull($tokenStorage->getToken());

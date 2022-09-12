@@ -10,6 +10,7 @@ CHANGELOG
  * Add `absolute_uri` option to surrogate fragment renderers
  * Add `ValueResolverInterface` and deprecate `ArgumentValueResolverInterface`
  * Add argument `$reflector` to `ArgumentResolverInterface` and `ArgumentMetadataFactoryInterface`
+ * Deprecate calling `ConfigDataCollector::setKernel()`, `RouterListener::setCurrentRequest()` without arguments
 
 6.1
 ---

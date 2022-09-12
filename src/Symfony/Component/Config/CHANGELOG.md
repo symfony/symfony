@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate calling `NodeBuilder::setParent()` without any arguments
+
 6.1
 ---
 

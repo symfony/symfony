@@ -33,7 +33,7 @@ class ContainerAwareTraitTest extends TestCase
 
         self::assertSame($container, $dummy->getContainer());
 
-        $this->expectDeprecation('Since symfony/dependency-injection 6.2: Calling "Symfony\Component\DependencyInjection\Tests\ContainerAwareDummy::setContainer()" without any arguments is deprecated. Please explicitly pass null if you want to unset the container.');
+        $this->expectDeprecation('Since symfony/dependency-injection 6.2: Calling "Symfony\Component\DependencyInjection\Tests\ContainerAwareDummy::setContainer()" without any arguments is deprecated, pass null explicitly instead.');
 
         $dummy->setContainer();
         self::assertNull($dummy->getContainer());

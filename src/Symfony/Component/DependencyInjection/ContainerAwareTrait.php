@@ -26,7 +26,7 @@ trait ContainerAwareTrait
     public function setContainer(ContainerInterface $container = null)
     {
         if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/dependency-injection', '6.2', 'Calling "%s::%s()" without any arguments is deprecated. Please explicitly pass null if you want to unset the container.', static::class, __FUNCTION__);
+            trigger_deprecation('symfony/dependency-injection', '6.2', 'Calling "%s::%s()" without any arguments is deprecated, pass null explicitly instead.', __CLASS__, __FUNCTION__);
         }
 
         $this->container = $container;

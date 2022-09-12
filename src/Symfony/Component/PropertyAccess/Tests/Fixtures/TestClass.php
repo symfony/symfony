@@ -49,7 +49,7 @@ class TestClass
         $this->publicAccessor = $value;
     }
 
-    public function setPublicAccessorWithDefaultValue($value = null)
+    public function setPublicAccessorWithDefaultValue($value)
     {
         $this->publicAccessorWithDefaultValue = $value;
     }

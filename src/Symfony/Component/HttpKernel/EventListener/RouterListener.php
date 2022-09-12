@@ -68,7 +68,7 @@ class RouterListener implements EventSubscriberInterface
         $this->debug = $debug;
     }
 
-    private function setCurrentRequest(Request $request = null)
+    private function setCurrentRequest(?Request $request)
     {
         if (null !== $request) {
             try {

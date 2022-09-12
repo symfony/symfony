@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * The HTTP cache store uses the `xxh128` algorithm
+ * Deprecate calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()` without arguments
 
 6.1
 ---

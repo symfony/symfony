@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate calling `PropertyAccessorBuilder::setCacheItemPool()` without arguments
+
 6.0
 ---
 

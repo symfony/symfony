@@ -30,5 +30,5 @@ interface TokenStorageInterface
      *
      * @param TokenInterface|null $token A TokenInterface token, or null if no further authentication information should be stored
      */
-    public function setToken(TokenInterface $token = null);
+    public function setToken(?TokenInterface $token);
 }

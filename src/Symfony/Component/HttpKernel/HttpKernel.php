@@ -105,7 +105,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     public function terminateWithException(\Throwable $exception, Request $request = null)
     {
-        if (!$request = $request ?: $this->requestStack->getMainRequest()) {
+        if (!$request ??= $this->requestStack->getMainRequest()) {
             throw $exception;
         }
 

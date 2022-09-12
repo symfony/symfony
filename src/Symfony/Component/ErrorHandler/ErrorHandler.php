@@ -539,7 +539,7 @@ class ErrorHandler
             if (null !== $exceptionHandler) {
                 return $exceptionHandler($exception);
             }
-            $handlerException = $handlerException ?: $exception;
+            $handlerException ??= $exception;
         } catch (\Throwable $handlerException) {
         }
         if ($exception === $handlerException && null === $this->exceptionHandler) {

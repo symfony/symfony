@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-03T11:27:11Z
+
+I like this idea. Do you need help to finish this PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-12T09:07:09Z
+
+~This is a hard BC break that provides no BC layer unfortunately. A given implementation cannot be made compatible with v5 and v6 at the same time. I think this makes this change impossible, following our policy.~
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-12T09:09:24Z
+
+> This is a hard BC break that provides no BC layer unfortunately. A given implementation cannot be made compatible with v5 and v6 at the same time.
+
+Can you elaborate?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-11T13:47:52Z
+
+Unlocked :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-22T21:33:06Z
+
+So, I was wrong about the BC break :grimacing:
+Let's rebase and merge this?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-22T22:43:47Z
+
+I'll try to find some time to resume my work. 🤞
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-09-12T14:21:13Z
+
+Thank you! ❤️

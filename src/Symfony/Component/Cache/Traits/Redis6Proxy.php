@@ -147,7 +147,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->clearLastError(...\func_get_args());
     }
 
-    public function client($opt, $arg = null): mixed
+    public function client($opt, ...$args): mixed
     {
         return $this->lazyObjectReal->client(...\func_get_args());
     }

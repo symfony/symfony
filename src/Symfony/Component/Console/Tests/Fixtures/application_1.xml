@@ -7,8 +7,36 @@
       </usages>
       <description>Internal command to provide shell completion suggestions</description>
       <help>Internal command to provide shell completion suggestions</help>
-      <arguments/>
-      <options>
+      <arguments type="application-level">
+        <argument name="command" is_required="1" is_array="0">
+          <description>The command to execute</description>
+          <defaults/>
+        </argument>
+      </arguments>
+      <options type="application-level">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
+        </option>
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not output any message</description>
+        </option>
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+        </option>
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Display this application version</description>
+        </option>
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Force (or disable --no-ansi) ANSI output</description>
+        </option>
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Negate the "--ansi" option</description>
+        </option>
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Do not ask any interactive question</description>
+        </option>
+      </options>
+      <options type="command-level">
         <option name="--shell" shortcut="-s" accept_value="1" is_value_required="1" is_multiple="0">
           <description>The shell type ("bash", "fish", "zsh")</description>
           <defaults/>
@@ -29,6 +57,21 @@
           <description>deprecated</description>
           <defaults/>
         </option>
+      </options>
+    </command>
+    <command id="completion" name="completion" hidden="0">
+      <usages>
+        <usage>completion [--debug] [--] [&lt;shell&gt;]</usage>
+      </usages>
+      <description>Dump the shell completion script</description>
+      <help>Dump the shell completion script</help>
+      <arguments type="application-level">
+        <argument name="command" is_required="1" is_array="0">
+          <description>The command to execute</description>
+          <defaults/>
+        </argument>
+      </arguments>
+      <options type="application-level">
         <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
@@ -51,43 +94,15 @@
           <description>Do not ask any interactive question</description>
         </option>
       </options>
-    </command>
-    <command id="completion" name="completion" hidden="0">
-      <usages>
-        <usage>completion [--debug] [--] [&lt;shell&gt;]</usage>
-      </usages>
-      <description>Dump the shell completion script</description>
-      <help>Dump the shell completion script</help>
-      <arguments>
+      <arguments type="command-level">
         <argument name="shell" is_required="0" is_array="0">
           <description>The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given</description>
           <defaults/>
         </argument>
       </arguments>
-      <options>
+      <options type="command-level">
         <option name="--debug" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Tail the completion debug log</description>
-        </option>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
-        </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Do not output any message</description>
-        </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
-        </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Display this application version</description>
-        </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Force (or disable --no-ansi) ANSI output</description>
-        </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Negate the "--ansi" option</description>
-        </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Do not ask any interactive question</description>
         </option>
       </options>
     </command>
@@ -105,24 +120,13 @@
    &lt;info&gt;%%PHP_SELF%% help --format=xml list&lt;/info&gt;
  
  To display the list of available commands, please use the &lt;info&gt;list&lt;/info&gt; command.</help>
-      <arguments>
-        <argument name="command_name" is_required="0" is_array="0">
-          <description>The command name</description>
-          <defaults>
-            <default>help</default>
-          </defaults>
+      <arguments type="application-level">
+        <argument name="command" is_required="1" is_array="0">
+          <description>The command to execute</description>
+          <defaults/>
         </argument>
       </arguments>
-      <options>
-        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
-          <description>The output format (txt, xml, json, or md)</description>
-          <defaults>
-            <default>txt</default>
-          </defaults>
-        </option>
-        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>To output raw command help</description>
-        </option>
+      <options type="application-level">
         <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
@@ -143,6 +147,25 @@
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
+        </option>
+      </options>
+      <arguments type="command-level">
+        <argument name="command_name" is_required="0" is_array="0">
+          <description>The command name</description>
+          <defaults>
+            <default>help</default>
+          </defaults>
+        </argument>
+      </arguments>
+      <options type="command-level">
+        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
+          <description>The output format (txt, xml, json, or md)</description>
+          <defaults>
+            <default>txt</default>
+          </defaults>
+        </option>
+        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>To output raw command help</description>
         </option>
       </options>
     </command>
@@ -166,25 +189,13 @@
  It's also possible to get raw list of commands (useful for embedding command runner):
  
    &lt;info&gt;%%PHP_SELF%% list --raw&lt;/info&gt;</help>
-      <arguments>
-        <argument name="namespace" is_required="0" is_array="0">
-          <description>The namespace name</description>
+      <arguments type="application-level">
+        <argument name="command" is_required="1" is_array="0">
+          <description>The command to execute</description>
           <defaults/>
         </argument>
       </arguments>
-      <options>
-        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>To output raw command list</description>
-        </option>
-        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
-          <description>The output format (txt, xml, json, or md)</description>
-          <defaults>
-            <default>txt</default>
-          </defaults>
-        </option>
-        <option name="--short" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>To skip describing commands' arguments</description>
-        </option>
+      <options type="application-level">
         <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
@@ -205,6 +216,26 @@
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
+        </option>
+      </options>
+      <arguments type="command-level">
+        <argument name="namespace" is_required="0" is_array="0">
+          <description>The namespace name</description>
+          <defaults/>
+        </argument>
+      </arguments>
+      <options type="command-level">
+        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>To output raw command list</description>
+        </option>
+        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
+          <description>The output format (txt, xml, json, or md)</description>
+          <defaults>
+            <default>txt</default>
+          </defaults>
+        </option>
+        <option name="--short" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>To skip describing commands' arguments</description>
         </option>
       </options>
     </command>

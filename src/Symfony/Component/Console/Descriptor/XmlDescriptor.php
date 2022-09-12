@@ -26,19 +26,29 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class XmlDescriptor extends Descriptor
 {
-    public function getInputDefinitionDocument(InputDefinition $definition): \DOMDocument
+    public function getInputDefinitionDocument(InputDefinition $definition, string $type = ''): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
 
-        $definitionXML->appendChild($argumentsXML = $dom->createElement('arguments'));
-        foreach ($definition->getArguments() as $argument) {
-            $this->appendDocument($argumentsXML, $this->getInputArgumentDocument($argument));
+        if ($definition->getArguments()) {
+            $definitionXML->appendChild($argumentsXML = $dom->createElement('arguments'));
+            if ($type) {
+                $argumentsXML->setAttribute('type', $type);
+            }
+            foreach ($definition->getArguments() as $argument) {
+                $this->appendDocument($argumentsXML, $this->getInputArgumentDocument($argument));
+            }
         }
 
-        $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
-        foreach ($definition->getOptions() as $option) {
-            $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
+        if ($definition->getOptions()) {
+            $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
+            if ($type) {
+                $optionsXML->setAttribute('type', $type);
+            }
+            foreach ($definition->getOptions() as $option) {
+                $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
+            }
         }
 
         return $dom;
@@ -63,7 +73,7 @@ class XmlDescriptor extends Descriptor
                 $usagesXML->appendChild($dom->createElement('usage', $usage));
             }
         } else {
-            $command->mergeApplicationDefinition(false);
+            $command->mergeApplicationDefinition(false, false);
 
             foreach (array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()) as $usage) {
                 $usagesXML->appendChild($dom->createElement('usage', $usage));
@@ -72,8 +82,17 @@ class XmlDescriptor extends Descriptor
             $commandXML->appendChild($helpXML = $dom->createElement('help'));
             $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
 
-            $definitionXML = $this->getInputDefinitionDocument($command->getDefinition());
-            $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+            $definition = $command->getApplication()?->getDefinition();
+            if ($definition && ($definition->getOptions() || $definition->getArguments())) {
+                $definitionXML = $this->getInputDefinitionDocument($definition, 'application-level');
+                $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+            }
+
+            $definition = $command->getDefinition();
+            if ($definition->getOptions() || $definition->getArguments()) {
+                $definitionXML = $this->getInputDefinitionDocument($definition, 'command-level');
+                $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
+            }
         }
 
         return $dom;
@@ -130,9 +149,9 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '')
     {
-        $this->writeDocument($this->getInputDefinitionDocument($definition));
+        $this->writeDocument($this->getInputDefinitionDocument($definition, $prefix));
     }
 
     protected function describeCommand(Command $command, array $options = [])

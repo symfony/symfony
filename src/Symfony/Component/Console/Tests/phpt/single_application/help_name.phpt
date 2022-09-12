@@ -27,7 +27,7 @@ require $vendor.'/vendor/autoload.php';
 Usage:
   %s
 
-Options:
+Application-level Options:
   -h, --help            Display help for the given command. When no command is given display help for the %s command
   -q, --quiet           Do not output any message
   -V, --version         Display this application version

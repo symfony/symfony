@@ -20,27 +20,17 @@ Dump the shell completion script
 
 Dump the shell completion script
 
-### Arguments
+### Application-level Arguments
 
-#### `shell`
+#### `command`
 
-The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given
+The command to execute
 
-* Is required: no
+* Is required: yes
 * Is array: no
 * Default: `NULL`
 
-### Options
-
-#### `--debug`
-
-Tail the completion debug log
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
+### Application-level Options
 
 #### `--help|-h`
 
@@ -95,6 +85,28 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+### Command-level Arguments
+
+#### `shell`
+
+The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given
+
+* Is required: no
+* Is array: no
+* Default: `NULL`
+
+### Command-level Options
+
+#### `--debug`
+
+Tail the completion debug log
 
 * Accept value: no
 * Is value required: no
@@ -121,37 +133,17 @@ You can also output the help in other formats by using the --format option:
 
 To display the list of available commands, please use the list command.
 
-### Arguments
+### Application-level Arguments
 
-#### `command_name`
+#### `command`
 
-The command name
+The command to execute
 
-* Is required: no
+* Is required: yes
 * Is array: no
-* Default: `'help'`
+* Default: `NULL`
 
-### Options
-
-#### `--format`
-
-The output format (txt, xml, json, or md)
-
-* Accept value: yes
-* Is value required: yes
-* Is multiple: no
-* Is negatable: no
-* Default: `'txt'`
-
-#### `--raw`
-
-To output raw command help
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
+### Application-level Options
 
 #### `--help|-h`
 
@@ -206,6 +198,38 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+### Command-level Arguments
+
+#### `command_name`
+
+The command name
+
+* Is required: no
+* Is array: no
+* Default: `'help'`
+
+### Command-level Options
+
+#### `--format`
+
+The output format (txt, xml, json, or md)
+
+* Accept value: yes
+* Is value required: yes
+* Is multiple: no
+* Is negatable: no
+* Default: `'txt'`
+
+#### `--raw`
+
+To output raw command help
 
 * Accept value: no
 * Is value required: no
@@ -238,7 +262,79 @@ It's also possible to get raw list of commands (useful for embedding command run
 
   %%PHP_SELF%% list --raw
 
-### Arguments
+### Application-level Arguments
+
+#### `command`
+
+The command to execute
+
+* Is required: yes
+* Is array: no
+* Default: `NULL`
+
+### Application-level Options
+
+#### `--help|-h`
+
+Display help for the given command. When no command is given display help for the list command
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--verbose|-v|-vv|-vvv`
+
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--version|-V`
+
+Display this application version
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--ansi|--no-ansi`
+
+Force (or disable --no-ansi) ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: yes
+* Default: `NULL`
+
+#### `--no-interaction|-n`
+
+Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+### Command-level Arguments
 
 #### `namespace`
 
@@ -248,7 +344,7 @@ The namespace name
 * Is array: no
 * Default: `NULL`
 
-### Options
+### Command-level Options
 
 #### `--raw`
 
@@ -280,66 +376,6 @@ To skip describing commands' arguments
 * Is negatable: no
 * Default: `false`
 
-#### `--help|-h`
-
-Display help for the given command. When no command is given display help for the list command
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
-
-#### `--quiet|-q`
-
-Do not output any message
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
-
-#### `--verbose|-v|-vv|-vvv`
-
-Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
-
-#### `--version|-V`
-
-Display this application version
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
-
-#### `--ansi|--no-ansi`
-
-Force (or disable --no-ansi) ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: yes
-* Default: `NULL`
-
-#### `--no-interaction|-n`
-
-Do not ask any interactive question
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
-
 `descriptor:åèä`
 ----------------
 
@@ -353,23 +389,17 @@ command åèä description
 
 command åèä help
 
-### Arguments
+### Application-level Arguments
 
-#### `argument_åèä`
+#### `command`
+
+The command to execute
 
 * Is required: yes
 * Is array: no
 * Default: `NULL`
 
-### Options
-
-#### `--option_åèä|-o`
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
+### Application-level Options
 
 #### `--help|-h`
 
@@ -424,6 +454,24 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+### Command-level Arguments
+
+#### `argument_åèä`
+
+* Is required: yes
+* Is array: no
+* Default: `NULL`
+
+### Command-level Options
+
+#### `--option_åèä|-o`
 
 * Accept value: no
 * Is value required: no

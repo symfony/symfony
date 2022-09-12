@@ -6,10 +6,10 @@
   descriptor:åèä -o|--option_name \<argument_name\>
   descriptor:åèä \<argument_name\>
 
-<comment>Arguments:</comment>
+<comment>Command-level Arguments:</comment>
   <info>argument_åèä</info>   
 
-<comment>Options:</comment>
+<comment>Command-level Options:</comment>
   <info>-o, --option_åèä</info>  
 
 <comment>Help:</comment>

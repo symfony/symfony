@@ -16,27 +16,17 @@ Dump the shell completion script
 
 Dump the shell completion script
 
-### Arguments
+### Application-level Arguments
 
-#### `shell`
+#### `command`
 
-The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given
+The command to execute
 
-* Is required: no
+* Is required: yes
 * Is array: no
 * Default: `NULL`
 
-### Options
-
-#### `--debug`
-
-Tail the completion debug log
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
+### Application-level Options
 
 #### `--help|-h`
 
@@ -91,6 +81,28 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+### Command-level Arguments
+
+#### `shell`
+
+The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given
+
+* Is required: no
+* Is array: no
+* Default: `NULL`
+
+### Command-level Options
+
+#### `--debug`
+
+Tail the completion debug log
 
 * Accept value: no
 * Is value required: no
@@ -117,37 +129,17 @@ You can also output the help in other formats by using the --format option:
 
 To display the list of available commands, please use the list command.
 
-### Arguments
+### Application-level Arguments
 
-#### `command_name`
+#### `command`
 
-The command name
+The command to execute
 
-* Is required: no
+* Is required: yes
 * Is array: no
-* Default: `'help'`
+* Default: `NULL`
 
-### Options
-
-#### `--format`
-
-The output format (txt, xml, json, or md)
-
-* Accept value: yes
-* Is value required: yes
-* Is multiple: no
-* Is negatable: no
-* Default: `'txt'`
-
-#### `--raw`
-
-To output raw command help
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
+### Application-level Options
 
 #### `--help|-h`
 
@@ -202,6 +194,38 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+### Command-level Arguments
+
+#### `command_name`
+
+The command name
+
+* Is required: no
+* Is array: no
+* Default: `'help'`
+
+### Command-level Options
+
+#### `--format`
+
+The output format (txt, xml, json, or md)
+
+* Accept value: yes
+* Is value required: yes
+* Is multiple: no
+* Is negatable: no
+* Default: `'txt'`
+
+#### `--raw`
+
+To output raw command help
 
 * Accept value: no
 * Is value required: no
@@ -234,47 +258,17 @@ It's also possible to get raw list of commands (useful for embedding command run
 
   %%PHP_SELF%% list --raw
 
-### Arguments
+### Application-level Arguments
 
-#### `namespace`
+#### `command`
 
-The namespace name
+The command to execute
 
-* Is required: no
+* Is required: yes
 * Is array: no
 * Default: `NULL`
 
-### Options
-
-#### `--raw`
-
-To output raw command list
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
-
-#### `--format`
-
-The output format (txt, xml, json, or md)
-
-* Accept value: yes
-* Is value required: yes
-* Is multiple: no
-* Is negatable: no
-* Default: `'txt'`
-
-#### `--short`
-
-To skip describing commands' arguments
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Is negatable: no
-* Default: `false`
+### Application-level Options
 
 #### `--help|-h`
 
@@ -329,6 +323,48 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+### Command-level Arguments
+
+#### `namespace`
+
+The namespace name
+
+* Is required: no
+* Is array: no
+* Default: `NULL`
+
+### Command-level Options
+
+#### `--raw`
+
+To output raw command list
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--format`
+
+The output format (txt, xml, json, or md)
+
+* Accept value: yes
+* Is value required: yes
+* Is multiple: no
+* Is negatable: no
+* Default: `'txt'`
+
+#### `--short`
+
+To skip describing commands' arguments
 
 * Accept value: no
 * Is value required: no

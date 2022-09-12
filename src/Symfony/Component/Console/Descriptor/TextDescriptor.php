@@ -83,7 +83,7 @@ class TextDescriptor extends Descriptor
         ), $options);
     }
 
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [], string $prefix = '')
     {
         $totalWidth = $this->calculateTotalWidthForOptions($definition->getOptions());
         foreach ($definition->getArguments() as $argument) {
@@ -91,7 +91,7 @@ class TextDescriptor extends Descriptor
         }
 
         if ($definition->getArguments()) {
-            $this->writeText('<comment>Arguments:</comment>', $options);
+            $this->writeText("<comment>{$prefix}Arguments:</comment>", $options);
             $this->writeText("\n");
             foreach ($definition->getArguments() as $argument) {
                 $this->describeInputArgument($argument, array_merge($options, ['total_width' => $totalWidth]));
@@ -106,7 +106,7 @@ class TextDescriptor extends Descriptor
         if ($definition->getOptions()) {
             $laterOptions = [];
 
-            $this->writeText('<comment>Options:</comment>', $options);
+            $this->writeText("<comment>{$prefix}Options:</comment>", $options);
             foreach ($definition->getOptions() as $option) {
                 if (\strlen($option->getShortcut() ?? '') > 1) {
                     $laterOptions[] = $option;
@@ -140,10 +140,19 @@ class TextDescriptor extends Descriptor
         }
         $this->writeText("\n");
 
+        $command->mergeApplicationDefinition(false, false);
+
+        $definition = $command->getApplication()?->getDefinition();
+        if ($definition && ($definition->getOptions() || $definition->getArguments())) {
+            $this->writeText("\n");
+            $this->describeInputDefinition($definition, $options, 'Application-level ');
+            $this->writeText("\n");
+        }
+
         $definition = $command->getDefinition();
         if ($definition->getOptions() || $definition->getArguments()) {
             $this->writeText("\n");
-            $this->describeInputDefinition($definition, $options);
+            $this->describeInputDefinition($definition, $options, 'Command-level ');
             $this->writeText("\n");
         }
 

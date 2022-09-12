@@ -9,7 +9,5 @@
     "description": "command 1 description",
     "help": "command 1 help",
     "definition": {
-        "arguments": [],
-        "options": []
     }
 }

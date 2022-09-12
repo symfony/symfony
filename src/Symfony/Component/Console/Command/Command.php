@@ -375,15 +375,19 @@ class Command
      *
      * @internal
      */
-    public function mergeApplicationDefinition(bool $mergeArgs = true)
+    public function mergeApplicationDefinition(bool $mergeArgs = true, bool $mergeOptions = true)
     {
         if (null === $this->application) {
             return;
         }
 
         $this->fullDefinition = new InputDefinition();
-        $this->fullDefinition->setOptions($this->definition->getOptions());
-        $this->fullDefinition->addOptions($this->application->getDefinition()->getOptions());
+        if ($mergeOptions) {
+            $this->fullDefinition->setOptions($this->definition->getOptions());
+            $this->fullDefinition->addOptions($this->application->getDefinition()->getOptions());
+        } else {
+            $this->fullDefinition->setOptions($this->definition->getOptions());
+        }
 
         if ($mergeArgs) {
             $this->fullDefinition->setArguments($this->application->getDefinition()->getArguments());

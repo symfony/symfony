@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by javaDeveloperKid at 2022-09-03T13:38:50Z
+
+Syfony 4.4 receives only bug fixes and your change ain't one. What's more, removing a required parameter on public method in a non-final class is a BC break.
+
+---------------------------------------------------------------------------
+
+by artyuum at 2022-09-03T17:12:47Z
+
+@javaDeveloperKid The PR removes an unused method argument and when I look into that file (RouterListener), I see that it implements the `EventSubscriberInterface` and this interface does not require the modified method to have this argument.
+
+So how is that a BR break?
+
+(Sorry for potentially polluting this PR, I'm just trying to understand things about Symfony better for my future contributions.)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-04T14:32:20Z
+
+If a class extends it, that child class would be broken because of the method signature mismatch. See https://symfony.com/doc/current/contributing/code/bc.html.
+**But** this class is marked as `@final since Symfony 4.3` so it is considered as really final since v5, thus this change is fine from a BC pov as of v5.
+Finally, as this change does not fix a bug, it should target 6.2.

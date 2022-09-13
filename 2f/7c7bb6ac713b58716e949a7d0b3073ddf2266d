@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-08T09:20:10Z
+
+Good catch. Can you please try the following patch? It might fix a few more things.
+
+<details>
+
+```diff
+--- a/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
++++ b/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
+@@ -210,11 +210,13 @@ class BinaryFileResponse extends Response
+             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');
+         }
+
+-        if ('HTTP/1.0' !== $request->server->get('SERVER_PROTOCOL')) {
+-            $this->setProtocolVersion('1.1');
+-        }
++        parent::prepare($request);
++
++        if ($this->isInformational() || $this->isEmpty()) {
++            $this->maxlen = 0;
+
+-        $this->ensureIEOverSSLCompatibility($request);
++            return $this;
++        }
+
+         $this->offset = 0;
+         $this->maxlen = -1;
+@@ -222,6 +224,7 @@ class BinaryFileResponse extends Response
+         if (false === $fileSize = $this->file->getSize()) {
+             return $this;
+         }
++        $this->headers->remove('Transfer-Encoding');
+         $this->headers->set('Content-Length', $fileSize);
+
+         if (!$this->headers->has('Accept-Ranges')) {
+@@ -291,6 +294,10 @@ class BinaryFileResponse extends Response
+             }
+         }
+
++        if ($request->isMethod('HEAD')) {
++            $this->maxlen = 0;
++        }
++
+         return $this;
+     }
+
+@@ -312,6 +319,7 @@ class BinaryFileResponse extends Response
+      */
+     public function sendContent()
+     {
++        try {
+             if (!$this->isSuccessful()) {
+                 return parent::sendContent();
+             }
+@@ -343,10 +351,11 @@ class BinaryFileResponse extends Response
+
+             fclose($out);
+             fclose($file);
++        } finally {
+             if ($this->deleteFileAfterSend && is_file($this->file->getPathname())) {
+                 unlink($this->file->getPathname());
+             }
++        }
+
+         return $this;
+     }
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by naitsirch at 2022-09-09T21:01:10Z
+
+@nicolas-grekas Thanks for your review and improvements. They are much cleaner! There is just one part where my commit differs from your suggestion.
+
+I have added the `($this->isInformational() || $this->isEmpty())` check and the return before the content type is setted, to reduce some needless instructions.

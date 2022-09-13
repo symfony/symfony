@@ -16,6 +16,7 @@
             "group_by",
             "multiple",
             "placeholder",
+            "placeholder_disabled",
             "preferred_choices"
         ],
         "overridden": {

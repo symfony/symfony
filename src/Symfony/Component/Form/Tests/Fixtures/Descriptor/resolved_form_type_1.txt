@@ -18,6 +18,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   group_by                                             data                                                  
   multiple                                             disabled                                              
   placeholder                                          form_attr                                             
+  placeholder_disabled                                 getter                                                
   preferred_choices                                    getter                                                
                                                        help                                                  
                                                        help_attr                                             

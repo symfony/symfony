@@ -352,6 +352,7 @@ class ChoiceType extends AbstractType
             'group_by' => null,
             'empty_data' => $emptyData,
             'placeholder' => $placeholderDefault,
+            'placeholder_disabled' => false,
             'error_bubbling' => false,
             'compound' => $compound,
             // The view data is always a string or an array of strings,
@@ -377,6 +378,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
         $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
+        $resolver->setAllowedTypes('placeholder_disabled', ['bool']);
     }
 
     public function getBlockPrefix(): string

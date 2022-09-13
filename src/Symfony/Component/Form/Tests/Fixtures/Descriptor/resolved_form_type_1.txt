@@ -19,8 +19,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   multiple                                             disabled                                              
   placeholder                                          form_attr                                             
   placeholder_disabled                                 getter                                                
-  preferred_choices                                    getter                                                
-                                                       help                                                  
+  preferred_choices                                    help                                                  
                                                        help_attr                                             
                                                        help_html                                             
                                                        help_translation_parameters                           

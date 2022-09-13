@@ -22,6 +22,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -44,6 +45,7 @@ use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -384,6 +386,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $id => new ServiceClosureArgument(new Reference($firewallEventDispatcherId)),
             ]))
         ;
+
+        // Register Firewall-specific chained user checker
+        $container->register('security.user_checker.chain.'.$id, ChainUserChecker::class)
+            ->addArgument(new TaggedIteratorArgument('security.user_checker.'.$id));
 
         // Register listeners
         $listeners = [];

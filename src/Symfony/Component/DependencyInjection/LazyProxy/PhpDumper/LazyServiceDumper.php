@@ -123,12 +123,13 @@ final class LazyServiceDumper implements DumperInterface
                 if (!interface_exists($tag['interface']) && !class_exists($tag['interface'], false)) {
                     throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": several "proxy" tags found but "%s" is not an interface.', $id ?? $definition->getClass(), $tag['interface']));
                 }
+                if (!is_a($class->name, $tag['interface'], true)) {
+                    throw new InvalidArgumentException(sprintf('Invalid "proxy" tag for service "%s": class "%s" doesn\'t implement "%s".', $id ?? $definition->getClass(), $definition->getClass(), $tag['interface']));
+                }
                 $interfaces[] = new \ReflectionClass($tag['interface']);
             }
 
-            if (1 === \count($interfaces) && !$interfaces[0]->isInterface()) {
-                $class = array_pop($interfaces);
-            }
+            $class = 1 === \count($interfaces) && !$interfaces[0]->isInterface() ? array_pop($interfaces) : null;
         } elseif ($class->isInterface()) {
             $interfaces = [$class];
             $class = null;

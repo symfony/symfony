@@ -39,8 +39,13 @@ interface ItemInterface extends CacheItemInterface
 
     /**
      * Reserved characters that cannot be used in a key or tag.
+     *
+     * Please note that this list should include a colon (:) to fully respect
+     * the PSR. A PR is opened to fix this in PSR-6
+     * (https://github.com/php-fig/fig-standards/pull/1269). So Symfony is a bit
+     * ahead of time on this one.
      */
-    public const RESERVED_CHARACTERS = '{}()/\@:';
+    public const RESERVED_CHARACTERS = '{}()/\@';
 
     /**
      * Adds a tag to a cache item.

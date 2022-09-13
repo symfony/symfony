@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-09T03:12:05Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ArchitectNate at 2022-08-09T03:12:56Z
+
+For the unit test, I tried to reuse the messages that were there but ultimately had to create new dummy messages. Let me know if I need to adjust any of these semantic things
+
+---------------------------------------------------------------------------
+
+by magikid at 2022-08-17T19:25:02Z
+
+@carsonbot find me a reviewer please
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-17T19:25:51Z
+
+@angelov could maybe review this PR?
+
+---------------------------------------------------------------------------
+
+by ArchitectNate at 2022-08-23T15:39:03Z
+
+@carsonbot find me a reviewer please
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-23T15:39:51Z
+
+@monteiro could maybe review this PR?
+
+---------------------------------------------------------------------------
+
+by klaussilveira at 2022-08-24T20:19:00Z
+
+Oh, this is useful. :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-09-10T11:02:50Z
+
+~For 5.4?~ (nope, support for adding the `#AsMessageHandler` attribute to methods was only introduced in #45273 in 6.1(

@@ -83,7 +83,7 @@ class RouterListener implements EventSubscriberInterface
      * After a sub-request is done, we need to reset the routing context to the parent request so that the URL generator
      * operates on the correct context again.
      */
-    public function onKernelFinishRequest(FinishRequestEvent $event)
+    public function onKernelFinishRequest()
     {
         $this->setCurrentRequest($this->requestStack->getParentRequest());
     }

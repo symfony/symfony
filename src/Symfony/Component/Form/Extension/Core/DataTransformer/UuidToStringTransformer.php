@@ -19,6 +19,8 @@ use Symfony\Component\Uid\Uuid;
  * Transforms between a UUID string and a Uuid object.
  *
  * @author Pavel Dyakonov <wapinet@mail.ru>
+ *
+ * @implements DataTransformerInterface<Uuid, string>
  */
 class UuidToStringTransformer implements DataTransformerInterface
 {

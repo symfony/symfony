@@ -15,6 +15,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @extends BaseDateTimeTransformer<string>
  */
 class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
 {

@@ -191,18 +191,7 @@ final class ProxyHelper
             $methods = ['initializeLazyObject' => implode('', $body).'    }'] + $methods;
         }
         $body = $methods ? "\n".implode("\n\n", $methods)."\n" : '';
-
-        if ($class) {
-            $propertyScopes = substr(self::exportPropertyScopes($class->name), 1, -6);
-            $body = <<<EOPHP
-
-                private const LAZY_OBJECT_PROPERTY_SCOPES = [
-                    'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
-                    "\\0".self::class."\\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],{$propertyScopes}
-                ];
-            {$body}
-            EOPHP;
-        }
+        $propertyScopes = $class ? substr(self::exportPropertyScopes($class->name), 1, -6) : '';
 
         return <<<EOPHP
             {$parent} implements \\{$interfaces}
@@ -211,6 +200,11 @@ final class ProxyHelper
 
                 private {$readonly}int \$lazyObjectId;
                 private {$readonly}{$type} \$lazyObjectReal;
+
+                private const LAZY_OBJECT_PROPERTY_SCOPES = [
+                    'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
+                    "\\0".self::class."\\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],{$propertyScopes}
+                ];
             {$body}}
 
             // Help opcache.preload discover always-needed symbols

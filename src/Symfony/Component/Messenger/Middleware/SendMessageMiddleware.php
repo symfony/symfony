@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
+use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
@@ -30,11 +31,13 @@ class SendMessageMiddleware implements MiddlewareInterface
 
     private SendersLocatorInterface $sendersLocator;
     private ?EventDispatcherInterface $eventDispatcher;
+    private bool $allowNoSenders;
 
-    public function __construct(SendersLocatorInterface $sendersLocator, EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(SendersLocatorInterface $sendersLocator, EventDispatcherInterface $eventDispatcher = null, bool $allowNoSenders = true)
     {
         $this->sendersLocator = $sendersLocator;
         $this->eventDispatcher = $eventDispatcher;
+        $this->allowNoSenders = $allowNoSenders;
         $this->logger = new NullLogger();
     }
 
@@ -63,6 +66,10 @@ class SendMessageMiddleware implements MiddlewareInterface
 
                 $this->logger->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => $sender::class]);
                 $envelope = $sender->send($envelope->with(new SentStamp($sender::class, \is_string($alias) ? $alias : null)));
+            }
+
+            if (!$this->allowNoSenders && !$sender) {
+                throw new NoSenderForMessageException(sprintf('No sender for message "%s".', $context['class']));
             }
         }
 

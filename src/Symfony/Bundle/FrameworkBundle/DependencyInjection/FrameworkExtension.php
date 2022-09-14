@@ -2035,12 +2035,9 @@ class FrameworkExtension extends Extension
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
 
-            if ($bus['default_middleware']) {
-                if ('allow_no_handlers' === $bus['default_middleware']) {
-                    $defaultMiddleware['after'][1]['arguments'] = [true];
-                } else {
-                    unset($defaultMiddleware['after'][1]['arguments']);
-                }
+            if ($bus['default_middleware']['enabled']) {
+                $defaultMiddleware['after'][0]['arguments'] = [$bus['default_middleware']['allow_no_senders']];
+                $defaultMiddleware['after'][1]['arguments'] = [$bus['default_middleware']['allow_no_handlers']];
 
                 // argument to add_bus_name_stamp_middleware
                 $defaultMiddleware['before'][0]['arguments'] = [$busId];

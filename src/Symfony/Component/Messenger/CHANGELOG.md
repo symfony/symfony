@@ -8,6 +8,7 @@ CHANGELOG
  * Add `TransportNamesStamp` to change the transport while dispatching a message
  * Add support for rate limited transports by using the RateLimiter component.
  * Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Add new parameter `allowNoSenders` to `SendMessageMiddleware` to enable throwing when a message doesn't have a sender
 
 6.1
 ---

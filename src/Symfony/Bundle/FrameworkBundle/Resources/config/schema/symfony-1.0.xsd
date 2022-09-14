@@ -426,7 +426,7 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:simpleType name="default_middleware">
+    <xsd:simpleType name="default_middleware_attr">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="true" />
             <xsd:enumeration value="false" />
@@ -435,6 +435,12 @@
             <xsd:enumeration value="allow_no_handlers" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="default_middleware_elem">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="allow_no_handlers" type="xsd:boolean" />
+        <xsd:attribute name="allow_no_senders" type="xsd:boolean" />
+    </xsd:complexType>
 
     <xsd:simpleType name="cookie_secure">
         <xsd:restriction base="xsd:string">
@@ -567,10 +573,11 @@
 
     <xsd:complexType name="messenger_bus">
         <xsd:sequence>
+            <xsd:element name="default-middleware" type="default_middleware_elem" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="middleware" type="messenger_middleware" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="default-middleware" type="default_middleware"/>
+        <xsd:attribute name="default-middleware" type="default_middleware_attr"/>
     </xsd:complexType>
 
     <xsd:complexType name="messenger_middleware">

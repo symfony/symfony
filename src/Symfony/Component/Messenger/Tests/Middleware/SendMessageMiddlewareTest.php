@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
+use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -195,6 +196,40 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware = new SendMessageMiddleware($this->createSendersLocator([], []), $dispatcher);
 
         $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testThrowsNoRoutingException()
+    {
+        $envelope = new Envelope(new DummyMessage('original envelope'));
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $sendersLocator = $this->createSendersLocator([DummyMessage::class => []], []);
+
+        $this->expectException(NoSenderForMessageException::class);
+        $this->expectExceptionMessage('No sender for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"');
+
+        $middleware = new SendMessageMiddleware($sendersLocator, $dispatcher, false);
+        $middleware->handle($envelope, $this->getStackMock(false));
+    }
+
+    public function testAllowNoRouting()
+    {
+        $envelope = new Envelope(new DummyMessage('original envelope'));
+
+        $sender = $this->createMock(SenderInterface::class);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new SendMessageToTransportsEvent($envelope, ['foo' => $sender]));
+
+        $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['foo']], ['foo' => $sender]);
+        $middleware = new SendMessageMiddleware($sendersLocator, $dispatcher);
+
+        $sender->expects($this->once())->method('send')->willReturn($envelope);
+
+        $middleware->handle($envelope, $this->getStackMock(false));
     }
 
     private function createSendersLocator(array $sendersMap, array $senders): SendersLocator

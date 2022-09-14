@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\Worker;
 
@@ -30,7 +30,7 @@ class StopWorkerOnTimeLimitListenerTest extends TestCase
 
         $worker = $this->createMock(Worker::class);
         $worker->expects($this->once())->method('stop');
-        $event = new WorkerRunningEvent($worker, false);
+        $event = new WorkerBusyEvent($worker);
 
         $timeoutListener = new StopWorkerOnTimeLimitListener(1, $logger);
         $timeoutListener->onWorkerStarted();

@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Worker;
 
@@ -26,13 +26,13 @@ class StopWorkerOnMessageLimitListenerTest extends TestCase
     {
         $worker = $this->createMock(Worker::class);
         $worker->expects($shouldStop ? $this->atLeastOnce() : $this->never())->method('stop');
-        $event = new WorkerRunningEvent($worker, false);
+        $event = new WorkerBusyEvent($worker);
 
         $maximumCountListener = new StopWorkerOnMessageLimitListener($max);
         // simulate three messages processed
-        $maximumCountListener->onWorkerRunning($event);
-        $maximumCountListener->onWorkerRunning($event);
-        $maximumCountListener->onWorkerRunning($event);
+        $maximumCountListener->onWorkerBusy($event);
+        $maximumCountListener->onWorkerBusy($event);
+        $maximumCountListener->onWorkerBusy($event);
     }
 
     public static function countProvider(): iterable
@@ -53,9 +53,9 @@ class StopWorkerOnMessageLimitListenerTest extends TestCase
             );
 
         $worker = $this->createMock(Worker::class);
-        $event = new WorkerRunningEvent($worker, false);
+        $event = new WorkerBusyEvent($worker);
 
         $maximumCountListener = new StopWorkerOnMessageLimitListener(1, $logger);
-        $maximumCountListener->onWorkerRunning($event);
+        $maximumCountListener->onWorkerBusy($event);
     }
 }

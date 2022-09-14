@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\Worker;
 
@@ -36,7 +36,7 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
 
         $worker = $this->createMock(Worker::class);
         $worker->expects($shouldStop ? $this->once() : $this->never())->method('stop');
-        $event = new WorkerRunningEvent($worker, false);
+        $event = new WorkerBusyEvent($worker);
 
         $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);
         $stopOnSignalListener->onWorkerStarted();
@@ -60,7 +60,7 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
 
         $worker = $this->createMock(Worker::class);
         $worker->expects($this->never())->method('stop');
-        $event = new WorkerRunningEvent($worker, false);
+        $event = new WorkerBusyEvent($worker);
 
         $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);
         $stopOnSignalListener->onWorkerStarted();

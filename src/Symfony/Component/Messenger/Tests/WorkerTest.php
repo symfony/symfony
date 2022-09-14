@@ -18,6 +18,7 @@ use Symfony\Component\Clock\MockClock;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
@@ -81,8 +82,8 @@ class WorkerTest extends TestCase
 
             public function dispatch(object $event): object
             {
-                if ($event instanceof WorkerRunningEvent) {
-                    $this->listener->onWorkerRunning($event);
+                if ($event instanceof WorkerBusyEvent) {
+                    $this->listener->onWorkerBusy($event);
                 }
 
                 return $event;
@@ -141,7 +142,7 @@ class WorkerTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new ResetServicesListener(new ServicesResetter(new \ArrayIterator([$resettableReceiver]), ['reset'])));
-        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) {
+        $dispatcher->addListener(WorkerBusyEvent::class, function (WorkerBusyEvent $event) {
             $event->getWorker()->stop();
         });
 
@@ -201,10 +202,11 @@ class WorkerTest extends TestCase
             $this->isInstanceOf(WorkerMessageReceivedEvent::class),
             $this->isInstanceOf(WorkerMessageHandledEvent::class),
             $this->isInstanceOf(WorkerRunningEvent::class),
+            $this->isInstanceOf(WorkerBusyEvent::class),
             $this->isInstanceOf(WorkerStoppedEvent::class),
         ];
 
-        $eventDispatcher->expects($this->exactly(5))
+        $eventDispatcher->expects($this->exactly(6))
             ->method('dispatch')
             ->willReturnCallback(function ($event) use (&$series) {
                 array_shift($series)->evaluate($event);
@@ -255,10 +257,11 @@ class WorkerTest extends TestCase
             $this->isInstanceOf(WorkerMessageReceivedEvent::class),
             $this->isInstanceOf(WorkerMessageFailedEvent::class),
             $this->isInstanceOf(WorkerRunningEvent::class),
+            $this->isInstanceOf(WorkerBusyEvent::class),
             $this->isInstanceOf(WorkerStoppedEvent::class),
         ];
 
-        $eventDispatcher->expects($this->exactly(5))
+        $eventDispatcher->expects($this->exactly(6))
             ->method('dispatch')
             ->willReturnCallback(function ($event) use (&$series) {
                 array_shift($series)->evaluate($event);

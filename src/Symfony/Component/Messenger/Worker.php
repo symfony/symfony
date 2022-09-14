@@ -15,6 +15,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
+use Symfony\Component\Messenger\Event\WorkerIdleEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
@@ -108,6 +110,7 @@ class Worker
                     $this->rateLimit($transportName);
                     $this->handleMessage($envelope, $transportName);
                     $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+                    $this->eventDispatcher?->dispatch(new WorkerBusyEvent($this));
 
                     if ($this->shouldStop) {
                         break 2;
@@ -130,6 +133,7 @@ class Worker
 
             if (!$envelopeHandled) {
                 $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, true));
+                $this->eventDispatcher?->dispatch(new WorkerIdleEvent($this));
 
                 if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->clock->now()->format('U.u') - $envelopeHandledStart->format('U.u')))) {
                     $this->clock->sleep($sleep / 1e6);

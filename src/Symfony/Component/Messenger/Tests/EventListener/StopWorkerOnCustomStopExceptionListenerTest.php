@@ -13,8 +13,8 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
-use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\StopWorkerException;
@@ -50,7 +50,7 @@ class StopWorkerOnCustomStopExceptionListenerTest extends TestCase
 
         $worker = $this->createMock(Worker::class);
         $worker->expects($shouldStop ? $this->once() : $this->never())->method('stop');
-        $runningEvent = new WorkerRunningEvent($worker, false);
+        $runningEvent = new WorkerBusyEvent($worker);
 
         $listener->onWorkerRunning($runningEvent);
     }

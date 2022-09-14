@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerBusyEvent;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 
 /**
@@ -36,9 +36,9 @@ class StopWorkerOnMessageLimitListener implements EventSubscriberInterface
         }
     }
 
-    public function onWorkerRunning(WorkerRunningEvent $event): void
+    public function onWorkerBusy(WorkerBusyEvent $event): void
     {
-        if (!$event->isWorkerIdle() && ++$this->receivedMessages >= $this->maximumNumberOfMessages) {
+        if (++$this->receivedMessages >= $this->maximumNumberOfMessages) {
             $this->receivedMessages = 0;
             $event->getWorker()->stop();
 
@@ -49,7 +49,7 @@ class StopWorkerOnMessageLimitListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WorkerRunningEvent::class => 'onWorkerRunning',
+            WorkerBusyEvent::class => 'onWorkerBusy',
         ];
     }
 }

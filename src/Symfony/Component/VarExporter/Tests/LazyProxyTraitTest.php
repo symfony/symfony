@@ -33,8 +33,10 @@ class LazyProxyTraitTest extends TestCase
 
         $this->assertInstanceOf(TestClass::class, $proxy);
         $this->assertSame(0, $initCounter);
+        $this->assertFalse($proxy->isLazyObjectInitialized());
 
         $dep1 = $proxy->getDep();
+        $this->assertTrue($proxy->isLazyObjectInitialized());
         $this->assertSame(1, $initCounter);
 
         $this->assertTrue($proxy->resetLazyObject());
@@ -55,8 +57,10 @@ class LazyProxyTraitTest extends TestCase
         });
 
         $this->assertSame(0, $initCounter);
+        $this->assertFalse($proxy->isLazyObjectInitialized());
 
         $proxy->initializeLazyObject();
+        $this->assertTrue($proxy->isLazyObjectInitialized());
         $this->assertSame(1, $initCounter);
 
         $proxy->initializeLazyObject();
@@ -98,6 +102,8 @@ class LazyProxyTraitTest extends TestCase
 
         $copy = unserialize(serialize($proxy));
         $this->assertSame(1, $initCounter);
+        $this->assertTrue($copy->isLazyObjectInitialized());
+        $this->assertTrue($proxy->isLazyObjectInitialized());
 
         $this->assertFalse($copy->resetLazyObject());
         $this->assertTrue($copy->getDep()->wokeUp);

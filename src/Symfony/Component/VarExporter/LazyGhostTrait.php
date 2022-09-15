@@ -48,6 +48,22 @@ trait LazyGhostTrait
     }
 
     /**
+     * Returns whether the object is initialized.
+     */
+    public function isLazyObjectInitialized(): bool
+    {
+        if (!$state = Registry::$states[$this->lazyObjectId ?? ''] ?? null) {
+            return true;
+        }
+
+        if (LazyObjectState::STATUS_INITIALIZED_PARTIAL === $state->status) {
+            return \count($state->preInitSetProperties) !== \count((array) $this);
+        }
+
+        return LazyObjectState::STATUS_INITIALIZED_FULL === $state->status;
+    }
+
+    /**
      * Forces initialization of a lazy object and returns it.
      */
     public function initializeLazyObject(): static

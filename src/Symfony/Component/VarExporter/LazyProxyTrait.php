@@ -45,6 +45,18 @@ trait LazyProxyTrait
     }
 
     /**
+     * Returns whether the object is initialized.
+     */
+    public function isLazyObjectInitialized(): bool
+    {
+        if (0 >= ($this->lazyObjectId ?? 0)) {
+            return true;
+        }
+
+        return \array_key_exists("\0".self::class."\0lazyObjectReal", (array) $this);
+    }
+
+    /**
      * Forces initialization of a lazy object and returns it.
      */
     public function initializeLazyObject(): parent

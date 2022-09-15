@@ -45,6 +45,18 @@ trait LazyProxyTrait
     }
 
     /**
+     * Returns whether the object is initialized.
+     */
+    public function isLazyObjectInitialized(): bool
+    {
+        if (0 >= ($this->lazyObjectId ?? 0)) {
+            return true;
+        }
+
+        return \array_key_exists("\0".self::class."\0lazyObjectReal", (array) $this);
+    }
+
+    /**
      * Forces initialization of a lazy object and returns it.
      */
     public function initializeLazyObject(): parent
@@ -84,7 +96,8 @@ trait LazyProxyTrait
             if (null === $scope || isset($propertyScopes["\0$scope\0$name"])) {
                 if (isset($this->lazyObjectId)) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
-                        $this->lazyObjectReal = (Registry::$states[$this->lazyObjectId]->initializer)();
+                        $state = Registry::$states[$this->lazyObjectId] ?? null;
+                        $this->lazyObjectReal = $state ? ($state->initializer)() : null;
 
                         return $this->lazyObjectReal;
                     }
@@ -184,7 +197,9 @@ trait LazyProxyTrait
             if (null === $scope || isset($propertyScopes["\0$scope\0$name"])) {
                 if (isset($this->lazyObjectId)) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
-                        return null !== $this->lazyObjectReal = (Registry::$states[$this->lazyObjectId]->initializer)();
+                        $state = Registry::$states[$this->lazyObjectId] ?? null;
+
+                        return null !== $this->lazyObjectReal = $state ? ($state->initializer)() : null;
                     }
                     if (isset($this->lazyObjectReal)) {
                         $instance = $this->lazyObjectReal;

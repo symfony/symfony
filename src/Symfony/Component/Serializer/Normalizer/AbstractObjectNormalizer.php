@@ -451,7 +451,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             }
                             break;
                         case Type::BUILTIN_TYPE_INT:
-                            if (ctype_digit($data) || '-' === $data[0] && ctype_digit(substr($data, 1))) {
+                            if (ctype_digit('-' === $data[0] ? substr($data, 1) : $data)) {
                                 $data = (int) $data;
                             } else {
                                 throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_INT], $context['deserialization_path'] ?? null);

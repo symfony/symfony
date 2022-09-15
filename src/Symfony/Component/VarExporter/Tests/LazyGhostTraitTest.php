@@ -98,6 +98,7 @@ class LazyGhostTraitTest extends TestCase
         unset($expected["\0".TestClass::class."\0lazyObjectId"]);
         $this->assertSame(array_keys($expected), array_keys((array) $clone));
         $this->assertFalse($clone->resetLazyObject());
+        $this->assertTrue($clone->isLazyObjectInitialized());
     }
 
     /**
@@ -162,6 +163,7 @@ class LazyGhostTraitTest extends TestCase
 
         $instance->foo = 234;
         $this->assertTrue($instance->resetLazyObject());
+        $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame('bar', $instance->foo);
     }
 
@@ -173,7 +175,9 @@ class LazyGhostTraitTest extends TestCase
             $ghost->__construct();
         });
 
+        $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertTrue(isset($instance->public));
+        $this->assertTrue($instance->isLazyObjectInitialized());
         $this->assertSame(-4, $instance->public);
         $this->assertSame(4, $instance->publicReadonly);
         $this->assertSame(1, $counter);
@@ -198,7 +202,9 @@ class LazyGhostTraitTest extends TestCase
         });
 
         $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
+        $this->assertTrue($instance->isLazyObjectInitialized());
         $this->assertSame(["\0".TestClass::class."\0lazyObjectId", 'public'], array_keys((array) $instance));
         $this->assertSame(1, $counter);
 
@@ -221,7 +227,9 @@ class LazyGhostTraitTest extends TestCase
 
         $instance->public = 123;
 
+        $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(234, $instance->publicReadonly);
+        $this->assertTrue($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
 
         $this->assertTrue($instance->resetLazyObject());

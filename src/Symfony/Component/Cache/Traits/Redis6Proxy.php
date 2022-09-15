@@ -102,7 +102,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->bgrewriteaof(...\func_get_args());
     }
 
-    public function bitcount($key, $start = 0, $end = -1)
+    public function bitcount($key, $start = 0, $end = -1, $bybit = false)
     {
         return $this->lazyObjectReal->bitcount(...\func_get_args());
     }

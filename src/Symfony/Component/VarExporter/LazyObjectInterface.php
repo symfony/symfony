@@ -14,6 +14,11 @@ namespace Symfony\Component\VarExporter;
 interface LazyObjectInterface
 {
     /**
+     * Returns whether the object is initialized.
+     */
+    public function isLazyObjectInitialized(): bool;
+
+    /**
      * Forces initialization of a lazy object and returns it.
      */
     public function initializeLazyObject(): object;

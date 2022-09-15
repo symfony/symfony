@@ -19,16 +19,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class WhenValidator extends ConstraintValidator
 {
-    private ?ExpressionLanguage $expressionLanguage;
-
-    public function __construct(ExpressionLanguage $expressionLanguage = null)
+    public function __construct(private ?ExpressionLanguage $expressionLanguage = null)
     {
-        $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof When) {
@@ -48,14 +42,10 @@ final class WhenValidator extends ConstraintValidator
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (null !== $this->expressionLanguage) {
-            return $this->expressionLanguage;
-        }
-
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" validator. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
-        return $this->expressionLanguage = new ExpressionLanguage();
+        return $this->expressionLanguage ??= new ExpressionLanguage();
     }
 }

@@ -102,6 +102,10 @@ EOF
                 $io->warning('No value provided: using empty string');
                 $value = '';
             }
+
+            if (4095 === strlen($value)) {
+                $io->warning('Value has exactly 4095 characters: it possibly was truncated by your shell or terminal emulator');
+            }
         } elseif ('-' === $file) {
             $value = file_get_contents('php://stdin');
         } elseif (is_file($file) && is_readable($file)) {

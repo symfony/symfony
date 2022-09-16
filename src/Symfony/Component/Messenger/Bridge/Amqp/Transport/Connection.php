@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
+use Symfony\Component\Messenger\Bridge\Amqp\Compressor\CompressorFactory;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
 
@@ -334,6 +335,11 @@ class Connection
         $attributes['timestamp'] ??= time();
 
         $this->lastActivityTime = time();
+
+        if (isset($attributes['content_encoding'])) {
+            $compressor = CompressorFactory::createCompressor($attributes['content_encoding']);
+            $body = $compressor->compress($body);
+        }
 
         $exchange->publish(
             $body,

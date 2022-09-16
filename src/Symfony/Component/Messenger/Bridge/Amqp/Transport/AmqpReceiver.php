@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
+use Symfony\Component\Messenger\Bridge\Amqp\Compressor\CompressorFactory;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -63,6 +64,12 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         $body = $amqpEnvelope->getBody();
 
         try {
+            $contentEncoding = $amqpEnvelope->getContentEncoding();
+            if ($contentEncoding) {
+                $compressor = CompressorFactory::createCompressor($contentEncoding);
+                $body = $compressor->decompress($body);
+            }
+
             $envelope = $this->serializer->decode([
                 'body' => false === $body ? '' : $body, // workaround https://github.com/pdezwart/php-amqp/issues/351
                 'headers' => $amqpEnvelope->getHeaders(),

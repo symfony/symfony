@@ -43,6 +43,9 @@ use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactory;
+use Symfony\Component\Messenger\WorkerExecution\DefaultWorkerExecutionStrategy;
+use Symfony\Component\Messenger\WorkerExecution\RankedWorkerExecutionStrategy;
+use Symfony\Component\Messenger\WorkerExecution\WorkerExecutionStrategyRegistry;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -216,5 +219,13 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('message bus locator'),
                 service('messenger.default_bus'),
             ])
+
+        ->set('messenger.worker_execution_strategy.registry', WorkerExecutionStrategyRegistry::class)
+
+        ->set('messenger.worker_execution_strategy.default', DefaultWorkerExecutionStrategy::class)
+        ->tag('messenger.worker_execution_strategy')
+
+        ->set('messenger.worker_execution_strategy.ranked', RankedWorkerExecutionStrategy::class)
+        ->tag('messenger.worker_execution_strategy')
     ;
 };

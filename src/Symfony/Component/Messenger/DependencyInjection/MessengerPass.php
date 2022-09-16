@@ -295,9 +295,9 @@ class MessengerPass implements CompilerPassInterface
                 $consumeCommandDefinition->replaceArgument(0, new Reference('messenger.routable_message_bus'));
             }
 
-            $consumeCommandDefinition->replaceArgument(4, array_values($receiverNames));
+            $consumeCommandDefinition->replaceArgument(5, array_values($receiverNames));
             try {
-                $consumeCommandDefinition->replaceArgument(6, $busIds);
+                $consumeCommandDefinition->replaceArgument(7, $busIds);
             } catch (OutOfBoundsException) {
                 // ignore to preserve compatibility with symfony/framework-bundle < 5.4
             }

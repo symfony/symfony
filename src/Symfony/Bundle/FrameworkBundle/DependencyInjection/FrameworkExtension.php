@@ -2183,6 +2183,11 @@ class FrameworkExtension extends Extension
 
         $sendersServiceLocator = ServiceLocatorTagPass::register($container, $senderReferences);
 
+        $workerExecutionStrategyRegistry = $container->getDefinition('messenger.worker_execution_strategy.registry');
+        foreach ($container->findTaggedServiceIds('messenger.worker_execution_strategy', true) as $serviceId => $unused) {
+            $workerExecutionStrategyRegistry->addMethodCall('registerStrategy', [$container->findDefinition($serviceId)->getClass()]);
+        }
+
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
             ->replaceArgument(1, $sendersServiceLocator)

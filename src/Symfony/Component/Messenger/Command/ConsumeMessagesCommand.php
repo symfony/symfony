@@ -33,6 +33,8 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Component\Messenger\WorkerExecution\DefaultWorkerExecutionStrategy;
+use Symfony\Component\Messenger\WorkerExecution\WorkerExecutionStrategyRegistry;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -48,8 +50,9 @@ class ConsumeMessagesCommand extends Command
     private ?ResetServicesListener $resetServicesListener;
     private array $busIds;
     private ?ContainerInterface $rateLimiterLocator;
+    private WorkerExecutionStrategyRegistry $strategyRegistry;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null)
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, WorkerExecutionStrategyRegistry $strategyRegistry, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
@@ -59,6 +62,7 @@ class ConsumeMessagesCommand extends Command
         $this->resetServicesListener = $resetServicesListener;
         $this->busIds = $busIds;
         $this->rateLimiterLocator = $rateLimiterLocator;
+        $this->strategyRegistry = $strategyRegistry;
 
         parent::__construct();
     }
@@ -78,6 +82,8 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
+                new InputOption('strategy', null, InputOption::VALUE_REQUIRED, 'Execution strategy', DefaultWorkerExecutionStrategy::getAlias()),
+                new InputOption('strategy-config', null, InputOption::VALUE_REQUIRED, 'Json-encoded custom config for the strategy. See the chosen strategy for info', '{}'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -210,7 +216,14 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
+        $strategyAlias = $input->getOption('strategy');
+        $strategyConfig = json_decode($input->getOption('strategy-config'), true);
+        if ($strategyConfig === null) {
+            throw new RuntimeException('Could not json-decode the value of the --strategy-config parameter');
+        }
+        $strategy = $this->strategyRegistry->createStrategy($strategyAlias, $strategyConfig);
+
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters, $strategy);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
         ];

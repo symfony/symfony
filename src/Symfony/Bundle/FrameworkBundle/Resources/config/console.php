@@ -156,6 +156,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Routable message bus'),
                 service('messenger.receiver_locator'),
                 service('event_dispatcher'),
+                service('messenger.worker_execution_strategy.registry'),
                 service('logger')->nullOnInvalid(),
                 [], // Receiver names
                 service('messenger.listener.reset_services')->nullOnInvalid(),

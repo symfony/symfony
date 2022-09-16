@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -58,6 +59,9 @@ abstract class AbstractController implements ServiceSubscriberInterface
      */
     protected $container;
 
+    // To be removed in 7.0
+    private bool $renderFormViews = false;
+
     /**
      * @required
      */
@@ -68,6 +72,14 @@ abstract class AbstractController implements ServiceSubscriberInterface
         $this->container = $container;
 
         return $previous;
+    }
+
+    /**
+     * @internal To be removed in 7.0
+     */
+    public function setRenderFormViews(bool $renderFormViews): void
+    {
+        $this->renderFormViews = $renderFormViews;
     }
 
     /**
@@ -233,9 +245,11 @@ abstract class AbstractController implements ServiceSubscriberInterface
             throw new \LogicException('You cannot use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
         }
 
-        foreach ($parameters as $k => $v) {
-            if ($v instanceof FormInterface) {
-                $parameters[$k] = $v->createView();
+        if ($this->renderFormViews) {
+            foreach ($parameters as $k => $v) {
+                if ($v instanceof FormInterface) {
+                    $parameters[$k] = $v->createView();
+                }
             }
         }
 
@@ -256,9 +270,12 @@ abstract class AbstractController implements ServiceSubscriberInterface
             $response = new Response();
         }
 
-        if (200 === $response->getStatusCode()) {
+        if ($this->renderFormViews && 200 === $response->getStatusCode()) {
             foreach ($parameters as $v) {
-                if ($v instanceof FormInterface && $v->isSubmitted() && !$v->isValid()) {
+                if (
+                    $v instanceof FormInterface && $v->isSubmitted() && !$v->isValid()
+                    || $v instanceof FormView && !($v->vars['valid'] ?? true)
+                ) {
                     $response->setStatusCode(422);
                     break;
                 }
@@ -281,7 +298,16 @@ abstract class AbstractController implements ServiceSubscriberInterface
     {
         trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s::renderForm()" method is deprecated, use "render()" instead.', get_debug_type($this));
 
-        return $this->render($view, $parameters, $response);
+        $oldValue = $this->renderFormViews;
+        $this->renderFormViews = true;
+
+        try {
+            $response = $this->render($view, $parameters, $response);
+        } finally {
+            $this->renderFormViews = $oldValue;
+        }
+
+        return $response;
     }
 
     /**

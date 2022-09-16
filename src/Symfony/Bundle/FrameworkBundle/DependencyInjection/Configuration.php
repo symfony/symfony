@@ -240,6 +240,21 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('legacy_error_messages')
                             ->setDeprecated('symfony/framework-bundle', '6.2')
                         ->end()
+                        // to be deprecated in Symfony 7.1
+                        ->booleanNode('controllers_render_form_views')
+                            ->info('Enables "AbstractController::render()" method to convert FormInterface to FormView and setting 422 status code when invalid.')
+                            ->defaultFalse()
+                            ->validate()
+                                ->always()
+                                ->then(function ($v) {
+                                    if (false === $v) {
+                                        trigger_deprecation('symfony/framework-bundle', '6.2', 'Not setting the "framework.form.controllers_render_form_views" option to "true" is deprecated. It will have no effect as of Symfony 7.0.');
+                                    }
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

@@ -453,6 +453,7 @@ class ConfigurationTest extends TestCase
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ],
+                'controllers_render_form_views' => false,
             ],
             'esi' => ['enabled' => false],
             'ssi' => ['enabled' => false],

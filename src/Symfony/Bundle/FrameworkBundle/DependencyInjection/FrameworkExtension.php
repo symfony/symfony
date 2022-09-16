@@ -259,6 +259,8 @@ class FrameworkExtension extends Extension
     private bool $notifierConfigEnabled = false;
     private bool $serializerConfigEnabled = false;
     private bool $propertyAccessConfigEnabled = false;
+    // To be removed in 7.0
+    private bool $controllersRenderFormViews = false;
     private static bool $lockConfigEnabled = false;
 
     /**
@@ -596,6 +598,7 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(ValueResolverInterface::class)
             ->addTag('controller.argument_value_resolver');
         $container->registerForAutoconfiguration(AbstractController::class)
+            ->addMethodCall('setRenderFormViews', [$this->controllersRenderFormViews])
             ->addTag('controller.service_arguments');
         $container->registerForAutoconfiguration(DataCollectorInterface::class)
             ->addTag('data_collector');
@@ -746,6 +749,8 @@ class FrameworkExtension extends Extension
                 ->clearTag('kernel.reset')
             ;
         }
+
+        $this->controllersRenderFormViews = $config['form']['controllers_render_form_views'];
     }
 
     private function registerHttpCacheConfiguration(array $config, ContainerBuilder $container, bool $httpMethodOverride)

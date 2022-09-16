@@ -392,7 +392,29 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testRenderViewWithForm()
+    {
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->never())->method('createView');
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $form])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $content = $controller->renderView('foo', ['bar' => $form]);
+
+        $this->assertSame('bar', $content);
+    }
+
+    public function testRenderViewWithFormHandlesFormView()
     {
         $formView = new FormView();
 
@@ -407,13 +429,39 @@ class AbstractControllerTest extends TestCase
 
         $controller = $this->createController();
         $controller->setContainer($container);
+        $controller->setRenderFormViews(true);
 
         $content = $controller->renderView('foo', ['bar' => $form]);
 
         $this->assertSame('bar', $content);
     }
 
+    /**
+     * @group legacy
+     */
     public function testRenderWithFormSubmittedAndInvalid()
+    {
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->never())->method('createView');
+        $form->expects($this->never())->method('isSubmitted');
+        $form->expects($this->never())->method('isValid');
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $form])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->render('foo', ['bar' => $form]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testRenderWithFormSubmittedAndInvalidHandlesStatusCode()
     {
         $formView = new FormView();
 
@@ -430,8 +478,30 @@ class AbstractControllerTest extends TestCase
 
         $controller = $this->createController();
         $controller->setContainer($container);
+        $controller->setRenderFormViews(true);
 
         $response = $controller->render('foo', ['bar' => $form]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testRenderWithInvalidFormViewHandlesStatusCode()
+    {
+        $formView = new FormView();
+        $formView->vars['valid'] = false;
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+        $controller->setRenderFormViews(true);
+
+        $response = $controller->render('foo', ['bar' => $formView]);
 
         $this->assertSame(422, $response->getStatusCode());
         $this->assertSame('bar', $response->getContent());

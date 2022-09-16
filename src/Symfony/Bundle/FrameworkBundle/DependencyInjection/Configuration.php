@@ -237,8 +237,9 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
                         ->end()
-                        // to be deprecated in Symfony 6.1
-                        ->booleanNode('legacy_error_messages')->end()
+                        ->booleanNode('legacy_error_messages')
+                            ->setDeprecated('symfony/framework-bundle', '6.2')
+                        ->end()
                     ->end()
                 ->end()
             ->end()

@@ -7,7 +7,7 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config http-method-override="false">
-        <framework:form enabled="true" legacy-error-messages="false" />
+        <framework:form enabled="true" />
         <framework:session storage-factory-id="session.storage.factory.native" handler-id="null"/>
     </framework:config>
 </container>

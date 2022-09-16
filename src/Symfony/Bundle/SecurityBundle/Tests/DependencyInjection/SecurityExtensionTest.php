@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -256,7 +256,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $requestMatcherId = 'My\Test\RequestMatcher';
-        $requestMatcher = new RequestMatcher('/');
+        $requestMatcher = new PathRequestMatcher('/');
         $container->set($requestMatcherId, $requestMatcher);
 
         $container->loadFromExtension('security', [
@@ -291,7 +291,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $requestMatcherId = 'My\Test\RequestMatcher';
-        $requestMatcher = new RequestMatcher('/');
+        $requestMatcher = new PathRequestMatcher('/');
         $container->set($requestMatcherId, $requestMatcher);
 
         $container->loadFromExtension('security', [

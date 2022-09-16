@@ -33,7 +33,13 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpFoundation\ChainRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PortRequestMatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -893,7 +899,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $methods = array_map('strtoupper', $methods);
         }
 
-        if (null !== $ips) {
+        if ($ips) {
             foreach ($ips as $ip) {
                 $container->resolveEnvPlaceholders($ip, null, $usedEnvs);
 
@@ -905,22 +911,58 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
         }
 
-        $id = '.security.request_matcher.'.ContainerBuilder::hash([$path, $host, $port, $methods, $ips, $attributes]);
+        $id = '.security.request_matcher.'.ContainerBuilder::hash([ChainRequestMatcher::class, $path, $host, $port, $methods, $ips, $attributes]);
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
         }
 
-        // only add arguments that are necessary
-        $arguments = [$path, $host, $methods, $ips, $attributes, null, $port];
-        while (\count($arguments) > 0 && !end($arguments)) {
-            array_pop($arguments);
+        $arguments = [];
+        if ($methods) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([MethodRequestMatcher::class, $methods]))) {
+                $container->register($lid, MethodRequestMatcher::class)->setArguments([$methods]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($path) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([PathRequestMatcher::class, $path]))) {
+                $container->register($lid, PathRequestMatcher::class)->setArguments([$path]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($host) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([HostRequestMatcher::class, $host]))) {
+                $container->register($lid, HostRequestMatcher::class)->setArguments([$host]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($ips) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([IpsRequestMatcher::class, $ips]))) {
+                $container->register($lid, IpsRequestMatcher::class)->setArguments([$ips]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($attributes) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([AttributesRequestMatcher::class, $attributes]))) {
+                $container->register($lid, AttributesRequestMatcher::class)->setArguments([$attributes]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($port) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([PortRequestMatcher::class, $port]))) {
+                $container->register($lid, PortRequestMatcher::class)->setArguments([$port]);
+            }
+            $arguments[] = new Reference($lid);
         }
 
         $container
-            ->register($id, RequestMatcher::class)
-            ->setPublic(false)
-            ->setArguments($arguments)
+            ->register($id, ChainRequestMatcher::class)
+            ->setArguments([$arguments])
         ;
 
         return $this->requestMatchers[$id] = new Reference($id);

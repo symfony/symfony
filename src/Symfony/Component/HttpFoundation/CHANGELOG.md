@@ -6,6 +6,9 @@ CHANGELOG
 
  * The HTTP cache store uses the `xxh128` algorithm
  * Deprecate calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()` without arguments
+ * Add request matchers under the `Symfony\Component\HttpFoundation\RequestMatcher` namespace
+ * Deprecate `RequestMatcher` in favor of `ChainRequestMatcher`
+ * Deprecate `Symfony\Component\HttpFoundation\ExpressionRequestMatcher` in favor of `Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher`
 
 6.1
 ---

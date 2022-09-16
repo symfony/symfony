@@ -9,49 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Tests;
+namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\HttpFoundation\ExpressionRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher;
 
-/**
- * @group legacy
- */
 class ExpressionRequestMatcherTest extends TestCase
 {
-    public function testWhenNoExpressionIsSet()
-    {
-        $this->expectException(\LogicException::class);
-        $expressionRequestMatcher = new ExpressionRequestMatcher();
-        $expressionRequestMatcher->matches(new Request());
-    }
-
     /**
      * @dataProvider provideExpressions
      */
     public function testMatchesWhenParentMatchesIsTrue($expression, $expected)
     {
         $request = Request::create('/foo');
-        $expressionRequestMatcher = new ExpressionRequestMatcher();
-
-        $expressionRequestMatcher->setExpression(new ExpressionLanguage(), $expression);
+        $expressionRequestMatcher = new ExpressionRequestMatcher(new ExpressionLanguage(), $expression);
         $this->assertSame($expected, $expressionRequestMatcher->matches($request));
-    }
-
-    /**
-     * @dataProvider provideExpressions
-     */
-    public function testMatchesWhenParentMatchesIsFalse($expression)
-    {
-        $request = Request::create('/foo');
-        $request->attributes->set('foo', 'foo');
-        $expressionRequestMatcher = new ExpressionRequestMatcher();
-        $expressionRequestMatcher->matchAttribute('foo', 'bar');
-
-        $expressionRequestMatcher->setExpression(new ExpressionLanguage(), $expression);
-        $this->assertFalse($expressionRequestMatcher->matches($request));
     }
 
     public function provideExpressions()

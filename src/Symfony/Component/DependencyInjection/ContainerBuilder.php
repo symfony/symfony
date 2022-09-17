@@ -684,6 +684,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         array_unshift($this->extensionConfigs[$name], $config);
     }
 
+    public function removeParameter(string $parameter): void
+    {
+        $this->parameterBag->remove($parameter);
+    }
+
     /**
      * Compiles the container.
      *

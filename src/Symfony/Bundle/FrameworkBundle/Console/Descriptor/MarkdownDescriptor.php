@@ -51,7 +51,7 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Host Regex: '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')
             ."\n".'- Scheme: '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
-            ."\n".'- Class: '.\get_class($route)
+            ."\n".'- Class: '.$route::class
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
             ."\n".'- Requirements: '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')
             ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions());
@@ -101,7 +101,7 @@ class MarkdownDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions, $builder);
         } else {
-            $this->write(sprintf('**`%s`:** `%s`', $options['id'], \get_class($service)));
+            $this->write(sprintf('**`%s`:** `%s`', $options['id'], $service::class));
         }
     }
 
@@ -188,7 +188,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nServices\n--------\n");
             foreach ($services['services'] as $id => $service) {
                 $this->write("\n");
-                $this->write(sprintf('- `%s`: `%s`', $id, \get_class($service)));
+                $this->write(sprintf('- `%s`: `%s`', $id, $service::class));
             }
         }
     }
@@ -231,7 +231,7 @@ class MarkdownDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $output .= "\n".'- Factory Service: `'.$factory[0].'`';
                 } elseif ($factory[0] instanceof Definition) {
-                    throw new \InvalidArgumentException('Factory is not describable.');
+                    $output .= "\n".sprintf('- Factory Service: inline factory service (%s)', $factory[0]->getClass() ? sprintf('`%s`', $factory[0]->getClass()) : 'not configured');
                 } else {
                     $output .= "\n".'- Factory Class: `'.$factory[0].'`';
                 }
@@ -399,7 +399,7 @@ class MarkdownDescriptor extends Descriptor
 
         if (method_exists($callable, '__invoke')) {
             $string .= "\n- Type: `object`";
-            $string .= "\n".sprintf('- Name: `%s`', \get_class($callable));
+            $string .= "\n".sprintf('- Name: `%s`', $callable::class);
 
             return $this->write($string."\n");
         }

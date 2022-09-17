@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate calling `Message::setBody()` without arguments
+
 6.1
 ---
 

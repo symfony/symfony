@@ -640,7 +640,7 @@ EOF
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->willReturn($bundleName ?? \get_class($bundle))
+            ->willReturn($bundleName ?? $bundle::class)
         ;
 
         $bundle

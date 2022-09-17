@@ -52,7 +52,7 @@ interface AttributeMetadataInterface
     /**
      * Sets the serialization name for this attribute.
      */
-    public function setSerializedName(string $serializedName = null);
+    public function setSerializedName(?string $serializedName);
 
     /**
      * Gets the serialization name for this attribute.

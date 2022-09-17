@@ -4,12 +4,13 @@ CHANGELOG
 6.2
 ---
 
- * Use lazy-loading ghost object proxies out of the box
- * Add argument `&$asGhostObject` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
+ * Use lazy-loading ghost objects and virtual proxies out of the box
+ * Add arguments `&$asGhostObject` and `$id` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
  * Add `enum` env var processor
  * Add `shuffle` env var processor
- * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
  * Allow #[When] to be extended
+ * Change the signature of `ContainerAwareInterface::setContainer()` to `setContainer(?ContainerInterface)`
+ * Deprecate calling `ContainerAwareTrait::setContainer()` without arguments
 
 6.1
 ---

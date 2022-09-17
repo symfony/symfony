@@ -112,7 +112,7 @@ class Inline
             case $value instanceof \DateTimeInterface:
                 return $value->format('c');
             case $value instanceof \UnitEnum:
-                return sprintf('!php/const %s::%s', \get_class($value), $value->name);
+                return sprintf('!php/const %s::%s', $value::class, $value->name);
             case \is_object($value):
                 if ($value instanceof TaggedValue) {
                     return '!'.$value->getTag().' '.self::dump($value->getValue(), $flags);

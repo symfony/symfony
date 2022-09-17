@@ -384,7 +384,7 @@ EOF
 
         if ('globals' === $type) {
             if (\is_object($meta)) {
-                return ' = object('.\get_class($meta).')';
+                return ' = object('.$meta::class.')';
             }
 
             $description = substr(@json_encode($meta), 0, 50);

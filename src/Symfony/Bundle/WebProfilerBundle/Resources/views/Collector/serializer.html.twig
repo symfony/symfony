@@ -63,7 +63,7 @@
 
 {% block menu %}
     <span class="label {{ not collector.handledCount ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/serializer.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/serializer.svg') }}</span>
         <strong>Serializer</strong>
     </span>
 {% endblock %}
@@ -72,7 +72,7 @@
     <h2>Serializer</h2>
     <div class="sf-serializer sf-reset">
         {% if not collector.handledCount %}
-            <div class="empty">
+            <div class="empty empty-panel">
                 <p>Nothing was handled by the serializer for this request.</p>
             </div>
         {% else %}

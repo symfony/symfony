@@ -19,14 +19,10 @@ class getNonSharedFooService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->factories['non_shared_foo'] ??= function () use ($container) {
-            return self::do($container);
-        };
+        $container->factories['non_shared_foo'] ??= fn () => self::do($container);
 
         if (true === $lazyLoad) {
-            return $container->createProxy('FooLazyClass_f814e3a', function () use ($container) {
-                return \FooLazyClass_f814e3a::createLazyGhostObject(function ($proxy) use ($container) { return self::do($container, $proxy); });
-            });
+            return $container->createProxy('FooLazyClass_f814e3a', fn () => \FooLazyClass_f814e3a::createLazyGhost(fn ($proxy) => self::do($container, $proxy)));
         }
 
         static $include = true;
@@ -45,10 +41,19 @@ class getNonSharedFooService extends ProjectServiceContainer
 
 namespace Container%s;
 
-class FooLazyClass_f814e3a extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyGhostObjectInterface
+class FooLazyClass_f814e3a extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
-    use \Symfony\Component\VarExporter\LazyGhostObjectTrait;
+    use \Symfony\Component\VarExporter\LazyGhostTrait;
+
+    private int $lazyObjectId;
+
+    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 }
+
+// Help opcache.preload discover always-needed symbols
+class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 
 if (!\class_exists('FooLazyClass_f814e3a', false)) {
     \class_alias(__NAMESPACE__.'\\FooLazyClass_f814e3a', 'FooLazyClass_f814e3a', false);
@@ -122,19 +127,6 @@ class ProjectServiceContainer extends Container
         class_exists($class, false) || require __DIR__.'/'.$class.'.php';
 
         return $factory();
-    }
-
-    protected function hydrateProxy($proxy, $instance)
-    {
-        if ($proxy === $instance) {
-            return $proxy;
-        }
-
-        if (!\in_array(\get_class($instance), [\get_class($proxy), get_parent_class($proxy)], true)) {
-            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', get_parent_class($proxy), get_debug_type($instance)));
-        }
-
-        return \Symfony\Component\VarExporter\Hydrator::hydrate($proxy, (array) $instance);
     }
 }
 

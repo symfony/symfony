@@ -223,6 +223,7 @@ use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
+use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -1571,6 +1572,10 @@ class FrameworkExtension extends Extension
         if (!class_exists(ExpressionLanguage::class)) {
             $container->removeDefinition('validator.expression_language');
         }
+
+        if (!class_exists(WhenValidator::class)) {
+            $container->removeDefinition('validator.when');
+        }
     }
 
     private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files)
@@ -2806,14 +2811,15 @@ class FrameworkExtension extends Extension
         $trustedHeaders = 0;
 
         foreach ($headers as $h) {
-            switch ($h) {
-                case 'forwarded': $trustedHeaders |= Request::HEADER_FORWARDED; break;
-                case 'x-forwarded-for': $trustedHeaders |= Request::HEADER_X_FORWARDED_FOR; break;
-                case 'x-forwarded-host': $trustedHeaders |= Request::HEADER_X_FORWARDED_HOST; break;
-                case 'x-forwarded-proto': $trustedHeaders |= Request::HEADER_X_FORWARDED_PROTO; break;
-                case 'x-forwarded-port': $trustedHeaders |= Request::HEADER_X_FORWARDED_PORT; break;
-                case 'x-forwarded-prefix': $trustedHeaders |= Request::HEADER_X_FORWARDED_PREFIX; break;
-            }
+            $trustedHeaders |= match ($h) {
+                'forwarded' => Request::HEADER_FORWARDED,
+                'x-forwarded-for' => Request::HEADER_X_FORWARDED_FOR,
+                'x-forwarded-host' => Request::HEADER_X_FORWARDED_HOST,
+                'x-forwarded-proto' => Request::HEADER_X_FORWARDED_PROTO,
+                'x-forwarded-port' => Request::HEADER_X_FORWARDED_PORT,
+                'x-forwarded-prefix' => Request::HEADER_X_FORWARDED_PREFIX,
+                default => 0,
+            };
         }
 
         return $trustedHeaders;

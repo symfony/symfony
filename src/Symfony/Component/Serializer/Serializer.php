@@ -246,7 +246,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     private function getNormalizer(mixed $data, ?string $format, array $context): ?NormalizerInterface
     {
-        $type = \is_object($data) ? \get_class($data) : 'native-'.\gettype($data);
+        $type = \is_object($data) ? $data::class : 'native-'.\gettype($data);
 
         if (!isset($this->normalizerCache[$format][$type])) {
             $this->normalizerCache[$format][$type] = [];

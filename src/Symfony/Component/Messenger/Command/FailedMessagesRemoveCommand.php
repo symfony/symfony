@@ -74,7 +74,13 @@ EOF
         }
 
         foreach ($ids as $id) {
-            $envelope = $receiver->find($id);
+            $this->phpSerializer?->enableClassNotFoundCreation();
+            try {
+                $envelope = $receiver->find($id);
+            } finally {
+                $this->phpSerializer?->enableClassNotFoundCreation(false);
+            }
+
             if (null === $envelope) {
                 $io->error(sprintf('The message with id "%s" was not found.', $id));
                 continue;

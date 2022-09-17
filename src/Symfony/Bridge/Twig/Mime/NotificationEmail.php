@@ -208,7 +208,7 @@ class NotificationEmail extends TemplatedEmail
             return $exception->getAsString();
         }
 
-        $message = \get_class($exception);
+        $message = $exception::class;
         if ('' !== $exception->getMessage()) {
             $message .= ': '.$exception->getMessage();
         }

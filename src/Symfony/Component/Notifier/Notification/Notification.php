@@ -139,7 +139,7 @@ class Notification
      */
     public function exception(\Throwable $exception): static
     {
-        $parts = explode('\\', \get_class($exception));
+        $parts = explode('\\', $exception::class);
 
         $this->subject = sprintf('%s: %s', array_pop($parts), $exception->getMessage());
         if (class_exists(FlattenException::class)) {
@@ -202,7 +202,7 @@ class Notification
             return $exception->getAsString();
         }
 
-        $message = \get_class($exception);
+        $message = $exception::class;
         if ('' !== $exception->getMessage()) {
             $message .= ': '.$exception->getMessage();
         }

@@ -158,7 +158,7 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         if (\is_object($value)) {
-            return sprintf('object(%s)', \get_class($value));
+            return sprintf('object(%s)', $value::class);
         }
 
         if (\is_string($value)) {
@@ -335,7 +335,7 @@ abstract class Descriptor implements DescriptorInterface
         $getDefaultParameter = function (string $name) {
             return parent::get($name);
         };
-        $getDefaultParameter = $getDefaultParameter->bindTo($bag, \get_class($bag));
+        $getDefaultParameter = $getDefaultParameter->bindTo($bag, $bag::class);
 
         $getEnvReflection = new \ReflectionMethod($container, 'getEnv');
 

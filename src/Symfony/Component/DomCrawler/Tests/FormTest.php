@@ -207,7 +207,7 @@ class FormTest extends TestCase
             $values,
             array_map(
                 function ($field) {
-                    $class = \get_class($field);
+                    $class = $field::class;
 
                     return [substr($class, strrpos($class, '\\') + 1), $field->getValue()];
                 },

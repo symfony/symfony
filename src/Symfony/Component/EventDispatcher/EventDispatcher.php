@@ -44,7 +44,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function dispatch(object $event, string $eventName = null): object
     {
-        $eventName ??= \get_class($event);
+        $eventName ??= $event::class;
 
         if (isset($this->optimized)) {
             $listeners = $this->optimized[$eventName] ?? (empty($this->listeners[$eventName]) ? [] : $this->optimizeListeners($eventName));

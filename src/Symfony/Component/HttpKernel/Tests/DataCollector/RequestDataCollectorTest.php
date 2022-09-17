@@ -312,6 +312,15 @@ class RequestDataCollectorTest extends TestCase
         $collector->lateCollect();
 
         $this->assertTrue($collector->getStatelessCheck());
+
+        $requestStack = new RequestStack();
+        $request = $this->createRequest();
+
+        $collector = new RequestDataCollector($requestStack);
+        $collector->collect($request, $response = $this->createResponse());
+        $collector->lateCollect();
+
+        $this->assertFalse($collector->getStatelessCheck());
     }
 
     public function testItHidesPassword()

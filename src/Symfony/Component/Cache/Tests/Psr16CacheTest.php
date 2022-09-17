@@ -163,7 +163,7 @@ class Psr16CacheTest extends SimpleCacheTest
 
     protected function isPruned(CacheInterface $cache, string $name): bool
     {
-        if (Psr16Cache::class !== \get_class($cache)) {
+        if (Psr16Cache::class !== $cache::class) {
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 

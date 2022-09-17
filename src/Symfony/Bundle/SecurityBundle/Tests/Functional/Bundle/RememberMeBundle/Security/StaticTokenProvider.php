@@ -23,8 +23,8 @@ class StaticTokenProvider implements TokenProviderInterface
     public function __construct($kernel)
     {
         // only reset the "internal db" for new tests
-        if (self::$kernelClass !== \get_class($kernel)) {
-            self::$kernelClass = \get_class($kernel);
+        if (self::$kernelClass !== $kernel::class) {
+            self::$kernelClass = $kernel::class;
             self::$db = [];
         }
     }

@@ -99,9 +99,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
     /**
      * @dataProvider provideAllValidComparisons
-     *
-     * @param mixed $dirtyValue
-     * @param mixed $comparisonValue
      */
     public function testValidComparisonToValue($dirtyValue, $comparisonValue)
     {
@@ -157,7 +154,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $constraint = $this->createConstraint(['propertyPath' => 'foo']);
 
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
+        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
 
         $object = new ComparisonTest_Class(5);
 
@@ -172,12 +169,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
     /**
      * @dataProvider provideAllInvalidComparisons
-     *
-     * @param mixed  $dirtyValue
-     * @param mixed  $dirtyValueAsString
-     * @param mixed  $comparedValue
-     * @param mixed  $comparedValueString
-     * @param string $comparedValueType
      */
     public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
     {
@@ -239,7 +230,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
             'value' => 'foo',
         ]);
 
-        $constraintClass = \get_class($constraint);
+        $constraintClass = $constraint::class;
 
         return [
             [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraintClass), new \DateTimeImmutable()],
@@ -290,9 +281,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
     abstract public function provideComparisonsToNullValueAtPropertyPath();
 
-    /**
-     * @param array|null $options Options for the constraint
-     */
     abstract protected function createConstraint(array $options = null): Constraint;
 
     protected function getErrorCode(): ?string

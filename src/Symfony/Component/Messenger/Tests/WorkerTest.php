@@ -425,7 +425,7 @@ class WorkerTest extends TestCase
         $worker->run();
 
         $envelope = current($receiver->getAcknowledgedEnvelopes());
-        $this->assertCount(1, $envelope->all(\get_class($stamp)));
+        $this->assertCount(1, $envelope->all($stamp::class));
     }
 
     public function testWorkerRateLimitMessages()

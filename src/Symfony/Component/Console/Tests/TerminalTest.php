@@ -98,7 +98,7 @@ class TerminalTest extends TestCase
     /**
      * @dataProvider provideTerminalColorEnv
      */
-    public function testGetTermColorSupport(?string $testColorTerm, ?string $testTerm, AnsiColorMode $expected)
+    public function testGetColorMode(?string $testColorTerm, ?string $testTerm, AnsiColorMode $expected)
     {
         $oriColorTerm = getenv('COLORTERM');
         $oriTerm = getenv('TERM');
@@ -107,10 +107,11 @@ class TerminalTest extends TestCase
             putenv($testColorTerm ? "COLORTERM={$testColorTerm}" : 'COLORTERM');
             putenv($testTerm ? "TERM={$testTerm}" : 'TERM');
 
-            $this->assertSame($expected, Terminal::getTermColorSupport());
+            $this->assertSame($expected, Terminal::getColorMode());
         } finally {
             (false !== $oriColorTerm) ? putenv('COLORTERM='.$oriColorTerm) : putenv('COLORTERM');
             (false !== $oriTerm) ? putenv('TERM='.$oriTerm) : putenv('TERM');
+            Terminal::setColorMode(null);
         }
     }
 
@@ -123,6 +124,28 @@ class TerminalTest extends TestCase
         yield [null, 'xterm-TRUECOLOR', AnsiColorMode::Ansi24];
         yield [null, 'xterm-256color', AnsiColorMode::Ansi8];
         yield [null, 'xterm-256COLOR', AnsiColorMode::Ansi8];
-        yield [null, null, AnsiColorMode::Ansi4];
+        yield [null, null, Terminal::DEFAULT_COLOR_MODE];
+    }
+
+    public function testSetColorMode()
+    {
+        $oriColorTerm = getenv('COLORTERM');
+        $oriTerm = getenv('TERM');
+
+        try {
+            putenv('COLORTERM');
+            putenv('TERM');
+            $this->assertSame(Terminal::DEFAULT_COLOR_MODE, Terminal::getColorMode());
+
+            putenv('COLORTERM=256color');
+            $this->assertSame(Terminal::DEFAULT_COLOR_MODE, Terminal::getColorMode()); // Terminal color mode is cached at first call. Terminal cannot change during execution.
+
+            Terminal::setColorMode(AnsiColorMode::Ansi24); // Force change by user.
+            $this->assertSame(AnsiColorMode::Ansi24, Terminal::getColorMode());
+        } finally {
+            (false !== $oriColorTerm) ? putenv('COLORTERM='.$oriColorTerm) : putenv('COLORTERM');
+            (false !== $oriTerm) ? putenv('TERM='.$oriTerm) : putenv('TERM');
+            Terminal::setColorMode(null);
+        }
     }
 }

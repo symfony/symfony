@@ -12,8 +12,15 @@ $loader = require __DIR__.'/../vendor/autoload.php';
 Symfony\Component\ErrorHandler\DebugClassLoader::enable();
 
 foreach ($loader->getClassMap() as $class => $file) {
+    $file = realpath($file);
+
     switch (true) {
-        case false !== strpos($file = realpath($file), '/vendor/'):
+        case false !== strpos($file, '/src/Symfony/Component/Cache/Traits/Redis'):
+            if (!str_ends_with($file, 'Proxy.php')) {
+                break;
+            }
+            // no break;
+        case false !== strpos($file, '/vendor/'):
         case false !== strpos($file, '/src/Symfony/Bridge/PhpUnit/'):
         case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Validation/Article.php'):
         case false !== strpos($file, '/src/Symfony/Component/Cache/Tests/Fixtures/DriverWrapper.php'):

@@ -52,7 +52,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     {
         $series = base64_encode(random_bytes(64));
         $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
-        $token = new PersistentToken(\get_class($user), $user->getUserIdentifier(), $series, $tokenValue, new \DateTime());
+        $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTime());
 
         $this->tokenProvider->createNewToken($token);
         $this->createCookie(RememberMeDetails::fromPersistentToken($token, time() + $this->options['lifetime']));
@@ -69,7 +69,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 
         if ($this->tokenVerifier) {
             $isTokenValid = $this->tokenVerifier->verifyToken($persistentToken, $tokenValue);
-            $tokenValue = $persistentToken->getTokenValue();
         } else {
             $isTokenValid = hash_equals($persistentToken->getTokenValue(), $tokenValue);
         }
@@ -88,9 +87,9 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
             $tokenLastUsed = new \DateTime();
             $this->tokenVerifier?->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
             $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
-        }
 
-        $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
+            $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
+        }
     }
 
     public function clearRememberMeCookie(): void

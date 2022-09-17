@@ -35,7 +35,7 @@ final class Envelope
         $this->message = $message;
 
         foreach ($stamps as $stamp) {
-            $this->stamps[\get_class($stamp)][] = $stamp;
+            $this->stamps[$stamp::class][] = $stamp;
         }
     }
 
@@ -59,7 +59,7 @@ final class Envelope
         $cloned = clone $this;
 
         foreach ($stamps as $stamp) {
-            $cloned->stamps[\get_class($stamp)][] = $stamp;
+            $cloned->stamps[$stamp::class][] = $stamp;
         }
 
         return $cloned;

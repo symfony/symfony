@@ -89,11 +89,6 @@ class TextPart extends AbstractPart
         return $this;
     }
 
-    public function getDisposition(): ?string
-    {
-        return $this->disposition;
-    }
-
     /**
      * Sets the name of the file (used by FormDataPart).
      *
@@ -207,6 +202,7 @@ class TextPart extends AbstractPart
         // convert resources to strings for serialization
         if (null !== $this->seekable) {
             $this->body = $this->getBody();
+            $this->seekable = null;
         }
 
         $this->_headers = $this->getHeaders();

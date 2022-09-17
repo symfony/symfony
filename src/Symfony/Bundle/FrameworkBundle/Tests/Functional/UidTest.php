@@ -18,9 +18,6 @@ use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV6;
 
-/**
- * @see UidController
- */
 class UidTest extends AbstractWebTestCase
 {
     protected function setUp(): void
@@ -41,7 +38,7 @@ class UidTest extends AbstractWebTestCase
         $exception = reset($exceptions);
 
         $this->assertInstanceOf(\TypeError::class, $exception);
-        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController::anyFormat(): Argument #1 ($userId) must be of type Symfony\Component\Uid\UuidV1, string given', $exception->getMessage());
+        $this->assertStringContainsString(UidController::class.'::anyFormat(): Argument #1 ($userId) must be of type Symfony\Component\Uid\UuidV1, string given', $exception->getMessage());
     }
 
     public function testArgumentValueResolverEnabled()

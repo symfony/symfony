@@ -77,9 +77,8 @@ final class ControllerArgumentsEvent extends KernelEvent
 
         $namedArguments = [];
         $arguments = $this->arguments;
-        $r = $this->getRequest()->attributes->get('_controller_reflectors')[1] ?? new \ReflectionFunction($this->controllerEvent->getController());
 
-        foreach ($r->getParameters() as $i => $param) {
+        foreach ($this->controllerEvent->getControllerReflector()->getParameters() as $i => $param) {
             if ($param->isVariadic()) {
                 $namedArguments[$param->name] = \array_slice($arguments, $i);
                 break;

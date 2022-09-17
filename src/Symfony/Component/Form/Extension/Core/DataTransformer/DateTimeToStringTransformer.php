@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @extends BaseDateTimeTransformer<string>
  */
 class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {
@@ -113,7 +115,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         $outputTz = new \DateTimeZone($this->outputTimezone);
         $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
 
-        $lastErrors = \DateTime::getLastErrors();
+        $lastErrors = \DateTime::getLastErrors() ?: ['error_count' => 0, 'warning_count' => 0];
 
         if (0 < $lastErrors['warning_count'] || 0 < $lastErrors['error_count']) {
             throw new TransformationFailedException(implode(', ', array_merge(array_values($lastErrors['warnings']), array_values($lastErrors['errors']))));

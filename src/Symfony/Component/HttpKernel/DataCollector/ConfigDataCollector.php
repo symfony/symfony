@@ -31,6 +31,10 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      */
     public function setKernel(KernelInterface $kernel = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/http-kernel', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
+
         $this->kernel = $kernel;
     }
 
@@ -62,7 +66,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = new ClassStub(\get_class($bundle));
+                $this->data['bundles'][$name] = new ClassStub($bundle::class);
             }
         }
 

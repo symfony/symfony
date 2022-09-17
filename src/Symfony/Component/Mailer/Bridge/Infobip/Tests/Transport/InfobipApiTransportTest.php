@@ -333,22 +333,10 @@ class InfobipApiTransportTest extends TestCase
             Content-Type: multipart/mixed; boundary=%s
 
             --%s
-            Content-Type: multipart/related; boundary=%s
-
-            --%s
             Content-Type: text/plain; charset=utf-8
             Content-Transfer-Encoding: quoted-printable
 
             foobar
-            --%s
-            Content-ID: %s
-            Content-Type: text/plain; name=inline.txt
-            Content-Transfer-Encoding: base64
-            Content-Disposition: inline; name=inline.txt; filename=inline.txt
-
-            c29tZSBpbmxpbmUgYXR0YWNobWVudA==
-            --%s--
-
             --%s
             Content-Type: text/plain; name=attachment.txt
             Content-Transfer-Encoding: base64
@@ -356,6 +344,12 @@ class InfobipApiTransportTest extends TestCase
              filename=attachment.txt
 
             c29tZSBhdHRhY2htZW50
+            --%s
+            Content-Type: text/plain; name=inline.txt
+            Content-Transfer-Encoding: base64
+            Content-Disposition: inline; name=inline.txt; filename=inline.txt
+
+            c29tZSBpbmxpbmUgYXR0YWNobWVudA==
             --%s--
             TXT,
             $sentMessage->toString()

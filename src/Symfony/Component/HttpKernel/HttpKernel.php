@@ -105,7 +105,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     public function terminateWithException(\Throwable $exception, Request $request = null)
     {
-        if (!$request = $request ?: $this->requestStack->getMainRequest()) {
+        if (!$request ??= $this->requestStack->getMainRequest()) {
             throw $exception;
         }
 
@@ -145,7 +145,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $controller = $event->getController();
 
         // controller arguments
-        $arguments = $this->argumentResolver->getArguments($request, $controller);
+        $arguments = $this->argumentResolver->getArguments($request, $controller, $event->getControllerReflector());
 
         $event = new ControllerArgumentsEvent($this, $event, $arguments, $request, $type);
         $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER_ARGUMENTS);
@@ -173,7 +173,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 throw new ControllerDoesNotReturnResponseException($msg, $controller, __FILE__, __LINE__ - 17);
             }
         }
-        $request->attributes->remove('_controller_reflectors');
 
         return $this->filterResponse($response, $request, $type);
     }
@@ -256,7 +255,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     private function varToString(mixed $var): string
     {
         if (\is_object($var)) {
-            return sprintf('an object of type %s', \get_class($var));
+            return sprintf('an object of type %s', $var::class);
         }
 
         if (\is_array($var)) {

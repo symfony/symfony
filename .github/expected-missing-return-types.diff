@@ -7,10 +7,10 @@ head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
 git checkout composer.json src/
 
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
-index 165797504b..0c0922088a 100644
+index 18b5c21b9f..8fca8244e3 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
-@@ -87,5 +87,5 @@ abstract class KernelTestCase extends TestCase
+@@ -88,5 +88,5 @@ abstract class KernelTestCase extends TestCase
       * @return Container
       */
 -    protected static function getContainer(): ContainerInterface
@@ -156,52 +156,52 @@ index 6b1c6c5fbe..bb80ed461e 100644
 +    public function isFresh(ResourceInterface $resource, int $timestamp): bool;
  }
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index 64068fcc23..f29aaf1b94 100644
+index 53f2021fa9..cf95c1fe99 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
-@@ -218,5 +218,5 @@ class Application implements ResetInterface
+@@ -219,5 +219,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    public function doRun(InputInterface $input, OutputInterface $output)
 +    public function doRun(InputInterface $input, OutputInterface $output): int
      {
          if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-@@ -454,5 +454,5 @@ class Application implements ResetInterface
+@@ -453,5 +453,5 @@ class Application implements ResetInterface
       * @return string
       */
 -    public function getLongVersion()
 +    public function getLongVersion(): string
      {
          if ('UNKNOWN' !== $this->getName()) {
-@@ -497,5 +497,5 @@ class Application implements ResetInterface
+@@ -496,5 +496,5 @@ class Application implements ResetInterface
       * @return Command|null
       */
 -    public function add(Command $command)
 +    public function add(Command $command): ?Command
      {
          $this->init();
-@@ -534,5 +534,5 @@ class Application implements ResetInterface
+@@ -533,5 +533,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When given command name does not exist
       */
 -    public function get(string $name)
 +    public function get(string $name): Command
      {
          $this->init();
-@@ -641,5 +641,5 @@ class Application implements ResetInterface
+@@ -640,5 +640,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When command name is incorrect or ambiguous
       */
 -    public function find(string $name)
 +    public function find(string $name): Command
      {
          $this->init();
-@@ -751,5 +751,5 @@ class Application implements ResetInterface
+@@ -750,5 +750,5 @@ class Application implements ResetInterface
       * @return Command[]
       */
 -    public function all(string $namespace = null)
 +    public function all(string $namespace = null): array
      {
          $this->init();
-@@ -950,5 +950,5 @@ class Application implements ResetInterface
+@@ -949,5 +949,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
@@ -234,7 +234,7 @@ index b41e691537..34de10fa70 100644
      {
          if (null === $this->helperSet) {
 diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatter.php b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
-index 3c6b0efccd..121664f15a 100644
+index 0112350a50..dc972564fb 100644
 --- a/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 +++ b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 @@ -137,5 +137,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
@@ -301,22 +301,22 @@ index 2f1631ed30..a4b572771e 100644
      {
          if (\is_array($value)) {
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index 04b7022484..5d736ec754 100644
+index 20ca68e514..e0850df0f8 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
-@@ -108,5 +108,5 @@ class Container implements ContainerInterface, ResetInterface
-      * @throws InvalidArgumentException if the parameter is not defined
+@@ -109,5 +109,5 @@ class Container implements ContainerInterface, ResetInterface
+      * @throws ParameterNotFoundException if the parameter is not defined
       */
 -    public function getParameter(string $name)
 +    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
      {
          return $this->parameterBag->get($name);
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerInterface.php b/src/Symfony/Component/DependencyInjection/ContainerInterface.php
-index cad44026c0..14cd192e07 100644
+index 9e97fb71fc..1cda97c611 100644
 --- a/src/Symfony/Component/DependencyInjection/ContainerInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/ContainerInterface.php
 @@ -53,5 +53,5 @@ interface ContainerInterface extends PsrContainerInterface
-      * @throws InvalidArgumentException if the parameter is not defined
+      * @throws ParameterNotFoundException if the parameter is not defined
       */
 -    public function getParameter(string $name);
 +    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null;
@@ -358,7 +358,7 @@ index d553203c43..1163f4b107 100644
      {
          $class = static::class;
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
-index 4f66f18073..e96d867296 100644
+index 11cda00cc5..07b4990160 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
 +++ b/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
 @@ -35,5 +35,5 @@ interface ExtensionInterface
@@ -913,7 +913,7 @@ index 5014b9bd51..757c76f546 100644
 +    public function supportsDecoding(string $format): bool;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-index 391cdcb39c..f637687e74 100644
+index e426d87076..350cbc6335 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 @@ -213,5 +213,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
@@ -1094,11 +1094,11 @@ index b22d6ae609..31d1a25f9d 100644
 +    public static function prepare($values, $objectsPool, &$refsPool, &$objectsCount, &$valuesAreStatic): array
      {
          $refs = $values;
-diff --git a/src/Symfony/Component/VarExporter/Internal/GhostObjectState.php b/src/Symfony/Component/VarExporter/Internal/GhostObjectState.php
-index 471c1a6b91..2e19d2ab2d 100644
---- a/src/Symfony/Component/VarExporter/Internal/GhostObjectState.php
-+++ b/src/Symfony/Component/VarExporter/Internal/GhostObjectState.php
-@@ -54,5 +54,5 @@ class GhostObjectState
+diff --git a/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php b/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php
+index 6ea89bc831..01748bcfc0 100644
+--- a/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php
++++ b/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php
+@@ -56,5 +56,5 @@ class LazyObjectState
       * @return bool Returns true when fully-initializing, false when partial-initializing
       */
 -    public function initialize($instance, $propertyName, $propertyScope)

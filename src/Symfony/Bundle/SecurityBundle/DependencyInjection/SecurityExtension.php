@@ -22,6 +22,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -44,6 +45,7 @@ use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -384,6 +386,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $id => new ServiceClosureArgument(new Reference($firewallEventDispatcherId)),
             ]))
         ;
+
+        // Register Firewall-specific chained user checker
+        $container->register('security.user_checker.chain.'.$id, ChainUserChecker::class)
+            ->addArgument(new TaggedIteratorArgument('security.user_checker.'.$id));
 
         // Register listeners
         $listeners = [];
@@ -845,8 +851,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!$userProvider) {
             throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "switch_user" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
         }
-        if ($stateless && null !== $config['target_url']) {
-            throw new InvalidConfigurationException(sprintf('Cannot set a "target_url" for the "switch_user" listener on the "%s" firewall as it is stateless.', $id));
+        if ($stateless && null !== $config['target_route']) {
+            throw new InvalidConfigurationException(sprintf('Cannot set a "target_route" for the "switch_user" listener on the "%s" firewall as it is stateless.', $id));
         }
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
@@ -857,7 +863,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);
         $listener->replaceArgument(9, $stateless);
-        $listener->replaceArgument(10, $config['target_url']);
+        $listener->replaceArgument(11, $config['target_route']);
 
         return $switchUserListenerId;
     }

@@ -78,7 +78,7 @@ class JsonDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $builder, $options['id']), $options);
         } else {
-            $this->writeData(\get_class($service), $options);
+            $this->writeData($service::class, $options);
         }
     }
 
@@ -108,7 +108,7 @@ class JsonDescriptor extends Descriptor
             } elseif ($service instanceof Definition) {
                 $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments, $builder, $serviceId);
             } else {
-                $data['services'][$serviceId] = \get_class($service);
+                $data['services'][$serviceId] = $service::class;
             }
         }
 
@@ -204,7 +204,7 @@ class JsonDescriptor extends Descriptor
             'hostRegex' => '' !== $route->getHost() ? $route->compile()->getHostRegex() : '',
             'scheme' => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
-            'class' => \get_class($route),
+            'class' => $route::class,
             'defaults' => $route->getDefaults(),
             'requirements' => $route->getRequirements() ?: 'NO CUSTOM',
             'options' => $route->getOptions(),
@@ -252,7 +252,7 @@ class JsonDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $data['factory_service'] = (string) $factory[0];
                 } elseif ($factory[0] instanceof Definition) {
-                    throw new \InvalidArgumentException('Factory is not describable.');
+                    $data['factory_service'] = sprintf('inline factory service (%s)', $factory[0]->getClass() ?? 'class not configured');
                 } else {
                     $data['factory_class'] = $factory[0];
                 }
@@ -382,7 +382,7 @@ class JsonDescriptor extends Descriptor
 
         if (method_exists($callable, '__invoke')) {
             $data['type'] = 'object';
-            $data['name'] = \get_class($callable);
+            $data['name'] = $callable::class;
 
             return $data;
         }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Semaphore\Tests\Store;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Semaphore\Store\RedisStore;
 use Symfony\Component\Semaphore\Store\StoreFactory;
 
@@ -36,9 +35,6 @@ class StoreFactoryTest extends TestCase
     {
         if (class_exists(\Redis::class)) {
             yield [$this->createMock(\Redis::class), RedisStore::class];
-        }
-        if (class_exists(RedisProxy::class)) {
-            yield [$this->createMock(RedisProxy::class), RedisStore::class];
         }
         yield [new \Predis\Client(), RedisStore::class];
         if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {

@@ -40,8 +40,8 @@ class ErrorListenerTest extends TestCase
         $logger = new TestLogger();
         $l = new ErrorListener('foo', $logger);
 
-        $_logger = new \ReflectionProperty(\get_class($l), 'logger');
-        $_controller = new \ReflectionProperty(\get_class($l), 'controller');
+        $_logger = new \ReflectionProperty($l::class, 'logger');
+        $_controller = new \ReflectionProperty($l::class, 'controller');
 
         $this->assertSame($logger, $_logger->getValue($l));
         $this->assertSame('foo', $_controller->getValue($l));

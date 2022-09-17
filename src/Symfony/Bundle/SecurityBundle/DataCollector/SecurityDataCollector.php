@@ -119,7 +119,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'impersonator_user' => $impersonatorUser,
                 'impersonation_exit_path' => null,
                 'token' => $token,
-                'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
+                'token_class' => $this->hasVarDumper ? new ClassStub($token::class) : $token::class,
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUserIdentifier(),
                 'roles' => $assignedRoles,
@@ -137,7 +137,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     $voter = $voter->getDecoratedVoter();
                 }
 
-                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub(\get_class($voter)) : \get_class($voter);
+                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub($voter::class) : $voter::class;
             }
 
             // collect voter details

@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
 
 /**
  * TwigExtension configuration structure.
@@ -48,6 +49,7 @@ class Configuration implements ConfigurationInterface
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
         $this->addTwigFormatOptions($rootNode);
+        $this->addMailerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -208,6 +210,22 @@ class Configuration implements ConfigurationInterface
                         ->integerNode('decimals')->defaultValue(0)->end()
                         ->scalarNode('decimal_point')->defaultValue('.')->end()
                         ->scalarNode('thousands_separator')->defaultValue(',')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addMailerSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('mailer')
+                    ->children()
+                        ->scalarNode('html_to_text_converter')
+                            ->info(sprintf('A service implementing the "%s"', HtmlToTextConverterInterface::class))
+                            ->defaultNull()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

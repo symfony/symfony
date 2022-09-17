@@ -123,7 +123,7 @@ public function NAME(): string
                     $this->handleArrayNode($child, $class, $namespace);
                     break;
                 default:
-                    throw new \RuntimeException(sprintf('Unknown node "%s".', \get_class($child)));
+                    throw new \RuntimeException(sprintf('Unknown node "%s".', $child::class));
             }
         }
     }

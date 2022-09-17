@@ -550,8 +550,8 @@ EOF;
         $strip = '' === $this->docStar && method_exists(Kernel::class, 'stripComments');
         $proxyDumper = $this->getProxyDumper();
         ksort($definitions);
-        foreach ($definitions as $definition) {
-            if (!$definition = $this->isProxyCandidate($definition)) {
+        foreach ($definitions as $id => $definition) {
+            if (!$definition = $this->isProxyCandidate($definition, $asGhostObject, $id)) {
                 continue;
             }
             if (isset($alreadyGenerated[$class = $definition->getClass()])) {
@@ -560,7 +560,7 @@ EOF;
             $alreadyGenerated[$class] = true;
             // register class' reflector for resource tracking
             $this->container->getReflectionClass($class);
-            if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition)) {
+            if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition, $id)) {
                 continue;
             }
 
@@ -655,7 +655,7 @@ EOF;
         }
 
         $asGhostObject = false;
-        $isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject);
+        $isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject, $id);
         $instantiation = '';
 
         $lastWitherIndex = null;
@@ -673,9 +673,6 @@ EOF;
 
         $return = '';
         if ($isSimpleInstance) {
-            if ($asGhostObject && null !== $definition->getFactory()) {
-                $instantiation .= '$this->hydrateProxy($lazyLoad, ';
-            }
             $return = 'return ';
         } else {
             $instantiation .= ' = ';
@@ -886,16 +883,14 @@ EOF;
             }
 
             $asGhostObject = false;
-            if ($isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject)) {
+            if ($isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject, $id)) {
                 $definition = $isProxyCandidate;
 
                 if (!$definition->isShared()) {
                     $code .= sprintf('        %s ??= ', $factory);
 
                     if ($asFile) {
-                        $code .= "function () {\n";
-                        $code .= "            return self::do(\$container);\n";
-                        $code .= "        };\n\n";
+                        $code .= "fn () => self::do(\$container);\n\n";
                     } else {
                         $code .= sprintf("\$this->%s(...);\n\n", $methodName);
                     }
@@ -1031,7 +1026,7 @@ EOTXT
             }
         }
 
-        if (isset($this->definitionVariables[$inlineDef = $inlineDef ?: $definition])) {
+        if (isset($this->definitionVariables[$inlineDef ??= $definition])) {
             return $code;
         }
 
@@ -1046,7 +1041,7 @@ EOTXT
         }
 
         $asGhostObject = false;
-        $isProxyCandidate = $this->isProxyCandidate($inlineDef, $asGhostObject);
+        $isProxyCandidate = $this->isProxyCandidate($inlineDef, $asGhostObject, $id);
 
         if (isset($this->definitionVariables[$inlineDef])) {
             $isSimpleInstance = false;
@@ -1076,11 +1071,7 @@ EOTXT
             return $code;
         }
 
-        if (!$asGhostObject) {
-            return $code."\n        return \$instance;\n";
-        }
-
-        return $code."\n        return \$this->hydrateProxy(\$lazyLoad, \$instance);\n";
+        return $code."\n        return \$instance;\n";
     }
 
     private function addServices(array &$services = null): string
@@ -1324,19 +1315,6 @@ EOF;
     protected function createProxy(\$class, \Closure \$factory)
     {
         {$proxyLoader}return \$factory();
-    }
-
-    protected function hydrateProxy(\$proxy, \$instance)
-    {
-        if (\$proxy === \$instance) {
-            return \$proxy;
-        }
-
-        if (!\in_array(\get_class(\$instance), [\get_class(\$proxy), get_parent_class(\$proxy)], true)) {
-            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1\$s".', get_parent_class(\$proxy), get_debug_type(\$instance)));
-        }
-
-        return \Symfony\Component\VarExporter\Hydrator::hydrate(\$proxy, (array) \$instance);
     }
 
 EOF;
@@ -1665,7 +1643,7 @@ EOF;
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain expressions. Expression "%s" found in "%s".', $value, $path.'/'.$key));
             } elseif ($value instanceof \UnitEnum) {
                 $hasEnum = true;
-                $value = sprintf('\%s::%s', \get_class($value), $value->name);
+                $value = sprintf('\%s::%s', $value::class, $value->name);
             } else {
                 $value = $this->export($value);
             }
@@ -1917,7 +1895,7 @@ EOF;
                 return $code;
             }
         } elseif ($value instanceof \UnitEnum) {
-            return sprintf('\%s::%s', \get_class($value), $value->name);
+            return sprintf('\%s::%s', $value::class, $value->name);
         } elseif ($value instanceof AbstractArgument) {
             throw new RuntimeException($value->getTextWithContext());
         } elseif (\is_object($value) || \is_resource($value)) {
@@ -2288,7 +2266,7 @@ EOF;
         return $classes;
     }
 
-    private function isProxyCandidate(Definition $definition, bool &$asGhostObject = null): ?Definition
+    private function isProxyCandidate(Definition $definition, ?bool &$asGhostObject, string $id): ?Definition
     {
         $asGhostObject = false;
 
@@ -2301,6 +2279,6 @@ EOF;
             ->setClass($bag->resolveValue($definition->getClass()))
             ->setTags(($definition->hasTag('proxy') ? ['proxy' => $bag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags());
 
-        return $proxyDumper->isProxyCandidate($definition, $asGhostObject) ? $definition : null;
+        return $proxyDumper->isProxyCandidate($definition, $asGhostObject, $id) ? $definition : null;
     }
 }

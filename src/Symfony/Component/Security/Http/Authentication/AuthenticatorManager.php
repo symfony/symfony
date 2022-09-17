@@ -102,13 +102,13 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $skippedAuthenticators = [];
         $lazy = true;
         foreach ($this->authenticators as $authenticator) {
-            $this->logger?->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
+            $this->logger?->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => $authenticator::class]);
 
             if (false !== $supports = $authenticator->supports($request)) {
                 $authenticators[] = $authenticator;
                 $lazy = $lazy && null === $supports;
             } else {
-                $this->logger?->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
+                $this->logger?->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => $authenticator::class]);
                 $skippedAuthenticators[] = $authenticator;
             }
         }
@@ -181,7 +181,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                     throw new BadCredentialsException(sprintf('Authentication failed: Security badge "%s" is not resolved, did you forget to register the correct listeners?', get_debug_type($badge)));
                 }
 
-                $resolvedBadges[] = \get_class($badge);
+                $resolvedBadges[] = $badge::class;
             }
 
             $missingRequiredBadges = array_diff($this->requiredBadges, $resolvedBadges);

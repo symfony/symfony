@@ -55,7 +55,7 @@ EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
+  Version                 0                                     
   toRfc4122 (canonical)   461cc9b9-2397-0dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6dw4oVPm5uT17um                
   toBase32                263K4VJ8WQ1PX93T9KNX667XZC            
@@ -71,7 +71,7 @@ EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
+  Version                 2                                     
   toRfc4122 (canonical)   461cc9b9-2397-2dba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6fjLfNnvSAHMV7Z                
   toBase32                263K4VJ8WQ5PX93T9KNX667XZC            
@@ -82,16 +82,16 @@ EOF
 EOF
             , $commandTester->getDisplay(true));
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-7dba-91e9-33af4c63f7ec']));
+        $this->assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-adba-91e9-33af4c63f7ec']));
         $this->assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
-  toRfc4122 (canonical)   461cc9b9-2397-7dba-91e9-33af4c63f7ec  
-  toBase58                9f9nftX6kE2K6HpooNEQ83                
-  toBase32                263K4VJ8WQFPX93T9KNX667XZC            
-  toHex                   0x461cc9b923977dba91e933af4c63f7ec    
+  Version                 10                                    
+  toRfc4122 (canonical)   461cc9b9-2397-adba-91e9-33af4c63f7ec  
+  toBase58                9f9nftX6nvS6vPZqBckwvj                
+  toBase32                263K4VJ8WQNPX93T9KNX667XZC            
+  toHex                   0x461cc9b92397adba91e933af4c63f7ec    
  ----------------------- -------------------------------------- 
 
 
@@ -103,7 +103,7 @@ EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
-  Version                 unknown                               
+  Version                 12                                    
   toRfc4122 (canonical)   461cc9b9-2397-cdba-91e9-33af4c63f7ec  
   toBase58                9f9nftX6pihxonjBST7K8X                
   toBase32                263K4VJ8WQSPX93T9KNX667XZC            
@@ -217,6 +217,50 @@ EOF
   toHex                   0x1eb59937b0a76288a861db3dc2d8d4db    
  ----------------------- -------------------------------------- 
   Time                    2021-01-18 13:45:52.427892 UTC        
+ ----------------------- -------------------------------------- 
+
+
+EOF
+            , $commandTester->getDisplay(true));
+    }
+
+    public function testV7()
+    {
+        $commandTester = new CommandTester(new InspectUuidCommand());
+
+        $this->assertSame(0, $commandTester->execute(['uuid' => '017f22e2-79b0-7cc3-98c4-dc0c0c07398f']));
+        $this->assertSame(<<<EOF
+ ----------------------- -------------------------------------- 
+  Label                   Value                                 
+ ----------------------- -------------------------------------- 
+  Version                 7                                     
+  toRfc4122 (canonical)   017f22e2-79b0-7cc3-98c4-dc0c0c07398f  
+  toBase58                1BihbxwwQ4NZZpKRH9JDCz                
+  toBase32                01FWHE4YDGFK1SHH6W1G60EECF            
+  toHex                   0x017f22e279b07cc398c4dc0c0c07398f    
+ ----------------------- -------------------------------------- 
+  Time                    2022-02-22 19:22:22.000000 UTC        
+ ----------------------- -------------------------------------- 
+
+
+EOF
+            , $commandTester->getDisplay(true));
+    }
+
+    public function testV8()
+    {
+        $commandTester = new CommandTester(new InspectUuidCommand());
+
+        $this->assertSame(0, $commandTester->execute(['uuid' => '017f22e2-79b0-8cc3-98c4-dc0c0c07398f']));
+        $this->assertSame(<<<EOF
+ ----------------------- -------------------------------------- 
+  Label                   Value                                 
+ ----------------------- -------------------------------------- 
+  Version                 8                                     
+  toRfc4122 (canonical)   017f22e2-79b0-8cc3-98c4-dc0c0c07398f  
+  toBase58                1BihbxwwQxWVWWu6QZUPot                
+  toBase32                01FWHE4YDGHK1SHH6W1G60EECF            
+  toHex                   0x017f22e279b08cc398c4dc0c0c07398f    
  ----------------------- -------------------------------------- 
 
 

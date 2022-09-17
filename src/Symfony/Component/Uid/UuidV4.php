@@ -30,7 +30,7 @@ class UuidV4 extends Uuid
 
             $this->uid = substr($uuid, 0, 8).'-'.substr($uuid, 8, 4).'-'.substr($uuid, 12, 4).'-'.substr($uuid, 16, 4).'-'.substr($uuid, 20, 12);
         } else {
-            parent::__construct($uuid);
+            parent::__construct($uuid, true);
         }
     }
 }

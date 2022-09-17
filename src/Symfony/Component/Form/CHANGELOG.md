@@ -4,8 +4,11 @@ CHANGELOG
 6.2
 ---
 
-* Allow passing `TranslatableInterface` objects to the `ChoiceView` label
-* Allow passing `TranslatableInterface` objects to the `help` option
+ * Allow passing `TranslatableInterface` objects to the `ChoiceView` label
+ * Allow passing `TranslatableInterface` objects to the `help` option
+ * Deprecate calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()` without arguments
+ * Change the signature of `FormConfigBuilderInterface::setDataMapper()` to `setDataMapper(?DataMapperInterface)`
+ * Change the signature of `FormInterface::setParent()` to `setParent(?self)`
 
 6.1
 ---

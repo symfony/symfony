@@ -50,11 +50,11 @@ class TraceableNormalizerTest extends TestCase
         $dataCollector
             ->expects($this->once())
             ->method('collectNormalization')
-            ->with($this->isType('string'), \get_class($normalizer), $this->isType('float'));
+            ->with($this->isType('string'), $normalizer::class, $this->isType('float'));
         $dataCollector
             ->expects($this->once())
             ->method('collectDenormalization')
-            ->with($this->isType('string'), \get_class($denormalizer), $this->isType('float'));
+            ->with($this->isType('string'), $denormalizer::class, $this->isType('float'));
 
         (new TraceableNormalizer($normalizer, $dataCollector))->normalize('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
         (new TraceableNormalizer($denormalizer, $dataCollector))->denormalize('data', 'type', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);

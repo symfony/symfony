@@ -204,7 +204,7 @@ EOF
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
+        $coreTypes = array_map(function (FormTypeInterface $type) { return $type::class; }, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;

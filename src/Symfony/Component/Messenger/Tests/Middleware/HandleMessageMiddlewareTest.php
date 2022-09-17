@@ -72,11 +72,11 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
     {
         $first = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
         $first->method('__invoke')->willReturn('first result');
-        $firstClass = \get_class($first);
+        $firstClass = $first::class;
 
         $second = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
         $second->method('__invoke')->willReturn(null);
-        $secondClass = \get_class($second);
+        $secondClass = $second::class;
 
         $failing = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
         $failing->method('__invoke')->will($this->throwException(new \Exception('handler failed.')));

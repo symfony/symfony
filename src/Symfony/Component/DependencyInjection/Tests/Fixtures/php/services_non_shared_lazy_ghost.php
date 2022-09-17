@@ -48,19 +48,6 @@ class ProjectServiceContainer extends Container
         return $factory();
     }
 
-    protected function hydrateProxy($proxy, $instance)
-    {
-        if ($proxy === $instance) {
-            return $proxy;
-        }
-
-        if (!\in_array(\get_class($instance), [\get_class($proxy), get_parent_class($proxy)], true)) {
-            throw new LogicException(sprintf('Lazy service of type "%s" cannot be hydrated because its factory returned an unexpected instance of "%s". Try adding the "proxy" tag to the corresponding service definition with attribute "interface" set to "%1$s".', get_parent_class($proxy), get_debug_type($instance)));
-        }
-
-        return \Symfony\Component\VarExporter\Hydrator::hydrate($proxy, (array) $instance);
-    }
-
     /**
      * Gets the public 'bar' shared service.
      *
@@ -81,16 +68,23 @@ class ProjectServiceContainer extends Container
         $this->factories['service_container']['foo'] ??= $this->getFooService(...);
 
         if (true === $lazyLoad) {
-            return $this->createProxy('stdClass_5a8a5eb', function () {
-                return \stdClass_5a8a5eb::createLazyGhostObject($this->getFooService(...));
-            });
+            return $this->createProxy('stdClass_5a8a5eb', fn () => \stdClass_5a8a5eb::createLazyGhost($this->getFooService(...)));
         }
 
         return $lazyLoad;
     }
 }
 
-class stdClass_5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyGhostObjectInterface
+class stdClass_5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
-    use \Symfony\Component\VarExporter\LazyGhostObjectTrait;
+    use \Symfony\Component\VarExporter\LazyGhostTrait;
+
+    private int $lazyObjectId;
+
+    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 }
+
+// Help opcache.preload discover always-needed symbols
+class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);

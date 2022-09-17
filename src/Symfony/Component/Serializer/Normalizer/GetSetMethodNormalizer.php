@@ -41,7 +41,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
-        return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
+        return parent::supportsNormalization($data, $format) && $this->supports($data::class);
     }
 
     /**
@@ -137,7 +137,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         $setter = 'set'.ucfirst($attribute);
-        $key = \get_class($object).':'.$setter;
+        $key = $object::class.':'.$setter;
 
         if (!isset(self::$setterAccessibleCache[$key])) {
             self::$setterAccessibleCache[$key] = \is_callable([$object, $setter]) && !(new \ReflectionMethod($object, $setter))->isStatic();

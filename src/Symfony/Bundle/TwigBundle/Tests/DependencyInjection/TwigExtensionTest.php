@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\Mailer\Mailer;
 
 class TwigExtensionTest extends TestCase
 {
@@ -43,6 +44,10 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
         $this->assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
         $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
+
+        if (class_exists(Mailer::class)) {
+            $this->assertCount(1, $container->getDefinition('twig.mime_body_renderer')->getArguments());
+        }
     }
 
     /**
@@ -261,6 +266,25 @@ class TwigExtensionTest extends TestCase
         $this->assertArrayHasKey('FooClass', $args);
         $this->assertEquals('twig.form.renderer', $args['Symfony\Component\Form\FormRenderer']->getValues()[0]);
         $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
+    }
+
+    /**
+     * @dataProvider getFormats
+     */
+    public function testCustomHtmlToTextConverterService(string $format)
+    {
+        if (!class_exists(Mailer::class)) {
+            $this->markTestSkipped('The "twig.mime_body_renderer" service requires the Mailer component');
+        }
+
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'mailer', $format);
+        $this->compileContainer($container);
+
+        $bodyRenderer = $container->getDefinition('twig.mime_body_renderer');
+        $this->assertCount(2, $bodyRenderer->getArguments());
+        $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
     }
 
     private function createContainer()

@@ -18,8 +18,8 @@ install:
     - cd ext
     - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.21-8.1-ts-vs16-x86.zip
     - 7z x php_apcu-5.1.21-8.1-ts-vs16-x86.zip -y >nul
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7rc1-8.1-ts-vs16-x86.zip
-    - 7z x php_redis-5.3.7rc1-8.1-ts-vs16-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7-8.1-ts-vs16-x86.zip
+    - 7z x php_redis-5.3.7-8.1-ts-vs16-x86.zip -y >nul
     - cd ..
     - copy /Y php.ini-development php.ini-min
     - echo memory_limit=-1 >> php.ini-min

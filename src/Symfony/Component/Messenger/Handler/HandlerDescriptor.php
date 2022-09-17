@@ -43,7 +43,7 @@ final class HandlerDescriptor
                 $this->batchHandler = $handler;
             }
 
-            $this->name = \get_class($handler).'::'.$r->name;
+            $this->name = $handler::class.'::'.$r->name;
         }
     }
 

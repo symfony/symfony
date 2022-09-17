@@ -40,11 +40,17 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     public function setForeground(string $color = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->color = new Color($this->foreground = $color ?: '', $this->background, $this->options);
     }
 
     public function setBackground(string $color = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->color = new Color($this->foreground, $this->background = $color ?: '', $this->options);
     }
 

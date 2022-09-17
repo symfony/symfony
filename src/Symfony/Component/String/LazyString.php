@@ -86,7 +86,7 @@ class LazyString implements \Stringable, \JsonSerializable
         try {
             return $this->value = ($this->value)();
         } catch (\Throwable $e) {
-            if (\TypeError::class === \get_class($e) && __FILE__ === $e->getFile()) {
+            if (\TypeError::class === $e::class && __FILE__ === $e->getFile()) {
                 $type = explode(', ', $e->getMessage());
                 $type = substr(array_pop($type), 0, -\strlen(' returned'));
                 $r = new \ReflectionFunction($this->value);

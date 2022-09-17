@@ -326,7 +326,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => $this->platformName = 'oci',
             $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform,
             $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform => $this->platformName = 'sqlsrv',
-            default => $this->platformName = \get_class($platform),
+            default => $this->platformName = $platform::class,
         };
     }
 

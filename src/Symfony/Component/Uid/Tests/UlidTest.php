@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\MaxUlid;
 use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
 use Symfony\Component\Uid\Ulid;
@@ -26,11 +27,16 @@ class UlidTest extends TestCase
     {
         $a = new Ulid();
         $b = new Ulid();
+        usleep(-10000);
+        $c = new Ulid();
 
         $this->assertSame(0, strncmp($a, $b, 20));
+        $this->assertSame(0, strncmp($a, $c, 20));
         $a = base_convert(strtr(substr($a, -6), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv'), 32, 10);
         $b = base_convert(strtr(substr($b, -6), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv'), 32, 10);
+        $c = base_convert(strtr(substr($c, -6), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv'), 32, 10);
         $this->assertSame(1, $b - $a);
+        $this->assertSame(1, $c - $b);
     }
 
     public function testWithInvalidUlid()
@@ -266,5 +272,22 @@ class UlidTest extends TestCase
     public function testNewNilUlid()
     {
         $this->assertSame('00000000000000000000000000', (string) new NilUlid());
+    }
+
+    /**
+     * @testWith    ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
+     *              ["7zzzzzzzzzzzzzzzzzzzzzzzzz"]
+     */
+    public function testMaxUlid(string $ulid)
+    {
+        $ulid = Ulid::fromString($ulid);
+
+        $this->assertInstanceOf(MaxUlid::class, $ulid);
+        $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) $ulid);
+    }
+
+    public function testNewMaxUlid()
+    {
+        $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) new MaxUlid());
     }
 }

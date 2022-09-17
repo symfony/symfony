@@ -18,8 +18,6 @@ use Symfony\Component\VarExporter\VarExporter;
  * @author Tobias Schultze <http://tobion.de>
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
  */
 class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 {

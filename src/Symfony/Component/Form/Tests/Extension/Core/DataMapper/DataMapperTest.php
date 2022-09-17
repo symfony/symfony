@@ -334,7 +334,7 @@ class DataMapperTest extends TestCase
         $article['publishedAt'] = $publishedAtValue;
         $propertyPath = new PropertyPath('[publishedAt]');
 
-        $config = new FormConfigBuilder('publishedAt', \get_class($publishedAt), $this->dispatcher);
+        $config = new FormConfigBuilder('publishedAt', $publishedAt::class, $this->dispatcher);
         $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $config->setData($publishedAt);

@@ -96,29 +96,29 @@ EOF
             $io->comment(sprintf('Displaying only \'%s\' messages', $classFilter));
         }
 
-        foreach ($envelopes as $envelope) {
-            $currentClassName = \get_class($envelope->getMessage());
+        $this->phpSerializer?->enableClassNotFoundCreation();
+        try {
+            foreach ($envelopes as $envelope) {
+                $currentClassName = \get_class($envelope->getMessage());
 
-            if ($classFilter && $classFilter !== $currentClassName) {
-                continue;
+                if ($classFilter && $classFilter !== $currentClassName) {
+                    continue;
+                }
+
+                /** @var RedeliveryStamp|null $lastRedeliveryStamp */
+                $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
+                /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
+                $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
+
+                $rows[] = [
+                    $this->getMessageId($envelope),
+                    $currentClassName,
+                    null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
+                    $lastErrorDetailsStamp?->getExceptionMessage() ?? '',
+                ];
             }
-
-            /** @var RedeliveryStamp|null $lastRedeliveryStamp */
-            $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
-            /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
-            $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
-
-            $errorMessage = '';
-            if (null !== $lastErrorDetailsStamp) {
-                $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
-            }
-
-            $rows[] = [
-                $this->getMessageId($envelope),
-                $currentClassName,
-                null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
-                $errorMessage,
-            ];
+        } finally {
+            $this->phpSerializer?->enableClassNotFoundCreation(false);
         }
 
         $rowsCount = \count($rows);
@@ -148,14 +148,19 @@ EOF
 
         $countPerClass = [];
 
-        foreach ($envelopes as $envelope) {
-            $c = \get_class($envelope->getMessage());
+        $this->phpSerializer?->enableClassNotFoundCreation();
+        try {
+            foreach ($envelopes as $envelope) {
+                $c = \get_class($envelope->getMessage());
 
-            if (!isset($countPerClass[$c])) {
-                $countPerClass[$c] = [$c, 0];
+                if (!isset($countPerClass[$c])) {
+                    $countPerClass[$c] = [$c, 0];
+                }
+
+                ++$countPerClass[$c][1];
             }
-
-            ++$countPerClass[$c][1];
+        } finally {
+            $this->phpSerializer?->enableClassNotFoundCreation(false);
         }
 
         if (0 === \count($countPerClass)) {
@@ -171,7 +176,12 @@ EOF
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);
-        $envelope = $receiver->find($id);
+        $this->phpSerializer?->enableClassNotFoundCreation();
+        try {
+            $envelope = $receiver->find($id);
+        } finally {
+            $this->phpSerializer?->enableClassNotFoundCreation(false);
+        }
         if (null === $envelope) {
             throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
         }

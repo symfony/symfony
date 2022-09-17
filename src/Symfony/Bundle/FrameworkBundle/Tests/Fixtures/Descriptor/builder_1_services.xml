@@ -17,4 +17,7 @@
       <tag name="tag2"/>
     </tags>
   </definition>
+  <definition id=".definition_3" class="Full\Qualified\Class3" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
+    <factory service="inline factory service (Full\Qualified\FactoryClass)" method="get"/>
+  </definition>
 </container>

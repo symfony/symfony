@@ -41,6 +41,9 @@ class NodeBuilder implements NodeParentInterface
      */
     public function setParent(ParentNodeDefinitionInterface $parent = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->parent = $parent;
 
         return $this;

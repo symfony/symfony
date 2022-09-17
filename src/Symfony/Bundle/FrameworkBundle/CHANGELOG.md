@@ -4,6 +4,7 @@ CHANGELOG
 6.2
 ---
 
+ * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
  * Add `NotificationAssertionsTrait`
  * Add option `framework.catch_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to catch all kinds of `Throwable`
  * Make `AbstractController::render()` able to deal with forms and deprecate `renderForm()`
@@ -16,6 +17,7 @@ CHANGELOG
    tagged with `workflow.workflow`, and those with type=state_machine with
    `workflow.state_machine`
  * Add `rate_limiter` configuration option to `messenger.transport` to allow rate limited transports using the RateLimiter component
+ * Remove `@internal` tag from secret vaults to allow them to be used directly outside the framework bundle and custom vaults to be added
 
 6.1
 ---

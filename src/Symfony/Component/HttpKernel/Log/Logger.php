@@ -48,12 +48,13 @@ class Logger extends AbstractLogger
             $minLevel = null === $output || 'php://stdout' === $output || 'php://stderr' === $output ? LogLevel::ERROR : LogLevel::WARNING;
 
             if (isset($_ENV['SHELL_VERBOSITY']) || isset($_SERVER['SHELL_VERBOSITY'])) {
-                switch ((int) ($_ENV['SHELL_VERBOSITY'] ?? $_SERVER['SHELL_VERBOSITY'])) {
-                    case -1: $minLevel = LogLevel::ERROR; break;
-                    case 1: $minLevel = LogLevel::NOTICE; break;
-                    case 2: $minLevel = LogLevel::INFO; break;
-                    case 3: $minLevel = LogLevel::DEBUG; break;
-                }
+                $minLevel = match ((int) ($_ENV['SHELL_VERBOSITY'] ?? $_SERVER['SHELL_VERBOSITY'])) {
+                    -1 => LogLevel::ERROR,
+                    1 => LogLevel::NOTICE,
+                    2 => LogLevel::INFO,
+                    3 => LogLevel::DEBUG,
+                    default => $minLevel,
+                };
             }
         }
 
@@ -96,7 +97,7 @@ class Logger extends AbstractLogger
                 } elseif ($val instanceof \DateTimeInterface) {
                     $replacements["{{$key}}"] = $val->format(\DateTime::RFC3339);
                 } elseif (\is_object($val)) {
-                    $replacements["{{$key}}"] = '[object '.\get_class($val).']';
+                    $replacements["{{$key}}"] = '[object '.$val::class.']';
                 } else {
                     $replacements["{{$key}}"] = '['.\gettype($val).']';
                 }

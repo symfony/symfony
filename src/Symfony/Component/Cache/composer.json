@@ -1,7 +1,7 @@
 {
     "name": "symfony/cache",
     "type": "library",
-    "description": "Provides an extended PSR-6, PSR-16 (and tags) implementation",
+    "description": "Provides extended PSR-6, PSR-16 (and tags) implementations",
     "keywords": ["caching", "psr6"],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -26,7 +26,7 @@
         "psr/log": "^1.1|^2|^3",
         "symfony/cache-contracts": "^1.1.7|^2|^3",
         "symfony/service-contracts": "^1.1|^2|^3",
-        "symfony/var-exporter": "^5.4|^6.0"
+        "symfony/var-exporter": "^6.2"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

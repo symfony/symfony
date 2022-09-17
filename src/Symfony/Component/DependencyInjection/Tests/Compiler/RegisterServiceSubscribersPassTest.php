@@ -382,7 +382,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->setAlias('stdClass $someService', 'some.service');
         $container->setAlias('stdClass $some_service', 'some.service');
         $container->setAlias('stdClass $anotherService', 'some.service');
-        $container->register('foo', \get_class($subscriber))
+        $container->register('foo', $subscriber::class)
             ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
             ->addTag('container.service_subscriber');
 
@@ -433,7 +433,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         };
 
         $container->setParameter('parameter.1', 'foobar');
-        $container->register('foo', \get_class($subscriber))
+        $container->register('foo', $subscriber::class)
             ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
             ->addTag('container.service_subscriber');
 

@@ -18,7 +18,7 @@ namespace Symfony\Component\Uid;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class UuidV6 extends Uuid
+class UuidV6 extends Uuid implements TimeBasedUidInterface
 {
     protected const TYPE = 6;
 
@@ -29,7 +29,7 @@ class UuidV6 extends Uuid
         if (null === $uuid) {
             $this->uid = static::generate();
         } else {
-            parent::__construct($uuid);
+            parent::__construct($uuid, true);
         }
     }
 

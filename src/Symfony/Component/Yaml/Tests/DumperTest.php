@@ -677,7 +677,7 @@ data:
     nested_inlined_multi_line_string: { inlined_multi_line: "foo\nbar\r\nempty line:\n\nbaz" }
 
 YAML
-);
+        );
         $this->assertSame($expected, $yml);
         $this->assertSame($data, $this->parser->parse($yml));
     }

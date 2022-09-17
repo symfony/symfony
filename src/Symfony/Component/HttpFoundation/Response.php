@@ -382,6 +382,7 @@ class Response
             litespeed_finish_request();
         } elseif (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             static::closeOutputBuffers(0, true);
+            flush();
         }
 
         return $this;
@@ -719,6 +720,9 @@ class Response
      */
     public function setExpires(\DateTimeInterface $date = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if (null === $date) {
             $this->headers->remove('Expires');
 
@@ -898,6 +902,9 @@ class Response
      */
     public function setLastModified(\DateTimeInterface $date = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if (null === $date) {
             $this->headers->remove('Last-Modified');
 
@@ -936,6 +943,9 @@ class Response
      */
     public function setEtag(string $etag = null, bool $weak = false): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if (null === $etag) {
             $this->headers->remove('Etag');
         } else {
@@ -1265,7 +1275,6 @@ class Response
         while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
             if ($flush) {
                 ob_end_flush();
-                flush();
             } else {
                 ob_end_clean();
             }

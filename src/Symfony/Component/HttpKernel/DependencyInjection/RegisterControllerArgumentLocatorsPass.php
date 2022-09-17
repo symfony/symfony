@@ -19,11 +19,11 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
  * Creates the service-locators required by ServiceValueResolver.
@@ -120,7 +120,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 $args = [];
                 foreach ($parameters as $p) {
                     /** @var \ReflectionParameter $p */
-                    $type = ltrim($target = (string) ProxyHelper::getTypeHint($r, $p), '\\');
+                    $type = preg_replace('/(^|[(|&])\\\\/', '\1', $target = ltrim(ProxyHelper::exportType($p) ?? '', '?'));
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
                     $autowireAttributes = $autowire ? $emptyAutowireAttributes : [];
 
@@ -183,7 +183,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 
                         $args[$p->name] = new Reference($erroredId, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE);
                     } else {
-                        $target = ltrim($target, '\\');
+                        $target = preg_replace('/(^|[(|&])\\\\/', '\1', $target);
                         $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, Target::parseName($p)) : new Reference($target, $invalidBehavior);
                     }
                 }

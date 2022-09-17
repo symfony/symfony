@@ -4,7 +4,10 @@ CHANGELOG
 6.2
 ---
 
-* Deprecate the `Security` class, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+ * Deprecate the `Security` class, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+ * Change the signature of `TokenStorageInterface::setToken()` to `setToken(?TokenInterface $token)`
+ * Deprecate calling `TokenStorage::setToken()` without arguments
+ * Add a `ChainUserChecker` to allow calling multiple user checkers for a firewall
 
 6.0
 ---

@@ -35,9 +35,6 @@ class ValidTest extends TestCase
         $this->assertNull($constraint->groups);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetaData(ValidDummy::class);

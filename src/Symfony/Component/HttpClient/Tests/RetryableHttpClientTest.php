@@ -187,4 +187,42 @@ class RetryableHttpClientTest extends TestCase
             $response->cancel();
         }
     }
+
+    public function testRetryWithDelay()
+    {
+        $retryAfter = '0.46';
+
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', [
+                    'http_code' => 503,
+                    'response_headers' => [
+                        'retry-after' => $retryAfter,
+                    ],
+                ]),
+                new MockResponse('', [
+                    'http_code' => 200,
+                ]),
+            ]),
+            new GenericRetryStrategy(),
+            1,
+            $logger = new class() extends TestLogger {
+                public $context = [];
+
+                public function log($level, $message, array $context = []): void
+                {
+                    $this->context = $context;
+                    parent::log($level, $message, $context);
+                }
+            }
+        );
+
+        $client->request('GET', 'http://example.com/foo-bar')->getContent();
+
+        $delay = $logger->context['delay'] ?? null;
+
+        $this->assertArrayHasKey('delay', $logger->context);
+        $this->assertNotNull($delay);
+        $this->assertSame((int) ($retryAfter * 1000), $delay);
+    }
 }

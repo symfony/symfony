@@ -406,23 +406,23 @@ class SvgRenderer {
 class Theme {
     constructor(element) {
         this.reservedCategoryColors = {
-            'default': '#777',
-            'section': '#999',
-            'event_listener': '#00b8f5',
-            'template': '#66cc00',
-            'doctrine': '#ff6633',
-            'messenger_middleware': '#bdb81e',
-            'controller.argument_value_resolver': '#8c5de6',
-            'http_client': '#ffa333',
+            'default': '#737373',
+            'section': '#a3a3a3',
+            'event_listener': '#54aeff',
+            'template': '#4ac26b',
+            'doctrine': '#fd8c73',
+            'messenger_middleware': '#ff8182',
+            'controller.argument_value_resolver': '#c297ff',
+            'http_client': '#d4a72c',
         };
 
         this.customCategoryColors = [
-            '#dbab09', // dark yellow
-            '#ea4aaa', // pink
-            '#964b00', // brown
-            '#22863a', // dark green
-            '#0366d6', // dark blue
-            '#17a2b8', // teal
+            '#d4a72c', // dark yellow
+            '#ffaba8', // light red
+            '#e6af05', // yellow
+            '#6fdd8b', // light green
+            '#76e3ea', // cyan
+            '#a475f9', // light purple
         ];
 
         this.getCategoryColor = this.getCategoryColor.bind(this);

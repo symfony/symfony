@@ -164,7 +164,7 @@ class XmlDescriptor extends Descriptor
             $routeXML->setAttribute('name', $name);
         }
 
-        $routeXML->setAttribute('class', \get_class($route));
+        $routeXML->setAttribute('class', $route::class);
 
         $routeXML->appendChild($pathXML = $dom->createElement('path'));
         $pathXML->setAttribute('regex', $route->compile()->getRegex());
@@ -269,7 +269,7 @@ class XmlDescriptor extends Descriptor
         } else {
             $dom->appendChild($serviceXML = $dom->createElement('service'));
             $serviceXML->setAttribute('id', $id);
-            $serviceXML->setAttribute('class', \get_class($service));
+            $serviceXML->setAttribute('class', $service::class);
         }
 
         return $dom;
@@ -324,7 +324,7 @@ class XmlDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $factoryXML->setAttribute('service', (string) $factory[0]);
                 } elseif ($factory[0] instanceof Definition) {
-                    throw new \InvalidArgumentException('Factory is not describable.');
+                    $factoryXML->setAttribute('service', sprintf('inline factory service (%s)', $factory[0]->getClass() ?? 'not configured'));
                 } else {
                     $factoryXML->setAttribute('class', $factory[0]);
                 }
@@ -577,7 +577,7 @@ class XmlDescriptor extends Descriptor
 
         if (method_exists($callable, '__invoke')) {
             $callableXML->setAttribute('type', 'object');
-            $callableXML->setAttribute('name', \get_class($callable));
+            $callableXML->setAttribute('name', $callable::class);
 
             return $dom;
         }

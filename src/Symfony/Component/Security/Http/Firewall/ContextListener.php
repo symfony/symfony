@@ -119,7 +119,7 @@ class ContextListener extends AbstractListener
 
         $this->logger?->debug('Read existing security token from the session.', [
             'key' => $this->sessionKey,
-            'token_class' => \is_object($token) ? \get_class($token) : null,
+            'token_class' => \is_object($token) ? $token::class : null,
         ]);
 
         if ($token instanceof TokenInterface) {
@@ -192,7 +192,7 @@ class ContextListener extends AbstractListener
 
         $userNotFoundByProvider = false;
         $userDeauthenticated = false;
-        $userClass = \get_class($user);
+        $userClass = $user::class;
 
         foreach ($this->userProviders as $provider) {
             if (!$provider instanceof UserProviderInterface) {
@@ -212,7 +212,7 @@ class ContextListener extends AbstractListener
                 if ($token instanceof AbstractToken && $this->hasUserChanged($user, $newToken)) {
                     $userDeauthenticated = true;
 
-                    $this->logger?->debug('Cannot refresh token because user has changed.', ['username' => $refreshedUser->getUserIdentifier(), 'provider' => \get_class($provider)]);
+                    $this->logger?->debug('Cannot refresh token because user has changed.', ['username' => $refreshedUser->getUserIdentifier(), 'provider' => $provider::class]);
 
                     continue;
                 }
@@ -220,7 +220,7 @@ class ContextListener extends AbstractListener
                 $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
-                    $context = ['provider' => \get_class($provider), 'username' => $refreshedUser->getUserIdentifier()];
+                    $context = ['provider' => $provider::class, 'username' => $refreshedUser->getUserIdentifier()];
 
                     if ($token instanceof SwitchUserToken) {
                         $originalToken = $token->getOriginalToken();
@@ -234,7 +234,7 @@ class ContextListener extends AbstractListener
             } catch (UnsupportedUserException) {
                 // let's try the next user provider
             } catch (UserNotFoundException $e) {
-                $this->logger?->warning('Username could not be found in the selected user provider.', ['username' => $e->getUserIdentifier(), 'provider' => \get_class($provider)]);
+                $this->logger?->warning('Username could not be found in the selected user provider.', ['username' => $e->getUserIdentifier(), 'provider' => $provider::class]);
 
                 $userNotFoundByProvider = true;
             }

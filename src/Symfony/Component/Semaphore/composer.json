@@ -26,6 +26,9 @@
     "require-dev": {
         "predis/predis": "~1.0"
     },
+    "conflict": {
+        "symfony/cache": "<6.2"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Semaphore\\": "" },
         "exclude-from-classmap": [

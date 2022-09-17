@@ -4,9 +4,12 @@ CHANGELOG
 6.2
 ---
 
-* Add support for constructor promoted properties to `Context` attribute
-* Add context option `PropertyNormalizer::NORMALIZE_VISIBILITY` with bitmask flags `PropertyNormalizer::NORMALIZE_PUBLIC`, `PropertyNormalizer::NORMALIZE_PROTECTED`, `PropertyNormalizer::NORMALIZE_PRIVATE`
-* Add method `withNormalizeVisibility` to `PropertyNormalizerContextBuilder`
+ * Add support for constructor promoted properties to `Context` attribute
+ * Add context option `PropertyNormalizer::NORMALIZE_VISIBILITY` with bitmask flags `PropertyNormalizer::NORMALIZE_PUBLIC`, `PropertyNormalizer::NORMALIZE_PROTECTED`, `PropertyNormalizer::NORMALIZE_PRIVATE`
+ * Add method `withNormalizeVisibility` to `PropertyNormalizerContextBuilder`
+ * Deprecate calling `AttributeMetadata::setSerializedName()`, `ClassMetadata::setClassDiscriminatorMapping()` without arguments
+ * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
+ * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
 
 6.1
 ---

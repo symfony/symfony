@@ -50,11 +50,11 @@ class TraceableEncoderTest extends TestCase
         $dataCollector
             ->expects($this->once())
             ->method('collectEncoding')
-            ->with($this->isType('string'), \get_class($encoder), $this->isType('float'));
+            ->with($this->isType('string'), $encoder::class, $this->isType('float'));
         $dataCollector
             ->expects($this->once())
             ->method('collectDecoding')
-            ->with($this->isType('string'), \get_class($decoder), $this->isType('float'));
+            ->with($this->isType('string'), $decoder::class, $this->isType('float'));
 
         (new TraceableEncoder($encoder, $dataCollector))->encode('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
         (new TraceableEncoder($decoder, $dataCollector))->decode('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);

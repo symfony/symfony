@@ -72,7 +72,7 @@
     <h2>Messages</h2>
 
     {% if collector.messages is empty %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No translations have been called.</p>
         </div>
     {% else %}
@@ -186,7 +186,7 @@
                 <td class="font-normal text-small text-bold nowrap">{{ message.domain }}</td>
                 <td class="font-normal text-small nowrap">{{ message.count }}</td>
                 <td>
-                    <span class="nowrap">{{ message.id }}</span>
+                    <span class="{{ message.id|length < 64 ? 'nowrap' }}">{{ message.id }}</span>
 
                     {% if message.transChoiceNumber is not null %}
                         <small class="newline">(pluralization is used)</small>

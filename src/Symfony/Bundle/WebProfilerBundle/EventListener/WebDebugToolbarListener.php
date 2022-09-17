@@ -85,7 +85,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
-                $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
+                $response->headers->set('X-Debug-Error', $e::class.': '.preg_replace('/\s+/', ' ', $e->getMessage()));
             }
         }
 
@@ -113,7 +113,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location')]));
+            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }

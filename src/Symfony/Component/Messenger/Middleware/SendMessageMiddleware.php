@@ -61,8 +61,8 @@ class SendMessageMiddleware implements MiddlewareInterface
                     $shouldDispatchEvent = false;
                 }
 
-                $this->logger->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => \get_class($sender)]);
-                $envelope = $sender->send($envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null)));
+                $this->logger->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => $sender::class]);
+                $envelope = $sender->send($envelope->with(new SentStamp($sender::class, \is_string($alias) ? $alias : null)));
             }
         }
 

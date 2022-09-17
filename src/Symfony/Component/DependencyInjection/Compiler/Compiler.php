@@ -52,10 +52,10 @@ class Compiler
     public function log(CompilerPassInterface $pass, string $message)
     {
         if (str_contains($message, "\n")) {
-            $message = str_replace("\n", "\n".\get_class($pass).': ', trim($message));
+            $message = str_replace("\n", "\n".$pass::class.': ', trim($message));
         }
 
-        $this->log[] = \get_class($pass).': '.$message;
+        $this->log[] = $pass::class.': '.$message;
     }
 
     public function getLog(): array

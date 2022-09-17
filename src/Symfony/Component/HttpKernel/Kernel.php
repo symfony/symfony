@@ -540,7 +540,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $bundlesMetadata = [];
 
         foreach ($this->bundles as $name => $bundle) {
-            $bundles[$name] = \get_class($bundle);
+            $bundles[$name] = $bundle::class;
             $bundlesMetadata[$name] = [
                 'path' => $bundle->getPath(),
                 'namespace' => $bundle->getNamespace(),

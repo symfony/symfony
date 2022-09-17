@@ -74,7 +74,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
             throw new NoSuchMetadataException(sprintf('Cannot create metadata for non-objects. Got: "%s".', get_debug_type($value)));
         }
 
-        $class = ltrim(\is_object($value) ? \get_class($value) : $value, '\\');
+        $class = ltrim(\is_object($value) ? $value::class : $value, '\\');
 
         if (isset($this->loadedClasses[$class])) {
             return $this->loadedClasses[$class];
@@ -139,7 +139,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
             return false;
         }
 
-        $class = ltrim(\is_object($value) ? \get_class($value) : $value, '\\');
+        $class = ltrim(\is_object($value) ? $value::class : $value, '\\');
 
         return class_exists($class) || interface_exists($class, false);
     }

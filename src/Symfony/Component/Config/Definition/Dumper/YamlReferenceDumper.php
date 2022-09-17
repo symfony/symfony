@@ -100,7 +100,7 @@ class YamlReferenceDumper
         } elseif ($node instanceof EnumNode) {
             $comments[] = 'One of '.implode('; ', array_map('json_encode', $node->getValues()));
             $default = $node->hasDefaultValue() ? Inline::dump($node->getDefaultValue()) : '~';
-        } elseif (VariableNode::class === \get_class($node) && \is_array($example)) {
+        } elseif (VariableNode::class === $node::class && \is_array($example)) {
             // If there is an array example, we are sure we dont need to print a default value
             $default = '';
         } else {

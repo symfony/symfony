@@ -107,8 +107,16 @@ class XmlFileLoader extends FileLoader
 
     private function parseParameters(\DOMDocument $xml, string $file, \DOMNode $root = null)
     {
-        if ($parameters = $this->getChildren($root ?? $xml->documentElement, 'parameters')) {
+        $node = $root ?? $xml->documentElement;
+
+        if ($parameters = $this->getChildren($node, 'parameters')) {
             $this->container->getParameterBag()->add($this->getArgumentsAsPhp($parameters[0], 'parameter', $file));
+        }
+
+        if ($buildParameters = $this->getChildren($node, 'build-parameters')) {
+            foreach ($this->getArgumentsAsPhp($buildParameters[0], 'parameter', $file) as $parameter => $value) {
+                $this->container->setBuildParameter($parameter, $value);
+            }
         }
     }
 

@@ -32,13 +32,17 @@ class ParametersConfigurator extends AbstractConfigurator
     /**
      * @return $this
      */
-    final public function set(string $name, mixed $value): static
+    final public function set(string $name, mixed $value, bool $buildOnly = false): static
     {
         if ($value instanceof Expression) {
             throw new InvalidArgumentException(sprintf('Using an expression in parameter "%s" is not allowed.', $name));
         }
 
-        $this->container->setParameter($name, static::processValue($value, true));
+        if ($buildOnly) {
+            $this->container->setBuildParameter($name, static::processValue($value, true));
+        } else {
+            $this->container->setParameter($name, static::processValue($value, true));
+        }
 
         return $this;
     }

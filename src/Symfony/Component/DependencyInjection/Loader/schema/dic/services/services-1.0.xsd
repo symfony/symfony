@@ -30,6 +30,10 @@
         <xsd:group ref="foreign" />
       </xsd:sequence>
       <xsd:sequence minOccurs="0">
+        <xsd:element name="build-parameters" type="parameters" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
         <xsd:element name="parameters" type="parameters" />
         <xsd:group ref="foreign" />
       </xsd:sequence>

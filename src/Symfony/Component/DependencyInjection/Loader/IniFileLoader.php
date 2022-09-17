@@ -46,6 +46,16 @@ class IniFileLoader extends FileLoader
             }
         }
 
+        if (isset($result['build_parameters']) && \is_array($result['build_parameters'])) {
+            foreach ($result['build_parameters'] as $key => $value) {
+                if (\is_array($value)) {
+                    $this->container->setBuildParameter($key, array_map([$this, 'phpize'], $value));
+                } else {
+                    $this->container->setBuildParameter($key, $this->phpize($value));
+                }
+            }
+        }
+
         if ($this->env && \is_array($result['parameters@'.$this->env] ?? null)) {
             foreach ($result['parameters@'.$this->env] as $key => $value) {
                 $this->container->setParameter($key, $this->phpize($value));

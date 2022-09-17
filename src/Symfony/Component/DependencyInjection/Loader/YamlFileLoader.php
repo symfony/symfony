@@ -162,6 +162,17 @@ class YamlFileLoader extends FileLoader
             }
         }
 
+        // build parameters
+        if (isset($content['build_parameters'])) {
+            if (!\is_array($content['build_parameters'])) {
+                throw new InvalidArgumentException(sprintf('The "build_parameters" key should contain an array in "%s". Check your YAML syntax.', $path));
+            }
+
+            foreach ($content['build_parameters'] as $key => $value) {
+                $this->container->setBuildParameter($key, $this->resolveServices($value, $path, true));
+            }
+        }
+
         // extensions
         $this->loadFromExtensions($content);
 

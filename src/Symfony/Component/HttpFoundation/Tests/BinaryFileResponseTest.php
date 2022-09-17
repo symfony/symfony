@@ -396,6 +396,21 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Content-Length'));
     }
 
+    public function testPrepareNotAddingContentTypeHeaderIfNoContentResponse()
+    {
+        $request = Request::create('/');
+        $request->headers->set('If-Modified-Since', date('D, d M Y H:i:s').' GMT');
+
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
+        $response->setLastModified(new \DateTimeImmutable('-1 day'));
+        $response->isNotModified($request);
+
+        $response->prepare($request);
+
+        $this->assertSame(BinaryFileResponse::HTTP_NOT_MODIFIED, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('Content-Type'));
+    }
+
     protected function provideResponse()
     {
         return new BinaryFileResponse(__DIR__.'/../README.md', 200, ['Content-Type' => 'application/octet-stream']);

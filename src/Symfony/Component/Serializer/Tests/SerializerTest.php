@@ -1169,9 +1169,6 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testCollectDenormalizationErrorsWithEnumConstructor()
     {
         $serializer = new Serializer(
@@ -1209,9 +1206,6 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testNoCollectDenormalizationErrorsWithWrongEnum()
     {
         $serializer = new Serializer(

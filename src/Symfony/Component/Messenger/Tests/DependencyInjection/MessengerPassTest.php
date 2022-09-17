@@ -38,6 +38,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -47,6 +48,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\TaggedDummyHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\UnionBuiltinTypeArgumentHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\UnionTypeArgumentHandler;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class MessengerPassTest extends TestCase
@@ -531,6 +534,43 @@ class MessengerPassTest extends TestCase
         $container = $this->getContainerBuilder();
         $container
             ->register(BuiltinArgumentTypeHandler::class, BuiltinArgumentTypeHandler::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testUnionTypeArgumentsTypeHandler()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container
+            ->register(UnionTypeArgumentHandler::class, UnionTypeArgumentHandler::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertArrayHasKey(ChildDummyMessage::class, $handlersMapping);
+        $this->assertArrayHasKey(DummyMessage::class, $handlersMapping);
+        $this->assertHandlerDescriptor($container, $handlersMapping, ChildDummyMessage::class, [UnionTypeArgumentHandler::class]);
+        $this->assertHandlerDescriptor($container, $handlersMapping, DummyMessage::class, [UnionTypeArgumentHandler::class]);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testUnionBuiltinArgumentTypeHandler()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Invalid handler service "%s": type-hint of argument "$message" in method "%s::__invoke()" must be a class , "string|int" given.', UnionBuiltinTypeArgumentHandler::class, UnionBuiltinTypeArgumentHandler::class));
+        $container = $this->getContainerBuilder();
+        $container
+            ->register(UnionBuiltinTypeArgumentHandler::class, UnionBuiltinTypeArgumentHandler::class)
             ->addTag('messenger.message_handler')
         ;
 

@@ -540,9 +540,6 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeArgumentsTypeHandler()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
@@ -561,9 +558,6 @@ class MessengerPassTest extends TestCase
         $this->assertHandlerDescriptor($container, $handlersMapping, DummyMessage::class, [UnionTypeArgumentHandler::class]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionBuiltinArgumentTypeHandler()
     {
         $this->expectException(RuntimeException::class);

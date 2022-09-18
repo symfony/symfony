@@ -259,7 +259,15 @@ EOF;
                 foreach ($ids as $id) {
                     $c .= '    '.$this->doExport($id)." => true,\n";
                 }
-                $files['removed-ids.php'] = $c."];\n";
+                $files['removed-service-ids.php'] = $c."];\n";
+            }
+            if ($ids = array_keys($this->container->buildParameters)) {
+                sort($ids);
+                $c = "<?php\n\nreturn [\n";
+                foreach ($ids as $id) {
+                    $c .= '    '.$this->doExport($id)." => true,\n";
+                }
+                $files['removed-build-parameters.php'] = $c."];\n";
             }
 
             if (!$this->inlineFactories) {
@@ -1275,6 +1283,7 @@ EOF;
 
 EOF;
         $code .= $this->addRemovedIds();
+        $code .= $this->addRemovedParameters();
 
         if ($this->asFiles && !$this->inlineFactories) {
             $code .= <<<'EOF'
@@ -1350,7 +1359,7 @@ EOF;
             return '';
         }
         if ($this->asFiles) {
-            $code = "require \$this->containerDir.\\DIRECTORY_SEPARATOR.'removed-ids.php'";
+            $code = "require \$this->containerDir.\\DIRECTORY_SEPARATOR.'removed-service-ids.php'";
         } else {
             $code = '';
             $ids = array_keys($ids);
@@ -1368,6 +1377,34 @@ EOF;
         return <<<EOF
 
     public function getRemovedIds(): array
+    {
+        return {$code};
+    }
+
+EOF;
+    }
+
+    private function addRemovedParameters(): string
+    {
+        $ids = array_keys($this->container->buildParameters);
+        if (!$ids) {
+            return '';
+        }
+        if ($this->asFiles) {
+            $code = "require \$this->containerDir.\\DIRECTORY_SEPARATOR.'removed-build-parameters.php'";
+        } else {
+            $code = '';
+            sort($ids);
+            foreach ($ids as $id) {
+                $code .= '            '.$this->doExport($id)." => true,\n";
+            }
+
+            $code = "[\n{$code}        ]";
+        }
+
+        return <<<EOF
+
+    public function getRemovedParameters(): array
     {
         return {$code};
     }
@@ -1520,6 +1557,9 @@ EOF;
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
                 throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: "%s".', $resolvedKey));
             }
+            if (isset($this->container->buildParameters[$key])) {
+                continue;
+            }
             $hasEnum = false;
             $export = $this->exportParameters([$value], '', 12, $hasEnum);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
@@ -1541,6 +1581,9 @@ EOF;
         }
 
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
+            if (isset($this->getRemovedParameters()[$name])) {
+                throw new \LogicException(sprintf('Build parameter "%s" cannot be accessed at runtime.', $name));
+            }
             throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
@@ -1567,14 +1610,21 @@ EOF;
     public function getParameterBag(): ParameterBagInterface
     {
         if (null === $this->parameterBag) {
-            $parameters = $this->parameters;
+            $removedParameters = $this->getRemovedParameters();
+            $parameters = array_diff_key($this->parameters, $removedParameters);
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
+                if (isset($removedParameters[$name])) {
+                    continue;
+                }
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
             }
             foreach ($this->buildParameters as $name => $value) {
+                if (isset($removedParameters[$name])) {
+                    continue;
+                }
                 $parameters[$name] = $value;
             }
-            $this->parameterBag = new FrozenParameterBag($parameters);
+            $this->parameterBag = new FrozenParameterBag($parameters, $removedParameters);
         }
 
         return $this->parameterBag;
@@ -1930,7 +1980,7 @@ EOF;
             $value = $this->container->getParameter($name);
             $dumpedValue = $this->dumpValue($value, false);
 
-            if (!$value || !\is_array($value)) {
+            if (!$value || !\is_array($value) || isset($this->container->buildParameters[$name])) {
                 return $dumpedValue;
             }
 

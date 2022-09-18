@@ -304,6 +304,14 @@ class Container implements ContainerInterface, ResetInterface
     }
 
     /**
+     * Gets parameter names that existed at compile time.
+     */
+    public function getRemovedParameters(): array
+    {
+        return [];
+    }
+
+    /**
      * Camelizes a string.
      */
     public static function camelize(string $id): string

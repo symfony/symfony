@@ -28,10 +28,19 @@ class FrozenParameterBag extends ParameterBag
      *
      * @param array $parameters An array of parameters
      */
-    public function __construct(array $parameters = [])
+    public function __construct(array $parameters = [], private array $buildParameters = [])
     {
         $this->parameters = $parameters;
         $this->resolved = true;
+    }
+
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|null
+    {
+        if (isset($this->buildParameters[$name])) {
+            throw new LogicException(sprintf('Build parameter "%s" cannot be accessed at runtime.', $name));
+        }
+
+        return parent::get($name);
     }
 
     public function clear()

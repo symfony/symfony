@@ -135,9 +135,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private array $removedBindingIds = [];
 
     /**
-     * @var string[]
+     * @internal
+     *
+     * @var array<string, false>
      */
-    private array $buildParameters = [];
+    public array $buildParameters = [];
 
     private const INTERNAL_TYPES = [
         'int' => true,
@@ -695,7 +697,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function setBuildParameter(string $parameter, array|bool|string|int|float|\UnitEnum|null $value): void
     {
         $this->parameterBag->set($parameter, $value);
-        $this->buildParameters[] = $parameter;
+        $this->buildParameters[$parameter] = false;
     }
 
     public function removeParameter(string $parameter): void
@@ -753,10 +755,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             $this->envPlaceholders = $bag->getEnvPlaceholders();
-        }
-
-        foreach ($this->buildParameters as $parameter) {
-            $this->parameterBag->remove($parameter);
         }
 
         parent::compile();

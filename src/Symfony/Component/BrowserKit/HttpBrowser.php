@@ -82,7 +82,35 @@ class HttpBrowser extends AbstractBrowser
         $fields = $request->getParameters();
 
         if ($uploadedFiles = $this->getUploadedFiles($request->getFiles())) {
-            $part = new FormDataPart(array_replace_recursive($fields, $uploadedFiles));
+            $values = array_replace_recursive($fields, $uploadedFiles);
+
+            $preparedValues = [];
+            array_walk($values, $prepare = static function ($item, $key, array $previousKeys = null) use (&$preparedValues, &$prepare) {
+                if (null !== $previousKeys && (\is_int($key) || \is_int($previousKeys[0]))) {
+                    $oldKey = array_pop($previousKeys);
+                    $key = sprintf('%s[%s]', $oldKey, $key);
+                }
+
+                $previousKeys[] = $key;
+
+                if (\is_array($item)) {
+                    array_walk($item, $prepare, $previousKeys);
+
+                    return;
+                }
+
+                $refValue = &$preparedValues;
+                foreach ($previousKeys as $previousKey) {
+                    if (!\array_key_exists($previousKey, $refValue)) {
+                        $refValue[$previousKey] = [];
+                    }
+                    $refValue = &$refValue[$previousKey];
+                }
+
+                $refValue = $item;
+            });
+
+            $part = new FormDataPart($preparedValues);
 
             return [$part->bodyToIterable(), $part->getPreparedHeaders()->toArray()];
         }

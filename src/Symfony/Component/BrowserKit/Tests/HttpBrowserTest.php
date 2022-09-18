@@ -105,9 +105,9 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->willReturn($this->createMock(ResponseInterface::class));
 
         $browser = new HttpBrowser($client);
-        $path = tempnam(sys_get_temp_dir(), 'http');
-        file_put_contents($path, 'my_file');
-        $browser->request('POST', 'http://example.com/', ['foo' => ['bar' => 'foo2']], ['foo' => ['file' => ['tmp_name' => $path, 'name' => 'foo']]]);
+        $browser->request('POST', 'http://example.com/', ['foo' => ['bar' => 'foo2']], ['foo' => [
+            'file' => $this->getUploadedFile('my_file'),
+        ]]);
     }
 
     public function testMultiPartRequestWithNormalFlatArray()
@@ -147,6 +147,55 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request('POST', 'http://example.com/', [], [
             'form[file1]' => $this->getUploadedFile('file1'),
             'form[file2]' => $this->getUploadedFile('file2'),
+        ]);
+    }
+
+    public function testMultiPartRequestWithBracketedArrayWithIntegers()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', 'http://example.com/', $this->callback(function ($options) {
+                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
+                $this->assertInstanceOf(\Generator::class, $options['body']);
+                $values = implode('', iterator_to_array($options['body'], false));
+                $this->assertStringContainsString('name="foo[0][bar]"', $values);
+                $this->assertStringContainsString('bar_val', $values);
+                $this->assertStringContainsString('name="foo[0][baz]"', $values);
+                $this->assertStringContainsString('baz_val', $values);
+                $this->assertStringContainsString('name="foo[1][bar]"', $values);
+                $this->assertStringContainsString('bar_val2', $values);
+                $this->assertStringContainsString('name="1[qux]"', $values);
+                $this->assertStringContainsString('qux_val', $values);
+                $this->assertStringContainsString('name="1[0][quux]"', $values);
+                $this->assertStringContainsString('quux_val', $values);
+                $this->assertStringContainsString('name="1[corge][0]"', $values);
+                $this->assertStringContainsString('corge_0_val', $values);
+                $this->assertStringContainsString('name="foo[1][file]"', $values);
+                $this->assertStringContainsString('my_file', $values);
+
+                return true;
+            }))
+            ->willReturn($this->createMock(ResponseInterface::class));
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [
+            'foo' => [
+                0 => ['bar' => 'bar_val', 'baz' => 'baz_val'],
+                1 => ['bar' => 'bar_val2'],
+            ],
+            1 => [
+                'qux' => 'qux_val',
+                ['quux' => 'quux_val'],
+                'corge' => [
+                    'corge_0_val',
+                ],
+            ],
+        ], [
+            'foo' => [
+                1 => ['file' => $this->getUploadedFile('my_file')],
+            ],
         ]);
     }
 

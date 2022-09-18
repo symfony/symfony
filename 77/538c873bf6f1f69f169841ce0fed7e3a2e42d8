@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-09-16T08:57:58Z
+
+I would love to simplify the `RequestMatcher` class by deprecating all the `match*` methods but I'm not sure it's worth it.

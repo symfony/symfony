@@ -1,0 +1,16 @@
+config:
+  source:
+    path: "src/"
+  test:
+    path: "tests/"
+  xray_hotspot:
+    code_lines_threshold: 200
+    complexity_threshold: 20
+tasks:
+  - xray_hotspot
+
+rules:
+  - rule: "All commit messages must be between 5 and 100 characters"
+    mandatory: false
+    conditions:
+      - every(github.pr_commits, 'x -> x.message.length() >= 5 && x.message.length() <= 100')

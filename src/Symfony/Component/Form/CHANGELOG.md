@@ -9,7 +9,7 @@ CHANGELOG
  * Deprecate calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()` without arguments
  * Change the signature of `FormConfigBuilderInterface::setDataMapper()` to `setDataMapper(?DataMapperInterface)`
  * Change the signature of `FormInterface::setParent()` to `setParent(?self)`
- * Add a `placeholder_disabled` option to `ChoiceType` (resolves #22318, #38958)
+ * Add a `placeholder_disabled` option to `ChoiceType`
 
 6.1
 ---

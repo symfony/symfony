@@ -324,7 +324,7 @@ trait LazyGhostTrait
 
     public function __destruct()
     {
-        $state = Registry::$states[$this->lazyObjectId ?? null] ?? null;
+        $state = Registry::$states[$this->lazyObjectId ?? ''] ?? null;
 
         try {
             if ($state && !\in_array($state->status, [LazyObjectState::STATUS_INITIALIZED_FULL, LazyObjectState::STATUS_INITIALIZED_PARTIAL], true)) {

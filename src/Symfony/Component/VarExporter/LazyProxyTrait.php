@@ -96,7 +96,8 @@ trait LazyProxyTrait
             if (null === $scope || isset($propertyScopes["\0$scope\0$name"])) {
                 if (isset($this->lazyObjectId)) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
-                        $this->lazyObjectReal = (Registry::$states[$this->lazyObjectId]->initializer)();
+                        $state = Registry::$states[$this->lazyObjectId] ?? null;
+                        $this->lazyObjectReal = $state ? ($state->initializer)() : null;
 
                         return $this->lazyObjectReal;
                     }
@@ -196,7 +197,9 @@ trait LazyProxyTrait
             if (null === $scope || isset($propertyScopes["\0$scope\0$name"])) {
                 if (isset($this->lazyObjectId)) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
-                        return null !== $this->lazyObjectReal = (Registry::$states[$this->lazyObjectId]->initializer)();
+                        $state = Registry::$states[$this->lazyObjectId] ?? null;
+
+                        return null !== $this->lazyObjectReal = $state ? ($state->initializer)() : null;
                     }
                     if (isset($this->lazyObjectReal)) {
                         $instance = $this->lazyObjectReal;

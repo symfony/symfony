@@ -33,7 +33,7 @@ class ProxyHelperTest extends TestCase
 
         foreach ($methods as $method) {
             $expected = substr($source[$method->getStartLine() - 1], $method->isAbstract() ? 13 : 4, -(1 + $method->isAbstract()));
-            $expected = str_replace(['.', ' .  .  . ', '"', '\0'], [' . ', '...', "'", '\'."\0".\''], $expected);
+            $expected = str_replace(['.', ' .  .  . ', '\'$a\', \'$a\n\', "\$a\n"'], [' . ', '...', '\'$a\', "\$a\\\n", "\$a\n"'], $expected);
             $expected = str_replace('Bar', '\\'.Bar::class, $expected);
             $expected = str_replace('self', '\\'.TestForProxyHelper::class, $expected);
 
@@ -226,6 +226,10 @@ abstract class TestForProxyHelper
     abstract protected function foo7();
 
     public static function foo8()
+    {
+    }
+
+    public function foo9($a = self::BOB, $b = ['$a', '$a\n', "\$a\n"], $c = ['$a', '$a\n', "\$a\n", new \stdClass()])
     {
     }
 }

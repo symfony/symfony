@@ -16,6 +16,7 @@ use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildMagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\LazyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\TestClass;
 
@@ -204,11 +205,12 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
-        $this->assertTrue($instance->isLazyObjectInitialized());
+        $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(["\0".TestClass::class."\0lazyObjectId", 'public'], array_keys((array) $instance));
         $this->assertSame(1, $counter);
 
         $instance->initializeLazyObject();
+        $this->assertTrue($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
         $this->assertSame(6, $counter);
 
@@ -225,11 +227,12 @@ class LazyGhostTraitTest extends TestCase
             return 234;
         });
 
-        $instance->public = 123;
+        $r = new \ReflectionProperty($instance, 'public');
+        $r->setValue($instance, 123);
 
         $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(234, $instance->publicReadonly);
-        $this->assertTrue($instance->isLazyObjectInitialized());
+        $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
 
         $this->assertTrue($instance->resetLazyObject());
@@ -265,5 +268,21 @@ class LazyGhostTraitTest extends TestCase
 
         $instance->public = 12;
         $this->assertSame(12, $instance->public);
+    }
+
+    public function testLazyClass()
+    {
+        $obj = new LazyClass(fn ($proxy) => $proxy->public = 123);
+
+        $this->assertSame(123, $obj->public);
+    }
+
+    public function testReflectionPropertyGetValue()
+    {
+        $obj = TestClass::createLazyGhost(fn ($proxy) => $proxy->__construct());
+
+        $r = new \ReflectionProperty($obj, 'private');
+
+        $this->assertSame(-3, $r->getValue($obj));
     }
 }

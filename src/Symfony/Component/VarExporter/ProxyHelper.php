@@ -219,16 +219,11 @@ final class ProxyHelper
     {
         $parameters = [];
         foreach ($function->getParameters() as $param) {
-            if (\in_array($default = rtrim(substr(explode('$'.$param->name.' = ', (string) $param, 2)[1] ?? '', 0, -2)), ['<default>', 'NULL'], true)) {
-                $default = 'null';
-            } elseif (str_contains($default, '\\') || str_contains($default, '::') || str_contains($default, '(')) {
-                $default = self::fixDefault($default, $function);
-            }
             $parameters[] = ($param->getAttributes(\SensitiveParameter::class) ? '#[\SensitiveParameter] ' : '')
                 .($withParameterTypes && $param->hasType() ? self::exportType($param).' ' : '')
                 .($param->isPassedByReference() ? '&' : '')
                 .($param->isVariadic() ? '...' : '').'$'.$param->name
-                .($param->isOptional() && !$param->isVariadic() ? ' = '.$default : '');
+                .($param->isOptional() && !$param->isVariadic() ? ' = '.self::exportDefault($param) : '');
         }
 
         $signature = 'function '.($function->returnsReference() ? '&' : '')
@@ -320,25 +315,37 @@ final class ProxyHelper
         return $propertyScopes;
     }
 
-    private static function fixDefault(string $default, \ReflectionFunctionAbstract $function): string
+    private static function exportDefault(\ReflectionParameter $param): string
     {
+        $default = rtrim(substr(explode('$'.$param->name.' = ', (string) $param, 2)[1] ?? '', 0, -2));
+
+        if (\in_array($default, ['<default>', 'NULL'], true)) {
+            return 'null';
+        }
+        if (str_ends_with($default, "...'") && preg_match("/^'(?:[^'\\\\]*+(?:\\\\.)*+)*+'$/", $default)) {
+            return VarExporter::export($param->getDefaultValue());
+        }
+        if (false === strpbrk($default, "\\:('")) {
+            return $default;
+        }
+
         $regexp = "/(\"(?:[^\"\\\\]*+(?:\\\\.)*+)*+\"|'(?:[^'\\\\]*+(?:\\\\.)*+)*+')/";
         $parts = preg_split($regexp, $default, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY);
 
         $regexp = '/([\( ]|^)([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z0-9_\x7f-\xff]++)*+)(?!: )/';
-        $callback = $function instanceof \ReflectionMethod
+        $callback = ($class = $param->getDeclaringClass())
             ? fn ($m) => $m[1].match ($m[2]) {
                 'new' => 'new',
-                'self' => '\\'.$function->getDeclaringClass()->name,
+                'self' => '\\'.$class->name,
                 'namespace\\parent',
-                'parent' => ($parent = $function->getDeclaringClass()->getParentClass()) ? '\\'.$parent->name : 'parent',
+                'parent' => ($parent = $class->getParentClass()) ? '\\'.$parent->name : 'parent',
                 default => '\\'.$m[2],
             }
             : fn ($m) => $m[1].(\in_array($m[2], ['new', 'self', 'parent'], true) ? '' : '\\').$m[2];
 
         return implode('', array_map(fn ($part) => match ($part[0]) {
             '"' => $part, // for internal classes only
-            "'" => str_replace("\0", '\'."\0".\'', $part),
+            "'" => false !== strpbrk($part, "\\\0\r\n") ? '"'.substr(str_replace(['$', "\0", "\r", "\n"], ['\$', '\0', '\r', '\n'], $part), 1, -1).'"' : $part,
             default => preg_replace_callback($regexp, $callback, $part),
         }, $parts));
     }

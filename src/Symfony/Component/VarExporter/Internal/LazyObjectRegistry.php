@@ -61,7 +61,7 @@ class LazyObjectRegistry
         }
 
         foreach ($propertyScopes as $key => [$scope, $name, $readonlyScope]) {
-            $propertyScopes[$k = "\0$scope\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = null !== $readonlyScope ? $name : null;
+            $propertyScopes[$k = "\0$scope\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = $name;
 
             if ($k === $key && "\0$class\0lazyObjectId" !== $k) {
                 $classProperties[$readonlyScope ?? $scope][$name] = $key;
@@ -146,6 +146,6 @@ class LazyObjectRegistry
             return null;
         }
 
-        return $scope;
+        return \ReflectionProperty::class === $scope ? $class : $scope;
     }
 }

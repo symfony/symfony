@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-19T06:40:43Z
+
+As described in https://github.com/composer/composer/issues/11068, we cannot use this flag on deps=low jobs.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-19T07:05:42Z
+
+Shouldn't we use it only when testing unreleased PHP versions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-19T07:40:46Z
+
+We strive to have deps (ours at least) use `>=` for the php constraint.
+
+We should be using `--ignore-platform-req=php+` on all jobs for the same reason why we run with `--minimum-stability=dev`: to spot as early as possible when one of our deps needs help supporting an upcoming version of PHP.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-19T07:58:59Z
+
+Using `--ignore-platform-req=php+` on stable versions of PHP will not help that (what helps that is always having a job running against PHP nightly, which would indeed need to use that option).
+On the other hand, using `--ignore-platform-req=php+` on stable versions would *hide* the fact that some deps are marked as incompatible with existing stable PHP version, which would then make them unusable in projects unless they use `--ignore-platform-req=php+` themselves.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-19T08:41:25Z
+
+ACK, updated. I saw that config on doctrine/migrations, they might want to adjust /cc @derrabus
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-09-19T08:47:26Z
+
+I think, in doctrine/migrations this setting is just fine. I'd like to keep the build simple there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-19T09:04:01Z
+
+> I think, in doctrine/migrations this setting is just fine. I'd like to keep the build simple there.
+
+Fine to me; just know that the deps=low job installs never tested combinations.

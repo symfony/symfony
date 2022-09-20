@@ -724,6 +724,7 @@
         <xsd:attribute name="allow-revalidate" type="xsd:boolean" />
         <xsd:attribute name="stale-while-revalidate" type="xsd:integer" />
         <xsd:attribute name="stale-if-error" type="xsd:integer" />
+        <xsd:attribute name="terminate-on-cache-hit" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:simpleType name="http_cache_trace_levels">

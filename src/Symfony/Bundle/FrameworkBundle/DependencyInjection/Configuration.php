@@ -269,6 +269,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('allow_revalidate')->end()
                         ->integerNode('stale_while_revalidate')->end()
                         ->integerNode('stale_if_error')->end()
+                        ->booleanNode('terminate_on_cache_hit')->end()
                     ->end()
                 ->end()
             ->end()

@@ -206,4 +206,14 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->resolve();
         $this->assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
     }
+
+    public function testGetEnum()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->set('ENUM_VAR', StringBackedEnum::Bar);
+        $value = $bag->get('ENUM_VAR');
+
+        $this->assertInstanceOf(StringBackedEnum::class, $value);
+        $this->assertEquals(StringBackedEnum::Bar, $value);
+    }
 }

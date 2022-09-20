@@ -211,9 +211,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('ENUM_VAR', StringBackedEnum::Bar);
-        $value = $bag->get('ENUM_VAR');
-
-        $this->assertInstanceOf(StringBackedEnum::class, $value);
-        $this->assertEquals(StringBackedEnum::Bar, $value);
+        $this->assertInstanceOf(StringBackedEnum::class, $bag->get('ENUM_VAR'));
+        $this->assertEquals(StringBackedEnum::Bar, $bag->get('ENUM_VAR'));
     }
 }

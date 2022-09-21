@@ -834,6 +834,22 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                 });
             },
 
+            initializeMailerTable: function() {
+                const emailRows = document.querySelectorAll('.mailer-email-summary-table-row');
+
+                emailRows.forEach((emailRow) => {
+                    emailRow.addEventListener('click', () => {
+                        emailRow.addEventListener('click', () => {
+                            emailRows.forEach((row) => row.classList.remove('active'));
+                            emailRow.classList.add('active');
+
+                            document.querySelectorAll('.mailer-email-details').forEach((emailDetails) => emailDetails.style.display = 'none');
+                            document.querySelector(emailRow.getAttribute('data-target')).style.display = 'block';
+                        });
+                    });
+                });
+            },
+
             updateLogsTable: function() {
                 const selectedType = document.querySelector('#log-filter-type input:checked').value;
                 const priorities = document.querySelectorAll('#log-filter-priority input');

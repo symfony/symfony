@@ -41,7 +41,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
 
             $ulid = strtoupper($ulid);
             if ('' === $ulid) {
-                throw new \InvalidArgumentException('Empty ULID');
+                throw new \InvalidArgumentException('Empty ULID.');
             }
 
             $this->uid = $ulid;
@@ -207,7 +207,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         ), 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
 
         if ('' === $ulid) {
-            throw new \InvalidArgumentException('Empty ULID');
+            throw new \InvalidArgumentException('Empty ULID.');
         }
 
         return $ulid;

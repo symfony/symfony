@@ -105,7 +105,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
             $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
         }
 
-        $uuid = substr_replace(sprintf('%012s-%04x-%04x-%04x%04x%04x',
+        return substr_replace(sprintf('%012s-%04x-%04x-%04x%04x%04x',
             $time,
             0x7000 | (self::$rand[1] << 2) | (self::$rand[2] >> 14),
             0x8000 | (self::$rand[2] & 0x3FFF),
@@ -113,11 +113,5 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
             self::$rand[4],
             self::$rand[5],
         ), '-', 8, 0);
-
-        if ('' === $uuid) {
-            throw new \InvalidArgumentException('Empty UUID.');
-        }
-
-        return $uuid;
     }
 }

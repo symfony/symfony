@@ -74,10 +74,6 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
             $uuid = substr($uuid, 0, 24).substr($node->uid, 24);
         }
 
-        if ('' === $uuid) {
-            throw new \InvalidArgumentException('Empty UUID.');
-        }
-
         return $uuid;
     }
 }

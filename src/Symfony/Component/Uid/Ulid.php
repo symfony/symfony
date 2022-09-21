@@ -39,12 +39,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
                 throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
             }
 
-            $ulid = strtoupper($ulid);
-            if ('' === $ulid) {
-                throw new \InvalidArgumentException('Empty ULID.');
-            }
-
-            $this->uid = $ulid;
+            $this->uid = strtoupper($ulid);
         }
     }
 

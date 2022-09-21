@@ -43,6 +43,9 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
         return substr($this->uid, 24);
     }
 
+    /**
+     * @return non-empty-string
+     */
     public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
     {
         $uuidV1 = UuidV1::generate($time, $node);
@@ -61,6 +64,11 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
             self::$node = sprintf('%06x%06x', ($seed[0] ^ $node[1]) | 0x010000, $seed[1] ^ $node[2]);
         }
 
-        return $uuid.self::$node;
+        $composedUuid = $uuid.self::$node;
+        if ('' === $composedUuid) {
+            throw new \InvalidArgumentException('Empty UUID.');
+        }
+
+        return $composedUuid;
     }
 }

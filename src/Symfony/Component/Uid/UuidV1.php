@@ -22,10 +22,18 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
 
     private static string $clockSeq;
 
+    /**
+     * @param non-empty-string|null $uuid
+     */
     public function __construct(string $uuid = null)
     {
         if (null === $uuid) {
-            $this->uid = uuid_create(static::TYPE);
+            $uid = uuid_create(static::TYPE);
+            if ('' === $uid) {
+                throw new \InvalidArgumentException('Empty UUID.');
+            }
+
+            $this->uid = $uid;
         } else {
             parent::__construct($uuid, true);
         }
@@ -41,6 +49,9 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
         return uuid_mac($this->uid);
     }
 
+    /**
+     * @return non-empty-string
+     */
     public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
     {
         $uuid = !$time || !$node ? uuid_create(static::TYPE) : parent::NIL;
@@ -66,6 +77,10 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
 
         if ($node) {
             $uuid = substr($uuid, 0, 24).substr($node->uid, 24);
+        }
+
+        if ('' === $uuid) {
+            throw new \InvalidArgumentException('Empty UUID.');
         }
 
         return $uuid;

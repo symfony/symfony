@@ -39,7 +39,12 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
                 throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
             }
 
-            $this->uid = strtoupper($ulid);
+            $ulid = strtoupper($ulid);
+            if ('' === $ulid) {
+                throw new \InvalidArgumentException('Empty ULID');
+            }
+
+            $this->uid = $ulid;
         }
     }
 
@@ -141,6 +146,9 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -3, 0));
     }
 
+    /**
+     * @return non-empty-string
+     */
     public static function generate(\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {
@@ -190,12 +198,18 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             );
         }
 
-        return strtr(sprintf('%010s%04s%04s%04s%04s',
+        $ulid = strtr(sprintf('%010s%04s%04s%04s%04s',
             $time,
             base_convert(self::$rand[1], 10, 32),
             base_convert(self::$rand[2], 10, 32),
             base_convert(self::$rand[3], 10, 32),
             base_convert(self::$rand[4], 10, 32)
         ), 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
+
+        if ('' === $ulid) {
+            throw new \InvalidArgumentException('Empty ULID');
+        }
+
+        return $ulid;
     }
 }

@@ -18,6 +18,8 @@ abstract class AbstractUid implements \JsonSerializable
 {
     /**
      * The identifier in its canonic representation.
+     *
+     * @var non-empty-string
      */
     protected $uid;
 
@@ -152,6 +154,9 @@ abstract class AbstractUid implements \JsonSerializable
         return (\strlen($this->uid) - \strlen($other->uid)) ?: ($this->uid <=> $other->uid);
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function __toString(): string
     {
         return $this->uid;

@@ -35,7 +35,12 @@ class Uuid extends AbstractUid
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
         }
 
-        $this->uid = strtolower($uuid);
+        $uuid = strtolower($uuid);
+        if ('' === $uuid) {
+            throw new \InvalidArgumentException('Empty UUID.');
+        }
+
+        $this->uid = $uuid;
 
         if ($checkVariant && !\in_array($this->uid[19], ['8', '9', 'a', 'b'], true)) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));

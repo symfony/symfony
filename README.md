@@ -2,6 +2,8 @@
     <img src="https://symfony.com/logos/symfony_black_02.svg">
 </a></p>
 
+# This is a Code Observability test
+
 [Symfony][1] is a **PHP framework** for web and console applications and a set
 of reusable **PHP components**. Symfony is used by thousands of web
 applications and most of the [popular PHP projects][2].

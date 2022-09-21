@@ -362,11 +362,15 @@ class DotenvTest extends TestCase
         $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
 
         $dotenv = new Dotenv(true);
-        $dotenv->populate(['HTTP_TEST_ENV_VAR' => 'env_value']);
+        $dotenv->populate(['HTTP_TEST_ENV_VAR' => 'env_value', 'HTTP_FOO' => 'bar']);
 
         $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
         $this->assertSame('env_value', $_ENV['HTTP_TEST_ENV_VAR']);
         $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
+
+        $this->assertSame('bar', getenv('HTTP_FOO'));
+        $this->assertSame('bar', $_ENV['HTTP_FOO']);
+        $this->assertSame('bar', $_SERVER['HTTP_FOO']);
     }
 
     public function testEnvVarIsOverriden()

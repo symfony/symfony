@@ -150,7 +150,7 @@ final class Dotenv
             }
 
             $_ENV[$name] = $value;
-            if ($notHttpName) {
+            if ($notHttpName || false === \array_key_exists($name, $_SERVER)) {
                 $_SERVER[$name] = $value;
             }
 

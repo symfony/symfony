@@ -22,9 +22,6 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
 
     private static string $clockSeq;
 
-    /**
-     * @param non-empty-string|null $uuid
-     */
     public function __construct(string $uuid = null)
     {
         if (null === $uuid) {

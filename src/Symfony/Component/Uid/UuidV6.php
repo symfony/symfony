@@ -64,11 +64,6 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
             self::$node = sprintf('%06x%06x', ($seed[0] ^ $node[1]) | 0x010000, $seed[1] ^ $node[2]);
         }
 
-        $composedUuid = $uuid.self::$node;
-        if ('' === $composedUuid) {
-            throw new \InvalidArgumentException('Empty UUID.');
-        }
-
-        return $composedUuid;
+        return $uuid.self::$node;
     }
 }

@@ -82,7 +82,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ['456daEFb-5AA6-41B5-8DBC-068B05A8B201'], // Version 4 UUID in mixed case
             ['456daEFb-5AA6-41B5-8DBC-068B05A8B201', [Uuid::V4_RANDOM]],
             ['1eb01932-4c0b-6570-aa34-d179cdf481ae', [Uuid::V6_SORTABLE]],
-            ['216fff40-98d9-71e3-a5e2-0800200c9a66', [Uuid::V7_SORTABLE]],
+            ['216fff40-98d9-71e3-a5e2-0800200c9a66', [Uuid::V7_MONOTONIC]],
             ['216fff40-98d9-81e3-a5e2-0800200c9a66', [Uuid::V8_CUSTOM]],
         ];
     }

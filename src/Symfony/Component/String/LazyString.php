@@ -34,7 +34,7 @@ class LazyString implements \Stringable, \JsonSerializable
             if (null !== $arguments) {
                 if (!\is_callable($callback)) {
                     $callback[0] = $callback[0]();
-                    $callback[1] = $callback[1] ?? '__invoke';
+                    $callback[1] ??= '__invoke';
                 }
                 $value = $callback(...$arguments);
                 $callback = self::getPrettyName($callback);

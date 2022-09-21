@@ -46,7 +46,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null, bool $appendOnly = false)
     {
         $this->appendOnly = $appendOnly;
-        self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
+        self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);
         $this->includeHandler = static function ($type, $msg, $file, $line) {
@@ -56,7 +56,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
     public static function isSupported()
     {
-        self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
+        self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
 
         return \function_exists('opcache_invalidate') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) || filter_var(\ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOL));
     }

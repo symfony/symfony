@@ -209,7 +209,7 @@ class Connection
             $options['host'] = $parsedUrl['host'] ?? $options['host'];
             $options['port'] = $parsedUrl['port'] ?? $options['port'];
             // See: https://github.com/phpredis/phpredis/#auth
-            $options['auth'] = $options['auth'] ?? (null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user));
+            $options['auth'] ??= null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
 
             $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
             $options['stream'] = $pathParts[1] ?? $options['stream'];

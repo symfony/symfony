@@ -42,8 +42,6 @@ Serializer
 
  * Deprecate `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
  * Deprecate `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
- * Deprecate `ContextAwareEncoderInterface`, use `EncoderInterface` instead
- * Deprecate `ContextAwareDecoderInterface`, use `DecoderInterface` instead
  * Deprecate supporting denormalization for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
  * Deprecate denormalizing to an abstract class in `UidNormalizer`
 

@@ -101,16 +101,11 @@ EOF
             throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s".', FilesystemLoader::class));
         }
 
-        switch ($input->getOption('format')) {
-            case 'text':
-                $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter);
-                break;
-            case 'json':
-                $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter);
-                break;
-            default:
-                throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
-        }
+        match ($input->getOption('format')) {
+            'text' => $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter),
+            'json' => $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter),
+            default => throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format'))),
+        };
 
         return 0;
     }

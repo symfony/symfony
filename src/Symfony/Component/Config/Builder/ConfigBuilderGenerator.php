@@ -109,22 +109,13 @@ public function NAME(): string
         }
 
         foreach ($node->getChildren() as $child) {
-            switch (true) {
-                case $child instanceof ScalarNode:
-                    $this->handleScalarNode($child, $class);
-                    break;
-                case $child instanceof PrototypedArrayNode:
-                    $this->handlePrototypedArrayNode($child, $class, $namespace);
-                    break;
-                case $child instanceof VariableNode:
-                    $this->handleVariableNode($child, $class);
-                    break;
-                case $child instanceof ArrayNode:
-                    $this->handleArrayNode($child, $class, $namespace);
-                    break;
-                default:
-                    throw new \RuntimeException(sprintf('Unknown node "%s".', $child::class));
-            }
+            match (true) {
+                $child instanceof ScalarNode => $this->handleScalarNode($child, $class),
+                $child instanceof PrototypedArrayNode => $this->handlePrototypedArrayNode($child, $class, $namespace),
+                $child instanceof VariableNode => $this->handleVariableNode($child, $class),
+                $child instanceof ArrayNode => $this->handleArrayNode($child, $class, $namespace),
+                default => throw new \RuntimeException(sprintf('Unknown node "%s".', $child::class)),
+            };
         }
     }
 

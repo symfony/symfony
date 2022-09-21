@@ -22,11 +22,9 @@ class AccessTokenHandler implements AccessTokenHandlerInterface
 
     public function getUserIdentifierFrom(string $accessToken): string
     {
-        switch ($accessToken) {
-            case 'VALID_ACCESS_TOKEN':
-                return 'dunglas';
-            default:
-                throw new BadCredentialsException('Invalid credentials.');
-        }
+        return match ($accessToken) {
+            'VALID_ACCESS_TOKEN' => 'dunglas',
+            default => throw new BadCredentialsException('Invalid credentials.'),
+        };
     }
 }

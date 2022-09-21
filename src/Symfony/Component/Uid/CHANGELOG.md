@@ -7,6 +7,7 @@ CHANGELOG
  * Add `UuidV7` and `UuidV8`
  * Add `TimeBasedUidInterface` to describe UIDs that embed a timestamp
  * Add `MaxUuid` and `MaxUlid`
+ * `AbstractUid::__toString()` guaranteed to return a non-empty string
 
 5.4
 ---

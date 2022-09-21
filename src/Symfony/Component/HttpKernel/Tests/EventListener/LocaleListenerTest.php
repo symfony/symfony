@@ -120,7 +120,7 @@ class LocaleListenerTest extends TestCase
     public function testRequestPreferredLocaleFromAcceptLanguageHeader()
     {
         $request = Request::create('/');
-        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+        $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
 
         $listener = new LocaleListener($this->requestStack, 'de', null, true, ['de', 'fr']);
         $event = $this->getEvent($request);
@@ -133,7 +133,7 @@ class LocaleListenerTest extends TestCase
     public function testRequestSecondPreferredLocaleFromAcceptLanguageHeader()
     {
         $request = Request::create('/');
-        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+        $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
 
         $listener = new LocaleListener($this->requestStack, 'de', null, true, ['de', 'en']);
         $event = $this->getEvent($request);
@@ -146,7 +146,7 @@ class LocaleListenerTest extends TestCase
     public function testDontUseAcceptLanguageHeaderIfNotEnabled()
     {
         $request = Request::create('/');
-        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+        $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
 
         $listener = new LocaleListener($this->requestStack, 'de', null, false, ['de', 'en']);
         $event = $this->getEvent($request);
@@ -159,7 +159,7 @@ class LocaleListenerTest extends TestCase
     public function testRequestUnavailablePreferredLocaleFromAcceptLanguageHeader()
     {
         $request = Request::create('/');
-        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+        $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
 
         $listener = new LocaleListener($this->requestStack, 'de', null, true, ['de', 'it']);
         $event = $this->getEvent($request);
@@ -172,7 +172,7 @@ class LocaleListenerTest extends TestCase
     public function testRequestNoLocaleFromAcceptLanguageHeader()
     {
         $request = Request::create('/');
-        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+        $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
 
         $listener = new LocaleListener($this->requestStack, 'de', null, true);
         $event = $this->getEvent($request);
@@ -186,7 +186,7 @@ class LocaleListenerTest extends TestCase
     {
         $request = Request::create('/');
         $request->attributes->set('_locale', 'it');
-        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
+        $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
 
         $listener = new LocaleListener($this->requestStack, 'de', null, true, ['fr', 'en']);
         $event = $this->getEvent($request);

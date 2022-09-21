@@ -51,7 +51,7 @@ class Uuid extends Constraint
     public const V4_RANDOM = 4;
     public const V5_SHA1 = 5;
     public const V6_SORTABLE = 6;
-    public const V7_SORTABLE = 7;
+    public const V7_MONOTONIC = 7;
     public const V8_CUSTOM = 8;
 
     public const ALL_VERSIONS = [
@@ -61,7 +61,7 @@ class Uuid extends Constraint
         self::V4_RANDOM,
         self::V5_SHA1,
         self::V6_SORTABLE,
-        self::V7_SORTABLE,
+        self::V7_MONOTONIC,
         self::V8_CUSTOM,
     ];
 

@@ -30,8 +30,6 @@ final class CsvEncoderContextBuilder implements ContextBuilderInterface
      *
      * Must be a single character.
      *
-     * @param non-empty-string|null $delimiter
-     *
      * @throws InvalidArgumentException
      */
     public function withDelimiter(?string $delimiter): static
@@ -47,8 +45,6 @@ final class CsvEncoderContextBuilder implements ContextBuilderInterface
      * Configures the field enclosure character.
      *
      * Must be a single character.
-     *
-     * @param non-empty-string|null $enclosure
      *
      * @throws InvalidArgumentException
      */

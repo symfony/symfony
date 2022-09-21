@@ -721,7 +721,7 @@ final class Path
     }
 
     /**
-     * @return non-empty-string[]
+     * @return string[]
      */
     private static function findCanonicalParts(string $root, string $pathWithoutRoot): array
     {

@@ -527,7 +527,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->lPop(...\func_get_args());
     }
 
-    public function lPos($key, $value, $options = null): array|bool|int
+    public function lPos($key, $value, $options = null): array|bool|int|null
     {
         return $this->lazyObjectReal->lPos(...\func_get_args());
     }

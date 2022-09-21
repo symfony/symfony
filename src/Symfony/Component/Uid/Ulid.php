@@ -193,18 +193,12 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             );
         }
 
-        $ulid = strtr(sprintf('%010s%04s%04s%04s%04s',
+        return strtr(sprintf('%010s%04s%04s%04s%04s',
             $time,
             base_convert(self::$rand[1], 10, 32),
             base_convert(self::$rand[2], 10, 32),
             base_convert(self::$rand[3], 10, 32),
             base_convert(self::$rand[4], 10, 32)
         ), 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
-
-        if ('' === $ulid) {
-            throw new \InvalidArgumentException('Empty ULID.');
-        }
-
-        return $ulid;
     }
 }

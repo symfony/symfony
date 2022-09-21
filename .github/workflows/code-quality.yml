@@ -1,0 +1,12 @@
+on: [pull_request]
+
+jobs:
+  analyse_code_job:
+    runs-on: ubuntu-latest
+    name: Code Observability analysis
+    steps:
+    - uses: actions/checkout@v1
+    - name: Analyse the code step
+      uses: codeobservability/client-action@master
+      with:
+        co-repo-key: ${{ secrets.CO_REPO_KEY }}

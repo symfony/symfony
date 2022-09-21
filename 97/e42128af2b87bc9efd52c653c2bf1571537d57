@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-21T19:58:30Z
+
+Ther's another one in src/Symfony/Component/PropertyInfo/Tests/Fixtures/PseudoTypesDummy.php and two others in src/Symfony/Component/Serializer/Context/Encoder/CsvEncoderContextBuilder.php isn't it?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-21T20:05:13Z
+
+This PR targets 5.4 but `CsvEncoderContextBuilder` is 6.1+, I'm planing to remove them while merging up.
+And `PseudoTypesDummy` serves a test case actually: `PhpStanTypeHelper` from property-info reads these `non-empty-*` annotations

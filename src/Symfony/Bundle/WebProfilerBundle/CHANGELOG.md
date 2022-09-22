@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * added intercept redirects configuration from frontend toolbar
+
 6.1
 ---
 

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
@@ -39,6 +40,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 {
     public const DISABLED = 1;
     public const ENABLED = 2;
+
+    private const INTERCEPT_REDIRECTS_COOKIE = '_sf_intercept_redirects';
 
     private Environment $twig;
     private ?UrlGeneratorInterface $urlGenerator;
@@ -71,6 +74,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         }
 
         $this->mode = $mode;
+    }
+
+    private function isInterceptRedirectsRequested(Request $request): bool
+    {
+        return match ($request->cookies->get(self::INTERCEPT_REDIRECTS_COOKIE)) {
+            'yes' => true,
+            'no' => false,
+            default => $this->interceptRedirects,
+        };
     }
 
     public function onKernelResponse(ResponseEvent $event)
@@ -107,7 +119,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat()) {
+        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->isInterceptRedirectsRequested($request) && 'html' === $request->getRequestFormat()) {
             if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
@@ -116,6 +128,11 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location')]));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
+        }
+
+        // set default intercept redirects cookie
+        if (!$request->cookies->has(self::INTERCEPT_REDIRECTS_COOKIE)) {
+            $response->headers->setCookie(Cookie::create(self::INTERCEPT_REDIRECTS_COOKIE, $this->interceptRedirects ? 'yes' : 'no', httpOnly: false));
         }
 
         if (self::DISABLED === $this->mode

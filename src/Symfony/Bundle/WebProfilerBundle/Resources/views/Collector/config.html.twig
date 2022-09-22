@@ -51,6 +51,34 @@
                     <span class="sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
                 </div>
             {% endif %}
+
+            <div class="sf-toolbar-info-piece">
+                <b>
+                    <label for="sf-intercept-redirects-control">
+                        Intercept Redirects
+                    </label>
+                </b>
+                <input type="checkbox" id="sf-intercept-redirects-control">
+
+                <script>
+                    {{ source('@WebProfiler/Collector/config.js') }}
+
+                    function setupInterceptRedirects() {
+                        new InterceptRedirects(
+                            document.getElementById('sf-intercept-redirects-control'),
+                            new InterceptRedirectCookie('_sf_intercept_redirects'),
+                        );
+                    }
+
+                    if (document.readyStage !== 'loading') {
+                        setupInterceptRedirects();
+                    } else {
+                        window.addEventListener('DOMContentLoaded', function onLoad() {
+                            setupInterceptRedirects();
+                        });
+                    }
+                </script>
+            </div>
         </div>
 
         <div class="sf-toolbar-info-group">

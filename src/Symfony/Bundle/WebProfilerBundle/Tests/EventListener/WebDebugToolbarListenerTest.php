@@ -351,4 +351,69 @@ class WebDebugToolbarListenerTest extends TestCase
 
         return $templating;
     }
+
+    /**
+     * @dataProvider provideInterceptRedirectCookies
+     */
+    public function testSetsInterceptRedirectEnabledCookie(bool $interceptRedirects, string $cookieValue): void
+    {
+        $response = new Response('Some content', 200);
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $event = new ResponseEvent($this->createMock(Kernel::class), new Request([], [], []), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), $interceptRedirects);
+        $listener->onKernelResponse($event);
+
+        $this->assertCount(1, $response->headers->getCookies());
+        $cookie = $response->headers->getCookies()[0];
+        $this->assertSame('_sf_intercept_redirects', $cookie->getName());
+        $this->assertSame($cookieValue, $cookie->getValue());
+        $this->assertSame('/', $cookie->getPath());
+        $this->assertFalse($cookie->isHttpOnly());
+    }
+
+    public function provideInterceptRedirectCookies(): array
+    {
+        return [
+            [true, 'yes'],
+            [false, 'no'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideRedirects
+     */
+    public function testInterceptRedirectsCookieOverwriteDisabledIntercepts(int $statusCode): void
+    {
+        $response = new Response('Some content', $statusCode);
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $request = new Request(
+            cookies: ['_sf_intercept_redirects' => 'yes'],
+        );
+        $event = new ResponseEvent($this->createMock(Kernel::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock('Redirection'), interceptRedirects: false);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Redirection', $response->getContent());
+    }
+
+    /**
+     * @dataProvider provideRedirects
+     */
+    public function testInterceptRedirectsCookieOverwriteEnabledIntercepts(int $statusCode): void
+    {
+        $response = new Response('Some content', $statusCode);
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $request = new Request(
+            cookies: ['_sf_intercept_redirects' => 'no'],
+        );
+        $event = new ResponseEvent($this->createMock(Kernel::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock('Redirection'), interceptRedirects: true);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals($statusCode, $response->getStatusCode());
+    }
 }

@@ -133,6 +133,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     /**
      * @depends testToolbarIsInjected
+     *
      * @dataProvider provideRedirects
      */
     public function testToolbarIsNotInjectedOnRedirection($statusCode)
@@ -355,7 +356,7 @@ class WebDebugToolbarListenerTest extends TestCase
     /**
      * @dataProvider provideInterceptRedirectCookies
      */
-    public function testSetsInterceptRedirectEnabledCookie(bool $interceptRedirects, string $cookieValue): void
+    public function testSetsInterceptRedirectEnabledCookie(bool $interceptRedirects, string $cookieValue)
     {
         $response = new Response('Some content', 200);
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -383,7 +384,7 @@ class WebDebugToolbarListenerTest extends TestCase
     /**
      * @dataProvider provideRedirects
      */
-    public function testInterceptRedirectsCookieOverwriteDisabledIntercepts(int $statusCode): void
+    public function testInterceptRedirectsCookieOverwriteDisabledIntercepts(int $statusCode)
     {
         $response = new Response('Some content', $statusCode);
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -402,7 +403,7 @@ class WebDebugToolbarListenerTest extends TestCase
     /**
      * @dataProvider provideRedirects
      */
-    public function testInterceptRedirectsCookieOverwriteEnabledIntercepts(int $statusCode): void
+    public function testInterceptRedirectsCookieOverwriteEnabledIntercepts(int $statusCode)
     {
         $response = new Response('Some content', $statusCode);
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');

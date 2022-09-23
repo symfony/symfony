@@ -405,6 +405,8 @@ class FFICasterTest extends TestCase
           }
         }
         OUTPUT, \FFI::addr($pointer));
+
+        \FFI::free($struct);
     }
 
     public function testCastComplexType()

@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-08-31T16:30:15Z
+
+Can you add a test case that breaks before your patch?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-08-31T17:27:21Z
+
+@chalasr done.
+
+While updating `testRequestAttributeLocaleNotOverridenFromAcceptLanguageHeader` I stumbled into a weird behavior which I think was caused by the `Accept-Language` header set the wrong way, so I updated tests doing this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-09-20T18:28:01Z
+
+@MatTheCat Can you create a PR on 4.4 for the tests fix?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-09-21T07:30:35Z
+
+@fabpot see https://github.com/symfony/symfony/pull/47638 (concerned tests were added by https://github.com/symfony/symfony/pull/43108 on 5.4). Should I copy its changes on this PR? Else tests will fail until it is merged and rebased :thinking:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-21T13:21:00Z
+
+Looks like because #47638's description included "Fix #47377(some comment)", github closed this PR automatically when merging #47638.
+
+> Should I copy its changes on this PR? Else tests will fail until it is merged and rebased 🤔
+
+Rebase unlocked, #47638 has been merged up to 6.2.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-09-21T13:30:20Z
+
+Damn okay sorry :sweat_smile:
+
+PR rebased!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-21T13:31:39Z
+
+No worries, I'd say it should be improved on Github :)
+Can you please add a small entry in the framework-bundle CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-09-21T13:36:34Z
+
+> Set locale from request rather that default locale if "framework.enabled_locales" is empty and "framework.set_locale_from_accept_language" is true
+
+WDYT? Don’t really know how to make it shorter.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-21T14:25:19Z
+
+Works for me!

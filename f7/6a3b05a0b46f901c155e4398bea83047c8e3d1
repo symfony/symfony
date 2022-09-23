@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-23T16:33:55Z
+
+The CHANGELOG entry introduced in https://github.com/symfony/symfony/pull/47377 needs to be removed when merging this up to 6.2.

@@ -46,18 +46,13 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        switch ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
-            case self::NORMALIZATION_FORMAT_CANONICAL:
-                return (string) $object;
-            case self::NORMALIZATION_FORMAT_BASE58:
-                return $object->toBase58();
-            case self::NORMALIZATION_FORMAT_BASE32:
-                return $object->toBase32();
-            case self::NORMALIZATION_FORMAT_RFC4122:
-                return $object->toRfc4122();
-        }
-
-        throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]));
+        return match ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
+            self::NORMALIZATION_FORMAT_CANONICAL => (string) $object,
+            self::NORMALIZATION_FORMAT_BASE58 => $object->toBase58(),
+            self::NORMALIZATION_FORMAT_BASE32 => $object->toBase32(),
+            self::NORMALIZATION_FORMAT_RFC4122 => $object->toRfc4122(),
+            default => throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY])),
+        };
     }
 
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool

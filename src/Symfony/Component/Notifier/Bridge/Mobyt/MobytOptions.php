@@ -38,20 +38,12 @@ final class MobytOptions implements MessageOptionsInterface
     public static function fromNotification(Notification $notification): self
     {
         $options = new self();
-        switch ($notification->getImportance()) {
-            case Notification::IMPORTANCE_HIGH:
-            case Notification::IMPORTANCE_URGENT:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH);
-                break;
-            case Notification::IMPORTANCE_MEDIUM:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_MEDIUM);
-                break;
-            case Notification::IMPORTANCE_LOW:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_LOW);
-                break;
-            default:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH);
-        }
+        match ($notification->getImportance()) {
+            Notification::IMPORTANCE_HIGH, Notification::IMPORTANCE_URGENT => $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH),
+            Notification::IMPORTANCE_MEDIUM => $options->messageType(self::MESSAGE_TYPE_QUALITY_MEDIUM),
+            Notification::IMPORTANCE_LOW => $options->messageType(self::MESSAGE_TYPE_QUALITY_LOW),
+            default => $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH),
+        };
 
         return $options;
     }

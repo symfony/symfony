@@ -179,18 +179,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
      */
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
     {
-        switch ($strategy) {
-            case MainConfiguration::STRATEGY_AFFIRMATIVE:
-                return new Definition(AffirmativeStrategy::class, [$allowIfAllAbstainDecisions]);
-            case MainConfiguration::STRATEGY_CONSENSUS:
-                return new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]);
-            case MainConfiguration::STRATEGY_UNANIMOUS:
-                return new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]);
-            case MainConfiguration::STRATEGY_PRIORITY:
-                return new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]);
-        }
-
-        throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
+        return match ($strategy) {
+            MainConfiguration::STRATEGY_AFFIRMATIVE => new Definition(AffirmativeStrategy::class, [$allowIfAllAbstainDecisions]),
+            MainConfiguration::STRATEGY_CONSENSUS => new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]),
+            MainConfiguration::STRATEGY_UNANIMOUS => new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]),
+            MainConfiguration::STRATEGY_PRIORITY => new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]),
+            default => throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy)),
+        };
     }
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container)

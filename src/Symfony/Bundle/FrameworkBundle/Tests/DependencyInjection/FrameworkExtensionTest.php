@@ -2268,26 +2268,14 @@ abstract class FrameworkExtensionTest extends TestCase
             $parentDefinition = $container->findDefinition($parentId);
         } while ($parentDefinition instanceof ChildDefinition);
 
-        switch ($adapter) {
-            case 'cache.adapter.apcu':
-                $this->assertSame(ApcuAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.app':
-            case 'cache.adapter.filesystem':
-                $this->assertSame(FilesystemAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.psr6':
-                $this->assertSame(ProxyAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.redis':
-                $this->assertSame(RedisAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.array':
-                $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass());
-                break;
-            default:
-                $this->fail('Unresolved adapter: '.$adapter);
-        }
+        match ($adapter) {
+            'cache.adapter.apcu' => $this->assertSame(ApcuAdapter::class, $parentDefinition->getClass()),
+            'cache.app', 'cache.adapter.filesystem' => $this->assertSame(FilesystemAdapter::class, $parentDefinition->getClass()),
+            'cache.adapter.psr6' => $this->assertSame(ProxyAdapter::class, $parentDefinition->getClass()),
+            'cache.adapter.redis' => $this->assertSame(RedisAdapter::class, $parentDefinition->getClass()),
+            'cache.adapter.array' => $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass()),
+            default => $this->fail('Unresolved adapter: '.$adapter),
+        };
     }
 }
 

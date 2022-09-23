@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by tigitz at 2022-09-21T20:04:22Z
+
+@wouterj I understand your POV, however to me it brings value in code readability but also reliability since match is a strict comparison. But you obviously know better than me if it's worth it as I don't realize the impact of the increased maintenance.
+
+If that's ok with you I'll let other core members confirm your stance and make the appropriate modifications. Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-21T20:11:47Z
+
+Personally I find the code more readable when using match. The change is fine to me.

@@ -392,12 +392,6 @@ class FFICasterTest extends TestCase
         }
         OUTPUT, \FFI::addr($struct));
 
-        $this->assertDumpEquals(<<<'OUTPUT'
-        FFI\CData<struct <anonymous>**> size 8 align 8 {
-          cdata: null
-        }
-        OUTPUT, \FFI::addr(\FFI::addr($struct)));
-
         // Save the pointer as variable so that
         // it is not cleaned up by the GC
         $pointer = \FFI::addr($struct);

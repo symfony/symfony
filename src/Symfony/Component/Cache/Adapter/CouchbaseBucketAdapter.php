@@ -141,17 +141,17 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
     private static function initOptions(array $options): array
     {
-        $options['username'] = $options['username'] ?? '';
-        $options['password'] = $options['password'] ?? '';
-        $options['operationTimeout'] = $options['operationTimeout'] ?? 0;
-        $options['configTimeout'] = $options['configTimeout'] ?? 0;
-        $options['configNodeTimeout'] = $options['configNodeTimeout'] ?? 0;
-        $options['n1qlTimeout'] = $options['n1qlTimeout'] ?? 0;
-        $options['httpTimeout'] = $options['httpTimeout'] ?? 0;
-        $options['configDelay'] = $options['configDelay'] ?? 0;
-        $options['htconfigIdleTimeout'] = $options['htconfigIdleTimeout'] ?? 0;
-        $options['durabilityInterval'] = $options['durabilityInterval'] ?? 0;
-        $options['durabilityTimeout'] = $options['durabilityTimeout'] ?? 0;
+        $options['username'] ??= '';
+        $options['password'] ??= '';
+        $options['operationTimeout'] ??= 0;
+        $options['configTimeout'] ??= 0;
+        $options['configNodeTimeout'] ??= 0;
+        $options['n1qlTimeout'] ??= 0;
+        $options['httpTimeout'] ??= 0;
+        $options['configDelay'] ??= 0;
+        $options['htconfigIdleTimeout'] ??= 0;
+        $options['durabilityInterval'] ??= 0;
+        $options['durabilityTimeout'] ??= 0;
 
         return $options;
     }

@@ -67,7 +67,7 @@ final class ExpoTransport extends AbstractTransport
 
         $options['title'] = $message->getSubject();
         $options['body'] = $message->getContent();
-        $options['data'] = $options['data'] ?? [];
+        $options['data'] ??= [];
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [

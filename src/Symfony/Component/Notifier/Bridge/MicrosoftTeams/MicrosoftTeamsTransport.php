@@ -64,7 +64,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
 
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
 
-        $options['text'] = $options['text'] ?? $message->getSubject();
+        $options['text'] ??= $message->getSubject();
 
         $path = $message->getRecipientId() ?? $this->path;
         $endpoint = sprintf('https://%s%s', $this->getEndpoint(), $path);

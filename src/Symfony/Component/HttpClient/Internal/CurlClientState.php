@@ -38,7 +38,7 @@ final class CurlClientState extends ClientState
 
     public function __construct(int $maxHostConnections, int $maxPendingPushes)
     {
-        self::$curlVersion = self::$curlVersion ?? curl_version();
+        self::$curlVersion ??= curl_version();
 
         $this->handle = curl_multi_init();
         $this->dnsCache = new DnsCache();

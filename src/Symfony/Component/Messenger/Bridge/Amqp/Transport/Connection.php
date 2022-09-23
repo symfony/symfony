@@ -329,8 +329,8 @@ class Connection
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
         $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
-        $attributes['delivery_mode'] = $attributes['delivery_mode'] ?? 2;
-        $attributes['timestamp'] = $attributes['timestamp'] ?? time();
+        $attributes['delivery_mode'] ??= 2;
+        $attributes['timestamp'] ??= time();
 
         $exchange->publish(
             $body,

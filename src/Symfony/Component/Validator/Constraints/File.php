@@ -152,10 +152,10 @@ class File extends Constraint
         ];
         if (ctype_digit((string) $maxSize)) {
             $this->maxSize = (int) $maxSize;
-            $this->binaryFormat = $this->binaryFormat ?? false;
+            $this->binaryFormat ??= false;
         } elseif (preg_match('/^(\d++)('.implode('|', array_keys($factors)).')$/i', $maxSize, $matches)) {
             $this->maxSize = $matches[1] * $factors[$unit = strtolower($matches[2])];
-            $this->binaryFormat = $this->binaryFormat ?? (2 === \strlen($unit));
+            $this->binaryFormat ??= 2 === \strlen($unit);
         } else {
             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size.', $maxSize));
         }

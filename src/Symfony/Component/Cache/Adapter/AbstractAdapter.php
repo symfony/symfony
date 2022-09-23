@@ -94,7 +94,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             $opcache->setLogger($logger);
         }
 
-        if (!self::$apcuSupported = self::$apcuSupported ?? ApcuAdapter::isSupported()) {
+        if (!self::$apcuSupported ??= ApcuAdapter::isSupported()) {
             return $opcache;
         }
 

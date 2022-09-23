@@ -118,7 +118,13 @@
 
     <div class="metrics">
         <div class="metric">
-            <span class="value">{{ collector.symfonyversion }}</span>
+            <span class="value">
+                {{ collector.symfonyversion }}
+
+                {% if collector.symfonylts %}
+                    <abbr class="config-symfony-version-lts" title="This is a Long-Term Support version">(LTS)</abbr>
+                {% endif %}
+            </span>
             <span class="label">Symfony version</span>
         </div>
 
@@ -137,33 +143,39 @@
         {% endif %}
     </div>
 
-    {% set symfony_status = { dev: 'Unstable Version', stable: 'Stable Version', eom: 'Maintenance Ended', eol: 'Version Expired' } %}
+    {% set symfony_status = { dev: 'In Development', stable: 'Maintained', eom: 'Security Fixes Only', eol: 'Unmaintained' } %}
     {% set symfony_status_class = { dev: 'warning', stable: 'success', eom: 'warning', eol: 'error' } %}
-    <table>
-        <thead class="small">
-            <tr>
-                <th>Symfony Status</th>
-                <th>Bugs {{ collector.symfonystate in ['eom', 'eol'] ? 'were' : 'are' }} fixed until</th>
-                <th>Security issues {{ collector.symfonystate == 'eol' ? 'were' : 'are' }} fixed until</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="font-normal">
-                    <span class="label status-{{ symfony_status_class[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</span>
-                    {% if collector.symfonylts %}
-                        &nbsp; <span class="label status-success">Long-Term Support</span>
-                    {% endif %}
-                </td>
-                <td class="font-normal">{{ collector.symfonyeom }}</td>
-                <td class="font-normal">{{ collector.symfonyeol }}</td>
-                <td class="font-normal">
-                    <a href="https://symfony.com/releases/{{ collector.symfonyminorversion }}#release-checker">View roadmap</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+
+    <div class="metrics">
+        <div class="metric-group">
+            <div class="metric">
+                <span class="value">
+                    <span class="config-symfony-version-status-badge status-{{ symfony_status_class[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</span>
+                </span>
+                <span class="label">Your Symfony version status</span>
+            </div>
+
+            {% if collector.symfonylts %}
+                <div class="metric">
+                    <span class="value config-symfony-eol">
+                        {{ collector.symfonyeom }}
+                    </span>
+                    <span class="label">Bug fixes {{ collector.symfonystate in ['eom', 'eol'] ? 'ended on' : 'until' }}</span>
+                </div>
+            {% endif %}
+
+            <div class="metric">
+                <span class="value config-symfony-eol">
+                    {{ collector.symfonyeol }}
+                </span>
+                <span class="label">
+                    {{ collector.symfonylts ? 'Security fixes' : 'Bug fixes and security fixes' }}
+                    {{ 'eol' == collector.symfonystate ? 'ended on' : 'until' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <a class="config-symfony-version-roadmap-link" href="https://symfony.com/releases/{{ collector.symfonyminorversion }}">View Symfony {{ collector.symfonyversion }} release details</a>
 
     <h2>PHP Configuration</h2>
 

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-22T13:00:13Z
+
+@stof thanks for your review. I've fixed everything.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-22T13:48:26Z
+
+@javiereguiluz I see that the CSS contains lots of panel-specific styles in this redesign. Should some of them become reusable components instead (in a separate PR), that third-party bundles could use as well in their own panels, or are they really ultra specific to those panels ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-22T14:09:13Z
+
+In these last cases I think the design is very specific to those features, so it's not really reusable.

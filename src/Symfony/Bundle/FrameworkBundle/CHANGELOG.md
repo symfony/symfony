@@ -19,7 +19,6 @@ CHANGELOG
  * Add `rate_limiter` configuration option to `messenger.transport` to allow rate limited transports using the RateLimiter component
  * Remove `@internal` tag from secret vaults to allow them to be used directly outside the framework bundle and custom vaults to be added
  * Deprecate `framework.form.legacy_error_messages` config node
- * Set locale from request rather than default locale if `framework.enabled_locales` is empty and `framework.set_locale_from_accept_language` is true
 
 6.1
 ---

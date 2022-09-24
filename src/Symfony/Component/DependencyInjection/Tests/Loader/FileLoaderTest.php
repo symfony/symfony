@@ -59,7 +59,7 @@ class FileLoaderTest extends TestCase
 
         $actual = $container->getParameterBag()->all();
         $expected = [
-            'a string',
+            'a_string' => 'a string',
             'foo' => 'bar',
             'values' => [
                 0,

@@ -71,6 +71,56 @@ class IniFileLoaderTest extends TestCase
             ['none', false, true],
             ['null', null, true],
             ['constant', \PHP_VERSION, true],
+            ['12_int', 12, true],
+            ['12_string', '12', true],
+            ['12_quoted_number', 12, false], // INI_SCANNER_RAW removes the double quotes
+            ['12_comment', 12, true],
+            ['12_string_comment', '12', true],
+            ['12_quoted_number_comment', 12, false], // INI_SCANNER_RAW removes the double quotes
+            ['-12_negative', -12, true],
+            ['one', 1, true],
+            ['zero', 0, true],
+            ['0b0110_byte_string', bindec('0b0110'), false], // not supported by INI_SCANNER_TYPED
+            ['11112222333344445555_great_number', '1111,2222,3333,4444,5555', true],
+            ['0777_number_starting_with_0', 0777, false], // not supported by INI_SCANNER_TYPED
+            ['255_hexadecimal', 0xFF, false], // not supported by INI_SCANNER_TYPED
+            ['100.0_exponential', 1e2, false], // not supported by INI_SCANNER_TYPED
+            ['-120.0_exponential', -1.2E2, false], // not supported by INI_SCANNER_TYPED
+            ['-10100.1_negative_float', -10100.1, false], // not supported by INI_SCANNER_TYPED
+            ['-10,100.1_negative_float', '-10,100.1', true],
+            ['list', [1, 2], true],
+            ['map', ['one' => 1, 'two' => 2], true],
+        ];
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider getLegacyTypeConversions
+     */
+    public function testLegacyTypeConversionsWithNativePhp($key, $value, $supported)
+    {
+        if (!$supported) {
+            $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
+        }
+
+        $expected = parse_ini_file(__DIR__.'/../Fixtures/ini/types_legacy.ini', true, \INI_SCANNER_TYPED);
+        $this->assertSame($value, $expected['parameters'][$key], '->load() converts values to PHP types');
+    }
+
+    public function getLegacyTypeConversions()
+    {
+        return [
+            ['true_comment', true, true],
+            ['true', true, true],
+            ['false', false, true],
+            ['on', true, true],
+            ['off', false, true],
+            ['yes', true, true],
+            ['no', false, true],
+            ['none', false, true],
+            ['null', null, true],
+            ['constant', \PHP_VERSION, true],
             ['12', 12, true],
             ['12_string', '12', true],
             ['12_quoted_number', 12, false], // INI_SCANNER_RAW removes the double quotes

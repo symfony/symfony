@@ -137,8 +137,10 @@ class PhpDumper extends Dumper
             'debug' => true,
             'hot_path_tag' => 'container.hot_path',
             'preload_tags' => ['container.preload', 'container.no_preload'],
-            'inline_factories_parameter' => 'container.dumper.inline_factories',
-            'inline_class_loader_parameter' => 'container.dumper.inline_class_loader',
+            'inline_factories_parameter' => 'container.dumper.inline_factories', // @deprecated since Symfony 6.3
+            'inline_class_loader_parameter' => 'container.dumper.inline_class_loader', // @deprecated since Symfony 6.3
+            'inline_factories' => null,
+            'inline_class_loader' => null,
             'preload_classes' => [],
             'service_locator_tag' => 'container.service_locator',
             'build_time' => time(),
@@ -149,8 +151,28 @@ class PhpDumper extends Dumper
         $this->asFiles = $options['as_files'];
         $this->hotPathTag = $options['hot_path_tag'];
         $this->preloadTags = $options['preload_tags'];
-        $this->inlineFactories = $this->asFiles && $options['inline_factories_parameter'] && $this->container->hasParameter($options['inline_factories_parameter']) && $this->container->getParameter($options['inline_factories_parameter']);
-        $this->inlineRequires = $options['inline_class_loader_parameter'] && ($this->container->hasParameter($options['inline_class_loader_parameter']) ? $this->container->getParameter($options['inline_class_loader_parameter']) : $options['debug']);
+
+        $this->inlineFactories = false;
+        if (isset($options['inline_factories'])) {
+            $this->inlineFactories = $this->asFiles && $options['inline_factories'];
+        } elseif (!$options['inline_factories_parameter']) {
+            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_factories_parameter" passed to "%s()" is deprecated, use option "inline_factories" instead.', __METHOD__);
+        } elseif ($this->container->hasParameter($options['inline_factories_parameter'])) {
+            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_factories_parameter" passed to "%s()" is deprecated, use option "inline_factories" instead.', __METHOD__);
+            $this->inlineFactories = $this->asFiles && $this->container->getParameter($options['inline_factories_parameter']);
+        }
+
+        $this->inlineRequires = $options['debug'];
+        if (isset($options['inline_class_loader'])) {
+            $this->inlineRequires = $options['inline_class_loader'];
+        } elseif (!$options['inline_class_loader_parameter']) {
+            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_class_loader_parameter" passed to "%s()" is deprecated, use option "inline_class_loader" instead.', __METHOD__);
+            $this->inlineRequires = false;
+        } elseif ($this->container->hasParameter($options['inline_class_loader_parameter'])) {
+            trigger_deprecation('symfony/dependency-injection', '6.3', 'Option "inline_class_loader_parameter" passed to "%s()" is deprecated, use option "inline_class_loader" instead.', __METHOD__);
+            $this->inlineRequires = $this->container->getParameter($options['inline_class_loader_parameter']);
+        }
+
         $this->serviceLocatorTag = $options['service_locator_tag'];
         $this->class = $options['class'];
 

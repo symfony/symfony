@@ -90,11 +90,15 @@ class PassConfig
             new DefinitionErrorExceptionPass(),
         ]];
 
-        $this->afterRemovingPasses = [[
-            new ResolveHotPathPass(),
-            new ResolveNoPreloadPass(),
-            new AliasDeprecatedPublicServicesPass(),
-        ]];
+        $this->afterRemovingPasses = [
+            0 => [
+                new ResolveHotPathPass(),
+                new ResolveNoPreloadPass(),
+                new AliasDeprecatedPublicServicesPass(),
+            ],
+            // Let build parameters be available as late as possible
+            -2048 => [new RemoveBuildParametersPass()],
+        ];
     }
 
     /**

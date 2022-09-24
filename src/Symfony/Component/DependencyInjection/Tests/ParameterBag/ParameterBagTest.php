@@ -121,6 +121,7 @@ class ParameterBagTest extends TestCase
             ['', 'You have requested a non-existent parameter "".'],
 
             ['fiz.bar.boo', 'You have requested a non-existent parameter "fiz.bar.boo". You cannot access nested array items, do you want to inject "fiz" instead?'],
+            ['.foo', 'Parameter ".foo" not found. It was probably deleted during the compilation of the container. Did you mean this: "foo"?'],
         ];
     }
 

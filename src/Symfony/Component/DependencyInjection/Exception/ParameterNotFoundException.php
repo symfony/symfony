@@ -53,6 +53,8 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
             $this->message = sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
         } elseif (null !== $this->sourceKey) {
             $this->message = sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
+        } elseif ('.' === ($this->key[0] ?? '')) {
+            $this->message = sprintf('Parameter "%s" not found. It was probably deleted during the compilation of the container.', $this->key);
         } else {
             $this->message = sprintf('You have requested a non-existent parameter "%s".', $this->key);
         }

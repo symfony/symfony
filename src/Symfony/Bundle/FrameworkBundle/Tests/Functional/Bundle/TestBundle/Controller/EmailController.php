@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 
 class EmailController
 {
@@ -25,7 +26,7 @@ class EmailController
             ->addCc('cc@symfony.com')
             ->text('Bar!')
             ->html('<p>Foo</p>')
-            ->attach(file_get_contents(__FILE__), 'foobar.php')
+            ->addPart(new DataPart(file_get_contents(__FILE__), 'foobar.php'))
         );
 
         $mailer->send((new Email())->to('fabien@symfony.com', 'thomas@symfony.com')->from('fabien@symfony.com')->subject('Foo')
@@ -33,7 +34,7 @@ class EmailController
             ->addCc('cc@symfony.com')
             ->text('Bar!')
             ->html('<p>Foo</p>')
-            ->attach(file_get_contents(__FILE__), 'foobar.php')
+            ->addPart(new DataPart(file_get_contents(__FILE__), 'foobar.php'))
         );
 
         return new Response();

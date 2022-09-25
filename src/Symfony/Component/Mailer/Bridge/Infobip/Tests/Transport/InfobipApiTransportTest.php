@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class InfobipApiTransportTest extends TestCase
@@ -206,8 +207,8 @@ class InfobipApiTransportTest extends TestCase
     {
         $email = $this->basicValidEmail()
             ->text('foobar')
-            ->attach('some attachment', 'attachment.txt', 'text/plain')
-            ->embed('some inline attachment', 'inline.txt', 'text/plain')
+            ->addPart(new DataPart('some attachment', 'attachment.txt', 'text/plain'))
+            ->addPart((new DataPart('some inline attachment', 'inline.txt', 'text/plain'))->asInline())
         ;
 
         $this->transport->send($email);
@@ -320,8 +321,8 @@ class InfobipApiTransportTest extends TestCase
     {
         $email = $this->basicValidEmail()
             ->text('foobar')
-            ->attach('some attachment', 'attachment.txt', 'text/plain')
-            ->embed('some inline attachment', 'inline.txt', 'text/plain')
+            ->addPart(new DataPart('some attachment', 'attachment.txt', 'text/plain'))
+            ->addPart((new DataPart('some inline attachment', 'inline.txt', 'text/plain'))->asInline())
         ;
 
         $sentMessage = $this->transport->send($email);

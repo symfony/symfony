@@ -327,7 +327,7 @@ class Email extends Message
      */
     public function attach($body, string $name = null, string $contentType = null): static
     {
-        return $this->attachPart(new DataPart($body, $name, $contentType));
+        return $this->addPart(new DataPart($body, $name, $contentType));
     }
 
     /**
@@ -335,7 +335,7 @@ class Email extends Message
      */
     public function attachFromPath(string $path, string $name = null, string $contentType = null): static
     {
-        return $this->attachPart(new DataPart(new BodyFile($path), $name, $contentType));
+        return $this->addPart(new DataPart(new BodyFile($path), $name, $contentType));
     }
 
     /**
@@ -345,7 +345,7 @@ class Email extends Message
      */
     public function embed($body, string $name = null, string $contentType = null): static
     {
-        return $this->attachPart((new DataPart($body, $name, $contentType))->asInline());
+        return $this->addPart((new DataPart($body, $name, $contentType))->asInline());
     }
 
     /**
@@ -353,13 +353,25 @@ class Email extends Message
      */
     public function embedFromPath(string $path, string $name = null, string $contentType = null): static
     {
-        return $this->attachPart((new DataPart(new BodyFile($path), $name, $contentType))->asInline());
+        return $this->addPart((new DataPart(new BodyFile($path), $name, $contentType))->asInline());
+    }
+
+    /**
+     * @return $this
+     *
+     * @deprecated since Symfony 6.2, use addPart() instead
+     */
+    public function attachPart(DataPart $part): static
+    {
+        @trigger_deprecation('symfony/mime', '6.2', 'The "%s()" method is deprecated, use "addPart()" instead.', __METHOD__);
+
+        return $this->addPart($part);
     }
 
     /**
      * @return $this
      */
-    public function attachPart(DataPart $part): static
+    public function addPart(DataPart $part): static
     {
         $this->cachedBody = null;
         $this->attachments[] = $part;

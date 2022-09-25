@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Mime;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\DataPart;
 use Twig\Extra\CssInliner\CssInlinerExtension;
 use Twig\Extra\Inky\InkyExtension;
 use Twig\Extra\Markdown\MarkdownExtension;
@@ -134,7 +135,7 @@ class NotificationEmail extends TemplatedEmail
         $exceptionAsString = $this->getExceptionAsString($exception);
 
         $this->context['exception'] = true;
-        $this->attach($exceptionAsString, 'exception.txt', 'text/plain');
+        $this->addPart(new DataPart($exceptionAsString, 'exception.txt', 'text/plain'));
         $this->importance(self::IMPORTANCE_URGENT);
 
         if (!$this->getSubject()) {

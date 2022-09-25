@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\MessageConverter;
+use Symfony\Component\Mime\Part\DataPart;
 
 class MessageConverterTest extends TestCase
 {
@@ -33,34 +34,34 @@ class MessageConverterTest extends TestCase
         $this->assertConversion((clone $email)
             ->text('text content')
             ->html('HTML content <img src="cid:test.jpg" />')
-            ->embed($file, 'test.jpg', 'image/gif')
+            ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline())
         );
         $this->assertConversion((clone $email)
             ->text('text content')
             ->html('HTML content <img src="cid:test.jpg" />')
-            ->attach($file, 'test_attached.jpg', 'image/gif')
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
         );
         $this->assertConversion((clone $email)
             ->text('text content')
             ->html('HTML content <img src="cid:test.jpg" />')
-            ->embed($file, 'test.jpg', 'image/gif')
-            ->attach($file, 'test_attached.jpg', 'image/gif')
+            ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline())
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
         );
         $this->assertConversion((clone $email)
             ->text('text content')
-            ->attach($file, 'test_attached.jpg', 'image/gif')
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
         );
         $this->assertConversion((clone $email)
             ->html('HTML content <img src="cid:test.jpg" />')
-            ->attach($file, 'test_attached.jpg', 'image/gif')
+            ->addPart(new DataPart($file, 'test_attached.jpg', 'image/gif'))
         );
         $this->assertConversion((clone $email)
             ->html('HTML content <img src="cid:test.jpg" />')
-            ->embed($file, 'test.jpg', 'image/gif')
+            ->addPart((new DataPart($file, 'test.jpg', 'image/gif'))->asInline())
         );
         $this->assertConversion((clone $email)
             ->text('text content')
-            ->embed($file, 'test_attached.jpg', 'image/gif')
+            ->addPart((new DataPart($file, 'test_attached.jpg', 'image/gif'))->asInline())
         );
     }
 

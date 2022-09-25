@@ -22,6 +22,9 @@
     "require-dev": {
         "symfony/http-client": "^5.4|^6.0"
     },
+    "conflict": {
+        "symfony/mime": "<6.2"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Sendgrid\\": "" },
         "exclude-from-classmap": [

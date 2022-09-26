@@ -386,6 +386,23 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Энэ утга зөв International Securities Identification Number (ISIN) биш байна.</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Энэ утга нь зөв илэрхийлэл байх ёстой.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Энэ утга нь хүчинтэй CSS өнгө биш байна.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Энэ утга нь хүчинтэй CIDR тэмдэглэгээ биш байна.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Сүлжээний маскын утга нь {{ min }} болон {{ max }} хооронд байх ёстой.</target>
+            </trans-unit>
+        </body>
         </body>
     </file>
 </xliff>

@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>Hierdie waarde is nie 'n geldige e-pos adres nie.</target>
+                <target>Hierdie waarde is nie 'n geldige e-pos address nie.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
-                <target>Hierdie is nie 'n geldige IP-adres nie.</target>
+                <target>Hierdie is nie 'n geldige IP-address nie.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>

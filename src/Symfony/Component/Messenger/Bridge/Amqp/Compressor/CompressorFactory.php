@@ -17,12 +17,10 @@ class CompressorFactory
 {
     public static function createCompressor(string $mimeContentEncoding)
     {
-        if ('gzip' === $mimeContentEncoding) {
-            return new Gzip();
-        } elseif ('deflate') {
-            return new Deflate();
-        }
-
-        throw new InvalidArgumentException(sprintf('The MIME content encoding of the message cannot be decompressed "%s".', $mimeContentEncoding));
+        return match ($mimeContentEncoding) {
+            Gzip::CONTENT_ENCODING => new Gzip(),
+            Deflate::CONTENT_ENCODING => new Deflate(),
+            default => throw new InvalidArgumentException(sprintf('The MIME content encoding of the message cannot be decompressed "%s".', $mimeContentEncoding)),
+        };
     }
 }

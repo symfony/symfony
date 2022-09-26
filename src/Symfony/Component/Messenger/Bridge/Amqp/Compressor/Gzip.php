@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Compressor;
 
 class Gzip implements CompressorInterface
 {
+    public const CONTENT_ENCODING = 'gzip';
+
     public function compress(mixed $data): string
     {
         return gzencode($data);
@@ -20,11 +22,10 @@ class Gzip implements CompressorInterface
 
     public function decompress(mixed $data): mixed
     {
-        $decompressData = gzdecode($data);
-        if (false === $decompressData) {
-            return $data;
+        if (\function_exists('gzdecode')) {
+            return @gzdecode($data) ?: $data;
         }
 
-        return $decompressData;
+        return $data;
     }
 }

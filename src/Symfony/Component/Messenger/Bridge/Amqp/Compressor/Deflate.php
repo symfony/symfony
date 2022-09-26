@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Compressor;
 
 class Deflate implements CompressorInterface
 {
+    public const CONTENT_ENCODING = 'deflate';
+
     public function compress(mixed $data): string
     {
         return gzdeflate($data);
@@ -20,11 +22,10 @@ class Deflate implements CompressorInterface
 
     public function decompress(mixed $data): mixed
     {
-        $decompressData = gzinflate($data);
-        if (false === $decompressData) {
-            return $data;
+        if (\function_exists('gzinflate')) {
+            return @gzinflate($data) ?: $data;
         }
 
-        return $decompressData;
+        return $data;
     }
 }

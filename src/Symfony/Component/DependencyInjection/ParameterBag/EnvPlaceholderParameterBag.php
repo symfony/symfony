@@ -29,7 +29,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function get(string $name): array|bool|string|int|float|null
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (str_starts_with($name, 'env(') && str_ends_with($name, ')') && 'env()' !== $name) {
             $env = substr($name, 4, -1);

@@ -402,6 +402,6 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Сүлжээний маскын утга нь {{ min }} болон {{ max }} хооронд байх ёстой.</target>
             </trans-unit>
-        </body>*
+        </body>
     </file>
 </xliff>

@@ -63,6 +63,6 @@ class StopwatchPeriodTest extends TestCase
         yield [2, 3.14, true, 1.1400000000000001];
         yield [2, 3.13, true, 1.13];
         yield [2.71, 3.14, false, 1];
-        yield [2.71, 3.14, true, 0.43];
+        yield [2.71, 3.14, true, 0.43000000000000016];
     }
 }

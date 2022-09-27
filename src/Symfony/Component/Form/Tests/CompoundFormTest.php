@@ -205,7 +205,9 @@ class CompoundFormTest extends TestCase
 
     public function testAddUsingNameAndType()
     {
-        $this->form->add('foo', TextType::class);
+        $this->form->add('foo', TextType::class, [
+            'empty_data' => null,
+        ]);
 
         $this->assertTrue($this->form->has('foo'));
 
@@ -218,7 +220,9 @@ class CompoundFormTest extends TestCase
     public function testAddUsingIntegerNameAndType()
     {
         // in order to make casting unnecessary
-        $this->form->add(0, TextType::class);
+        $this->form->add(0, TextType::class, [
+            'empty_data' => null,
+        ]);
 
         $this->assertTrue($this->form->has(0));
 
@@ -230,7 +234,9 @@ class CompoundFormTest extends TestCase
 
     public function testAddWithoutType()
     {
-        $this->form->add('foo');
+        $this->form->add('foo', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertTrue($this->form->has('foo'));
 
@@ -247,7 +253,9 @@ class CompoundFormTest extends TestCase
             ->setDataMapper(new DataMapper())
             ->getForm();
 
-        $this->form->add('foo');
+        $this->form->add('foo', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertTrue($this->form->has('foo'));
 
@@ -264,7 +272,9 @@ class CompoundFormTest extends TestCase
             ->setDataMapper(new DataMapper())
             ->getForm();
 
-        $this->form->add('foo');
+        $this->form->add('foo', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertTrue($this->form->has('foo'));
 

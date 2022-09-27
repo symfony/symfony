@@ -424,6 +424,7 @@ class CollectionTypeTest extends BaseTypeTest
             ],
             'prototype_options' => [
                 'help' => 'foo',
+                'empty_data' => null,
             ],
         ]);
 

@@ -142,7 +142,9 @@ class FormBuilderTest extends TestCase
 
     public function testCreateNoTypeNo()
     {
-        $builder = $this->builder->create('foo');
+        $builder = $this->builder->create('foo', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
@@ -165,7 +167,9 @@ class FormBuilderTest extends TestCase
 
     public function testGetExplicitType()
     {
-        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $builder = $this->builder->get('foo');
 
         $this->assertNotSame($builder, $this->builder);
@@ -174,7 +178,9 @@ class FormBuilderTest extends TestCase
     public function testGetGuessedType()
     {
         $rootFormBuilder = new FormBuilder('name', 'stdClass', new EventDispatcher(), $this->factory);
-        $rootFormBuilder->add('foo');
+        $rootFormBuilder->add('foo', null, [
+            'empty_data' => null,
+        ]);
         $fooBuilder = $rootFormBuilder->get('foo');
 
         $this->assertNotSame($fooBuilder, $rootFormBuilder);

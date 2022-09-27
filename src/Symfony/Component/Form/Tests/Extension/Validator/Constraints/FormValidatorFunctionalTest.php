@@ -347,7 +347,9 @@ class FormValidatorFunctionalTest extends TestCase
         $form = $this->formFactory->create(FormType::class, null, [
             'data_class' => Review::class,
         ])
-            ->add('title')
+            ->add('title', null, [
+                'empty_data' => null,
+            ])
             ->add('customers', CollectionType::class, [
                 'mapped' => false,
                 'entry_type' => CustomerType::class,

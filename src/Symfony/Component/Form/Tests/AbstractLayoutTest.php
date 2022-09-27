@@ -2805,6 +2805,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         };
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => $message,
         ]);
         $html = $this->renderHelp($form->createView());

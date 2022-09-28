@@ -101,7 +101,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
             ->createView();
 
         self::assertSame(<<<'HTML'
-<div class="input-group "><span class="input-group-text">&euro; </span><input type="text" id="name" name="name" required="required" class="form-control" /></div>
+<div class="input-group "><span class="input-group-text">&euro; </span><input type="text" id="name" name="name" required="required" class="form-control"></div>
 HTML
             , trim($this->renderWidget($view)));
     }

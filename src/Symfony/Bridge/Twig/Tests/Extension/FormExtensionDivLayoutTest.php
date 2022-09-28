@@ -184,7 +184,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
             ->createView()
         ;
 
-        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
+        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required">', $this->renderWidget($view));
     }
 
     public function testHelpAttr()

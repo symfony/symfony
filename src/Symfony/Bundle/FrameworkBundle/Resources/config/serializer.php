@@ -177,6 +177,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.encoder')
 
         ->set('serializer.encoder.json', JsonEncoder::class)
+            ->args([null, null])
             ->tag('serializer.encoder')
 
         ->set('serializer.encoder.yaml', YamlEncoder::class)

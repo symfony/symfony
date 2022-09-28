@@ -140,6 +140,46 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
+    public function testFilterDuplicateTransPaths()
+    {
+        $transPaths = [
+            $this->translationDir.'/a/test/folder/with/a/subfolder',
+            $this->translationDir.'/a/test/folder/',
+            $this->translationDir.'/a/test/folder/with/a/subfolder/and/a/file.txt',
+            $this->translationDir.'/a/different/test/folder',
+        ];
+
+        $expectedPaths = [
+            $this->translationDir.'/a/different/test/folder',
+            $this->translationDir.'/a/test/folder',
+        ];
+
+        foreach ($transPaths as $transPath) {
+            if (realpath($transPath)) {
+                continue;
+            }
+
+            if (preg_match('/\.[a-z]+$/', $transPath)) {
+                if (!realpath(\dirname($transPath))) {
+                    mkdir(\dirname($transPath), 0777, true);
+                }
+
+                touch($transPath);
+            } else {
+                mkdir($transPath, 0777, true);
+            }
+        }
+
+        $command = $this->createMock(TranslationUpdateCommand::class);
+
+        $method = new \ReflectionMethod(TranslationUpdateCommand::class, 'filterDuplicateTransPaths');
+        $method->setAccessible(true);
+
+        $filteredTransPaths = $method->invoke($command, $transPaths);
+
+        $this->assertEquals($expectedPaths, $filteredTransPaths);
+    }
+
     protected function setUp(): void
     {
         $this->fs = new Filesystem();

@@ -198,6 +198,9 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
     }
 
+    /**
+     * @requires PHP 8.1
+     */
     public function testGetEnum()
     {
         $bag = new EnvPlaceholderParameterBag();

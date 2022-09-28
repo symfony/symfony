@@ -12,9 +12,11 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -100,9 +102,12 @@ class UniqueValidator extends ConstraintValidator
         return $output;
     }
 
-    private function getPropertyAccessor(): PropertyAccessorInterface
+    private function getPropertyAccessor(): PropertyAccessor
     {
         if (null === $this->propertyAccessor) {
+            if (!class_exists(PropertyAccess::class)) {
+                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed.');
+            }
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
 

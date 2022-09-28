@@ -280,6 +280,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['id' => 1, 'email' => 'bar@email.com'],
                 ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id']],
+            'unique string sub array' => [[
+                ['id' => 1, 'translation' => ['lang' => 'eng', 'translation' => 'hi']],
+                ['id' => 2, 'translation' => ['lang' => 'eng', 'translation' => 'hello']],
+            ], ['[translation][lang]']],
             'unique string attribute' => [[
                 (object) ['lang' => 'eng', 'translation' => 'hi'],
                 (object) ['lang' => 'eng', 'translation' => 'hello'],
@@ -293,6 +297,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 (object) ['id' => 1, 'email' => 'bar@email.com'],
                 (object) ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id']],
+            'unique string sub object attribute' => [[
+                (object) ['id' => 1, 'translation' => (object) ['lang' => 'eng', 'translation' => 'hi']],
+                (object) ['id' => 2, 'translation' => (object) ['lang' => 'eng', 'translation' => 'hello']],
+            ], ['translation.lang']],
         ];
     }
 }

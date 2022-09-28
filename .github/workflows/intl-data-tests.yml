@@ -48,7 +48,7 @@ jobs:
         with:
           coverage: "none"
           extensions: "zip,intl-${{env.SYMFONY_ICU_VERSION}}"
-          ini-values: "memory_limit=-1"
+          ini-values: "memory_limit=-1,precision=14"
           php-version: "7.4"
 
       - name: Install dependencies

@@ -22,6 +22,7 @@ install:
     - cd ..
     - copy /Y php.ini-development php.ini-min
     - echo memory_limit=-1 >> php.ini-min
+    - echo precision=14 >> php.ini-min
     - echo serialize_precision=14 >> php.ini-min
     - echo max_execution_time=1200 >> php.ini-min
     - echo post_max_size=4G >> php.ini-min

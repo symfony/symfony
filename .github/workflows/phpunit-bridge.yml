@@ -33,6 +33,7 @@ jobs:
         with:
           coverage: "none"
           php-version: "5.5"
+          ini-values: "memory_limit=-1,precision=14"
 
       - name: Lint
         run: find ./src/Symfony/Bridge/PhpUnit -name '*.php' | grep -v -e /Tests/ -e ForV6 -e ForV7 -e ForV8 -e ForV9 -e ConstraintLogicTrait | parallel -j 4 php -l {}

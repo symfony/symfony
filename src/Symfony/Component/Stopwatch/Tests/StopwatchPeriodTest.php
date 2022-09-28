@@ -40,7 +40,7 @@ class StopwatchPeriodTest extends TestCase
     public function testGetDuration($start, $end, $useMorePrecision, $duration)
     {
         $period = new StopwatchPeriod($start, $end, $useMorePrecision);
-        $this->assertSame($duration, $period->getDuration());
+        $this->assertEqualsWithDelta($duration, $period->getDuration(), \PHP_FLOAT_EPSILON);
     }
 
     public function provideTimeValues()

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Guard\Authenticator;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
@@ -36,7 +37,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     /**
      * Override to change what happens after a bad username/password is submitted.
      *
-     * @return RedirectResponse
+     * @return Response
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
@@ -58,7 +59,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      * Override to control what happens when the user hits a secure page
      * but isn't logged in yet.
      *
-     * @return RedirectResponse
+     * @return Response
      */
     public function start(Request $request, AuthenticationException $authException = null)
     {

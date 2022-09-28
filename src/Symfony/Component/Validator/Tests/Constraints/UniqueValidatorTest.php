@@ -280,6 +280,19 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['id' => 1, 'email' => 'bar@email.com'],
                 ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id']],
+            'unique string attribute' => [[
+                (object) ['lang' => 'eng', 'translation' => 'hi'],
+                (object) ['lang' => 'eng', 'translation' => 'hello'],
+            ], ['lang']],
+            'unique float attribute' => [[
+                (object) ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
+                (object) ['latitude' => 52.520008, 'longitude' => 13.404954],
+                (object) ['latitude' => 51.509865, 'longitude' => -0.118092],
+            ], ['latitude', 'longitude']],
+            'unique int attribute' => [[
+                (object) ['id' => 1, 'email' => 'bar@email.com'],
+                (object) ['id' => 1, 'email' => 'foo@email.com'],
+            ], ['id']],
         ];
     }
 }

@@ -43,11 +43,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Configure for PHP >= 8.2
-        if: "matrix.php >= '8.2'"
-        run: |
-          composer config platform.php 8.1.99
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -69,7 +64,7 @@ jobs:
 
           echo COLUMNS=120 >> $GITHUB_ENV
           echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration" >> $GITHUB_ENV
-          echo COMPOSER_UP='composer update --no-progress --ansi' >> $GITHUB_ENV
+          echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.php }}" = "8.2" ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
           SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | cut -d "'" -f2 | cut -d '.' -f 1-2)

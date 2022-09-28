@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\FinalPublicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass;
@@ -239,6 +240,25 @@ class LazyProxyTraitTest extends TestCase
         $proxy = $this->createLazyProxy(ReadOnlyClass::class, fn () => new ReadOnlyClass(123));
 
         $this->assertSame(123, $proxy->foo);
+    }
+
+    public function testLazyDecoratorClass()
+    {
+        $obj = new class() extends TestClass {
+            use LazyProxyTrait {
+                createLazyProxy as private;
+            }
+
+            private int $lazyObjectId;
+            private parent $lazyObjectReal;
+
+            public function __construct()
+            {
+                self::createLazyProxy(fn () => new TestClass((object) ['foo' => 123]), $this);
+            }
+        };
+
+        $this->assertSame(['foo' => 123], (array) $obj->getDep());
     }
 
     /**

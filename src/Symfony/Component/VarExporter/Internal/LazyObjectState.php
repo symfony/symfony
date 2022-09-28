@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Internal;
 
-use Symfony\Component\VarExporter\Hydrator;
+use Symfony\Component\VarExporter\Hydrator as PublicHydrator;
 
 /**
  * Keeps the state of lazy objects.
@@ -29,12 +29,12 @@ class LazyObjectState
     /**
      * @var array<class-string|'*', array<string, true>>
      */
-    public array $preInitUnsetProperties;
+    public readonly array $preInitUnsetProperties;
 
     /**
      * @var array<string, true>
      */
-    public array $preInitSetProperties;
+    public readonly array $preInitSetProperties;
 
     /**
      * @var array<class-string|'*', array<string, true>>
@@ -44,7 +44,7 @@ class LazyObjectState
     /**
      * @var array<string, true>
      */
-    public array $skippedProperties;
+    public readonly array $skippedProperties;
 
     /**
      * @var self::STATUS_*
@@ -53,7 +53,7 @@ class LazyObjectState
 
     public function __construct(public \Closure $initializer, $skippedProperties = [])
     {
-        $this->skippedProperties = $this->preInitSetProperties = $skippedProperties;
+        $this->skippedProperties = $skippedProperties;
     }
 
     /**
@@ -61,13 +61,14 @@ class LazyObjectState
      */
     public function initialize($instance, $propertyName, $propertyScope)
     {
+        $properties = null;
+        $class = $instance::class;
+
         if (!$this->status) {
             $this->status = 1 < (new \ReflectionFunction($this->initializer))->getNumberOfRequiredParameters() ? self::STATUS_INITIALIZED_PARTIAL : self::STATUS_UNINITIALIZED_FULL;
             $this->preInitUnsetProperties = $this->unsetProperties ??= [];
-
-            if (\count($this->preInitSetProperties) !== \count($properties = $this->preInitSetProperties + (array) $instance)) {
-                $this->preInitSetProperties = array_fill_keys(array_keys($properties), true);
-            }
+            $properties = (array) $instance;
+            $this->preInitSetProperties = array_fill_keys(array_keys(array_diff_key($properties, $this->skippedProperties, ["\0{$class}\0lazyObjectId" => true])), true);
 
             if (null === $propertyName) {
                 return self::STATUS_INITIALIZED_PARTIAL !== $this->status;
@@ -78,24 +79,52 @@ class LazyObjectState
             return true;
         }
 
-        if (self::STATUS_UNINITIALIZED_FULL === $this->status) {
-            if ($defaultProperties = array_diff_key(LazyObjectRegistry::$defaultProperties[$instance::class], $this->preInitSetProperties)) {
-                Hydrator::hydrate($instance, $defaultProperties);
-            }
+        if (self::STATUS_INITIALIZED_PARTIAL === $this->status) {
+            $value = ($this->initializer)(...[$instance, $propertyName, $propertyScope]);
 
-            $this->status = self::STATUS_INITIALIZED_FULL;
-            ($this->initializer)($instance);
+            $propertyScope ??= $class;
+            $accessor = LazyObjectRegistry::$classAccessors[$propertyScope] ??= LazyObjectRegistry::getClassAccessors($propertyScope);
 
-            return true;
+            $accessor['set']($instance, $propertyName, $value);
+
+            return false;
         }
 
-        $value = ($this->initializer)(...[$instance, $propertyName, $propertyScope]);
+        $this->status = self::STATUS_INITIALIZED_FULL;
 
-        $propertyScope ??= $instance::class;
-        $accessor = LazyObjectRegistry::$classAccessors[$propertyScope] ??= LazyObjectRegistry::getClassAccessors($propertyScope);
+        try {
+            if ($defaultProperties = array_diff_key(LazyObjectRegistry::$defaultProperties[$class], $this->preInitSetProperties, $this->skippedProperties)) {
+                PublicHydrator::hydrate($instance, $defaultProperties);
+            }
 
-        $accessor['set']($instance, $propertyName, $value);
+            ($this->initializer)($instance);
+        } catch (\Throwable $e) {
+            $this->status = self::STATUS_UNINITIALIZED_FULL;
 
-        return false;
+            if ($defaultProperties) {
+                self::resetProperties($class, $instance, $defaultProperties);
+            }
+
+            throw $e;
+        }
+
+        return true;
+    }
+
+    private static function resetProperties($class, $instance, $properties): void
+    {
+        $propertyScopes = Hydrator::$propertyScopes[$class];
+        $skippedProperties = [];
+        foreach ($propertyScopes as $key => [$scope, $name, $readonlyScope]) {
+            $propertyScopes[$k = "\0$scope\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = $name;
+
+            if (($k === $key && !\array_key_exists($k, $properties)) || null !== $readonlyScope) {
+                $skippedProperties[$key] = true;
+            }
+        }
+
+        foreach (LazyObjectRegistry::$classResetters[$class] as $reset) {
+            $reset($instance, $skippedProperties);
+        }
     }
 }

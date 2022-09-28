@@ -25,15 +25,15 @@ trait LazyProxyTrait
     /**
      * @param \Closure():object $initializer Returns the proxied object
      */
-    public static function createLazyProxy(\Closure $initializer): static
+    public static function createLazyProxy(\Closure $initializer, self $instance = null): static
     {
-        if (self::class !== $class = static::class) {
+        if (self::class !== $class = $instance ? $instance::class : static::class) {
             $skippedProperties = ["\0".self::class."\0lazyObjectId" => true];
         } elseif (\defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
             Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
         }
 
-        $instance = (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
+        $instance ??= (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
         $instance->lazyObjectId = $id = spl_object_id($instance);
         Registry::$states[$id] = new LazyObjectState($initializer);
 

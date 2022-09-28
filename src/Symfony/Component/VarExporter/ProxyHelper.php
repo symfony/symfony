@@ -325,15 +325,12 @@ final class ProxyHelper
         if (str_ends_with($default, "...'") && preg_match("/^'(?:[^'\\\\]*+(?:\\\\.)*+)*+'$/", $default)) {
             return VarExporter::export($param->getDefaultValue());
         }
-        if (false === strpbrk($default, "\\:('")) {
-            return $default;
-        }
 
         $regexp = "/(\"(?:[^\"\\\\]*+(?:\\\\.)*+)*+\"|'(?:[^'\\\\]*+(?:\\\\.)*+)*+')/";
         $parts = preg_split($regexp, $default, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY);
 
-        $regexp = '/([\( ]|^)([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z0-9_\x7f-\xff]++)*+)(?!: )/';
-        $callback = ($class = $param->getDeclaringClass())
+        $regexp = '/([\[\( ]|^)([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z0-9_\x7f-\xff]++)*+)(?!: )/';
+        $callback = (false !== strpbrk($default, "\\:('") && $class = $param->getDeclaringClass())
             ? fn ($m) => $m[1].match ($m[2]) {
                 'new' => 'new',
                 'self' => '\\'.$class->name,

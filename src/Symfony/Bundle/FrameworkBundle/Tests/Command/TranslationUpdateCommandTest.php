@@ -149,11 +149,6 @@ class TranslationUpdateCommandTest extends TestCase
             $this->translationDir.'/a/different/test/folder',
         ];
 
-        $expectedPaths = [
-            $this->translationDir.'/a/different/test/folder',
-            $this->translationDir.'/a/test/folder',
-        ];
-
         foreach ($transPaths as $transPath) {
             if (realpath($transPath)) {
                 continue;
@@ -176,6 +171,11 @@ class TranslationUpdateCommandTest extends TestCase
         $method->setAccessible(true);
 
         $filteredTransPaths = $method->invoke($command, $transPaths);
+
+        $expectedPaths = [
+            realpath($this->translationDir.'/a/different/test/folder'),
+            realpath($this->translationDir.'/a/test/folder'),
+        ];
 
         $this->assertEquals($expectedPaths, $filteredTransPaths);
     }

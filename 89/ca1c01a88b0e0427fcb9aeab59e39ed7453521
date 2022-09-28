@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-09-28T00:24:55Z
+
+The calculation of PHP itself seems to be false because of usage of floats.
+If it is important to be correct the microtime could be first converted into bigger values:
+
+```php
+var_dump(3.14-2.71); // incorrect: float(0.43000000000000016)
+
+var_dump((3.14 * 1_000_000 - 2.71 * 1_000_000) / 1_000_000); // correct: float(0.43)
+```
+
+https://3v4l.org/oi0o0
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-28T12:32:04Z
+
+I opened #47713 as an alternative approach.

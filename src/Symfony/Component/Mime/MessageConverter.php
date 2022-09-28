@@ -114,10 +114,7 @@ final class MessageConverter
                 throw new RuntimeException(sprintf('Unable to create an Email from an instance of "%s" as the body is too complex.', get_debug_type($email)));
             }
 
-            $headers = $part->getPreparedHeaders();
-            $method = 'inline' === $headers->getHeaderBody('Content-Disposition') ? 'embed' : 'attach';
-            $name = $headers->getHeaderParameter('Content-Disposition', 'filename');
-            $email->$method($part->getBody(), $name, $part->getMediaType().'/'.$part->getMediaSubtype());
+            $email->attachPart($part);
         }
 
         return $email;

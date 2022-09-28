@@ -13,6 +13,7 @@ namespace Symfony\Component\Mime;
 
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\BodyFile;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
@@ -326,14 +327,7 @@ class Email extends Message
      */
     public function attach($body, string $name = null, string $contentType = null): static
     {
-        if (!\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body must be a string or a resource (got "%s").', get_debug_type($body)));
-        }
-
-        $this->cachedBody = null;
-        $this->attachments[] = ['body' => $body, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
-
-        return $this;
+        return $this->attachPart(new DataPart($body, $name, $contentType));
     }
 
     /**
@@ -341,10 +335,7 @@ class Email extends Message
      */
     public function attachFromPath(string $path, string $name = null, string $contentType = null): static
     {
-        $this->cachedBody = null;
-        $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
-
-        return $this;
+        return $this->attachPart(new DataPart(new BodyFile($path), $name, $contentType));
     }
 
     /**
@@ -354,14 +345,7 @@ class Email extends Message
      */
     public function embed($body, string $name = null, string $contentType = null): static
     {
-        if (!\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body must be a string or a resource (got "%s").', get_debug_type($body)));
-        }
-
-        $this->cachedBody = null;
-        $this->attachments[] = ['body' => $body, 'name' => $name, 'content-type' => $contentType, 'inline' => true];
-
-        return $this;
+        return $this->attachPart((new DataPart($body, $name, $contentType))->asInline());
     }
 
     /**
@@ -369,10 +353,7 @@ class Email extends Message
      */
     public function embedFromPath(string $path, string $name = null, string $contentType = null): static
     {
-        $this->cachedBody = null;
-        $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => true];
-
-        return $this;
+        return $this->attachPart((new DataPart(new BodyFile($path), $name, $contentType))->asInline());
     }
 
     /**
@@ -381,22 +362,17 @@ class Email extends Message
     public function attachPart(DataPart $part): static
     {
         $this->cachedBody = null;
-        $this->attachments[] = ['part' => $part];
+        $this->attachments[] = $part;
 
         return $this;
     }
 
     /**
-     * @return array|DataPart[]
+     * @return DataPart[]
      */
     public function getAttachments(): array
     {
-        $parts = [];
-        foreach ($this->attachments as $attachment) {
-            $parts[] = $this->createDataPart($attachment);
-        }
-
-        return $parts;
+        return $this->attachments;
     }
 
     public function getBody(): AbstractPart
@@ -502,59 +478,29 @@ class Email extends Message
         }
 
         $otherParts = $relatedParts = [];
-        foreach ($this->attachments as $attachment) {
-            $part = $this->createDataPart($attachment);
-            if (isset($attachment['part'])) {
-                $attachment['name'] = $part->getName();
-            }
-
-            $related = false;
+        foreach ($this->attachments as $part) {
             foreach ($names as $name) {
-                if ($name !== $attachment['name']) {
+                if ($name !== $part->getName()) {
                     continue;
                 }
                 if (isset($relatedParts[$name])) {
                     continue 2;
                 }
-                $part->setDisposition('inline');
+
                 $html = str_replace('cid:'.$name, 'cid:'.$part->getContentId(), $html, $count);
-                if ($count) {
-                    $related = true;
-                }
-                $part->setName($part->getContentId());
+                $relatedParts[$name] = $part;
+                $part->setName($part->getContentId())->asInline();
 
-                break;
+                continue 2;
             }
 
-            if ($related) {
-                $relatedParts[$attachment['name']] = $part;
-            } else {
-                $otherParts[] = $part;
-            }
+            $otherParts[] = $part;
         }
         if (null !== $htmlPart) {
             $htmlPart = new TextPart($html, $this->htmlCharset, 'html');
         }
 
         return [$htmlPart, $otherParts, array_values($relatedParts)];
-    }
-
-    private function createDataPart(array $attachment): DataPart
-    {
-        if (isset($attachment['part'])) {
-            return $attachment['part'];
-        }
-
-        if (isset($attachment['body'])) {
-            $part = new DataPart($attachment['body'], $attachment['name'] ?? null, $attachment['content-type'] ?? null);
-        } else {
-            $part = DataPart::fromPath($attachment['path'] ?? '', $attachment['name'] ?? null, $attachment['content-type'] ?? null);
-        }
-        if ($attachment['inline']) {
-            $part->asInline();
-        }
-
-        return $part;
     }
 
     /**
@@ -604,12 +550,6 @@ class Email extends Message
 
         if (\is_resource($this->html)) {
             $this->html = (new TextPart($this->html))->getBody();
-        }
-
-        foreach ($this->attachments as $i => $attachment) {
-            if (isset($attachment['body']) && \is_resource($attachment['body'])) {
-                $this->attachments[$i]['body'] = (new TextPart($attachment['body']))->getBody();
-            }
         }
 
         return [$this->text, $this->textCharset, $this->html, $this->htmlCharset, $this->attachments, parent::__serialize()];

@@ -74,10 +74,16 @@ class TemplatedEmailTest extends TestCase
     "htmlCharset": null,
     "attachments": [
         {
+            "filename": "test.txt",
+            "mediaType": "application",
             "body": "Some Text file",
+            "charset": null,
+            "subtype": "octet-stream",
+            "disposition": "attachment",
             "name": "test.txt",
-            "content-type": null,
-            "inline": false
+            "encoding": "base64",
+            "headers": [],
+            "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
         }
     ],
     "headers": {

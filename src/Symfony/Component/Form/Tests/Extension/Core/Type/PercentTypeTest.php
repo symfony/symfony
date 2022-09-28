@@ -96,7 +96,7 @@ class PercentTypeTest extends TypeTestCase
 
         $form->submit('1.23456');
 
-        $this->assertEquals(0.0123456, $form->getData());
+        $this->assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
     }
 
     /**
@@ -113,6 +113,6 @@ class PercentTypeTest extends TypeTestCase
 
         $form->submit('1.23456');
 
-        $this->assertEquals(0.0123456, $form->getData());
+        $this->assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
     }
 }

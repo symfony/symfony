@@ -82,7 +82,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         $transformer = new PercentToLocalizedStringTransformer(2, PercentToLocalizedStringTransformer::FRACTIONAL);
 
-        $this->assertEquals(0.0123456, $transformer->reverseTransform('1.23456'));
+        $this->assertEqualsWithDelta(0.0123456, $transformer->reverseTransform('1.23456'), \PHP_FLOAT_EPSILON);
     }
 
     public function testReverseTransform()

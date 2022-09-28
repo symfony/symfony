@@ -332,13 +332,18 @@ final class ProxyHelper
         $regexp = '/([\[\( ]|^)([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z0-9_\x7f-\xff]++)*+)(?!: )/';
         $callback = (false !== strpbrk($default, "\\:('") && $class = $param->getDeclaringClass())
             ? fn ($m) => $m[1].match ($m[2]) {
-                'new' => 'new',
+                'new', 'false', 'true', 'null' => $m[2],
+                'NULL' => 'null',
                 'self' => '\\'.$class->name,
                 'namespace\\parent',
                 'parent' => ($parent = $class->getParentClass()) ? '\\'.$parent->name : 'parent',
                 default => '\\'.$m[2],
             }
-            : fn ($m) => $m[1].(\in_array($m[2], ['new', 'self', 'parent'], true) ? '' : '\\').$m[2];
+            : fn ($m) => $m[1].match ($m[2]) {
+                'new', 'false', 'true', 'null', 'self', 'parent' => $m[2],
+                'NULL' => 'null',
+                default => '\\'.$m[2],
+            };
 
         return implode('', array_map(fn ($part) => match ($part[0]) {
             '"' => $part, // for internal classes only

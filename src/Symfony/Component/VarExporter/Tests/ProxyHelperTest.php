@@ -219,7 +219,7 @@ abstract class TestForProxyHelper
     {
     }
 
-    protected function foo6($b = null, $c = \PHP_EOL, $d = [\PHP_EOL]): never
+    protected function foo6($b = null, $c = \PHP_EOL, $d = [\PHP_EOL], $e = [false, true, null]): never
     {
     }
 

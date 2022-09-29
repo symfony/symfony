@@ -72,6 +72,7 @@ class CompletionInputTest extends TestCase
 
         // end of definition
         yield 'end' => [CompletionInput::fromTokens(['bin/console', 'symfony', 'sensiolabs'], 3), CompletionInput::TYPE_NONE, null, ''];
+        yield 'end-with-value' => [CompletionInput::fromTokens(['bin/console', 'symfony', 'sensiolabs', 'am'], 3), CompletionInput::TYPE_NONE, null, ''];
     }
 
     /**

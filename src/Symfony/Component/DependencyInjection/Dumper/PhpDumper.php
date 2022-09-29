@@ -35,6 +35,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator as BaseServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -1234,6 +1235,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class $class extends $baseClass
 {
+    private const DEPRECATED_PARAMETERS = [];
+
     protected \$parameters = [];
     protected readonly \WeakReference \$ref;
 
@@ -1242,11 +1245,9 @@ class $class extends $baseClass
         \$this->ref = \WeakReference::create(\$this);
 
 EOF;
+        $code = str_replace("    private const DEPRECATED_PARAMETERS = [];\n\n", $this->addDeprecatedParameters(), $code);
         if ($this->asFiles) {
-            $code = str_replace('$parameters = []', "\$containerDir;\n    protected \$parameters = [];\n    private \$buildParameters", $code);
-            $code = str_replace('__construct()', '__construct(array $buildParameters = [], $containerDir = __DIR__)', $code);
-            $code .= "        \$this->buildParameters = \$buildParameters;\n";
-            $code .= "        \$this->containerDir = \$containerDir;\n";
+            $code = str_replace('__construct()', '__construct(private array $buildParameters = [], protected string $containerDir = __DIR__)', $code);
 
             if (null !== $this->targetDirRegex) {
                 $code = str_replace('$parameters = []', "\$targetDir;\n    protected \$parameters = []", $code);
@@ -1389,6 +1390,24 @@ EOF;
     }
 
 EOF;
+    }
+
+    private function addDeprecatedParameters(): string
+    {
+        if (!($bag = $this->container->getParameterBag()) instanceof ParameterBag) {
+            return '';
+        }
+
+        if (!$deprecated = $bag->allDeprecated()) {
+            return '';
+        }
+        $code = '';
+        ksort($deprecated);
+        foreach ($deprecated as $param => $deprecation) {
+            $code .= '        '.$this->doExport($param).' => ['.implode(', ', array_map($this->doExport(...), $deprecation))."],\n";
+        }
+
+        return "    private const DEPRECATED_PARAMETERS = [\n{$code}    ];\n\n";
     }
 
     private function addMethodMap(): string
@@ -1552,6 +1571,10 @@ EOF;
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
+        if (isset(self::DEPRECATED_PARAMETERS[$name])) {
+            trigger_deprecation(...self::DEPRECATED_PARAMETERS[$name]);
+        }
+
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
@@ -1590,15 +1613,21 @@ EOF;
             foreach ($this->buildParameters as $name => $value) {
                 $parameters[$name] = $value;
             }
-            $this->parameterBag = new FrozenParameterBag($parameters);
+            $this->parameterBag = new FrozenParameterBag($parameters, self::DEPRECATED_PARAMETERS);
         }
 
         return $this->parameterBag;
     }
 
 EOF;
+
         if (!$this->asFiles) {
             $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n\n?/m', '', $code);
+        }
+
+        if (!($bag = $this->container->getParameterBag()) instanceof ParameterBag || !$bag->allDeprecated()) {
+            $code = preg_replace("/\n.*DEPRECATED_PARAMETERS.*\n.*\n.*\n/m", '', $code, 1);
+            $code = str_replace(', self::DEPRECATED_PARAMETERS', '', $code);
         }
 
         if ($dynamicPhp) {

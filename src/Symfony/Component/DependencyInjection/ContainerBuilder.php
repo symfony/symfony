@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -610,7 +611,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
         $this->addAliases($container->getAliases());
-        $this->getParameterBag()->add($container->getParameterBag()->all());
+        $parameterBag = $this->getParameterBag();
+        $otherBag = $container->getParameterBag();
+        $parameterBag->add($otherBag->all());
+
+        if ($parameterBag instanceof ParameterBag && $otherBag instanceof ParameterBag) {
+            foreach ($otherBag->allDeprecated() as $name => $deprecated) {
+                $parameterBag->deprecate($name, ...$deprecated);
+            }
+        }
 
         if ($this->trackResources) {
             foreach ($container->getResources() as $resource) {
@@ -626,9 +635,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->extensionConfigs[$name] = array_merge($this->extensionConfigs[$name], $container->getExtensionConfig($name));
         }
 
-        if ($this->getParameterBag() instanceof EnvPlaceholderParameterBag && $container->getParameterBag() instanceof EnvPlaceholderParameterBag) {
-            $envPlaceholders = $container->getParameterBag()->getEnvPlaceholders();
-            $this->getParameterBag()->mergeEnvPlaceholders($container->getParameterBag());
+        if ($parameterBag instanceof EnvPlaceholderParameterBag && $otherBag instanceof EnvPlaceholderParameterBag) {
+            $envPlaceholders = $otherBag->getEnvPlaceholders();
+            $parameterBag->mergeEnvPlaceholders($otherBag);
         } else {
             $envPlaceholders = [];
         }
@@ -687,6 +696,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         array_unshift($this->extensionConfigs[$name], $config);
+    }
+
+    /**
+     * Deprecates a service container parameter.
+     *
+     * @throws ParameterNotFoundException if the parameter is not defined
+     */
+    public function deprecateParameter(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.'): void
+    {
+        if (!$this->parameterBag instanceof ParameterBag) {
+            throw new BadMethodCallException(sprintf('The parameter bag must be an instance of "%s" to call "%s".', ParameterBag::class, __METHOD__));
+        }
+
+        $this->parameterBag->deprecate($name, $package, $version, $message);
     }
 
     /**

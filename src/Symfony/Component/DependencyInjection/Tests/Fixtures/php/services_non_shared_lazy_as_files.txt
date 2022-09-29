@@ -77,17 +77,13 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ProjectServiceContainer extends Container
 {
-    protected $containerDir;
     protected $targetDir;
     protected $parameters = [];
-    private $buildParameters;
     protected readonly \WeakReference $ref;
 
-    public function __construct(array $buildParameters = [], $containerDir = __DIR__)
+    public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
         $this->ref = \WeakReference::create($this);
-        $this->buildParameters = $buildParameters;
-        $this->containerDir = $containerDir;
         $this->targetDir = \dirname($containerDir);
         $this->services = $this->privates = [];
         $this->fileMap = [

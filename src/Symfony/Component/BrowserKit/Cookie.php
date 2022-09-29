@@ -72,7 +72,7 @@ class Cookie
         $this->samesite = $samesite;
 
         if (null !== $expires) {
-            $timestampAsDateTime = \DateTime::createFromFormat('U', $expires);
+            $timestampAsDateTime = \DateTimeImmutable::createFromFormat('U', $expires);
             if (false === $timestampAsDateTime) {
                 throw new \UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.', $expires));
             }
@@ -89,7 +89,7 @@ class Cookie
         $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
-            $dateTime = \DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
+            $dateTime = \DateTimeImmutable::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
             $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::DATE_FORMATS[0]));
         }
 
@@ -202,13 +202,13 @@ class Cookie
         }
 
         foreach (self::DATE_FORMATS as $dateFormat) {
-            if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
+            if (false !== $date = \DateTimeImmutable::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
                 return $date->format('U');
             }
         }
 
         // attempt a fallback for unusual formatting
-        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+        if (false !== $date = date_create_immutable($dateValue, new \DateTimeZone('GMT'))) {
             return $date->format('U');
         }
 

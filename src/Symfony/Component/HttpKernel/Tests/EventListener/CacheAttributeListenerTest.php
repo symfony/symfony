@@ -259,8 +259,8 @@ class CacheAttributeListenerTest extends TestCase
 
         $response = new Response();
         $response->setEtag('"54321"');
-        $response->setLastModified(new \DateTime('Fri, 23 Aug 2014 00:00:00 GMT'));
-        $response->setExpires(new \DateTime('Fri, 24 Aug 2014 00:00:00 GMT'));
+        $response->setLastModified(new \DateTimeImmutable('Fri, 23 Aug 2014 00:00:00 GMT'));
+        $response->setExpires(new \DateTimeImmutable('Fri, 24 Aug 2014 00:00:00 GMT'));
         $response->setSharedMaxAge(30);
         $response->setMaxAge(30);
         $response->setVary(['foobaz']);
@@ -270,8 +270,8 @@ class CacheAttributeListenerTest extends TestCase
         $listener->onKernelResponse($responseEvent);
 
         $this->assertSame('"54321"', $response->getEtag());
-        $this->assertEquals(new \DateTime('Fri, 23 Aug 2014 00:00:00 GMT'), $response->getLastModified());
-        $this->assertEquals(new \DateTime('Fri, 24 Aug 2014 00:00:00 GMT'), $response->getExpires());
+        $this->assertEquals(new \DateTimeImmutable('Fri, 23 Aug 2014 00:00:00 GMT'), $response->getLastModified());
+        $this->assertEquals(new \DateTimeImmutable('Fri, 24 Aug 2014 00:00:00 GMT'), $response->getExpires());
         $this->assertSame('30', $response->headers->getCacheControlDirective('s-maxage'));
         $this->assertSame(30, $response->getMaxAge());
         $this->assertSame(['foobaz'], $response->getVary());
@@ -320,7 +320,7 @@ class TestEntity
 {
     public function getDate()
     {
-        return new \DateTime('Fri, 23 Aug 2013 00:00:00 GMT');
+        return new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT');
     }
 
     public function getId()

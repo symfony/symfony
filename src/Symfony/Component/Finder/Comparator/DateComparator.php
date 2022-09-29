@@ -30,7 +30,7 @@ class DateComparator extends Comparator
         }
 
         try {
-            $date = new \DateTime($matches[2]);
+            $date = new \DateTimeImmutable($matches[2]);
             $target = $date->format('U');
         } catch (\Exception) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid date.', $matches[2]));

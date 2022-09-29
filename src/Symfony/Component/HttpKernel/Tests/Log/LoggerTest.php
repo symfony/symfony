@@ -160,7 +160,7 @@ class LoggerTest extends TestCase
             'int' => 0,
             'float' => 0.5,
             'nested' => ['with object' => new DummyTest()],
-            'object' => new \DateTime(),
+            'object' => new \DateTimeImmutable(),
             'resource' => fopen('php://memory', 'r'),
         ];
 

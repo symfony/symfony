@@ -1546,10 +1546,10 @@ EOT
         $yaml = <<<'EOT'
 date: 2002-12-14
 EOT;
-        $expectedDate = new \DateTime();
-        $expectedDate->setTimeZone(new \DateTimeZone('UTC'));
-        $expectedDate->setDate(2002, 12, 14);
-        $expectedDate->setTime(0, 0, 0);
+        $expectedDate = (new \DateTimeImmutable())
+            ->setTimeZone(new \DateTimeZone('UTC'))
+            ->setDate(2002, 12, 14)
+            ->setTime(0, 0, 0);
 
         $this->assertSameData(['date' => $expectedDate], $this->parser->parse($yaml, Yaml::PARSE_DATETIME));
     }

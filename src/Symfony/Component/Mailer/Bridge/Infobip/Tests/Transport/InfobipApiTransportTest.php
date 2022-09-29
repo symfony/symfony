@@ -133,7 +133,7 @@ class InfobipApiTransportTest extends TestCase
             ->html('<html><p>Hello!</p></html>')
             ->bcc('bcc@example.com')
             ->cc('cc@example.com')
-            ->date(new \DateTime('2022-04-28 14:00.00', new \DateTimeZone('UTC')))
+            ->date(new \DateTimeImmutable('2022-04-28 14:00.00', new \DateTimeZone('UTC')))
             ->replyTo('replyTo@example.com')
         ;
 
@@ -279,7 +279,7 @@ class InfobipApiTransportTest extends TestCase
             ->html('<html><p>Hello!</p></html>')
             ->bcc('bcc@example.com')
             ->cc('cc@example.com')
-            ->date(new \DateTime('2022-04-28 14:00.00', new \DateTimeZone('UTC')))
+            ->date(new \DateTimeImmutable('2022-04-28 14:00.00', new \DateTimeZone('UTC')))
             ->replyTo('replyTo@example.com')
         ;
 

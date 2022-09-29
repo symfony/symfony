@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Fixtures;
 
-class DateTimeChild extends \DateTime
+class DateTimeChild extends \DateTimeImmutable
 {
     private $addedProperty = 'foo';
 }

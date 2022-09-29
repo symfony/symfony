@@ -41,7 +41,7 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
      */
     public function supports(Request $request): bool
     {
-        return $request->isMethod('POST') && $this->getLoginUrl($request) === $request->getPathInfo();
+        return $request->isMethod('POST') && $this->getLoginUrl($request) === $request->getBaseUrl().$request->getPathInfo();
     }
 
     /**

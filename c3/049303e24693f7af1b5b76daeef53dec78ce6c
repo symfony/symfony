@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by dbu at 2022-08-23T12:45:09Z
+
+@dunglas does this approach make sense? and would you have an idea what i got wrong with the service configuration?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-28T16:21:59Z
+
+Hey!
+
+I think @mtarld has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-29T09:33:01Z
+
+I've cherry-picked the changes on JsonEncoder in c693778940f379edf42272018cf8984e217befeb, on top of #45554, branch 5.4
+
+I've updated the patch attached to this PR to keep only the part related to YamlEncoder.
+This would be a new feature so it should target 6.2
+
+I'll let you update the PR description if you don't mind, also add tests and a line in the changelog of the component?
+
+---------------------------------------------------------------------------
+
+by dbu at 2022-09-29T13:58:23Z
+
+thanks. i rebased on 6.2 and updated the commit.
+
+i think the build errors are not related to my change but broken in the 6.2 branch.

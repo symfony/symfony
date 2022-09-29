@@ -18,6 +18,10 @@ use Symfony\Component\Serializer\Encoder\YamlEncoder;
 /**
  * A helper providing autocompletion for available YamlEncoder options.
  *
+ * Note that the "indentation" setting is not offered in this builder because
+ * it can only be set during the construction of the YamlEncoder, but not per
+ * call.
+ *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
 final class YamlEncoderContextBuilder implements ContextBuilderInterface

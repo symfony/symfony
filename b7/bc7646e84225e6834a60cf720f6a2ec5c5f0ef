@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-08-23T19:43:25Z
+
+Can something "like this" be applied to "fix this"?  https://github.com/symfony/symfony/issues/29746
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-09-29T10:02:53Z
+
+I've added some tests, this is ready now as far as I'm concerned.

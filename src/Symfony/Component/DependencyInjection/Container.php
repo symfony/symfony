@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -82,7 +83,10 @@ class Container implements ContainerInterface, ResetInterface
     {
         $this->parameterBag->resolve();
 
-        $this->parameterBag = new FrozenParameterBag($this->parameterBag->all());
+        $this->parameterBag = new FrozenParameterBag(
+            $this->parameterBag->all(),
+            $this->parameterBag instanceof ParameterBag ? $this->parameterBag->allDeprecated() : []
+        );
 
         $this->compiled = true;
     }

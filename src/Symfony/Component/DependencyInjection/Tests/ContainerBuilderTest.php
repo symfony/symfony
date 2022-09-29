@@ -31,9 +31,11 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -42,6 +44,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInst
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
@@ -98,6 +101,109 @@ class ContainerBuilderTest extends TestCase
         } catch (ServiceNotFoundException $e) {
             $this->assertEquals('You have requested a non-existent service "baz".', $e->getMessage(), '->getDefinition() throws a ServiceNotFoundException if the service definition does not exist');
         }
+    }
+
+    /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
+     * @group legacy
+     */
+    public function testDeprecateParameter()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setParameter('foo', 'bar');
+
+        $builder->deprecateParameter('foo', 'symfony/test', '6.3');
+
+        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
+
+        $builder->getParameter('foo');
+    }
+
+    /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
+     * @group legacy
+     */
+    public function testParameterDeprecationIsTrgiggeredWhenCompiled()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setParameter('foo', '%bar%');
+        $builder->setParameter('bar', 'baz');
+
+        $builder->deprecateParameter('bar', 'symfony/test', '6.3');
+
+        $this->expectDeprecation('Since symfony/test 6.3: The parameter "bar" is deprecated.');
+
+        $builder->compile();
+    }
+
+    public function testDeprecateParameterThrowsWhenParameterIsUndefined()
+    {
+        $builder = new ContainerBuilder();
+
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent parameter "foo".');
+
+        $builder->deprecateParameter('foo', 'symfony/test', '6.3');
+    }
+
+    public function testDeprecateParameterThrowsWhenParameterBagIsNotInternal()
+    {
+        $builder = new ContainerBuilder(new class() implements ParameterBagInterface {
+            public function clear()
+            {
+            }
+
+            public function add(array $parameters)
+            {
+            }
+
+            public function all(): array
+            {
+                return [];
+            }
+
+            public function get(string $name): array|bool|string|int|float|\UnitEnum|null
+            {
+                return null;
+            }
+
+            public function remove(string $name)
+            {
+            }
+
+            public function set(string $name, \UnitEnum|float|int|bool|array|string|null $value)
+            {
+            }
+
+            public function has(string $name): bool
+            {
+                return false;
+            }
+
+            public function resolve()
+            {
+            }
+
+            public function resolveValue(mixed $value)
+            {
+            }
+
+            public function escapeValue(mixed $value): mixed
+            {
+                return null;
+            }
+
+            public function unescapeValue(mixed $value): mixed
+            {
+                return null;
+            }
+        });
+
+        $this->expectException(BadMethodCallException::class);
+
+        $builder->deprecateParameter('foo', 'symfony/test', '6.3');
     }
 
     public function testRegister()

@@ -10,6 +10,7 @@ CHANGELOG
  * Add support for nesting autowiring-related attributes into `#[Autowire(...)]`
  * Deprecate undefined and numeric keys with `service_locator` config
  * Fail if Target attribute does not exist during compilation
+ * Enable deprecating parameters with `ContainerBuilder::deprecateParameter()`
 
 6.2
 ---

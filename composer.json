@@ -197,6 +197,15 @@
         {
             "type": "path",
             "url": "src/Symfony/Component/Runtime"
+        },
+        {
+            "type": "path",
+            "url": "src/Symfony/Component/Notifier/Bridge/Mercure/Tests/stella-maris-clock",
+            "options": {
+                "versions": {
+                    "stella-maris/clock": "0.1.x-dev"
+                }
+            }
         }
     ],
     "minimum-stability": "dev"

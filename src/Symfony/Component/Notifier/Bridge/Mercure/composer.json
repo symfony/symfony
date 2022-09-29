@@ -28,5 +28,16 @@
             "/Tests/"
         ]
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "Tests/stella-maris-clock",
+            "options": {
+                "versions": {
+                    "stella-maris/clock": "0.1.x-dev"
+                }
+            }
+        }
+    ],
     "minimum-stability": "dev"
 }

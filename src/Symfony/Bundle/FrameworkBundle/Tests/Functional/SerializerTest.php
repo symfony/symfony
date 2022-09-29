@@ -32,6 +32,41 @@ class SerializerTest extends AbstractWebTestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @dataProvider provideNormalizersAndEncodersWithDefaultContextOption
+     */
+    public function testNormalizersAndEncodersUseDefaultContextConfigOption(string $normalizerId)
+    {
+        static::bootKernel(['test_case' => 'Serializer']);
+
+        $normalizer = static::getContainer()->get($normalizerId);
+
+        $reflectionObject = new \ReflectionObject($normalizer);
+        $property = $reflectionObject->getProperty('defaultContext');
+        $property->setAccessible(true);
+
+        $defaultContext = $property->getValue($normalizer);
+
+        self::assertArrayHasKey('fake_context_option', $defaultContext);
+        self::assertEquals('foo', $defaultContext['fake_context_option']);
+    }
+
+    public function provideNormalizersAndEncodersWithDefaultContextOption(): array
+    {
+        return [
+            ['serializer.normalizer.constraint_violation_list.alias'],
+            ['serializer.normalizer.dateinterval.alias'],
+            ['serializer.normalizer.datetime.alias'],
+            ['serializer.normalizer.json_serializable.alias'],
+            ['serializer.normalizer.problem.alias'],
+            ['serializer.normalizer.uid.alias'],
+            ['serializer.normalizer.object.alias'],
+            ['serializer.encoder.xml.alias'],
+            ['serializer.encoder.yaml.alias'],
+            ['serializer.encoder.csv.alias'],
+        ];
+    }
 }
 
 class Foo

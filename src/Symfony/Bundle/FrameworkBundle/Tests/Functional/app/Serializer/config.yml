@@ -7,9 +7,54 @@ framework:
         enabled: true
         default_context:
             enable_max_depth: true
+            fake_context_option: foo
     property_info: { enabled: true }
 
 services:
     serializer.alias:
         alias: serializer
+        public: true
+
+    serializer.normalizer.constraint_violation_list.alias:
+        alias: serializer.normalizer.constraint_violation_list
+        public: true
+
+    serializer.normalizer.dateinterval.alias:
+        alias: serializer.normalizer.dateinterval
+        public: true
+
+    serializer.normalizer.datetime.alias:
+        alias: serializer.normalizer.datetime
+        public: true
+
+    serializer.normalizer.json_serializable.alias:
+        alias: serializer.normalizer.json_serializable
+        public: true
+
+    serializer.normalizer.problem.alias:
+        alias: serializer.normalizer.problem
+        public: true
+
+    serializer.normalizer.uid.alias:
+        alias: serializer.normalizer.uid
+        public: true
+
+    serializer.normalizer.property.alias:
+        alias: serializer.normalizer.property
+        public: true
+
+    serializer.normalizer.object.alias:
+        alias: serializer.normalizer.object
+        public: true
+
+    serializer.encoder.xml.alias:
+        alias: serializer.encoder.xml
+        public: true
+
+    serializer.encoder.yaml.alias:
+        alias: serializer.encoder.yaml
+        public: true
+
+    serializer.encoder.csv.alias:
+        alias: serializer.encoder.csv
         public: true

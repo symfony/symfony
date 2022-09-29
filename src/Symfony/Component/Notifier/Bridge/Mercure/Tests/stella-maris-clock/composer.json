@@ -1,0 +1,17 @@
+{
+    "name": "stella-maris/clock",
+    "description": "A local fork to workaround gitlab failing to serve the package reliably",
+    "homepage": "https://gitlab.com/stella-maris/clock",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andreas Heigl",
+            "role": "Maintainer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "StellaMaris\\Clock\\": ""
+        }
+    }
+}

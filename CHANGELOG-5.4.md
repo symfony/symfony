@@ -7,6 +7,37 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.13 (2022-09-30)
+
+ * bug #47317 [Security] Fix login url matching when app is not run with url rewriting or from a sub folder (sgehrig)
+ * bug #47637 [FrameworkBundle] Fix passing `serializer.default_context` option to normalizers (wuchen90)
+ * bug #47695 [FrameworkBundle] Filter out trans paths that are covered by a parent folder path (natewiebe13)
+ * bug #45554 [Serializer] Fixed framework.serializer.default_context is not working for JsonEncoder (siganushka)
+ * bug #47547 [Ldap] Do not run ldap_set_option on failed connection (tatankat)
+ * bug #47578 [Security] Fix AbstractFormLoginAuthenticator return types (AndrolGenhald)
+ * bug #47614 [FrameworkBundle] Fix a phpdoc in mailer assertions (HeahDude)
+ * bug #47516 [HttpFoundation] Prevent BinaryFileResponse::prepare from adding content type if no content is sent (naitsirch)
+ * bug #47533 [Messenger] decode URL-encoded characters in DSN's usernames/passwords (xabbuh)
+ * bug #47530 [HttpFoundation] Always return strings from accept headers (ausi)
+ * bug #47523 [Uid] Ensure ULIDs are monotonic even when the time goes backward (nicolas-grekas)
+ * bug #47528 [Form] fix UUID tranformer (nicolas-grekas)
+ * bug #47488 [Security] Fix valid remember-me token exposure to the second consequent request (Ivan Kurnosov)
+ * bug #47518 [Uid] Fix validating UUID variant bits (nicolas-grekas)
+ * bug #47441 [HttpClient] [HttpClientBundle] Bugfix for delayed retryableHttpClient (martkop26)
+ * bug #47499 [Uid][Validator] Stop to first ULID format violation (ogizanagi)
+ * bug #47491 [HttpKernel] Prevent exception in RequestDataCollector if request stack is empty (aschempp)
+ * bug #47497 [Bridge] Fix mkdir() race condition in ProxyCacheWarmer (andrey-tech)
+ * bug #47415 [HttpClient] Psr18Client ignore invalid HTTP headers (nuryagdym)
+ * bug #47394 [Console] [Completion] Make bash completion run in non interactive mode (Seldaek)
+ * bug #47455 [Mime] Fix TextPart broken after being serialized (fabpot)
+ * bug #47423 [String] CamelCase/SnakeCase on uppercase word (mpiot)
+ * bug #47435 [HttpKernel] lock when writting profiles (nicolas-grekas)
+ * bug #47417 [WebProfilerBundle] Fix profile search bar link query params (HeahDude)
+ * bug #47437 [Mime] Fix email rendering when having inlined parts that are not related to the content (fabpot)
+ * bug #47434 [HttpFoundation] move flushing outside of Response::closeOutputBuffers (nicolas-grekas)
+ * bug #47351 [FrameworkBundle] Do not throw when describing a factory definition (MatTheCat)
+ * bug #47403 [Mailer] Fix edge cases in STMP transports (fabpot)
+
 * 5.4.12 (2022-08-26)
 
  * bug #47391 [LokaliseBridge] Fix push command --delete-missing options when there are no missing messages (rwionczek)

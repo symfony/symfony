@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-09-20T07:40:58Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-09-20T18:21:52Z
+
+Does it mean that the current way to deal with errors is wrong? Can we fix that instead?
+
+---------------------------------------------------------------------------
+
+by sdrewergutland at 2022-09-21T04:37:48Z
+
+Yes, I suppose that would be another option; that would make it more consistent with how other transports handle errors that are not Connection/Authorization based. So a solution in the manner of https://github.com/symfony/symfony/blob/363347519316cb076d28654f4886b27105edf111/src/Symfony/Component/Notifier/Bridge/AllMySms/AllMySmsTransport.php#L90-L92
+
+But that would cause a BC break I assume since now receiving an Exception when a device is not registered is very different behaviour. But if that is acceptable I would close this PR and open one with the correct description and implementation of the solution then.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-09-21T06:16:50Z
+
+But IIUC, right now, the message is not sent and you don't get any error. So, that's a bug that should be fixed.
+
+---------------------------------------------------------------------------
+
+by sdrewergutland at 2022-09-22T05:14:10Z
+
+Alright, thanks for the feedback & PR is updated.

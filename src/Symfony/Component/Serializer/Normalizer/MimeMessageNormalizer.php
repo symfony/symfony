@@ -64,6 +64,10 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
             $ret['class'] = $object::class;
             unset($ret['seekable'], $ret['cid']);
 
+            if (class_exists(BodyFile::class)) {
+                unset($ret['seekable'], $ret['cid']);
+            }
+
             return $ret;
         }
 

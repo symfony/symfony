@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Innloggingslenka er ugyldig eller utgjengen.</target>
             </trans-unit>
+    	    <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>For mange mislykkede påloggingsforsøk, prøv igjen om %minutes% minutt.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>For mange mislykkede påloggingsforsøk, prøv igjen om %minutes% minutter.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

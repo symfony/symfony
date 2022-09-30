@@ -7,6 +7,22 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.46 (2022-09-30)
+
+ * bug #47547 [Ldap] Do not run ldap_set_option on failed connection (tatankat)
+ * bug #47578 [Security] Fix AbstractFormLoginAuthenticator return types (AndrolGenhald)
+ * bug #47614 [FrameworkBundle] Fix a phpdoc in mailer assertions (HeahDude)
+ * bug #47516 [HttpFoundation] Prevent BinaryFileResponse::prepare from adding content type if no content is sent (naitsirch)
+ * bug #47533 [Messenger] decode URL-encoded characters in DSN's usernames/passwords (xabbuh)
+ * bug #47530 [HttpFoundation] Always return strings from accept headers (ausi)
+ * bug #47497 [Bridge] Fix mkdir() race condition in ProxyCacheWarmer (andrey-tech)
+ * bug #47415 [HttpClient] Psr18Client ignore invalid HTTP headers (nuryagdym)
+ * bug #47435 [HttpKernel] lock when writting profiles (nicolas-grekas)
+ * bug #47437 [Mime] Fix email rendering when having inlined parts that are not related to the content (fabpot)
+ * bug #47434 [HttpFoundation] move flushing outside of Response::closeOutputBuffers (nicolas-grekas)
+ * bug #47351 [FrameworkBundle] Do not throw when describing a factory definition (MatTheCat)
+ * bug #47403 [Mailer] Fix edge cases in STMP transports (fabpot)
+
 * 4.4.45 (2022-08-26)
 
  * bug #47358 Fix broken request stack state if throwable is thrown. (Warxcell)

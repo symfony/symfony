@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2022-07-28T10:04:29Z
+
+Rebased on the latest `5.4` to resolve CI failures with doctrine deprecations

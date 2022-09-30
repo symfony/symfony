@@ -35,7 +35,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature1()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature1']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature1(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, false, null),
@@ -46,7 +46,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature2()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature2']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature2(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, true, null, true),
@@ -57,7 +57,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature3()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature3']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature3(...));
 
         $this->assertEquals([
             new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, false, null),
@@ -67,7 +67,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature4()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature4']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature4(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', null, false, true, 'default'),
@@ -78,7 +78,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature5()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature5']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature5(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', 'array', false, true, null, true),

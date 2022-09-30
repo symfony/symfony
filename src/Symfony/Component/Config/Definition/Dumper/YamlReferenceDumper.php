@@ -170,7 +170,7 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray(array_map([Inline::class, 'dump'], $example), $depth + 1);
+            $this->writeArray(array_map(Inline::dump(...), $example), $depth + 1);
         }
 
         if ($children) {

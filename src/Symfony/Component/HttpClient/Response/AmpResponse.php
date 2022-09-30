@@ -207,7 +207,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         $timeout += microtime(true);
         self::$delay = Loop::defer(static function () use ($timeout) {
             if (0 < $timeout -= microtime(true)) {
-                self::$delay = Loop::delay(ceil(1000 * $timeout), [Loop::class, 'stop']);
+                self::$delay = Loop::delay(ceil(1000 * $timeout), Loop::stop(...));
             } else {
                 Loop::stop();
             }
@@ -447,6 +447,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             self::$delay = null;
         }
 
-        Loop::defer([Loop::class, 'stop']);
+        Loop::defer(Loop::stop(...));
     }
 }

@@ -44,7 +44,7 @@ class SendMessageMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $context = [
-            'class' => \get_class($envelope->getMessage()),
+            'class' => $envelope->getMessage()::class,
         ];
 
         $sender = null;

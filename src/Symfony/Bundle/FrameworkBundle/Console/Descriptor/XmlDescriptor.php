@@ -523,7 +523,7 @@ class XmlDescriptor extends Descriptor
 
             if (\is_object($callable[0])) {
                 $callableXML->setAttribute('name', $callable[1]);
-                $callableXML->setAttribute('class', \get_class($callable[0]));
+                $callableXML->setAttribute('class', $callable[0]::class);
             } else {
                 if (!str_starts_with($callable[1], 'parent::')) {
                     $callableXML->setAttribute('name', $callable[1]);

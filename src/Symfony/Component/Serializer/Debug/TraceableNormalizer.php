@@ -46,7 +46,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectNormalization($traceId, \get_class($this->normalizer), $time);
+            $this->dataCollector->collectNormalization($traceId, $this->normalizer::class, $time);
         }
 
         return $normalized;
@@ -72,7 +72,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectDenormalization($traceId, \get_class($this->normalizer), $time);
+            $this->dataCollector->collectDenormalization($traceId, $this->normalizer::class, $time);
         }
 
         return $denormalized;

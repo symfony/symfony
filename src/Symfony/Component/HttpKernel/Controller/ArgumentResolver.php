@@ -73,7 +73,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
             $representative = $controller;
 
             if (\is_array($representative)) {
-                $representative = sprintf('%s::%s()', \get_class($representative[0]), $representative[1]);
+                $representative = sprintf('%s::%s()', $representative[0]::class, $representative[1]);
             } elseif (\is_object($representative)) {
                 $representative = get_debug_type($representative);
             }

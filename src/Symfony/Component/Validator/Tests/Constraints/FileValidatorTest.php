@@ -501,7 +501,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ], '1'];
 
             // access FileValidator::factorizeSizes() private method to format max file size
-            $reflection = new \ReflectionClass(\get_class(new FileValidator()));
+            $reflection = new \ReflectionClass((new FileValidator()));
             $method = $reflection->getMethod('factorizeSizes');
             [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 

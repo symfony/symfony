@@ -90,7 +90,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
             FormInterface::class => function (FormInterface $f, array $a) {
                 return [
                     Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(\get_class($f->getConfig()->getType()->getInnerType())),
+                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub($f->getConfig()->getType()->getInnerType()::class),
                     Caster::PREFIX_VIRTUAL.'data' => $f->getData(),
                 ];
             },

@@ -145,7 +145,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             foreach ($decisionLog as $key => $log) {
                 $decisionLog[$key]['voter_details'] = [];
                 foreach ($log['voterDetails'] as $voterDetail) {
-                    $voterClass = \get_class($voterDetail['voter']);
+                    $voterClass = $voterDetail['voter']::class;
                     $classData = $this->hasVarDumper ? new ClassStub($voterClass) : $voterClass;
                     $decisionLog[$key]['voter_details'][] = [
                         'class' => $classData,

@@ -99,7 +99,7 @@ EOF
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
-                $currentClassName = \get_class($envelope->getMessage());
+                $currentClassName = $envelope->getMessage()::class;
 
                 if ($classFilter && $classFilter !== $currentClassName) {
                     continue;
@@ -151,7 +151,7 @@ EOF
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
-                $c = \get_class($envelope->getMessage());
+                $c = $envelope->getMessage()::class;
 
                 if (!isset($countPerClass[$c])) {
                     $countPerClass[$c] = [$c, 0];

@@ -328,7 +328,7 @@ class JsonDescriptor extends Descriptor
 
             if (\is_object($callable[0])) {
                 $data['name'] = $callable[1];
-                $data['class'] = \get_class($callable[0]);
+                $data['class'] = $callable[0]::class;
             } else {
                 if (!str_starts_with($callable[1], 'parent::')) {
                     $data['name'] = $callable[1];

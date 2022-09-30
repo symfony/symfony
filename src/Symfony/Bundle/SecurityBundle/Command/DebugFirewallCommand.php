@@ -230,7 +230,7 @@ EOF
     {
         if (\is_array($callable)) {
             if (\is_object($callable[0])) {
-                return sprintf('%s::%s()', \get_class($callable[0]), $callable[1]);
+                return sprintf('%s::%s()', $callable[0]::class, $callable[1]);
             }
 
             return sprintf('%s::%s()', $callable[0], $callable[1]);

@@ -63,7 +63,7 @@ class HandlersLocator implements HandlersLocatorInterface
      */
     public static function listTypes(Envelope $envelope): array
     {
-        $class = \get_class($envelope->getMessage());
+        $class = $envelope->getMessage()::class;
 
         return [$class => $class]
             + class_parents($class)

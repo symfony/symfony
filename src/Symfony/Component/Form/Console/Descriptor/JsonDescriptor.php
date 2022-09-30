@@ -51,7 +51,7 @@ class JsonDescriptor extends Descriptor
         $this->sortOptions($formOptions);
 
         $data = [
-            'class' => \get_class($resolvedFormType->getInnerType()),
+            'class' => $resolvedFormType->getInnerType()::class,
             'block_prefix' => $resolvedFormType->getInnerType()->getBlockPrefix(),
             'options' => $formOptions,
             'parent_types' => $this->parents,

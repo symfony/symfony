@@ -86,7 +86,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         $lastMessageDecodingFailedStamp = $envelope->last(MessageDecodingFailedStamp::class);
 
         $rows = [
-            ['Class', \get_class($envelope->getMessage())],
+            ['Class', $envelope->getMessage()::class],
         ];
 
         if (null !== $id = $this->getMessageId($envelope)) {

@@ -119,10 +119,6 @@ $initializer = function (Foo $instance, string $propertyName, ?string $propertyS
 };
 ```
 
-Because lazy-initialization is not triggered when (un)setting a property, it's
-also possible to do partial initialization by calling setters on a just-created
-ghost object.
-
 ### `LazyProxyTrait`
 
 Alternatively, `LazyProxyTrait` can be used to create virtual proxies:

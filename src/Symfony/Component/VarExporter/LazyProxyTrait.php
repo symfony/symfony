@@ -17,12 +17,15 @@ use Symfony\Component\VarExporter\Internal\LazyObjectRegistry as Registry;
 use Symfony\Component\VarExporter\Internal\LazyObjectState;
 
 /**
- * @property int    $lazyObjectId
- * @property parent $lazyObjectReal
+ * @property int    $lazyObjectId   This property must be declared in classes using this trait
+ * @property parent $lazyObjectReal This property must be declared in classes using this trait;
+ *                                  its type should match the type of the proxied object
  */
 trait LazyProxyTrait
 {
     /**
+     * Creates a lazy-loading virtual proxy.
+     *
      * @param \Closure():object $initializer Returns the proxied object
      */
     public static function createLazyProxy(\Closure $initializer, self $instance = null): static
@@ -86,7 +89,7 @@ trait LazyProxyTrait
 
     public function &__get($name): mixed
     {
-        $propertyScopes = Hydrator::$propertyScopes[static::class] ??= Hydrator::getPropertyScopes(static::class);
+        $propertyScopes = Hydrator::$propertyScopes[$this::class] ??= Hydrator::getPropertyScopes($this::class);
         $scope = null;
         $instance = $this;
 
@@ -144,7 +147,7 @@ trait LazyProxyTrait
 
     public function __set($name, $value): void
     {
-        $propertyScopes = Hydrator::$propertyScopes[static::class] ??= Hydrator::getPropertyScopes(static::class);
+        $propertyScopes = Hydrator::$propertyScopes[$this::class] ??= Hydrator::getPropertyScopes($this::class);
         $scope = null;
         $instance = $this;
 
@@ -165,6 +168,7 @@ trait LazyProxyTrait
                 goto set_in_scope;
             }
         }
+
         if (isset($this->lazyObjectReal)) {
             $instance = $this->lazyObjectReal;
         } elseif ((Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['set']) {
@@ -177,17 +181,15 @@ trait LazyProxyTrait
 
         if (null === $scope) {
             $instance->$name = $value;
-
-            return;
+        } else {
+            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
+            $accessor['set']($instance, $name, $value);
         }
-        $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-
-        $accessor['set']($instance, $name, $value);
     }
 
     public function __isset($name): bool
     {
-        $propertyScopes = Hydrator::$propertyScopes[static::class] ??= Hydrator::getPropertyScopes(static::class);
+        $propertyScopes = Hydrator::$propertyScopes[$this::class] ??= Hydrator::getPropertyScopes($this::class);
         $scope = null;
         $instance = $this;
 
@@ -208,6 +210,7 @@ trait LazyProxyTrait
                 goto isset_in_scope;
             }
         }
+
         if (isset($this->lazyObjectReal)) {
             $instance = $this->lazyObjectReal;
         } elseif ((Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['isset']) {
@@ -226,7 +229,7 @@ trait LazyProxyTrait
 
     public function __unset($name): void
     {
-        $propertyScopes = Hydrator::$propertyScopes[static::class] ??= Hydrator::getPropertyScopes(static::class);
+        $propertyScopes = Hydrator::$propertyScopes[$this::class] ??= Hydrator::getPropertyScopes($this::class);
         $scope = null;
         $instance = $this;
 
@@ -247,6 +250,7 @@ trait LazyProxyTrait
                 goto unset_in_scope;
             }
         }
+
         if (isset($this->lazyObjectReal)) {
             $instance = $this->lazyObjectReal;
         } elseif ((Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['unset']) {
@@ -259,12 +263,10 @@ trait LazyProxyTrait
 
         if (null === $scope) {
             unset($instance->$name);
-
-            return;
+        } else {
+            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
+            $accessor['unset']($instance, $name);
         }
-        $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-
-        $accessor['unset']($instance, $name);
     }
 
     public function __clone(): void

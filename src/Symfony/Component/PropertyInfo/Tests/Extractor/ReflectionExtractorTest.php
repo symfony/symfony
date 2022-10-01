@@ -22,6 +22,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -234,6 +235,7 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php80TypesProvider
+     *
      * @requires PHP 8
      */
     public function testExtractPhp80Type($property, array $type = null)
@@ -257,6 +259,7 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php81TypesProvider
+     *
      * @requires PHP 8.1
      */
     public function testExtractPhp81Type($property, array $type = null)
@@ -273,7 +276,16 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
+     * @requires PHP 8.1
+     */
+    public function testReadonlyPropertiesAreNotWriteable()
+    {
+        $this->assertFalse($this->extractor->isWritable(Php81Dummy::class, 'foo'));
+    }
+
+    /**
      * @dataProvider php82TypesProvider
+     *
      * @requires PHP 8.2
      */
     public function testExtractPhp82Type($property, array $type = null)

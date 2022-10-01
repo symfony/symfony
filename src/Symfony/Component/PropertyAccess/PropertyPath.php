@@ -47,9 +47,17 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * Contains a Boolean for each property in $elements denoting whether this
      * element is an index. It is a property otherwise.
      *
-     * @var array
+     * @var array<bool>
      */
     private $isIndex = [];
+
+    /**
+     * Contains a Boolean for each property in $elements denoting whether this
+     * element is optional or not.
+     *
+     * @var array<bool>
+     */
+    private $isNullSafe = [];
 
     /**
      * String representation of the path.
@@ -72,6 +80,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->elements = $propertyPath->elements;
             $this->length = $propertyPath->length;
             $this->isIndex = $propertyPath->isIndex;
+            $this->isNullSafe = $propertyPath->isNullSafe;
             $this->pathAsString = $propertyPath->pathAsString;
 
             return;
@@ -95,6 +104,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             } else {
                 $element = $matches[3];
                 $this->isIndex[] = true;
+            }
+
+            // Mark as optional when last character is "?".
+            if (str_ends_with($element, '?')) {
+                $this->isNullSafe[] = true;
+                $element = substr($element, 0, -1);
+            } else {
+                $this->isNullSafe[] = false;
             }
 
             $this->elements[] = $element;
@@ -133,6 +150,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent->pathAsString = substr($parent->pathAsString, 0, max(strrpos($parent->pathAsString, '.'), strrpos($parent->pathAsString, '[')));
         array_pop($parent->elements);
         array_pop($parent->isIndex);
+        array_pop($parent->isNullSafe);
 
         return $parent;
     }
@@ -175,5 +193,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         }
 
         return $this->isIndex[$index];
+    }
+
+    public function isNullSafe(int $index): bool
+    {
+        if (!isset($this->isNullSafe[$index])) {
+            throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));
+        }
+
+        return $this->isNullSafe[$index];
     }
 }

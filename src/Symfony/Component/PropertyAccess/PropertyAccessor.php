@@ -288,6 +288,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
 
+            $isNullSafe = false;
+            if (method_exists($propertyPath, 'isNullSafe')) {
+                // To be removed in symfony 7 once we are sure isNullSafe is always implemented.
+                $isNullSafe = $propertyPath->isNullSafe($i);
+            } else {
+                trigger_deprecation('symfony/property-access', '6.2', 'The "%s()" method in class "%s" needs to be implemented in version 7.0, not defining it is deprecated.', 'isNullSafe', PropertyPathInterface::class);
+            }
+
             if ($isIndex) {
                 // Create missing nested arrays on demand
                 if (($zval[self::VALUE] instanceof \ArrayAccess && !$zval[self::VALUE]->offsetExists($property)) ||
@@ -316,12 +324,14 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
 
                 $zval = $this->readIndex($zval, $property);
+            } elseif ($isNullSafe && !\is_object($zval[self::VALUE])) {
+                $zval[self::VALUE] = null;
             } else {
-                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty);
+                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty, $isNullSafe);
             }
 
             // the final value of the path must not be validated
-            if ($i + 1 < $propertyPath->getLength() && !\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE])) {
+            if ($i + 1 < $propertyPath->getLength() && !\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE]) && !$isNullSafe) {
                 throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $i + 1);
             }
 
@@ -373,7 +383,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If $ignoreInvalidProperty is false and the property does not exist or is not public
      */
-    private function readProperty(array $zval, string $property, bool $ignoreInvalidProperty = false): array
+    private function readProperty(array $zval, string $property, bool $ignoreInvalidProperty = false, bool $isNullSafe = false): array
     {
         if (!\is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%1$s]" instead.', $property));
@@ -433,6 +443,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             if (isset($zval[self::REF])) {
                 $result[self::REF] = &$object->$property;
             }
+        } elseif ($isNullSafe) {
+            $result[self::VALUE] = null;
         } elseif (!$ignoreInvalidProperty) {
             throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $class));
         }

@@ -66,6 +66,7 @@ PropertyAccess
 --------------
 
  * Deprecate calling `PropertyAccessorBuilder::setCacheItemPool()` without arguments
+ * Implementing the `PropertyPathInterface` without implementing the `isNullSafe()` method is deprecated
 
 Messenger
 --------

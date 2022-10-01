@@ -26,9 +26,12 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
 
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
-        ['serialize' => $serialize] = $this->parseDsn($dsn);
+        ['resettable' => $resettable, 'serialize' => $serialize] = $this->parseDsn($dsn);
 
-        return $this->createdTransports[] = new InMemoryTransport($serialize ? $serializer : null);
+        return $this->createdTransports[] = new InMemoryTransport(
+            $serialize ? $serializer : null,
+            $resettable ?? true
+        );
     }
 
     public function supports(string $dsn, array $options): bool
@@ -51,6 +54,7 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
         }
 
         return [
+            'resettable' => filter_var($query['resettable'] ?? true, \FILTER_VALIDATE_BOOLEAN),
             'serialize' => filter_var($query['serialize'] ?? false, \FILTER_VALIDATE_BOOL),
         ];
     }

@@ -89,12 +89,28 @@ class InMemoryTransportFactoryTest extends TestCase
         $this->assertCount(0, $transport->get());
     }
 
+    public function testResetCreatedTransportsWhenResetDisabled()
+    {
+        $transport = $this->factory->createTransport(
+            'in-memory://?resettable=false',
+            [],
+            $this->createMock(SerializerInterface::class)
+        );
+        $transport->send(Envelope::wrap(new DummyMessage('Hello.')));
+
+        $this->assertCount(1, $transport->get());
+        $this->factory->reset();
+        $this->assertCount(1, $transport->get());
+    }
+
     public function provideDSN(): array
     {
         return [
             'Supported' => ['in-memory://foo'],
             'Serialize enabled' => ['in-memory://?serialize=true'],
             'Serialize disabled' => ['in-memory://?serialize=false'],
+            'Serialize enabled and resettable disabled' => ['in-memory://?serialize=false&resettable=false'],
+            'Resettable disabled' => ['in-memory://?resettable=false'],
             'Unsupported' => ['amqp://bar', false],
         ];
     }

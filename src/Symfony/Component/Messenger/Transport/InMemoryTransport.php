@@ -44,12 +44,16 @@ class InMemoryTransport implements TransportInterface, ResetInterface
      */
     private array $queue = [];
 
-    private int $nextId = 1;
+    private $nextId = 1;
+
+    private $resettable = true;
+
     private ?SerializerInterface $serializer;
 
-    public function __construct(SerializerInterface $serializer = null)
+    public function __construct(SerializerInterface $serializer = null, bool $resettable = true)
     {
         $this->serializer = $serializer;
+        $this->resettable = $resettable;
     }
 
     public function get(): iterable
@@ -92,7 +96,9 @@ class InMemoryTransport implements TransportInterface, ResetInterface
 
     public function reset()
     {
-        $this->sent = $this->queue = $this->rejected = $this->acknowledged = [];
+        if ($this->resettable) {
+            $this->sent = $this->queue = $this->rejected = $this->acknowledged = [];
+        }
     }
 
     /**

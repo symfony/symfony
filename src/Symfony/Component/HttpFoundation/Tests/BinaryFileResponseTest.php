@@ -388,6 +388,32 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFalse($response->headers->has('Content-Type'));
     }
 
+    public function testContentTypeIsCorrectlyDetected()
+    {
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+
+        $request = Request::create('/');
+        $response->prepare($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('image/gif', $response->headers->get('Content-Type'));
+    }
+
+    public function testContentTypeIsNotGuessedWhenTheFileWasNotModified()
+    {
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+        $response->setAutoLastModified();
+
+        $request = Request::create('/');
+        $request->headers->set('If-Modified-Since', $response->getLastModified()->format('D, d M Y H:i:s').' GMT');
+        $isNotModified = $response->isNotModified($request);
+        $this->assertTrue($isNotModified);
+        $response->prepare($request);
+
+        $this->assertSame(304, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('Content-Type'));
+    }
+
     protected function provideResponse()
     {
         return new BinaryFileResponse(__DIR__.'/../README.md', 200, ['Content-Type' => 'application/octet-stream']);

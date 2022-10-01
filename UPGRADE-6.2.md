@@ -67,6 +67,11 @@ PropertyAccess
 
  * Deprecate calling `PropertyAccessorBuilder::setCacheItemPool()` without arguments
 
+Messenger
+--------
+
+* Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use the `AsMessageHandler` attribute instead
+
 Security
 --------
 

@@ -7,6 +7,7 @@ CHANGELOG
  * Add new `messenger:stats` command that returns a list of transports with their "to be processed" message count
  * Add `TransportNamesStamp` to change the transport while dispatching a message
  * Add support for rate limited transports by using the RateLimiter component.
+ * Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
 
 6.1
 ---

@@ -202,7 +202,6 @@ EOF;
                         "disposition": null,
                         "name": null,
                         "encoding": "quoted-printable",
-                        "seekable": null,
                         "headers": [],
                         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\TextPart"
                     },
@@ -213,7 +212,6 @@ EOF;
                         "disposition": null,
                         "name": null,
                         "encoding": "quoted-printable",
-                        "seekable": null,
                         "headers": [],
                         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\TextPart"
                     }
@@ -224,15 +222,12 @@ EOF;
             {
                 "filename": "text.txt",
                 "mediaType": "application",
-                "cid": null,
-                "handle": null,
                 "body": "text data",
                 "charset": null,
                 "subtype": "octet-stream",
                 "disposition": "attachment",
                 "name": "text.txt",
                 "encoding": "base64",
-                "seekable": null,
                 "headers": [],
                 "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
             }

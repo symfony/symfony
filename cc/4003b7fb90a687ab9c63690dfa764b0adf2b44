@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-09-21T10:33:38Z
+
+One thing that seems gone is showing which transport was used for each email (previously, it was shown in the tabs switching between emails)
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-21T12:55:39Z
+
+@javiereguiluz can you share the before/after comparison for how the panel looks like with multiple transports ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-21T13:08:56Z
+
+@stof thanks for the review. About the transport, to reduce the noise I thought it was a good idea to only display the transport if there's more than one transport. This is how it'd look like when showing the transport name:
+
+<img width="1090" alt="mailer-transport" src="https://user-images.githubusercontent.com/73419/191509028-9fdbd895-eebb-415d-9c3c-a72ef62ac96f.png">
+
+But thanks to your comment, I realized that maybe your app defines multiple transports, but this request only used one of them ... so you need the transport info somewhere. What about showing it like this:
+
+<img width="742" alt="mailer-transport-information" src="https://user-images.githubusercontent.com/73419/191512144-58ac5483-2e16-477d-b0f7-230827ec3043.png">
+
+Do you know how long can be the transport name in practice? It's the full DNS or a human-friendly short name? Thanks!
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-21T13:11:38Z
+
+IIRC, it is the full DSN (minus the auth part)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-21T13:31:38Z
+
+Given that it's the DSN, I've updated the design as follows:
+
+<img width="632" alt="transport-sent" src="https://user-images.githubusercontent.com/73419/191517298-ae94ec09-9fe7-4f08-8f2a-57f7d70e65c5.png">
+
+<img width="616" alt="transport-queued" src="https://user-images.githubusercontent.com/73419/191517313-c9fa88b8-583b-4682-8cb2-e5a83b17a972.png">
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-09-21T13:49:10Z
+
+what about showing multiple emails inbox-like? eg. a list of subject and date.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-21T13:51:38Z
+
+@ro0NL I doubt you will have web requests sending lots of emails (such case must be handled asynchronously). So it is better to optimize the experience for a few emails than for the case of a big list IMO.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-09-21T13:53:33Z
+
+im not sure how not seeing the subject improves the experience ...
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-21T13:55:57Z
+
+Well, if you want to display the subject instead of just `#1` and `#2`, it requires moving away from horizontal tabs then (as the subject won't fit in them), which means adding much more space for this email switcher.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-21T15:26:35Z
+
+I liked @ro0NL proposal, so I gave it a shot ... and I think it works better. It now shows a clickable list of messages to follow the familiar behavior of email clients:
+
+![mailer-email-list](https://user-images.githubusercontent.com/73419/191545703-4db85b42-a9aa-4301-8d22-0d438df844b0.gif)
+
+We also protect the design against too long lists:
+
+<img width="1108" alt="mailer-list-long" src="https://user-images.githubusercontent.com/73419/191545777-9363b838-7ae4-4769-9695-0944e6ff66f5.png">
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-09-22T06:56:44Z
+
+@stof I thought about what you said and I think you were right. That's why I've changed my mind and introduced some buttons in the table of emails to make it accessible.
+
+This is how it looks when using a browser with accessibility capabilities. In regular browsers, the buttons are completely hidden:
+
+<img width="991" alt="table-accessible" src="https://user-images.githubusercontent.com/73419/191679014-85918c2a-a3bd-44fd-83dc-f31fbd477c0e.png">
+
+So, I think this feature is now ready and complete. Thanks.

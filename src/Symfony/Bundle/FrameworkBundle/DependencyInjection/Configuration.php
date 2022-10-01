@@ -608,6 +608,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
+                        ->scalarNode('cache_dir')->defaultValue('%kernel.cache_dir%')->end()
                         ->scalarNode('default_uri')
                             ->info('The default URI used to generate URLs in a non-HTTP context')
                             ->defaultNull()

@@ -19,6 +19,7 @@ CHANGELOG
  * Add `rate_limiter` configuration option to `messenger.transport` to allow rate limited transports using the RateLimiter component
  * Remove `@internal` tag from secret vaults to allow them to be used directly outside the framework bundle and custom vaults to be added
  * Deprecate `framework.form.legacy_error_messages` config node
+ * Add a `framework.router.cache_dir` configuration option to configure the default `Router` `cache_dir` option
 
 6.1
 ---

@@ -584,6 +584,18 @@ abstract class FrameworkExtensionTest extends TestCase
                 'log_level' => 'info',
                 'status_code' => 422,
             ],
+            \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class => [
+                'log_level' => 'info',
+                'status_code' => null,
+            ],
+            \Symfony\Component\HttpKernel\Exception\ConflictHttpException::class => [
+                'log_level' => 'info',
+                'status_code' => null,
+            ],
+            \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException::class => [
+                'log_level' => null,
+                'status_code' => 500,
+            ],
         ], $container->getDefinition('exception_listener')->getArgument(3));
     }
 

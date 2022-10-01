@@ -201,7 +201,7 @@ class MailjetApiTransport extends AbstractApiTransport
         return match ($type) {
             'bool' => filter_var($value, \FILTER_VALIDATE_BOOL),
             'int' => (int) $value,
-            'json' => json_decode($value, true, 2, \JSON_THROW_ON_ERROR),
+            'json' => json_decode($value, true, 512, \JSON_THROW_ON_ERROR),
             'string' => $value,
         };
     }

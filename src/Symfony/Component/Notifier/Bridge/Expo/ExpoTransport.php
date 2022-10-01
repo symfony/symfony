@@ -50,6 +50,9 @@ final class ExpoTransport extends AbstractTransport
         return $message instanceof PushMessage;
     }
 
+    /**
+     * @see https://docs.expo.dev/push-notifications/sending-notifications/#http2-api
+     */
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof PushMessage) {
@@ -91,10 +94,14 @@ final class ExpoTransport extends AbstractTransport
             throw new TransportException('Unable to post the Expo message: '.$errorMessage, $response);
         }
 
-        $success = $response->toArray(false);
+        $result = $response->toArray(false);
+
+        if ('error' === $result['data']['status']) {
+            throw new TransportException(sprintf('Unable to post the Expo message: "%s" (%s)', $result['data']['message'], $result['data']['details']['error']), $response);
+        }
 
         $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId($success['data']['id']);
+        $sentMessage->setMessageId($result['data']['id']);
 
         return $sentMessage;
     }

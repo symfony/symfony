@@ -8,6 +8,9 @@
     <framework:config http-method-override="false">
         <framework:exceptions>
             <framework:exception name="Symfony\Component\HttpKernel\Exception\BadRequestHttpException" log-level="info" status-code="422" />
+            <framework:exception name="Symfony\Component\HttpKernel\Exception\NotFoundHttpException" log-level="info" status-code="0" />
+            <framework:exception name="Symfony\Component\HttpKernel\Exception\ConflictHttpException" log-level="info" status-code="0" />
+            <framework:exception name="Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException" log-level="null" status-code="500" />
         </framework:exceptions>
     </framework:config>
 </container>

@@ -96,6 +96,7 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --color-warning: var(--yellow-700);
     --color-error: var(--red-600);
     --h2-border-color: var(--gray-200);
+    --heading-code-background: var(--gray-100);
     --form-input-border-color: var(--gray-300);
     --button-background: var(--gray-100);
     --button-border-color: var(--gray-300);
@@ -151,6 +152,9 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --shadow: 0px 0px 1px rgba(128, 128, 128, .2);
     --border: 1px solid #e0e0e0;
     --background-error: var(--color-error);
+    --mailer-email-table-wrapper-background: var(--gray-100);
+    --mailer-email-table-active-row-background: #dbeafe;
+    --mailer-email-table-active-row-color: var(--color-text);
 
     --highlight-variable: #e36209;
     --highlight-string: #22863a;
@@ -220,6 +224,7 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --header-error-status-text-color: var(--red-200);
 
     --h2-border-color: var(--gray-500);
+    --heading-code-background: var(--gray-600);
     --form-input-border-color: var(--gray-400);
     --button-background: var(--gray-300);
     --button-border-color: var(--gray-500);
@@ -273,6 +278,9 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --shadow: 0px 0px 1px rgba(32, 32, 32, .2);
     --border: 1px solid #666;
     --background-error: #b0413e;
+    --mailer-email-table-wrapper-background: var(--gray-900);
+    --mailer-email-table-active-row-background: var(--gray-300);
+    --mailer-email-table-active-row-color: var(--gray-800);
     --highlight-variable: #ffa657;
     --highlight-string: #7ee787;
     --highlight-comment: #8b949e;
@@ -402,6 +410,16 @@ code, pre {
     font-family: var(--font-family-monospace);
     font-size: 14px;
 }
+h1 code, h2 code, h3 code, h4 code, h5 code, h6 code {
+    color: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    background: var(--heading-code-background);
+    border-radius: 4px;
+    padding: 0 3px;
+    word-break: break-word;
+}
 
 input, select {
     background-color: var(--page-background);
@@ -413,6 +431,19 @@ input, select {
 }
 input[type="radio"], input[type="checkbox"] {
     box-shadow: none;
+}
+
+/* Used to hide elements added for accessibility reasons (the !important modifier is needed here) */
+.visually-hidden {
+    border: 0 !important;
+    clip: rect(0, 0, 0, 0) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    width: 1px !important;
+    white-space: nowrap !important;
 }
 
 {# Buttons (the colors of this element don't change based on the selected theme)
@@ -646,7 +677,7 @@ table tbody td.num-col {
 .metrics {
     align-items: flex-start;
     display: flex;
-    margin: 1em 0 0;
+    margin: 1em 0;
     flex-wrap: wrap;
 }
 .metrics .metric {
@@ -658,7 +689,7 @@ table tbody td.num-col {
     box-shadow: inset 0 0 0 1px var(--metric-border-color), 0 0 0 5px var(--page-background);
     border-radius: 6px;
     color: var(--metric-value-color);
-    display: flex;
+    display: inline-flex;
     flex-direction: column-reverse;
     min-width: 60px;
     padding: 10px 15px;
@@ -760,7 +791,7 @@ table tbody td.num-col {
 }
 
 .metric-divider {
-    float: left;
+    display: inline-flex;
     margin: 0 10px;
     min-height: 1px; {# required to apply 'margin' to an empty 'div' #}
 }
@@ -773,6 +804,7 @@ table tbody td.num-col {
     box-shadow: inset 0 0 0 1px var(--form-input-border-color), 0 0 0 5px var(--page-background);
     margin: 1em 0;
     padding: 10px;
+    overflow-y: auto;
 }
 .card-block + .card-block {
     border-top: 1px solid var(--form-input-border-color);
@@ -1471,11 +1503,14 @@ tr.status-warning td {
     box-shadow: inset 0 0 0 1px var(--tab-border-color), 0 0 0 5px var(--page-background);
     display: inline-flex;
     flex-wrap: wrap;
-    font-size: 13px;
     margin: 0 0 15px;
     padding: 2px;
     user-select: none;
     -webkit-user-select: none;
+}
+.sf-tabs-sm .tab-navigation {
+    box-shadow: inset 0 0 0 1px var(--tab-border-color), 0 0 0 4px var(--page-background);
+    margin: 0 0 10px;
 }
 .tab-navigation li {
     cursor: pointer;
@@ -1486,6 +1521,10 @@ tr.status-warning td {
     position: relative;
     text-align: center;
     z-index: 1;
+}
+.sf-tabs-sm .tab-navigation li {
+    font-size: 13px;
+    padding: 2.5px 10px;
 }
 .tab-navigation li:before {
     background: var(--tab-border-color);
@@ -1643,6 +1682,10 @@ tr.status-warning td {
     font-size: 12px;
     font-weight: bold;
     padding: 1px 4px;
+}
+.badge-success {
+    background: var(--badge-success-background);
+    color: var(--badge-success-color);
 }
 .badge-warning {
     background: var(--badge-warning-background);
@@ -1845,6 +1888,129 @@ tr.log-status-silenced > td:first-child:before {
 }
 .container-compilation-logs summary p {
     margin: 0;
+}
+
+{# Mailer panel
+   ========================================================================= #}
+.mailer-email-summary-table-wrapper {
+    background: var(--mailer-email-table-wrapper-background);
+    border-bottom: 4px double var(--table-border-color);
+    border-radius: inherit;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin: 0 -9px 10px -9px;
+    padding-bottom: 10px;
+    transform: translateY(-9px);
+    max-height: 265px;
+    overflow-y: auto;
+}
+.mailer-email-summary-table,
+.mailer-email-summary-table tr,
+.mailer-email-summary-table td {
+    border: 0;
+    border-radius: inherit;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: none;
+}
+.mailer-email-summary-table th {
+    color: var(--color-muted);
+    font-size: 13px;
+    padding: 4px 10px;
+}
+.mailer-email-summary-table tr td,
+.mailer-email-summary-table tr:last-of-type td {
+    border: solid var(--table-border-color);
+    border-width: 1px 0;
+}
+.mailer-email-summary-table-row {
+    margin: 5px 0;
+}
+.mailer-email-summary-table-row:hover {
+    cursor: pointer;
+}
+.mailer-email-summary-table-row.active {
+    background: var(--mailer-email-table-active-row-background);
+    color: var(--mailer-email-table-active-row-color);
+}
+.mailer-email-summary-table-row td {
+    font-family: var(--font-family-system);
+    font-size: inherit;
+}
+.mailer-email-details {
+    display: none;
+}
+.mailer-email-details.active {
+    display: block;
+}
+.mailer-transport-information {
+    border-bottom: 1px solid var(--form-input-border-color);
+    padding-bottom: 5px;
+    font-size: 14px;
+    margin: 5px 0 10px 5px;
+}
+.mailer-transport-information .badge {
+    font-size: inherit;
+    font-weight: inherit;
+}
+.mailer-message-subject {
+    font-size: 21px;
+    font-weight: bold;
+    margin: 5px;
+}
+.mailer-message-headers {
+    margin-bottom: 10px;
+}
+.mailer-message-headers p {
+    font-size: 14px;
+    margin: 2px 5px;
+}
+.mailer-message-header-secondary {
+    color: var(--color-muted);
+}
+.mailer-message-attachments-title {
+    align-items: center;
+    display: flex;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.mailer-message-attachments-title svg {
+    color: var(--color-muted);
+    margin-right: 5px;
+    height: 18px;
+    width: 18px;
+}
+.mailer-message-attachments-title span {
+    font-weight: normal;
+    margin-left: 4px;
+}
+.mailer-message-attachments-list {
+    list-style: none;
+    margin: 0 0 5px 20px;
+    padding: 0;
+}
+.mailer-message-attachments-list li {
+    align-items: center;
+    display: flex;
+}
+.mailer-message-attachments-list li svg {
+    margin-right: 5px;
+    height: 18px;
+    width: 18px;
+}
+.mailer-message-attachments-list li a {
+    margin-left: 5px;
+}
+.mailer-message-download-raw {
+    align-items: center;
+    display: flex;
+    padding: 5px 0 0 5px;
+}
+.mailer-message-download-raw svg {
+    height: 18px;
+    width: 18px;
+    margin-right: 3px;
 }
 
 {# Doctrine panel

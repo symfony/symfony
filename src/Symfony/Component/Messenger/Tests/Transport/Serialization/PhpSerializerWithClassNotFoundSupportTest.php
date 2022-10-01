@@ -65,7 +65,7 @@ class PhpSerializerWithClassNotFoundSupportTest extends PhpSerializerTest
     protected function createPhpSerializer(): PhpSerializer
     {
         $serializer = new PhpSerializer();
-        $serializer->enableClassNotFoundCreation();
+        $serializer->acceptPhpIncompleteClass();
 
         return $serializer;
     }

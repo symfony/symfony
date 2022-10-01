@@ -96,7 +96,7 @@ EOF
             $io->comment(sprintf('Displaying only \'%s\' messages', $classFilter));
         }
 
-        $this->phpSerializer?->enableClassNotFoundCreation();
+        $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
                 $currentClassName = \get_class($envelope->getMessage());
@@ -118,7 +118,7 @@ EOF
                 ];
             }
         } finally {
-            $this->phpSerializer?->enableClassNotFoundCreation(false);
+            $this->phpSerializer?->rejectPhpIncompleteClass();
         }
 
         $rowsCount = \count($rows);
@@ -148,7 +148,7 @@ EOF
 
         $countPerClass = [];
 
-        $this->phpSerializer?->enableClassNotFoundCreation();
+        $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
                 $c = \get_class($envelope->getMessage());
@@ -160,7 +160,7 @@ EOF
                 ++$countPerClass[$c][1];
             }
         } finally {
-            $this->phpSerializer?->enableClassNotFoundCreation(false);
+            $this->phpSerializer?->rejectPhpIncompleteClass();
         }
 
         if (0 === \count($countPerClass)) {
@@ -176,11 +176,11 @@ EOF
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);
-        $this->phpSerializer?->enableClassNotFoundCreation();
+        $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             $envelope = $receiver->find($id);
         } finally {
-            $this->phpSerializer?->enableClassNotFoundCreation(false);
+            $this->phpSerializer?->rejectPhpIncompleteClass();
         }
         if (null === $envelope) {
             throw new RuntimeException(sprintf('The message "%s" was not found.', $id));

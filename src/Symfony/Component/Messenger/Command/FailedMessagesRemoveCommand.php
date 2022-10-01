@@ -74,11 +74,11 @@ EOF
         }
 
         foreach ($ids as $id) {
-            $this->phpSerializer?->enableClassNotFoundCreation();
+            $this->phpSerializer?->acceptPhpIncompleteClass();
             try {
                 $envelope = $receiver->find($id);
             } finally {
-                $this->phpSerializer?->enableClassNotFoundCreation(false);
+                $this->phpSerializer?->rejectPhpIncompleteClass();
             }
 
             if (null === $envelope) {

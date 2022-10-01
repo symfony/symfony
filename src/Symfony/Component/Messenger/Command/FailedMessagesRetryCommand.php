@@ -135,14 +135,14 @@ EOF
             // handling the message
             while (true) {
                 $envelopes = [];
-                $this->phpSerializer?->enableClassNotFoundCreation();
+                $this->phpSerializer?->acceptPhpIncompleteClass();
                 try {
                     foreach ($receiver->all(1) as $envelope) {
                         ++$count;
                         $envelopes[] = $envelope;
                     }
                 } finally {
-                    $this->phpSerializer?->enableClassNotFoundCreation(false);
+                    $this->phpSerializer?->rejectPhpIncompleteClass();
                 }
 
                 // break the loop if all messages are consumed
@@ -212,11 +212,11 @@ EOF
         }
 
         foreach ($ids as $id) {
-            $this->phpSerializer?->enableClassNotFoundCreation();
+            $this->phpSerializer?->acceptPhpIncompleteClass();
             try {
                 $envelope = $receiver->find($id);
             } finally {
-                $this->phpSerializer?->enableClassNotFoundCreation(false);
+                $this->phpSerializer?->rejectPhpIncompleteClass();
             }
             if (null === $envelope) {
                 throw new RuntimeException(sprintf('The message "%s" was not found.', $id));

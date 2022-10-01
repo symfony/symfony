@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by alanpoulain at 2022-09-28T08:50:44Z
+
+Related :smile: https://github.com/symfony/symfony/pull/39063
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-09-28T09:23:09Z
+
+My patch is a bit more advanced than #39063 and prevents real security issues.
+Unlike #39063, when you use this new option the validator checks:
+
+* the mime type of the file content
+* the extension
+* if both are consistent
+
+The other PR was only checking the extension, without checking the actual content of the file. My patch can be seen as an easier way to configure the accepted MIME types and an extra check for consistency between the mime type and the extension.
+
+When using only mime-type validation, you may have issues:
+
+* You allow `text/xml`
+* The user uploads a [`.wsf`](https://en.wikipedia.org/wiki/Windows_Script_File) file (which is technically also an XML document)
+* Another user using Windows downloads the `.wsf` file, which can be executed
+
+With my patch, if you only allow `.xml`, a `.wsf` file will be rejected even if it is valid XML (and the validator will still check that the content of the file is valid XML, as with the old mime-type validation).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-09-28T09:28:13Z
+
+My patch also prevents uploading files with misleading extensions (.e.g., a GIF named `foo.exe`), which is currently hard to achieve with Symfony (see the tests).

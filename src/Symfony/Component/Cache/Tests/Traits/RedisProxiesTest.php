@@ -26,7 +26,7 @@ class RedisProxiesTest extends TestCase
      */
     public function testRedis5Proxy($class)
     {
-        $proxy = file_get_contents(\dirname(__DIR__)."/Traits/{$class}5Proxy.php");
+        $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}5Proxy.php");
         $proxy = substr($proxy, 0, 8 + strpos($proxy, "\n    ];"));
         $methods = [];
 
@@ -46,7 +46,7 @@ class RedisProxiesTest extends TestCase
         uksort($methods, 'strnatcmp');
         $proxy .= implode('', $methods)."}\n";
 
-        $this->assertStringEqualsFile(\dirname(__DIR__)."/Traits/{$class}5Proxy.php", $proxy);
+        $this->assertStringEqualsFile(\dirname(__DIR__, 2)."/Traits/{$class}5Proxy.php", $proxy);
     }
 
     /**
@@ -60,7 +60,7 @@ class RedisProxiesTest extends TestCase
         $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
         eval(substr($stub, 5));
 
-        $proxy = file_get_contents(\dirname(__DIR__)."/Traits/{$class}6Proxy.php");
+        $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");
         $proxy = substr($proxy, 0, 8 + strpos($proxy, "\n    ];"));
         $methods = [];
 
@@ -80,6 +80,6 @@ class RedisProxiesTest extends TestCase
         uksort($methods, 'strnatcmp');
         $proxy .= implode('', $methods)."}\n";
 
-        $this->assertStringEqualsFile(\dirname(__DIR__)."/Traits/{$class}6Proxy.php", $proxy);
+        $this->assertStringEqualsFile(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php", $proxy);
     }
 }

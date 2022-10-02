@@ -538,6 +538,12 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         $path = __DIR__.'/Fixtures/'.$name;
         $file = new \Symfony\Component\HttpFoundation\File\File($path);
 
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
         $constraint = new File(mimeTypes: [], extensions: ['gif', 'txt'], extensionsMessage: 'myMessage');
 
         $this->validator->validate($file, $constraint);
@@ -587,6 +593,12 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         $path = __DIR__.'/Fixtures/invalid-content.gif';
         $file = new \Symfony\Component\HttpFoundation\File\File($path);
 
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
         $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['gif']);
 
         $this->validator->validate($file, $constraint);
@@ -606,6 +618,12 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     {
         $path = __DIR__.'/Fixtures/invalid-content.gif';
         $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
 
         $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['gif', 'txt']);
 

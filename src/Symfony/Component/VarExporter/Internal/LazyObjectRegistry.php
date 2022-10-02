@@ -136,16 +136,18 @@ class LazyObjectRegistry
 
     public static function getScope($propertyScopes, $class, $property, $readonlyScope = null)
     {
-        if (null === $readonlyScope && !isset($propertyScopes["\0$class\0$property"]) && !isset($propertyScopes["\0*\0$property"])) {
+        if (null === $readonlyScope && !isset($propertyScopes[$k = "\0$class\0$property"]) && !isset($propertyScopes[$k = "\0*\0$property"])) {
+            return null;
+        }
+        $frame = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2];
+
+        if (\ReflectionProperty::class === $scope = $frame['class'] ?? \Closure::class) {
+            $scope = $frame['object']->class;
+        }
+        if (null === $readonlyScope && '*' === $k[1] && ($class === $scope || is_subclass_of($class, $scope))) {
             return null;
         }
 
-        $scope = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['class'] ?? \Closure::class;
-
-        if (null === $readonlyScope && isset($propertyScopes["\0*\0$property"]) && ($class === $scope || is_subclass_of($class, $scope))) {
-            return null;
-        }
-
-        return \ReflectionProperty::class === $scope ? $class : $scope;
+        return $scope;
     }
 }

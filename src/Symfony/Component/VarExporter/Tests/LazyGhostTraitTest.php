@@ -33,6 +33,17 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(4, $instance->publicReadonly);
     }
 
+    public function testGetPrivate()
+    {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
+            $ghost->__construct();
+        });
+
+        $r = new \ReflectionProperty(TestClass::class, 'private');
+
+        $this->assertSame(-3, $r->getValue($instance));
+    }
+
     public function testIssetPublic()
     {
         $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
@@ -66,6 +77,18 @@ class LazyGhostTraitTest extends TestCase
         $instance->public = 12;
         $this->assertSame(12, $instance->public);
         $this->assertSame(4, $instance->publicReadonly);
+    }
+
+    public function testSetPrivate()
+    {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $ghost) {
+            $ghost->__construct();
+        });
+
+        $r = new \ReflectionProperty(TestClass::class, 'private');
+        $r->setValue($instance, 3);
+
+        $this->assertSame(3, $r->getValue($instance));
     }
 
     public function testClone()
@@ -187,17 +210,17 @@ class LazyGhostTraitTest extends TestCase
     public function testPartialInitialization()
     {
         $counter = 0;
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) use (&$counter) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
             ++$counter;
 
-            return match ($propertyName) {
-                'public' => 123,
+            return match ($property) {
+                'public' => 4 === $default ? 123 : -1,
                 'publicReadonly' => 234,
-                'protected' => 345,
+                'protected' => 5 === $default ? 345 : -1,
                 'protectedReadonly' => 456,
-                'private' => match ($propertyScope) {
-                    TestClass::class => 567,
-                    ChildTestClass::class => 678,
+                'private' => match ($scope) {
+                    TestClass::class => 3 === $default ? 567 : -1,
+                    ChildTestClass::class => 6 === $default ? 678 : -1,
                 },
             };
         });
@@ -223,7 +246,7 @@ class LazyGhostTraitTest extends TestCase
 
     public function testPartialInitializationWithReset()
     {
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) {
             return 234;
         });
 
@@ -237,9 +260,9 @@ class LazyGhostTraitTest extends TestCase
 
         $this->assertTrue($instance->resetLazyObject());
         $this->assertSame(234, $instance->publicReadonly);
-        $this->assertSame(123, $instance->public);
+        $this->assertSame(234, $instance->public);
 
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $propertyName, ?string $propertyScope) {
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) {
             return 234;
         });
 
@@ -254,8 +277,8 @@ class LazyGhostTraitTest extends TestCase
 
     public function testPartialInitializationWithNastyPassByRef()
     {
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string &$propertyName, ?string &$propertyScope) {
-            return $propertyName = $propertyScope = 123;
+        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string &$property, ?string &$scope, mixed $default) {
+            return $property = $scope = 123;
         });
 
         $this->assertSame(123, $instance->public);

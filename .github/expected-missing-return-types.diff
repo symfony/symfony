@@ -1094,17 +1094,6 @@ index b22d6ae609..31d1a25f9d 100644
 +    public static function prepare($values, $objectsPool, &$refsPool, &$objectsCount, &$valuesAreStatic): array
      {
          $refs = $values;
-diff --git a/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php b/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php
-index 6ea89bc831..01748bcfc0 100644
---- a/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php
-+++ b/src/Symfony/Component/VarExporter/Internal/LazyObjectState.php
-@@ -56,5 +56,5 @@ class LazyObjectState
-      * @return bool Returns true when fully-initializing, false when partial-initializing
-      */
--    public function initialize($instance, $propertyName, $propertyScope)
-+    public function initialize($instance, $propertyName, $propertyScope): bool
-     {
-         if (!$this->status) {
 diff --git a/src/Symfony/Component/Workflow/Event/Event.php b/src/Symfony/Component/Workflow/Event/Event.php
 index cd7fab7896..b340eba38e 100644
 --- a/src/Symfony/Component/Workflow/Event/Event.php

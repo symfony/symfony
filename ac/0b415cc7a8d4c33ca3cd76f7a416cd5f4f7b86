@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-10-01T10:06:26Z
+
+Before continuing here we should IMO discuss whether or not the BC promise applies to the serialized message format or if #47462 would introduce a BC break.
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-01T10:20:49Z
+
+As the removed information was never used anyway, I think it's safe.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-10-01T15:22:27Z
+
+@fabpot I think I need to look into this a bit more. The `deps=low` job shouldn’t fail. I’ll take care of this later today.

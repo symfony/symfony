@@ -33,7 +33,8 @@
         "egulias/email-validator": "~3.0.0",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
-        "symfony/mailer": "<5.4"
+        "symfony/mailer": "<5.4",
+        "symfony/serializer": "<6.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },

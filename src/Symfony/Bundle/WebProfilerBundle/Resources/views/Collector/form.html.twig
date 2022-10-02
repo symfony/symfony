@@ -92,7 +92,8 @@
             cursor: pointer;
             padding: 5px 7px 5px 22px;
             position: relative;
-
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .tree .toggle-button {
             width: 16px;
@@ -417,7 +418,7 @@
     {% import _self as tree %}
     {% set has_error = data.errors is defined and data.errors|length > 0 %}
     <li>
-        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
+        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details" title="{{ name|default('(no name)') }}">
             {% if has_error %}
                 <div class="badge-error">{{ data.errors|length }}</div>
             {% endif %}

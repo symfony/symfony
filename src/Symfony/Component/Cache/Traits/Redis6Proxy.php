@@ -162,7 +162,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->command(...\func_get_args());
     }
 
-    public function config($operation, $key, $value = null): mixed
+    public function config($operation, $key = null, $value = null): mixed
     {
         return $this->lazyObjectReal->config(...\func_get_args());
     }
@@ -255,6 +255,16 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function failover($to = null, $abort = false, $timeout = 0): bool
     {
         return $this->lazyObjectReal->failover(...\func_get_args());
+    }
+
+    public function expiretime($key): \Redis|false|int
+    {
+        return $this->lazyObjectReal->expiretime(...\func_get_args());
+    }
+
+    public function pexpiretime($key): \Redis|false|int
+    {
+        return $this->lazyObjectReal->pexpiretime(...\func_get_args());
     }
 
     public function flushAll($sync = null): bool
@@ -380,6 +390,11 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function getRange($key, $start, $end)
     {
         return $this->lazyObjectReal->getRange(...\func_get_args());
+    }
+
+    public function lcs($key1, $key2, $options = null): \Redis|array|false|int|string
+    {
+        return $this->lazyObjectReal->lcs(...\func_get_args());
     }
 
     public function getReadTimeout(): int
@@ -765,6 +780,11 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function sInter($key, ...$other_keys): array
     {
         return $this->lazyObjectReal->sInter(...\func_get_args());
+    }
+
+    public function sintercard($keys, $limit = -1): \Redis|false|int
+    {
+        return $this->lazyObjectReal->sintercard(...\func_get_args());
     }
 
     public function sInterStore($dst, $key, ...$other_keys): int
@@ -1160,6 +1180,11 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function zinter($keys, $weights = null, $options = null): array
     {
         return $this->lazyObjectReal->zinter(...\func_get_args());
+    }
+
+    public function zintercard($keys, $limit = -1): \Redis|false|int
+    {
+        return $this->lazyObjectReal->zintercard(...\func_get_args());
     }
 
     public function zinterstore($dst, $keys, $weights = null, $aggregate = null): int

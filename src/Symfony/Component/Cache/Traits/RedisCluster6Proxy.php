@@ -247,6 +247,16 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
         return $this->lazyObjectReal->expireat(...\func_get_args());
     }
 
+    public function expiretime($key): \Redis|false|int
+    {
+        return $this->lazyObjectReal->expiretime(...\func_get_args());
+    }
+
+    public function pexpiretime($key): \Redis|false|int
+    {
+        return $this->lazyObjectReal->pexpiretime(...\func_get_args());
+    }
+
     public function flushall($node, $async = false): bool
     {
         return $this->lazyObjectReal->flushall(...\func_get_args());
@@ -325,6 +335,11 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
     public function getrange($key, $start, $end): string
     {
         return $this->lazyObjectReal->getrange(...\func_get_args());
+    }
+
+    public function lcs($key1, $key2, $options = null): \Redis|array|false|int|string
+    {
+        return $this->lazyObjectReal->lcs(...\func_get_args());
     }
 
     public function getset($key, $value): string
@@ -707,6 +722,11 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
         return $this->lazyObjectReal->sinter(...\func_get_args());
     }
 
+    public function sintercard($keys, $limit = -1): \Redis|false|int
+    {
+        return $this->lazyObjectReal->sintercard(...\func_get_args());
+    }
+
     public function sinterstore($dst, $key, ...$other_keys): bool
     {
         return $this->lazyObjectReal->sinterstore(...\func_get_args());
@@ -900,6 +920,11 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
     public function zinterstore($key, $keys, $weights = null, $aggregate = null): int
     {
         return $this->lazyObjectReal->zinterstore(...\func_get_args());
+    }
+
+    public function zintercard($keys, $limit = -1): \Redis|false|int
+    {
+        return $this->lazyObjectReal->zintercard(...\func_get_args());
     }
 
     public function zlexcount($key, $min, $max): int

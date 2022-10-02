@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Bundle\SecurityBundle\Security\Security as NewSecurityHelper;
+use Symfony\Bundle\SecurityBundle\Security as NewSecurityHelper;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,26 +20,26 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Helper class for commonly-needed security tasks.
  *
- * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security\Security instead
+ * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security instead
  */
 class Security implements AuthorizationCheckerInterface
 {
     /**
-     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security\Security::ACCESS_DENIED_ERROR instead
+     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::ACCESS_DENIED_ERROR instead
      *
      * In 7.0, move this constant to the NewSecurityHelper class and make it reference SecurityRequestAttributes:ACCESS_DENIED_ERROR.
      */
     public const ACCESS_DENIED_ERROR = '_security.403_error';
 
     /**
-     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security\Security::AUTHENTICATION_ERROR instead
+     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::AUTHENTICATION_ERROR instead
      *
      * In 7.0, move this constant to the NewSecurityHelper class and make it reference SecurityRequestAttributes:AUTHENTICATION_ERROR.
      */
     public const AUTHENTICATION_ERROR = '_security.last_error';
 
     /**
-     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security\Security::LAST_USERNAME instead
+     * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::LAST_USERNAME instead
      *
      * In 7.0, move this constant to the NewSecurityHelper class and make it reference SecurityRequestAttributes:LAST_USERNAME.
      */

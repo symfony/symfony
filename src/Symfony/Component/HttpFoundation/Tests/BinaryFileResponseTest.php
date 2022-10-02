@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\Stream;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -389,7 +390,15 @@ class BinaryFileResponseTest extends ResponseTestCase
 
     public function testContentTypeIsCorrectlyDetected()
     {
-        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+        $file = new File(__DIR__.'/File/Fixtures/test.gif');
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $response = new BinaryFileResponse($file);
 
         $request = Request::create('/');
         $response->prepare($request);

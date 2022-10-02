@@ -65,6 +65,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         if ($object instanceof AbstractPart) {
             $ret = $this->normalizer->normalize($object, $format, $context);
             $ret['class'] = \get_class($object);
+            unset($ret['seekable'], $ret['cid'], $ret['handle']);
 
             return $ret;
         }

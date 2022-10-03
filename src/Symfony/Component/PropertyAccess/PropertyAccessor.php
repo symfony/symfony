@@ -519,10 +519,20 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
             $type = $mutator->getType();
+            $reflClass = new \ReflectionClass($object);
 
             if (PropertyWriteInfo::TYPE_METHOD === $type) {
+                if ($reflClass->hasMethod($mutator->getName())) {
+                    $reflMethod = $reflClass->getMethod($mutator->getName());
+                    if ($reflMethod->getNumberOfParameters() >= 1 && $type = $reflMethod->getParameters()[0]->getType()) {
+                        $value = self::coerceValue($value, $type);
+                    }
+                }
                 $object->{$mutator->getName()}($value);
             } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
+                if ($reflClass->hasProperty($mutator->getName())) {
+                    $value = self::coerceValue($value, $reflClass->getProperty($mutator->getName())->getType());
+                }
                 $object->{$mutator->getName()} = $value;
             } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
                 $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
@@ -536,6 +546,19 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));
         }
+    }
+
+    private static function coerceValue(mixed $value, ?\ReflectionType $targetType): mixed
+    {
+        // Only attempt coercion for specifically typed targets
+        if ($targetType instanceof \ReflectionNamedType) {
+            $type = $targetType->getName();
+            if ($value instanceof \DateTimeInterface && $type !== get_class($value) && $type !== \DateTimeInterface::class) {
+                $value = $type::createFromInterface($value);
+            }
+        }
+
+        return $value;
     }
 
     /**

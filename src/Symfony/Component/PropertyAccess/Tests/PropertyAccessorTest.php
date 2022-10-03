@@ -20,6 +20,7 @@ use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\DateTimeConversion;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ExtendedUninitializedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
@@ -918,5 +919,31 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected argument of type "float", "string" given at property path "publicProperty"');
         $this->propertyAccessor->setValue($object, 'publicProperty', 'string');
+    }
+
+    public function testSetValueConvertDateTimeTypes(): void
+    {
+        $fixture = new DateTimeConversion();
+        $mutable = new \DateTime($mutableDate = '2021-01-01');
+        $immutable = new \DateTimeImmutable($immutableDate = '2022-02-02');
+
+        // Test conversion with public properties
+        $this->propertyAccessor->setValue($fixture, 'publicDateTimeImmutable', $mutable);
+        $this->assertSame($this->propertyAccessor->getValue($fixture, 'publicDateTimeImmutable')->format('Y-m-d'), $mutableDate);
+
+        $this->propertyAccessor->setValue($fixture, 'publicDateTime', $immutable);
+        $this->assertSame($this->propertyAccessor->getValue($fixture, 'publicDateTime')->format('Y-m-d'), $immutableDate);
+
+        // Test conversion via setters/getters
+        $this->propertyAccessor->setValue($fixture, 'dateTimeImmutable', $mutable);
+        $this->assertSame($this->propertyAccessor->getValue($fixture, 'dateTimeImmutable')->format('Y-m-d'), $mutableDate);
+
+        $this->propertyAccessor->setValue($fixture, 'dateTime', $immutable);
+        $this->assertSame($this->propertyAccessor->getValue($fixture, 'dateTime')->format('Y-m-d'), $immutableDate);
+
+        // Ensure conversion also happens on nested properties
+        $array = [$fixture];
+        $this->propertyAccessor->setValue($array, '[0].publicDateTime', new \DateTimeImmutable('2023-03-03'));
+        $this->assertSame($this->propertyAccessor->getValue($fixture, 'publicDateTime')->format('Y-m-d'), '2023-03-03');
     }
 }

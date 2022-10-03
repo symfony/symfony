@@ -553,7 +553,8 @@ class PropertyAccessor implements PropertyAccessorInterface
         // Only attempt coercion for specifically typed targets
         if ($targetType instanceof \ReflectionNamedType) {
             $type = $targetType->getName();
-            if ($value instanceof \DateTimeInterface && $type !== $value::class && \DateTimeInterface::class !== $type) {
+            if ($value instanceof \DateTimeInterface && is_a($type, \DateTimeInterface::class, true)
+                    && $type !== $value::class && \DateTimeInterface::class !== $type) {
                 $value = $type::createFromInterface($value);
             }
         }

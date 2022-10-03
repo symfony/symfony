@@ -945,5 +945,9 @@ class PropertyAccessorTest extends TestCase
         $array = [$fixture];
         $this->propertyAccessor->setValue($array, '[0].publicDateTime', new \DateTimeImmutable('2023-03-03'));
         $this->assertSame($this->propertyAccessor->getValue($fixture, 'publicDateTime')->format('Y-m-d'), '2023-03-03');
+
+        // Ensure setting to an interface does not cause conversion or issues
+        $this->propertyAccessor->setValue($fixture, 'publicDateTimeInterface', $immutable);
+        $this->assertSame($fixture->publicDateTimeInterface, $immutable);
     }
 }

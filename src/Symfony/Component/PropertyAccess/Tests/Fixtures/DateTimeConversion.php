@@ -18,6 +18,7 @@ class DateTimeConversion
 {
     public \DateTime $publicDateTime;
     public \DateTimeImmutable $publicDateTimeImmutable;
+    public \DateTimeInterface $publicDateTimeInterface;
 
     private \DateTime $dateTime;
     private \DateTimeImmutable $dateTimeImmutable;

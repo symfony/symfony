@@ -13,5 +13,4 @@ namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 class ExtendedUninitializedProperty extends UninitializedProperty
 {
-
 }

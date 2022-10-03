@@ -9,6 +9,10 @@
  * file that was distributed with this source code.
  */
 
+if ('cli' !== \PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+
 // load new map
 $data = file_get_contents('https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types');
 $new = [];

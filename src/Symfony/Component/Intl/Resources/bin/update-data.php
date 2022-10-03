@@ -23,6 +23,10 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\Util\GitRepository;
 
+if ('cli' !== \PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+
 require_once __DIR__.'/common.php';
 require_once __DIR__.'/autoload.php';
 

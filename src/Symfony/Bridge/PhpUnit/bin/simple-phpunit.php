@@ -12,6 +12,10 @@
 // Please update when phpunit needs to be reinstalled with fresh deps:
 // Cache-Id: 2021-02-04 11:00 UTC
 
+if ('cli' !== \PHP_SAPI && 'phpdbg' !== \PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+
 error_reporting(-1);
 
 global $argv, $argc;

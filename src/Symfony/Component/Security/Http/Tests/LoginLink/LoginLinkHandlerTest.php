@@ -107,7 +107,7 @@ class LoginLinkHandlerTest extends TestCase
         ];
 
         yield [
-            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTime('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
+            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTimeImmutable('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
             ['lastAuthenticatedAt' => '2020-06-01T00:00:00+00:00'],
         ];
     }

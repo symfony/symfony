@@ -18,7 +18,7 @@ class PersistentTokenTest extends TestCase
 {
     public function testConstructor()
     {
-        $lastUsed = new \DateTime();
+        $lastUsed = new \DateTimeImmutable();
         $token = new PersistentToken('fooclass', 'fooname', 'fooseries', 'footokenvalue', $lastUsed);
 
         $this->assertEquals('fooclass', $token->getClass());

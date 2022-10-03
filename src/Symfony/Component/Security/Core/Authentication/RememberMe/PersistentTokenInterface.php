@@ -37,7 +37,7 @@ interface PersistentTokenInterface
     /**
      * Returns the time the token was last used.
      */
-    public function getLastUsed(): \DateTime;
+    public function getLastUsed(): \DateTimeInterface;
 
     /**
      * Returns the identifier used to authenticate (e.g. their email address or username).

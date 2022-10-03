@@ -52,7 +52,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     {
         $series = base64_encode(random_bytes(64));
         $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
-        $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTime());
+        $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTimeImmutable());
 
         $this->tokenProvider->createNewToken($token);
         $this->createCookie(RememberMeDetails::fromPersistentToken($token, time() + $this->options['lifetime']));
@@ -84,7 +84,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         // if multiple concurrent requests reauthenticate a user we do not want to update the token several times
         if ($persistentToken->getLastUsed()->getTimestamp() + 60 < time()) {
             $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
-            $tokenLastUsed = new \DateTime();
+            $tokenLastUsed = new \DateTimeImmutable();
             $this->tokenVerifier?->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
             $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
 

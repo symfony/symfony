@@ -80,7 +80,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->tokenProvider->expects($this->any())
             ->method('loadTokenBySeries')
             ->with('series1')
-            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTime('-10 min')))
+            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min')))
         ;
 
         $this->tokenProvider->expects($this->once())->method('updateToken')->with('series1');
@@ -108,7 +108,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $verifier = $this->createMock(TokenVerifierInterface::class);
         $handler = new PersistentRememberMeHandler($this->tokenProvider, 'secret', $this->userProvider, $this->requestStack, [], null, $verifier);
 
-        $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTime('30 seconds'));
+        $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('30 seconds'));
 
         $this->tokenProvider->expects($this->any())
             ->method('loadTokenBySeries')
@@ -135,7 +135,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->tokenProvider->expects($this->any())
             ->method('loadTokenBySeries')
             ->with('series1')
-            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue1', new \DateTime('-10 min')));
+            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue1', new \DateTimeImmutable('-10 min')));
 
         $this->tokenProvider->expects($this->never())->method('updateToken')->with('series1');
 
@@ -150,7 +150,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->tokenProvider->expects($this->any())
             ->method('loadTokenBySeries')
             ->with('series1')
-            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTime('@'.(time() - (31536000 + 1)))));
+            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('@'.(time() - (31536000 + 1)))));
 
         $this->tokenProvider->expects($this->never())->method('updateToken')->with('series1');
 

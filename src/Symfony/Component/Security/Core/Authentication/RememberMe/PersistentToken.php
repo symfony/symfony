@@ -22,9 +22,9 @@ final class PersistentToken implements PersistentTokenInterface
     private string $userIdentifier;
     private string $series;
     private string $tokenValue;
-    private \DateTime $lastUsed;
+    private \DateTimeInterface $lastUsed;
 
-    public function __construct(string $class, string $userIdentifier, string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
+    public function __construct(string $class, string $userIdentifier, string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed)
     {
         if (empty($class)) {
             throw new \InvalidArgumentException('$class must not be empty.');
@@ -37,6 +37,10 @@ final class PersistentToken implements PersistentTokenInterface
         }
         if (empty($tokenValue)) {
             throw new \InvalidArgumentException('$tokenValue must not be empty.');
+        }
+
+        if ($lastUsed instanceof \DateTime) {
+            trigger_deprecation('symfony/security-core', '6.2', 'usage of \DateTime is deprecated use \DateTimeImmutable instead.');
         }
 
         $this->class = $class;
@@ -66,7 +70,7 @@ final class PersistentToken implements PersistentTokenInterface
         return $this->tokenValue;
     }
 
-    public function getLastUsed(): \DateTime
+    public function getLastUsed(): \DateTimeInterface
     {
         return $this->lastUsed;
     }

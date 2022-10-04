@@ -13,21 +13,17 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\Security\UserAuthenticator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
-use Symfony\Component\Security\Http\Authentication\NoopAuthenticationManager;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
-use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
-use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\EventListener\SessionStrategyListener;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
 use Symfony\Component\Security\Http\EventListener\UserProviderListener;
@@ -46,6 +42,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('provider key'),
                 service('logger')->nullOnInvalid(),
                 param('security.authentication.manager.erase_credentials'),
+                param('security.authentication.hide_user_not_found'),
                 abstract_arg('required badges'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
@@ -60,9 +57,6 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
             ])
         ->alias(UserAuthenticatorInterface::class, 'security.user_authenticator')
-
-        ->set('security.authentication.manager', NoopAuthenticationManager::class)
-        ->alias(AuthenticationManagerInterface::class, 'security.authentication.manager')
 
         ->set('security.firewall.authenticator', AuthenticatorManagerListener::class)
             ->abstract()
@@ -107,14 +101,6 @@ return static function (ContainerConfigurator $container) {
                 service('security.authentication.session_strategy'),
             ])
 
-        ->set('security.listener.remember_me', RememberMeListener::class)
-            ->abstract()
-            ->args([
-                abstract_arg('remember me services'),
-                service('logger')->nullOnInvalid(),
-            ])
-            ->tag('monolog.logger', ['channel' => 'security'])
-
         ->set('security.listener.login_throttling', LoginThrottlingListener::class)
             ->abstract()
             ->args([
@@ -153,16 +139,6 @@ return static function (ContainerConfigurator $container) {
                 service('property_accessor')->nullOnInvalid(),
             ])
             ->call('setTranslator', [service('translator')->ignoreOnInvalid()])
-
-        ->set('security.authenticator.remember_me', RememberMeAuthenticator::class)
-            ->abstract()
-            ->args([
-                abstract_arg('remember me services'),
-                param('kernel.secret'),
-                service('security.token_storage'),
-                abstract_arg('options'),
-                service('security.authentication.session_strategy'),
-            ])
 
         ->set('security.authenticator.x509', X509Authenticator::class)
             ->abstract()

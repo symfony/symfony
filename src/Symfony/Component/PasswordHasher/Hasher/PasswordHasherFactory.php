@@ -13,7 +13,7 @@ namespace Symfony\Component\PasswordHasher\Hasher;
 
 use Symfony\Component\PasswordHasher\Exception\LogicException;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * A generic hasher factory implementation.
@@ -23,21 +23,21 @@ use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
  */
 class PasswordHasherFactory implements PasswordHasherFactoryInterface
 {
-    private $passwordHashers;
+    private array $passwordHashers;
 
+    /**
+     * @param array<string, PasswordHasherInterface|array> $passwordHashers
+     */
     public function __construct(array $passwordHashers)
     {
         $this->passwordHashers = $passwordHashers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPasswordHasher($user): PasswordHasherInterface
+    public function getPasswordHasher(string|PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user): PasswordHasherInterface
     {
         $hasherKey = null;
 
-        if (($user instanceof PasswordHasherAwareInterface && null !== $hasherName = $user->getPasswordHasherName()) || ($user instanceof EncoderAwareInterface && null !== $hasherName = $user->getEncoderName())) {
+        if ($user instanceof PasswordHasherAwareInterface && null !== $hasherName = $user->getPasswordHasherName()) {
             if (!\array_key_exists($hasherName, $this->passwordHashers)) {
                 throw new \RuntimeException(sprintf('The password hasher "%s" was not configured.', $hasherName));
             }
@@ -105,9 +105,13 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         if ('auto' === $config['algorithm']) {
             // "plaintext" is not listed as any leaked hashes could then be used to authenticate directly
             if (SodiumPasswordHasher::isSupported()) {
-                $algorithms = ['native', 'sodium', 'pbkdf2', $config['hash_algorithm']];
+                $algorithms = ['native', 'sodium', 'pbkdf2'];
             } else {
-                $algorithms = ['native', 'pbkdf2', $config['hash_algorithm']];
+                $algorithms = ['native', 'pbkdf2'];
+            }
+
+            if ($config['hash_algorithm'] ?? '') {
+                $algorithms[] = $config['hash_algorithm'];
             }
 
             $hasherChain = [];

@@ -27,9 +27,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class FakeChatEmailTransport extends AbstractTransport
 {
-    private $mailer;
-    private $to;
-    private $from;
+    protected const HOST = 'default';
+
+    private MailerInterface $mailer;
+    private string $to;
+    private string $from;
 
     public function __construct(MailerInterface $mailer, string $to, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -61,12 +63,21 @@ final class FakeChatEmailTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
+        $subject = 'New Chat message without specified recipient!';
+        if (null !== $message->getRecipientId()) {
+            $subject = sprintf('New Chat message for recipient: %s', $message->getRecipientId());
+        }
+
         $email = (new Email())
             ->from($this->from)
             ->to($this->to)
-            ->subject(sprintf('New Chat message for recipient: %s', $message->getRecipientId()))
+            ->subject($subject)
             ->html($message->getSubject())
             ->text($message->getSubject());
+
+        if ('default' !== $transportName = $this->getEndpoint()) {
+            $email->getHeaders()->addTextHeader('X-Transport', $transportName);
+        }
 
         $this->mailer->send($email);
 

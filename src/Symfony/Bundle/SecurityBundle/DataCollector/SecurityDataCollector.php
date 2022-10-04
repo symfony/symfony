@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -37,13 +36,13 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $tokenStorage;
-    private $roleHierarchy;
-    private $logoutUrlGenerator;
-    private $accessDecisionManager;
-    private $firewallMap;
-    private $firewall;
-    private $hasVarDumper;
+    private ?TokenStorageInterface $tokenStorage;
+    private ?RoleHierarchyInterface $roleHierarchy;
+    private ?LogoutUrlGenerator $logoutUrlGenerator;
+    private ?AccessDecisionManagerInterface $accessDecisionManager;
+    private ?FirewallMapInterface $firewallMap;
+    private ?TraceableFirewallListener $firewall;
+    private bool $hasVarDumper;
 
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
     {
@@ -56,9 +55,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->hasVarDumper = class_exists(ClassStub::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         if (null === $this->tokenStorage) {
@@ -98,8 +94,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $impersonatorUser = null;
             if ($token instanceof SwitchUserToken) {
                 $originalToken = $token->getOriginalToken();
-                // @deprecated since 5.3, change to $originalToken->getUserIdentifier() in 6.0
-                $impersonatorUser = method_exists($originalToken, 'getUserIdentifier') ? $originalToken->getUserIdentifier() : $originalToken->getUsername();
+                $impersonatorUser = $originalToken->getUserIdentifier();
             }
 
             if (null !== $this->roleHierarchy) {
@@ -112,24 +107,21 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $logoutUrl = null;
             try {
-                if (null !== $this->logoutUrlGenerator && !$token instanceof AnonymousToken) {
-                    $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
-                }
-            } catch (\Exception $e) {
+                $logoutUrl = $this->logoutUrlGenerator?->getLogoutPath();
+            } catch (\Exception) {
                 // fail silently when the logout URL cannot be generated
             }
 
             $this->data = [
                 'enabled' => true,
-                'authenticated' => $token->isAuthenticated(),
+                'authenticated' => method_exists($token, 'isAuthenticated') ? $token->isAuthenticated(false) : (bool) $token->getUser(),
                 'impersonated' => null !== $impersonatorUser,
                 'impersonator_user' => $impersonatorUser,
                 'impersonation_exit_path' => null,
                 'token' => $token,
-                'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
+                'token_class' => $this->hasVarDumper ? new ClassStub($token::class) : $token::class,
                 'logout_url' => $logoutUrl,
-                // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
-                'user' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
+                'user' => $token->getUserIdentifier(),
                 'roles' => $assignedRoles,
                 'inherited_roles' => array_unique($inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
@@ -145,7 +137,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     $voter = $voter->getDecoratedVoter();
                 }
 
-                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub(\get_class($voter)) : \get_class($voter);
+                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub($voter::class) : $voter::class;
             }
 
             // collect voter details
@@ -178,7 +170,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             if (null !== $firewallConfig) {
                 $this->data['firewall'] = [
                     'name' => $firewallConfig->getName(),
-                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
                     'request_matcher' => $firewallConfig->getRequestMatcher(),
                     'security_enabled' => $firewallConfig->isSecurityEnabled(),
                     'stateless' => $firewallConfig->isStateless(),
@@ -188,7 +179,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
                     'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
                     'user_checker' => $firewallConfig->getUserChecker(),
-                    'listeners' => $firewallConfig->getListeners(),
+                    'authenticators' => $firewallConfig->getAuthenticators(),
                 ];
 
                 // generate exit impersonation path from current request
@@ -207,11 +198,10 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         if ($this->firewall) {
             $this->data['listeners'] = $this->firewall->getWrappedListeners();
         }
+
+        $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->data = [];
@@ -224,40 +214,32 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Checks if security is enabled.
-     *
-     * @return bool true if security is enabled, false otherwise
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->data['enabled'];
     }
 
     /**
      * Gets the user.
-     *
-     * @return string The user
      */
-    public function getUser()
+    public function getUser(): string
     {
         return $this->data['user'];
     }
 
     /**
      * Gets the roles of the user.
-     *
-     * @return array|Data
      */
-    public function getRoles()
+    public function getRoles(): array|Data
     {
         return $this->data['roles'];
     }
 
     /**
      * Gets the inherited roles of the user.
-     *
-     * @return array|Data
      */
-    public function getInheritedRoles()
+    public function getInheritedRoles(): array|Data
     {
         return $this->data['inherited_roles'];
     }
@@ -265,74 +247,55 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Checks if the data contains information about inherited roles. Still the inherited
      * roles can be an empty array.
-     *
-     * @return bool true if the profile was contains inherited role information
      */
-    public function supportsRoleHierarchy()
+    public function supportsRoleHierarchy(): bool
     {
         return $this->data['supports_role_hierarchy'];
     }
 
     /**
      * Checks if the user is authenticated or not.
-     *
-     * @return bool true if the user is authenticated, false otherwise
      */
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         return $this->data['authenticated'];
     }
 
-    /**
-     * @return bool
-     */
-    public function isImpersonated()
+    public function isImpersonated(): bool
     {
         return $this->data['impersonated'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getImpersonatorUser()
+    public function getImpersonatorUser(): ?string
     {
         return $this->data['impersonator_user'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getImpersonationExitPath()
+    public function getImpersonationExitPath(): ?string
     {
         return $this->data['impersonation_exit_path'];
     }
 
     /**
      * Get the class name of the security token.
-     *
-     * @return string|Data|null The token
      */
-    public function getTokenClass()
+    public function getTokenClass(): string|Data|null
     {
         return $this->data['token_class'];
     }
 
     /**
      * Get the full security token class as Data object.
-     *
-     * @return Data|null
      */
-    public function getToken()
+    public function getToken(): ?Data
     {
         return $this->data['token'];
     }
 
     /**
      * Get the logout URL.
-     *
-     * @return string|null The logout URL
      */
-    public function getLogoutUrl()
+    public function getLogoutUrl(): ?string
     {
         return $this->data['logout_url'];
     }
@@ -342,53 +305,46 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return string[]|Data
      */
-    public function getVoters()
+    public function getVoters(): array|Data
     {
         return $this->data['voters'];
     }
 
     /**
      * Returns the strategy configured for the security voters.
-     *
-     * @return string
      */
-    public function getVoterStrategy()
+    public function getVoterStrategy(): string
     {
         return $this->data['voter_strategy'];
     }
 
     /**
      * Returns the log of the security decisions made by the access decision manager.
-     *
-     * @return array|Data
      */
-    public function getAccessDecisionLog()
+    public function getAccessDecisionLog(): array|Data
     {
         return $this->data['access_decision_log'];
     }
 
     /**
      * Returns the configuration of the current firewall context.
-     *
-     * @return array|Data|null
      */
-    public function getFirewall()
+    public function getFirewall(): array|Data|null
     {
         return $this->data['firewall'];
     }
 
-    /**
-     * @return array|Data
-     */
-    public function getListeners()
+    public function getListeners(): array|Data
     {
         return $this->data['listeners'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getAuthenticators(): array|Data
+    {
+        return $this->data['authenticators'];
+    }
+
+    public function getName(): string
     {
         return 'security';
     }

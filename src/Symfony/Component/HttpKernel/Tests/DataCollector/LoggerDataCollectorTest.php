@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class LoggerDataCollectorTest extends TestCase
 {
@@ -43,6 +44,52 @@ class LoggerDataCollectorTest extends TestCase
             ['message' => 'Some custom logging message'],
             ['message' => 'With ending :'],
         ], $compilerLogs['Unknown Compiler Pass']);
+    }
+
+    public function testCollectFromDeprecationsLog()
+    {
+        $containerPathPrefix = __DIR__.'/';
+        $path = $containerPathPrefix.'Deprecations.log';
+        touch($path);
+        file_put_contents($path, serialize([[
+            'type' => 16384,
+            'message' => 'The "Symfony\Bundle\FrameworkBundle\Controller\Controller" class is deprecated since Symfony 4.2, use Symfony\Bundle\FrameworkBundle\Controller\AbstractController instead.',
+            'file' => '/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php',
+            'line' => 17,
+            'trace' => [[
+                'file' => '/home/hamza/projet/contrib/sf/src/Controller/DefaultController.php',
+                'line' => 9,
+                'function' => 'spl_autoload_call',
+            ]],
+            'count' => 1,
+        ]]));
+
+        $logger = $this
+            ->getMockBuilder(DebugLoggerInterface::class)
+            ->setMethods(['countErrors', 'getLogs', 'clear'])
+            ->getMock();
+
+        $logger->expects($this->once())->method('countErrors')->willReturn(0);
+        $logger->expects($this->exactly(2))->method('getLogs')->willReturn([]);
+
+        $c = new LoggerDataCollector($logger, $containerPathPrefix);
+        $c->lateCollect();
+
+        $processedLogs = $c->getProcessedLogs();
+
+        $this->assertCount(1, $processedLogs);
+
+        $this->assertEquals($processedLogs[0]['type'], 'deprecation');
+        $this->assertEquals($processedLogs[0]['errorCount'], 1);
+        $this->assertEquals($processedLogs[0]['timestamp'], (new \DateTimeImmutable())->setTimestamp(filemtime($path))->format(\DateTimeInterface::RFC3339_EXTENDED));
+        $this->assertEquals($processedLogs[0]['priority'], 100);
+        $this->assertEquals($processedLogs[0]['priorityName'], 'DEBUG');
+        $this->assertNull($processedLogs[0]['channel']);
+
+        $this->assertInstanceOf(Data::class, $processedLogs[0]['message']);
+        $this->assertInstanceOf(Data::class, $processedLogs[0]['context']);
+
+        @unlink($path);
     }
 
     public function testWithMainRequest()

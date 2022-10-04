@@ -37,10 +37,7 @@ final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
         $this->filesystem = $filesystem;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $metadatas = [];
 
@@ -55,10 +52,7 @@ final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

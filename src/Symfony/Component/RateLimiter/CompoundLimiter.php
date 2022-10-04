@@ -15,12 +15,10 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 final class CompoundLimiter implements LimiterInterface
 {
-    private $limiters;
+    private array $limiters;
 
     /**
      * @param LimiterInterface[] $limiters
@@ -33,7 +31,7 @@ final class CompoundLimiter implements LimiterInterface
         $this->limiters = $limiters;
     }
 
-    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
     {
         throw new ReserveNotSupportedException(__CLASS__);
     }

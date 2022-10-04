@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
@@ -12,7 +21,7 @@ class ValidValidatorTest extends TestCase
     public function testPropertyPathsArePassedToNestedContexts()
     {
         $validatorBuilder = new ValidatorBuilder();
-        $validator = $validatorBuilder->enableAnnotationMapping(true)->addDefaultDoctrineAnnotationReader()->getValidator();
+        $validator = $validatorBuilder->enableAnnotationMapping()->addDefaultDoctrineAnnotationReader()->getValidator();
 
         $violations = $validator->validate(new Foo(), null, ['nested']);
 
@@ -23,7 +32,7 @@ class ValidValidatorTest extends TestCase
     public function testNullValues()
     {
         $validatorBuilder = new ValidatorBuilder();
-        $validator = $validatorBuilder->enableAnnotationMapping(true)->addDefaultDoctrineAnnotationReader()->getValidator();
+        $validator = $validatorBuilder->enableAnnotationMapping()->addDefaultDoctrineAnnotationReader()->getValidator();
 
         $foo = new Foo();
         $foo->fooBar = null;

@@ -22,7 +22,7 @@ class AnnotatedController
      */
     public function requestDefaultNullAction(Request $request = null)
     {
-        return new Response($request ? \get_class($request) : null);
+        return new Response($request ? $request::class : null);
     }
 
     /**
@@ -47,5 +47,13 @@ class AnnotatedController
     public function argumentWithoutDefaultWithRouteParamAndDefaultAction($value)
     {
         return new Response($value);
+    }
+
+    /**
+     * @Route("/create-transaction")
+     */
+    public function createTransaction()
+    {
+        return new Response();
     }
 }

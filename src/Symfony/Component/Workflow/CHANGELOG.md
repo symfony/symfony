@@ -1,10 +1,27 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Mark `Symfony\Component\Workflow\Registry` as internal
+ * Deprecate calling `Definition::setInitialPlaces()` without arguments
+
+6.0
+---
+
+ * Remove `InvalidTokenConfigurationException`
+
+5.4
+---
+
+ * Add support for getting updated context after a transition
+
 5.3
 ---
 
  * Deprecate `InvalidTokenConfigurationException`
+ * Added `MermaidDumper` to dump Workflow graphs in the Mermaid.js flowchart format
 
 5.2.0
 -----

@@ -1,7 +1,18 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow multiple `TagHeaders` with `MailgunApiTransport`
+
+5.2
+---
+
+ * Not prefixing headers with "h:" is no more deprecated
+
 5.1.0
+-----
 
  * Not prefixing headers with "h:" is deprecated.
 

@@ -15,11 +15,14 @@ use Symfony\Component\Ldap\Entry;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @extends \ArrayAccess<int, Entry>
+ * @extends \IteratorAggregate<int, Entry>
  */
 interface CollectionInterface extends \Countable, \IteratorAggregate, \ArrayAccess
 {
     /**
-     * @return Entry[]
+     * @return list<Entry>
      */
-    public function toArray();
+    public function toArray(): array;
 }

@@ -1,0 +1,7 @@
+security:
+    enable_authenticator_manager: true
+    firewalls:
+        default:
+            remember_me:
+                always_remember_me: true
+                secret: key

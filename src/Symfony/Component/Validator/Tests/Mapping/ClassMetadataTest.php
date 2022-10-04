@@ -336,22 +336,6 @@ class ClassMetadataTest extends TestCase
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
 
-    /**
-     * @requires PHP < 7.4
-     */
-    public function testCascadeConstraintIsNotAvailable()
-    {
-        $metadata = new ClassMetadata(CascadingEntity::class);
-
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Constraints\Cascade" requires PHP 7.4.');
-
-        $metadata->addConstraint(new Cascade());
-    }
-
-    /**
-     * @requires PHP 7.4
-     */
     public function testCascadeConstraint()
     {
         $metadata = new ClassMetadata(CascadingEntity::class);
@@ -373,17 +357,17 @@ class ClassCompositeConstraint extends Composite
 {
     public $nested;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return $this->getCompositeOption();
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'nested';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT];
     }

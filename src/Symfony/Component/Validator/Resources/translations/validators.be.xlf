@@ -386,6 +386,22 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Значэнне не з'яўляецца карэктным міжнародным ідэнтыфікацыйным нумарам каштоўных папер (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Значэнне не з'яўляецца сапраўдным выразам.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Значэнне не з'яўляецца дапушчальным колерам CSS.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Значэнне не з'яўляецца сапраўднай натацыяй CIDR.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Значэнне сеткавай маскі павінна быць ад {{min}} да {{max}}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

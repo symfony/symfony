@@ -29,8 +29,10 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Deprecated;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\IntersectionConstructor;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\WaldoFoo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Wobble;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -818,9 +820,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -834,9 +833,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -849,9 +845,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithFalse()
     {
         $container = new ContainerBuilder();
@@ -865,9 +858,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -882,9 +872,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -898,9 +885,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -916,9 +900,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithTrue()
     {
         $container = new ContainerBuilder();
@@ -934,9 +915,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReferencePassesMixed()
     {
         $container = new ContainerBuilder();
@@ -949,5 +927,64 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testIntersectionTypePassesWithReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', WaldoFoo::class);
+        $container->register('intersection', IntersectionConstructor::class)
+            ->setArguments([new Reference('foo')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testIntersectionTypeFailsWithReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('waldo', Waldo::class);
+        $container->register('intersection', IntersectionConstructor::class)
+            ->setArguments([new Reference('waldo')]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "intersection": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\IntersectionConstructor::__construct()" accepts "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo&Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\WaldoInterface", "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo" passed.');
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    public function testCallableClass()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('foo', CallableClass::class);
+        $definition->addMethodCall('callMethod', [123]);
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testIgnoreDefinitionFactoryArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', Bar::class)
+            ->setArguments([
+                (new Definition(Foo::class))
+                    ->setFactory([Foo::class, 'createStdClass']),
+            ]);
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+}
+
+class CallableClass
+{
+    public function __call($name, $arguments)
+    {
     }
 }

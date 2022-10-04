@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
@@ -18,14 +19,9 @@ use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\ProcessStream;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SendmailTransport for sending mail through a Sendmail/Postfix (etc..) binary.
- *
- * Supported modes are -bs and -t, with any additional flags desired.
- * It is advised to use -bs mode since error reporting with -t mode is not
- * possible.
  *
  * Transport can be instanciated through SendmailTransportFactory or NativeTransportFactory:
  *
@@ -37,25 +33,28 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class SendmailTransport extends AbstractTransport
 {
-    private $command = '/usr/sbin/sendmail -bs';
-    private $stream;
-    private $transport;
+    private string $command = '/usr/sbin/sendmail -bs';
+    private ProcessStream $stream;
+    private ?SmtpTransport $transport = null;
 
     /**
      * Constructor.
      *
-     * If using -t mode you are strongly advised to include -oi or -i in the flags.
-     * For example: /usr/sbin/sendmail -oi -t
-     * -f<sender> flag will be appended automatically if one is not present.
+     * Supported modes are -bs and -t, with any additional flags desired.
      *
      * The recommended mode is "-bs" since it is interactive and failure notifications are hence possible.
+     * Note that the -t mode does not support error reporting and does not support Bcc properly (the Bcc headers are not removed).
+     *
+     * If using -t mode, you are strongly advised to include -oi or -i in the flags (like /usr/sbin/sendmail -oi -t)
+     *
+     * -f<sender> flag will be appended automatically if one is not present.
      */
     public function __construct(string $command = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct($dispatcher, $logger);
 
         if (null !== $command) {
-            if (false === strpos($command, ' -bs') && false === strpos($command, ' -t')) {
+            if (!str_contains($command, ' -bs') && !str_contains($command, ' -t')) {
                 throw new \InvalidArgumentException(sprintf('Unsupported sendmail command flags "%s"; must be one of "-bs" or "-t" but can include additional flags.', $command));
             }
 
@@ -63,7 +62,7 @@ class SendmailTransport extends AbstractTransport
         }
 
         $this->stream = new ProcessStream();
-        if (false !== strpos($this->command, ' -bs')) {
+        if (str_contains($this->command, ' -bs')) {
             $this->stream->setCommand($this->command);
             $this->transport = new SmtpTransport($this->stream, $dispatcher, $logger);
         }
@@ -92,14 +91,23 @@ class SendmailTransport extends AbstractTransport
         $this->getLogger()->debug(sprintf('Email transport "%s" starting', __CLASS__));
 
         $command = $this->command;
-        if (false === strpos($command, ' -f')) {
+
+        if ($recipients = $message->getEnvelope()->getRecipients()) {
+            $command = str_replace(' -t', '', $command);
+        }
+
+        if (!str_contains($command, ' -f')) {
             $command .= ' -f'.escapeshellarg($message->getEnvelope()->getSender()->getEncodedAddress());
         }
 
         $chunks = AbstractStream::replace("\r\n", "\n", $message->toIterable());
 
-        if (false === strpos($command, ' -i') && false === strpos($command, ' -oi')) {
+        if (!str_contains($command, ' -i') && !str_contains($command, ' -oi')) {
             $chunks = AbstractStream::replace("\n.", "\n..", $chunks);
+        }
+
+        foreach ($recipients as $recipient) {
+            $command .= ' '.escapeshellarg($recipient->getEncodedAddress());
         }
 
         $this->stream->setCommand($command);

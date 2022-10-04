@@ -280,6 +280,34 @@ class HeadersTest extends TestCase
         ], $headers->toArray());
     }
 
+    public function testInReplyToAcceptsNonIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('In-Reply-To', 'foobar');
+        $this->assertEquals('foobar', $headers->get('In-Reply-To')->getBody());
+    }
+
+    public function testInReplyToAcceptsIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addIdHeader('In-Reply-To', 'foo@bar.com');
+        $this->assertEquals('<foo@bar.com>', $headers->get('In-Reply-To')->getBodyAsString());
+    }
+
+    public function testReferencesAcceptsNonIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('References', 'foobar');
+        $this->assertEquals('foobar', $headers->get('References')->getBody());
+    }
+
+    public function testReferencesAcceptsIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addIdHeader('References', 'foo@bar.com');
+        $this->assertEquals('<foo@bar.com>', $headers->get('References')->getBodyAsString());
+    }
+
     public function testHeaderBody()
     {
         $headers = new Headers();

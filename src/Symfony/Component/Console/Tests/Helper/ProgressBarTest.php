@@ -66,6 +66,69 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testResumeNoMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(null, 15);
+        $bar->advance();
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '   15 [--------------->------------]'.
+            $this->generateOutput('   16 [---------------->-----------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeWithMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 5000, 0);
+        $bar->start(null, 1000);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            ' 1000/5000 [=====>----------------------]  20%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegularTimeEstimation()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);
+        $bar->start();
+
+        $bar->advance();
+        $bar->advance();
+
+        sleep(1);
+
+        $this->assertEquals(
+            600.0,
+            $bar->getEstimated()
+        );
+    }
+
+    public function testResumedTimeEstimation()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);
+        $bar->start(null, 599);
+        $bar->advance();
+
+        sleep(1);
+
+        $this->assertEquals(
+            1_200.0,
+            $bar->getEstimated()
+        );
+
+        $this->assertEquals(
+            600.0,
+            $bar->getRemaining()
+        );
+    }
+
     public function testAdvanceWithStep()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
@@ -535,7 +598,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     public function testRedrawFrequencyIsAtLeastOneIfSmallerOneGiven()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
-        $bar->setRedrawFrequency(0.9);
+        $bar->setRedrawFrequency(0);
         $bar->start();
         $bar->advance();
 
@@ -812,7 +875,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
-            "\x1B[1A\x1B[1G\x1B[2K".
+            "\x1B[1G\x1B[2K\x1B[1A\x1B[1G\x1B[2K".
             $this->generateOutput("============================\nfoobar"),
             stream_get_contents($output->getStream())
         );
@@ -983,7 +1046,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     {
         $count = substr_count($expected, "\n");
 
-        return ($count ? sprintf("\x1B[%dA\x1B[1G\x1b[2K", $count) : "\x1B[1G\x1B[2K").$expected;
+        return ($count ? str_repeat("\x1B[1G\x1b[2K\x1B[1A", $count) : '')."\x1B[1G\x1B[2K".$expected;
     }
 
     public function testBarWidthWithMultilineFormat()
@@ -1033,14 +1096,14 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->setRedrawFrequency(4); // disable step based redraws
         $bar->start();
 
-        $bar->setProgress(1); // No treshold hit, no redraw
+        $bar->setProgress(1); // No threshold hit, no redraw
         $bar->maxSecondsBetweenRedraws(2);
         sleep(1);
         $bar->setProgress(2); // Still no redraw because it takes 2 seconds for a redraw
         sleep(1);
         $bar->setProgress(3); // 1+1 = 2 -> redraw finally
         $bar->setProgress(4); // step based redraw freq hit, redraw even without sleep
-        $bar->setProgress(5); // No treshold hit, no redraw
+        $bar->setProgress(5); // No threshold hit, no redraw
         $bar->maxSecondsBetweenRedraws(3);
         sleep(2);
         $bar->setProgress(6); // No redraw even though 2 seconds passed. Throttling has priority
@@ -1071,7 +1134,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->setProgress(3); // 1 second passed but we changed threshold, should not draw
         sleep(1);
         $bar->setProgress(4); // 1+1 seconds = 2 seconds passed which conforms threshold, draw
-        $bar->setProgress(5); // No treshold hit, no redraw
+        $bar->setProgress(5); // No threshold hit, no redraw
 
         rewind($output->getStream());
         $this->assertEquals(
@@ -1092,6 +1155,35 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ' 0/2 [>---------------------------]   0%'.
             $this->generateOutput(' 1/2 [==============>-------------]  50%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testMultiLineFormatIsFullyCleared()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar->setFormat("%current%/%max%\n%message%\nFoo");
+
+        $bar->setMessage('1234567890');
+        $bar->start();
+        $bar->display();
+
+        $bar->setMessage('ABC');
+        $bar->advance();
+        $bar->display();
+
+        $bar->setMessage('A');
+        $bar->advance();
+        $bar->display();
+
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            "0/3\n1234567890\nFoo".
+            $this->generateOutput("1/3\nABC\nFoo").
+            $this->generateOutput("2/3\nA\nFoo").
+            $this->generateOutput("3/3\nA\nFoo"),
             stream_get_contents($output->getStream())
         );
     }

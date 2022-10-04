@@ -11,11 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator;
 
+use Doctrine\ORM\Mapping\Column;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEnum;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderNestedEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderNoAutoMappingEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderParentEntity;
@@ -25,7 +27,6 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AutoMappingTrait;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
@@ -36,13 +37,6 @@ use Symfony\Component\Validator\Validation;
  */
 class DoctrineLoaderTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!trait_exists(AutoMappingTrait::class)) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.4+');
-        }
-    }
-
     public function testLoadClassMetadata()
     {
         $validator = Validation::createValidatorBuilder()
@@ -147,6 +141,29 @@ class DoctrineLoaderTest extends TestCase
         $noAutoMappingConstraints = $noAutoMappingMetadata[0]->getConstraints();
         $this->assertCount(0, $noAutoMappingConstraints);
         $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
+    }
+
+    public function testExtractEnum()
+    {
+        if (!property_exists(Column::class, 'enumType')) {
+            $this->markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
+        }
+
+        $validator = Validation::createValidatorBuilder()
+            ->addMethodMapping('loadValidatorMetadata')
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
+            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
+            ->getValidator()
+        ;
+
+        $classMetadata = $validator->getMetadataFor(new DoctrineLoaderEnum());
+
+        $enumStringMetadata = $classMetadata->getPropertyMetadata('enumString');
+        $this->assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
+
+        $enumStringMetadata = $classMetadata->getPropertyMetadata('enumInt');
+        $this->assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
     }
 
     public function testFieldMappingsConfiguration()

@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,8 +28,8 @@ final class ClickatellTransport extends AbstractTransport
 {
     protected const HOST = 'api.clickatell.com';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private ?string $from;
 
     public function __construct(string $authToken, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -60,6 +61,8 @@ final class ClickatellTransport extends AbstractTransport
 
         $endpoint = sprintf('https://%s/rest/message', $this->getEndpoint());
 
+        $from = $message->getFrom() ?: $this->from;
+
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
@@ -68,13 +71,19 @@ final class ClickatellTransport extends AbstractTransport
                 'X-Version' => 1,
             ],
             'json' => [
-                'from' => $this->from ?? '',
+                'from' => $from ?? '',
                 'to' => [$message->getPhone()],
                 'text' => $message->getSubject(),
             ],
         ]);
 
-        if (202 === $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Clicktell server.', $response, 0, $e);
+        }
+
+        if (202 === $statusCode) {
             $result = $response->toArray();
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($result['data']['message'][0]['apiMessageId']);

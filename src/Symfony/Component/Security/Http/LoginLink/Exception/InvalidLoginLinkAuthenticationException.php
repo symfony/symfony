@@ -17,14 +17,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * Thrown when a login link is invalid.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
- * @experimental in 5.3
  */
 class InvalidLoginLinkAuthenticationException extends AuthenticationException
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Invalid or expired login link.';
     }

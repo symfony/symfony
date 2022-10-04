@@ -12,6 +12,7 @@
         "abstract": false,
         "autowire": false,
         "autoconfigure": false,
+        "deprecated": false,
         "file": "\/path\/to\/file",
         "factory_service": "factory.service",
         "factory_method": "get",
@@ -36,6 +37,9 @@
                 "name": "tag2",
                 "parameters": []
             }
+        ],
+        "usages": [
+          ".alias_2"
         ]
     }
 ]

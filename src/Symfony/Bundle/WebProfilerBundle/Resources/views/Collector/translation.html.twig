@@ -5,7 +5,7 @@
 {% block toolbar %}
     {% if collector.messages|length %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/translation.svg') }}
+            {{ source('@WebProfiler/Icon/translation.svg') }}
             {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}
             <span class="sf-toolbar-value">{{ error_count ?: collector.countDefines }}</span>
@@ -44,7 +44,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.countMissings ? 'error' : collector.countFallbacks ? 'warning' }} {{ collector.messages is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/translation.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/translation.svg') }}</span>
         <strong>Translation</strong>
         {% if collector.countMissings or collector.countFallbacks %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}
@@ -72,7 +72,7 @@
     <h2>Messages</h2>
 
     {% if collector.messages is empty %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No translations have been called.</p>
         </div>
     {% else %}
@@ -186,7 +186,7 @@
                 <td class="font-normal text-small text-bold nowrap">{{ message.domain }}</td>
                 <td class="font-normal text-small nowrap">{{ message.count }}</td>
                 <td>
-                    <span class="nowrap">{{ message.id }}</span>
+                    <span class="{{ message.id|length < 64 ? 'nowrap' }}">{{ message.id }}</span>
 
                     {% if message.transChoiceNumber is not null %}
                         <small class="newline">(pluralization is used)</small>

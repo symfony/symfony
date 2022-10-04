@@ -28,11 +28,15 @@ class SlidingWindowTest extends TestCase
         $this->assertSame(2 * 10, $window->getExpirationTime());
 
         $data = serialize($window);
+        sleep(10);
         $cachedWindow = unserialize($data);
-        $this->assertNull($cachedWindow->getExpirationTime());
+        $this->assertSame(10, $cachedWindow->getExpirationTime());
 
         $new = SlidingWindow::createFromPreviousWindow($cachedWindow, 15);
         $this->assertSame(2 * 15, $new->getExpirationTime());
+
+        usleep(10.1);
+        $this->assertIsInt($new->getExpirationTime());
     }
 
     public function testInvalidInterval()
@@ -71,5 +75,44 @@ class SlidingWindowTest extends TestCase
         sleep(300);
         $new = SlidingWindow::createFromPreviousWindow($window, 60);
         $this->assertFalse($new->isExpired());
+    }
+
+    public function testCreateFromPreviousWindowUsesMicrotime()
+    {
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('foo', 8);
+
+        usleep(11.6 * 1e6); // wait just under 12s (8+4)
+        $new = SlidingWindow::createFromPreviousWindow($window, 4);
+
+        // should be 400ms left (12 - 11.6)
+        $this->assertEqualsWithDelta(0.4, $new->getRetryAfter()->format('U.u') - microtime(true), 0.2);
+    }
+
+    public function testIsExpiredUsesMicrotime()
+    {
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('foo', 10);
+
+        usleep(10.1 * 1e6);
+        $this->assertTrue($window->isExpired());
+    }
+
+    public function testGetRetryAfterUsesMicrotime()
+    {
+        $window = new SlidingWindow('foo', 10);
+
+        usleep(9.5 * 1e6);
+        // should be 500ms left (10 - 9.5)
+        $this->assertEqualsWithDelta(0.5, $window->getRetryAfter()->format('U.u') - microtime(true), 0.2);
+    }
+
+    public function testCreateAtExactTime()
+    {
+        ClockMock::register(SlidingWindow::class);
+        ClockMock::withClockMock(1234567890.000000);
+        $window = new SlidingWindow('foo', 10);
+        $window->getRetryAfter();
+        $this->assertEquals('1234567900.000000', $window->getRetryAfter()->format('U.u'));
     }
 }

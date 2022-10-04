@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -25,6 +26,19 @@ use Symfony\Component\Routing\RouteCollection;
 
 abstract class AbstractDescriptorTest extends TestCase
 {
+    private $colSize;
+
+    protected function setUp(): void
+    {
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS=121');
+    }
+
+    protected function tearDown(): void
+    {
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+    }
+
     /** @dataProvider getDescribeRouteCollectionTestData */
     public function testDescribeRouteCollection(RouteCollection $routes, $expectedDescription)
     {
@@ -108,6 +122,8 @@ abstract class AbstractDescriptorTest extends TestCase
             $definitionsWithArgs[str_replace('definition_', 'definition_arguments_', $key)] = $definition;
         }
 
+        $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
+
         return $this->getDescriptionTestData($definitionsWithArgs);
     }
 
@@ -190,13 +206,27 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->assertDescription($expectedDescription, $callable);
     }
 
-    public function getDescribeCallableTestData()
+    public function getDescribeCallableTestData(): array
     {
         return $this->getDescriptionTestData(ObjectsProvider::getCallables());
     }
 
+    /**
+     * @group legacy
+     * @dataProvider getDescribeDeprecatedCallableTestData
+     */
+    public function testDescribeDeprecatedCallable($callable, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $callable);
+    }
+
+    public function getDescribeDeprecatedCallableTestData(): array
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getDeprecatedCallables());
+    }
+
     /** @dataProvider getClassDescriptionTestData */
-    public function testGetClassDecription($object, $expectedDescription)
+    public function testGetClassDescription($object, $expectedDescription)
     {
         $this->assertEquals($expectedDescription, $this->getDescriptor()->getClassDescription($object));
     }
@@ -248,7 +278,7 @@ abstract class AbstractDescriptorTest extends TestCase
         }
     }
 
-    private function getDescriptionTestData(array $objects)
+    private function getDescriptionTestData(iterable $objects)
     {
         $data = [];
         foreach ($objects as $name => $object) {
@@ -315,7 +345,7 @@ abstract class AbstractDescriptorTest extends TestCase
             foreach ($variations as $suffix => $options) {
                 $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
-                $data[] = [$object, $description, $options, $file];
+                $data[] = [$object, $description, $options];
             }
         }
 

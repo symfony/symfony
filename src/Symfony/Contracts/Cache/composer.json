@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "psr/cache": "^1.0|^2.0|^3.0"
+        "php": ">=8.1",
+        "psr/cache": "^3.0"
     },
     "suggest": {
         "symfony/cache-implementation": ""
@@ -28,7 +28,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-main": "2.4-dev"
+            "dev-main": "3.2-dev"
         },
         "thanks": {
             "name": "symfony/contracts",

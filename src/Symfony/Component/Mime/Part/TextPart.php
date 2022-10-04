@@ -23,6 +23,9 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class TextPart extends AbstractPart
 {
+    /** @internal */
+    protected $_headers;
+
     private static $encoders = [];
 
     private $body;
@@ -37,14 +40,23 @@ class TextPart extends AbstractPart
     private $seekable;
 
     /**
-     * @param resource|string $body
+     * @param resource|string|BodyFile $body Use a BodyFile instance to defer loading the file until rendering
      */
     public function __construct($body, ?string $charset = 'utf-8', string $subtype = 'plain', string $encoding = null)
     {
+        unset($this->_headers);
+
         parent::__construct();
 
-        if (!\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body of "%s" must be a string or a resource (got "%s").', self::class, get_debug_type($body)));
+        if (!\is_string($body) && !\is_resource($body) && !$body instanceof BodyFile) {
+            throw new \TypeError(sprintf('The body of "%s" must be a string, a resource, or an instance of "%s" (got "%s").', self::class, BodyFile::class, get_debug_type($body)));
+        }
+
+        if ($body instanceof BodyFile) {
+            $path = $body->getPath();
+            if ((is_file($path) && !is_readable($path)) || is_dir($path)) {
+                throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
+            }
         }
 
         $this->body = $body;
@@ -77,7 +89,7 @@ class TextPart extends AbstractPart
      *
      * @return $this
      */
-    public function setDisposition(string $disposition)
+    public function setDisposition(string $disposition): static
     {
         $this->disposition = $disposition;
 
@@ -89,15 +101,27 @@ class TextPart extends AbstractPart
      *
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
+    /**
+     * Gets the name of the file.
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
     public function getBody(): string
     {
+        if ($this->body instanceof BodyFile) {
+            return file_get_contents($this->body->getPath());
+        }
+
         if (null === $this->seekable) {
             return $this->body;
         }
@@ -116,7 +140,14 @@ class TextPart extends AbstractPart
 
     public function bodyToIterable(): iterable
     {
-        if (null !== $this->seekable) {
+        if ($this->body instanceof BodyFile) {
+            $path = $this->body->getPath();
+            if (false === $handle = @fopen($path, 'r', false)) {
+                throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));
+            }
+
+            yield from $this->getEncoder()->encodeByteStream($handle);
+        } elseif (null !== $this->seekable) {
             if ($this->seekable) {
                 rewind($this->body);
             }
@@ -184,14 +215,12 @@ class TextPart extends AbstractPart
         return 'quoted-printable';
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         // convert resources to strings for serialization
         if (null !== $this->seekable) {
             $this->body = $this->getBody();
+            $this->seekable = null;
         }
 
         $this->_headers = $this->getHeaders();
@@ -202,7 +231,6 @@ class TextPart extends AbstractPart
     public function __wakeup()
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
-        $r->setAccessible(true);
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
     }

@@ -28,9 +28,6 @@ class WeekType extends AbstractType
         'choice' => ChoiceType::class,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ('string' === $options['input']) {
@@ -83,9 +80,6 @@ class WeekType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget'] = $options['widget'];
@@ -95,9 +89,6 @@ class WeekType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
@@ -155,9 +146,7 @@ class WeekType extends AbstractType
             },
             'compound' => $compound,
             'choice_translation_domain' => false,
-            'invalid_message' => static function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true) ? $previousValue : 'Please enter a valid week.';
-            },
+            'invalid_message' => 'Please enter a valid week.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -185,10 +174,7 @@ class WeekType extends AbstractType
         $resolver->setAllowedTypes('weeks', 'int[]');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'week';
     }

@@ -203,10 +203,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             'type' => ['boolean', 'array'],
             'message' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\Type(type: ["boolean", "array"], message: "myMessage");')];
-        }
+        yield 'named arguments' => [new Type(type: ['boolean', 'array'], message: 'myMessage')];
     }
 
     protected function createFile()

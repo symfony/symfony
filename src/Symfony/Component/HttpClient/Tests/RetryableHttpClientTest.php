@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
@@ -158,5 +168,61 @@ class RetryableHttpClientTest extends TestCase
         }
         $this->assertCount(2, $logger->logs);
         $this->assertSame('Try #{count} after {delay}ms: Could not resolve host "does.not.exists".', $logger->logs[0]);
+    }
+
+    public function testCancelOnTimeout()
+    {
+        $client = HttpClient::create();
+
+        if ($client instanceof NativeHttpClient) {
+            $this->markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
+        }
+
+        $client = new RetryableHttpClient($client);
+
+        $response = $client->request('GET', 'https://example.com/');
+
+        foreach ($client->stream($response, 0) as $chunk) {
+            $this->assertTrue($chunk->isTimeout());
+            $response->cancel();
+        }
+    }
+
+    public function testRetryWithDelay()
+    {
+        $retryAfter = '0.46';
+
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', [
+                    'http_code' => 503,
+                    'response_headers' => [
+                        'retry-after' => $retryAfter,
+                    ],
+                ]),
+                new MockResponse('', [
+                    'http_code' => 200,
+                ]),
+            ]),
+            new GenericRetryStrategy(),
+            1,
+            $logger = new class() extends TestLogger {
+                public $context = [];
+
+                public function log($level, $message, array $context = []): void
+                {
+                    $this->context = $context;
+                    parent::log($level, $message, $context);
+                }
+            }
+        );
+
+        $client->request('GET', 'http://example.com/foo-bar')->getContent();
+
+        $delay = $logger->context['delay'] ?? null;
+
+        $this->assertArrayHasKey('delay', $logger->context);
+        $this->assertNotNull($delay);
+        $this->assertSame((int) ($retryAfter * 1000), $delay);
     }
 }

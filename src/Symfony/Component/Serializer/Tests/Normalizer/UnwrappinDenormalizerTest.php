@@ -34,9 +34,9 @@ class UnwrappinDenormalizerTest extends TestCase
 
     public function testSupportsNormalization()
     {
-        $this->assertTrue($this->denormalizer->supportsDenormalization([], new \stdClass(), 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]']));
-        $this->assertFalse($this->denormalizer->supportsDenormalization([], new \stdClass(), 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]', 'unwrapped' => true]));
-        $this->assertFalse($this->denormalizer->supportsDenormalization([], new \stdClass(), 'any', []));
+        $this->assertTrue($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]']));
+        $this->assertFalse($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]', 'unwrapped' => true]));
+        $this->assertFalse($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', []));
     }
 
     public function testDenormalize()

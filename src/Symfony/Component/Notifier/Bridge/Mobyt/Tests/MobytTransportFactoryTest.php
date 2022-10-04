@@ -13,17 +13,13 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
 final class MobytTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return MobytTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): MobytTransportFactory
     {
         return new MobytTransportFactory();
     }

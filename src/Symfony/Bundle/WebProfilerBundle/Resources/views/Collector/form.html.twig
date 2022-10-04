@@ -4,9 +4,9 @@
 
 {% block toolbar %}
     {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
-        {% set status_color = collector.data.nb_errors ? 'red' : '' %}
+        {% set status_color = collector.data.nb_errors ? 'red' %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/form.svg') }}
+            {{ source('@WebProfiler/Icon/form.svg') }}
             <span class="sf-toolbar-value">
                 {{ collector.data.nb_errors ?: collector.data.forms|length }}
             </span>
@@ -29,7 +29,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.data.nb_errors ? 'error' }} {{ collector.data.forms is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/form.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
         {% if collector.data.nb_errors > 0 %}
             <span class="count">
@@ -46,7 +46,7 @@
         #tree-menu {
             float: left;
             padding-right: 10px;
-            width: 230px;
+            width: 220px;
         }
         #tree-menu ul {
             list-style: none;
@@ -60,11 +60,12 @@
         }
         #tree-menu .empty {
             border: 0;
+            box-shadow: none !important;
             padding: 0;
         }
         #tree-details-container {
-            border-left: 1px solid #DDD;
-            margin-left: 250px;
+            border-left: 1px solid var(--table-border-color);
+            margin-left: 230px;
             padding-left: 20px;
         }
         .tree-details {
@@ -77,73 +78,62 @@
 
         .toggle-icon {
             display: inline-block;
-            background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDgwx4LcKwAAAABVQTFRFAAAA////////////////ZmZm////bvjBwAAAAAV0Uk5TABZwsuCVEUjgAAAAAWJLR0QF+G/pxwAAAE1JREFUGNNjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBmwgTQgQGWgA7h2uIFwK+CWwp1BpHvYEqDuATEYkBlY3IOmBq6dCPcAAIT5Eg2IksjQAAAAAElFTkSuQmCC") no-repeat top left #5eb5e0;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' data-icon-name='icon-tabler-square-plus' width='24' height='24' viewBox='0 0 24 24' stroke-width='2px' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'%3E%3C/path%3E%3Crect x='4' y='4' width='16' height='16' rx='2'%3E%3C/rect%3E%3Cline x1='9' y1='12' x2='15' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='9' x2='12' y2='15'%3E%3C/line%3E%3C/svg%3E") no-repeat;
+            background-size: 18px 18px;
         }
         .closed .toggle-icon, .closed.toggle-icon {
             background-position: bottom left;
         }
         .toggle-icon.empty {
-            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QAZgBmAGYHukptAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhIf6CA40AAAAFRJREFUOMvtk7ENACEMA61vfx767MROWfO+AdGBHlNyTZrYUZRYDBII4NWE1pNdpFarfgLUbpDaBEgBYRiEVjsvDLa1l6O4Z3wkFWN+OfLKdpisOH/TlICzukmUJwAAAABJRU5ErkJggg==");
+            background-image: none;
         }
 
         .tree .tree-inner {
             cursor: pointer;
             padding: 5px 7px 5px 22px;
             position: relative;
-
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .tree .toggle-button {
-            /* provide a bigger clickable area than just 10x10px */
             width: 16px;
             height: 16px;
             margin-left: -18px;
         }
         .tree .toggle-icon {
-            width: 10px;
-            height: 10px;
-            /* position the icon in the center of the clickable area */
-            margin-left: 3px;
-            margin-top: 3px;
-            background-size: 10px 20px;
-            background-color: #AAA;
+            width: 18px;
+            height: 18px;
+            vertical-align: bottom;
         }
         .tree .toggle-icon.empty {
-            width: 10px;
-            height: 10px;
+            width: 5px;
+            height: 5px;
             position: absolute;
             top: 50%;
-            margin-top: -5px;
-            margin-left: -15px;
-            background-size: 10px 10px;
+            margin-top: -2px;
+            margin-left: -13px;
+        }
+        .tree .tree-inner {
+            border-radius: 4px;
         }
         .tree ul ul .tree-inner {
-            padding-left: 37px;
+            padding-left: 32px;
         }
         .tree ul ul ul .tree-inner {
-            padding-left: 52px;
+            padding-left: 48px;
         }
         .tree ul ul ul ul .tree-inner {
-            padding-left: 67px;
+            padding-left: 64px;
         }
         .tree ul ul ul ul ul .tree-inner {
-            padding-left: 82px;
+            padding-left: 72px;
         }
         .tree .tree-inner:hover {
-            background: #dfdfdf;
-        }
-        .tree .tree-inner:hover span:not(.has-error) {
-            color: var(--base-0);
+            background: var(--gray-200);
         }
         .tree .tree-inner.active, .tree .tree-inner.active:hover {
             background: var(--tree-active-background);
             font-weight: bold;
-        }
-        .tree .tree-inner.active .toggle-icon, .tree .tree-inner:hover .toggle-icon, .tree .tree-inner.active:hover .toggle-icon {
-            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhEYXWn+sAAAABhQTFRFAAAA39/f39/f39/f39/fZmZm39/f////gc3YPwAAAAV0Uk5TAAtAc6ZeVyCYAAAAAWJLR0QF+G/pxwAAAE1JREFUGNNjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBmwgXIgQGWgA7h2uIFwK+CWwp1BpHvYC6DuATEYkBlY3IOmBq6dCPcAADqLE4MnBi/fAAAAAElFTkSuQmCC");
-            background-color: #999;
-        }
-        .tree .tree-inner.active .toggle-icon.empty, .tree .tree-inner:hover .toggle-icon.empty, .tree .tree-inner.active:hover .toggle-icon.empty {
-            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhoucSey4gAAABVQTFRFAAAA39/f39/f39/f39/fZmZm39/fD5Dx2AAAAAV0Uk5TAAtAc6ZeVyCYAAAAAWJLR0QF+G/pxwAAADJJREFUCNdjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBnIA3DtcAPhVsAthTkDAFOfBKW9C1iqAAAAAElFTkSuQmCC");
         }
         .tree-details .toggle-icon {
             width: 16px;
@@ -180,26 +170,6 @@
             color: inherit;
             text-decoration: inherit;
         }
-        h2 + h3.form-data-type {
-            margin-top: 0;
-        }
-        h3.form-data-type + h3 {
-            margin-top: 1em;
-        }
-        .theme-dark .toggle-icon {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAVUExURUdwTH+Ag0lNUZiYmGRmbP///zU5P2n9VV4AAAAFdFJOUwCv+yror0g1sQAAAE1JREFUGNNjSFM0YGBgEEpjSGEAAzcGBQiDiUEAwmBkMIAwmBmwgVAgQGWgA7h2uIFwK+CWwp1BpHtYA6DuATEYkBlY3IOmBq6dCPcAAKMtEEs3tfChAAAAAElFTkSuQmCC');
-        }
-        .theme-dark .toggle-icon.empty {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAASUExURUdwTDI3OzQ5PS4uLjU3PzU5P4keoyIAAAAFdFJOUwBApgtzrnKGEwAAADJJREFUCNdjCFU0YGBgEAplCGEAA1cGBQiDiUEAwmBkMIAwmBnIA3DtcAPhVsAthTkDACsZBBmrTTSxAAAAAElFTkSuQmCC');
-        }
-        .theme-dark .tree .tree-inner.active .toggle-icon, .theme-dark .tree .tree-inner:hover .toggle-icon, .theme-dark  .tree .tree-inner.active:hover .toggle-icon {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAAD1BMVEVHcEx/gIOYmJiZmZn///+IJ2wIAAAAA3RSTlMAryoIUq0uAAAAUElEQVQY02NgYFQ2NjYWYGBgMAYDBgZmCMOAQRjCMGRQhjCMoEqAipAYLkCAykBXA9cONxBuBdxShDOIc4+JM9Q9IIYxMgOLe9DUwLUT4R4AznguG0qfEa0AAAAASUVORK5CYII=');
-            background-color: transparent;
-        }
-        .theme-dark .tree .tree-inner.active .toggle-icon.empty, .theme-dark .tree .tree-inner:hover .toggle-icon.empty, .theme-dark  .tree .tree-inner.active:hover .toggle-icon.empty {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEVHcEwyNzuqqqrd9nIgAAAAAnRSTlMAQABPjKgAAAArSURBVAjXY2BctcqBgWvVqgUMWqtWrWDIWrVqJcMqICCGACsGawMbADIKANflJYEoGMqtAAAAAElFTkSuQmCC');
-            background-color: transparent;
-        }
     </style>
 {% endblock %}
 
@@ -221,7 +191,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No forms were submitted for this request.</p>
         </div>
     {% endif %}
@@ -441,7 +411,6 @@
         };
 
     tabTarget.initTabs(document.querySelectorAll('.tree .tree-inner'));
-    toggler.initButtons(document.querySelectorAll('a.toggle-button'));
     </script>
 {% endblock %}
 
@@ -449,7 +418,7 @@
     {% import _self as tree %}
     {% set has_error = data.errors is defined and data.errors|length > 0 %}
     <li>
-        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
+        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details" title="{{ name|default('(no name)') }}">
             {% if has_error %}
                 <div class="badge-error">{{ data.errors|length }}</div>
             {% endif %}
@@ -480,10 +449,71 @@
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
         <h2>{{ name|default('(no name)') }}</h2>
         {% if data.type_class is defined %}
-            <h3 class="dump-inline form-data-type">{{ profiler_dump(data.type_class) }}</h3>
+            <div class="form-type-class">
+                <span class="form-type-class-label">Form type:</span>
+                {{ profiler_dump(data.type_class) }}
+            </div>
         {% endif %}
 
-        {% if data.errors is defined and data.errors|length > 0 %}
+        {% set form_has_errors = data.errors ?? [] is not empty %}
+        <div class="sf-tabs">
+            <div class="tab {{ form_has_errors ? 'active' : 'disabled' }}">
+                <h3 class="tab-title">Errors</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_errors(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ not form_has_errors ? 'active' }}">
+                <h3 class="tab-title">Default Data</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_default_data(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ data.submitted_data ?? [] is empty ? 'disabled' }}">
+                <h3 class="tab-title">Submitted Data</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_submitted_data(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ data.passed_options ?? [] is empty ? 'disabled' }}">
+                <h3 class="tab-title">Passed Options</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_passed_options(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ data.resolved_options ?? [] is empty ? 'disabled' }}">
+                <h3 class="tab-title">Resolved Options</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_resolved_options(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ data.view_vars ?? [] is empty ? 'disabled' }}">
+                <h3 class="tab-title">View Variables</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_view_variables(data) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for childName, childData in data.children %}
+        {{ tree.form_tree_details(childName, childData, forms_by_hash) }}
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_form_errors(data) %}
+    {% if data.errors is defined and data.errors|length > 0 %}
         <div class="errors">
             <h3>
                 <a class="toggle-button" data-toggle-target-id="{{ data.id }}-errors" href="#">
@@ -493,157 +523,145 @@
 
             <table id="{{ data.id }}-errors">
                 <thead>
-                    <tr>
-                        <th>Message</th>
-                        <th>Origin</th>
-                        <th>Cause</th>
-                    </tr>
+                <tr>
+                    <th>Message</th>
+                    <th>Origin</th>
+                    <th>Cause</th>
+                </tr>
                 </thead>
                 <tbody>
                 {% for error in data.errors %}
-                <tr>
-                    <td>{{ error.message }}</td>
-                    <td>
-                        {% if error.origin is empty %}
-                            <em>This form.</em>
-                        {% elseif forms_by_hash[error.origin] is not defined %}
-                            <em>Unknown.</em>
-                        {% else %}
-                            {{ forms_by_hash[error.origin].name }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if error.trace %}
-                            <span class="newline">Caused by:</span>
-                            {% for stacked in error.trace %}
-                                {{ profiler_dump(stacked) }}
-                            {% endfor %}
-                        {% else %}
-                            <em>Unknown.</em>
-                        {% endif %}
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ error.message }}</td>
+                        <td>
+                            {% if error.origin is empty %}
+                                <em>This form.</em>
+                            {% elseif forms_by_hash[error.origin] is not defined %}
+                                <em>Unknown.</em>
+                            {% else %}
+                                {{ forms_by_hash[error.origin].name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if error.trace %}
+                                <span class="newline">Caused by:</span>
+                                {% for stacked in error.trace %}
+                                    {{ profiler_dump(stacked) }}
+                                {% endfor %}
+                            {% else %}
+                                <em>Unknown.</em>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% endif %}
-
-        {% if data.default_data is defined %}
-        <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-default_data" href="#">
-                Default Data <span class="toggle-icon"></span>
-            </a>
-        </h3>
-
-        <div id="{{ data.id }}-default_data">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="180">Property</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th class="font-normal" scope="row">Model Format</th>
-                        <td>
-                            {% if data.default_data.model is defined %}
-                                {{ profiler_dump(data.default_data.seek('model')) }}
-                            {% else %}
-                                <em class="font-normal text-muted">same as normalized format</em>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="font-normal" scope="row">Normalized Format</th>
-                        <td>{{ profiler_dump(data.default_data.seek('norm')) }}</td>
-                    </tr>
-                    <tr>
-                        <th class="font-normal" scope="row">View Format</th>
-                        <td>
-                            {% if data.default_data.view is defined %}
-                                {{ profiler_dump(data.default_data.seek('view')) }}
-                            {% else %}
-                                <em class="font-normal text-muted">same as normalized format</em>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    {% else %}
+        <div class="empty">
+            <p>This form has no errors.</p>
         </div>
-        {% endif %}
+    {% endif %}
+{% endmacro %}
 
-        {% if data.submitted_data is defined %}
-        <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#">
-                Submitted Data <span class="toggle-icon"></span>
-            </a>
-        </h3>
-
-        <div id="{{ data.id }}-submitted_data">
-        {% if data.submitted_data.norm is defined %}
-            <table>
-                <thead>
-                    <tr>
-                        <th width="180">Property</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th class="font-normal" scope="row">View Format</th>
-                        <td>
-                            {% if data.submitted_data.view is defined %}
-                                {{ profiler_dump(data.submitted_data.seek('view')) }}
-                            {% else %}
-                                <em class="font-normal text-muted">same as normalized format</em>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="font-normal" scope="row">Normalized Format</th>
-                        <td>{{ profiler_dump(data.submitted_data.seek('norm')) }}</td>
-                    </tr>
-                    <tr>
-                        <th class="font-normal" scope="row">Model Format</th>
-                        <td>
-                            {% if data.submitted_data.model is defined %}
-                                {{ profiler_dump(data.submitted_data.seek('model')) }}
-                            {% else %}
-                                <em class="font-normal text-muted">same as normalized format</em>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        {% else %}
-            <div class="empty">
-                <p>This form was not submitted.</p>
-            </div>
-        {% endif %}
+{% macro render_form_default_data(data) %}
+    {% if data.default_data is defined %}
+        <table>
+            <thead>
+            <tr>
+                <th width="180">Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th class="font-normal" scope="row">Model Format</th>
+                <td>
+                    {% if data.default_data.model is defined %}
+                        {{ profiler_dump(data.default_data.seek('model')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">Normalized Format</th>
+                <td>{{ profiler_dump(data.default_data.seek('norm')) }}</td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">View Format</th>
+                <td>
+                    {% if data.default_data.view is defined %}
+                        {{ profiler_dump(data.default_data.seek('view')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>This form has default data defined.</p>
         </div>
-        {% endif %}
+    {% endif %}
+{% endmacro %}
 
-        {% if data.passed_options is defined %}
-        <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-passed_options" href="#">
-                Passed Options <span class="toggle-icon"></span>
-            </a>
-        </h3>
+{% macro render_form_submitted_data(data) %}
+    {% if data.submitted_data.norm is defined %}
+        <table>
+            <thead>
+            <tr>
+                <th width="180">Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th class="font-normal" scope="row">View Format</th>
+                <td>
+                    {% if data.submitted_data.view is defined %}
+                        {{ profiler_dump(data.submitted_data.seek('view')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">Normalized Format</th>
+                <td>{{ profiler_dump(data.submitted_data.seek('norm')) }}</td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">Model Format</th>
+                <td>
+                    {% if data.submitted_data.model is defined %}
+                        {{ profiler_dump(data.submitted_data.seek('model')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>This form was not submitted.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
 
-        <div id="{{ data.id }}-passed_options">
-            {% if data.passed_options|length %}
-            <table>
-                <thead>
-                    <tr>
-                        <th width="180">Option</th>
-                        <th>Passed Value</th>
-                        <th>Resolved Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for option, value in data.passed_options %}
+{% macro render_form_passed_options(data) %}
+    {% if data.passed_options ?? [] is not empty %}
+        <table>
+            <thead>
+            <tr>
+                <th width="180">Option</th>
+                <th>Passed Value</th>
+                <th>Resolved Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for option, value in data.passed_options %}
                 <tr>
                     <th>{{ option }}</th>
                     <td>{{ profiler_dump(value) }}</td>
@@ -658,73 +676,50 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-                <div class="empty">
-                    <p>No options were passed when constructing this form.</p>
-                </div>
-            {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No options were passed when constructing this form.</p>
         </div>
-        {% endif %}
+    {% endif %}
+{% endmacro %}
 
-        {% if data.resolved_options is defined %}
-        <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-resolved_options" href="#">
-                Resolved Options <span class="toggle-icon"></span>
-            </a>
-        </h3>
+{% macro render_form_resolved_options(data) %}
+    <table>
+        <thead>
+        <tr>
+            <th width="180">Option</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for option, value in data.resolved_options ?? [] %}
+            <tr>
+                <th scope="row">{{ option }}</th>
+                <td>{{ profiler_dump(value) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
 
-        <div id="{{ data.id }}-resolved_options" class="hidden">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="180">Option</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for option, value in data.resolved_options %}
-                <tr>
-                    <th scope="row">{{ option }}</th>
-                    <td>{{ profiler_dump(value) }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-
-        {% if data.view_vars is defined %}
-        <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-view_vars" href="#">
-                View Variables <span class="toggle-icon"></span>
-            </a>
-        </h3>
-
-        <div id="{{ data.id }}-view_vars" class="hidden">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="180">Variable</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for variable, value in data.view_vars %}
-                <tr>
-                    <th scope="row">{{ variable }}</th>
-                    <td>{{ profiler_dump(value) }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-
-    {% for childName, childData in data.children %}
-        {{ tree.form_tree_details(childName, childData, forms_by_hash) }}
-    {% endfor %}
+{% macro render_form_view_variables(data) %}
+    <table>
+        <thead>
+        <tr>
+            <th width="180">Variable</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for variable, value in data.view_vars %}
+            <tr>
+                <th scope="row">{{ variable }}</th>
+                <td>{{ profiler_dump(value) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endmacro %}

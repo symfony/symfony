@@ -27,7 +27,10 @@ class HandlersLocatorTest extends TestCase
             DummyMessage::class => [$handler],
         ]);
 
-        $this->assertEquals([new HandlerDescriptor($handler)], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('a')))));
+        $descriptor = new HandlerDescriptor($handler);
+        $descriptor->getName();
+
+        $this->assertEquals([$descriptor], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('a')))));
     }
 
     public function testItReturnsOnlyHandlersMatchingTransport()
@@ -42,6 +45,9 @@ class HandlersLocatorTest extends TestCase
                 $second = new HandlerDescriptor($secondHandler, ['from_transport' => 'transportName', 'alias' => 'three']),
             ],
         ]);
+
+        $first->getName();
+        $second->getName();
 
         $this->assertEquals([
             $first,

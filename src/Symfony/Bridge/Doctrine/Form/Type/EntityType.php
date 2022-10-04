@@ -32,7 +32,7 @@ class EntityType extends DoctrineType
                 $queryBuilder = $queryBuilder($options['em']->getRepository($options['class']));
 
                 if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
-                    throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
+                    throw new UnexpectedTypeException($queryBuilder, QueryBuilder::class);
                 }
             }
 
@@ -40,17 +40,15 @@ class EntityType extends DoctrineType
         };
 
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
-        $resolver->setAllowedTypes('query_builder', ['null', 'callable', 'Doctrine\ORM\QueryBuilder']);
+        $resolver->setAllowedTypes('query_builder', ['null', 'callable', QueryBuilder::class]);
     }
 
     /**
      * Return the default loader object.
      *
      * @param QueryBuilder $queryBuilder
-     *
-     * @return ORMQueryBuilderLoader
      */
-    public function getLoader(ObjectManager $manager, $queryBuilder, string $class)
+    public function getLoader(ObjectManager $manager, object $queryBuilder, string $class): ORMQueryBuilderLoader
     {
         if (!$queryBuilder instanceof QueryBuilder) {
             throw new \TypeError(sprintf('Expected an instance of "%s", but got "%s".', QueryBuilder::class, get_debug_type($queryBuilder)));
@@ -59,10 +57,7 @@ class EntityType extends DoctrineType
         return new ORMQueryBuilderLoader($queryBuilder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'entity';
     }
@@ -76,7 +71,7 @@ class EntityType extends DoctrineType
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash($queryBuilder): ?array
+    public function getQueryBuilderPartsForCachingHash(object $queryBuilder): ?array
     {
         if (!$queryBuilder instanceof QueryBuilder) {
             throw new \TypeError(sprintf('Expected an instance of "%s", but got "%s".', QueryBuilder::class, get_debug_type($queryBuilder)));
@@ -84,7 +79,7 @@ class EntityType extends DoctrineType
 
         return [
             $queryBuilder->getQuery()->getSQL(),
-            array_map([$this, 'parameterToArray'], $queryBuilder->getParameters()->toArray()),
+            array_map($this->parameterToArray(...), $queryBuilder->getParameters()->toArray()),
         ];
     }
 

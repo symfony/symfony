@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 
-class DateTimeToRfc3339TransformerTest extends TestCase
+class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTest
 {
     use DateTimeEqualsTrait;
 
@@ -142,5 +142,10 @@ class DateTimeToRfc3339TransformerTest extends TestCase
             'RFC 822 format' => ['Sat, 01 May 10 04:05:00 +0000'],
             'RSS format' => ['Sat, 01 May 2010 04:05:00 +0000'],
         ];
+    }
+
+    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    {
+        return new DateTimeToRfc3339Transformer($inputTimezone, $outputTimezone);
     }
 }

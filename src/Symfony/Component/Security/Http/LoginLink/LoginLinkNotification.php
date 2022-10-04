@@ -25,12 +25,10 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  * emails/SMS using the Notifier component.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 class LoginLinkNotification extends Notification implements EmailNotificationInterface, SmsNotificationInterface
 {
-    private $loginLinkDetails;
+    private LoginLinkDetails $loginLinkDetails;
 
     public function __construct(LoginLinkDetails $loginLinkDetails, string $subject, array $channels = [])
     {

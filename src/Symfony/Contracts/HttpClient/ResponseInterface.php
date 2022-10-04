@@ -102,8 +102,8 @@ interface ResponseInterface
      *
      * Other info SHOULD be named after curl_getinfo()'s associative return value.
      *
-     * @return array|mixed An array of all available info, or one of them when $type is
-     *                     provided, or null when an unsupported type is requested
+     * @return mixed An array of all available info, or one of them when $type is
+     *               provided, or null when an unsupported type is requested
      */
-    public function getInfo(string $type = null);
+    public function getInfo(string $type = null): mixed;
 }

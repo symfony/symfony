@@ -2,6 +2,7 @@ imports:
     - { resource: ./../config/framework.yml }
 
 security:
+    enable_authenticator_manager: true
     password_hashers:
         Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
@@ -22,4 +23,3 @@ security:
                 secret: key
                 secure: auto
             logout: ~
-            anonymous: ~

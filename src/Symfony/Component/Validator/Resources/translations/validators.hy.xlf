@@ -131,24 +131,24 @@
                 <target>Արժեքը պետք է լինի թիվ։</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>Արժեքը պետք է լինի երկիր։</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>Նիշքը նկարի վավեր ֆորմատ չէ։</target>
             </trans-unit>
-            <trans-unit id="38">
+            <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
                 <target>Արժեքը վավեր IP հասցե չէ։</target>
             </trans-unit>
-            <trans-unit id="39">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
                 <target>Արժեքը վավեր լեզու չէ։</target>
             </trans-unit>
-            <trans-unit id="40">
+            <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
                 <target>Արժեքը չի հանդիսանում վավեր տեղայնացում։</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Արժեքը պետք է լինի երկիր։</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -385,6 +385,10 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Այս արժեքը արժեթղթերի նույնականացման միջազգային համարը վավեր չէ(ISIN)։</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Այս արժեքը պետք է լինի վավեր արտահայտություն:</target>
             </trans-unit>
         </body>
     </file>

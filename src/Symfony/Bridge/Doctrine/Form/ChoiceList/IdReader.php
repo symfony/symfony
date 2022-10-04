@@ -24,16 +24,12 @@ use Symfony\Component\Form\Exception\RuntimeException;
  */
 class IdReader
 {
-    private $om;
-    private $classMetadata;
-    private $singleId;
-    private $intId;
-    private $idField;
-
-    /**
-     * @var IdReader|null
-     */
-    private $associationIdReader;
+    private ObjectManager $om;
+    private ClassMetadata $classMetadata;
+    private bool $singleId;
+    private bool $intId;
+    private string $idField;
+    private ?self $associationIdReader = null;
 
     public function __construct(ObjectManager $om, ClassMetadata $classMetadata)
     {
@@ -59,9 +55,6 @@ class IdReader
 
     /**
      * Returns whether the class has a single-column ID.
-     *
-     * @return bool returns `true` if the class has a single-column ID and
-     *              `false` otherwise
      */
     public function isSingleId(): bool
     {
@@ -70,9 +63,6 @@ class IdReader
 
     /**
      * Returns whether the class has a single-column integer ID.
-     *
-     * @return bool returns `true` if the class has a single-column integer ID
-     *              and `false` otherwise
      */
     public function isIntId(): bool
     {
@@ -83,10 +73,8 @@ class IdReader
      * Returns the ID value for an object.
      *
      * This method assumes that the object has a single-column ID.
-     *
-     * @return string The ID value
      */
-    public function getIdValue(object $object = null)
+    public function getIdValue(object $object = null): string
     {
         if (!$object) {
             return '';
@@ -111,8 +99,6 @@ class IdReader
      * Returns the name of the ID field.
      *
      * This method assumes that the object has a single-column ID.
-     *
-     * @return string The name of the ID field
      */
     public function getIdField(): string
     {

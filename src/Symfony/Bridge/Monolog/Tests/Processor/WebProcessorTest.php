@@ -12,8 +12,10 @@
 namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use Monolog\Logger;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\WebProcessor;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -94,17 +96,9 @@ class WebProcessorTest extends TestCase
         return [$event, $server];
     }
 
-    private function getRecord(int $level = Logger::WARNING, string $message = 'test'): array
+    private function getRecord(int $level = Logger::WARNING, string $message = 'test'): array|LogRecord
     {
-        return [
-            'message' => $message,
-            'context' => [],
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'test',
-            'datetime' => new \DateTime(),
-            'extra' => [],
-        ];
+        return RecordFactory::create($level, $message);
     }
 
     private function isExtraFieldsSupported()

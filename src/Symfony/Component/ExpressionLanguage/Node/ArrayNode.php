@@ -96,7 +96,7 @@ class ArrayNode extends Node
         return $pairs;
     }
 
-    protected function compileArguments(Compiler $compiler, $withKeys = true)
+    protected function compileArguments(Compiler $compiler, bool $withKeys = true)
     {
         $first = true;
         foreach ($this->getKeyValuePairs() as $pair) {

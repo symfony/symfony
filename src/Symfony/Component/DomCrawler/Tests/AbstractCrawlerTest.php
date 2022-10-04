@@ -12,7 +12,6 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Image;
@@ -20,8 +19,6 @@ use Symfony\Component\DomCrawler\Link;
 
 abstract class AbstractCrawlerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     abstract public function getDoctype(): string;
 
     protected function createCrawler($node = null, string $uri = null, string $baseHref = null)
@@ -82,13 +79,6 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
 
-    public function testAddInvalidType()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $crawler = $this->createCrawler();
-        $crawler->add(1);
-    }
-
     public function testAddMultipleDocumentNode()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -139,7 +129,7 @@ abstract class AbstractCrawlerTest extends TestCase
     public function testAddHtmlContentCharsetGbk()
     {
         $crawler = $this->createCrawler();
-        //gbk encode of <html><p>中文</p></html>
+        // gbk encode of <html><p>中文</p></html>
         $crawler->addHtmlContent($this->getDoctype().base64_decode('PGh0bWw+PHA+1tDOxDwvcD48L2h0bWw+'), 'gbk');
 
         $this->assertEquals('中文', $crawler->filterXPath('//p')->text());
@@ -190,6 +180,10 @@ abstract class AbstractCrawlerTest extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><span>中文</span></html>');
         $this->assertEquals('中文', $crawler->filterXPath('//span')->text(), '->addContent() guess wrong charset');
+
+        $crawler = $this->createCrawler();
+        $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=unicode" /><div class="foo"></html></html>');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() ignores bad charset');
     }
 
     /**
@@ -354,6 +348,14 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
+    public function testInnerText()
+    {
+        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element"]'));
+
+        self::assertSame('Parent text Child text', $crawler->text());
+        self::assertSame('Parent text', $crawler->innerText());
+    }
+
     public function testHtml()
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
@@ -367,6 +369,13 @@ abstract class AbstractCrawlerTest extends TestCase
         }
 
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->html('my value'));
+    }
+
+    public function testEmojis()
+    {
+        $crawler = $this->createCrawler('<body><p>Hey 👋</p></body>');
+
+        $this->assertSame('<body><p>Hey 👋</p></body>', $crawler->html());
     }
 
     public function testExtract()
@@ -1088,31 +1097,6 @@ HTML;
         $this->assertEquals(1, $foo->children('.ipsum')->count());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testParents()
-    {
-        $this->expectDeprecation('Since symfony/dom-crawler 5.3: The Symfony\Component\DomCrawler\Crawler::parents() method is deprecated, use ancestors() instead.');
-
-        $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
-        $this->assertNotSame($crawler, $crawler->parents(), '->parents() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->parents(), '->parents() returns a new instance of a crawler');
-
-        $nodes = $crawler->parents();
-        $this->assertEquals(3, $nodes->count());
-
-        $nodes = $this->createTestCrawler()->filterXPath('//html')->parents();
-        $this->assertEquals(0, $nodes->count());
-
-        try {
-            $this->createTestCrawler()->filterXPath('//ol')->parents();
-            $this->fail('->parents() throws an \InvalidArgumentException if the node list is empty');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->parents() throws an \InvalidArgumentException if the node list is empty');
-        }
-    }
-
     public function testAncestors()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
@@ -1283,6 +1267,10 @@ HTML;
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
+                    <div id="complex-element">
+                        Parent text
+                        <span>Child text</span>
+                    </div>
                 </body>
             </html>
         ');

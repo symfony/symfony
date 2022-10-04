@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class HelpCommandTest extends TestCase
@@ -67,5 +68,36 @@ class HelpCommandTest extends TestCase
         $commandTester->execute(['command_name' => 'list', '--format' => 'xml']);
         $this->assertStringContainsString('list [--raw] [--format FORMAT] [--short] [--] [&lt;namespace&gt;]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
         $this->assertStringContainsString('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --format=xml is passed');
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        require_once realpath(__DIR__.'/../Fixtures/FooCommand.php');
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $tester = new CommandCompletionTester($application->get('help'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'xml', 'json', 'md'],
+        ];
+
+        yield 'nothing' => [
+            [''],
+            ['completion', 'help', 'list', 'foo:bar'],
+        ];
+
+        yield 'command_name' => [
+            ['f'],
+            ['completion', 'help', 'list', 'foo:bar'],
+        ];
     }
 }

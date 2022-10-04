@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Fixtures\Attribute;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 #[Assert\GroupSequenceProvider]
@@ -27,7 +28,7 @@ class GroupSequenceProviderEntity implements GroupSequenceProviderInterface
         $this->sequence = $sequence;
     }
 
-    public function getGroupSequence()
+    public function getGroupSequence(): array|GroupSequence
     {
         return $this->sequence;
     }

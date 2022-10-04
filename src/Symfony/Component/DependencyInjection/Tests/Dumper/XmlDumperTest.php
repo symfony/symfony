@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,6 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 
 class XmlDumperTest extends TestCase
@@ -40,13 +43,6 @@ class XmlDumperTest extends TestCase
     }
 
     public function testExportParameters()
-    {
-        $container = include self::$fixturesPath.'//containers/container8.php';
-        $dumper = new XmlDumper($container);
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
-    }
-
-    public function testAddParameters()
     {
         $container = include self::$fixturesPath.'//containers/container8.php';
         $dumper = new XmlDumper($container);
@@ -88,12 +84,6 @@ class XmlDumperTest extends TestCase
         </service>
       </argument>
     </service>
-    <service id="Psr\Container\ContainerInterface" alias="service_container">
-      <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container">
-      <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
   </services>
 </container>
 ', $dumper->dump());
@@ -110,12 +100,6 @@ class XmlDumperTest extends TestCase
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\">
       <tag name=\"foo&quot;bar\bar\" foo=\"foo&quot;barřž€\"/>
       <argument>foo&lt;&gt;&amp;bar</argument>
-    </service>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
     </service>
   </services>
 </container>
@@ -141,12 +125,6 @@ class XmlDumperTest extends TestCase
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container15.php'],
@@ -155,12 +133,6 @@ class XmlDumperTest extends TestCase
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\"/>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container16.php'],
@@ -169,12 +141,6 @@ class XmlDumperTest extends TestCase
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"decorator\" decorates=\"decorated\" decoration-on-invalid=\"null\" decoration-inner-name=\"decorated.inner\" decoration-priority=\"1\"/>
-    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
-    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\">
-      <deprecated package=\"symfony/dependency-injection\" version=\"5.1\">The \"%alias_id%\" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container34.php'],
@@ -252,12 +218,40 @@ class XmlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_tagged_arguments.xml', $dumper->dump());
     }
 
+    public function testServiceClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_service_closure.xml', $dumper->dump());
+    }
+
     public function testDumpAbstractServices()
     {
         $container = include self::$fixturesPath.'/containers/container_abstract.php';
         $dumper = new XmlDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_abstract.xml'), $dumper->dump());
+    }
+
+    public function testDumpHandlesEnumeration()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register(FooClassWithEnumAttribute::class, FooClassWithEnumAttribute::class)
+            ->setPublic(true)
+            ->addArgument(FooUnitEnum::BAR);
+
+        $container->setParameter('unit_enum', FooUnitEnum::BAR);
+        $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
+
+        $container->compile();
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_enumeration.xml'), $dumper->dump());
     }
 
     public function testDumpServiceWithAbstractArgument()

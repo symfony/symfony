@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 
-use Symfony\Component\Notifier\Bridge\GoogleChat\Component\Card;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -21,8 +20,8 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class GoogleChatOptions implements MessageOptionsInterface
 {
-    private $threadKey;
-    private $options = [];
+    private ?string $threadKey = null;
+    private array $options = [];
 
     public function __construct(array $options = [])
     {
@@ -62,21 +61,30 @@ final class GoogleChatOptions implements MessageOptionsInterface
         return $this->options;
     }
 
-    public function card(array $card): self
+    /**
+     * @return $this
+     */
+    public function card(array $card): static
     {
         $this->options['cards'][] = $card;
 
         return $this;
     }
 
-    public function text(string $text): self
+    /**
+     * @return $this
+     */
+    public function text(string $text): static
     {
         $this->options['text'] = $text;
 
         return $this;
     }
 
-    public function setThreadKey(?string $threadKey): self
+    /**
+     * @return $this
+     */
+    public function setThreadKey(?string $threadKey): static
     {
         $this->threadKey = $threadKey;
 

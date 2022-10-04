@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#AAA" d="M6 18.9V15h12v3.9c0 .7-.2 1.1-1 1.1H7c-.8 0-1-.4-1-1.1zM20 1c-.6 0-1 .5-1 1.1v18c0 .5-.4.9-.9.9H5.9a.9.9 0 0 1-.9-.9v-18C5 1.5 4.6 1 4 1c-.5 0-1 .5-1 1.1v18C3 21.7 4.3 23 5.9 23h12.2c1.6 0 2.9-1.3 2.9-2.9v-18c0-.6-.4-1.1-1-1.1zm-2 8H6v5h12V9z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" data-icon-name="icon-tabler-cpu" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <rect x="5" y="5" width="14" height="14" rx="1"></rect>
+    <path d="M9 9h6v6h-6z"></path>
+    <path d="M3 10h2"></path>
+    <path d="M3 14h2"></path>
+    <path d="M10 3v2"></path>
+    <path d="M14 3v2"></path>
+    <path d="M21 10h-2"></path>
+    <path d="M21 14h-2"></path>
+    <path d="M14 21v-2"></path>
+    <path d="M10 21v-2"></path>
+</svg>

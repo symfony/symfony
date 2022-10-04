@@ -41,11 +41,9 @@ class OptionsResolverIntrospector
     }
 
     /**
-     * @return mixed
-     *
      * @throws NoConfigurationException on no configured value
      */
-    public function getDefault(string $option)
+    public function getDefault(string $option): mixed
     {
         return ($this->get)('defaults', $option, sprintf('No default value was set for the "%s" option.', $option));
     }
@@ -94,20 +92,6 @@ class OptionsResolverIntrospector
     public function getNormalizers(string $option): array
     {
         return ($this->get)('normalizers', $option, sprintf('No normalizer was set for the "%s" option.', $option));
-    }
-
-    /**
-     * @return string|\Closure
-     *
-     * @throws NoConfigurationException on no configured deprecation
-     *
-     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
-     */
-    public function getDeprecationMessage(string $option)
-    {
-        trigger_deprecation('symfony/options-resolver', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
-
-        return $this->getDeprecation($option)['message'];
     }
 
     /**

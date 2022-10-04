@@ -14,11 +14,14 @@ namespace Symfony\Component\Form\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -42,11 +45,6 @@ class DebugCommandTest extends TestCase
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertSame(<<<TXT
 
-Built-in form types (Symfony\Component\Form\Extension\Core\Type)
-----------------------------------------------------------------
-
- PercentType
-
 Service form types
 ------------------
 
@@ -54,7 +52,7 @@ Service form types
 
 
 TXT
-        , $tester->getDisplay(true));
+            , $tester->getDisplay(true));
     }
 
     public function testDebugSingleFormType()
@@ -71,7 +69,7 @@ TXT
         $tester = $this->createCommandTester();
         $tester->execute(['class' => 'DateTime'], ['decorated' => false, 'interactive' => false]);
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\DateTimeType (Block prefix: "datetime")', $tester->getDisplay());
     }
 
@@ -123,7 +121,7 @@ TXT;
         $tester->setInputs([0]);
         $tester->execute(['class' => 'AmbiguousType'], ['decorated' => false, 'interactive' => true]);
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $output = $tester->getDisplay(true);
         $this->assertStringMatchesFormat(<<<TXT
 
@@ -136,7 +134,7 @@ Select one of the following form types to display its information: [%A\A\Ambiguo
 %A\A\AmbiguousType (Block prefix: "ambiguous")
 %A
 TXT
-        , $output);
+            , $output);
     }
 
     public function testDebugInvalidFormType()
@@ -184,6 +182,91 @@ Symfony\Component\Form\Tests\Command\FooType (foo)
 
 TXT
             , $tester->getDisplay(true));
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
+        $command = new DebugCommand($formRegistry);
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandCompletionTester($application->get('debug:form'));
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'json'],
+        ];
+
+        yield 'form_type' => [
+            [''],
+            $this->getCoreTypes(),
+        ];
+
+        yield 'option for FQCN' => [
+            ['Symfony\\Component\\Form\\Extension\\Core\\Type\\ButtonType', ''],
+            [
+                'block_name',
+                'block_prefix',
+                'disabled',
+                'label',
+                'label_format',
+                'row_attr',
+                'label_html',
+                'label_translation_parameters',
+                'attr_translation_parameters',
+                'attr',
+                'translation_domain',
+                'auto_initialize',
+                'priority',
+            ],
+        ];
+
+        yield 'option for short name' => [
+            ['ButtonType', ''],
+            [
+                'block_name',
+                'block_prefix',
+                'disabled',
+                'label',
+                'label_format',
+                'row_attr',
+                'label_html',
+                'label_translation_parameters',
+                'attr_translation_parameters',
+                'attr',
+                'translation_domain',
+                'auto_initialize',
+                'priority',
+            ],
+        ];
+
+        yield 'option for ambiguous form type' => [
+            ['Type', ''],
+            [],
+        ];
+
+        yield 'option for invalid form type' => [
+            ['NotExistingFormType', ''],
+            [],
+        ];
+    }
+
+    private function getCoreTypes(): array
+    {
+        $coreExtension = new CoreExtension();
+        $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
+        $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
+        $coreTypes = array_map(function (FormTypeInterface $type) { return $type::class; }, $coreTypes);
+        sort($coreTypes);
+
+        return $coreTypes;
     }
 
     private function createCommandTester(array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [])

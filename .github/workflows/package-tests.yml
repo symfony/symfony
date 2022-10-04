@@ -5,6 +5,9 @@ on:
     paths:
       - src/**
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: Verify
@@ -18,7 +21,7 @@ jobs:
 
       - name: Find packages
         id: find-packages
-        run: echo "::set-output name=packages::$(php .github/get-modified-packages.php $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | jq -R -s -c 'split("\n")[:-1]') $(git diff --name-only origin/${{ github.base_ref }} HEAD | grep src/ | jq -R -s -c 'split("\n")[:-1]'))"
+        run: echo "::set-output name=packages::$(php .github/get-modified-packages.php $(find src/Symfony -mindepth 2 -maxdepth 6 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Intl/Resources/emoji |jq -R -s -c 'split("\n")[:-1]') $(git diff --name-only origin/${{ github.base_ref }} HEAD | grep src/ | jq -R -s -c 'split("\n")[:-1]'))"
 
       - name: Verify meta files are correct
         run: |
@@ -63,13 +66,18 @@ jobs:
               DIR=$(_jq '.directory')
               NAME=$(_jq '.name')
               echo "::group::$NAME"
+              TYPE=$(_jq '.type')
               localExit=0
 
-              _file_exist $DIR/.gitattributes || localExit=1
+              if [ $TYPE != 'contract' ] && [ $TYPE != 'contracts' ]; then
+                _file_exist $DIR/.gitattributes || localExit=1
+              fi
               _file_exist $DIR/.gitignore || localExit=1
               _file_exist $DIR/CHANGELOG.md || localExit=1
               _file_exist $DIR/LICENSE || localExit=1
-              _file_exist $DIR/phpunit.xml.dist || localExit=1
+              if [ $TYPE != 'contract' ]; then
+                _file_exist $DIR/phpunit.xml.dist || localExit=1
+              fi
               _file_exist $DIR/README.md || localExit=1
               _file_not_exist $DIR/phpunit.xml || localExit=1
 
@@ -77,7 +85,7 @@ jobs:
                 echo "Verifying new package"
                 _correct_license_file $DIR/LICENSE || localExit=1
 
-                if [ $(_jq '.component_bridge') == false ]; then
+                if [ $TYPE != 'component_bridge' ]; then
                   if [ ! $(cat composer.json | jq -e ".replace.\"$NAME\"|test(\"self.version\")") ]; then
                     echo "Composer.json's replace section needs to contain $NAME"
                     localExit=1

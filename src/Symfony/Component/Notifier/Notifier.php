@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Notifier\Channel\ChannelInterface;
 use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Channel\ChannelPolicyInterface;
+use Symfony\Component\Notifier\Channel\SmsChannel;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\NoRecipient;
@@ -25,14 +26,14 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 final class Notifier implements NotifierInterface
 {
-    private $adminRecipients = [];
-    private $channels;
-    private $policy;
+    private array $adminRecipients = [];
+    private array|ContainerInterface $channels;
+    private ?ChannelPolicyInterface $policy;
 
     /**
      * @param ChannelInterface[]|ContainerInterface $channels
      */
-    public function __construct($channels, ChannelPolicyInterface $policy = null)
+    public function __construct(array|ContainerInterface $channels, ChannelPolicyInterface $policy = null)
     {
         $this->channels = $channels;
         $this->policy = $policy;
@@ -64,11 +65,14 @@ final class Notifier implements NotifierInterface
         return $this->adminRecipients;
     }
 
+    /**
+     * @return iterable<ChannelInterface, string|null>
+     */
     private function getChannels(Notification $notification, RecipientInterface $recipient): iterable
     {
         $channels = $notification->getChannels($recipient);
         if (!$channels) {
-            $errorPrefix = sprintf('Unable to determine which channels to use to send the "%s" notification', \get_class($notification));
+            $errorPrefix = sprintf('Unable to determine which channels to use to send the "%s" notification', $notification::class);
             $error = 'you should either pass channels in the constructor, override its "getChannels()" method';
             if (null === $this->policy) {
                 throw new LogicException(sprintf('%s; %s, or configure a "%s".', $errorPrefix, $error, ChannelPolicy::class));
@@ -87,6 +91,10 @@ final class Notifier implements NotifierInterface
 
             if (null === $channel = $this->getChannel($channelName)) {
                 throw new LogicException(sprintf('The "%s" channel does not exist.', $channelName));
+            }
+
+            if ($channel instanceof SmsChannel && $recipient instanceof NoRecipient) {
+                throw new LogicException(sprintf('The "%s" channel needs a Recipient.', $channelName));
             }
 
             if (!$channel->supports($notification, $recipient)) {

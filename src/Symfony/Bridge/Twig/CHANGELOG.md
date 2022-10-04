@@ -1,16 +1,32 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `form_label_content` and `form_help_content` block to form themes
+ * Add `#[Template()]` to describe how to render arrays returned by controllers
+ * Add support for toggle buttons in Bootstrap 5 form theme
+ * Add `app.current_route` and `app.current_route_parameters` variables
+
+6.1
+---
+
+ * Wrap help messages on form elements in `div` instead of `p`
+
+5.4
+---
+
+* Add `github` format & autodetection to render errors as annotations when
+  running the Twig linter command in a Github Actions environment.
+
 5.3
------
+---
 
-* Add a new `markAsPublic` method on `NotificationEmail` to change the `importance` context option to null after creation
-* Add a new `fragment_uri()` helper to generate the URI of a fragment
-
-5.3.0
------
-
-* Added a new `serialize` filter to serialize objects using the Serializer component
+ * Add a new `markAsPublic` method on `NotificationEmail` to change the `importance` context option to null after creation
+ * Add a new `fragment_uri()` helper to generate the URI of a fragment
+ * Add support of Bootstrap 5 for form theming
+ * Add a new `serialize` filter to serialize objects using the Serializer component
 
 5.2.0
 -----

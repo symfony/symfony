@@ -1,6 +1,6 @@
 {
     "name": "symfony/sendinblue-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Sendinblue Notifier Bridge",
     "keywords": ["sms", "sendinblue", "notifier"],
     "homepage": "https://symfony.com",
@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
         "ext-json": "*",
-        "symfony/http-client": "^4.3|^5.0",
-        "symfony/notifier": "^5.3"
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^6.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sendinblue\\": "" },

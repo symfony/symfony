@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -28,27 +29,25 @@ class MemcachedStoreTest extends AbstractStoreTest
 
     public static function setUpBeforeClass(): void
     {
+        if (version_compare(phpversion('memcached'), '3.1.6', '<')) {
+            throw new SkippedTestSuiteError('Extension memcached > 3.1.5 required.');
+        }
+
         $memcached = new \Memcached();
         $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
         $memcached->get('foo');
         $code = $memcached->getResultCode();
 
         if (\Memcached::RES_SUCCESS !== $code && \Memcached::RES_NOTFOUND !== $code) {
-            self::markTestSkipped('Unable to connect to the memcache host');
+            throw new SkippedTestSuiteError('Unable to connect to the memcache host');
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         $memcached = new \Memcached();

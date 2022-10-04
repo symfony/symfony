@@ -15,13 +15,15 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-final class ConstraintValidatorTest extends TestCase
+class ConstraintValidatorTest extends TestCase
 {
     /**
      * @dataProvider formatValueProvider
      */
     public function testFormatValue($expected, $value, $format = 0)
     {
+        \Locale::setDefault('en');
+
         $this->assertSame($expected, (new TestFormatValueConstraintValidator())->formatValueProxy($value, $format));
     }
 
@@ -66,7 +68,7 @@ final class TestFormatValueConstraintValidator extends ConstraintValidator
 
 final class TestToStringObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'ccc';
     }

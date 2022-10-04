@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends TestCase
@@ -38,7 +39,7 @@ class ConfigCacheTest extends TestCase
     /**
      * @dataProvider debugModes
      */
-    public function testCacheIsNotValidIfNothingHasBeenCached($debug)
+    public function testCacheIsNotValidIfNothingHasBeenCached(bool $debug)
     {
         unlink($this->cacheFile); // remove tempnam() side effect
         $cache = new ConfigCache($this->cacheFile, $debug);
@@ -60,7 +61,7 @@ class ConfigCacheTest extends TestCase
     /**
      * @dataProvider debugModes
      */
-    public function testIsFreshWhenNoResourceProvided($debug)
+    public function testIsFreshWhenNoResourceProvided(bool $debug)
     {
         $cache = new ConfigCache($this->cacheFile, $debug);
         $cache->write('', []);
@@ -69,6 +70,9 @@ class ConfigCacheTest extends TestCase
 
     public function testFreshResourceInDebug()
     {
+        $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
+        $p->setValue(SelfCheckingResourceChecker::class, []);
+
         $freshResource = new ResourceStub();
         $freshResource->setFresh(true);
 
@@ -80,6 +84,9 @@ class ConfigCacheTest extends TestCase
 
     public function testStaleResourceInDebug()
     {
+        $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
+        $p->setValue(SelfCheckingResourceChecker::class, []);
+
         $staleResource = new ResourceStub();
         $staleResource->setFresh(false);
 
@@ -89,7 +96,7 @@ class ConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function debugModes()
+    public function debugModes(): array
     {
         return [
             [true],

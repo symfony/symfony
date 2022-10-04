@@ -11,15 +11,18 @@
 
 namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -30,7 +33,9 @@ class PostmarkApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.postmarkapp.com';
 
-    private $key;
+    private string $key;
+
+    private $messageStream;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -41,7 +46,7 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('postmark+api://%s', $this->getEndpoint());
+        return sprintf('postmark+api://%s', $this->getEndpoint()).($this->messageStream ? '?message_stream='.$this->messageStream : '');
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -54,8 +59,16 @@ class PostmarkApiTransport extends AbstractApiTransport
             'json' => $this->getPayload($email, $envelope),
         ]);
 
-        $result = $response->toArray(false);
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+            $result = $response->toArray(false);
+        } catch (DecodingExceptionInterface) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote Postmark server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $result['ErrorCode']), $response);
         }
 
@@ -85,6 +98,10 @@ class PostmarkApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
+                if (isset($payload['Tag'])) {
+                    throw new TransportException('Postmark only allows a single tag per email.');
+                }
+
                 $payload['Tag'] = $header->getValue();
 
                 continue;
@@ -96,10 +113,20 @@ class PostmarkApiTransport extends AbstractApiTransport
                 continue;
             }
 
+            if ($header instanceof MessageStreamHeader) {
+                $payload['MessageStream'] = $header->getValue();
+
+                continue;
+            }
+
             $payload['Headers'][] = [
-                'Name' => $name,
+                'Name' => $header->getName(),
                 'Value' => $header->getBodyAsString(),
             ];
+        }
+
+        if (null !== $this->messageStream && !isset($payload['MessageStream'])) {
+            $payload['MessageStream'] = $this->messageStream;
         }
 
         return $payload;
@@ -132,5 +159,15 @@ class PostmarkApiTransport extends AbstractApiTransport
     private function getEndpoint(): ?string
     {
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMessageStream(string $messageStream): static
+    {
+        $this->messageStream = $messageStream;
+
+        return $this;
     }
 }

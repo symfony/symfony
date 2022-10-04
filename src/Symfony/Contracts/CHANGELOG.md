@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+3.2
+---
+
+ * Allow `ServiceSubscriberInterface::getSubscribedServices()` to return `SubscribedService[]`
+
+3.0
+---
+
+ * Bump to PHP 8 minimum
+ * Add native return types
+ * Remove deprecated features
+
+2.5
+---
+
+ *  Add `SubscribedService` attribute, deprecate current `ServiceSubscriberTrait` usage
+
 2.4
 ---
 

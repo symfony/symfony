@@ -55,6 +55,14 @@ class KernelTest extends TestCase
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
     }
 
+    public function testEmptyEnv()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
+
+        new KernelForTest('', false);
+    }
+
     public function testClone()
     {
         $env = 'test_env';
@@ -508,17 +516,17 @@ EOF
                 $container->setParameter('test.extension-registered', true);
             }
 
-            public function getNamespace()
+            public function getNamespace(): string
             {
                 return '';
             }
 
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
 
-            public function getAlias()
+            public function getAlias(): string
             {
                 return 'test-extension';
             }
@@ -585,7 +593,7 @@ EOF
         $kernel->boot();
         $preReBoot = $kernel->getStartTime();
 
-        sleep(3600); //Intentionally large value to detect if ClockMock ever breaks
+        sleep(3600); // Intentionally large value to detect if ClockMock ever breaks
         $kernel->reboot(null);
 
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
@@ -632,7 +640,7 @@ EOF
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->willReturn(null === $bundleName ? \get_class($bundle) : $bundleName)
+            ->willReturn($bundleName ?? $bundle::class)
         ;
 
         $bundle

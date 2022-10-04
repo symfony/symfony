@@ -21,8 +21,8 @@ use Symfony\Component\Form\FormEvents;
  */
 class MergeCollectionListener implements EventSubscriberInterface
 {
-    private $allowAdd;
-    private $allowDelete;
+    private bool $allowAdd;
+    private bool $allowDelete;
 
     /**
      * @param bool $allowAdd    Whether values might be added to the collection
@@ -34,7 +34,7 @@ class MergeCollectionListener implements EventSubscriberInterface
         $this->allowDelete = $allowDelete;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::SUBMIT => 'onSubmit',

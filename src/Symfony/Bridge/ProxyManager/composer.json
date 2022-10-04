@@ -16,13 +16,12 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "composer/package-versions-deprecated": "^1.8",
+        "php": ">=8.1",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
-        "symfony/dependency-injection": "^5.0"
+        "symfony/dependency-injection": "^6.2"
     },
     "require-dev": {
-        "symfony/config": "^4.4|^5.0"
+        "symfony/config": "^6.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" },

@@ -26,7 +26,6 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TypeError;
 
@@ -35,9 +34,9 @@ use TypeError;
  */
 final class MercureTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): MercureTransport
     {
-        $hub = $hub ?? $this->createMock(HubInterface::class);
+        $hub ??= $this->createMock(HubInterface::class);
 
         return new MercureTransport($hub, $hubId, $topics);
     }
@@ -78,7 +77,7 @@ final class MercureTransportTest extends TransportTestCase
     public function testConstructWithWrongTopicsThrows()
     {
         $this->expectException(TypeError::class);
-        $this->createTransport(null, null, 'publisherId', 1);
+        $this->createTransport(null, null, 'publisherId', new \stdClass());
     }
 
     public function testSendWithNonMercureOptionsThrows()

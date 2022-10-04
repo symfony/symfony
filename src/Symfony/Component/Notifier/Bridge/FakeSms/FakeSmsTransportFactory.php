@@ -11,48 +11,51 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeSms;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
+ * @author Oskar Stark <oskarstark@googlemail.com>
+ * @author Antoine Makdessi <amakdessi@me.com>
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
-    protected $serviceProvider;
+    private MailerInterface $mailer;
+    private LoggerInterface $logger;
 
-    public function __construct(ServiceProviderInterface $serviceProvider)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger)
     {
         parent::__construct();
 
-        $this->serviceProvider = $serviceProvider;
+        $this->mailer = $mailer;
+        $this->logger = $logger;
     }
 
-    /**
-     * @return FakeSmsEmailTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FakeSmsEmailTransport|FakeSmsLoggerTransport
     {
         $scheme = $dsn->getScheme();
 
-        if (!\in_array($scheme, $this->getSupportedSchemes())) {
-            throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
-        }
-
         if ('fakesms+email' === $scheme) {
-            $serviceId = $dsn->getHost();
+            $mailerTransport = $dsn->getHost();
             $to = $dsn->getRequiredOption('to');
             $from = $dsn->getRequiredOption('from');
 
-            return (new FakeSmsEmailTransport($this->serviceProvider->get($serviceId), $to, $from))->setHost($serviceId);
+            return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
         }
+
+        if ('fakesms+logger' === $scheme) {
+            return new FakeSmsLoggerTransport($this->logger);
+        }
+
+        throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['fakesms+email'];
+        return ['fakesms+email', 'fakesms+logger'];
     }
 }

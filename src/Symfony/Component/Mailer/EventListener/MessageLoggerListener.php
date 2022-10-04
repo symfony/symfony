@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
+use Symfony\Component\Mailer\Event\QueuingMessageEvent;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -23,16 +24,13 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
 {
-    private $events;
+    private MessageEvents $events;
 
     public function __construct()
     {
         $this->events = new MessageEvents();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->events = new MessageEvents();
@@ -48,10 +46,11 @@ class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
         return $this->events;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             MessageEvent::class => ['onMessage', -255],
+            QueuingMessageEvent::class => ['onMessage', -255],
         ];
     }
 }

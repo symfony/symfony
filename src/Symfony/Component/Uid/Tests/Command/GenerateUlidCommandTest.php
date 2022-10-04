@@ -12,6 +12,8 @@
 namespace Symfony\Component\Uid\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Uid\Command\GenerateUlidCommand;
 use Symfony\Component\Uid\Ulid;
@@ -99,5 +101,25 @@ final class GenerateUlidCommandTest extends TestCase
         $ulids = explode("\n", trim($commandTester->getDisplay(true)));
 
         $this->assertNotSame($ulids[0], $ulids[1]);
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $application = new Application();
+        $application->add(new GenerateUlidCommand());
+        $tester = new CommandCompletionTester($application->get('ulid:generate'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['base32', 'base58', 'rfc4122'],
+        ];
     }
 }

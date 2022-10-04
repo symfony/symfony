@@ -31,7 +31,7 @@ class BundleEntryReaderTest extends TestCase
     private $reader;
 
     /**
-     * @var MockObject
+     * @var MockObject&BundleEntryReaderInterface
      */
     private $readerImpl;
 

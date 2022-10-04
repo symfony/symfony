@@ -64,7 +64,7 @@ class RouterListenerTest extends TestCase
 
         $this->assertEquals($expectedHttpPort, $context->getHttpPort());
         $this->assertEquals($expectedHttpsPort, $context->getHttpsPort());
-        $this->assertEquals(0 === strpos($uri, 'https') ? 'https' : 'http', $context->getScheme());
+        $this->assertEquals(str_starts_with($uri, 'https') ? 'https' : 'http', $context->getScheme());
     }
 
     public function getPortData()
@@ -84,12 +84,6 @@ class RouterListenerTest extends TestCase
         $request->attributes->set('_controller', null); // Prevents going in to routing process
 
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
-    }
-
-    public function testInvalidMatcher()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new RouterListener(new \stdClass(), $this->requestStack);
     }
 
     public function testRequestMatcher()
@@ -179,7 +173,7 @@ class RouterListenerTest extends TestCase
             return new Response('Exception handled', 400);
         }));
 
-        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver(), true);
 
         $request = Request::create('http://localhost/');
         $request->headers->set('host', '###');
@@ -201,7 +195,7 @@ class RouterListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
 
-        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver(), true);
 
         $request = Request::create('http://localhost/');
         $response = $kernel->handle($request);

@@ -25,7 +25,7 @@ interface RetryStrategyInterface
      *
      * @param ?string $responseContent Null is passed when the body did not arrive yet
      *
-     * @return ?bool Returns null to signal that the body is required to take a decision
+     * @return bool|null Returns null to signal that the body is required to take a decision
      */
     public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool;
 

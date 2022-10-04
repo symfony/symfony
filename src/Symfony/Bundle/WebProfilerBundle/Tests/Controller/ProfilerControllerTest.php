@@ -285,6 +285,8 @@ class ProfilerControllerTest extends WebTestCase
                 'limit' => 2,
                 'panel' => null,
                 'request' => $request,
+                'csp_script_nonce' => $withCsp ? 'dummy_nonce' : null,
+                'csp_style_nonce' => $withCsp ? 'dummy_nonce' : null,
             ]));
 
         $response = $controller->searchResultsAction($request, 'empty');

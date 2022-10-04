@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
 /**
@@ -33,16 +33,15 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
- * @experimental in 5.3
  */
 abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private $userProvider;
-    private $tokenStorage;
-    private $firewallName;
-    private $logger;
+    private UserProviderInterface $userProvider;
+    private TokenStorageInterface $tokenStorage;
+    private string $firewallName;
+    private ?LoggerInterface $logger;
 
-    public function __construct(UserProviderInterface $userProvider, TokenStorageInterface $tokenStorage, string $firewallName, ?LoggerInterface $logger = null)
+    public function __construct(UserProviderInterface $userProvider, TokenStorageInterface $tokenStorage, string $firewallName, LoggerInterface $logger = null)
     {
         $this->userProvider = $userProvider;
         $this->tokenStorage = $tokenStorage;
@@ -65,17 +64,22 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         } catch (BadCredentialsException $e) {
             $this->clearToken($e);
 
-            if (null !== $this->logger) {
-                $this->logger->debug('Skipping pre-authenticated authenticator as a BadCredentialsException is thrown.', ['exception' => $e, 'authenticator' => static::class]);
-            }
+            $this->logger?->debug('Skipping pre-authenticated authenticator as a BadCredentialsException is thrown.', ['exception' => $e, 'authenticator' => static::class]);
 
             return false;
         }
 
         if (null === $username) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Skipping pre-authenticated authenticator no username could be extracted.', ['authenticator' => static::class]);
-            }
+            $this->logger?->debug('Skipping pre-authenticated authenticator no username could be extracted.', ['authenticator' => static::class]);
+
+            return false;
+        }
+
+        // do not overwrite already stored tokens from the same user (i.e. from the session)
+        $token = $this->tokenStorage->getToken();
+
+        if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName() && $token->getUserIdentifier() === $username) {
+            $this->logger?->debug('Skipping pre-authenticated authenticator as the user already has an existing session.', ['authenticator' => static::class]);
 
             return false;
         }
@@ -85,25 +89,16 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         return true;
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
-        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-        $method = 'loadUserByIdentifier';
-        if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+        $userBadge = new UserBadge($request->attributes->get('_pre_authenticated_username'), $this->userProvider->loadUserByIdentifier(...));
 
-            $method = 'loadUserByUsername';
-        }
-
-        return new SelfValidatingPassport(
-            new UserBadge($request->attributes->get('_pre_authenticated_username'), [$this->userProvider, $method]),
-            [new PreAuthenticatedUserBadge()]
-        );
+        return new SelfValidatingPassport($userBadge, [new PreAuthenticatedUserBadge()]);
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        return new PreAuthenticatedToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
+        return new PreAuthenticatedToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
@@ -129,9 +124,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
 
-            if (null !== $this->logger) {
-                $this->logger->info('Cleared pre-authenticated token due to an exception.', ['exception' => $exception]);
-            }
+            $this->logger?->info('Cleared pre-authenticated token due to an exception.', ['exception' => $exception]);
         }
     }
 }

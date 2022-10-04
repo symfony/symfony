@@ -23,41 +23,26 @@ abstract class Helper implements HelperInterface
 {
     protected $helperSet = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setHelperSet(HelperSet $helperSet = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->helperSet = $helperSet;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getHelperSet()
+    public function getHelperSet(): ?HelperSet
     {
         return $this->helperSet;
     }
 
     /**
-     * Returns the length of a string, using mb_strwidth if it is available.
-     *
-     * @return int The length of the string
-     */
-    public static function strlen(?string $string)
-    {
-        return self::width($string);
-    }
-
-    /**
      * Returns the width of a string, using mb_strwidth if it is available.
      * The width is how many characters positions the string will use.
-     *
-     * @internal in Symfony 5.2
      */
     public static function width(?string $string): int
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (preg_match('//u', $string)) {
             return (new UnicodeString($string))->width(false);
@@ -73,12 +58,10 @@ abstract class Helper implements HelperInterface
     /**
      * Returns the length of a string, using mb_strlen if it is available.
      * The length is related to how many bytes the string will use.
-     *
-     * @internal in Symfony 5.2
      */
     public static function length(?string $string): int
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (preg_match('//u', $string)) {
             return (new UnicodeString($string))->length();
@@ -93,12 +76,10 @@ abstract class Helper implements HelperInterface
 
     /**
      * Returns the subset of a string, using mb_substr if it is available.
-     *
-     * @return string The string subset
      */
-    public static function substr(?string $string, int $from, int $length = null)
+    public static function substr(?string $string, int $from, int $length = null): string
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
@@ -107,7 +88,7 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    public static function formatTime($secs)
+    public static function formatTime(int|float $secs)
     {
         static $timeFormats = [
             [0, '< 1 sec'],
@@ -153,11 +134,6 @@ abstract class Helper implements HelperInterface
         return sprintf('%d B', $memory);
     }
 
-    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, ?string $string)
-    {
-        return self::width(self::removeDecoration($formatter, $string));
-    }
-
     public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
     {
         $isDecorated = $formatter->isDecorated();
@@ -165,7 +141,7 @@ abstract class Helper implements HelperInterface
         // remove <...> formatting
         $string = $formatter->format($string ?? '');
         // remove already formatted characters
-        $string = preg_replace("/\033\[[^m]*m/", '', $string);
+        $string = preg_replace("/\033\[[^m]*m/", '', $string ?? '');
         $formatter->setDecorated($isDecorated);
 
         return $string;

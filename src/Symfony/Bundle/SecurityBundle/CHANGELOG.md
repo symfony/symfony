@@ -1,9 +1,61 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add the `Security` helper class
+ * Deprecate the `Symfony\Component\Security\Core\Security` service alias, use `Symfony\Bundle\SecurityBundle\Security` instead
+ * Add `Security::getFirewallConfig()` to help to get the firewall configuration associated to the Request
+ * Add `Security::login()` to login programmatically
+ * Add `Security::logout()` to logout programmatically
+ * Add `security.firewalls.logout.enable_csrf` to enable CSRF protection using the default CSRF token generator
+ * Add RFC6750 Access Token support to allow token-based authentication
+ * Add `security.firewalls.switch_user.target_route` option to configure redirect target route on switch user
+
+6.1
+---
+
+ * The `security.access_control` now accepts a `RequestMatcherInterface` under the `request_matcher` option as scope configuration
+ * Display the inherited roles of the logged-in user in the Web Debug Toolbar
+
+6.0
+---
+
+ * The `security.authorization_checker` and `security.token_storage` services are now private
+ * Remove `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
+   use `UserPasswordHashCommand` and `user:hash-password` instead
+ * Remove the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,
+   use `security.password_hasher_factory` and `Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface` instead
+ * Remove the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
+   use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
+ * Remove the `logout.success_handler` and `logout.handlers` config options, register a listener on the `LogoutEvent` event instead
+ * Remove `FirewallConfig::getListeners()`, use `FirewallConfig::getAuthenticators()` instead
+
+5.4
+---
+
+ * Deprecate `FirewallConfig::getListeners()`, use `FirewallConfig::getAuthenticators()` instead
+ * Deprecate `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services, the logic is moved into the
+   `HttpBasicAuthenticator` and `ChannelListener` respectively
+ * Deprecate `FirewallConfig::allowsAnonymous()` and the `allows_anonymous` from the data collector data, there will be no anonymous concept as of version 6.
+ * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
+ * Deprecate `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
+   `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
+ * Add `AuthenticatorFactoryInterface::getPriority()` which replaces `SecurityFactoryInterface::getPosition()`
+ * Deprecate passing an array of arrays as 1st argument to `MainConfiguration`, pass a sorted flat array of
+   factories instead.
+ * Deprecate the `always_authenticate_before_granting` option
+ * Display the roles of the logged-in user in the Web Debug Toolbar
+ * Add the `security.access_decision_manager.strategy_service` option
+ * Deprecate not configuring explicitly a provider for custom_authenticators when there is more than one registered provider
+
+
 5.3
 ---
 
+ * The authenticator system is no longer experimental
+ * Login Link functionality is no longer experimental
  * Add `required_badges` firewall config option
  * [BC break] Add `login_throttling.lock_factory` setting defaulting to `null` (instead of `lock.factory`)
  * Add a `login_throttling.interval` (in `security.firewalls`) option to change the default throttling interval.
@@ -14,6 +66,12 @@ CHANGELOG
    use `security.password_hasher_factory` and `Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface` instead
  * Deprecate the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
    use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
+ * Deprecate the public `security.authorization_checker` and `security.token_storage` services to private
+ * Not setting the `enable_authenticator_manager` config option to `true` is deprecated
+ * Deprecate the `security.authentication.provider.*` services, use the new authenticator system instead
+ * Deprecate the `security.authentication.listener.*` services, use the new authenticator system instead
+ * Deprecate the Guard component integration, use the new authenticator system instead
+ * Add `form_login.form_only` option
 
 5.2.0
 -----

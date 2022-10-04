@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Netinkama arba pasibaigusio galiojimo laiko prisijungimo nuoroda.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minutės.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minutės.|Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minučių.|Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minučių.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

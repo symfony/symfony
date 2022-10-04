@@ -35,11 +35,10 @@ final class ChoiceList
     /**
      * Creates a cacheable loader from any callable providing iterable choices.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param callable                                     $choices  A callable that must return iterable choices or grouped choices
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the loader
+     * @param callable $choices A callable that must return iterable choices or grouped choices
+     * @param mixed    $vary    Dynamic data used to compute a unique hash when caching the loader
      */
-    public static function lazy($formType, callable $choices, $vary = null): ChoiceLoader
+    public static function lazy(FormTypeInterface|FormTypeExtensionInterface $formType, callable $choices, mixed $vary = null): ChoiceLoader
     {
         return self::loader($formType, new CallbackChoiceLoader($choices), $vary);
     }
@@ -47,11 +46,10 @@ final class ChoiceList
     /**
      * Decorates a loader to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param ChoiceLoaderInterface                        $loader   A loader responsible for creating loading choices or grouped choices
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the loader
+     * @param ChoiceLoaderInterface $loader A loader responsible for creating loading choices or grouped choices
+     * @param mixed                 $vary   Dynamic data used to compute a unique hash when caching the loader
      */
-    public static function loader($formType, ChoiceLoaderInterface $loader, $vary = null): ChoiceLoader
+    public static function loader(FormTypeInterface|FormTypeExtensionInterface $formType, ChoiceLoaderInterface $loader, mixed $vary = null): ChoiceLoader
     {
         return new ChoiceLoader($formType, $loader, $vary);
     }
@@ -59,21 +57,19 @@ final class ChoiceList
     /**
      * Decorates a "choice_value" callback to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param callable                                     $value    Any pseudo callable to create a unique string value from a choice
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the callback
+     * @param callable|array $value Any pseudo callable to create a unique string value from a choice
+     * @param mixed          $vary  Dynamic data used to compute a unique hash when caching the callback
      */
-    public static function value($formType, $value, $vary = null): ChoiceValue
+    public static function value(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $value, mixed $vary = null): ChoiceValue
     {
         return new ChoiceValue($formType, $value, $vary);
     }
 
     /**
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param callable                                     $filter   Any pseudo callable to filter a choice list
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the callback
+     * @param callable|array $filter Any pseudo callable to filter a choice list
+     * @param mixed          $vary   Dynamic data used to compute a unique hash when caching the callback
      */
-    public static function filter($formType, $filter, $vary = null): ChoiceFilter
+    public static function filter(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $filter, mixed $vary = null): ChoiceFilter
     {
         return new ChoiceFilter($formType, $filter, $vary);
     }
@@ -81,11 +77,10 @@ final class ChoiceList
     /**
      * Decorates a "choice_label" option to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param callable|false                               $label    Any pseudo callable to create a label from a choice or false to discard it
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the option
+     * @param callable|false $label Any pseudo callable to create a label from a choice or false to discard it
+     * @param mixed          $vary  Dynamic data used to compute a unique hash when caching the option
      */
-    public static function label($formType, $label, $vary = null): ChoiceLabel
+    public static function label(FormTypeInterface|FormTypeExtensionInterface $formType, callable|false $label, mixed $vary = null): ChoiceLabel
     {
         return new ChoiceLabel($formType, $label, $vary);
     }
@@ -93,11 +88,10 @@ final class ChoiceList
     /**
      * Decorates a "choice_name" callback to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType  A form type or type extension configuring a cacheable choice list
-     * @param callable                                     $fieldName Any pseudo callable to create a field name from a choice
-     * @param mixed|null                                   $vary      Dynamic data used to compute a unique hash when caching the callback
+     * @param callable|array $fieldName Any pseudo callable to create a field name from a choice
+     * @param mixed          $vary      Dynamic data used to compute a unique hash when caching the callback
      */
-    public static function fieldName($formType, $fieldName, $vary = null): ChoiceFieldName
+    public static function fieldName(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $fieldName, mixed $vary = null): ChoiceFieldName
     {
         return new ChoiceFieldName($formType, $fieldName, $vary);
     }
@@ -105,11 +99,10 @@ final class ChoiceList
     /**
      * Decorates a "choice_attr" option to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param callable|array                               $attr     Any pseudo callable or array to create html attributes from a choice
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the option
+     * @param callable|array $attr Any pseudo callable or array to create html attributes from a choice
+     * @param mixed          $vary Dynamic data used to compute a unique hash when caching the option
      */
-    public static function attr($formType, $attr, $vary = null): ChoiceAttr
+    public static function attr(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $attr, mixed $vary = null): ChoiceAttr
     {
         return new ChoiceAttr($formType, $attr, $vary);
     }
@@ -117,11 +110,10 @@ final class ChoiceList
     /**
      * Decorates a "choice_translation_parameters" option to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType              A form type or type extension configuring a cacheable choice list
-     * @param callable|array                               $translationParameters Any pseudo callable or array to create translation parameters from a choice
-     * @param mixed|null                                   $vary                  Dynamic data used to compute a unique hash when caching the option
+     * @param callable|array $translationParameters Any pseudo callable or array to create translation parameters from a choice
+     * @param mixed          $vary                  Dynamic data used to compute a unique hash when caching the option
      */
-    public static function translationParameters($formType, $translationParameters, $vary = null): ChoiceTranslationParameters
+    public static function translationParameters(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $translationParameters, mixed $vary = null): ChoiceTranslationParameters
     {
         return new ChoiceTranslationParameters($formType, $translationParameters, $vary);
     }
@@ -129,11 +121,10 @@ final class ChoiceList
     /**
      * Decorates a "group_by" callback to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param callable                                     $groupBy  Any pseudo callable to return a group name from a choice
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the callback
+     * @param callable|array $groupBy Any pseudo callable to return a group name from a choice
+     * @param mixed          $vary    Dynamic data used to compute a unique hash when caching the callback
      */
-    public static function groupBy($formType, $groupBy, $vary = null): GroupBy
+    public static function groupBy(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $groupBy, mixed $vary = null): GroupBy
     {
         return new GroupBy($formType, $groupBy, $vary);
     }
@@ -141,11 +132,10 @@ final class ChoiceList
     /**
      * Decorates a "preferred_choices" option to make it cacheable.
      *
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType  A form type or type extension configuring a cacheable choice list
-     * @param callable|array                               $preferred Any pseudo callable or array to return a group name from a choice
-     * @param mixed|null                                   $vary      Dynamic data used to compute a unique hash when caching the option
+     * @param callable|array $preferred Any pseudo callable or array to return a group name from a choice
+     * @param mixed          $vary      Dynamic data used to compute a unique hash when caching the option
      */
-    public static function preferred($formType, $preferred, $vary = null): PreferredChoice
+    public static function preferred(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $preferred, mixed $vary = null): PreferredChoice
     {
         return new PreferredChoice($formType, $preferred, $vary);
     }

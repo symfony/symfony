@@ -376,7 +376,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse('\\' === \DIRECTORY_SEPARATOR ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
+        $this->assertDirectoryDoesNotExist($basePath.'dir-link');
 
         $this->filesystem->remove($basePath);
 
@@ -409,7 +409,7 @@ class FilesystemTest extends FilesystemTestCase
         chdir($basePath);
         $file = str_repeat('T', $maxPathLength - \strlen($basePath) + 1);
         $path = $basePath.$file;
-        exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
+        exec('TYPE NUL >>'.$file); // equivalent of touch, we cannot use the php touch() here because it suffers from the same limitation
         $this->longPathNamesWindows[] = $path; // save this so we can clean up later
         chdir($oldPath);
         $this->filesystem->exists($path);
@@ -1076,6 +1076,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->symlink($link1, $link2);
 
         $this->assertEquals($file, $this->filesystem->readlink($link1));
+
         $this->assertEquals($link1, $this->filesystem->readlink($link2));
         $this->assertEquals($file, $this->filesystem->readlink($link1, true));
         $this->assertEquals($file, $this->filesystem->readlink($link2, true));
@@ -1759,6 +1760,27 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertFilePermissions(767, $targetFilePath);
+    }
+
+    public function testDumpToProtectedDirectory()
+    {
+        if (\DIRECTORY_SEPARATOR !== '\\') {
+            $this->markTestSkipped('This test is specific to Windows.');
+        }
+
+        if (($userProfilePath = getenv('USERPROFILE')) === false || !is_dir($userProfilePath)) {
+            throw new \RuntimeException('Failed to retrieve user profile path.');
+        }
+
+        $targetPath = implode(\DIRECTORY_SEPARATOR, [$userProfilePath, 'Downloads', '__test_file.ext']);
+
+        try {
+            $this->assertFileDoesNotExist($targetPath);
+            $this->filesystem->dumpFile($targetPath, 'foobar');
+            $this->assertFileExists($targetPath);
+        } finally {
+            $this->filesystem->remove($targetPath);
+        }
     }
 
     /**

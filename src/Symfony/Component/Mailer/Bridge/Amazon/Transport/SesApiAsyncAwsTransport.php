@@ -14,10 +14,13 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 use AsyncAws\Ses\Input\SendEmailRequest;
 use AsyncAws\Ses\ValueObject\Content;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MessageConverter;
 
 /**
@@ -53,7 +56,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         $envelope = $message->getEnvelope();
 
         $request = [
-            'FromEmailAddress' => $envelope->getSender()->toString(),
+            'FromEmailAddress' => $this->stringifyAddress(self::getSenderFromHeaders($email->getHeaders())),
             'Destination' => [
                 'ToAddresses' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
             ],
@@ -99,6 +102,12 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
 
+        foreach ($email->getHeaders()->all() as $header) {
+            if ($header instanceof MetadataHeader) {
+                $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+            }
+        }
+
         return new SendEmailRequest($request);
     }
 
@@ -109,5 +118,40 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         return array_filter($envelope->getRecipients(), function (Address $address) use ($emailRecipients) {
             return !\in_array($address, $emailRecipients, true);
         });
+    }
+
+    protected function stringifyAddresses(array $addresses): array
+    {
+        return array_map(function (Address $a) {
+            return $this->stringifyAddress($a);
+        }, $addresses);
+    }
+
+    protected function stringifyAddress(Address $a): string
+    {
+        // AWS does not support UTF-8 address
+        if (preg_match('~[\x00-\x08\x10-\x19\x7F-\xFF\r\n]~', $name = $a->getName())) {
+            return sprintf('=?UTF-8?B?%s?= <%s>',
+                base64_encode($name),
+                $a->getEncodedAddress()
+            );
+        }
+
+        return $a->toString();
+    }
+
+    private static function getSenderFromHeaders(Headers $headers): Address
+    {
+        if ($sender = $headers->get('Sender')) {
+            return $sender->getAddress();
+        }
+        if ($from = $headers->get('From')) {
+            return $from->getAddresses()[0];
+        }
+        if ($return = $headers->get('Return-Path')) {
+            return $return->getAddress();
+        }
+
+        throw new LogicException('Unable to determine the sender of the message.');
     }
 }

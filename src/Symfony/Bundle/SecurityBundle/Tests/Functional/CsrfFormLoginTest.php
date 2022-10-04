@@ -102,9 +102,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
     public function provideClientOptions()
     {
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml']];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 }

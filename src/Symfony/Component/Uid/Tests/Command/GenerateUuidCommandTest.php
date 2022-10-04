@@ -12,6 +12,8 @@
 namespace Symfony\Component\Uid\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Uid\Command\GenerateUuidCommand;
 use Symfony\Component\Uid\Factory\UuidFactory;
@@ -228,5 +230,25 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertSame(0, $commandTester->execute(['--name-based' => 'https://symfony.com', '--namespace' => 'url']));
 
         $this->assertSame('9c7d0eda-982d-5708-b4bd-79b3b179725d', (string) Uuid::fromRfc4122(trim($commandTester->getDisplay())));
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $application = new Application();
+        $application->add(new GenerateUuidCommand());
+        $tester = new CommandCompletionTester($application->get('uuid:generate'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['base32', 'base58', 'rfc4122'],
+        ];
     }
 }

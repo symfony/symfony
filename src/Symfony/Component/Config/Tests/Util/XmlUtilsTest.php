@@ -72,7 +72,7 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'invalid_schema.xml', 'invalid_callback_or_file');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('XSD file or callable', $e->getMessage());
+            $this->assertStringContainsString('Invalid XSD file: "invalid_callback_or_file".', $e->getMessage());
         }
 
         $mock = $this->createMock(Validator::class);
@@ -116,7 +116,7 @@ class XmlUtilsTest extends TestCase
     /**
      * @dataProvider getDataForConvertDomToArray
      */
-    public function testConvertDomToArray($expected, $xml, $root = false, $checkPrefix = true)
+    public function testConvertDomToArray($expected, string $xml, bool $root = false, bool $checkPrefix = true)
     {
         $dom = new \DOMDocument();
         $dom->loadXML($root ? $xml : '<root>'.$xml.'</root>');
@@ -124,7 +124,7 @@ class XmlUtilsTest extends TestCase
         $this->assertSame($expected, XmlUtils::convertDomElementToArray($dom->documentElement, $checkPrefix));
     }
 
-    public function getDataForConvertDomToArray()
+    public function getDataForConvertDomToArray(): array
     {
         return [
             [null, ''],
@@ -150,12 +150,12 @@ class XmlUtilsTest extends TestCase
     /**
      * @dataProvider getDataForPhpize
      */
-    public function testPhpize($expected, $value)
+    public function testPhpize($expected, string $value)
     {
         $this->assertSame($expected, XmlUtils::phpize($value));
     }
 
-    public function getDataForPhpize()
+    public function getDataForPhpize(): array
     {
         return [
             ['', ''],
@@ -169,6 +169,8 @@ class XmlUtilsTest extends TestCase
             [1, '1'],
             [-1, '-1'],
             [0777, '0777'],
+            [-511, '-0777'],
+            ['0877', '0877'],
             [255, '0xFF'],
             [100.0, '1e2'],
             [-120.0, '-1.2E2'],
@@ -200,9 +202,6 @@ class XmlUtilsTest extends TestCase
     // test for issue https://github.com/symfony/symfony/issues/9731
     public function testLoadWrongEmptyXMLWithErrorHandler()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $originalDisableEntities = libxml_disable_entity_loader(false);
-        }
         $errorReporting = error_reporting(-1);
 
         set_error_handler(function ($errno, $errstr) {
@@ -220,14 +219,6 @@ class XmlUtilsTest extends TestCase
         } finally {
             restore_error_handler();
             error_reporting($errorReporting);
-        }
-
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-            libxml_disable_entity_loader($disableEntities);
-
-            libxml_disable_entity_loader($originalDisableEntities);
-            $this->assertFalse($disableEntities);
         }
 
         // should not throw an exception

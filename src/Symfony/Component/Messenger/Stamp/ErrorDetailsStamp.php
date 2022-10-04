@@ -20,22 +20,12 @@ use Throwable;
  */
 final class ErrorDetailsStamp implements StampInterface
 {
-    /** @var string */
-    private $exceptionClass;
+    private string $exceptionClass;
+    private int|string $exceptionCode;
+    private string $exceptionMessage;
+    private ?FlattenException $flattenException;
 
-    /** @var int|mixed */
-    private $exceptionCode;
-
-    /** @var string */
-    private $exceptionMessage;
-
-    /** @var FlattenException|null */
-    private $flattenException;
-
-    /**
-     * @param int|mixed $exceptionCode
-     */
-    public function __construct(string $exceptionClass, $exceptionCode, string $exceptionMessage, FlattenException $flattenException = null)
+    public function __construct(string $exceptionClass, int|string $exceptionCode, string $exceptionMessage, FlattenException $flattenException = null)
     {
         $this->exceptionClass = $exceptionClass;
         $this->exceptionCode = $exceptionCode;
@@ -54,7 +44,7 @@ final class ErrorDetailsStamp implements StampInterface
             $flattenException = FlattenException::createFromThrowable($throwable);
         }
 
-        return new self(\get_class($throwable), $throwable->getCode(), $throwable->getMessage(), $flattenException);
+        return new self($throwable::class, $throwable->getCode(), $throwable->getMessage(), $flattenException);
     }
 
     public function getExceptionClass(): string
@@ -62,7 +52,7 @@ final class ErrorDetailsStamp implements StampInterface
         return $this->exceptionClass;
     }
 
-    public function getExceptionCode()
+    public function getExceptionCode(): int|string
     {
         return $this->exceptionCode;
     }

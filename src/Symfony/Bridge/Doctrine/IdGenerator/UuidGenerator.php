@@ -12,22 +12,34 @@
 namespace Symfony\Bridge\Doctrine\IdGenerator;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Id\AbstractIdGenerator;
+use Symfony\Component\Uid\Factory\NameBasedUuidFactory;
+use Symfony\Component\Uid\Factory\RandomBasedUuidFactory;
+use Symfony\Component\Uid\Factory\TimeBasedUuidFactory;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\Uuid;
 
 final class UuidGenerator extends AbstractIdGenerator
 {
-    private $protoFactory;
-    private $factory;
-    private $entityGetter;
+    private UuidFactory $protoFactory;
+    private UuidFactory|NameBasedUuidFactory|RandomBasedUuidFactory|TimeBasedUuidFactory $factory;
+    private ?string $entityGetter = null;
 
     public function __construct(UuidFactory $factory = null)
     {
         $this->protoFactory = $this->factory = $factory ?? new UuidFactory();
     }
 
+    /**
+     * doctrine/orm < 2.11 BC layer.
+     */
     public function generate(EntityManager $em, $entity): Uuid
+    {
+        return $this->generateId($em, $entity);
+    }
+
+    public function generateId(EntityManagerInterface $em, $entity): Uuid
     {
         if (null !== $this->entityGetter) {
             if (\is_callable([$entity, $this->entityGetter])) {
@@ -40,12 +52,7 @@ final class UuidGenerator extends AbstractIdGenerator
         return $this->factory->create();
     }
 
-    /**
-     * @param Uuid|string|null $namespace
-     *
-     * @return static
-     */
-    public function nameBased(string $entityGetter, $namespace = null): self
+    public function nameBased(string $entityGetter, Uuid|string $namespace = null): static
     {
         $clone = clone $this;
         $clone->factory = $clone->protoFactory->nameBased($namespace);
@@ -54,10 +61,7 @@ final class UuidGenerator extends AbstractIdGenerator
         return $clone;
     }
 
-    /**
-     * @return static
-     */
-    public function randomBased(): self
+    public function randomBased(): static
     {
         $clone = clone $this;
         $clone->factory = $clone->protoFactory->randomBased();
@@ -66,12 +70,7 @@ final class UuidGenerator extends AbstractIdGenerator
         return $clone;
     }
 
-    /**
-     * @param Uuid|string|null $node
-     *
-     * @return static
-     */
-    public function timeBased($node = null): self
+    public function timeBased(Uuid|string $node = null): static
     {
         $clone = clone $this;
         $clone->factory = $clone->protoFactory->timeBased($node);

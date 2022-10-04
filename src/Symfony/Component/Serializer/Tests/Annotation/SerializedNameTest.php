@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
@@ -21,28 +20,9 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class SerializedNameTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
-     * @group legacy
-     */
-    public function testNotSetSerializedNameParameter()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" should be set.');
-        new SerializedName([]);
-    }
-
-    public function provideInvalidValues(): array
-    {
-        return [
-            [''],
-            [0],
-        ];
-    }
-
-    /**
-     * @dataProvider provideInvalidValues
+     * @testWith    [""]
+     *              [0]
      */
     public function testNotAStringSerializedNameParameter($value)
     {
@@ -54,18 +34,7 @@ class SerializedNameTest extends TestCase
 
     public function testSerializedNameParameters()
     {
-        $maxDepth = new SerializedName(['value' => 'foo']);
-        $this->assertEquals('foo', $maxDepth->getSerializedName());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSerializedNameParametersLegacy()
-    {
-        $this->expectDeprecation('Since symfony/serializer 5.3: Passing an array as first argument to "Symfony\Component\Serializer\Annotation\SerializedName::__construct" is deprecated. Use named arguments instead.');
-
-        $maxDepth = new SerializedName(['value' => 'foo']);
+        $maxDepth = new SerializedName('foo');
         $this->assertEquals('foo', $maxDepth->getSerializedName());
     }
 }

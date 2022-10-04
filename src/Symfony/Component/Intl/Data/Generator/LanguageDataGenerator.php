@@ -96,36 +96,24 @@ class LanguageDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $languageCodes = [];
+    private array $languageCodes = [];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
     {
         return $scanner->scanLocales($sourceDir.'/lang');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $compiler->compile($sourceDir.'/lang', $tempDir);
         $compiler->compile($sourceDir.'/misc/metadata.txt', $tempDir);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function preGenerate()
     {
         $this->languageCodes = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array
     {
         $localeBundle = $reader->read($tempDir, $displayLocale);
@@ -135,7 +123,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
             $names = [];
             $localizedNames = [];
             foreach (self::generateLanguageNames($localeBundle) as $language => $name) {
-                if (false === strpos($language, '_')) {
+                if (!str_contains($language, '_')) {
                     $this->languageCodes[] = $language;
                     $names[$language] = $name;
                 } else {
@@ -153,17 +141,11 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         $metadataBundle = $reader->read($tempDir, 'metadata');

@@ -28,18 +28,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class BaseType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setDisabled($options['disabled']);
         $builder->setAutoInitialize($options['auto_initialize']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $name = $form->getName();
@@ -107,6 +101,7 @@ abstract class BaseType extends AbstractType
             'translation_domain' => $translationDomain,
             'label_translation_parameters' => $labelTranslationParameters,
             'attr_translation_parameters' => $attrTranslationParameters,
+            'priority' => $options['priority'],
             // Using the block name here speeds up performance in collection
             // forms, where each entry has the same full block name.
             // Including the type is important too, because if rows of a
@@ -117,9 +112,6 @@ abstract class BaseType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -135,11 +127,15 @@ abstract class BaseType extends AbstractType
             'attr' => [],
             'translation_domain' => null,
             'auto_initialize' => true,
+            'priority' => 0,
         ]);
 
         $resolver->setAllowedTypes('block_prefix', ['null', 'string']);
         $resolver->setAllowedTypes('attr', 'array');
         $resolver->setAllowedTypes('row_attr', 'array');
         $resolver->setAllowedTypes('label_html', 'bool');
+        $resolver->setAllowedTypes('priority', 'int');
+
+        $resolver->setInfo('priority', 'The form rendering priority (higher priorities will be rendered first)');
     }
 }

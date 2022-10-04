@@ -28,8 +28,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class TestContainer extends Container
 {
-    private $kernel;
-    private $privateServicesLocatorId;
+    private KernelInterface $kernel;
+    private string $privateServicesLocatorId;
 
     public function __construct(KernelInterface $kernel, string $privateServicesLocatorId)
     {
@@ -37,107 +37,66 @@ class TestContainer extends Container
         $this->privateServicesLocatorId = $privateServicesLocatorId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile()
     {
         $this->getPublicContainer()->compile();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCompiled(): bool
     {
         return $this->getPublicContainer()->isCompiled();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag(): ParameterBagInterface
     {
         return $this->getPublicContainer()->getParameterBag();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         return $this->getPublicContainer()->getParameter($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter(string $name): bool
     {
         return $this->getPublicContainer()->hasParameter($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setParameter(string $name, $value)
+    public function setParameter(string $name, mixed $value)
     {
         $this->getPublicContainer()->setParameter($name, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function set(string $id, $service)
+    public function set(string $id, mixed $service)
     {
         $this->getPublicContainer()->set($id, $service);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has(string $id): bool
     {
         return $this->getPublicContainer()->has($id) || $this->getPrivateContainer()->has($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function get(string $id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object
     {
         return $this->getPrivateContainer()->has($id) ? $this->getPrivateContainer()->get($id) : $this->getPublicContainer()->get($id, $invalidBehavior);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialized(string $id): bool
     {
         return $this->getPublicContainer()->initialized($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         // ignore the call
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceIds(): array
     {
         return $this->getPublicContainer()->getServiceIds();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemovedIds(): array
     {
         return $this->getPublicContainer()->getRemovedIds();

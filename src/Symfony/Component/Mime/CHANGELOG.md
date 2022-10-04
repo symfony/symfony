@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate calling `Message::setBody()` without arguments
+
+6.1
+---
+
+ * Add `DataPart::getFilename()` and `DataPart::getContentType()`
+
+6.0
+---
+
+ * Remove `Address::fromString()`, use `Address::create()` instead
+ * Remove `Serializable` interface from `RawMessage`
+
 5.2.0
 -----
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -24,11 +25,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 {
-    private $manager;
-    private $strategy;
-    private $voters = [];
-    private $decisionLog = []; // All decision logs
-    private $currentLog = [];  // Logs being filled in
+    private AccessDecisionManagerInterface $manager;
+    private ?AccessDecisionStrategyInterface $strategy = null;
+    /** @var iterable<mixed, VoterInterface> */
+    private iterable $voters = [];
+    private array $decisionLog = []; // All decision logs
+    private array $currentLog = [];  // Logs being filled in
 
     public function __construct(AccessDecisionManagerInterface $manager)
     {
@@ -37,20 +39,13 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         if ($this->manager instanceof AccessDecisionManager) {
             // The strategy and voters are stored in a private properties of the decorated service
             $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'strategy');
-            $reflection->setAccessible(true);
             $this->strategy = $reflection->getValue($manager);
             $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'voters');
-            $reflection->setAccessible(true);
             $this->voters = $reflection->getValue($manager);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
-     */
-    public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/): bool
+    public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {
         $currentDecisionLog = [
             'attributes' => $attributes,
@@ -60,7 +55,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 
         $this->currentLog[] = &$currentDecisionLog;
 
-        $result = $this->manager->decide($token, $attributes, $object, 3 < \func_num_args() && func_get_arg(3));
+        $result = $this->manager->decide($token, $attributes, $object, $allowMultipleAttributes);
 
         $currentDecisionLog['result'] = $result;
 
@@ -87,14 +82,18 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 
     public function getStrategy(): string
     {
-        // The $strategy property is misleading because it stores the name of its
-        // method (e.g. 'decideAffirmative') instead of the original strategy name
-        // (e.g. 'affirmative')
-        return null === $this->strategy ? '-' : strtolower(substr($this->strategy, 6));
+        if (null === $this->strategy) {
+            return '-';
+        }
+        if (method_exists($this->strategy, '__toString')) {
+            return (string) $this->strategy;
+        }
+
+        return get_debug_type($this->strategy);
     }
 
     /**
-     * @return iterable|VoterInterface[]
+     * @return iterable<mixed, VoterInterface>
      */
     public function getVoters(): iterable
     {
@@ -106,5 +105,3 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         return $this->decisionLog;
     }
 }
-
-class_alias(TraceableAccessDecisionManager::class, DebugAccessDecisionManager::class);

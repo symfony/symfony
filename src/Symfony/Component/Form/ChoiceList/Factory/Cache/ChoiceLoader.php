@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\ChoiceList\Factory\Cache;
 
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -25,26 +26,17 @@ use Symfony\Component\Form\FormTypeInterface;
  */
 final class ChoiceLoader extends AbstractStaticOption implements ChoiceLoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function loadChoiceList(callable $value = null)
+    public function loadChoiceList(callable $value = null): ChoiceListInterface
     {
         return $this->getOption()->loadChoiceList($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadChoicesForValues(array $values, callable $value = null)
+    public function loadChoicesForValues(array $values, callable $value = null): array
     {
         return $this->getOption()->loadChoicesForValues($values, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadValuesForChoices(array $choices, callable $value = null)
+    public function loadValuesForChoices(array $choices, callable $value = null): array
     {
         return $this->getOption()->loadValuesForChoices($choices, $value);
     }

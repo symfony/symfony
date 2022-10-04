@@ -12,10 +12,13 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
@@ -24,7 +27,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class UniqueEntityValidator extends ConstraintValidator
 {
-    private $registry;
+    private ManagerRegistry $registry;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -37,7 +40,7 @@ class UniqueEntityValidator extends ConstraintValidator
      * @throws UnexpectedTypeException
      * @throws ConstraintDefinitionException
      */
-    public function validate($entity, Constraint $constraint)
+    public function validate(mixed $entity, Constraint $constraint)
     {
         if (!$constraint instanceof UniqueEntity) {
             throw new UnexpectedTypeException($constraint, UniqueEntity::class);
@@ -61,6 +64,10 @@ class UniqueEntityValidator extends ConstraintValidator
             return;
         }
 
+        if (!\is_object($entity)) {
+            throw new UnexpectedValueException($entity, 'object');
+        }
+
         if ($constraint->em) {
             $em = $this->registry->getManager($constraint->em);
 
@@ -68,14 +75,14 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf('Object manager "%s" does not exist.', $constraint->em));
             }
         } else {
-            $em = $this->registry->getManagerForClass(\get_class($entity));
+            $em = $this->registry->getManagerForClass($entity::class);
 
             if (!$em) {
                 throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', get_debug_type($entity)));
             }
         }
 
-        $class = $em->getClassMetadata(\get_class($entity));
+        $class = $em->getClassMetadata($entity::class);
 
         $criteria = [];
         $hasNullValue = false;
@@ -129,10 +136,21 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf('The "%s" entity repository does not support the "%s" entity. The entity should be an instance of or extend "%s".', $constraint->entityClass, $class->getName(), $supportedClass));
             }
         } else {
-            $repository = $em->getRepository(\get_class($entity));
+            $repository = $em->getRepository($entity::class);
         }
 
-        $result = $repository->{$constraint->repositoryMethod}($criteria);
+        $arguments = [$criteria];
+
+        /* If the default repository method is used, it is always enough to retrieve at most two entities because:
+         * - No entity returned, the current entity is definitely unique.
+         * - More than one entity returned, the current entity cannot be unique.
+         * - One entity returned the uniqueness depends on the current entity.
+         */
+        if ('findBy' === $constraint->repositoryMethod) {
+            $arguments = [$criteria, null, 2];
+        }
+
+        $result = $repository->{$constraint->repositoryMethod}(...$arguments);
 
         if ($result instanceof \IteratorAggregate) {
             $result = $result->getIterator();
@@ -163,7 +181,7 @@ class UniqueEntityValidator extends ConstraintValidator
             return;
         }
 
-        $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
+        $errorPath = $constraint->errorPath ?? $fields[0];
         $invalidValue = $criteria[$errorPath] ?? $criteria[$fields[0]];
 
         $this->context->buildViolation($constraint->message)
@@ -175,17 +193,17 @@ class UniqueEntityValidator extends ConstraintValidator
             ->addViolation();
     }
 
-    private function formatWithIdentifiers($em, $class, $value)
+    private function formatWithIdentifiers(ObjectManager $em, ClassMetadata $class, mixed $value)
     {
         if (!\is_object($value) || $value instanceof \DateTimeInterface) {
             return $this->formatValue($value, self::PRETTY_DATE);
         }
 
-        if (method_exists($value, '__toString')) {
+        if ($value instanceof \Stringable) {
             return (string) $value;
         }
 
-        if ($class->getName() !== $idClass = \get_class($value)) {
+        if ($class->getName() !== $idClass = $value::class) {
             // non unique value might be a composite PK that consists of other entity objects
             if ($em->getMetadataFactory()->hasMetadataFor($idClass)) {
                 $identifiers = $em->getClassMetadata($idClass)->getIdentifierValues($value);
@@ -206,7 +224,7 @@ class UniqueEntityValidator extends ConstraintValidator
             if (!\is_object($id) || $id instanceof \DateTimeInterface) {
                 $idAsString = $this->formatValue($id, self::PRETTY_DATE);
             } else {
-                $idAsString = sprintf('object("%s")', \get_class($id));
+                $idAsString = sprintf('object("%s")', $id::class);
             }
 
             $id = sprintf('%s => %s', $field, $idAsString);

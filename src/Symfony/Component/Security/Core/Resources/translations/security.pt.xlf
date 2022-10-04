@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Ligação de login inválida ou expirada.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Demasiadas tentativas de login, tente novamente num minuto.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Demasiadas tentativas de login, tente novamente em %minutes% minutos.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -54,39 +54,35 @@ ob_start();
 class TestSessionHandler extends AbstractSessionHandler
 {
     private $data;
+    private ?string $sessionId;
 
-    public function __construct($data = '')
+    public function __construct($data = '', $sessionId = null)
     {
         $this->data = $data;
+        $this->sessionId = $sessionId;
     }
 
-    public function open($path, $name): bool
+    public function open(string $path, string $name): bool
     {
         echo __FUNCTION__, "\n";
 
         return parent::open($path, $name);
     }
 
-    public function validateId($sessionId): bool
+    public function validateId(string $sessionId): bool
     {
         echo __FUNCTION__, "\n";
 
         return parent::validateId($sessionId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function read($sessionId): string
+    public function read(string $sessionId): string
     {
         echo __FUNCTION__, "\n";
 
         return parent::read($sessionId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function updateTimestamp($sessionId, $data): bool
     {
         echo __FUNCTION__, "\n";
@@ -94,20 +90,14 @@ class TestSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function write($sessionId, $data): bool
+    public function write(string $sessionId, string $data): bool
     {
         echo __FUNCTION__, "\n";
 
         return parent::write($sessionId, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function destroy($sessionId): bool
+    public function destroy(string $sessionId): bool
     {
         echo __FUNCTION__, "\n";
 
@@ -121,16 +111,21 @@ class TestSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function gc($maxLifetime): bool
+    public function gc($maxLifetime): int|false
     {
         echo __FUNCTION__, "\n";
 
-        return true;
+        return 1;
     }
 
     protected function doRead($sessionId): string
     {
-        echo __FUNCTION__.': ', $this->data, "\n";
+        if (isset($this->sessionId) && $sessionId !== $this->sessionId) {
+            echo __FUNCTION__ . ": invalid sessionId\n";
+
+            return '';
+        }
+        echo __FUNCTION__ . ': ', $this->data, "\n";
 
         return $this->data;
     }

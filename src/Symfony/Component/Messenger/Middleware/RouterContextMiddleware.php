@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Middleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\RouterContextStamp;
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
@@ -24,7 +23,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 class RouterContextMiddleware implements MiddlewareInterface
 {
-    private $router;
+    private RequestContextAwareInterface $router;
 
     public function __construct(RequestContextAwareInterface $router)
     {
@@ -49,24 +48,41 @@ class RouterContextMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $currentContext = $this->router->getContext();
+        $context = $this->router->getContext();
+        $currentBaseUrl = $context->getBaseUrl();
+        $currentMethod = $context->getMethod();
+        $currentHost = $context->getHost();
+        $currentScheme = $context->getScheme();
+        $currentHttpPort = $context->getHttpPort();
+        $currentHttpsPort = $context->getHttpsPort();
+        $currentPathInfo = $context->getPathInfo();
+        $currentQueryString = $context->getQueryString();
 
         /* @var RouterContextStamp $contextStamp */
-        $this->router->setContext(new RequestContext(
-            $contextStamp->getBaseUrl(),
-            $contextStamp->getMethod(),
-            $contextStamp->getHost(),
-            $contextStamp->getScheme(),
-            $contextStamp->getHttpPort(),
-            $contextStamp->getHttpsPort(),
-            $contextStamp->getPathInfo(),
-            $contextStamp->getQueryString()
-        ));
+        $context
+            ->setBaseUrl($contextStamp->getBaseUrl())
+            ->setMethod($contextStamp->getMethod())
+            ->setHost($contextStamp->getHost())
+            ->setScheme($contextStamp->getScheme())
+            ->setHttpPort($contextStamp->getHttpPort())
+            ->setHttpsPort($contextStamp->getHttpsPort())
+            ->setPathInfo($contextStamp->getPathInfo())
+            ->setQueryString($contextStamp->getQueryString())
+        ;
 
         try {
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            $this->router->setContext($currentContext);
+            $context
+                ->setBaseUrl($currentBaseUrl)
+                ->setMethod($currentMethod)
+                ->setHost($currentHost)
+                ->setScheme($currentScheme)
+                ->setHttpPort($currentHttpPort)
+                ->setHttpsPort($currentHttpsPort)
+                ->setPathInfo($currentPathInfo)
+                ->setQueryString($currentQueryString)
+            ;
         }
     }
 }

@@ -16,28 +16,40 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
  */
 final class DiscordAuthorEmbedObject extends AbstractDiscordEmbedObject
 {
-    public function name(string $name): self
+    /**
+     * @return $this
+     */
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
         return $this;
     }
 
-    public function url(string $url): self
+    /**
+     * @return $this
+     */
+    public function url(string $url): static
     {
         $this->options['url'] = $url;
 
         return $this;
     }
 
-    public function iconUrl(string $iconUrl): self
+    /**
+     * @return $this
+     */
+    public function iconUrl(string $iconUrl): static
     {
         $this->options['icon_url'] = $iconUrl;
 
         return $this;
     }
 
-    public function proxyIconUrl(string $proxyIconUrl): self
+    /**
+     * @return $this
+     */
+    public function proxyIconUrl(string $proxyIconUrl): static
     {
         $this->options['proxy_icon_url'] = $proxyIconUrl;
 

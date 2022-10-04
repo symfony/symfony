@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -30,10 +31,10 @@ final class DiscordTransport extends AbstractTransport
 
     private const SUBJECT_LIMIT = 2000;
 
-    private $token;
-    private $webhookId;
+    private string $token;
+    private string $webhookId;
 
-    public function __construct(string $token, string $webhookId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, string $webhookId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->webhookId = $webhookId;
@@ -76,17 +77,23 @@ final class DiscordTransport extends AbstractTransport
             'json' => array_filter($options),
         ]);
 
-        if (204 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Discord server.', $response, 0, $e);
+        }
+
+        if (204 !== $statusCode) {
             $result = $response->toArray(false);
 
-            if (401 === $response->getStatusCode()) {
+            if (401 === $statusCode) {
                 $originalContent = $message->getSubject();
                 $errorMessage = $result['message'];
                 $errorCode = $result['code'];
                 throw new TransportException(sprintf('Unable to post the Discord message: "%s" (%d: "%s").', $originalContent, $errorCode, $errorMessage), $response);
             }
 
-            if (400 === $response->getStatusCode()) {
+            if (400 === $statusCode) {
                 $originalContent = $message->getSubject();
 
                 $errorMessage = '';
@@ -99,7 +106,7 @@ final class DiscordTransport extends AbstractTransport
                 throw new TransportException(sprintf('Unable to post the Discord message: "%s" (%s).', $originalContent, $errorMessage), $response);
             }
 
-            throw new TransportException(sprintf('Unable to post the Discord message: "%s" (Status Code: %d).', $message->getSubject(), $response->getStatusCode()), $response);
+            throw new TransportException(sprintf('Unable to post the Discord message: "%s" (Status Code: %d).', $message->getSubject(), $statusCode), $response);
         }
 
         return new SentMessage($message, (string) $this);

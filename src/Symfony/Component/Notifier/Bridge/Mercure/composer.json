@@ -1,6 +1,6 @@
 {
     "name": "symfony/mercure-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Mercure Notifier Bridge",
     "keywords": ["mercure", "notifier"],
     "homepage": "https://symfony.com",
@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
         "ext-json": "*",
-        "symfony/mercure": "^0.5.2",
-        "symfony/notifier": "^5.3",
-        "symfony/service-contracts": "^1.10|^2"
+        "symfony/mercure": "^0.5.2|^0.6",
+        "symfony/notifier": "^6.2",
+        "symfony/service-contracts": "^1.10|^2|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mercure\\": "" },
@@ -28,5 +28,16 @@
             "/Tests/"
         ]
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "Tests/stella-maris-clock",
+            "options": {
+                "versions": {
+                    "stella-maris/clock": "0.1.x-dev"
+                }
+            }
+        }
+    ],
     "minimum-stability": "dev"
 }

@@ -14,7 +14,10 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,28 +29,24 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 /**
  * @author Timo Bakx <timobakx@gmail.com>
  */
+#[AsCommand(name: 'debug:firewall', description: 'Display information about your security firewall(s)')]
 final class DebugFirewallCommand extends Command
 {
-    protected static $defaultName = 'debug:firewall';
-    protected static $defaultDescription = 'Display information about your security firewall(s)';
-
-    private $firewallNames;
-    private $contexts;
-    private $eventDispatchers;
-    private $authenticators;
-    private $authenticatorManagerEnabled;
+    private array $firewallNames;
+    private ContainerInterface $contexts;
+    private ContainerInterface $eventDispatchers;
+    private array $authenticators;
 
     /**
      * @param string[]                   $firewallNames
      * @param AuthenticatorInterface[][] $authenticators
      */
-    public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators, bool $authenticatorManagerEnabled)
+    public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators)
     {
         $this->firewallNames = $firewallNames;
         $this->contexts = $contexts;
         $this->eventDispatchers = $eventDispatchers;
         $this->authenticators = $authenticators;
-        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
 
         parent::__construct();
     }
@@ -57,7 +56,6 @@ final class DebugFirewallCommand extends Command
         $exampleName = $this->getExampleName();
 
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command displays the firewalls that are configured
 in your application:
@@ -115,9 +113,7 @@ EOF
             $this->displayEventListeners($name, $context, $io);
         }
 
-        if ($this->authenticatorManagerEnabled) {
-            $this->displayAuthenticators($name, $io);
-        }
+        $this->displayAuthenticators($name, $io);
 
         return 0;
     }
@@ -222,7 +218,7 @@ EOF
             array_map(
                 static function ($authenticator) {
                     return [
-                        \get_class($authenticator),
+                        $authenticator::class,
                     ];
                 },
                 $authenticators
@@ -230,7 +226,7 @@ EOF
         );
     }
 
-    private function formatCallable($callable): string
+    private function formatCallable(mixed $callable): string
     {
         if (\is_array($callable)) {
             if (\is_object($callable[0])) {
@@ -246,7 +242,7 @@ EOF
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return 'Closure()';
             }
             if ($class = $r->getClosureScopeClass()) {
@@ -257,7 +253,7 @@ EOF
         }
 
         if (method_exists($callable, '__invoke')) {
-            return sprintf('%s::__invoke()', \get_class($callable));
+            return sprintf('%s::__invoke()', $callable::class);
         }
 
         throw new \InvalidArgumentException('Callable is not describable.');
@@ -272,5 +268,12 @@ EOF
         }
 
         return $name;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues($this->firewallNames);
+        }
     }
 }

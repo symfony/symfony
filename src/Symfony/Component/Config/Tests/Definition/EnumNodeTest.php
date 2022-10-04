@@ -55,4 +55,20 @@ class EnumNodeTest extends TestCase
         $node = new EnumNode('foo', null, ['foo', 'bar']);
         $node->finalize('foobar');
     }
+
+    public function testWithPlaceHolderWithValidValue()
+    {
+        $node = new EnumNode('cookie_samesite', null, ['lax', 'strict', 'none']);
+        EnumNode::setPlaceholder('custom', ['string' => 'lax']);
+        $this->assertSame('custom', $node->finalize('custom'));
+    }
+
+    public function testWithPlaceHolderWithInvalidValue()
+    {
+        $node = new EnumNode('cookie_samesite', null, ['lax', 'strict', 'none']);
+        EnumNode::setPlaceholder('custom', ['string' => 'foo']);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value "foo" is not allowed for path "cookie_samesite". Permissible values: "lax", "strict", "none"');
+        $node->finalize('custom');
+    }
 }

@@ -1,4 +1,5 @@
 security:
+    enable_authenticator_manager: true
     password_hashers:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:
@@ -51,7 +52,6 @@ security:
             stateless: true
             http_basic: true
             form_login: true
-            anonymous: true
             switch_user:
             x509: true
             remote_user: true
@@ -59,18 +59,17 @@ security:
             remember_me:
                 secret: TheSecret
             user_checker: ~
+            entry_point: form_login
 
         host:
             provider: default
             pattern: /test
             host: foo\.example\.org
             methods: [GET,POST]
-            anonymous: true
             http_basic: true
 
         with_user_checker:
             provider: default
-            anonymous: ~
             http_basic: ~
             user_checker: app.user_checker
 

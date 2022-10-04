@@ -65,9 +65,10 @@ final class UuidFactoryTest extends TestCase
         $this->assertSame('c10ab929ae84', $uuid1->getNode());
 
         // Test default node override
-        $uuid2 = $uuidFactory->timeBased('7c1ede70-3586-48ed-a984-23c8018d9174')->create();
-        $this->assertInstanceOf(UuidV6::class, $uuid2);
-        $this->assertSame('23c8018d9174', $uuid2->getNode());
+        $uuid2Factory = $uuidFactory->timeBased('7c1ede70-3586-48ed-a984-23c8018d9174');
+        $this->assertSame('1eb5a7ae-17e1-62d0-a984-23c8018d9174', (string) $uuid2Factory->create(new \DateTime('@1611076938.057800')));
+        $this->assertSame('23c8018d9174', substr($uuid2Factory->create(), 24));
+        $this->assertNotSame('a984', substr($uuid2Factory->create(), 19, 4));
 
         // Test version override
         $uuid3 = (new UuidFactory(6, 1))->timeBased()->create();

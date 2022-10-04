@@ -18,7 +18,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
 {
     protected $parent;
     protected $id;
-    private $defaultTags = [];
+    private array $defaultTags = [];
 
     public function __construct(ServicesConfigurator $parent, Definition $definition, string $id = null, array $defaultTags = [])
     {
@@ -32,8 +32,8 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
     {
         // default tags should be added last
         foreach ($this->defaultTags as $name => $attributes) {
-            foreach ($attributes as $attributes) {
-                $this->definition->addTag($name, $attributes);
+            foreach ($attributes as $attribute) {
+                $this->definition->addTag($name, $attribute);
             }
         }
         $this->defaultTags = [];

@@ -29,7 +29,7 @@ class DisallowRobotsIndexingListenerTest extends TestCase
         $response = new Response(...$responseArgs);
         $listener = new DisallowRobotsIndexingListener();
 
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $this->createMock(Request::class), KernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), KernelInterface::MAIN_REQUEST, $response);
 
         $listener->onResponse($event);
 

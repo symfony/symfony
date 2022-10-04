@@ -2,6 +2,7 @@ imports:
     - { resource: container1.yml }
 
 security:
+    enable_authenticator_manager: true
     password_hashers:
         JMS\FooBundle\Entity\User7:
             algorithm: sodium

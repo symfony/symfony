@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
  */
 class HandlersLocator implements HandlersLocatorInterface
 {
-    private $handlers;
+    private array $handlers;
 
     /**
      * @param HandlerDescriptor[][]|callable[][] $handlers
@@ -32,9 +32,6 @@ class HandlersLocator implements HandlersLocatorInterface
         $this->handlers = $handlers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHandlers(Envelope $envelope): iterable
     {
         $seen = [];

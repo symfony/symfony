@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Tests;
+namespace Symfony\Component\Mailer\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;

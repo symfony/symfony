@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
-
 class FormLoginTest extends AbstractWebTestCase
 {
     /**
@@ -113,11 +111,7 @@ class FormLoginTest extends AbstractWebTestCase
      */
     public function testLoginThrottling()
     {
-        if (!class_exists(LoginThrottlingListener::class)) {
-            $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
-        }
-
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml', 'enable_authenticator_manager' => true]);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml']);
 
         $attempts = [
             ['johannes', 'wrong'],
@@ -138,15 +132,15 @@ class FormLoginTest extends AbstractWebTestCase
 
                     break;
                 case 1: // Second attempt : login throttling !
-                    $this->assertStringContainsString('Too many failed login attempts, please try again in 8 minutes.', $text, 'Invalid response on 2nd attempt');
+                    $this->assertStringContainsString('Too many failed login attempts, please try again', $text, 'Invalid response on 2nd attempt');
 
                     break;
                 case 2: // Third attempt with unexisting username
-                    $this->assertStringContainsString('Username could not be found.', $text, 'Invalid response on 3rd attempt');
+                    $this->assertStringContainsString('Invalid credentials.', $text, 'Invalid response on 3rd attempt');
 
                     break;
                 case 3: // Fourth attempt : still login throttling !
-                    $this->assertStringContainsString('Too many failed login attempts, please try again in 8 minutes.', $text, 'Invalid response on 4th attempt');
+                    $this->assertStringContainsString('Too many failed login attempts, please try again', $text, 'Invalid response on 4th attempt');
 
                     break;
             }
@@ -155,9 +149,7 @@ class FormLoginTest extends AbstractWebTestCase
 
     public function provideClientOptions()
     {
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 }

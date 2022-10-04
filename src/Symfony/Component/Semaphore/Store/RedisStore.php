@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
@@ -27,30 +25,60 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
  */
 class RedisStore implements PersistingStoreInterface
 {
-    private $redis;
-
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster|\RedisClusterProxy|\Predis\ClientInterface $redisClient
-     */
-    public function __construct($redisClient)
-    {
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster, RedisProxy, RedisClusterProxy or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redisClient)));
-        }
-
-        $this->redis = $redisClient;
+    public function __construct(
+        private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key, float $ttlInSecond)
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
         }
 
-        $script = file_get_contents(__DIR__.'/Resources/redis_save.lua');
+        $script = '
+            local key = KEYS[1]
+            local weightKey = key .. ":weight"
+            local timeKey = key .. ":time"
+            local identifier = ARGV[1]
+            local now = tonumber(ARGV[2])
+            local ttlInSecond = tonumber(ARGV[3])
+            local limit = tonumber(ARGV[4])
+            local weight = tonumber(ARGV[5])
+
+            -- Remove expired values
+            redis.call("ZREMRANGEBYSCORE", timeKey, "-inf", now)
+            redis.call("ZINTERSTORE", weightKey, 2, weightKey, timeKey, "WEIGHTS", 1, 0)
+
+            -- Semaphore already acquired?
+            if redis.call("ZSCORE", timeKey, identifier) then
+                return true
+            end
+
+            -- Try to get a semaphore
+            local semaphores = redis.call("ZRANGE", weightKey, 0, -1, "WITHSCORES")
+            local count = 0
+
+            for i = 1, #semaphores, 2 do
+                count = count + semaphores[i+1]
+            end
+
+            -- Could we get the semaphore ?
+            if count + weight > limit then
+                return false
+            end
+
+            -- Acquire the semaphore
+            redis.call("ZADD", timeKey, now + ttlInSecond, identifier)
+            redis.call("ZADD", weightKey, weight, identifier)
+
+            -- Extend the TTL
+            local maxExpiration = redis.call("ZREVRANGE", timeKey, 0, 0, "WITHSCORES")[2]
+            redis.call("EXPIREAT", weightKey, maxExpiration + 10)
+            redis.call("EXPIREAT", timeKey, maxExpiration + 10)
+
+            return true
+        ';
 
         $args = [
             $this->getUniqueToken($key),
@@ -65,16 +93,34 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttlInSecond)
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
         }
 
-        $script = file_get_contents(__DIR__.'/Resources/redis_put_off_expiration.lua');
+        $script = '
+            local key = KEYS[1]
+            local weightKey = key .. ":weight"
+            local timeKey = key .. ":time"
+
+            local added = redis.call("ZADD", timeKey, ARGV[1], ARGV[2])
+            if added == 1 then
+                redis.call("ZREM", timeKey, ARGV[2])
+                redis.call("ZREM", weightKey, ARGV[2])
+            end
+
+            -- Extend the TTL
+            local maxExpiration = redis.call("ZREVRANGE", timeKey, 0, 0, "WITHSCORES")[2]
+            if nil == maxExpiration then
+                return 1
+            end
+
+            redis.call("EXPIREAT", weightKey, maxExpiration + 10)
+            redis.call("EXPIREAT", timeKey, maxExpiration + 10)
+
+            return added
+        ';
 
         $ret = $this->evaluate($script, sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)]);
 
@@ -89,37 +135,29 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
-        $script = file_get_contents(__DIR__.'/Resources/redis_delete.lua');
+        $script = '
+            local key = KEYS[1]
+            local weightKey = key .. ":weight"
+            local timeKey = key .. ":time"
+            local identifier = ARGV[1]
+
+            redis.call("ZREM", timeKey, identifier)
+            return redis.call("ZREM", weightKey, identifier)
+        ';
 
         $this->evaluate($script, sprintf('{%s}', $key), [$this->getUniqueToken($key)]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         return (bool) $this->redis->zScore(sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
     }
 
-    /**
-     * Evaluates a script in the corresponding redis client.
-     *
-     * @return mixed
-     */
-    private function evaluate(string $script, string $resource, array $args)
+    private function evaluate(string $script, string $resource, array $args): mixed
     {
-        if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
-        ) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster) {
             return $this->redis->eval($script, array_merge([$resource], $args), 1);
         }
 
@@ -131,7 +169,7 @@ class RedisStore implements PersistingStoreInterface
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, \is_object($this->redis) ? \get_class($this->redis) : \gettype($this->redis)));
+        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

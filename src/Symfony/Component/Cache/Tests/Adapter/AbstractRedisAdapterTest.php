@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
@@ -24,7 +25,7 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
 
     protected static $redis;
 
-    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
         return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
@@ -32,17 +33,31 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('redis')) {
-            self::markTestSkipped('Extension redis required.');
+            throw new SkippedTestSuiteError('Extension redis required.');
         }
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
+            throw new SkippedTestSuiteError(getenv('REDIS_HOST').': '.$e->getMessage());
         }
     }
 
     public static function tearDownAfterClass(): void
     {
         self::$redis = null;
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testClearWithPrefix()
+    {
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $this->assertTrue($cache->hasItem('foo'));
+
+        $cache->clear();
+        $this->assertFalse($cache->hasItem('foo'));
     }
 }

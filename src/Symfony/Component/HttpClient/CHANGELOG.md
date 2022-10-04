@@ -1,10 +1,22 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow yielding `Exception` from MockResponse's `$body` to mock transport errors
+ * Remove credentials from requests redirected to same host but different port
+
+5.4
+---
+
+ * Add `MockHttpClient::setResponseFactory()` method to be able to set response factory after client creating
+
 5.3
 ---
 
  * Implement `HttpClientInterface::withOptions()` from `symfony/contracts` v2.4
+ * Add `DecoratorTrait` to ease writing simple decorators
 
 5.2.0
 -----

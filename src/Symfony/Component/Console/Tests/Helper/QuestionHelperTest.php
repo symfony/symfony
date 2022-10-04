@@ -714,9 +714,6 @@ EOD;
         $this->assertEquals('not yet', $dialog->ask($this->createStreamableInputInterfaceMock(null, false), $this->createOutputInterface(), $question));
     }
 
-    /**
-     * @requires function mb_strwidth
-     */
     public function testChoiceOutputFormattingQuestionForUtf8Keys()
     {
         $question = 'Lorem ipsum?';
@@ -872,13 +869,16 @@ EOD;
             $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
         } finally {
             $reflection = new \ReflectionProperty(QuestionHelper::class, 'stty');
-            $reflection->setAccessible(true);
             $reflection->setValue(null, true);
         }
     }
 
     public function testTraversableMultiselectAutocomplete()
     {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
         // <NEWLINE>
         // F<TAB><NEWLINE>
         // A<3x UP ARROW><TAB>,F<TAB><NEWLINE>

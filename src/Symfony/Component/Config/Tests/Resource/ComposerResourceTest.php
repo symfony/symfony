@@ -25,7 +25,7 @@ class ComposerResourceTest extends TestCase
         $found = false;
 
         foreach ($res->getVendors() as $vendor) {
-            if ($vendor && 0 === strpos($r->getFileName(), $vendor)) {
+            if ($vendor && str_starts_with($r->getFileName(), $vendor)) {
                 $found = true;
                 break;
             }

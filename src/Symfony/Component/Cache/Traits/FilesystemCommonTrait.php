@@ -20,8 +20,8 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 trait FilesystemCommonTrait
 {
-    private $directory;
-    private $tmp;
+    private string $directory;
+    private string $tmp;
 
     private function init(string $namespace, ?string $directory)
     {
@@ -50,15 +50,12 @@ trait FilesystemCommonTrait
         $this->directory = $directory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doClear(string $namespace)
+    protected function doClear(string $namespace): bool
     {
         $ok = true;
 
         foreach ($this->scanHashDir($this->directory) as $file) {
-            if ('' !== $namespace && 0 !== strpos($this->getFileKey($file), $namespace)) {
+            if ('' !== $namespace && !str_starts_with($this->getFileKey($file), $namespace)) {
                 continue;
             }
 
@@ -68,10 +65,7 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doDelete(array $ids)
+    protected function doDelete(array $ids): bool
     {
         $ok = true;
 
@@ -83,7 +77,7 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
-    protected function doUnlink($file)
+    protected function doUnlink(string $file)
     {
         return @unlink($file);
     }
@@ -92,13 +86,13 @@ trait FilesystemCommonTrait
     {
         set_error_handler(__CLASS__.'::throwError');
         try {
-            if (null === $this->tmp) {
+            if (!isset($this->tmp)) {
                 $this->tmp = $this->directory.bin2hex(random_bytes(6));
             }
             try {
                 $h = fopen($this->tmp, 'x');
             } catch (\ErrorException $e) {
-                if (false === strpos($e->getMessage(), 'File exists')) {
+                if (!str_contains($e->getMessage(), 'File exists')) {
                     throw $e;
                 }
 
@@ -109,7 +103,7 @@ trait FilesystemCommonTrait
             fclose($h);
 
             if (null !== $expiresAt) {
-                touch($this->tmp, $expiresAt);
+                touch($this->tmp, $expiresAt ?: time() + 31556952); // 1 year in seconds
             }
 
             return rename($this->tmp, $file);
@@ -166,15 +160,12 @@ trait FilesystemCommonTrait
     /**
      * @internal
      */
-    public static function throwError($type, $message, $file, $line)
+    public static function throwError(int $type, string $message, string $file, int $line)
     {
         throw new \ErrorException($message, 0, $type, $file, $line);
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -189,7 +180,7 @@ trait FilesystemCommonTrait
         if (method_exists(parent::class, '__destruct')) {
             parent::__destruct();
         }
-        if (null !== $this->tmp && is_file($this->tmp)) {
+        if (isset($this->tmp) && is_file($this->tmp)) {
             unlink($this->tmp);
         }
     }

@@ -58,14 +58,14 @@ class GitRepositoryTest extends TestCase
         $this->assertNotEmpty($git->getLastAuthor());
         $this->assertInstanceOf(\DateTime::class, $git->getLastAuthoredDate());
         $this->assertStringMatchesFormat('v%s', $git->getLastTag());
-        $this->assertStringMatchesFormat('v3%s', $git->getLastTag(function ($tag) { return 0 === strpos($tag, 'v3'); }));
+        $this->assertStringMatchesFormat('v3%s', $git->getLastTag(function ($tag) { return str_starts_with($tag, 'v3'); }));
     }
 
     public function testItCheckoutsToTheLastTag()
     {
         $git = GitRepository::download(self::REPO_URL, $this->targetDir);
         $lastCommitHash = $git->getLastCommitHash();
-        $lastV3Tag = $git->getLastTag(function ($tag) { return 0 === strpos($tag, 'v3'); });
+        $lastV3Tag = $git->getLastTag(function ($tag) { return str_starts_with($tag, 'v3'); });
 
         $git->checkout($lastV3Tag);
 

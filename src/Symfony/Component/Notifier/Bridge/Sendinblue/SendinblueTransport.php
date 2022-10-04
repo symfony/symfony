@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,8 +28,8 @@ final class SendinblueTransport extends AbstractTransport
 {
     protected const HOST = 'api.sendinblue.com';
 
-    private $apiKey;
-    private $sender;
+    private string $apiKey;
+    private string $sender;
 
     public function __construct(string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -54,9 +55,11 @@ final class SendinblueTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $sender = $message->getFrom() ?: $this->sender;
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
             'json' => [
-                'sender' => $this->sender,
+                'sender' => $sender,
                 'recipient' => $message->getPhone(),
                 'content' => $message->getSubject(),
             ],
@@ -65,7 +68,13 @@ final class SendinblueTransport extends AbstractTransport
             ],
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
+        }
+
+        if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException('Unable to send the SMS: '.$error['message'], $response);

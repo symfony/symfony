@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return FreeMobileTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): FreeMobileTransportFactory
     {
         return new FreeMobileTransportFactory();
     }

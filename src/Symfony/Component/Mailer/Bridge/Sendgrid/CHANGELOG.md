@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support for `TagHeader` and `MetadataHeader` to the Sendgrid API transport
+
 4.4.0
 -----
 

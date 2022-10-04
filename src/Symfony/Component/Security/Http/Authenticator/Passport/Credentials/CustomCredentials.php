@@ -20,23 +20,21 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.3
  */
 class CustomCredentials implements CredentialsInterface
 {
-    private $customCredentialsChecker;
-    private $credentials;
-    private $resolved = false;
+    private \Closure $customCredentialsChecker;
+    private mixed $credentials;
+    private bool $resolved = false;
 
     /**
      * @param callable $customCredentialsChecker the check function. If this function does not return `true`, a
      *                                           BadCredentialsException is thrown. You may also throw a more
      *                                           specific exception in the function.
-     * @param          $credentials
      */
-    public function __construct(callable $customCredentialsChecker, $credentials)
+    public function __construct(callable $customCredentialsChecker, mixed $credentials)
     {
-        $this->customCredentialsChecker = $customCredentialsChecker;
+        $this->customCredentialsChecker = $customCredentialsChecker(...);
         $this->credentials = $credentials;
     }
 

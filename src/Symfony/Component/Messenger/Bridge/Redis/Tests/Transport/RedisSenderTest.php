@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisSender;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class RedisSenderTest extends TestCase
@@ -26,12 +27,17 @@ class RedisSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('add')->with($encoded['body'], $encoded['headers']);
+        $connection->expects($this->once())->method('add')->with($encoded['body'], $encoded['headers'])->willReturn('THE_MESSAGE_ID');
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new RedisSender($connection, $serializer);
-        $sender->send($envelope);
+
+        /** @var TransportMessageIdStamp $stamp */
+        $stamp = $sender->send($envelope)->last(TransportMessageIdStamp::class);
+
+        $this->assertNotNull($stamp, sprintf('A "%s" stamp should be added', TransportMessageIdStamp::class));
+        $this->assertSame('THE_MESSAGE_ID', $stamp->getId());
     }
 }

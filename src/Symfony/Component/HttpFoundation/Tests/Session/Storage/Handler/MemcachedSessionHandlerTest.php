@@ -38,7 +38,15 @@ class MemcachedSessionHandlerTest extends TestCase
             $this->markTestSkipped('Tests can only be run with memcached extension 2.1.0 or lower, or 3.0.0b1 or higher');
         }
 
-        $this->memcached = $this->createMock(\Memcached::class);
+        $r = new \ReflectionClass(\Memcached::class);
+        $methodsToMock = array_map(function ($m) { return $m->name; }, $r->getMethods(\ReflectionMethod::IS_PUBLIC));
+        $methodsToMock = array_diff($methodsToMock, ['getDelayed', 'getDelayedByKey']);
+
+        $this->memcached = $this->getMockBuilder(\Memcached::class)
+            ->disableOriginalConstructor()
+            ->setMethods($methodsToMock)
+            ->getMock();
+
         $this->storage = new MemcachedSessionHandler(
             $this->memcached,
             ['prefix' => self::PREFIX, 'expiretime' => self::TTL]
@@ -105,7 +113,7 @@ class MemcachedSessionHandlerTest extends TestCase
 
     public function testGcSession()
     {
-        $this->assertTrue($this->storage->gc(123));
+        $this->assertIsInt($this->storage->gc(123));
     }
 
     /**
@@ -126,7 +134,7 @@ class MemcachedSessionHandlerTest extends TestCase
         return [
             [['prefix' => 'session'], true],
             [['expiretime' => 100], true],
-            [['prefix' => 'session', 'expiretime' => 200], true],
+            [['prefix' => 'session', 'ttl' => 200], true],
             [['expiretime' => 100, 'foo' => 'bar'], false],
         ];
     }
@@ -134,7 +142,6 @@ class MemcachedSessionHandlerTest extends TestCase
     public function testGetConnection()
     {
         $method = new \ReflectionMethod($this->storage, 'getMemcached');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\Memcached::class, $method->invoke($this->storage));
     }

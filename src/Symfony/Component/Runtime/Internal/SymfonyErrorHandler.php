@@ -29,7 +29,7 @@ class SymfonyErrorHandler
         if (class_exists(ErrorHandler::class)) {
             DebugClassLoader::enable();
             restore_error_handler();
-            ErrorHandler::register(new ErrorHandler(new BufferingLogger(), true));
+            ErrorHandler::register(new ErrorHandler(new BufferingLogger(), $debug));
         }
     }
 }

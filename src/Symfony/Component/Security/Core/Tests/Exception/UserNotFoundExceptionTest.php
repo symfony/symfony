@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class UserNotFoundExceptionTest extends TestCase
 {
@@ -25,15 +24,10 @@ class UserNotFoundExceptionTest extends TestCase
         $this->assertEquals(['{{ username }}' => 'username', '{{ user_identifier }}' => 'username'], $exception->getMessageData());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testUsernameNotFoundException()
+    public function testUserIdentifierIsNotSetByDefault()
     {
-        $exception = new UsernameNotFoundException();
-        $this->assertInstanceOf(UserNotFoundException::class, $exception);
+        $exception = new UserNotFoundException();
 
-        $exception->setUsername('username');
-        $this->assertEquals('username', $exception->getUserIdentifier());
+        $this->assertNull($exception->getUserIdentifier());
     }
 }

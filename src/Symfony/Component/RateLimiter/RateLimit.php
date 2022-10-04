@@ -15,15 +15,13 @@ use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 
 /**
  * @author Valentin Silvestre <vsilvestre.pro@gmail.com>
- *
- * @experimental in 5.3
  */
 class RateLimit
 {
-    private $availableTokens;
-    private $retryAfter;
-    private $accepted;
-    private $limit;
+    private int $availableTokens;
+    private \DateTimeImmutable $retryAfter;
+    private bool $accepted;
+    private int $limit;
 
     public function __construct(int $availableTokens, \DateTimeImmutable $retryAfter, bool $accepted, int $limit)
     {
@@ -39,9 +37,11 @@ class RateLimit
     }
 
     /**
+     * @return $this
+     *
      * @throws RateLimitExceededException if not accepted
      */
-    public function ensureAccepted(): self
+    public function ensureAccepted(): static
     {
         if (!$this->accepted) {
             throw new RateLimitExceededException($this);
@@ -67,11 +67,11 @@ class RateLimit
 
     public function wait(): void
     {
-        $delta = $this->retryAfter->getTimestamp() - time();
+        $delta = $this->retryAfter->format('U.u') - microtime(true);
         if ($delta <= 0) {
             return;
         }
 
-        sleep($delta);
+        usleep((int) ($delta * 1e6));
     }
 }

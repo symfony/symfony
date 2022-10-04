@@ -26,11 +26,11 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
     }
 
     /**
-     * @param array|KeyboardButton[] $buttons
+     * @param KeyboardButton[] $buttons
      *
      * @return $this
      */
-    public function keyboard(array $buttons): self
+    public function keyboard(array $buttons): static
     {
         $buttons = array_map(static function (KeyboardButton $button) {
             return $button->toArray();
@@ -41,21 +41,30 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
         return $this;
     }
 
-    public function resizeKeyboard(bool $bool): self
+    /**
+     * @return $this
+     */
+    public function resizeKeyboard(bool $bool): static
     {
         $this->options['resize_keyboard'] = $bool;
 
         return $this;
     }
 
-    public function oneTimeKeyboard(bool $bool): self
+    /**
+     * @return $this
+     */
+    public function oneTimeKeyboard(bool $bool): static
     {
         $this->options['one_time_keyboard'] = $bool;
 
         return $this;
     }
 
-    public function selective(bool $bool): self
+    /**
+     * @return $this
+     */
+    public function selective(bool $bool): static
     {
         $this->options['selective'] = $bool;
 

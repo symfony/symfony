@@ -85,6 +85,7 @@ class UrlPackageTest extends TestCase
 
             [true, ['http://example.com'], '', 'foo', 'http://example.com/foo?v1'],
             [true, ['http://example.com', 'https://example.com'], '', 'foo', 'https://example.com/foo?v1'],
+            [true, ['', 'https://example.com'], '', 'foo', '/foo?v1'],
         ];
     }
 

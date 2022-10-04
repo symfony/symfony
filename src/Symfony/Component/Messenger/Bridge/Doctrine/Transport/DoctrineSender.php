@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -26,8 +25,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class DoctrineSender implements SenderInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -35,9 +34,6 @@ class DoctrineSender implements SenderInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         $encodedMessage = $this->serializer->encode($envelope);
@@ -48,11 +44,10 @@ class DoctrineSender implements SenderInterface
 
         try {
             $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
         return $envelope->with(new TransportMessageIdStamp($id));
     }
 }
-class_alias(DoctrineSender::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineSender::class);

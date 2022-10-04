@@ -44,15 +44,15 @@
             </trans-unit>
             <trans-unit id="106">
                 <source>Please choose a valid date interval.</source>
-                <target>Per favore, scegli a valid date interval.</target>
+                <target>Per favore, scegli un intervallo di date valido.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Please enter a valid date and time.</source>
-                <target>Per favore, inserisci a valid date and time.</target>
+                <target>Per favore, inserisci una data e ora valida.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Please enter a valid date.</source>
-                <target>Per favore, inserisci a valid date.</target>
+                <target>Per favore, inserisci una data valida.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Please select a valid file.</source>

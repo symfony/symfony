@@ -16,10 +16,12 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements DataTransformerInterface<mixed, array>
  */
 class ValueToDuplicatesTransformer implements DataTransformerInterface
 {
-    private $keys;
+    private array $keys;
 
     public function __construct(array $keys)
     {
@@ -28,12 +30,8 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
 
     /**
      * Duplicates the given value through the array.
-     *
-     * @param mixed $value The value
-     *
-     * @return array The array
      */
-    public function transform($value)
+    public function transform(mixed $value): array
     {
         $result = [];
 
@@ -47,12 +45,10 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
     /**
      * Extracts the duplicated value from an array.
      *
-     * @return mixed The value
-     *
      * @throws TransformationFailedException if the given value is not an array or
-     *                                       if the given array can not be transformed
+     *                                       if the given array cannot be transformed
      */
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array): mixed
     {
         if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');

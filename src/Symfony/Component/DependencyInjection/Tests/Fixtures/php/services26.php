@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -39,14 +39,6 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        ];
-    }
-
     /**
      * Gets the public 'bar' shared service.
      *
@@ -67,13 +59,10 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         return $this->services['test'] = new ${($_ = $this->getEnv('FOO')) && false ?: "_"}($this->getEnv('Bar'), 'foo'.$this->getEnv('string:FOO').'baz', $this->getEnv('int:Baz'));
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -115,13 +104,13 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'bar': $value = $this->getEnv('FOO'); break;
-            case 'baz': $value = $this->getEnv('int:Baz'); break;
-            case 'json': $value = $this->getEnv('json:file:json_file'); break;
-            case 'db_dsn': $value = $this->getEnv('resolve:DB'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $value = match ($name) {
+            'bar' => $this->getEnv('FOO'),
+            'baz' => $this->getEnv('int:Baz'),
+            'json' => $this->getEnv('json:file:json_file'),
+            'db_dsn' => $this->getEnv('resolve:DB'),
+            default => throw new ParameterNotFoundException($name),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

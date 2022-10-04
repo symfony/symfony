@@ -177,6 +177,9 @@ class PhpFileLoaderTest extends TestCase
         $expectedCollection->add('buz', (new Route('/zub'))
             ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
         );
+        $expectedCollection->add('controller_class', (new Route('/controller'))
+            ->setDefaults(['_controller' => ['Acme\MyApp\MyController', 'myAction']])
+        );
         $expectedCollection->add('c_root', (new Route('/sub/pub/'))
             ->setRequirements(['id' => '\d+'])
         );
@@ -285,13 +288,13 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    public function testWhenEnv()
+    public function testImportingAliases()
     {
-        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
-        $routes = $loader->load('when-env.php');
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.php');
 
-        $this->assertSame(['b', 'a'], array_keys($routes->all()));
-        $this->assertSame('/b', $routes->get('b')->getPath());
-        $this->assertSame('/a1', $routes->get('a')->getPath());
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
     }
 }

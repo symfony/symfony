@@ -36,7 +36,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     private const UTF8_BOM = "\xEF\xBB\xBF";
 
-    private $formulasStartCharacters = ['=', '-', '+', '@'];
+    private const FORMULAS_START_CHARACTERS = ['=', '-', '+', '@', "\t", "\r"];
+
     private $defaultContext = [
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
@@ -53,16 +54,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public function __construct(array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
-
-        if (\PHP_VERSION_ID < 70400 && '' === $this->defaultContext[self::ESCAPE_CHAR_KEY]) {
-            $this->defaultContext[self::ESCAPE_CHAR_KEY] = '\\';
-        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function encode($data, string $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = []): string
     {
         $handle = fopen('php://temp,', 'w+');
 
@@ -93,19 +87,20 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         unset($value);
 
         $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
+        $endOfLine = $context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE];
 
         if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
             fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
-            if ("\n" !== ($context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE]) && 0 === fseek($handle, -1, \SEEK_CUR)) {
-                fwrite($handle, $context[self::END_OF_LINE]);
+            if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
+                fwrite($handle, $endOfLine);
             }
         }
 
         $headers = array_fill_keys($headers, '');
         foreach ($data as $row) {
             fputcsv($handle, array_replace($headers, $row), $delimiter, $enclosure, $escapeChar);
-            if ("\n" !== ($context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE]) && 0 === fseek($handle, -1, \SEEK_CUR)) {
-                fwrite($handle, $context[self::END_OF_LINE]);
+            if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
+                fwrite($handle, $endOfLine);
             }
         }
 
@@ -124,24 +119,18 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsEncoding(string $format)
+    public function supportsEncoding(string $format): bool
     {
         return self::FORMAT === $format;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function decode(string $data, string $format, array $context = [])
+    public function decode(string $data, string $format, array $context = []): mixed
     {
         $handle = fopen('php://temp', 'r+');
         fwrite($handle, $data);
         rewind($handle);
 
-        if (0 === strpos($data, self::UTF8_BOM)) {
+        if (str_starts_with($data, self::UTF8_BOM)) {
             fseek($handle, \strlen(self::UTF8_BOM));
         }
 
@@ -210,10 +199,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $result[0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDecoding(string $format)
+    public function supportsDecoding(string $format): bool
     {
         return self::FORMAT === $format;
     }
@@ -227,8 +213,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             if (is_iterable($value)) {
                 $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator, $escapeFormulas);
             } else {
-                if ($escapeFormulas && \in_array(substr((string) $value, 0, 1), $this->formulasStartCharacters, true)) {
-                    $result[$parentKey.$key] = "\t".$value;
+                if ($escapeFormulas && \in_array(substr((string) $value, 0, 1), self::FORMULAS_START_CHARACTERS, true)) {
+                    $result[$parentKey.$key] = "'".$value;
                 } else {
                     // Ensures an actual value is used when dealing with true and false
                     $result[$parentKey.$key] = false === $value ? 0 : (true === $value ? 1 : $value);

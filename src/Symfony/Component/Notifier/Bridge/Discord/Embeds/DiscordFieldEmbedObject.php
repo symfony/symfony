@@ -16,21 +16,30 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
  */
 final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
 {
-    public function name(string $name): self
+    /**
+     * @return $this
+     */
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
         return $this;
     }
 
-    public function value(string $value): self
+    /**
+     * @return $this
+     */
+    public function value(string $value): static
     {
         $this->options['value'] = $value;
 
         return $this;
     }
 
-    public function inline(bool $inline): self
+    /**
+     * @return $this
+     */
+    public function inline(bool $inline): static
     {
         $this->options['inline'] = $inline;
 

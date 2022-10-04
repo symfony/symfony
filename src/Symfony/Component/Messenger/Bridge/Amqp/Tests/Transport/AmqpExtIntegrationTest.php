@@ -76,20 +76,14 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEmpty(iterator_to_array($receiver->get()));
     }
 
-    /**
-     * @group legacy
-     * ^ for now, deprecation errors are thrown during serialization.
-     */
     public function testRetryAndDelay()
     {
-        $serializer = $this->createSerializer();
-
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
         $connection->purgeQueues();
 
-        $sender = new AmqpSender($connection, $serializer);
-        $receiver = new AmqpReceiver($connection, $serializer);
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
 
         // send a first message
         $sender->send($first = new Envelope(new DummyMessage('First')));
@@ -140,6 +134,44 @@ class AmqpExtIntegrationTest extends TestCase
         $receiver->ack($envelope);
     }
 
+    public function testRetryAffectsOnlyOriginalQueue()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
+            'exchange' => [
+                'name' => 'messages_topic',
+                'type' => 'topic',
+                'default_publish_routing_key' => 'topic_routing_key',
+            ],
+            'queues' => [
+                'A' => ['binding_keys' => ['topic_routing_key']],
+                'B' => ['binding_keys' => ['topic_routing_key']],
+            ],
+        ]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
+
+        // initial delivery: should receive in both queues
+        $sender->send(new Envelope(new DummyMessage('Payload')));
+
+        $receivedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(2, $receivedEnvelopes);
+        $this->assertArrayHasKey('A', $receivedEnvelopes);
+        $this->assertArrayHasKey('B', $receivedEnvelopes);
+
+        // retry: should receive in only "A" queue
+        $retryEnvelope = $receivedEnvelopes['A']
+            ->with(new DelayStamp(10))
+            ->with(new RedeliveryStamp(1));
+        $sender->send($retryEnvelope);
+
+        $retriedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(1, $retriedEnvelopes);
+        $this->assertArrayHasKey('A', $retriedEnvelopes);
+    }
+
     public function testItReceivesSignals()
     {
         $serializer = $this->createSerializer();
@@ -181,9 +213,11 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertSame($expectedOutput.<<<'TXT'
 Get envelope with message: Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage
 with stamps: [
+    "Symfony\\Component\\Messenger\\Stamp\\SerializedMessageStamp",
     "Symfony\\Component\\Messenger\\Bridge\\Amqp\\Transport\\AmqpReceivedStamp",
     "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp",
-    "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp"
+    "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp",
+    "Symfony\\Component\\Messenger\\Stamp\\AckStamp"
 ]
 Done.
 
@@ -214,7 +248,7 @@ TXT
         $timedOutTime = time() + $timeoutInSeconds;
 
         while (time() < $timedOutTime) {
-            if (0 === strpos($process->getOutput(), $output)) {
+            if (str_starts_with($process->getOutput(), $output)) {
                 return;
             }
 
@@ -254,5 +288,20 @@ TXT
         }
 
         return $envelopes;
+    }
+
+    private function receiveWithQueueName(AmqpReceiver $receiver)
+    {
+        // let RabbitMQ receive messages
+        usleep(100 * 1000); // 100ms
+
+        $receivedEnvelopes = [];
+        foreach ($receiver->get() as $envelope) {
+            $queueName = $envelope->last(AmqpReceivedStamp::class)->getQueueName();
+            $receivedEnvelopes[$queueName] = $envelope;
+            $receiver->ack($envelope);
+        }
+
+        return $receivedEnvelopes;
     }
 }

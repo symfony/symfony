@@ -1,0 +1,30 @@
+imports:
+  - { resource: ./../config/framework.yml }
+
+services:
+  _defaults: { public: true }
+
+  security.user.provider.array:
+    class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider
+
+security:
+  password_hashers:
+    \Symfony\Component\Security\Core\User\UserInterface: plaintext
+
+  providers:
+    array:
+      id: security.user.provider.array
+
+  firewalls:
+    default:
+      form_login:
+        check_path: login
+        remember_me: true
+        require_previous_session: false
+      logout: ~
+      stateless: false
+
+  access_control:
+    - { path: ^/admin$, roles: ROLE_ADMIN }
+    - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: .*, roles: IS_AUTHENTICATED_FULLY }

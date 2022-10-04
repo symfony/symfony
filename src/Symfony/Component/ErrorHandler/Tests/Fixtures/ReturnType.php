@@ -7,6 +7,7 @@ use Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeInterface;
 
 class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtures\OutsideInterface
 {
+    public function __construct() { }
     public function returnTypeGrandParent() { }
     public function returnTypeParentInterface() { }
     public function returnTypeInterface() { }

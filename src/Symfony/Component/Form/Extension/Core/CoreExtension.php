@@ -28,9 +28,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CoreExtension extends AbstractExtension
 {
-    private $propertyAccessor;
-    private $choiceListFactory;
-    private $translator;
+    private PropertyAccessorInterface $propertyAccessor;
+    private ChoiceListFactoryInterface $choiceListFactory;
+    private ?TranslatorInterface $translator;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
     {
@@ -39,13 +39,13 @@ class CoreExtension extends AbstractExtension
         $this->translator = $translator;
     }
 
-    protected function loadTypes()
+    protected function loadTypes(): array
     {
         return [
             new Type\FormType($this->propertyAccessor),
             new Type\BirthdayType(),
             new Type\CheckboxType(),
-            new Type\ChoiceType($this->choiceListFactory),
+            new Type\ChoiceType($this->choiceListFactory, $this->translator),
             new Type\CollectionType(),
             new Type\CountryType(),
             new Type\DateIntervalType(),
@@ -80,7 +80,7 @@ class CoreExtension extends AbstractExtension
         ];
     }
 
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new TransformationFailureExtension($this->translator),

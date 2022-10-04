@@ -20,35 +20,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class LogoutTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testSessionLessRememberMeLogout(array $options)
+    public function testCsrfTokensAreClearedOnLogout()
     {
-        $client = $this->createClient($options + ['test_case' => 'RememberMeLogout', 'root_config' => 'config.yml']);
-
-        $client->request('POST', '/login', [
-            '_username' => 'johannes',
-            '_password' => 'test',
-        ]);
-
-        $cookieJar = $client->getCookieJar();
-        $cookieJar->expire(session_name());
-
-        $this->assertNotNull($cookieJar->get('REMEMBERME'));
-        $this->assertSame('lax', $cookieJar->get('REMEMBERME')->getSameSite());
-
-        $client->request('GET', '/logout');
-
-        $this->assertNull($cookieJar->get('REMEMBERME'));
-    }
-
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testCsrfTokensAreClearedOnLogout(array $options)
-    {
-        $client = $this->createClient($options + ['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
+        $client = $this->createClient(['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
         $client->disableReboot();
         $this->callInRequestContext($client, function () {
             static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
@@ -71,12 +45,9 @@ class LogoutTest extends AbstractWebTestCase
         });
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testAccessControlDoesNotApplyOnLogout(array $options)
+    public function testAccessControlDoesNotApplyOnLogout()
     {
-        $client = $this->createClient($options + ['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
 
         $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
         $client->request('GET', '/logout');

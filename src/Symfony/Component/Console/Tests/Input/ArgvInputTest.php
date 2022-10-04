@@ -25,7 +25,6 @@ class ArgvInputTest extends TestCase
         $input = new ArgvInput();
         $r = new \ReflectionObject($input);
         $p = $r->getProperty('tokens');
-        $p->setAccessible(true);
 
         $this->assertEquals(['foo'], $p->getValue($input), '__construct() automatically get its input from the argv server variable');
     }
@@ -211,6 +210,24 @@ class ArgvInputTest extends TestCase
             [
                 ['cli.php', '--no-foo'],
                 [new InputOption('foo', null, InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE)],
+                ['foo' => false],
+                '->parse() parses long options without a value',
+            ],
+            [
+                ['cli.php'],
+                [new InputOption('foo', null, InputOption::VALUE_NEGATABLE)],
+                ['foo' => null],
+                '->parse() parses long options without a value',
+            ],
+            [
+                ['cli.php'],
+                [new InputOption('foo', null, InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE)],
+                ['foo' => null],
+                '->parse() parses long options without a value',
+            ],
+            [
+                ['cli.php'],
+                [new InputOption('foo', null, InputOption::VALUE_NEGATABLE, '', false)],
                 ['foo' => false],
                 '->parse() parses long options without a value',
             ],

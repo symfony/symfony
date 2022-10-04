@@ -18,22 +18,27 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
+trigger_deprecation('symfony/validator', '6.1', 'The "%s" constraint is deprecated since symfony 6.1, use "ExpressionSyntaxValidator" instead.', ExpressionLanguageSyntaxValidator::class);
+
 /**
  * @author Andrey Sevastianov <mrpkmail@gmail.com>
+ *
+ * @deprecated since symfony 6.1, use ExpressionSyntaxValidator instead
  */
 class ExpressionLanguageSyntaxValidator extends ConstraintValidator
 {
-    private $expressionLanguage;
+    private ?ExpressionLanguage $expressionLanguage;
 
     public function __construct(ExpressionLanguage $expressionLanguage = null)
     {
+        if (!class_exists(ExpressionLanguage::class)) {
+            throw new \LogicException(sprintf('The "%s" class requires the "ExpressionLanguage" component. Try running "composer require symfony/expression-language".', self::class));
+        }
+
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($expression, Constraint $constraint): void
+    public function validate(mixed $expression, Constraint $constraint): void
     {
         if (!$constraint instanceof ExpressionLanguageSyntax) {
             throw new UnexpectedTypeException($constraint, ExpressionLanguageSyntax::class);

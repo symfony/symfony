@@ -12,6 +12,7 @@
 namespace Symfony\Component\PasswordHasher\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -25,6 +26,7 @@ class UserPasswordHashCommandTest extends TestCase
 {
     /** @var CommandTester */
     private $passwordHasherCommandTester;
+    private $colSize;
 
     public function testEncodePasswordEmptySalt()
     {
@@ -262,7 +264,7 @@ class UserPasswordHashCommandTest extends TestCase
   [2] Custom\Class\Test\User
   [3] Symfony\Component\Security\Core\User\InMemoryUser
 EOTXT
-        , $this->passwordHasherCommandTester->getDisplay(true));
+            , $this->passwordHasherCommandTester->getDisplay(true));
     }
 
     public function testNonInteractiveEncodePasswordUsesFirstUserClass()
@@ -285,9 +287,35 @@ EOTXT
         ], ['interactive' => false]);
     }
 
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testCompletionSuggestions(array $input, array $expectedSuggestions)
+    {
+        $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);
+        $tester = new CommandCompletionTester($command);
+
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'user_class_empty' => [
+            ['p@ssw0rd', ''],
+            ['App\Entity\User'],
+        ];
+
+        yield 'user_class_given' => [
+            ['p@ssw0rd', 'App'],
+            ['App\Entity\User'],
+        ];
+    }
+
     protected function setUp(): void
     {
+        $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
+
         $hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => ['algorithm' => 'plaintext'],
             'Custom\Class\Native\User' => ['algorithm' => 'native', 'cost' => 10],
@@ -304,12 +332,11 @@ EOTXT
     protected function tearDown(): void
     {
         $this->passwordHasherCommandTester = null;
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     private function setupArgon2i()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Argon2i\User' => ['algorithm' => 'argon2i'],
         ]);
@@ -321,8 +348,6 @@ EOTXT
 
     private function setupArgon2id()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Argon2id\User' => ['algorithm' => 'argon2id'],
         ]);
@@ -334,8 +359,6 @@ EOTXT
 
     private function setupBcrypt()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Bcrypt\User' => ['algorithm' => 'bcrypt'],
         ]);
@@ -348,8 +371,6 @@ EOTXT
 
     private function setupSodium()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Sodium\User' => ['algorithm' => 'sodium'],
         ]);

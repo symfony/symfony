@@ -13,5 +13,6 @@ This is a class with a doc comment.
   Abstract         no                                                                           
   Autowired        no                                                                           
   Autoconfigured   no                                                                           
+  Usages           none                                                                         
  ---------------- -----------------------------------------------------------------------------
 

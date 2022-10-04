@@ -14,6 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\ExtensionWithoutConfigTestBundle\ExtensionWithoutConfigTestBundle;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
@@ -34,7 +37,7 @@ class TranslationDebugCommandTest extends TestCase
         $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
         $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
-        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_MISSING, $res);
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_MISSING, $res);
     }
 
     public function testDebugUnusedMessages()
@@ -43,7 +46,7 @@ class TranslationDebugCommandTest extends TestCase
         $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
         $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
-        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_UNUSED, $res);
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_UNUSED, $res);
     }
 
     public function testDebugFallbackMessages()
@@ -52,7 +55,7 @@ class TranslationDebugCommandTest extends TestCase
         $res = $tester->execute(['locale' => 'fr', 'bundle' => 'foo']);
 
         $this->assertMatchesRegularExpression('/fallback/', $tester->getDisplay());
-        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_FALLBACK, $res);
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_FALLBACK, $res);
     }
 
     public function testNoDefinedMessages()
@@ -61,7 +64,7 @@ class TranslationDebugCommandTest extends TestCase
         $res = $tester->execute(['locale' => 'fr', 'bundle' => 'test']);
 
         $this->assertMatchesRegularExpression('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
-        $this->assertEquals(TranslationDebugCommand::EXIT_CODE_GENERAL_ERROR, $res);
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_GENERAL_ERROR, $res);
     }
 
     public function testDebugDefaultDirectory()
@@ -72,7 +75,7 @@ class TranslationDebugCommandTest extends TestCase
 
         $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
         $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
-        $this->assertEquals($expectedExitStatus, $res);
+        $this->assertSame($expectedExitStatus, $res);
     }
 
     public function testDebugDefaultRootDirectory()
@@ -90,7 +93,7 @@ class TranslationDebugCommandTest extends TestCase
 
         $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
         $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
-        $this->assertEquals($expectedExitStatus, $res);
+        $this->assertSame($expectedExitStatus, $res);
     }
 
     public function testDebugCustomDirectory()
@@ -110,7 +113,7 @@ class TranslationDebugCommandTest extends TestCase
 
         $this->assertMatchesRegularExpression('/missing/', $tester->getDisplay());
         $this->assertMatchesRegularExpression('/unused/', $tester->getDisplay());
-        $this->assertEquals($expectedExitStatus, $res);
+        $this->assertSame($expectedExitStatus, $res);
     }
 
     public function testDebugInvalidDirectory()
@@ -126,6 +129,22 @@ class TranslationDebugCommandTest extends TestCase
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
+    public function testNoErrorWithOnlyMissingOptionAndNoResults()
+    {
+        $tester = $this->createCommandTester([], ['foo' => 'foo']);
+        $res = $tester->execute(['locale' => 'en', '--only-missing' => true]);
+
+        $this->assertSame(Command::SUCCESS, $res);
+    }
+
+    public function testNoErrorWithOnlyUnusedOptionAndNoResults()
+    {
+        $tester = $this->createCommandTester(['foo' => 'foo']);
+        $res = $tester->execute(['locale' => 'en', '--only-unused' => true]);
+
+        $this->assertSame(Command::SUCCESS, $res);
+    }
+
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
@@ -139,7 +158,12 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
+    private function createCommandTester(array $extractedMessages = [], array $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
+    {
+        return new CommandTester($this->createCommand($extractedMessages, $loadedMessages, $kernel, $transPaths, $codePaths));
+    }
+
+    private function createCommand(array $extractedMessages = [], array $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ExtractorInterface $extractor = null, array $bundles = [], array $enabledLocales = []): TranslationDebugCommand
     {
         $translator = $this->createMock(Translator::class);
         $translator
@@ -147,15 +171,17 @@ class TranslationDebugCommandTest extends TestCase
             ->method('getFallbackLocales')
             ->willReturn(['en']);
 
-        $extractor = $this->createMock(ExtractorInterface::class);
-        $extractor
-            ->expects($this->any())
-            ->method('extract')
-            ->willReturnCallback(
-                function ($path, $catalogue) use ($extractedMessages) {
-                    $catalogue->add($extractedMessages);
-                }
-            );
+        if (!$extractor) {
+            $extractor = $this->createMock(ExtractorInterface::class);
+            $extractor
+                ->expects($this->any())
+                ->method('extract')
+                ->willReturnCallback(
+                    function ($path, $catalogue) use ($extractedMessages) {
+                        $catalogue->add($extractedMessages);
+                    }
+                );
+        }
 
         $loader = $this->createMock(TranslationReader::class);
         $loader
@@ -182,7 +208,7 @@ class TranslationDebugCommandTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getBundles')
-            ->willReturn([]);
+            ->willReturn($bundles);
 
         $container = new Container();
         $kernel
@@ -190,12 +216,12 @@ class TranslationDebugCommandTest extends TestCase
             ->method('getContainer')
             ->willReturn($container);
 
-        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths);
+        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths, $enabledLocales);
 
         $application = new Application($kernel);
         $application->add($command);
 
-        return new CommandTester($application->find('debug:translation'));
+        return $application->find('debug:translation');
     }
 
     private function getBundle($path)
@@ -208,5 +234,56 @@ class TranslationDebugCommandTest extends TestCase
         ;
 
         return $bundle;
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $extractedMessagesWithDomains = [
+            'messages' => [
+                'foo' => 'foo',
+            ],
+            'validators' => [
+                'foo' => 'foo',
+            ],
+            'custom_domain' => [
+                'foo' => 'foo',
+            ],
+        ];
+        $extractor = $this->createMock(ExtractorInterface::class);
+        $extractor
+            ->expects($this->any())
+            ->method('extract')
+            ->willReturnCallback(
+                function ($path, $catalogue) use ($extractedMessagesWithDomains) {
+                    foreach ($extractedMessagesWithDomains as $domain => $message) {
+                        $catalogue->add($message, $domain);
+                    }
+                }
+            );
+
+        $tester = new CommandCompletionTester($this->createCommand([], [], null, [], [], $extractor, [new ExtensionWithoutConfigTestBundle()], ['fr', 'nl']));
+        $suggestions = $tester->complete($input);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'locale' => [
+            [''],
+            ['fr', 'nl'],
+        ];
+
+        yield 'bundle' => [
+            ['fr', '--domain', 'messages', ''],
+            ['ExtensionWithoutConfigTestBundle', 'extension_without_config_test'],
+        ];
+
+        yield 'option --domain' => [
+            ['en', '--domain', ''],
+            ['messages', 'validators', 'custom_domain'],
+        ];
     }
 }

@@ -48,31 +48,27 @@ class MockSplFileInfo extends \SplFileInfo
         }
     }
 
-    public function isFile()
+    public function isFile(): bool
     {
         if (null === $this->type) {
-            return false !== strpos($this->getFilename(), 'file');
+            return str_contains($this->getFilename(), 'file');
         }
 
         return self::TYPE_FILE === $this->type;
     }
 
-    public function isDir()
+    public function isDir(): bool
     {
         if (null === $this->type) {
-            return false !== strpos($this->getFilename(), 'directory');
+            return str_contains($this->getFilename(), 'directory');
         }
 
         return self::TYPE_DIRECTORY === $this->type;
     }
 
-    public function isReadable()
+    public function isReadable(): bool
     {
-        if (null === $this->mode) {
-            return preg_match('/r\+/', $this->getFilename());
-        }
-
-        return preg_match('/r\+/', $this->mode);
+        return (bool) preg_match('/r\+/', $this->mode ?? $this->getFilename());
     }
 
     public function getContents()
@@ -93,18 +89,13 @@ class MockSplFileInfo extends \SplFileInfo
     public function setType($type)
     {
         if (\is_string($type)) {
-            switch ($type) {
-                case 'directory':
-                case 'd':
-                    $this->type = self::TYPE_DIRECTORY;
-                    break;
-                case 'file':
-                case 'f':
-                    $this->type = self::TYPE_FILE;
-                    break;
-                default:
-                    $this->type = self::TYPE_UNKNOWN;
-            }
+            $this->type = match ($type) {
+                'directory',
+                'd' => self::TYPE_DIRECTORY,
+                'file',
+                'f' => self::TYPE_FILE,
+                default => self::TYPE_UNKNOWN,
+            };
         } else {
             $this->type = $type;
         }

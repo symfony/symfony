@@ -42,7 +42,7 @@ class FormErrorNormalizerTest extends TestCase
                 new FormError('a', 'b', ['c', 'd'], 5, 'f'),
                 new FormError(1, 2, [3, 4], 5, 6),
             ])
-        );
+            );
     }
 
     public function testSupportsNormalizationWithWrongClass()
@@ -130,21 +130,21 @@ class FormErrorNormalizerTest extends TestCase
             ->willReturn(new FormErrorIterator($form1, [
                 new FormError('b'),
             ])
-        );
+            );
         $form1->method('getName')->willReturn('form1');
 
         $form2->method('getErrors')
             ->willReturn(new FormErrorIterator($form1, [
                 new FormError('c'),
             ])
-        );
+            );
         $form2->method('getName')->willReturn('form2');
 
         $form3->method('getErrors')
             ->willReturn(new FormErrorIterator($form1, [
                 new FormError('d'),
             ])
-        );
+            );
         $form3->method('getName')->willReturn('form3');
 
         $form2->method('all')->willReturn([$form3]);
@@ -156,7 +156,7 @@ class FormErrorNormalizerTest extends TestCase
             ->willReturn(new FormErrorIterator($form, [
                 new FormError('a'),
             ])
-        );
+            );
 
         $this->assertEquals($exptected, $this->normalizer->normalize($form));
     }

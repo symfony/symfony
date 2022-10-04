@@ -309,9 +309,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                    function ($data) { return $data; },
-                    function () { throw new TransformationFailedException(); }
-                ))
+                function ($data) { return $data; },
+                function () { throw new TransformationFailedException(); }
+            ))
             ->getForm();
 
         // Launch transformer
@@ -366,7 +366,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     public function testTransformationFailedExceptionInvalidMessageIsUsed()
     {
-        $object = $this->createMock('\stdClass');
+        $object = new \stdClass();
 
         $form = $this
             ->getBuilder('name', '\stdClass', [
@@ -736,7 +736,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     private function getCompoundForm($data, array $options = [])
     {
-        return $this->getBuilder('name', \is_object($data) ? \get_class($data) : null, $options)
+        return $this->getBuilder('name', \is_object($data) ? $data::class : null, $options)
             ->setData($data)
             ->setCompound(true)
             ->setDataMapper(new DataMapper())

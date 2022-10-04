@@ -139,13 +139,14 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
         $config = [
             'security' => [
+                'enable_authenticator_manager' => true,
                 'providers' => ['some_provider' => ['id' => 'foo']],
                 'firewalls' => ['some_firewall' => ['security' => false]],
             ],
         ];
 
         $ext = new FrameworkExtension();
-        $ext->load(['framework' => ['csrf_protection' => false, 'router' => ['resource' => 'dummy', 'utf8' => true]]], $container);
+        $ext->load(['framework' => ['http_method_override' => false, 'csrf_protection' => false, 'router' => ['resource' => 'dummy', 'utf8' => true]]], $container);
 
         $ext = new SecurityExtension();
         $ext->load($config, $container);

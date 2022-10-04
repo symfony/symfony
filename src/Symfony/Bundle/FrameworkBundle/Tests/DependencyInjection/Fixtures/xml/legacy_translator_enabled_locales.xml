@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config secret="s3cr3t" ide="file%%link%%format" default-locale="fr" http-method-override="false">
+        <framework:router resource="%kernel.project_dir%/config/routing.xml" type="xml" utf8="true" />
+        <framework:translator enabled="true" fallback="fr" logging="true" cache-dir="%kernel.cache_dir%/translations">
+            <framework:path>%kernel.project_dir%/Fixtures/translations</framework:path>
+            <framework:enabled-locale>fr</framework:enabled-locale>
+            <framework:enabled-locale>en</framework:enabled-locale>
+        </framework:translator>
+    </framework:config>
+</container>

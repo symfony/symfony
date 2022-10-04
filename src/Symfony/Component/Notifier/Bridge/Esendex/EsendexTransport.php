@@ -20,18 +20,19 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class EsendexTransport extends AbstractTransport
 {
     protected const HOST = 'api.esendex.com';
 
-    private $email;
-    private $password;
-    private $accountReference;
-    private $from;
+    private string $email;
+    private string $password;
+    private string $accountReference;
+    private string $from;
 
-    public function __construct(string $email, string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $email, #[\SensitiveParameter] string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->email = $email;
         $this->password = $password;
@@ -62,22 +63,39 @@ final class EsendexTransport extends AbstractTransport
             'body' => $message->getSubject(),
         ];
 
-        if (null !== $this->from) {
+        if ('' !== $message->getFrom()) {
+            $messageData['from'] = $message->getFrom();
+        } elseif (null !== $this->from) {
             $messageData['from'] = $this->from;
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
             'auth_basic' => sprintf('%s:%s', $this->email, $this->password),
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
             'json' => [
                 'accountreference' => $this->accountReference,
                 'messages' => [$messageData],
             ],
         ]);
 
-        $statusCode = $response->getStatusCode();
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Esendex server.', $response, 0, $e);
+        }
 
         if (200 === $statusCode) {
-            return new SentMessage($message, (string) $this);
+            $result = $response->toArray();
+            $sentMessage = new SentMessage($message, (string) $this);
+
+            $messageId = $result['batch']['messageheaders'][0]['id'] ?? null;
+            if ($messageId) {
+                $sentMessage->setMessageId($messageId);
+            }
+
+            return $sentMessage;
         }
 
         $message = sprintf('Unable to send the SMS: error %d.', $statusCode);
@@ -89,10 +107,10 @@ final class EsendexTransport extends AbstractTransport
 
                 $message .= sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
             }
-        } catch (HttpClientTransportException $e) {
+        } catch (HttpClientTransportException) {
             // Catching this exception is useful to keep compatibility, with symfony/http-client < 4.4.10
             // See https://github.com/symfony/symfony/pull/37065
-        } catch (JsonException $e) {
+        } catch (JsonException) {
         }
 
         throw new TransportException($message, $response);

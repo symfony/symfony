@@ -23,9 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LanguageType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -43,7 +40,7 @@ class LanguageType extends AbstractType
                             try {
                                 $languageCode = $useAlpha3Codes ? Languages::getAlpha3Code($alpha2Code) : $alpha2Code;
                                 $languagesList[$languageCode] = Languages::getName($alpha2Code, $alpha2Code);
-                            } catch (MissingResourceException $e) {
+                            } catch (MissingResourceException) {
                                 // ignore errors like "Couldn't read the indices for the locale 'meta'"
                             }
                         }
@@ -58,11 +55,7 @@ class LanguageType extends AbstractType
             'choice_translation_locale' => null,
             'alpha3' => false,
             'choice_self_translation' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid language.';
-            },
+            'invalid_message' => 'Please select a valid language.',
         ]);
 
         $resolver->setAllowedTypes('choice_self_translation', ['bool']);
@@ -78,18 +71,12 @@ class LanguageType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'language';
     }

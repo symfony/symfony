@@ -28,10 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MarkdownDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function describe(OutputInterface $output, $object, array $options = [])
+    public function describe(OutputInterface $output, object $object, array $options = [])
     {
         $decorated = $output->isDecorated();
         $output->setDecorated(false);
@@ -41,17 +38,11 @@ class MarkdownDescriptor extends Descriptor
         $output->setDecorated($decorated);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function write(string $content, bool $decorated = true)
     {
         parent::write($content, $decorated);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         $this->write(
@@ -63,9 +54,6 @@ class MarkdownDescriptor extends Descriptor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
         $name = '--'.$option->getName();
@@ -87,9 +75,6 @@ class MarkdownDescriptor extends Descriptor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         if ($showArguments = \count($definition->getArguments()) > 0) {
@@ -117,15 +102,12 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeCommand(Command $command, array $options = [])
     {
         if ($options['short'] ?? false) {
             $this->write(
                 '`'.$command->getName()."`\n"
-                .str_repeat('-', Helper::strlen($command->getName()) + 2)."\n\n"
+                .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 .'### Usage'."\n\n"
                 .array_reduce($command->getAliases(), function ($carry, $usage) {
@@ -140,7 +122,7 @@ class MarkdownDescriptor extends Descriptor
 
         $this->write(
             '`'.$command->getName()."`\n"
-            .str_repeat('-', Helper::strlen($command->getName()) + 2)."\n\n"
+            .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
             .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
@@ -160,16 +142,13 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeApplication(Application $application, array $options = [])
     {
         $describedNamespace = $options['namespace'] ?? null;
         $description = new ApplicationDescription($application, $describedNamespace);
         $title = $this->getApplicationTitle($application);
 
-        $this->write($title."\n".str_repeat('=', Helper::strlen($title)));
+        $this->write($title."\n".str_repeat('=', Helper::width($title)));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {

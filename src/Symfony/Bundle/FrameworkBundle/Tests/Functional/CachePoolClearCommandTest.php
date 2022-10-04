@@ -33,7 +33,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.private_pool']], ['decorated' => false]);
 
-        $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
+        $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
         $this->assertStringContainsString('Clearing cache pool: cache.private_pool', $tester->getDisplay());
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
@@ -43,7 +43,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.public_pool']], ['decorated' => false]);
 
-        $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
+        $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
         $this->assertStringContainsString('Clearing cache pool: cache.public_pool', $tester->getDisplay());
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
@@ -53,7 +53,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.pool_with_clearer']], ['decorated' => false]);
 
-        $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
+        $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
         $this->assertStringContainsString('Clearing cache pool: cache.pool_with_clearer', $tester->getDisplay());
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
@@ -63,7 +63,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.app_clearer']], ['decorated' => false]);
 
-        $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
+        $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
         $this->assertStringContainsString('Calling cache clearer: cache.app_clearer', $tester->getDisplay());
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
@@ -86,7 +86,6 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $pool->save($item);
         $r = new \ReflectionObject($pool);
         $p = $r->getProperty('directory');
-        $p->setAccessible(true);
         $poolDir = $p->getValue($pool);
 
         /** @var SplFileInfo $entry */

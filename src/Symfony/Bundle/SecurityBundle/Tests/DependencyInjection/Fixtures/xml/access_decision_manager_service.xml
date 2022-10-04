@@ -7,7 +7,7 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <config>
+    <config enable-authenticator-manager="true">
         <access-decision-manager service="app.access_decision_manager" />
 
         <provider name="default">

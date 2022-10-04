@@ -90,42 +90,27 @@ class ArrayChoiceList implements ChoiceListInterface
         $this->structuredValues = $structuredValues;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getChoices()
+    public function getChoices(): array
     {
         return $this->choices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValues()
+    public function getValues(): array
     {
         return array_map('strval', array_keys($this->choices));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStructuredValues()
+    public function getStructuredValues(): array
     {
         return $this->structuredValues;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOriginalKeys()
+    public function getOriginalKeys(): array
     {
         return $this->originalKeys;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getChoicesForValues(array $values)
+    public function getChoicesForValues(array $values): array
     {
         $choices = [];
 
@@ -138,10 +123,7 @@ class ArrayChoiceList implements ChoiceListInterface
         return $choices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValuesForChoices(array $choices)
+    public function getValuesForChoices(array $choices): array
     {
         $values = [];
 
@@ -219,7 +201,7 @@ class ArrayChoiceList implements ChoiceListInterface
                 }
 
                 continue;
-            } elseif (!is_scalar($choice)) {
+            } elseif (!\is_scalar($choice)) {
                 return false;
             }
 

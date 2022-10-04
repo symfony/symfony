@@ -23,8 +23,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmazonSqsSender implements SenderInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer)
     {
@@ -32,9 +32,6 @@ class AmazonSqsSender implements SenderInterface
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         $encodedMessage = $this->serializer->encode($envelope);
@@ -45,6 +42,7 @@ class AmazonSqsSender implements SenderInterface
 
         $messageGroupId = null;
         $messageDeduplicationId = null;
+        $xrayTraceId = null;
 
         /** @var AmazonSqsFifoStamp|null $amazonSqsFifoStamp */
         $amazonSqsFifoStamp = $envelope->last(AmazonSqsFifoStamp::class);
@@ -53,13 +51,18 @@ class AmazonSqsSender implements SenderInterface
             $messageDeduplicationId = $amazonSqsFifoStamp->getMessageDeduplicationId();
         }
 
+        /** @var AmazonSqsXrayTraceHeaderStamp|null $amazonSqsXrayTraceHeaderStamp */
+        $amazonSqsXrayTraceHeaderStamp = $envelope->last(AmazonSqsXrayTraceHeaderStamp::class);
+        $xrayTraceId = $amazonSqsXrayTraceHeaderStamp?->getTraceId();
+
         try {
             $this->connection->send(
                 $encodedMessage['body'],
                 $encodedMessage['headers'] ?? [],
                 $delay,
                 $messageGroupId,
-                $messageDeduplicationId
+                $messageDeduplicationId,
+                $xrayTraceId
             );
         } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);

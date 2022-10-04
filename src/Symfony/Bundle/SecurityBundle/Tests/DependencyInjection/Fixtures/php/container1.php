@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'enable_authenticator_manager' => true,
     'password_hashers' => [
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => [
@@ -70,26 +71,24 @@ $container->loadFromExtension('security', [
             'provider' => 'default',
             'http_basic' => true,
             'form_login' => true,
-            'anonymous' => true,
             'switch_user' => true,
             'x509' => true,
             'remote_user' => true,
             'logout' => true,
             'remember_me' => ['secret' => 'TheSecret'],
             'user_checker' => null,
+            'entry_point' => 'form_login',
         ],
         'host' => [
             'provider' => 'default',
             'pattern' => '/test',
             'host' => 'foo\\.example\\.org',
             'methods' => ['GET', 'POST'],
-            'anonymous' => true,
             'http_basic' => true,
         ],
         'with_user_checker' => [
             'provider' => 'default',
             'user_checker' => 'app.user_checker',
-            'anonymous' => true,
             'http_basic' => true,
         ],
     ],

@@ -1,0 +1,7 @@
+framework:
+    http_method_override: false
+    serializer:
+        enabled: true
+    profiler:
+        enabled: true
+        collect_serializer_data: true

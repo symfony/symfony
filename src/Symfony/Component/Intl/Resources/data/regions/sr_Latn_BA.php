@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'Names' => [
+        'BY' => 'Bjelorusija',
+        'CC' => 'Kokosova (Kiling) ostrva',
+        'CG' => 'Kongo',
+        'CV' => 'Kabo Verde',
+        'CZ' => 'Češka Republika',
+        'DE' => 'Njemačka',
+        'GS' => 'Južna Džordžija i Južna Sendvička ostrva',
+        'GU' => 'Gvam',
+        'HK' => 'Hongkong (SAO Kine)',
+        'HM' => 'ostrvo Herd i ostrva Makdonald',
+        'KN' => 'Sveti Kits i Nevis',
+        'KP' => 'Sjeverna Koreja',
+        'MK' => 'Sjeverna Makedonija',
+        'MO' => 'SAR Makao',
+        'MP' => 'Sjeverna Marijanska ostrva',
+        'NF' => 'ostrvo Norfok',
+        'NU' => 'Nijue',
+        'PM' => 'Sveti Pjer i Mikelon',
+        'PS' => 'palestinske teritorije',
+        'RE' => 'Reunion',
+        'UM' => 'Spoljna ostrva SAD',
+        'VC' => 'Sveti Vinsent i Grenadini',
+        'VG' => 'Britanska Djevičanska Ostrva',
+        'VI' => 'Američka Djevičanska Ostrva',
+    ],
+];

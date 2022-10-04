@@ -18,11 +18,18 @@ class DateTimeTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
+    private $defaultLocale;
+
     protected function setUp(): void
     {
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
-
         parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function testSubmitDateTime()
@@ -516,7 +523,6 @@ class DateTimeTypeTest extends BaseTypeTest
     public function testSingleTextWidgetWithCustomNonHtml5Format()
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTime('2019-02-13 19:12:13'), [
-            'html5' => false,
             'widget' => 'single_text',
             'date_format' => \IntlDateFormatter::SHORT,
             'format' => null,

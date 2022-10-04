@@ -836,6 +836,29 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame($view->vars['id'], $view['child1']->vars['attr']['form']);
         $this->assertSame($view->vars['id'], $view['child2']->vars['attr']['form']);
     }
+
+    public function testSortingViewChildrenBasedOnPriorityOption()
+    {
+        $view = $this->factory->createNamedBuilder('parent', self::TESTED_TYPE)
+            ->add('child1', null, ['priority' => -1])
+            ->add('child2')
+            ->add('child3', null, ['priority' => -1])
+            ->add('child4')
+            ->add('child5', null, ['priority' => 1])
+            ->add('child6')
+            ->getForm()
+            ->createView();
+
+        $expected = [
+            'child5',
+            'child2',
+            'child4',
+            'child6',
+            'child1',
+            'child3',
+        ];
+        $this->assertSame($expected, array_keys($view->children));
+    }
 }
 
 class Money

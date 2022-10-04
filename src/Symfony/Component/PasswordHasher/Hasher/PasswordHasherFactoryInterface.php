@@ -13,7 +13,6 @@ namespace Symfony\Component\PasswordHasher\Hasher;
 
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * PasswordHasherFactoryInterface to support different password hashers for different user accounts.
@@ -26,9 +25,7 @@ interface PasswordHasherFactoryInterface
     /**
      * Returns the password hasher to use for the given user.
      *
-     * @param PasswordAuthenticatedUserInterface|UserInterface|string $user A PasswordAuthenticatedUserInterface/UserInterface instance or a class name
-     *
      * @throws \RuntimeException When no password hasher could be found for the user
      */
-    public function getPasswordHasher($user): PasswordHasherInterface;
+    public function getPasswordHasher(string|PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user): PasswordHasherInterface;
 }

@@ -15,15 +15,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * A base class to make form login authentication easier!
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 5.3
  */
 abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
@@ -33,8 +31,6 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
     abstract protected function getLoginUrl(Request $request): string;
 
     /**
-     * {@inheritdoc}
-     *
      * Override to change the request conditions that have to be
      * matched in order to handle the login form submit.
      *
@@ -43,7 +39,7 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
      */
     public function supports(Request $request): bool
     {
-        return $request->isMethod('POST') && $this->getLoginUrl($request) === $request->getPathInfo();
+        return $request->isMethod('POST') && $this->getLoginUrl($request) === $request->getBaseUrl().$request->getPathInfo();
     }
 
     /**
@@ -52,7 +48,7 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         if ($request->hasSession()) {
-            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+            $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
         }
 
         $url = $this->getLoginUrl($request);

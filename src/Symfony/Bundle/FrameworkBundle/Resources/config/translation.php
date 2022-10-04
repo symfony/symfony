@@ -39,11 +39,13 @@ use Symfony\Component\Translation\Loader\PoFileLoader;
 use Symfony\Component\Translation\Loader\QtFileLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -114,6 +116,10 @@ return static function (ContainerConfigurator $container) {
         ->set('translation.dumper.xliff', XliffFileDumper::class)
             ->tag('translation.dumper', ['alias' => 'xlf'])
 
+        ->set('translation.dumper.xliff.xliff', XliffFileDumper::class)
+            ->args(['xliff'])
+            ->tag('translation.dumper', ['alias' => 'xliff'])
+
         ->set('translation.dumper.po', PoFileDumper::class)
             ->tag('translation.dumper', ['alias' => 'po'])
 
@@ -158,5 +164,15 @@ return static function (ContainerConfigurator $container) {
             ->args([service(ContainerInterface::class)])
             ->tag('container.service_subscriber', ['id' => 'translator'])
             ->tag('kernel.cache_warmer')
+
+        ->set('translation.locale_switcher', LocaleSwitcher::class)
+            ->args([
+                param('kernel.default_locale'),
+                tagged_iterator('kernel.locale_aware'),
+                service('router.request_context')->ignoreOnInvalid(),
+            ])
+            ->tag('kernel.reset', ['method' => 'reset'])
+        ->alias(LocaleAwareInterface::class, 'translation.locale_switcher')
+        ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
     ;
 };

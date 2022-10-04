@@ -285,4 +285,23 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
+
+    public function testViolationOnPass()
+    {
+        $constraint = new Expression([
+            'expression' => 'value + custom != 2',
+            'values' => [
+                'custom' => 1,
+            ],
+            'negate' => false,
+        ]);
+
+        $this->validator->validate(2, $constraint);
+
+        $this->buildViolation('This value is not valid.')
+            ->atPath('property.path')
+            ->setParameter('{{ value }}', 2)
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
+            ->assertRaised();
+    }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
 class ApiAuthenticator extends AbstractAuthenticator
@@ -37,10 +37,10 @@ class ApiAuthenticator extends AbstractAuthenticator
         return $request->headers->has('X-USER-EMAIL');
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         $email = $request->headers->get('X-USER-EMAIL');
-        if (false === strpos($email, '@')) {
+        if (!str_contains($email, '@')) {
             throw new BadCredentialsException('Email is not a valid email address.');
         }
 

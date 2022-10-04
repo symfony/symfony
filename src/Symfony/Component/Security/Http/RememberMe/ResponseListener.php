@@ -24,6 +24,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ResponseListener implements EventSubscriberInterface
 {
+    /**
+     * This attribute name can be used by the implementation if it needs to set
+     * a cookie on the Request when there is no actual Response, yet.
+     */
+    public const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
+
     public function onKernelResponse(ResponseEvent $event)
     {
         if (!$event->isMainRequest()) {
@@ -33,14 +39,11 @@ class ResponseListener implements EventSubscriberInterface
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        if ($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME)) {
-            $response->headers->setCookie($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+        if ($request->attributes->has(self::COOKIE_ATTR_NAME)) {
+            $response->headers->setCookie($request->attributes->get(self::COOKIE_ATTR_NAME));
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [KernelEvents::RESPONSE => 'onKernelResponse'];

@@ -22,18 +22,17 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.3
  */
 class PasswordUpgradeBadge implements BadgeInterface
 {
-    private $plaintextPassword;
-    private $passwordUpgrader;
+    private ?string $plaintextPassword = null;
+    private ?PasswordUpgraderInterface $passwordUpgrader;
 
     /**
      * @param string                         $plaintextPassword The presented password, used in the rehash
      * @param PasswordUpgraderInterface|null $passwordUpgrader  The password upgrader, defaults to the UserProvider if null
      */
-    public function __construct(string $plaintextPassword, ?PasswordUpgraderInterface $passwordUpgrader = null)
+    public function __construct(string $plaintextPassword, PasswordUpgraderInterface $passwordUpgrader = null)
     {
         $this->plaintextPassword = $plaintextPassword;
         $this->passwordUpgrader = $passwordUpgrader;

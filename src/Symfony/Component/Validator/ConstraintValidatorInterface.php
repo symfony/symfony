@@ -25,8 +25,6 @@ interface ConstraintValidatorInterface
 
     /**
      * Checks if the passed value is valid.
-     *
-     * @param mixed $value The value that should be validated
      */
-    public function validate($value, Constraint $constraint);
+    public function validate(mixed $value, Constraint $constraint);
 }

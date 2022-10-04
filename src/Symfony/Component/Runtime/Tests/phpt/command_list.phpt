@@ -32,7 +32,7 @@ Options:
       --no-debug        Switches off debug mode.
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
-Available commands:
+Available commands:%A
   help        Display%S help for a command
   list        List%S commands
   my_command  Hello description

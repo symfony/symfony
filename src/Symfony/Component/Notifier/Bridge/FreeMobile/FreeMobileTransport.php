@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\FreeMobile;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,11 +29,11 @@ final class FreeMobileTransport extends AbstractTransport
 {
     protected const HOST = 'smsapi.free-mobile.fr/sendmsg';
 
-    private $login;
-    private $password;
-    private $phone;
+    private string $login;
+    private string $password;
+    private string $phone;
 
-    public function __construct(string $login, string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, #[\SensitiveParameter] string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;
@@ -56,17 +58,28 @@ final class FreeMobileTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        /** @var SmsMessage $message */
+        if ('' !== $message->getFrom()) {
+            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
+        }
+
         $endpoint = sprintf('https://%s', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
-            'json' => [
+            'query' => [
                 'user' => $this->login,
                 'pass' => $this->password,
                 'msg' => $message->getSubject(),
             ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote FreeMobile server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             $errors = [
                 400 => 'Missing required parameter or wrongly formatted message.',
                 402 => 'Too many messages have been sent too fast.',
@@ -74,7 +87,7 @@ final class FreeMobileTransport extends AbstractTransport
                 500 => 'Server error, please try again later.',
             ];
 
-            throw new TransportException(sprintf('Unable to send the SMS: error %d: ', $response->getStatusCode()).($errors[$response->getStatusCode()] ?? ''), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: error %d: ', $statusCode).($errors[$statusCode] ?? ''), $response);
         }
 
         return new SentMessage($message, (string) $this);

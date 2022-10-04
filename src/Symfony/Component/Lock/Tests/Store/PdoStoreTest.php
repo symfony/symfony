@@ -20,6 +20,7 @@ use Symfony\Component\Lock\Store\PdoStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension pdo_sqlite
+ * @group integration
  */
 class PdoStoreTest extends AbstractStoreTest
 {
@@ -40,17 +41,11 @@ class PdoStoreTest extends AbstractStoreTest
         @unlink(self::$dbFile);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new PdoStore('sqlite:'.self::$dbFile);
@@ -72,7 +67,7 @@ class PdoStoreTest extends AbstractStoreTest
     {
         $this->expectException(InvalidTtlException::class);
 
-        return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
+        return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0);
     }
 
     /**
@@ -84,7 +79,6 @@ class PdoStoreTest extends AbstractStoreTest
 
         try {
             $store = new PdoStore($dsn);
-            $store->createTable();
 
             $store->save($key);
             $this->assertTrue($store->exists($key));
@@ -98,10 +92,7 @@ class PdoStoreTest extends AbstractStoreTest
     public function provideDsn()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
         yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
         yield ['sqlite::memory:'];
     }
 }

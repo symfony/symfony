@@ -13,9 +13,6 @@ namespace Symfony\Component\ErrorHandler\Error;
 
 class UndefinedMethodError extends \Error
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $message, \Throwable $previous)
     {
         parent::__construct($message, $previous->getCode(), $previous->getPrevious());
@@ -26,7 +23,6 @@ class UndefinedMethodError extends \Error
             'trace' => $previous->getTrace(),
         ] as $property => $value) {
             $refl = new \ReflectionProperty(\Error::class, $property);
-            $refl->setAccessible(true);
             $refl->setValue($this, $value);
         }
     }

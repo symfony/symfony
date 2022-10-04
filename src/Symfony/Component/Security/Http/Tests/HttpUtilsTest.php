@@ -20,8 +20,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class HttpUtilsTest extends TestCase
 {
@@ -162,9 +162,9 @@ class HttpUtilsTest extends TestCase
     }
 
     /**
-     * @dataProvider provideSecurityContextAttributes
+     * @dataProvider provideSecurityRequestAttributes
      */
-    public function testCreateRequestPassesSecurityContextAttributesToTheNewRequest($attribute)
+    public function testCreateRequestPassesSecurityRequestAttributesToTheNewRequest($attribute)
     {
         $request = $this->getRequest();
         $request->attributes->set($attribute, 'foo');
@@ -175,12 +175,12 @@ class HttpUtilsTest extends TestCase
         $this->assertSame('foo', $subRequest->attributes->get($attribute));
     }
 
-    public function provideSecurityContextAttributes()
+    public function provideSecurityRequestAttributes()
     {
         return [
-            [Security::AUTHENTICATION_ERROR],
-            [Security::ACCESS_DENIED_ERROR],
-            [Security::LAST_USERNAME],
+            [SecurityRequestAttributes::AUTHENTICATION_ERROR],
+            [SecurityRequestAttributes::ACCESS_DENIED_ERROR],
+            [SecurityRequestAttributes::LAST_USERNAME],
         ];
     }
 
@@ -280,13 +280,6 @@ class HttpUtilsTest extends TestCase
 
         $utils = new HttpUtils(null, $urlMatcher);
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
-    }
-
-    public function testUrlMatcher()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface');
-        new HttpUtils($this->getUrlGenerator(), new \stdClass());
     }
 
     public function testGenerateUriRemovesQueryString()

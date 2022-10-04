@@ -13,6 +13,7 @@ namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 
 class SodiumPasswordHasherTest extends TestCase
@@ -33,7 +34,7 @@ class SodiumPasswordHasherTest extends TestCase
         $this->assertFalse($hasher->verify($result, '', null));
     }
 
-    public function testBCryptValidation()
+    public function testBcryptValidation()
     {
         $hasher = new SodiumPasswordHasher();
         $this->assertTrue($hasher->verify('$2y$04$M8GDODMoGQLQRpkYCdoJh.lbiZPee3SZI32RcYK49XYTolDGwoRMm', 'abc', null));
@@ -61,6 +62,24 @@ class SodiumPasswordHasherTest extends TestCase
         $result = $hasher->hash(str_repeat('a', 4096), null);
         $this->assertFalse($hasher->verify($result, str_repeat('a', 4097), null));
         $this->assertTrue($hasher->verify($result, str_repeat('a', 4096), null));
+    }
+
+    public function testBcryptWithLongPassword()
+    {
+        $hasher = new SodiumPasswordHasher(null, null, 4);
+        $plainPassword = str_repeat('a', 100);
+
+        $this->assertFalse($hasher->verify(password_hash($plainPassword, \PASSWORD_BCRYPT, ['cost' => 4]), $plainPassword, 'salt'));
+        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT))->hash($plainPassword), $plainPassword, 'salt'));
+    }
+
+    public function testBcryptWithNulByte()
+    {
+        $hasher = new SodiumPasswordHasher(null, null, 4);
+        $plainPassword = "a\0b";
+
+        $this->assertFalse($hasher->verify(password_hash($plainPassword, \PASSWORD_BCRYPT, ['cost' => 4]), $plainPassword, 'salt'));
+        $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT))->hash($plainPassword), $plainPassword, 'salt'));
     }
 
     public function testUserProvidedSaltIsNotUsed()

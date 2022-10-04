@@ -26,8 +26,8 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $opsLimit;
-    private $memLimit;
+    private int $opsLimit;
+    private int $memLimit;
 
     public function __construct(int $opsLimit = null, int $memLimit = null)
     {
@@ -52,7 +52,7 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
         return version_compare(\extension_loaded('sodium') ? \SODIUM_LIBRARY_VERSION : phpversion('libsodium'), '1.0.14', '>=');
     }
 
-    public function hash(string $plainPassword): string
+    public function hash(#[\SensitiveParameter] string $plainPassword): string
     {
         if ($this->isPasswordTooLong($plainPassword)) {
             throw new InvalidPasswordException();
@@ -69,7 +69,7 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
         throw new LogicException('Libsodium is not available. You should either install the sodium extension or use a different password hasher.');
     }
 
-    public function verify(string $hashedPassword, string $plainPassword): bool
+    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword): bool
     {
         if ('' === $plainPassword) {
             return false;
@@ -79,9 +79,13 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
             return false;
         }
 
-        if (0 !== strpos($hashedPassword, '$argon')) {
+        if (!str_starts_with($hashedPassword, '$argon')) {
+            if (str_starts_with($hashedPassword, '$2') && (72 < \strlen($plainPassword) || str_contains($plainPassword, "\0"))) {
+                $plainPassword = base64_encode(hash('sha512', $plainPassword, true));
+            }
+
             // Accept validating non-argon passwords for seamless migrations
-            return (72 >= \strlen($plainPassword) || 0 !== strpos($hashedPassword, '$2')) && password_verify($plainPassword, $hashedPassword);
+            return password_verify($plainPassword, $hashedPassword);
         }
 
         if (\function_exists('sodium_crypto_pwhash_str_verify')) {

@@ -38,7 +38,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\')',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
     }

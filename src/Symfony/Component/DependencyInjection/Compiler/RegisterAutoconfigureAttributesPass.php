@@ -24,19 +24,39 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 {
-    private $registerForAutoconfiguration;
+    private static $registerForAutoconfiguration;
 
-    public function __construct()
+    public function process(ContainerBuilder $container)
     {
-        if (80000 > \PHP_VERSION_ID) {
-            return;
+        foreach ($container->getDefinitions() as $id => $definition) {
+            if ($this->accept($definition) && $class = $container->getReflectionClass($definition->getClass(), false)) {
+                $this->processClass($container, $class);
+            }
+        }
+    }
+
+    public function accept(Definition $definition): bool
+    {
+        return $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes');
+    }
+
+    public function processClass(ContainerBuilder $container, \ReflectionClass $class)
+    {
+        foreach ($class->getAttributes(Autoconfigure::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            self::registerForAutoconfiguration($container, $class, $attribute);
+        }
+    }
+
+    private static function registerForAutoconfiguration(ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute)
+    {
+        if (self::$registerForAutoconfiguration) {
+            return (self::$registerForAutoconfiguration)($container, $class, $attribute);
         }
 
         $parseDefinitions = new \ReflectionMethod(YamlFileLoader::class, 'parseDefinitions');
-        $parseDefinitions->setAccessible(true);
         $yamlLoader = $parseDefinitions->getDeclaringClass()->newInstanceWithoutConstructor();
 
-        $this->registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
+        self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
             $attribute = (array) $attribute->newInstance();
 
             foreach ($attribute['tags'] ?? [] as $i => $tag) {
@@ -54,36 +74,11 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
                         ],
                     ],
                 ],
-                $class->getFileName()
+                $class->getFileName(),
+                false
             );
         };
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        if (80000 > \PHP_VERSION_ID) {
-            return;
-        }
-
-        foreach ($container->getDefinitions() as $id => $definition) {
-            if ($this->accept($definition) && null !== $class = $container->getReflectionClass($definition->getClass())) {
-                $this->processClass($container, $class);
-            }
-        }
-    }
-
-    public function accept(Definition $definition): bool
-    {
-        return 80000 <= \PHP_VERSION_ID && $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes');
-    }
-
-    public function processClass(ContainerBuilder $container, \ReflectionClass $class)
-    {
-        foreach ($class->getAttributes(Autoconfigure::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-            ($this->registerForAutoconfiguration)($container, $class, $attribute);
-        }
+        return (self::$registerForAutoconfiguration)($container, $class, $attribute);
     }
 }

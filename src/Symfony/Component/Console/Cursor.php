@@ -18,79 +18,112 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class Cursor
 {
-    private $output;
+    private OutputInterface $output;
     private $input;
 
+    /**
+     * @param resource|null $input
+     */
     public function __construct(OutputInterface $output, $input = null)
     {
         $this->output = $output;
         $this->input = $input ?? (\defined('STDIN') ? \STDIN : fopen('php://input', 'r+'));
     }
 
-    public function moveUp(int $lines = 1): self
+    /**
+     * @return $this
+     */
+    public function moveUp(int $lines = 1): static
     {
         $this->output->write(sprintf("\x1b[%dA", $lines));
 
         return $this;
     }
 
-    public function moveDown(int $lines = 1): self
+    /**
+     * @return $this
+     */
+    public function moveDown(int $lines = 1): static
     {
         $this->output->write(sprintf("\x1b[%dB", $lines));
 
         return $this;
     }
 
-    public function moveRight(int $columns = 1): self
+    /**
+     * @return $this
+     */
+    public function moveRight(int $columns = 1): static
     {
         $this->output->write(sprintf("\x1b[%dC", $columns));
 
         return $this;
     }
 
-    public function moveLeft(int $columns = 1): self
+    /**
+     * @return $this
+     */
+    public function moveLeft(int $columns = 1): static
     {
         $this->output->write(sprintf("\x1b[%dD", $columns));
 
         return $this;
     }
 
-    public function moveToColumn(int $column): self
+    /**
+     * @return $this
+     */
+    public function moveToColumn(int $column): static
     {
         $this->output->write(sprintf("\x1b[%dG", $column));
 
         return $this;
     }
 
-    public function moveToPosition(int $column, int $row): self
+    /**
+     * @return $this
+     */
+    public function moveToPosition(int $column, int $row): static
     {
         $this->output->write(sprintf("\x1b[%d;%dH", $row + 1, $column));
 
         return $this;
     }
 
-    public function savePosition(): self
+    /**
+     * @return $this
+     */
+    public function savePosition(): static
     {
         $this->output->write("\x1b7");
 
         return $this;
     }
 
-    public function restorePosition(): self
+    /**
+     * @return $this
+     */
+    public function restorePosition(): static
     {
         $this->output->write("\x1b8");
 
         return $this;
     }
 
-    public function hide(): self
+    /**
+     * @return $this
+     */
+    public function hide(): static
     {
         $this->output->write("\x1b[?25l");
 
         return $this;
     }
 
-    public function show(): self
+    /**
+     * @return $this
+     */
+    public function show(): static
     {
         $this->output->write("\x1b[?25h\x1b[?0c");
 
@@ -99,8 +132,10 @@ final class Cursor
 
     /**
      * Clears all the output from the current line.
+     *
+     * @return $this
      */
-    public function clearLine(): self
+    public function clearLine(): static
     {
         $this->output->write("\x1b[2K");
 
@@ -119,8 +154,10 @@ final class Cursor
 
     /**
      * Clears all the output from the cursors' current position to the end of the screen.
+     *
+     * @return $this
      */
-    public function clearOutput(): self
+    public function clearOutput(): static
     {
         $this->output->write("\x1b[0J");
 
@@ -129,8 +166,10 @@ final class Cursor
 
     /**
      * Clears the entire screen.
+     *
+     * @return $this
      */
-    public function clearScreen(): self
+    public function clearScreen(): static
     {
         $this->output->write("\x1b[2J");
 
@@ -144,8 +183,8 @@ final class Cursor
     {
         static $isTtySupported;
 
-        if (null === $isTtySupported && \function_exists('proc_open')) {
-            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
+        if (null === $isTtySupported) {
+            $isTtySupported = ('/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT));
         }
 
         if (!$isTtySupported) {

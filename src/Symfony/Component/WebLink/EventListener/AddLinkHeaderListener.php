@@ -29,7 +29,7 @@ class_exists(HttpHeaderSerializer::class);
  */
 class AddLinkHeaderListener implements EventSubscriberInterface
 {
-    private $serializer;
+    private HttpHeaderSerializer $serializer;
 
     public function __construct()
     {
@@ -50,9 +50,6 @@ class AddLinkHeaderListener implements EventSubscriberInterface
         $event->getResponse()->headers->set('Link', $this->serializer->serialize($links), false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [KernelEvents::RESPONSE => 'onKernelResponse'];

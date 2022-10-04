@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\LightSms;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -19,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -28,9 +28,9 @@ final class LightSmsTransport extends AbstractTransport
 {
     protected const HOST = 'www.lightsms.com';
 
-    private $login;
-    private $password;
-    private $from;
+    private string $login;
+    private string $password;
+    private string $from;
 
     private const ERROR_CODES = [
         1 => 'Missing Signature',
@@ -68,14 +68,14 @@ final class LightSmsTransport extends AbstractTransport
         33 => 'Missing phone number',
         34 => 'Phone is in stop list',
         35 => 'Not enough money',
-        36 => 'Can not obtain information about phone',
+        36 => 'Cannot obtain information about phone',
         37 => 'Base Id is not set',
         38 => 'Phone number already exists in this database',
         39 => 'Phone number does not exist in this database',
         999 => 'Unknown Error',
     ];
 
-    public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, #[\SensitiveParameter] string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;
@@ -100,10 +100,12 @@ final class LightSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $data = [
             'login' => $this->login,
             'phone' => $phone = $this->escapePhoneNumber($message->getPhone()),
-            'sender' => $this->from,
+            'sender' => $from,
             'text' => $message->getSubject(),
             'timestamp' => time(),
         ];
@@ -118,7 +120,13 @@ final class LightSmsTransport extends AbstractTransport
             ]
         );
 
-        if (Response::HTTP_OK !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote LightSms server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             throw new TransportException('Unable to send the SMS.', $response);
         }
 

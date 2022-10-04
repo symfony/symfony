@@ -12,8 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\LoginLink\FirewallAwareLoginLinkHandler;
+use Symfony\Component\Security\Core\Signature\ExpiredSignatureStorage;
+use Symfony\Component\Security\Core\Signature\SignatureHasher;
 use Symfony\Component\Security\Http\Authenticator\LoginLinkAuthenticator;
-use Symfony\Component\Security\Http\LoginLink\ExpiredLoginLinkStorage;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
@@ -34,14 +35,20 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('router'),
                 abstract_arg('user provider'),
+                abstract_arg('signature hasher'),
+                abstract_arg('options'),
+            ])
+
+        ->set('security.authenticator.abstract_login_link_signature_hasher', SignatureHasher::class)
+            ->args([
                 service('property_accessor'),
                 abstract_arg('signature properties'),
                 '%kernel.secret%',
-                abstract_arg('options'),
-                abstract_arg('expired login link storage'),
+                abstract_arg('expired signature storage'),
+                abstract_arg('max signature uses'),
             ])
 
-        ->set('security.authenticator.expired_login_link_storage', ExpiredLoginLinkStorage::class)
+        ->set('security.authenticator.expired_login_link_storage', ExpiredSignatureStorage::class)
             ->abstract()
             ->args([
                 abstract_arg('cache pool service'),
@@ -59,13 +66,5 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
             ])
         ->alias(LoginLinkHandlerInterface::class, 'security.authenticator.firewall_aware_login_link_handler')
-
-        ->set('security.authenticator.entity_login_link_user_handler', EntityLoginLinkUserHandler::class)
-            ->abstract()
-            ->args([
-                service('doctrine'),
-                abstract_arg('user entity class name'),
-            ])
-
     ;
 };

@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Link za prijavljivanje je istekao ili je neispravan.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Previše neuspešnih pokušaja prijavljivanja, molim pokušajte ponovo za %minutes% minut.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Previše neuspešnih pokušaja prijavljivanja, molim pokušajte ponovo za %minutes% minuta.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

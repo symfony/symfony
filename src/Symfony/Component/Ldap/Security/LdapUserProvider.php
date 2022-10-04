@@ -12,12 +12,14 @@
 namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Exception\ExceptionInterface;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
+use Symfony\Component\Ldap\Exception\InvalidSearchCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -31,17 +33,17 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private $ldap;
-    private $baseDn;
-    private $searchDn;
-    private $searchPassword;
-    private $defaultRoles;
-    private $uidKey;
-    private $defaultSearch;
-    private $passwordAttribute;
-    private $extraFields;
+    private LdapInterface $ldap;
+    private string $baseDn;
+    private ?string $searchDn;
+    private ?string $searchPassword;
+    private array $defaultRoles;
+    private ?string $uidKey;
+    private string $defaultSearch;
+    private ?string $passwordAttribute;
+    private array $extraFields;
 
-    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
+    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, #[\SensitiveParameter] string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
     {
         if (null === $uidKey) {
             $uidKey = 'sAMAccountName';
@@ -63,12 +65,10 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * @internal for compatibility with Symfony 5.4
      */
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
-        trigger_deprecation('symfony/ldap', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
-
         return $this->loadUserByIdentifier($username);
     }
 
@@ -76,15 +76,17 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     {
         try {
             $this->ldap->bind($this->searchDn, $this->searchPassword);
-            $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
-            $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
-            $search = $this->ldap->query($this->baseDn, $query);
-        } catch (ConnectionException $e) {
-            $e = new UserNotFoundException(sprintf('User "%s" not found.', $identifier), 0, $e);
-            $e->setUserIdentifier($identifier);
-
-            throw $e;
+        } catch (InvalidCredentialsException) {
+            throw new InvalidSearchCredentialsException();
         }
+
+        $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
+        $query = str_replace('{username}', '{user_identifier}', $this->defaultSearch, $replaceCount);
+        if ($replaceCount > 0) {
+            trigger_deprecation('symfony/ldap', '6.2', 'Using "{username}" parameter in LDAP configuration is deprecated, consider using "{user_identifier}" instead.');
+        }
+        $query = str_replace('{user_identifier}', $identifier, $query);
+        $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
 
         $entries = $search->execute();
         $count = \count($entries);
@@ -109,16 +111,13 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             if (null !== $this->uidKey) {
                 $identifier = $this->getAttributeValue($entry, $this->uidKey);
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
         }
 
         return $this->loadUser($identifier, $entry);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof LdapUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
@@ -128,11 +127,9 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
-    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof LdapUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
@@ -143,28 +140,23 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         try {
-            $user->getEntry()->setAttribute($this->passwordAttribute, [$newEncodedPassword]);
+            $user->getEntry()->setAttribute($this->passwordAttribute, [$newHashedPassword]);
             $this->ldap->getEntryManager()->update($user->getEntry());
-            $user->setPassword($newEncodedPassword);
-        } catch (ExceptionInterface $e) {
+            $user->setPassword($newHashedPassword);
+        } catch (ExceptionInterface) {
             // ignore failed password upgrades
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return LdapUser::class === $class;
     }
 
     /**
      * Loads a user from an LDAP entry.
-     *
-     * @return UserInterface
      */
-    protected function loadUser(string $identifier, Entry $entry)
+    protected function loadUser(string $identifier, Entry $entry): UserInterface
     {
         $password = null;
         $extraFields = [];

@@ -1,7 +1,0 @@
-imports:
-    - { resource: ./localized_form_failure_handler.yml }
-
-security:
-    firewalls:
-        default:
-            anonymous: ~

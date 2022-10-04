@@ -34,8 +34,6 @@ class GraphvizDumper implements DumperInterface
     ];
 
     /**
-     * {@inheritdoc}
-     *
      * Dumps the workflow as a graphviz graph.
      *
      * Available options:
@@ -44,7 +42,7 @@ class GraphvizDumper implements DumperInterface
      *  * node: The default options for nodes (places + transitions)
      *  * edge: The default options for edges
      */
-    public function dump(Definition $definition, Marking $marking = null, array $options = [])
+    public function dump(Definition $definition, Marking $marking = null, array $options = []): string
     {
         $places = $this->findPlaces($definition, $marking);
         $transitions = $this->findTransitions($definition);
@@ -73,7 +71,7 @@ class GraphvizDumper implements DumperInterface
             if (\in_array($place, $definition->getInitialPlaces(), true)) {
                 $attributes['style'] = 'filled';
             }
-            if ($marking && $marking->has($place)) {
+            if ($marking?->has($place)) {
                 $attributes['color'] = '#FF0000';
                 $attributes['shape'] = 'doublecircle';
             }
@@ -245,7 +243,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function escape($value): string
+    protected function escape(string|bool $value): string
     {
         return \is_bool($value) ? ($value ? '1' : '0') : addslashes($value);
     }

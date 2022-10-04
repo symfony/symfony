@@ -20,15 +20,11 @@ interface VersionStrategyInterface
 {
     /**
      * Returns the asset version for an asset.
-     *
-     * @return string The version string
      */
-    public function getVersion(string $path);
+    public function getVersion(string $path): string;
 
     /**
      * Applies version to the supplied path.
-     *
-     * @return string The versionized path
      */
-    public function applyVersion(string $path);
+    public function applyVersion(string $path): string;
 }

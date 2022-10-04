@@ -405,6 +405,32 @@ class EventDispatcherTest extends TestCase
 
         $this->assertTrue($testLoaded);
     }
+
+    public function testNamedClosures()
+    {
+        $listener = new TestEventListener();
+
+        $callback1 = $listener(...);
+        $callback2 = $listener(...);
+        $callback3 = (new TestEventListener())(...);
+
+        $this->assertNotSame($callback1, $callback2);
+        $this->assertNotSame($callback1, $callback3);
+        $this->assertNotSame($callback2, $callback3);
+        $this->assertTrue($callback1 == $callback2);
+        $this->assertFalse($callback1 == $callback3);
+
+        $this->dispatcher->addListener('foo', $callback1, 3);
+        $this->dispatcher->addListener('foo', $callback2, 2);
+        $this->dispatcher->addListener('foo', $callback3, 1);
+
+        $this->assertSame(3, $this->dispatcher->getListenerPriority('foo', $callback1));
+        $this->assertSame(3, $this->dispatcher->getListenerPriority('foo', $callback2));
+
+        $this->dispatcher->removeListener('foo', $callback1);
+
+        $this->assertSame(['foo' => [$callback3]], $this->dispatcher->getListeners());
+    }
 }
 
 class CallableClass
@@ -416,6 +442,7 @@ class CallableClass
 
 class TestEventListener
 {
+    public $name;
     public $preFooInvoked = false;
     public $postFooInvoked = false;
 
@@ -433,6 +460,10 @@ class TestEventListener
         if (!$this->preFooInvoked) {
             $e->stopPropagation();
         }
+    }
+
+    public function __invoke()
+    {
     }
 }
 

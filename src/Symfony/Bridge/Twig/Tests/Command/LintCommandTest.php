@@ -14,7 +14,9 @@ namespace Symfony\Bridge\Twig\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -107,7 +109,54 @@ class LintCommandTest extends TestCase
         self::assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
+    public function testLintIncorrectFileWithGithubFormat()
+    {
+        $filename = $this->createFile('{{ foo');
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => [$filename], '--format' => 'github'], ['decorated' => false]);
+        self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertStringMatchesFormat('%A::error file=%s,line=1,col=0::Unexpected token "end of template" ("end of print statement" expected).%A', trim($tester->getDisplay()));
+    }
+
+    public function testLintAutodetectsGithubActionEnvironment()
+    {
+        $prev = getenv('GITHUB_ACTIONS');
+        putenv('GITHUB_ACTIONS');
+
+        try {
+            putenv('GITHUB_ACTIONS=1');
+
+            $filename = $this->createFile('{{ foo');
+            $tester = $this->createCommandTester();
+
+            $tester->execute(['filename' => [$filename]], ['decorated' => false]);
+            self::assertStringMatchesFormat('%A::error file=%s,line=1,col=0::Unexpected token "end of template" ("end of print statement" expected).%A', trim($tester->getDisplay()));
+        } finally {
+            putenv('GITHUB_ACTIONS'.($prev ? "=$prev" : ''));
+        }
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $tester = new CommandCompletionTester($this->createCommand());
+
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+    }
+
     private function createCommandTester(): CommandTester
+    {
+        return new CommandTester($this->createCommand());
+    }
+
+    private function createCommand(): Command
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
         $environment->addFilter(new TwigFilter('deprecated_filter', function ($v) {
@@ -118,9 +167,8 @@ class LintCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $command = $application->find('lint:twig');
 
-        return new CommandTester($command);
+        return $application->find('lint:twig');
     }
 
     private function createFile($content): string

@@ -32,6 +32,11 @@ class TestAppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
+        $loader->load(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_method_override' => false,
+            ]);
+        });
     }
 
     protected function build(ContainerBuilder $container)

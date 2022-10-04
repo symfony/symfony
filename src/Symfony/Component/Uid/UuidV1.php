@@ -16,16 +16,18 @@ namespace Symfony\Component\Uid;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class UuidV1 extends Uuid
+class UuidV1 extends Uuid implements TimeBasedUidInterface
 {
     protected const TYPE = 1;
+
+    private static string $clockSeq;
 
     public function __construct(string $uuid = null)
     {
         if (null === $uuid) {
             $this->uid = uuid_create(static::TYPE);
         } else {
-            parent::__construct($uuid);
+            parent::__construct($uuid, true);
         }
     }
 
@@ -41,11 +43,25 @@ class UuidV1 extends Uuid
 
     public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
     {
-        $uuid = uuid_create(static::TYPE);
+        $uuid = !$time || !$node ? uuid_create(static::TYPE) : parent::NIL;
 
-        if (null !== $time) {
+        if ($time) {
+            if ($node) {
+                // use clock_seq from the node
+                $seq = substr($node->uid, 19, 4);
+            } elseif (!$seq = self::$clockSeq ?? '') {
+                // generate a static random clock_seq to prevent any collisions with the real one
+                $seq = substr($uuid, 19, 4);
+
+                do {
+                    self::$clockSeq = sprintf('%04x', random_int(0, 0x3FFF) | 0x8000);
+                } while ($seq === self::$clockSeq);
+
+                $seq = self::$clockSeq;
+            }
+
             $time = BinaryUtil::dateTimeToHex($time);
-            $uuid = substr($time, 8).'-'.substr($time, 4, 4).'-1'.substr($time, 1, 3).substr($uuid, 18);
+            $uuid = substr($time, 8).'-'.substr($time, 4, 4).'-1'.substr($time, 1, 3).'-'.$seq.substr($uuid, 23);
         }
 
         if ($node) {

@@ -25,10 +25,7 @@ class NullOutputFormatterTest extends TestCase
     {
         $formatter = new NullOutputFormatter();
 
-        $message = 'this message will not be changed';
-        $formatter->format($message);
-
-        $this->assertSame('this message will not be changed', $message);
+        $this->assertNull($formatter->format('this message will be destroyed'));
     }
 
     public function testGetStyle()

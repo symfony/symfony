@@ -23,22 +23,21 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/deprecation-contracts": "^2.1",
-        "symfony/polyfill-php80": "^1.15",
-        "symfony/string": "^5.1"
+        "php": ">=8.1",
+        "symfony/string": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/serializer": "^4.4|^5.0",
-        "symfony/cache": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
-        "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
+        "symfony/serializer": "^5.4|^6.0",
+        "symfony/cache": "^5.4|^6.0",
+        "symfony/dependency-injection": "^5.4|^6.0",
+        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpstan/phpdoc-parser": "^1.0",
         "doctrine/annotations": "^1.10.4"
     },
     "conflict": {
-        "phpdocumentor/reflection-docblock": "<3.2.2",
-        "phpdocumentor/type-resolver": "<1.4.0",
-        "symfony/dependency-injection": "<4.4"
+        "phpdocumentor/reflection-docblock": "<5.2",
+        "phpdocumentor/type-resolver": "<1.5.1",
+        "symfony/dependency-injection": "<5.4"
     },
     "suggest": {
         "psr/cache-implementation": "To cache results",

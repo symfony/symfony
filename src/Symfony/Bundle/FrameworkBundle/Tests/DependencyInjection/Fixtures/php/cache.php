@@ -1,16 +1,12 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'cache' => [
         'pools' => [
             'cache.foo' => [
                 'adapter' => 'cache.adapter.apcu',
                 'default_lifetime' => 30,
-            ],
-            'cache.bar' => [
-                'adapter' => 'cache.adapter.doctrine',
-                'default_lifetime' => 5,
-                'provider' => 'app.doctrine_cache_provider',
             ],
             'cache.baz' => [
                 'adapter' => 'cache.adapter.filesystem',
@@ -34,6 +30,11 @@ $container->loadFromExtension('framework', [
                     'cache.adapter.filesystem',
                     'redis://foo' => 'cache.adapter.redis',
                 ],
+            ],
+            'cache.ccc' => [
+                'adapter' => 'cache.adapter.array',
+                'default_lifetime' => 410,
+                'tags' => true,
             ],
             'cache.redis_tag_aware.foo' => [
                 'adapter' => 'cache.adapter.redis_tag_aware',

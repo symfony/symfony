@@ -20,11 +20,6 @@ namespace Symfony\Component\Routing;
 class RouteCompiler implements RouteCompilerInterface
 {
     /**
-     * @deprecated since Symfony 5.1, to be removed in 6.0
-     */
-    public const REGEX_DELIMITER = '#';
-
-    /**
      * This string defines the characters that are automatically considered separators in front of
      * optional placeholders (with default and no static text following). Such a single separator
      * can be left out together with the optional placeholder from matching and generating URLs.
@@ -40,14 +35,12 @@ class RouteCompiler implements RouteCompilerInterface
     public const VARIABLE_MAXIMUM_LENGTH = 32;
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \InvalidArgumentException if a path variable is named _fragment
      * @throws \LogicException           if a variable is referenced more than once
      * @throws \DomainException          if a variable name starts with a digit or if it is too long to be successfully used as
      *                                   a PCRE subpattern
      */
-    public static function compile(Route $route)
+    public static function compile(Route $route): CompiledRoute
     {
         $hostVariables = [];
         $variables = [];
@@ -122,7 +115,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
-        preg_match_all('#\{(!)?(\w+)\}#', $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);
+        preg_match_all('#\{(!)?([\w\x80-\xFF]+)\}#', $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);
         foreach ($matches as $match) {
             $important = $match[1][1] >= 0;
             $varName = $match[2][0];
@@ -138,7 +131,7 @@ class RouteCompiler implements RouteCompilerInterface
             } else {
                 $precedingChar = substr($precedingText, -1);
             }
-            $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
+            $isSeparator = '' !== $precedingChar && str_contains(static::SEPARATORS, $precedingChar);
 
             // A PCRE subpattern name must start with a non-digit. Also a PHP variable cannot start with a digit so the
             // variable would not be usable as a Controller action argument.
@@ -155,7 +148,7 @@ class RouteCompiler implements RouteCompilerInterface
 
             if ($isSeparator && $precedingText !== $precedingChar) {
                 $tokens[] = ['text', substr($precedingText, 0, -\strlen($precedingChar))];
-            } elseif (!$isSeparator && \strlen($precedingText) > 0) {
+            } elseif (!$isSeparator && '' !== $precedingText) {
                 $tokens[] = ['text', $precedingText];
             }
 
@@ -175,7 +168,7 @@ class RouteCompiler implements RouteCompilerInterface
                     preg_quote($defaultSeparator),
                     $defaultSeparator !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator) : ''
                 );
-                if (('' !== $nextSeparator && !preg_match('#^\{\w+\}#', $followingPattern)) || '' === $followingPattern) {
+                if (('' !== $nextSeparator && !preg_match('#^\{[\w\x80-\xFF]+\}#', $followingPattern)) || '' === $followingPattern) {
                     // When we have a separator, which is disallowed for the variable, we can optimize the regex with a possessive
                     // quantifier. This prevents useless backtracking of PCRE and improves performance by 20% for matching those patterns.
                     // Given the above example, there is no point in backtracking into {page} (that forbids the dot) when a dot must follow
@@ -276,14 +269,14 @@ class RouteCompiler implements RouteCompilerInterface
             return '';
         }
         // first remove all placeholders from the pattern so we can find the next real static character
-        if ('' === $pattern = preg_replace('#\{\w+\}#', '', $pattern)) {
+        if ('' === $pattern = preg_replace('#\{[\w\x80-\xFF]+\}#', '', $pattern)) {
             return '';
         }
         if ($useUtf8) {
             preg_match('/^./u', $pattern, $pattern);
         }
 
-        return false !== strpos(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
+        return str_contains(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
     }
 
     /**
@@ -292,8 +285,6 @@ class RouteCompiler implements RouteCompilerInterface
      * @param array $tokens        The route tokens
      * @param int   $index         The index of the current token
      * @param int   $firstOptional The index of the first optional token
-     *
-     * @return string The regexp pattern for a single token
      */
     private static function computeRegexp(array $tokens, int $index, int $firstOptional): string
     {

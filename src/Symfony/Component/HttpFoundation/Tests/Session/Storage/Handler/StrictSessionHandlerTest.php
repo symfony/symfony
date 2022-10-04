@@ -181,9 +181,9 @@ class StrictSessionHandlerTest extends TestCase
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $handler->expects($this->once())->method('gc')
-            ->with(123)->willReturn(true);
+            ->with(123)->willReturn(1);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->gc(123));
+        $this->assertSame(1, $proxy->gc(123));
     }
 }

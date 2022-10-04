@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class CountryTest extends TestCase
 {
     public function testAttributes()

@@ -11,16 +11,29 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class SecurityController implements ContainerAwareInterface
+class SecurityController implements ServiceSubscriberInterface
 {
-    use ContainerAwareTrait;
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function profileAction()
     {
         return new Response('Welcome '.$this->container->get('security.token_storage')->getToken()->getUserIdentifier().'!');
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'security.token_storage' => TokenStorageInterface::class,
+        ];
     }
 }

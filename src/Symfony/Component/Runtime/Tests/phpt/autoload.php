@@ -1,10 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Symfony\Component\Runtime\SymfonyRuntime;
 
-$_SERVER['APP_RUNTIME_OPTIONS'] = [
+$_SERVER['APP_RUNTIME_OPTIONS'] ??= [];
+$_SERVER['APP_RUNTIME_OPTIONS'] += [
     'project_dir' => __DIR__,
-];
+] + ($_SERVER['APP_RUNTIME_OPTIONS'] ?? []);
 
 if (file_exists(dirname(__DIR__, 2).'/vendor/autoload.php')) {
     if (true === (require_once dirname(__DIR__, 2).'/vendor/autoload.php') || empty($_SERVER['SCRIPT_FILENAME'])) {

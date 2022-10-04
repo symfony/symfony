@@ -11,19 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
-    use ExpectDeprecationTrait;
-
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
     private $choices = [
@@ -1861,6 +1857,32 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('name[]', $view->vars['full_name']);
     }
 
+    public function testInvalidMessageAwarenessForMultiple()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'invalid_message' => 'You are not able to use value "{{ value }}"',
+        ]);
+
+        $form->submit(['My invalid choice']);
+        $this->assertEquals("ERROR: You are not able to use value \"My invalid choice\"\n", (string) $form->getErrors(true));
+    }
+
+    public function testInvalidMessageAwarenessForMultipleWithoutScalarOrArrayViewData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'invalid_message' => 'You are not able to use value "{{ value }}"',
+        ]);
+
+        $form->submit(new \stdClass());
+        $this->assertEquals("ERROR: You are not able to use value \"stdClass\"\n", (string) $form->getErrors(true));
+    }
+
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
@@ -1928,7 +1950,12 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
-        $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        $this->assertInstanceOf(TransformationFailedException::class, $form->getTransformationFailure());
+        if (!$multiple && !$expanded) {
+            $this->assertEquals('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+        } else {
+            $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+        }
     }
 
     public function invalidNestedValueTestMatrix()
@@ -2227,15 +2254,31 @@ class ChoiceTypeTest extends BaseTypeTest
         ], $form->createView()->vars['choices']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testUsingDeprecatedChoiceListFactory()
+    public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
     {
-        $this->expectDeprecation('The "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromChoices()" method will require a new "callable|null $filter" argument in the next major version of its interface "Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface", not defining it is deprecated.');
-        $this->expectDeprecation('The "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromLoader()" method will require a new "callable|null $filter" argument in the next major version of its interface "Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface", not defining it is deprecated.');
-        $this->expectDeprecation('Since symfony/form 5.1: Not defining a third parameter "callable|null $filter" in "Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory::createListFromChoices()" is deprecated.');
+        $choiceLoader = new CallbackChoiceLoader(function () {
+            return [1, 2, 3];
+        });
 
-        new ChoiceType(new DeprecatedChoiceListFactory());
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('choice_one', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+            ])
+            ->add('choice_two', self::TESTED_TYPE, [
+                'choice_loader' => $choiceLoader,
+                'choice_value' => function ($choice) {
+                    return $choice ? (string) $choice * 10 : '';
+                },
+            ])
+            ->createView()
+        ;
+
+        $this->assertSame('1', $view['choice_one']->vars['choices'][0]->value);
+        $this->assertSame('2', $view['choice_one']->vars['choices'][1]->value);
+        $this->assertSame('3', $view['choice_one']->vars['choices'][2]->value);
+
+        $this->assertSame('10', $view['choice_two']->vars['choices'][0]->value);
+        $this->assertSame('20', $view['choice_two']->vars['choices'][1]->value);
+        $this->assertSame('30', $view['choice_two']->vars['choices'][2]->value);
     }
 }

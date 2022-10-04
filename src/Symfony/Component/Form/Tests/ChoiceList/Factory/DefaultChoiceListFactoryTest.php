@@ -16,11 +16,14 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
@@ -253,7 +256,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoader()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $list = $this->factory->createListFromLoader($loader);
 
@@ -262,7 +265,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithValues()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $loader = new ArrayChoiceLoader();
 
         $value = function () {};
         $list = $this->factory->createListFromLoader($loader, $value);
@@ -272,12 +275,11 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithFilter()
     {
-        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $filter = function () {};
 
-        $list = $this->factory->createListFromLoader($loader, null, $filter);
+        $list = $this->factory->createListFromLoader(new ArrayChoiceLoader(), null, $filter);
 
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator($loader, $filter)), $list);
+        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $filter)), $list);
     }
 
     public function testCreateViewFlat()
@@ -285,12 +287,12 @@ class DefaultChoiceListFactoryTest extends TestCase
         $view = $this->factory->createView($this->list);
 
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], []
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], []
         ), $view);
     }
 
@@ -365,12 +367,12 @@ class DefaultChoiceListFactoryTest extends TestCase
         );
 
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], []
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], []
         ), $view);
     }
 
@@ -728,11 +730,11 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // index
             null, // group
             function ($object, $key) {
-                switch ($key) {
-                    case 'B': return ['attr1' => 'value1'];
-                    case 'C': return ['attr2' => 'value2'];
-                    default: return [];
-                }
+                return match ($key) {
+                    'B' => ['attr1' => 'value1'],
+                    'C' => ['attr2' => 'value2'],
+                    default => [],
+                };
             }
         );
 
@@ -748,15 +750,50 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // index
             null, // group
             function ($object, $key, $value) {
-                switch ($value) {
-                    case '1': return ['attr1' => 'value1'];
-                    case '2': return ['attr2' => 'value2'];
-                    default: return [];
-                }
+                return match ($value) {
+                    '1' => ['attr1' => 'value1'],
+                    '2' => ['attr2' => 'value2'],
+                    default => [],
+                };
             }
         );
 
         $this->assertFlatViewWithAttr($view);
+    }
+
+    public function testPassTranslatableMessageAsLabelDoesntCastItToString()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj1],
+            static function ($choice, $key, $value) {
+                return new TranslatableMessage('my_message', ['param1' => 'value1']);
+            }
+        );
+
+        $this->assertInstanceOf(TranslatableMessage::class, $view->choices[0]->label);
+        $this->assertEquals('my_message', $view->choices[0]->label->getMessage());
+        $this->assertArrayHasKey('param1', $view->choices[0]->label->getParameters());
+    }
+
+    public function testPassTranslatableInterfaceAsLabelDoesntCastItToString()
+    {
+        $message = new class() implements TranslatableInterface {
+            public function trans(TranslatorInterface $translator, string $locale = null): string
+            {
+                return 'my_message';
+            }
+        };
+
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj1],
+            static function () use ($message) {
+                return $message;
+            }
+        );
+
+        $this->assertSame($message, $view->choices[0]->label);
     }
 
     public function testCreateViewFlatLabelTranslationParametersAsArray()
@@ -833,10 +870,10 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // group
             null, // attr
             function ($object, $key) {
-                switch ($key) {
-                    case 'D': return ['%placeholder1%' => 'value1'];
-                    default: return [];
-                }
+                return match ($key) {
+                    'D' => ['%placeholder1%' => 'value1'],
+                    default => [],
+                };
             }
         );
 
@@ -853,10 +890,10 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // group
             null, // attr
             function ($object, $key, $value) {
-                switch ($value) {
-                    case '3': return ['%placeholder1%' => 'value1'];
-                    default: return [];
-                }
+                return match ($value) {
+                    '3' => ['%placeholder1%' => 'value1'],
+                    default => [],
+                };
             }
         );
 
@@ -942,64 +979,64 @@ class DefaultChoiceListFactoryTest extends TestCase
     private function assertFlatView($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], [
-                    1 => new ChoiceView($this->obj2, '1', 'B'),
-                    2 => new ChoiceView($this->obj3, '2', 'C'),
-                ]
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], [
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+            ]
         ), $view);
     }
 
     private function assertFlatViewWithCustomIndices($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    'w' => new ChoiceView($this->obj1, '0', 'A'),
-                    'x' => new ChoiceView($this->obj2, '1', 'B'),
-                    'y' => new ChoiceView($this->obj3, '2', 'C'),
-                    'z' => new ChoiceView($this->obj4, '3', 'D'),
-                ], [
-                    'x' => new ChoiceView($this->obj2, '1', 'B'),
-                    'y' => new ChoiceView($this->obj3, '2', 'C'),
-                ]
+            [
+                'w' => new ChoiceView($this->obj1, '0', 'A'),
+                'x' => new ChoiceView($this->obj2, '1', 'B'),
+                'y' => new ChoiceView($this->obj3, '2', 'C'),
+                'z' => new ChoiceView($this->obj4, '3', 'D'),
+            ], [
+                'x' => new ChoiceView($this->obj2, '1', 'B'),
+                'y' => new ChoiceView($this->obj3, '2', 'C'),
+            ]
         ), $view);
     }
 
     private function assertFlatViewWithAttr($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    0 => new ChoiceView($this->obj1, '0', 'A'),
-                    1 => new ChoiceView(
-                        $this->obj2,
-                        '1',
-                        'B',
-                        ['attr1' => 'value1']
-                    ),
-                    2 => new ChoiceView(
-                        $this->obj3,
-                        '2',
-                        'C',
-                        ['attr2' => 'value2']
-                    ),
-                    3 => new ChoiceView($this->obj4, '3', 'D'),
-                ], [
-                    1 => new ChoiceView(
-                        $this->obj2,
-                        '1',
-                        'B',
-                        ['attr1' => 'value1']
-                    ),
-                    2 => new ChoiceView(
-                        $this->obj3,
-                        '2',
-                        'C',
-                        ['attr2' => 'value2']
-                    ),
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView(
+                    $this->obj2,
+                    '1',
+                    'B',
+                    ['attr1' => 'value1']
+                ),
+                2 => new ChoiceView(
+                    $this->obj3,
+                    '2',
+                    'C',
+                    ['attr2' => 'value2']
+                ),
+                3 => new ChoiceView($this->obj4, '3', 'D'),
+            ], [
+                1 => new ChoiceView(
+                    $this->obj2,
+                    '1',
+                    'B',
+                    ['attr1' => 'value1']
+                ),
+                2 => new ChoiceView(
+                    $this->obj3,
+                    '2',
+                    'C',
+                    ['attr2' => 'value2']
+                ),
                 ]
         ), $view);
     }
@@ -1022,30 +1059,30 @@ class DefaultChoiceListFactoryTest extends TestCase
     private function assertGroupedView($view)
     {
         $this->assertEquals(new ChoiceListView(
-                [
-                    'Group 1' => new ChoiceGroupView(
-                        'Group 1',
-                        [
-                            0 => new ChoiceView($this->obj1, '0', 'A'),
-                            1 => new ChoiceView($this->obj2, '1', 'B'),
-                        ]
-                    ),
-                    'Group 2' => new ChoiceGroupView(
-                        'Group 2',
-                        [
-                            2 => new ChoiceView($this->obj3, '2', 'C'),
-                            3 => new ChoiceView($this->obj4, '3', 'D'),
-                        ]
-                    ),
-                ], [
-                    'Group 1' => new ChoiceGroupView(
-                        'Group 1',
-                        [1 => new ChoiceView($this->obj2, '1', 'B')]
-                    ),
-                    'Group 2' => new ChoiceGroupView(
-                        'Group 2',
-                        [2 => new ChoiceView($this->obj3, '2', 'C')]
-                    ),
+            [
+                'Group 1' => new ChoiceGroupView(
+                    'Group 1',
+                    [
+                        0 => new ChoiceView($this->obj1, '0', 'A'),
+                        1 => new ChoiceView($this->obj2, '1', 'B'),
+                    ]
+                ),
+                'Group 2' => new ChoiceGroupView(
+                    'Group 2',
+                    [
+                        2 => new ChoiceView($this->obj3, '2', 'C'),
+                        3 => new ChoiceView($this->obj4, '3', 'D'),
+                    ]
+                ),
+            ], [
+                'Group 1' => new ChoiceGroupView(
+                    'Group 1',
+                    [1 => new ChoiceView($this->obj2, '1', 'B')]
+                ),
+                'Group 2' => new ChoiceGroupView(
+                    'Group 2',
+                    [2 => new ChoiceView($this->obj3, '2', 'C')]
+                ),
                 ]
         ), $view);
     }

@@ -20,17 +20,16 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\D;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\Dummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\DummyWithInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\E;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\F;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\G;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\IntersectionDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\UnionDummy;
 
 class PreloaderTest extends TestCase
 {
-    /**
-     * @requires PHP 7.4
-     */
     public function testPreload()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -42,13 +41,9 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(C::class, false));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testPreloadSkipsNonExistingInterface()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -56,13 +51,9 @@ class PreloaderTest extends TestCase
         self::assertFalse(class_exists(DummyWithInterface::class, false));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testPreloadUnion()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -71,5 +62,18 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(UnionDummy::class, false));
         self::assertTrue(class_exists(D::class, false));
         self::assertTrue(class_exists(E::class, false));
+    }
+
+    public function testPreloadIntersection()
+    {
+        $r = new \ReflectionMethod(Preloader::class, 'doPreload');
+
+        $preloaded = [];
+
+        $r->invokeArgs(null, ['Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\IntersectionDummy', &$preloaded]);
+
+        self::assertTrue(class_exists(IntersectionDummy::class, false));
+        self::assertTrue(class_exists(F::class, false));
+        self::assertTrue(class_exists(G::class, false));
     }
 }

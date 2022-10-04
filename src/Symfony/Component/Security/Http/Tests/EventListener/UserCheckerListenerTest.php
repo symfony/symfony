@@ -12,14 +12,12 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -45,13 +43,6 @@ class UserCheckerListenerTest extends TestCase
         $this->listener->preCheckCredentials($this->createCheckPassportEvent());
     }
 
-    public function testPreAuthNoUser()
-    {
-        $this->userChecker->expects($this->never())->method('checkPreAuth');
-
-        $this->listener->preCheckCredentials($this->createCheckPassportEvent($this->createMock(PassportInterface::class)));
-    }
-
     public function testPreAuthenticatedBadge()
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
@@ -64,13 +55,6 @@ class UserCheckerListenerTest extends TestCase
         $this->userChecker->expects($this->once())->method('checkPostAuth')->with($this->user);
 
         $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', [])));
-    }
-
-    public function testPostAuthNoUser()
-    {
-        $this->userChecker->expects($this->never())->method('checkPostAuth');
-
-        $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PreAuthenticatedToken('nobody', null, 'main')));
     }
 
     private function createCheckPassportEvent($passport = null)

@@ -1,0 +1,37 @@
+<?php
+
+return [
+    'Names' => [
+        'arn' => 'mapudungun',
+        'be' => 'bjeloruski',
+        'bm' => 'bamanankan',
+        'bn' => 'bangla',
+        'de' => 'njemački',
+        'gsw' => 'njemački (Švajcarska)',
+        'ht' => 'haićanski kreolski',
+        'lo' => 'laoški',
+        'lrc' => 'sjeverni luri',
+        'moh' => 'mohok',
+        'nd' => 'sjeverni ndebele',
+        'nds' => 'niskonjemački',
+        'nqo' => 'n’ko',
+        'se' => 'sjeverni sami',
+        'shi' => 'južni šilha',
+        'si' => 'sinhalski',
+        'tzm' => 'centralnoatlaski tamašek',
+        'xh' => 'isikosa',
+        'zgh' => 'standardni marokanski tamašek',
+        'zu' => 'isizulu',
+    ],
+    'LocalizedNames' => [
+        'ar_001' => 'savremeni standardni arapski',
+        'de_CH' => 'švajcarski visoki njemački',
+        'en_GB' => 'engleski (Velika Britanija)',
+        'es_ES' => 'španski (Evropa)',
+        'fa_AF' => 'dari',
+        'pt_PT' => 'portugalski (Portugal)',
+        'sw_CD' => 'kisvahili',
+        'zh_Hans' => 'pojednostavljeni kineski',
+        'zh_Hant' => 'tradicionalni kineski',
+    ],
+];

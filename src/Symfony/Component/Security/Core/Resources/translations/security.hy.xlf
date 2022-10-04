@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>No session available, it either timed out or cookies are not enabled.</target>
+                <target>Հասանելի սեսիա չկա, կամ այն սպառվել է կամ cookie-ները անջատված են:</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
@@ -69,6 +69,14 @@
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
                 <target>Անվավեր կամ ժամկետանց մուտքի հղում։</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Մուտքի չափազանց շատ անհաջող փորձեր: Խնդրում ենք կրկին փորձել %minutes րոպե:</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Մուտքի չափազանց շատ անհաջող փորձեր: Խնդրում ենք կրկին փորձել %minutes րոպե:</target>
             </trans-unit>
         </body>
     </file>

@@ -19,58 +19,92 @@ namespace Symfony\Component\Security\Core\User;
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class InMemoryUser extends User
+final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
+    private string $username;
+    private ?string $password;
+    private bool $enabled;
+    private array $roles;
+
+    public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true)
+    {
+        if ('' === $username || null === $username) {
+            throw new \InvalidArgumentException('The username cannot be empty.');
+        }
+
+        $this->username = $username;
+        $this->password = $password;
+        $this->enabled = $enabled;
+        $this->roles = $roles;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
     /**
-     * {@inheritdoc}
+     * Returns the identifier for this user (e.g. its username or email address).
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * Checks whether the user is enabled.
      *
-     * @deprecated since Symfony 5.3
-     */
-    public function isAccountNonExpired(): bool
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
-
-        return parent::isAccountNonExpired();
-    }
-
-    /**
-     * {@inheritdoc}
+     * Internally, if this method returns false, the authentication system
+     * will throw a DisabledException and prevent login.
      *
-     * @deprecated since Symfony 5.3
-     */
-    public function isAccountNonLocked(): bool
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
-
-        return parent::isAccountNonLocked();
-    }
-
-    /**
-     * {@inheritdoc}
+     * @return bool true if the user is enabled, false otherwise
      *
-     * @deprecated since Symfony 5.3
+     * @see DisabledException
      */
-    public function isCredentialsNonExpired(): bool
+    public function isEnabled(): bool
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
-
-        return parent::isCredentialsNonExpired();
+        return $this->enabled;
     }
 
-    /**
-     * @deprecated since Symfony 5.3
-     */
-    public function getExtraFields(): array
+    public function eraseCredentials()
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
-
-        return parent::getExtraFields();
     }
 
-    public function setPassword(string $password)
+    public function isEqualTo(UserInterface $user): bool
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
+        if (!$user instanceof self) {
+            return false;
+        }
 
-        parent::setPassword($password);
+        if ($this->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        $currentRoles = array_map('strval', (array) $this->getRoles());
+        $newRoles = array_map('strval', (array) $user->getRoles());
+        $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
+        if ($rolesChanged) {
+            return false;
+        }
+
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
+            return false;
+        }
+
+        if ($this->isEnabled() !== $user->isEnabled()) {
+            return false;
+        }
+
+        return true;
     }
 }

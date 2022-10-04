@@ -44,6 +44,7 @@ class PropertyInfoLoaderTest extends TestCase
                 'scalar',
                 'object',
                 'collection',
+                'collectionOfUnknown',
                 'alreadyMappedType',
                 'alreadyMappedNotNull',
                 'alreadyMappedNotBlank',
@@ -61,6 +62,7 @@ class PropertyInfoLoaderTest extends TestCase
                 [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_BOOL)],
                 [new Type(Type::BUILTIN_TYPE_OBJECT, true, Entity::class)],
                 [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Entity::class))],
+                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)],
                 [new Type(Type::BUILTIN_TYPE_FLOAT, true)], // The existing constraint is float
                 [new Type(Type::BUILTIN_TYPE_STRING, true)],
                 [new Type(Type::BUILTIN_TYPE_STRING, true)],
@@ -72,6 +74,7 @@ class PropertyInfoLoaderTest extends TestCase
         $propertyInfoStub
             ->method('isWritable')
             ->will($this->onConsecutiveCalls(
+                true,
                 true,
                 true,
                 true,
@@ -134,6 +137,13 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertInstanceOf(NotNull::class, $collectionConstraints[0]->constraints[0]);
         $this->assertInstanceOf(TypeConstraint::class, $collectionConstraints[0]->constraints[1]);
         $this->assertSame(Entity::class, $collectionConstraints[0]->constraints[1]->type);
+
+        $collectionOfUnknownMetadata = $classMetadata->getPropertyMetadata('collectionOfUnknown');
+        $this->assertCount(1, $collectionOfUnknownMetadata);
+        $collectionOfUnknownConstraints = $collectionOfUnknownMetadata[0]->getConstraints();
+        $this->assertCount(1, $collectionOfUnknownConstraints);
+        $this->assertInstanceOf(TypeConstraint::class, $collectionOfUnknownConstraints[0]);
+        $this->assertSame('array', $collectionOfUnknownConstraints[0]->type);
 
         $alreadyMappedTypeMetadata = $classMetadata->getPropertyMetadata('alreadyMappedType');
         $this->assertCount(1, $alreadyMappedTypeMetadata);

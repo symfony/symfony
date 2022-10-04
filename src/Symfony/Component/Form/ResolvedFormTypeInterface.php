@@ -22,47 +22,37 @@ interface ResolvedFormTypeInterface
 {
     /**
      * Returns the prefix of the template block name for this type.
-     *
-     * @return string The prefix of the template block name
      */
-    public function getBlockPrefix();
+    public function getBlockPrefix(): string;
 
     /**
      * Returns the parent type.
-     *
-     * @return self|null The parent type or null
      */
-    public function getParent();
+    public function getParent(): ?self;
 
     /**
      * Returns the wrapped form type.
-     *
-     * @return FormTypeInterface The wrapped form type
      */
-    public function getInnerType();
+    public function getInnerType(): FormTypeInterface;
 
     /**
      * Returns the extensions of the wrapped form type.
      *
-     * @return FormTypeExtensionInterface[] An array of {@link FormTypeExtensionInterface} instances
+     * @return FormTypeExtensionInterface[]
      */
-    public function getTypeExtensions();
+    public function getTypeExtensions(): array;
 
     /**
      * Creates a new form builder for this type.
      *
      * @param string $name The name for the builder
-     *
-     * @return FormBuilderInterface The created form builder
      */
-    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = []);
+    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = []): FormBuilderInterface;
 
     /**
      * Creates a new form view for a form of this type.
-     *
-     * @return FormView The created form view
      */
-    public function createView(FormInterface $form, FormView $parent = null);
+    public function createView(FormInterface $form, FormView $parent = null): FormView;
 
     /**
      * Configures a form builder for the type hierarchy.
@@ -85,8 +75,6 @@ interface ResolvedFormTypeInterface
 
     /**
      * Returns the configured options resolver used for this type.
-     *
-     * @return OptionsResolver The options resolver
      */
-    public function getOptionsResolver();
+    public function getOptionsResolver(): OptionsResolver;
 }

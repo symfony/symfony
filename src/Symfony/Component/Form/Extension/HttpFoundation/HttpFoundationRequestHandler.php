@@ -58,8 +58,11 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $data = $request->query->all();
             } else {
                 $missingData = $this->missingDataHandler->missingData;
+                $queryData = $request->query->all()[$name] ?? $missingData;
 
-                if ($missingData === $data = $this->missingDataHandler->handle($form, $request->query->all()[$name] ?? $missingData)) {
+                $data = $this->missingDataHandler->handle($form, $queryData);
+
+                if ($missingData === $data) {
                     // Don't submit GET requests if the form's name does not exist
                     // in the request
                     return;

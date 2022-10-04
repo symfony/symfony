@@ -78,8 +78,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
             'method' => $method,
         ]);
 
-        $this->setRequestData($method, [
-        ]);
+        $this->setRequestData($method, []);
 
         $this->requestHandler->handleRequest($form, $this->request);
 

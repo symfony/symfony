@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-03T14:25:42Z
+
+This makes sense to me.
+Other traceable decorators don't have such a high priority except the `TraceableValidator`. Here is the rationale: https://github.com/symfony/symfony/pull/22554#discussion_r116217802 (tl;dr: it's for extra safety, but as said above the result is surprising).
+/cc @ogizanagi I think the same fix should apply to the `TraceableValidator`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-10-03T14:49:32Z
+
+Hmm, re-reading this, would make sense to make the traceable decorator last indeed… but since we don't have any unexpected report for this yet, perhaps keep this status-quo for the validator one. 🤷🏻‍♂️
+
+---------------------------------------------------------------------------
+
+by mtarld at 2022-10-03T15:09:11Z
+
+Indeed, I think that decorating a validator isn't a common use case (I think almost nobody tried it).
+That being said, the Validator decoration priority isn't valid IMHO, maybe it should be updated?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-03T15:31:10Z
+
+> but since we don't have any unexpected report for this yet, perhaps keep this status-quo for the validator one. 🤷🏻‍♂️
+
+I agree, let's keep it as-is as long as nobody actually complains (from my experience that kind of bugfixes in old versions is source of problems/anger -_-)

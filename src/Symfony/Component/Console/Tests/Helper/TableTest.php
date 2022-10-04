@@ -1392,4 +1392,29 @@ TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
     }
+
+    public function testWithHyperlinkAndMaxWidth()
+    {
+        $table = new Table($output = $this->getOutputStream(true));
+        $table
+            ->setRows([
+                ['<href=Lorem>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor</>'],
+            ])
+        ;
+        $table->setColumnMaxWidth(0, 20);
+        $table->render();
+
+        $expected =
+            <<<TABLE
++----------------------+
+| \033]8;;Lorem\033\\Lorem ipsum dolor si\033]8;;\033\\ |
+| \033]8;;Lorem\033\\t amet, consectetur \033]8;;\033\\ |
+| \033]8;;Lorem\033\\adipiscing elit, sed\033]8;;\033\\ |
+| \033]8;;Lorem\033\\do eiusmod tempor\033]8;;\033\\    |
++----------------------+
+
+TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
 }

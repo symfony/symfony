@@ -189,6 +189,9 @@ class Table
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setRows(array $rows)
     {
         $this->rows = [];

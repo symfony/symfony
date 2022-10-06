@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
@@ -450,8 +451,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         $expectedTypes = [];
         $isUnionType = \count($types) > 1;
-        $extraAttributesException = null;
-        $missingConstructorArgumentException = null;
+        $exception = null;
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return null;
@@ -585,35 +585,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if (('is_'.$builtinType)($data)) {
                     return $data;
                 }
-            } catch (NotNormalizableValueException $e) {
-                if (!$isUnionType) {
-                    throw $e;
-                }
-            } catch (ExtraAttributesException $e) {
+            } catch (ExceptionInterface $e) {
                 if (!$isUnionType) {
                     throw $e;
                 }
 
-                if (!$extraAttributesException) {
-                    $extraAttributesException = $e;
-                }
-            } catch (MissingConstructorArgumentsException $e) {
-                if (!$isUnionType) {
-                    throw $e;
-                }
-
-                if (!$missingConstructorArgumentException) {
-                    $missingConstructorArgumentException = $e;
+                if (!$exception && !$e instanceof NotNormalizableValueException) {
+                    $exception = $e;
                 }
             }
         }
 
-        if ($extraAttributesException) {
-            throw $extraAttributesException;
-        }
-
-        if ($missingConstructorArgumentException) {
-            throw $missingConstructorArgumentException;
+        if ($exception) {
+            throw $exception;
         }
 
         if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {

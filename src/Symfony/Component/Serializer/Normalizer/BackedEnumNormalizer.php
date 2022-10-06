@@ -65,6 +65,9 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
             return $type::from($data);
         } catch (\ValueError $e) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration of type '.$type);
+        } catch (\TypeError $e) {
+            $enumBackingType = (new \ReflectionEnum($type))->getBackingType()->getName();
+            throw NotNormalizableValueException::createForUnexpectedDataType('The data must be of the same type as the backed enumeration of type '.$type, $data, [$enumBackingType], $context['deserialization_path'] ?? null, true);
         }
     }
 

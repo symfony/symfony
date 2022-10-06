@@ -60,10 +60,13 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithUnionEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\IntegerBackedEnumDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
+use Symfony\Component\Serializer\Tests\Fixtures\StringBackedEnumDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
@@ -788,6 +791,52 @@ class SerializerTest extends TestCase
         $serializer->deserialize('{ "v": { "b": 1, "d": "i am not allowed" }}', DummyUnionWithAAndCAndB::class, 'json', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
         ]);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testEnumUnionTypeDeserializable()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [
+                new BackedEnumNormalizer(),
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        $actual = $serializer->deserialize('{"sub": 200}', DummyObjectWithUnionEnumConstructor::class, 'json');
+        $this->assertEquals(new DummyObjectWithUnionEnumConstructor(IntegerBackedEnumDummy::SUCCESS), $actual);
+
+        $actual = $serializer->deserialize('{"sub": "GET"}', DummyObjectWithUnionEnumConstructor::class, 'json');
+        $this->assertEquals(new DummyObjectWithUnionEnumConstructor(StringBackedEnumDummy::GET), $actual);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testEnumUnionTypeDeserializationWithWrongEnum()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [
+                new BackedEnumNormalizer(),
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize('{"sub": "INVALID"}', DummyObjectWithUnionEnumConstructor::class, 'json');
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(InvalidArgumentException::class, $th);
+        }
     }
 
     /**

@@ -197,6 +197,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         if ($autoCacheControl) {
             $response
                 ->setExpires(new \DateTime())
+                ->setNoStore()
                 ->setPrivate()
                 ->setMaxAge(0)
                 ->headers->addCacheControlDirective('must-revalidate');

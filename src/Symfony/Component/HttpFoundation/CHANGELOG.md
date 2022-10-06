@@ -9,6 +9,7 @@ CHANGELOG
  * Add request matchers under the `Symfony\Component\HttpFoundation\RequestMatcher` namespace
  * Deprecate `RequestMatcher` in favor of `ChainRequestMatcher`
  * Deprecate `Symfony\Component\HttpFoundation\ExpressionRequestMatcher` in favor of `Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher`
+ * add `cache-control: no-store` header to default responses
 
 6.1
 ---

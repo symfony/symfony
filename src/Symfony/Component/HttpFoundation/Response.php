@@ -558,6 +558,22 @@ class Response
     }
 
     /**
+     * Marks the response as "no-store".
+     *
+     * It indicates that the response should not be stored in any kind of caches.
+     *
+     * @return $this
+     *
+     * @final
+     */
+    public function setNoStore(): static
+    {
+        $this->headers->addCacheControlDirective('no-store');
+
+        return $this;
+    }
+
+    /**
      * Marks the response as "private".
      *
      * It makes the response ineligible for serving other clients.

@@ -396,6 +396,15 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('stale-while-revalidate=300, private', $cacheControl);
     }
 
+    public function testNoStore()
+    {
+        $response = new Response();
+        $response->headers->set('Cache-Control', 'max-age=100');
+        $response->setNoStore();
+        $this->assertEquals(100, $response->headers->getCacheControlDirective('max-age'), '->setNoStore() adds the no-store Cache-Control directive');
+        $this->assertTrue($response->headers->getCacheControlDirective('no-store'), '->setNoStore() adds the no-store Cache-Control directive');
+    }
+
     public function testIsPrivate()
     {
         $response = new Response();

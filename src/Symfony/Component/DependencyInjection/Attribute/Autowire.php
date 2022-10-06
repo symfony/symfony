@@ -23,7 +23,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Autowire
 {
-    public readonly string|Expression|Reference $value;
+    public readonly string|array|Expression|Reference $value;
 
     /**
      * Use only ONE of the following.
@@ -33,7 +33,7 @@ class Autowire
      * @param string|null $expression Expression (ie 'service("some.service").someMethod()')
      */
     public function __construct(
-        string $value = null,
+        string|array $value = null,
         string $service = null,
         string $expression = null,
     ) {
@@ -41,7 +41,7 @@ class Autowire
             throw new LogicException('#[Autowire] attribute must declare exactly one of $service, $expression, or $value.');
         }
 
-        if (null !== $value && str_starts_with($value, '@')) {
+        if (\is_string($value) && str_starts_with($value, '@')) {
             match (true) {
                 str_starts_with($value, '@@') => $value = substr($value, 1),
                 str_starts_with($value, '@=') => $expression = substr($value, 2),

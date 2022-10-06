@@ -820,6 +820,7 @@ class ResponseTest extends ResponseTestCase
         $response->setExpires($now);
 
         $this->assertEquals($response->getExpires()->getTimestamp(), $now->getTimestamp());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $response->getExpiresImmutable());
     }
 
     public function testSetExpiresWithImmutable()

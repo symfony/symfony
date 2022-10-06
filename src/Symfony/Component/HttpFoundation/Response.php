@@ -710,6 +710,20 @@ class Response
     }
 
     /**
+     * Returns the value of the Expires headers as a DateTimeImmutable instance
+     *
+     * @final
+     */
+    public function getExpiresImmutable(): ?\DateTimeImmutable
+    {
+        try {
+            return $this->headers->getImmutableDate('Expires');
+        } catch (\RuntimeException) {
+            return \DateTimeImmutable::createFromFormat('U', time() - 172800);
+        }
+    }
+
+    /**
      * Sets the Expires HTTP header with a DateTime instance.
      *
      * Passing null as value will remove the header.

@@ -48,6 +48,13 @@ class HeaderBagTest extends TestCase
         $this->assertInstanceOf(\DateTime::class, $headerDate);
     }
 
+    public function testGetImmutableDate()
+    {
+        $bag = new HeaderBag(['foo' => 'Tue, 4 Sep 2012 20:00:00 +0200']);
+        $headerDate = $bag->getImmutableDate('foo');
+        $this->assertInstanceOf(\DateTimeImmutable::class, $headerDate);
+    }
+
     public function testGetDateNull()
     {
         $bag = new HeaderBag(['foo' => null]);

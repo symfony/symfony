@@ -38,7 +38,7 @@
                         {% set file_size_in_kb = file_info.size / 1024 %}
                         {% set file_num_lines = source|split("\n")|length - 1 %}
                         <dd>
-                            {{ file_size_in_kb < 1 ? file_info.size : file_size_in_kb|number_format(0) }} KB
+                            {{ file_size_in_kb < 1 ? file_info.size ~ ' bytes' : file_size_in_kb|number_format(0) ~ ' KB' }}
                             / {{ file_num_lines }} lines
                         </dd>
                     </dl>

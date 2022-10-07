@@ -108,12 +108,12 @@ class SerializerPassTest extends TestCase
         $traceableEncoderDefinition = $container->getDefinition('debug.e');
 
         $this->assertEquals(TraceableNormalizer::class, $traceableNormalizerDefinition->getClass());
-        $this->assertEquals(['n', null, 255], $traceableNormalizerDefinition->getDecoratedService());
+        $this->assertEquals(['n', null, 0], $traceableNormalizerDefinition->getDecoratedService());
         $this->assertEquals(new Reference('debug.n.inner'), $traceableNormalizerDefinition->getArgument(0));
         $this->assertEquals(new Reference('serializer.data_collector'), $traceableNormalizerDefinition->getArgument(1));
 
         $this->assertEquals(TraceableEncoder::class, $traceableEncoderDefinition->getClass());
-        $this->assertEquals(['e', null, 255], $traceableEncoderDefinition->getDecoratedService());
+        $this->assertEquals(['e', null, 0], $traceableEncoderDefinition->getDecoratedService());
         $this->assertEquals(new Reference('debug.e.inner'), $traceableEncoderDefinition->getArgument(0));
         $this->assertEquals(new Reference('serializer.data_collector'), $traceableEncoderDefinition->getArgument(1));
     }

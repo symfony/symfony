@@ -13,6 +13,10 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 class Php81Dummy
 {
+    public function __construct(public readonly string $foo)
+    {
+    }
+
     public function getNothing(): never
     {
         throw new \Exception('Oops');

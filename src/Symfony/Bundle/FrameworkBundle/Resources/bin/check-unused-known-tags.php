@@ -9,6 +9,10 @@
  * file that was distributed with this source code.
  */
 
+if ('cli' !== \PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+
 require dirname(__DIR__, 6).'/vendor/autoload.php';
 
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\UnusedTagsPassUtils;

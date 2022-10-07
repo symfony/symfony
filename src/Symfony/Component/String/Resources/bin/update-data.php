@@ -11,6 +11,10 @@
 
 use Symfony\Component\String\Resources\WcswidthDataGenerator;
 
+if ('cli' !== \PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+
 error_reporting(\E_ALL);
 
 set_error_handler(static function (int $type, string $msg, string $file, int $line): void {

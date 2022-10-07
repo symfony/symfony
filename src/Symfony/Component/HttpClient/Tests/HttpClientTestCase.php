@@ -118,6 +118,18 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertTrue(feof($stream));
     }
 
+    public function testSeekAsyncStream()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-body');
+        $stream = $response->toStream(false);
+
+        $this->assertSame(0, fseek($stream, 0, \SEEK_CUR));
+        $this->assertSame('<1>', fread($stream, 8192));
+        $this->assertFalse(feof($stream));
+        $this->assertSame('<2>', stream_get_contents($stream));
+    }
+
     public function testTimeoutIsNotAFatalError()
     {
         $client = $this->getHttpClient(__FUNCTION__);

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-09-29T13:55:41Z
+
+you should not mark this PR is fixing the issue, as it only does part of the work. We don't want the issue to get closed automatically by github when only that PR is merged. So having a link to the issue is good, but you should not have `Fix` before it.
+
+Note: I edited the PR description to remove it, but please be careful about that for your next PRs
+
+---------------------------------------------------------------------------
+
+by WebMamba at 2022-09-29T14:07:44Z
+
+> you should not mark this PR is fixing the issue, as it only does part of the work. We don't want the issue to get closed automatically by github when only that PR is merged. So having a link to the issue is good, but you should not have `Fix` before it.
+>
+> Note: I edited the PR description to remove it, but please be careful about that for your next PRs
+
+thanks for for it @stof, I wasn't aware of this.
+
+> This component is still using `date_create`, which needs to be migrated to `date_create_immutable` instead
+
+Nice catch thanks !
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-29T14:53:22Z
+
+@WebMamba looks like I miunderstood what you meant by "I'll process component by component", as it seems like you are adding other components in the same PR (which would invalidate my previous approval as it was only for BrowserKit).
+
+If you want us to review it component by component, separate PRs would be a better fit.
+
+---------------------------------------------------------------------------
+
+by WebMamba at 2022-09-29T14:56:53Z
+
+> @WebMamba looks like I miunderstood what you meant by "I'll process component by component", as it seems like you are adding other components in the same PR (which would invalidate my previous approval as it was only for BrowserKit).
+>
+> If you want us to review it component by component, separate PRs would be a better fit.
+
+@nicolas-grekas  asked me to process it like this. I do all the easy changes here and if we spot a tricky one we do a dedicated PR
+
+---------------------------------------------------------------------------
+
+by WebMamba at 2022-09-30T15:16:36Z
+
+Thanks, @stof for your review! All the things you spotted are corrected now! 👍

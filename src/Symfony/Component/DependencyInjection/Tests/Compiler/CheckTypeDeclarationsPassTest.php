@@ -497,12 +497,12 @@ class CheckTypeDeclarationsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('bar', \DateTime::class)
-            ->setFactory('date_create');
+        $container->register('bar', \DateTimeImmutable::class)
+            ->setFactory('date_create_immutable');
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 
-        $this->assertInstanceOf(\DateTime::class, $container->get('bar'));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $container->get('bar'));
     }
 
     public function testProcessDoesNotLoadCodeByDefault()

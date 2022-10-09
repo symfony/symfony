@@ -49,7 +49,7 @@ final class DiscordEmbed extends AbstractDiscordEmbed
     /**
      * @return $this
      */
-    public function timestamp(\DateTime $timestamp): static
+    public function timestamp(\DateTimeInterface $timestamp): static
     {
         $this->options['timestamp'] = $timestamp->format(\DateTimeInterface::ISO8601);
 

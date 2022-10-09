@@ -1296,20 +1296,20 @@ class ContainerBuilderTest extends TestCase
     public function testNoClassFromGlobalNamespaceClassId()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "DateTime" has no class attribute, and appears to reference a class or interface in the global namespace.');
+        $this->expectExceptionMessage('The definition for "DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
         $container = new ContainerBuilder();
 
-        $container->register(\DateTime::class);
+        $container->register(\DateTimeImmutable::class);
         $container->compile();
     }
 
     public function testNoClassFromGlobalNamespaceClassIdWithLeadingSlash()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "\DateTime" has no class attribute, and appears to reference a class or interface in the global namespace.');
+        $this->expectExceptionMessage('The definition for "\DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
         $container = new ContainerBuilder();
 
-        $container->register('\\'.\DateTime::class);
+        $container->register('\\'.\DateTimeImmutable::class);
         $container->compile();
     }
 

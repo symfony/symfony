@@ -124,8 +124,8 @@ class Connection implements ResetInterface
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
-        $now = new \DateTime();
-        $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
+        $now = new \DateTimeImmutable();
+        $availableAt = $now->modify(sprintf('+%d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])
@@ -225,7 +225,7 @@ class Connection implements ResetInterface
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $now = new \DateTime();
+            $now = new \DateTimeImmutable();
             $this->executeStatement($queryBuilder->getSQL(), [
                 $now,
                 $doctrineEnvelope['id'],
@@ -348,8 +348,8 @@ class Connection implements ResetInterface
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
-        $now = new \DateTime();
-        $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+        $now = new \DateTimeImmutable();
+        $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()
             ->where('m.delivered_at is null OR m.delivered_at < ?')

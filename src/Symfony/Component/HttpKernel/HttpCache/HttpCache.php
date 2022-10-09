@@ -508,7 +508,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             Anyway, a client that received a message without a "Date" header MUST add it.
         */
         if (!$response->headers->has('Date')) {
-            $response->setDate(\DateTime::createFromFormat('U', time()));
+            $response->setDate(\DateTimeImmutable::createFromFormat('U', time()));
         }
 
         $this->processResponseBody($request, $response);

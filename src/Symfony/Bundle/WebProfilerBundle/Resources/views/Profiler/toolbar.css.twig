@@ -81,14 +81,11 @@
     display: none;
 }
 
-.sf-toolbarreset * {
+.sf-toolbarreset *:not(svg rect) {
     box-sizing: content-box;
     vertical-align: baseline;
     letter-spacing: normal;
     width: auto;
-}
-.sf-toolbarreset svg rect {
-    width: inherit;
 }
 
 .sf-toolbarreset {

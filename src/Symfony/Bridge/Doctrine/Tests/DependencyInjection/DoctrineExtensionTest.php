@@ -279,8 +279,10 @@ class DoctrineExtensionTest extends TestCase
     public function providerBundles()
     {
         yield ['AnnotationsBundle', 'annotation', '/Entity'];
+        yield ['FullEmbeddableAnnotationsBundle', 'annotation', '/Entity'];
         if (\PHP_VERSION_ID >= 80000) {
             yield ['AttributesBundle', 'attribute', '/Entity'];
+            yield ['FullEmbeddableAttributesBundle', 'attribute', '/Entity'];
         }
         yield ['XmlBundle', 'xml', '/Resources/config/doctrine'];
         yield ['PhpBundle', 'php', '/Resources/config/doctrine'];

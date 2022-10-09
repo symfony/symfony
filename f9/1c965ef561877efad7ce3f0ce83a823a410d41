@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by Chris53897 at 2022-10-02T13:52:27Z
+
+It would be great improvement in my eyes, if the available commands can have a shortcut with a number. If you enter the number the command will be executed.
+But i am not sure if this in the scope of this PR and how much work this would be.
+
+`Available commands for the "debug" namespace:
+  (1) debug:autowiring        List classes/interfaces you can use for autowiring
+  (2) debug:config            Dump the current configuration for an extension
+  (3) debug:container         Display current services for an application
+  (4) debug:dotenv            Lists all dotenv files with variables and values
+  (5) debug:event-dispatcher  Display configured listeners for an application
+ (6) debug:router            Display current routes for an application`
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-10-09T22:12:28Z
+
+Hi @Chris53897! It may be a cool idea to explore further, but it is a bit out of scope for the current implementation. Currently, this PR reuses the `list` command (`bin/console demo` effectively is "aliased" to `bin/console list demo`), so we cannot customize anything in the output at the moment. Let's keep version 1 of this feature simple, and iterate on it in new PRs from the community :)

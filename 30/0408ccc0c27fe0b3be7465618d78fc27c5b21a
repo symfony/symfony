@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-09-27T10:55:24Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-09-27T10:55:25Z
+
+Hey!
+
+Oh no, it looks like you have made this PR towards a branch that is not maintained anymore. :/
+Could you update the [PR base branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request) to target one of these branches instead? 4.4, 5.4, 6.0, 6.1, 6.2.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mtarld at 2022-10-04T14:42:38Z
+
+Hey @barton-webwings,
+
+Thanks for your PR! As you can see in the [Symfony releases calendar](https://symfony.com/releases#symfony-releases-calendar), the 4.3 version isn't maintained anymore, can you please target 4.4 instead?
+
+---------------------------------------------------------------------------
+
+by barton-webwings at 2022-10-05T09:12:21Z
+
+Hello @mtarld,
+
+yeah, the bot warned me about it too, so I rebased the branch onto [symfony:4.4](https://github.com/symfony/symfony/tree/4.4) and changed the target.
+
+I am getting some weird failures in the tests though, looks like due to direct float comparison.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-05T09:15:33Z
+
+Don't worry about the failures, they are not related to your change.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-10-05T09:23:36Z
+
+If you can, you could rebase your changes onto the latest `4.4` branch which should make the CI pass again.

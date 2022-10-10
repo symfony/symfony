@@ -699,7 +699,7 @@ class Inline
                         return (float) str_replace('_', '', $scalar);
                     case Parser::preg_match(self::getTimestampRegex(), $scalar):
                         // When no timezone is provided in the parsed date, YAML spec says we must assume UTC.
-                        $time = new \DateTime($scalar, new \DateTimeZone('UTC'));
+                        $time = new \DateTimeImmutable($scalar, new \DateTimeZone('UTC'));
 
                         if (Yaml::PARSE_DATETIME & $flags) {
                             return $time;

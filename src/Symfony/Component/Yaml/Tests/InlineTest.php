@@ -573,10 +573,10 @@ class InlineTest extends TestCase
      */
     public function testParseTimestampAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond, string $timezone)
     {
-        $expected = new \DateTime($yaml);
-        $expected->setTimeZone(new \DateTimeZone('UTC'));
-        $expected->setDate($year, $month, $day);
-        $expected->setTime($hour, $minute, $second, $microsecond);
+        $expected = (new \DateTime($yaml))
+            ->setTimeZone(new \DateTimeZone('UTC'))
+            ->setDate($year, $month, $day)
+            ->setTime($hour, $minute, $second, $microsecond);
 
         $date = Inline::parse($yaml, Yaml::PARSE_DATETIME);
         $this->assertEquals($expected, $date);
@@ -598,10 +598,10 @@ class InlineTest extends TestCase
      */
     public function testParseNestedTimestampListAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond)
     {
-        $expected = new \DateTime($yaml);
-        $expected->setTimeZone(new \DateTimeZone('UTC'));
-        $expected->setDate($year, $month, $day);
-        $expected->setTime($hour, $minute, $second, $microsecond);
+        $expected = (new \DateTime($yaml))
+            ->setTimeZone(new \DateTimeZone('UTC'))
+            ->setDate($year, $month, $day)
+            ->setTime($hour, $minute, $second, $microsecond);
 
         $expectedNested = ['nested' => [$expected]];
         $yamlNested = "{nested: [$yaml]}";
@@ -636,7 +636,7 @@ class InlineTest extends TestCase
     {
         $tests = [];
 
-        $dateTime = new \DateTime('2001-12-15 21:59:43', new \DateTimeZone('UTC'));
+        $dateTime = new \DateTimeImmutable('2001-12-15 21:59:43', new \DateTimeZone('UTC'));
         $tests['date-time-utc'] = [$dateTime, '2001-12-15T21:59:43+00:00'];
 
         $dateTime = new \DateTimeImmutable('2001-07-15 21:59:43', new \DateTimeZone('Europe/Berlin'));

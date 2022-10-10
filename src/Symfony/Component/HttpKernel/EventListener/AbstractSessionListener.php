@@ -196,7 +196,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
 
         if ($autoCacheControl) {
             $response
-                ->setExpires(new \DateTime())
+                ->setExpires(new \DateTimeImmutable())
                 ->setNoStore()
                 ->setPrivate()
                 ->setMaxAge(0)

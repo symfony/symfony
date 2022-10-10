@@ -33,6 +33,7 @@ use Symfony\Component\Console\Exception\NamespaceNotFoundException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
+use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -259,7 +260,24 @@ class Application implements ResetInterface
             // the command name MUST be the first element of the input
             $command = $this->find($name);
         } catch (\Throwable $e) {
-            if (!($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) || 1 !== \count($alternatives = $e->getAlternatives()) || !$input->isInteractive()) {
+            if (($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) && 1 === \count($alternatives = $e->getAlternatives()) && $input->isInteractive()) {
+                $alternative = $alternatives[0];
+
+                $style = new SymfonyStyle($input, $output);
+                $style->block(sprintf("\nCommand \"%s\" is not defined.\n", $name), null, 'error');
+                if (!$style->confirm(sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
+                    if (null !== $this->dispatcher) {
+                        $event = new ConsoleErrorEvent($input, $output, $e);
+                        $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
+
+                        return $event->getExitCode();
+                    }
+
+                    return 1;
+                }
+
+                $command = $this->find($alternative);
+            } else {
                 if (null !== $this->dispatcher) {
                     $event = new ConsoleErrorEvent($input, $output, $e);
                     $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
@@ -271,25 +289,22 @@ class Application implements ResetInterface
                     $e = $event->getError();
                 }
 
-                throw $e;
-            }
+                try {
+                    if ($e instanceof CommandNotFoundException && $namespace = $this->findNamespace($name)) {
+                        $helper = new DescriptorHelper();
+                        $helper->describe($output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output, $this, [
+                            'format' => 'txt',
+                            'raw_text' => false,
+                            'namespace' => $namespace,
+                            'short' => false,
+                        ]);
 
-            $alternative = $alternatives[0];
-
-            $style = new SymfonyStyle($input, $output);
-            $style->block(sprintf("\nCommand \"%s\" is not defined.\n", $name), null, 'error');
-            if (!$style->confirm(sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
-                if (null !== $this->dispatcher) {
-                    $event = new ConsoleErrorEvent($input, $output, $e);
-                    $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
-
-                    return $event->getExitCode();
+                        return isset($event) ? $event->getExitCode() : 1;
+                    }
+                } catch (NamespaceNotFoundException) {
+                    throw $e;
                 }
-
-                return 1;
             }
-
-            $command = $this->find($alternative);
         }
 
         if ($command instanceof LazyCommand) {

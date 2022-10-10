@@ -44,8 +44,8 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
         $this->assertContains($c->getSymfonyState(), ['eol', 'eom', 'dev', 'stable']);
 
-        $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->format('F Y');
-        $eol = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->format('F Y');
+        $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->format('F Y');
+        $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->format('F Y');
         $this->assertSame($eom, $c->getSymfonyEom());
         $this->assertSame($eol, $c->getSymfonyEol());
     }
@@ -72,8 +72,8 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
         $this->assertContains($c->getSymfonyState(), ['eol', 'eom', 'dev', 'stable']);
 
-        $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->format('F Y');
-        $eol = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->format('F Y');
+        $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->format('F Y');
+        $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->format('F Y');
         $this->assertSame($eom, $c->getSymfonyEom());
         $this->assertSame($eol, $c->getSymfonyEol());
     }

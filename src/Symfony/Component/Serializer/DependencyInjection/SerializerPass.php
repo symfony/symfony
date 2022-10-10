@@ -44,7 +44,7 @@ class SerializerPass implements CompilerPassInterface
         if ($container->getParameter('kernel.debug') && $container->hasDefinition('serializer.data_collector')) {
             foreach (array_keys($normalizers) as $normalizer) {
                 $container->register('debug.'.$normalizer, TraceableNormalizer::class)
-                    ->setDecoratedService($normalizer, null, 255)
+                    ->setDecoratedService($normalizer)
                     ->setArguments([new Reference('debug.'.$normalizer.'.inner'), new Reference('serializer.data_collector')]);
             }
         }
@@ -59,7 +59,7 @@ class SerializerPass implements CompilerPassInterface
         if ($container->getParameter('kernel.debug') && $container->hasDefinition('serializer.data_collector')) {
             foreach (array_keys($encoders) as $encoder) {
                 $container->register('debug.'.$encoder, TraceableEncoder::class)
-                    ->setDecoratedService($encoder, null, 255)
+                    ->setDecoratedService($encoder)
                     ->setArguments([new Reference('debug.'.$encoder.'.inner'), new Reference('serializer.data_collector')]);
             }
         }

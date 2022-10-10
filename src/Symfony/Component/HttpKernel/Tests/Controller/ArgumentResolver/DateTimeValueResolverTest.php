@@ -76,13 +76,13 @@ class DateTimeValueResolverTest extends TestCase
         date_default_timezone_set($timezone);
         $resolver = new DateTimeValueResolver();
 
-        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00']);
 
         $results = $resolver->resolve($request, $argument);
 
         $this->assertCount(1, $results);
-        $this->assertInstanceOf(\DateTime::class, $results[0]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $results[0]);
         $this->assertSame($timezone, $results[0]->getTimezone()->getName(), 'Default timezone');
         $this->assertEquals('2012-07-21 00:00:00', $results[0]->format('Y-m-d H:i:s'));
     }
@@ -95,13 +95,13 @@ class DateTimeValueResolverTest extends TestCase
         date_default_timezone_set($timezone);
         $resolver = new DateTimeValueResolver();
 
-        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '989541720']);
 
         $results = $resolver->resolve($request, $argument);
 
         $this->assertCount(1, $results);
-        $this->assertInstanceOf(\DateTime::class, $results[0]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $results[0]);
         $this->assertSame('+00:00', $results[0]->getTimezone()->getName(), 'Timestamps are UTC');
         $this->assertEquals('2001-05-11 00:42:00', $results[0]->format('Y-m-d H:i:s'));
     }
@@ -110,7 +110,7 @@ class DateTimeValueResolverTest extends TestCase
     {
         $resolver = new DateTimeValueResolver();
 
-        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null, true);
+        $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null, true);
         $request = self::requestWithAttributes(['dummy' => '']);
 
         $results = $resolver->resolve($request, $argument);
@@ -123,8 +123,8 @@ class DateTimeValueResolverTest extends TestCase
     {
         $resolver = new DateTimeValueResolver();
 
-        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null, true);
-        $request = self::requestWithAttributes(['dummy' => $datetime = new \DateTime()]);
+        $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null, true);
+        $request = self::requestWithAttributes(['dummy' => $datetime = new \DateTimeImmutable()]);
 
         $results = $resolver->resolve($request, $argument);
 
@@ -191,15 +191,15 @@ class DateTimeValueResolverTest extends TestCase
     {
         return [
             'invalid date' => [
-                new ArgumentMetadata('dummy', \DateTime::class, false, false, null),
+                new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null),
                 self::requestWithAttributes(['dummy' => 'Invalid DateTime Format']),
             ],
             'invalid format' => [
-                new ArgumentMetadata('dummy', \DateTime::class, false, false, null, false, [new MapDateTime(format: 'd.m.Y')]),
+                new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null, false, [new MapDateTime(format: 'd.m.Y')]),
                 self::requestWithAttributes(['dummy' => '2012-07-21']),
             ],
             'invalid ymd format' => [
-                new ArgumentMetadata('dummy', \DateTime::class, false, false, null, false, [new MapDateTime(format: 'Y-m-d')]),
+                new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null, false, [new MapDateTime(format: 'Y-m-d')]),
                 self::requestWithAttributes(['dummy' => '2012-21-07']),
             ],
         ];
@@ -230,6 +230,6 @@ class DateTimeValueResolverTest extends TestCase
     }
 }
 
-class FooDateTime extends \DateTime
+class FooDateTime extends \DateTimeImmutable
 {
 }

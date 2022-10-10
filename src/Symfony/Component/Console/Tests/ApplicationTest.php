@@ -555,6 +555,22 @@ class ApplicationTest extends TestCase
         ];
     }
 
+    public function testRunNamespace()
+    {
+        putenv('COLUMNS=120');
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'foo'], ['decorated' => false]);
+        $display = trim($tester->getDisplay(true));
+        $this->assertStringContainsString('Available commands for the "foo" namespace:', $display);
+        $this->assertStringContainsString('The foo:bar command', $display);
+        $this->assertStringContainsString('The foo:bar1 command', $display);
+    }
+
     public function testFindAlternativeExceptionMessageMultiple()
     {
         putenv('COLUMNS=120');

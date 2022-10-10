@@ -159,9 +159,9 @@ EOTXT;
     public function testCastObjectStorageDumpsInfo()
     {
         $var = new \SplObjectStorage();
-        $var->attach(new \stdClass(), new \DateTime());
+        $var->attach(new \stdClass(), new \DateTimeImmutable());
 
-        $this->assertDumpMatchesFormat('%ADateTime%A', $var);
+        $this->assertDumpMatchesFormat('%ADateTimeImmutable%A', $var);
     }
 
     public function testCastArrayObject()

@@ -227,7 +227,7 @@ class Process implements \IteratorAggregate
      * from the independent process during execution.
      *
      * The STDOUT and STDERR are also available after the process is finished
-     * via the getOutput() and getErrorOutput() methods.
+     * via the getOutput(), getErrorOutput() or getAnyOutput() methods.
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR

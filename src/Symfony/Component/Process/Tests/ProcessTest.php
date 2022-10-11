@@ -437,6 +437,19 @@ class ProcessTest extends TestCase
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
     }
 
+    public function testGetAnyOutput()
+    {
+        $p = $this->getProcessForCode('$n = 0; while ($n < 3) { echo \' foo \'; $n++; }');
+
+        $p->run();
+        $this->assertEquals(3, preg_match_all('/foo/', $p->getAnyOutput(), $matches));
+
+        $p = $this->getProcessForCode('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }');
+
+        $p->run();
+        $this->assertEquals(3, preg_match_all('/ERROR/', $p->getAnyOutput(), $matches));
+    }
+
     public function testFlushOutput()
     {
         $p = $this->getProcessForCode('$n=0;while ($n<3) {echo \' foo \';$n++;}');

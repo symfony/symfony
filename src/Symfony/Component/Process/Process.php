@@ -577,6 +577,17 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Returns any output of the process (STDOUT and STDERR).
+     *
+     * @throws LogicException in case the output has been disabled
+     * @throws LogicException In case the process is not started
+     */
+    public function getAnyOutput(): string
+    {
+        return $this->getOutput() . $this->getErrorOutput();
+    }
+
+    /**
      * Returns the output incrementally.
      *
      * In comparison with the getOutput method which always return the whole

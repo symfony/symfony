@@ -213,10 +213,10 @@
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {%- set row_class = 'form-check' -%}
     {%- if 'checkbox-inline' in parent_label_class %}
-        {% set row_class = row_class ~ ' form-check-inline' %}
+        {%- set row_class = row_class ~ ' form-check-inline' -%}
     {% endif -%}
     {%- if 'checkbox-switch' in parent_label_class %}
-        {% set row_class = row_class ~ ' form-switch' %}
+        {%- set row_class = row_class ~ ' form-switch' -%}
     {% endif -%}
     <div class="{{ row_class }}">
         {{- form_label(form, null, { widget: parent() }) -}}

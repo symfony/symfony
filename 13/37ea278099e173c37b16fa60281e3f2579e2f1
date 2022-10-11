@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by sarbanha at 2022-10-10T10:56:27Z
+
+> Not a bug per se though, I'd say this should be merged in 6.2.
+
+I couldn't decide initially if it should be suggested as a bug or feature, but it looks more like an improvement. Do you think I should create another PR for 6.2 too?
+
+I think it has been said that merges to older tags would be merged to newer ones in a few days.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-10T11:14:36Z
+
+No worry, we can switch the branch while merging this PR.

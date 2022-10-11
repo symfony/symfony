@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2.0
+-----
+
+* added `Process::getAnyOutput()` to get any output regardless if it origins from stderr or stdout
+
 5.2.0
 -----
 

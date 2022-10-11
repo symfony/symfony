@@ -195,11 +195,11 @@ class Connection
         self::validateOptions($amqpOptions);
 
         if (isset($parsedUrl['user'])) {
-            $amqpOptions['login'] = urldecode($parsedUrl['user']);
+            $amqpOptions['login'] = $parsedUrl['user'];
         }
 
         if (isset($parsedUrl['pass'])) {
-            $amqpOptions['password'] = urldecode($parsedUrl['pass']);
+            $amqpOptions['password'] = $parsedUrl['pass'];
         }
 
         if (!isset($amqpOptions['queues'])) {

@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by drupol at 2022-10-07T09:17:46Z
+
+Oh ! Going to test this ASAP ! Thanks @nicolas-grekas !
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-10-07T21:13:40Z
+
+I tested it and it works, however, there is still an issue in our app.
+
+This is because of [PsrHttpFactory.php#L130](https://github.com/symfony/psr-http-message-bridge/blob/main/Factory/PsrHttpFactory.php#L130). I have the feeling that it also need some adaptations.
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-10-07T21:52:40Z
+
+I made further test, but I'm still unable to get the body of a response twice. I'm also unable to reproduce the issue in a few lines of code.
+
+I made a screenshot after adding some `dump` and `dd` in `Psr18Client::sendRequest()`, without changing anything else, as such:
+
+```php
+   /**
+     * {@inheritdoc}
+     */
+    public function sendRequest(RequestInterface $request): ResponseInterface
+    {
+        try {
+            $body = $request->getBody();
+
+            if ($body->isSeekable()) {
+                $body->seek(0);
+            }
+
+            $response = $this->client->request($request->getMethod(), (string) $request->getUri(), [
+                'headers' => $request->getHeaders(),
+                'body' => $body->getContents(),
+                'http_version' => '1.0' === $request->getProtocolVersion() ? '1.0' : null,
+            ]);
+
+            $psrResponse = $this->responseFactory->createResponse($response->getStatusCode());
+
+            foreach ($response->getHeaders(false) as $name => $values) {
+                foreach ($values as $value) {
+                    try {
+                        $psrResponse = $psrResponse->withAddedHeader($name, $value);
+                    } catch (\InvalidArgumentException $e) {
+                        // ignore invalid header
+                    }
+                }
+            }
+
+            if ($response instanceof StreamableInterface) {
+                dump('Response is StreamableInterface', $response);
+                $body = $response->toStream(false);
+            } else {
+                dump('Response is not StreamableInterface', $response);
+                $body = StreamWrapper::createResource($response, $this->client);
+            }
+
+            $body = $this->streamFactory->createStreamFromResource($body);
+
+            $r = $psrResponse->withBody($body);
+
+            dump((string)$r->getBody());
+            dd((string)$r->getBody());
+
+            return $r;
+        } catch (TransportExceptionInterface $e) {
+            if ($e instanceof \InvalidArgumentException) {
+                throw new Psr18RequestException($e, $request);
+            }
+
+            throw new Psr18NetworkException($e, $request);
+        }
+    }
+```
+
+And here's the result. Sorry for the pixelisation of the information, but they are not relevant here.
+
+![screenshot-127 0 0 1_8000-2022 10 07-23_45_48](https://user-images.githubusercontent.com/252042/194666828-98556981-380d-4d9f-83d2-de36464129a4.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-07T22:37:35Z
+
+Please provide a reproducing script if you can, I don't be able to
+understand without one.
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-10-07T22:47:10Z
+
+I've spent the whole evening trying to reproduce it, without luck. I'll try again this weekend.
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-10-09T20:51:27Z
+
+What I propose is to merge this PR, then I'll open another issue for the rest. WDYT ?

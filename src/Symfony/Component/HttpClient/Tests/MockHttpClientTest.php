@@ -311,6 +311,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 return $client;
 
             case 'testNonBlockingStream':
+            case 'testSeekAsyncStream':
                 $responses[] = new MockResponse((function () { yield '<1>'; yield ''; yield '<2>'; })(), ['response_headers' => $headers]);
                 break;
 

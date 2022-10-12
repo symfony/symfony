@@ -39,6 +39,7 @@ class ClassDiscriminatorMappingTest extends TestCase
             'third' => AbstractDummyThirdChild::class,
         ]);
 
+        $this->assertEquals('first', $mapping->getMappedObjectType(AbstractDummyFirstChild::class));
         $this->assertEquals('first', $mapping->getMappedObjectType(new AbstractDummyFirstChild()));
         $this->assertNull($mapping->getMappedObjectType(new AbstractDummySecondChild()));
         $this->assertSame('third', $mapping->getMappedObjectType(new AbstractDummyThirdChild()));

@@ -9,9 +9,8 @@ close
 open
 validateId
 read
-doRead: abc|i:123;
+doRead: invalid sessionId
 read
-doRead: abc|i:123;
 
 write
 doWrite: abc|i:123;

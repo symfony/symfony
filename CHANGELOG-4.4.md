@@ -7,6 +7,16 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.47 (2022-10-12)
+
+ * bug #47621 [Serializer] Allow getting discriminated type by class name (TamasSzigeti)
+ * bug #47808 [HttpClient] Fix seeking in not-yet-initialized requests (nicolas-grekas)
+ * bug #47702 [Messenger] Fix default serializer not handling DateTime objects properly (barton-webwings)
+ * bug #47779 [Console] Fix `Helper::removeDecoration` hyperlink bug (greew)
+ * bug #47763 [PropertyInfo] a readonly property must not be reported as being writable (xabbuh)
+ * bug #47731 [WebProfiler] Fix overflow issue in Forms panel (zolikonta)
+ * bug #47746 [HttpFoundation] Fix BinaryFileResponse content type detection logic (X-Coder264)
+
 * 4.4.46 (2022-09-30)
 
  * bug #47547 [Ldap] Do not run ldap_set_option on failed connection (tatankat)

@@ -72,20 +72,29 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $this->requestStack->push($request);
         try {
-            return $this->handleRaw($request, $type);
-        } catch (\Exception $e) {
+            $response = $this->handleRaw($request, $type);
+            $this->requestStack->pop();
+
+            return $response;
+        } catch (\Error|\Exception $e) {
             if ($e instanceof RequestExceptionInterface) {
                 $e = new BadRequestHttpException($e->getMessage(), $e);
             }
             if (false === $catch) {
                 $this->finishRequest($request, $type);
+                $this->requestStack->pop();
 
                 throw $e;
             }
 
-            return $this->handleThrowable($e, $request, $type);
-        } finally {
-            $this->requestStack->pop();
+            try {
+                $response = $this->handleThrowable($e, $request, $type);
+            } catch (\Error|\Exception $exception) {
+                $this->requestStack->pop();
+                throw $exception;
+            }
+
+            return $response;
         }
     }
 

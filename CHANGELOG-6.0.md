@@ -7,6 +7,22 @@ in 6.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.0.0...v6.0.1
 
+* 6.0.14 (2022-10-12)
+
+ * bug #47621 [Serializer] Allow getting discriminated type by class name (TamasSzigeti)
+ * bug #47833 [TwigBridge] Remove empty spaces between choices when using checkbox-inline or checkbox-switch (simondaigre)
+ * bug #47808 [HttpClient] Fix seeking in not-yet-initialized requests (nicolas-grekas)
+ * bug #47798 [DoctrineBridge] Fix auto mapping for bundles that contain only embeddables (jorissae)
+ * bug #47702 [Messenger] Fix default serializer not handling DateTime objects properly (barton-webwings)
+ * bug #47779 [Console] Fix `Helper::removeDecoration` hyperlink bug (greew)
+ * bug #47753 [Mime] sync message serializer code for forward-compatibility (xabbuh)
+ * bug #47763 [PropertyInfo] a readonly property must not be reported as being writable (xabbuh)
+ * bug #47731 [WebProfiler] Fix overflow issue in Forms panel (zolikonta)
+ * bug #46956 [FrameworkBundle] Allow to specify `null` for exception mapping configuration values (andrew-demb)
+ * bug #47746 [HttpFoundation] Fix BinaryFileResponse content type detection logic (X-Coder264)
+ * bug #47626 [Notifier] [Expo] Throw exception on error-response from expo api (sdrewergutland)
+ * bug #47317 [Security] Fix login url matching when app is not run with url rewriting or from a sub folder (sgehrig)
+
 * 6.0.13 (2022-09-30)
 
  * bug #47637 [FrameworkBundle] Fix passing `serializer.default_context` option to normalizers (wuchen90)

@@ -68,7 +68,7 @@
             <h2><code>{{ transport }}</code> transport</h2>
             {{ _self.render_transport_details(collector, transport) }}
         {% endfor %}
-    {% else %}
+    {% elseif events.transports %}
         {{ _self.render_transport_details(collector, events.transports|first, true) }}
     {% endif %}
 
@@ -106,7 +106,7 @@
                 {% endfor %}
 
                 <script>Sfjs.initializeMailerTable();</script>
-            {% else %}
+            {% elseif num_emails %}
                 {% set event = (collector.events.events(transport)|first) %}
                 {{ _self.render_email_details(collector, transport, event.message, event.isQueued, show_transport_name) }}
             {% endif %}

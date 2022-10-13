@@ -11,16 +11,25 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
+use Symfony\Component\Notifier\Exception\LengthException;
+
 /**
  * @author Karoly Gossler <connor@connor.hu>
  */
 final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
 {
+    private const NAME_LIMIT = 256;
+    private const VALUE_LIMIT = 1024;
+
     /**
      * @return $this
      */
     public function name(string $name): static
     {
+        if (\strlen($name) > self::NAME_LIMIT) {
+            throw new LengthException(sprintf('Maximum length for the name is %d characters.', self::NAME_LIMIT));
+        }
+
         $this->options['name'] = $name;
 
         return $this;
@@ -31,6 +40,10 @@ final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
      */
     public function value(string $value): static
     {
+        if (\strlen($value) > self::VALUE_LIMIT) {
+            throw new LengthException(sprintf('Maximum length for the value is %d characters.', self::VALUE_LIMIT));
+        }
+
         $this->options['value'] = $value;
 
         return $this;

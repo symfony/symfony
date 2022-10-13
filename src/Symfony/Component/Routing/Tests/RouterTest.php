@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
@@ -129,6 +130,29 @@ class RouterTest extends TestCase
             ->willReturn(new RouteCollection());
 
         $this->assertInstanceOf(UrlGenerator::class, $this->router->getGenerator());
+    }
+
+    /**
+     * @dataProvider provideGeneratorClass
+     */
+    public function testGeneratorIsCreatedWithGeneratorClass(string $generatorClass)
+    {
+        $this->router->setOption('cache_dir', null);
+        $this->router->setOption('generator_class', $generatorClass);
+
+        $this->loader->expects($this->once())
+            ->method('load')->with('routing.yml', null)
+            ->willReturn(new RouteCollection());
+
+        $this->assertInstanceOf($generatorClass, $this->router->getGenerator());
+    }
+
+    public function provideGeneratorClass(): array
+    {
+        return [
+            CompiledUrlGenerator::class => [CompiledUrlGenerator::class],
+            UrlGenerator::class => [UrlGenerator::class],
+        ];
     }
 
     public function testMatchRequestWithUrlMatcherInterface()

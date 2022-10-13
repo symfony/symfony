@@ -49,6 +49,25 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
     }
 
+    public function testPrepareRequestWithBodyIsArray()
+    {
+        $defaults = [
+            'base_uri' => 'http://example.com?c=c',
+            'query' => ['a' => 1, 'b' => 'b'],
+            'body' => []
+        ];
+        [, $defaults] = self::prepareRequest(null, null, $defaults);
+
+        [,$options] = self::prepareRequest(null, 'http://example.com', [
+            'body' => [1, 2],
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8'
+            ]
+        ], $defaults);
+
+        $this->assertContains('Content-Type: application/x-www-form-urlencoded; charset=utf-8', $options['headers']);
+    }
+
     /**
      * @dataProvider provideResolveUrl
      */

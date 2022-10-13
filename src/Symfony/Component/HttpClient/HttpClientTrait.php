@@ -50,7 +50,6 @@ trait HttpClientTrait
         }
 
         $options = self::mergeDefaultOptions($options, $defaultOptions, $allowExtraOptions);
-
         $buffer = $options['buffer'] ?? true;
 
         if ($buffer instanceof \Closure) {
@@ -95,7 +94,9 @@ trait HttpClientTrait
 
         if (isset($options['body'])) {
             if (\is_array($options['body'])) {
-                $options['normalized_headers']['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
+                $options['normalized_headers']['content-type'] = self::isFormUrlEncoded($options) ?
+                    $options['normalized_headers']['content-type'] :
+                    ['Content-Type: application/x-www-form-urlencoded'];
             }
 
             $options['body'] = self::normalizeBody($options['body']);
@@ -675,5 +676,17 @@ trait HttpClientTrait
         }
 
         return $contentType && preg_match('#^(?:text/|application/(?:.+\+)?(?:json|xml)$)#i', $contentType);
+    }
+
+    public static function isFormUrlEncoded(array $options): bool
+    {
+        if (isset($options['normalized_headers']['content-type'])) {
+            return count(array_filter(
+                    $options['normalized_headers']['content-type'],
+                    fn(string $contentType) => str_contains($contentType, 'application/x-www-form-urlencoded')
+                )) > 0;
+        }
+
+        return false;
     }
 }

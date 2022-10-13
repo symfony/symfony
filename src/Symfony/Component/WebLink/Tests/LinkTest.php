@@ -12,6 +12,7 @@
 namespace Symfony\Component\WebLink\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\WebLink\Enum\LinkRelations;
 use Symfony\Component\WebLink\Link;
 
 /**
@@ -54,11 +55,11 @@ class LinkTest extends TestCase
         $link = (new Link())
             ->withHref('http://www.google.com')
             ->withRel('next')
-            ->withRel('reference');
+            ->withRel('acl');
 
         $this->assertCount(2, $link->getRels());
         $this->assertContains('next', $link->getRels());
-        $this->assertContains('reference', $link->getRels());
+        $this->assertContains('acl', $link->getRels());
     }
 
     public function testConstructor()
@@ -105,5 +106,21 @@ class LinkTest extends TestCase
             ['http://www.google.com/foo'],
             ['/foo/bar/baz'],
         ];
+    }
+
+    public function testWithEnumRel()
+    {
+        $link = (new Link(LinkRelations::ABOUT))
+            ->withRel(LinkRelations::ACL);
+
+        $this->assertCount(2, $link->getRels());
+        $this->assertContains('about', $link->getRels());
+        $this->assertContains('acl', $link->getRels());
+
+        $link = $link->withoutRel(LinkRelations::ACL);
+
+        $this->assertCount(1, $link->getRels());
+        $this->assertContains('about', $link->getRels());
+        $this->assertFalse(\in_array('acl', $link->getRels()));
     }
 }

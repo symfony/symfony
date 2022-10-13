@@ -64,9 +64,9 @@ final class GitRepository
         return $this->getLastLine($this->execInPath('git log -1 --format="%an"'));
     }
 
-    public function getLastAuthoredDate(): \DateTime
+    public function getLastAuthoredDate(): \DateTimeImmutable
     {
-        return new \DateTime($this->getLastLine($this->execInPath('git log -1 --format="%ai"')));
+        return new \DateTimeImmutable($this->getLastLine($this->execInPath('git log -1 --format="%ai"')));
     }
 
     public function getLastTag(callable $filter = null): string

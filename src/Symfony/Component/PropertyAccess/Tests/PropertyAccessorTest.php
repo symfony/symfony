@@ -632,16 +632,16 @@ class PropertyAccessorTest extends TestCase
     public function testThrowTypeError()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected argument of type "DateTime", "string" given at property path "date"');
+        $this->expectExceptionMessage('Expected argument of type "DateTimeImmutable", "string" given at property path "date"');
         $object = new TypeHinted();
 
-        $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTime expected.');
+        $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTimeImmutable expected.');
     }
 
     public function testThrowTypeErrorWithNullArgument()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected argument of type "DateTime", "null" given');
+        $this->expectExceptionMessage('Expected argument of type "DateTimeImmutable", "null" given');
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', null);
@@ -649,7 +649,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testSetTypeHint()
     {
-        $date = new \DateTime();
+        $date = new \DateTimeImmutable();
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', $date);
@@ -774,7 +774,7 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(\TypeError::class);
         $object = new ReturnTyped();
 
-        $this->propertyAccessor->setValue($object, 'foos', [new \DateTime()]);
+        $this->propertyAccessor->setValue($object, 'foos', [new \DateTimeImmutable()]);
     }
 
     public function testDoNotDiscardReturnTypeErrorWhenWriterMethodIsMisconfigured()

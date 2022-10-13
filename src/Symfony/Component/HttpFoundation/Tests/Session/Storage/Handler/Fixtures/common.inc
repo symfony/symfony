@@ -126,6 +126,7 @@ class TestSessionHandler extends AbstractSessionHandler
             return '';
         }
         echo __FUNCTION__ . ': ', $this->data, "\n";
+        $this->sessionId = $sessionId;
 
         return $this->data;
     }
@@ -133,6 +134,7 @@ class TestSessionHandler extends AbstractSessionHandler
     protected function doWrite($sessionId, $data): bool
     {
         echo __FUNCTION__.': ', $data, "\n";
+        $this->sessionId = $sessionId;
 
         return true;
     }
@@ -140,6 +142,7 @@ class TestSessionHandler extends AbstractSessionHandler
     protected function doDestroy($sessionId): bool
     {
         echo __FUNCTION__, "\n";
+        $this->sessionId = '';
 
         return true;
     }

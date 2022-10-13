@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Debug\TraceableSerializer;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('debug.serializer', TraceableSerializer::class)
-            ->decorate('serializer', null, 255)
+            ->decorate('serializer')
             ->args([
                 service('debug.serializer.inner'),
                 service('serializer.data_collector'),

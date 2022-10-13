@@ -27,7 +27,7 @@ class SMimeSignerTest extends SMimeTestCase
     {
         $message = new Message(
             (new Headers())
-                ->addDateHeader('Date', new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+                ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
                 ->addMailboxListHeader('From', ['fabien@symfony.com']),
             new TextPart('content')
         );
@@ -41,7 +41,7 @@ class SMimeSignerTest extends SMimeTestCase
     public function testSignEncryptedMessage()
     {
         $message = (new Email())
-            ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->to('fabien@symfony.com')
             ->subject('Testing')
             ->from('noreply@example.com')
@@ -62,7 +62,7 @@ class SMimeSignerTest extends SMimeTestCase
     {
         $message = new Message(
             (new Headers())
-                ->addDateHeader('Date', new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+                ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
                 ->addMailboxListHeader('From', ['fabien@symfony.com']),
             new TextPart('content')
         );
@@ -76,7 +76,7 @@ class SMimeSignerTest extends SMimeTestCase
     public function testProperSerialiable()
     {
         $message = (new Email())
-            ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->to('fabien@symfony.com')
             ->subject('Testing')
             ->from('noreply@example.com')
@@ -98,7 +98,7 @@ class SMimeSignerTest extends SMimeTestCase
     public function testSignedMessageWithBcc()
     {
         $message = (new Email())
-            ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->to('fabien@symfony.com')
             ->addBcc('fabien@symfony.com', 's.stok@rollerscapes.net')
             ->subject('I am your sign of fear')
@@ -114,7 +114,7 @@ class SMimeSignerTest extends SMimeTestCase
     public function testSignedMessageWithAttachments()
     {
         $message = new Email((new Headers())
-            ->addDateHeader('Date', new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->addMailboxListHeader('From', ['fabien@symfony.com'])
             ->addMailboxListHeader('To', ['fabien@symfony.com'])
         );
@@ -133,7 +133,7 @@ class SMimeSignerTest extends SMimeTestCase
     {
         $message = new Message(
             (new Headers())
-                ->addDateHeader('Date', new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+                ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
                 ->addMailboxListHeader('From', ['fabien@symfony.com']),
             new TextPart('content')
         );

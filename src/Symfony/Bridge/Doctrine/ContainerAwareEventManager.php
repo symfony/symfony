@@ -70,6 +70,8 @@ class ContainerAwareEventManager extends EventManager
     public function getListeners($event = null): array
     {
         if (null === $event) {
+            trigger_deprecation('symfony/doctrine-bridge', '6.2', 'Calling "%s()" without an event name is deprecated. Call "getAllListeners()" instead.', __METHOD__);
+
             return $this->getAllListeners();
         }
         if (!$this->initializedSubscribers) {

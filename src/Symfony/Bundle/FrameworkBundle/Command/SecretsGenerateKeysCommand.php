@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
+use Symfony\Bundle\FrameworkBundle\Secrets\DotenvVault;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -74,7 +75,7 @@ EOF
             return 1;
         }
 
-        if (!$input->getOption('rotate')) {
+        if (!$vault instanceof DotenvVault && !$input->getOption('rotate')) {
             if ($vault->generateKeys()) {
                 $io->success($vault->getLastMessage());
 
@@ -101,13 +102,15 @@ EOF
             $secrets[$name] = $value;
         }
 
-        if (!$vault->generateKeys(true)) {
+        if (!$vault instanceof DotenvVault && !$vault->generateKeys(true)) {
             $io->warning($vault->getLastMessage());
 
             return 1;
         }
 
-        $io->success($vault->getLastMessage());
+        if ($vault->getLastMessage()) {
+            $io->success($vault->getLastMessage());
+        }
 
         if ($secrets) {
             foreach ($secrets as $name => $value) {

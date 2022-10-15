@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Nav tiesību ši resursa izsaukšanai.</target>
+                <target>Nav tiesību šī resursa izsaukšanai.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>Pārāk daudz atteiktu ieejas mēģinājumu, lūdzu, mēģiniet vēlreiz vēlāk.</target>
+                <target>Pārāk daudz atteiktu autentifikācijas mēģinājumu, lūdzu, mēģiniet vēlreiz vēlāk.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
-                <target>Ieejas saite ir nederīga vai arī tai ir beidzies derīguma termiņš.</target>
+                <target>Autentifikācijas saite ir nederīga vai arī tai ir beidzies derīguma termiņš.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>

@@ -5,7 +5,9 @@ CHANGELOG
 ---
 
  * Deprecate calling `PropertyAccessorBuilder::setCacheItemPool()` without arguments
- * Added method `isNullSafe()` to `PropertyPathInterface`
+ * Added method `isNullSafe()` to `PropertyPathInterface`, implementing the interface without implementing this method
+   is deprecated
+ * Add support for the null-coalesce operator in property paths
 
 6.0
 ---

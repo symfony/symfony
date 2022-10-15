@@ -19,6 +19,7 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
  * This is a lazy-loading firewall map implementation.
  *
  * Listeners will only be initialized if we really need them.
+ * Some change
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

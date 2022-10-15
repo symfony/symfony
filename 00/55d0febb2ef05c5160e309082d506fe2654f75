@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-09-28T08:32:23Z
+
+As mentioned in the related PR, I'm not sure this is worth it either. That's just a proposal.
+The current names are slightly wrong; that's why it might make sense to deprecate them.
+But again, not 100% convinced.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-28T08:39:19Z
+
+To make it easier to support multiple versions, we might keep those names around for now, and deprecate them only in 7.1. As those methods are implemented as shortcuts on top of the new API, their maintenance cost is quite low.
+
+However, if you expect to rename `attachPart` to `addPart` as part of the deprecations, I would add the new name already.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-28T09:18:00Z
+
+Thanks for the insights. I'm "-0" personnaly: not worth the trouble pushed to the community IMHO.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-09-28T09:37:16Z
+
+I would at least keep the removal of using these methods internally and I would advocate for adding the addPart() method to replace the attachPart one.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-15T06:36:14Z
+
+I've removed all deprecations but the one for `attachPart()` which is semantically wrong.

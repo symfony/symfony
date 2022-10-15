@@ -68,7 +68,7 @@
             <h2><code>{{ transport }}</code> transport</h2>
             {{ _self.render_transport_details(collector, transport) }}
         {% endfor %}
-    {% else %}
+    {% elseif events.transports is not empty %}
         {{ _self.render_transport_details(collector, events.transports|first, true) }}
     {% endif %}
 

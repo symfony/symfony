@@ -107,14 +107,27 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --button-active-background: var(--gray-200);
     --badge-background: var(--gray-200);
     --badge-color: var(--gray-600);
+    --badge-shadow: none;
+    --selected-badge-background: var(--gray-200);
+    --selected-badge-color: var(--gray-600);
+    --selected-badge-shadow: inset 0 0 0 1px var(--gray-300);
     --badge-light-background: var(--gray-100);
     --badge-light-color: var(--gray-500);
     --badge-success-background: var(--green-100);
     --badge-success-color: var(--green-700);
+    --badge-success-shadow: none;
     --badge-warning-background: var(--yellow-200);
     --badge-warning-color: var(--yellow-700);
+    --badge-warning-shadow: none;
+    --selected-badge-warning-background: var(--yellow-200);
+    --selected-badge-warning-color: var(--yellow-700);
+    --selected-badge-warning-shadow: inset 0 0 0 1px var(--yellow-500);
     --badge-danger-background: var(--red-100);
     --badge-danger-color: var(--red-700);
+    --badge-danger-shadow: none;
+    --selected-badge-danger-background: var(--red-100);
+    --selected-badge-danger-color: var(--red-700);
+    --selected-badge-danger-shadow: inset 0 0 0 1px var(--red-200);
     --sidebar-shadow: inset 0 0 0 1px var(--menu-border-color), 0 0 0 3px var(--gray-50), 0 0 0 5px var(--page-background);
     --menu-border-color: var(--gray-300);
     --menu-color: var(--gray-700);
@@ -233,14 +246,29 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
     --button-box-shadow: 0 1px 0 0 var(--gray-500);
     --button-color: var(--gray-800);
     --button-active-background: var(--gray-400);
-    --badge-background: #555;
-    --badge-color: #ddd;
-    --badge-light-background: var(--gray-600);
-    --badge-light-color: var(--gray-200);
-    --badge-warning-background: var(--yellow-300);
-    --badge-warning-color: var(--yellow-700);
-    --badge-danger-background: var(--red-600);
-    --badge-danger-color: var(--red-100);
+    --badge-background: rgba(221, 221, 221, 0.2);
+    --badge-color: var(--gray-300);
+    --badge-shadow: none;
+    --selected-badge-background: #555;
+    --selected-badge-color: #ddd;
+    --selected-badge-shadow: none;
+    --badge-light-background: var(--gray-700);
+    --badge-light-color: var(--gray-300);
+    --badge-success-background: #1dc9a420;
+    --badge-success-color: #36e2bd;
+    --badge-success-shadow: inset 0 0 0 1px #36e2bd4d;
+    --badge-warning-background: #f97a1f33;
+    --badge-warning-color: #FCDE83;
+    --badge-warning-shadow: inset 0 0 0 1px #e6af0580;
+    --selected-badge-warning-background: var(--yellow-300);
+    --selected-badge-warning-color: var(--yellow-700);
+    --selected-badge-warning-shadow: inset 0 0 0 1px var(--yellow-600);
+    --badge-danger-background: #E1244B20;
+    --badge-danger-color: var(--red-300);
+    --badge-danger-shadow: inset 0 0 0 1px #e1244Bd0;
+    --selected-badge-danger-background: var(--red-600);
+    --selected-badge-danger-color: var(--red-100);
+    --selected-badge-danger-shadow: none;
     --sidebar-shadow: inset 0 0 0 1px var(--menu-border-color), 0 0 0 5px var(--page-background);
     --menu-border-color: var(--gray-500);
     --menu-color: var(--gray-300);
@@ -657,8 +685,9 @@ table tbody td.num-col {
 }
 
 .label {
-    background-color: var(--base-4);
+    background-color: var(--badge-background);
     border-radius: 4px;
+    box-shadow: var(--badge-shadow);
     color: #FAFAFA;
     display: inline-block;
     font-size: 12px;
@@ -670,9 +699,9 @@ table tbody td.num-col {
     min-width: 70px;
     text-align: center;
 }
-.label.status-success { background: var(--badge-success-background); color: var(--badge-success-color); }
-.label.status-warning { background: var(--badge-warning-background); color: var(--badge-warning-color); }
-.label.status-error   { background: var(--badge-danger-background); color: var(--badge-danger-color); }
+.label.status-success { background: var(--badge-success-background); box-shadow: var(--badge-success-shadow); color: var(--badge-success-color); }
+.label.status-warning { background: var(--badge-warning-background); box-shadow: var(--badge-warning-shadow); color: var(--badge-warning-color); }
+.label.status-error { background: var(--badge-danger-background); box-shadow: var(--badge-danger-shadow); color: var(--badge-danger-color); }
 
 {# Metrics
    ------------------------------------------------------------------------- #}
@@ -1381,10 +1410,10 @@ tr.status-warning td {
     border-radius: 6px;
     content: '';
     position: absolute;
-    top: calc(50% - 12px);
+    top: calc(50% - 14px);
     left: -8px;
     width: 4px;
-    height: 26px;
+    height: 28px;
 }
 #menu-profiler li.selected a .label,
 #menu-profiler:hover li.selected a:hover .label,
@@ -1403,9 +1432,10 @@ tr.status-warning td {
 }
 
 #menu-profiler li a .count {
-    background: var(--badge-background);
+    background: var(--selected-badge-background);
     border-radius: 4px;
-    color: var(--badge-color);
+    box-shadow: var(--selected-badge-shadow);
+    color: var(--selected-badge-color);
     display: inline-block;
     font-weight: bold;
     line-height: 1;
@@ -1423,15 +1453,14 @@ tr.status-warning td {
 }
 
 #menu-profiler .label-status-warning .count {
-    background: var(--badge-warning-background);
-    color: var(--badge-warning-color);
-}
-.theme-dark #menu-profiler .label-status-warning .count {
-    box-shadow: inset 0 0 0 1px var(--yellow-600);
+    background: var(--selected-badge-warning-background);
+    color: var(--selected-badge-warning-color);
+    box-shadow: var(--selected-badge-warning-shadow);
 }
 #menu-profiler .label-status-error .count {
-    background: var(--badge-danger-background);
-    color: var(--badge-danger-color);
+    background: var(--selected-badge-danger-background);
+    color: var(--selected-badge-danger-color);
+    box-shadow: var(--selected-badge-danger-shadow);
 }
 
 {# Timeline panel
@@ -1544,6 +1573,9 @@ tr.status-warning td {
     width: 0;
 }
 .tab-navigation li .badge {
+    background: var(--selected-badge-background);
+    box-shadow: var(--selected-badge-shadow);
+    color: var(--selected-badge-color);
     display: inline-block;
     font-size: 12px;
     font-weight: bold;
@@ -1568,11 +1600,16 @@ tr.status-warning td {
 .tab-content > *:first-child {
     margin-top: 0;
 }
-.tab-navigation li .badge.status-warning { background: var(--badge-warning-background); color: var(--badge-warning-color); }
-.theme-dark .tab-navigation li.active .badge.status-warning {
-    box-shadow: inset 0 0 0 1px var(--yellow-600);
+.tab-navigation li .badge.status-warning {
+    background: var(--selected-badge-warning-background);
+    box-shadow: var(--selected-badge-warning-shadow);
+    color: var(--selected-badge-warning-color);
 }
-.tab-navigation li .badge.status-error { background: var(--badge-danger-background); color: var(--badge-danger-color); }
+.tab-navigation li .badge.status-error {
+    background: var(--selected-badge-danger-background);
+    box-shadow: var(--selected-badge-danger-shadow);
+    color: var(--selected-badge-danger-color);
+}
 
 .sf-tabs .tab:not(:first-child) { display: none; }
 
@@ -1829,12 +1866,14 @@ table.logs .log-metadata .context + .context {
 }
 .log-type-badge {
     background: var(--badge-light-background);
+    box-shadow: none;
     color: var(--badge-light-color);
     display: inline-block;
     font-family: var(--font-family-system);
     margin-top: 5px;
 }
-.log-type-badge.badge-deprecation {
+.log-type-badge.badge-deprecation,
+.log-type-badge.badge-warning {
     background: var(--badge-warning-background);
     color: var(--badge-warning-color);
 }

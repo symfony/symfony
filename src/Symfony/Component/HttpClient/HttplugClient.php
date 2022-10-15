@@ -49,6 +49,10 @@ if (!interface_exists(RequestFactory::class)) {
     throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/message-factory" package is not installed. Try running "composer require nyholm/psr7".');
 }
 
+if (!interface_exists(RequestFactoryInterface::class)) {
+    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as the "psr/http-factory" package is not installed. Try running "composer require nyholm/psr7".');
+}
+
 /**
  * An adapter to turn a Symfony HttpClientInterface into an Httplug client.
  *
@@ -57,7 +61,7 @@ if (!interface_exists(RequestFactory::class)) {
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactory, StreamFactory, UriFactory, ResetInterface
+final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface, RequestFactory, StreamFactory, UriFactory, ResetInterface
 {
     private HttpClientInterface $client;
     private ResponseFactoryInterface $responseFactory;
@@ -142,8 +146,15 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         return $this->waitLoop->wait(null, $maxDuration, $idleTimeout);
     }
 
+    /**
+     * @param string              $method
+     * @param UriInterface|string $uri
+     */
     public function createRequest($method, $uri, array $headers = [], $body = null, $protocolVersion = '1.1'): RequestInterface
     {
+        if (2 < \func_num_args()) {
+            trigger_deprecation('symfony/http-client', '6.2', 'Passing more than 2 arguments to "%s()" is deprecated.', __METHOD__);
+        }
         if ($this->responseFactory instanceof RequestFactoryInterface) {
             $request = $this->responseFactory->createRequest($method, $uri);
         } elseif (class_exists(Request::class)) {
@@ -156,7 +167,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
 
         $request = $request
             ->withProtocolVersion($protocolVersion)
-            ->withBody($this->createStream($body))
+            ->withBody($this->createStream($body ?? ''))
         ;
 
         foreach ($headers as $name => $value) {
@@ -166,18 +177,25 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         return $request;
     }
 
-    public function createStream($body = null): StreamInterface
+    /**
+     * @param string $content
+     */
+    public function createStream($content = ''): StreamInterface
     {
-        if ($body instanceof StreamInterface) {
-            return $body;
+        if (!\is_string($content)) {
+            trigger_deprecation('symfony/http-client', '6.2', 'Passing a "%s" to "%s()" is deprecated, use "createStreamFrom*()" instead.', get_debug_type($content), __METHOD__);
         }
 
-        if (\is_string($body ?? '')) {
-            $stream = $this->streamFactory->createStream($body ?? '');
-        } elseif (\is_resource($body)) {
-            $stream = $this->streamFactory->createStreamFromResource($body);
+        if ($content instanceof StreamInterface) {
+            return $content;
+        }
+
+        if (\is_string($content ?? '')) {
+            $stream = $this->streamFactory->createStream($content ?? '');
+        } elseif (\is_resource($content)) {
+            $stream = $this->streamFactory->createStreamFromResource($content);
         } else {
-            throw new \InvalidArgumentException(sprintf('"%s()" expects string, resource or StreamInterface, "%s" given.', __METHOD__, get_debug_type($body)));
+            throw new \InvalidArgumentException(sprintf('"%s()" expects string, resource or StreamInterface, "%s" given.', __METHOD__, get_debug_type($content)));
         }
 
         if ($stream->isSeekable()) {
@@ -187,8 +205,25 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         return $stream;
     }
 
-    public function createUri($uri): UriInterface
+    public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
+        return $this->streamFactory->createStreamFromFile($filename, $mode);
+    }
+
+    public function createStreamFromResource($resource): StreamInterface
+    {
+        return $this->streamFactory->createStreamFromResource($resource);
+    }
+
+    /**
+     * @param string $uri
+     */
+    public function createUri($uri = ''): UriInterface
+    {
+        if (!\is_string($uri)) {
+            trigger_deprecation('symfony/http-client', '6.2', 'Passing a "%s" to "%s()" is deprecated, pass a string instead.', get_debug_type($uri), __METHOD__);
+        }
+
         if ($uri instanceof UriInterface) {
             return $uri;
         }

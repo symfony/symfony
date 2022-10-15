@@ -41,6 +41,11 @@ HttpFoundation
  * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
  * Deprecate calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()`   without arguments
 
+HttpClient
+----------
+
+ * Deprecate implementing `Http\Message\RequestFactory`, `StreamFactory` and `UriFactory` on `HttplugClient`
+
 HttpKernel
 ----------
 

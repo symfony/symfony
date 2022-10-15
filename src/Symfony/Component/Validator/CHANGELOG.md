@@ -4,6 +4,7 @@ CHANGELOG
 6.2
 ---
 
+ * Add option `Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD` with "html5-allow-no-tld" e-mail validation mode, to match with the W3C official specification
  * Add method `getCause()` to `ConstraintViolationInterface`
  * Add the `When` constraint and validator
  * Deprecate the "loose" e-mail validation mode, use "html5" instead

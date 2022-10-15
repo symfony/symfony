@@ -16,6 +16,7 @@ use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\TextPart;
 
 /**
@@ -120,8 +121,8 @@ class SMimeSignerTest extends SMimeTestCase
         );
         $message->html('html content <img src="cid:test.gif">');
         $message->text('text content');
-        $message->attach(fopen(__DIR__.'/../Fixtures/mimetypes/test', 'r'));
-        $message->attach(fopen(__DIR__.'/../Fixtures/mimetypes/test.gif', 'r'), 'test.gif');
+        $message->addPart(new DataPart(fopen(__DIR__.'/../Fixtures/mimetypes/test', 'r')));
+        $message->addPart(new DataPart(fopen(__DIR__.'/../Fixtures/mimetypes/test.gif', 'r'), 'test.gif'));
 
         $signer = new SMimeSigner($this->samplesDir.'sign.crt', $this->samplesDir.'sign.key');
 

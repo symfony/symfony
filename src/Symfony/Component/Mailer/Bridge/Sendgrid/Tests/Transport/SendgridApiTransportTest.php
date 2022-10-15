@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -107,7 +108,7 @@ class SendgridApiTransportTest extends TestCase
         $email->from('foo@example.com')
             ->to('bar@example.com')
             // even if content doesn't include new lines, the base64 encoding performed later may add them
-            ->attach('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod', 'lorem.txt');
+            ->addPart(new DataPart('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod', 'lorem.txt'));
 
         $response = $this->createMock(ResponseInterface::class);
 

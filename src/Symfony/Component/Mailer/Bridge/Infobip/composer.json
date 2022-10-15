@@ -27,6 +27,9 @@
     "require-dev": {
         "symfony/http-client": "^6.1"
     },
+    "conflict": {
+        "symfony/mime": "<6.2"
+    },
     "autoload": {
         "psr-4": {
             "Symfony\\Component\\Mailer\\Bridge\\Infobip\\": ""

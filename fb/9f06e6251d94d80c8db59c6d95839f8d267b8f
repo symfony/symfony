@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-17T11:17:39Z
+
+Note that the issue might be `SymfonyStyle::block()` not properly handling inputs with a leading line break, but I'm fine merging this and revisit if the problem comes out again in the future.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-10-17T11:28:30Z
+
+@chalasr it's a bug with linebreaks at all on windows cli, not just leading. see the screenshot with a linebreak in the middle.
+![2022_10_17_09_44_07_test_console_bug_2](https://user-images.githubusercontent.com/11738128/196165840-21ab9276-3ff3-4aef-991f-9269ee523051.png)
+
+The code behind the screenshot:
+`$style->block(sprintf("Command \"%s\" is\nnot defined.", $name), null, 'error', " ", true);`

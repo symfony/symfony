@@ -2,7 +2,6 @@ imports:
     - { resource: ./../config/framework.yml }
 
 security:
-    enable_authenticator_manager: true
     firewalls:
         default:
             http_basic: ~

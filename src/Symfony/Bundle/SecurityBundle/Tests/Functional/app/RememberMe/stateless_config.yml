@@ -9,7 +9,6 @@ framework:
         cookie_samesite: lax
 
 security:
-    enable_authenticator_manager: true
     firewalls:
         default:
             stateless: true

@@ -89,6 +89,11 @@ Security
  * Change the signature of `TokenStorageInterface::setToken()` to `setToken(?TokenInterface $token)`
  * Deprecate calling `TokenStorage::setToken()` or `UsageTrackingTokenStorage::setToken()` without arguments
 
+SecurityBundle
+--------------
+
+ * Deprecate the `security.enable_authenticator_manager` config option
+
 Serializer
 ----------
 

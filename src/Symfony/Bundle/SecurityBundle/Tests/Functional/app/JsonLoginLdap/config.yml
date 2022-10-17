@@ -12,7 +12,6 @@ services:
                     protocol_version: 3
                     referrals: false
 security:
-    enable_authenticator_manager: true
     providers:
         ldap:
             ldap:

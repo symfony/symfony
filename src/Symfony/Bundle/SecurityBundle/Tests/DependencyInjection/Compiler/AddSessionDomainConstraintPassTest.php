@@ -139,7 +139,6 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
         $config = [
             'security' => [
-                'enable_authenticator_manager' => true,
                 'providers' => ['some_provider' => ['id' => 'foo']],
                 'firewalls' => ['some_firewall' => ['security' => false]],
             ],

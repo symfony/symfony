@@ -8,8 +8,6 @@ services:
     class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider
 
 security:
-  enable_authenticator_manager: true
-
   password_hashers:
     \Symfony\Component\Security\Core\User\UserInterface: plaintext
 

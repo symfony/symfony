@@ -7,7 +7,6 @@ services:
         class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AutowiringBundle\AutowiredServices
         autowire: true
 security:
-    enable_authenticator_manager: true
     providers:
         dummy:
             memory: ~

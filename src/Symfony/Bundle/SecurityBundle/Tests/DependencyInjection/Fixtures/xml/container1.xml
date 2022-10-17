@@ -8,7 +8,7 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <config enable-authenticator-manager="true">
+    <config>
         <password_hasher class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
 
         <password_hasher class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />

@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by upyx at 2022-09-19T05:08:54Z
+
+> float is not enough precision on 32bit CPU
+
+If it is true, some of my code leads to bugs. Could you guide me on what platforms PHP uses single precision? Maybe ARM32?
+
+The https://github.com/php/php-src/blob/master/Zend/zend_float.h tries hard to force double precisioin on any known platform. It's hardly possible to compile modern PHP with single precision floats. Or have I missed something?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-19T05:54:09Z
+
+> [zend_float.h](https://github.com/php/php-src/blob/master/Zend/zend_float.h?rgh-link-date=2022-09-19T05%3A08%3A54Z) tries hard to force double precision on any known platform
+
+Oh, that's something I have missed, thanks for pointing at this! We can then simplify things a bit you're right. We just need to be sure to never use any intermediary int in the process and all should be good. Can you do it in this PR?
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-09-19T06:28:38Z
+
+> Can you do it in this PR?
+
+OK
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-09-19T08:20:56Z
+
+Well, the default "precision" ini setting is 14. So it's a bit tricky convertion:
+```php
+$m = 2.0**53/1e6;
+printf('format: %.6F, auto: '. $m, $m);
+// format: 9007199254.740992, auto: 9007199254.741
+```
+
+The `sprintf` is slow, but it is the only way to bypass the "precision" setting.
+
+And the maximum date without losing any presition will be "2112-09-17 23:53:47.370496":
+
+```
+php > var_dump(new DateTime(sprintf('@%.6F', 2.0**52/1e6)));
+object(DateTime)#1 (3) {
+  ["date"]=>
+  string(26) "2112-09-17 23:53:47.370496"
+  ["timezone_type"]=>
+  int(1)
+  ["timezone"]=>
+  string(6) "+00:00"
+}
+```
+
+It's possible to increase it up to "2255-06-05 23:47:34.740992" (plus 1 bit), but code will be less clear:
+```php
+    public function sleep(float|int $seconds): void
+    {
+        $microseconds = (float) $this->now->format('Uu') + $seconds * 1e6;
+        $datetime = substr_replace(sprintf('@%07.0F', $microseconds), '.', -6, 0);
+        $timezone = $this->now->getTimezone();
+
+        $this->now = (new \DateTimeImmutable($datetime, $timezone))->setTimezone($timezone);
+    }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-19T08:34:35Z
+
+Shouldn't we keep the current code then if it doesn't have these issues?
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-09-19T08:46:32Z
+
+> Shouldn't we keep the current code then if it doesn't have these issues?
+
+:man_shrugging:
+
+Dates after 2100 year don't look practical. Anyway, it's a mock for testing only.

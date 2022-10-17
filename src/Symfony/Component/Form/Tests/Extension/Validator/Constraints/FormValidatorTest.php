@@ -423,7 +423,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testHandleCallbackValidationGroups()
     {
         $object = new \stdClass();
-        $options = ['validation_groups' => [$this, 'getValidationGroups']];
+        $options = ['validation_groups' => $this->getValidationGroups(...)];
         $form = $this->getCompoundForm($object, $options);
         $form->submit([]);
 
@@ -543,7 +543,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
 
-        $parentOptions = ['validation_groups' => [$this, 'getValidationGroups']];
+        $parentOptions = ['validation_groups' => $this->getValidationGroups(...)];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)
             ->setDataMapper(new DataMapper())

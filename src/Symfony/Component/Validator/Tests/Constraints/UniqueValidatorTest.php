@@ -162,6 +162,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             }],
             'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\CallableClass::execute'],
             'callable with static notation' => [[CallableClass::class, 'execute']],
+            'callable with first-class callable notation' => [CallableClass::execute(...)],
             'callable with object' => [[new CallableClass(), 'execute']],
         ];
     }

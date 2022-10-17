@@ -123,6 +123,17 @@ class RequestDataCollectorTest extends TestCase
             ],
 
             [
+                'First-class callable closure',
+                $this->testControllerInspection(...),
+                [
+                    'class' => self::class,
+                    'method' => 'testControllerInspection',
+                    'file' => __FILE__,
+                    'line' => $r1->getStartLine(),
+                ],
+            ],
+
+            [
                 'Static callback as string',
                 __NAMESPACE__.'\RequestDataCollectorTest::staticControllerMethod',
                 [

@@ -405,7 +405,7 @@ class CommandTest extends TestCase
     public function testSetCodeWithNonClosureCallable()
     {
         $command = new \TestCommand();
-        $ret = $command->setCode([$this, 'callableMethodCommand']);
+        $ret = $command->setCode($this->callableMethodCommand(...));
         $this->assertEquals($command, $ret, '->setCode() implements a fluent interface');
         $tester = new CommandTester($command);
         $tester->execute([]);

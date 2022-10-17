@@ -30,7 +30,7 @@ class ResponseListenerTest extends TestCase
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
-        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...));
 
         $this->kernel = $this->createMock(HttpKernelInterface::class);
     }
@@ -54,7 +54,7 @@ class ResponseListenerTest extends TestCase
     public function testFilterSetsNonDefaultCharsetIfNotOverridden()
     {
         $listener = new ResponseListener('ISO-8859-15');
-        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...), 1);
 
         $response = new Response('foo');
 
@@ -67,7 +67,7 @@ class ResponseListenerTest extends TestCase
     public function testFilterDoesNothingIfCharsetIsOverridden()
     {
         $listener = new ResponseListener('ISO-8859-15');
-        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...), 1);
 
         $response = new Response('foo');
         $response->setCharset('ISO-8859-1');
@@ -81,7 +81,7 @@ class ResponseListenerTest extends TestCase
     public function testFiltersSetsNonDefaultCharsetIfNotOverriddenOnNonTextContentType()
     {
         $listener = new ResponseListener('ISO-8859-15');
-        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...), 1);
 
         $response = new Response('foo');
         $request = Request::create('/');
@@ -96,7 +96,7 @@ class ResponseListenerTest extends TestCase
     public function testSetContentLanguageHeaderWhenEmptyAndAtLeast2EnabledLocalesAreConfigured()
     {
         $listener = new ResponseListener('ISO-8859-15', true, ['fr', 'en']);
-        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...), 1);
 
         $response = new Response('content');
         $request = Request::create('/');
@@ -111,7 +111,7 @@ class ResponseListenerTest extends TestCase
     public function testNotOverrideContentLanguageHeaderWhenNotEmpty()
     {
         $listener = new ResponseListener('ISO-8859-15', true, ['de']);
-        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...), 1);
 
         $response = new Response('content');
         $response->headers->set('Content-Language', 'mi, en');
@@ -127,7 +127,7 @@ class ResponseListenerTest extends TestCase
     public function testNotSetContentLanguageHeaderWhenDisabled()
     {
         $listener = new ResponseListener('ISO-8859-15', false);
-        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...), 1);
 
         $response = new Response('content');
         $request = Request::create('/');

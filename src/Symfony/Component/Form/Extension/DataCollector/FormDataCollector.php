@@ -235,7 +235,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
                     Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(\get_class($f->getConfig()->getType()->getInnerType())),
                 ];
             },
-            FormView::class => [StubCaster::class, 'cutInternals'],
+            FormView::class => StubCaster::cutInternals(...),
             ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
                 return [
                     Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),

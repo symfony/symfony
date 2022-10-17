@@ -50,7 +50,7 @@ class LazyString implements \Stringable, \JsonSerializable
     public static function fromStringable(string|int|float|bool|\Stringable $value): static
     {
         if (\is_object($value)) {
-            return static::fromCallable([$value, '__toString']);
+            return static::fromCallable($value->__toString(...));
         }
 
         $lazyString = new static();

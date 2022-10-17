@@ -24,7 +24,7 @@ class DebugDataHolder
             'sql' => $query->getSql(),
             'params' => $query->getParams(),
             'types' => $query->getTypes(),
-            'executionMS' => [$query, 'getDuration'],  // stop() may not be called at this point
+            'executionMS' => $query->getDuration(...),  // stop() may not be called at this point
         ];
     }
 

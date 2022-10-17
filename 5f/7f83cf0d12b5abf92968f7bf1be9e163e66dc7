@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by tigitz at 2022-09-23T08:01:55Z
+
+There are related failures in the test suite, I'm looking into it.
+
+---------------------------------------------------------------------------
+
+by tigitz at 2022-09-25T23:34:52Z
+
+So I've dug a little more to properly implement these improvements. Hopefully, I got a good enough understanding now.
+
+Mainly I've been reminded that
+```php
+$this->foo(...) === $this->foo(...) // false
+[$this, 'foo'] === [$this, 'foo'] // true
+```
+Even though both are callables, they are `Closure` and `array` respectively. So switching one with the other is not as straightforward as I previously thought.
+
+This has consequences on unit tests where equality is tested. Symfony public api returning callables with the array syntax form must be kept that way and therefore their related tests too.
+
+**A couple more points:**
+
+- As stated by @stof `\Symfony\Component\DependencyInjection\Definition::setFactory` doesn't support closures.
+
+- I refrained from applying this in `\Symfony\Component\EventDispatcher\EventDispatcher::addSubscriber`
+```diff
+--- a/src/Symfony/Component/EventDispatcher/EventDispatcher.php
++++ b/src/Symfony/Component/EventDispatcher/EventDispatcher.php
+@@ -163,10 +163,10 @@ class EventDispatcher implements EventDispatcherInterface
+             if (\is_string($params)) {
+                 $this->addListener($eventName, [$subscriber, $params]);
+             } elseif (\is_string($params[0])) {
+-                $this->addListener($eventName, [$subscriber, $params[0]], $params[1] ?? 0);
++                $this->addListener($eventName, $subscriber->{$params[0]}(...), $params[1] ?? 0);
+             } else {
+                 foreach ($params as $listener) {
+-                    $this->addListener($eventName, [$subscriber, $listener[0]], $listener[1] ?? 0);
++                    $this->addListener($eventName, $subscriber->{$params[0]}(...), $listener[1] ?? 0);
+                 }
+             }
+         }
+```
+
+As it changes the expected behavior of what's stored inside the `listeners` (closure instead of array) when adding a `Subscriber`.
+Even though it's valid, as the param is typed `array|callable`, it could break userland code if they implicitly rely on having an array here when `addSubscriber` is called.
+
+- I've reverted updates on `EventDispatcherTest::testGetLazyListeners` , `testRemoveFindsLazyListeners`, `testPriorityFindsLazyListeners` as it fails and I don't understand what it's actually testing to fix them. Maybe @nicolas-grekas can provide some guidance here :pray:
+- I've reverted updates on the `ErrorHandler` component as it breaks a lot of tests and there's too much dark magic going on to make the modernizing effort worth it.
+- It seems `\Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver::resolve` doesn't support `$request->attributes->get('_controller')` returning a `Closure`. TBC.
+
+Ready to be reviewed again. Test failures are not related.
+
+---------------------------------------------------------------------------
+
+by tigitz at 2022-09-30T20:46:26Z
+
+@nicolas-grekas Thanks for your thorough review, very motivating :)
+
+Ready to be reviewed again. :+1:

@@ -18,12 +18,14 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\AutowireAsDecoratorPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
+use Symfony\Component\DependencyInjection\Compiler\AutowireSealedPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\SealedClassException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
@@ -1252,6 +1254,26 @@ class AutowirePassTest extends TestCase
             $this->fail('AutowirePass should have thrown an exception');
         } catch (AutowiringFailedException $e) {
             $this->assertSame('Cannot autowire service "a": argument "$k" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotGuessableArgument::__construct()" needs an instance of "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" but this type has been excluded from autowiring.', (string) $e->getMessage());
+        }
+    }
+
+    public function testSealedAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AsSealedBar::class);
+        $container->register(AsPermittedFoo::class)->setArgument(0, new Reference(AsSealedBar::class));
+        $container->register(AsNonPermittedBar::class)->setArgument(0, new Reference(AsSealedBar::class));
+
+        $resolvePass = new ResolveClassPass();
+        $sealedPass = new AutowireSealedPass();
+
+        try {
+            $resolvePass->process($container);
+            $sealedPass->process($container);
+            $this->fail('AutowireSealedPass should have thrown an exception');
+        } catch (SealedClassException $e) {
+            $this->assertSame('Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Compiler\AsNonPermittedBar", argument "$asSealedBar" of method "Symfony\Component\DependencyInjection\Tests\Compiler\AsNonPermittedBar::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\AsSealedBar" but this class is sealed.', (string) $e->getMessage());
         }
     }
 }

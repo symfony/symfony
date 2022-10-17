@@ -5,6 +5,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
+use Symfony\Component\DependencyInjection\Attribute\Sealed;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -84,4 +85,19 @@ class AsDecoratorBaz implements AsDecoratorInterface
     public function __construct(#[MapDecorated] AsDecoratorInterface $inner = null)
     {
     }
+}
+
+#[Sealed(permits: [AsPermittedFoo::class])]
+final class AsSealedBar
+{
+}
+
+final class AsPermittedFoo
+{
+    public function __construct(private readonly AsSealedBar $asSealedBar) {}
+}
+
+final class AsNonPermittedBar
+{
+    public function __construct(private readonly AsSealedBar $asSealedBar) {}
 }

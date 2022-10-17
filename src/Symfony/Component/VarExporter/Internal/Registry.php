@@ -40,7 +40,11 @@ class Registry
 
         try {
             foreach ($serializables as $k => $v) {
-                $objects[$k] = unserialize($v);
+                try {
+                    $objects[$k] = unserialize($v);
+                } catch (\UnserializationFailedException $e) {
+                    throw $e->getPrevious() instanceof ClassNotFoundException ? $e->getPrevious() : $e;
+                }
             }
         } finally {
             ini_set('unserialize_callback_func', $unserializeCallback);

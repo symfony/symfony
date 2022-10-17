@@ -93,6 +93,10 @@ class PhpSerializer implements SerializerInterface
         try {
             /** @var Envelope */
             $envelope = unserialize($contents);
+        } catch (\Throwable $e) {
+            $message = ($e instanceof \UnserializationFailedException ? $e->getPrevious() : $e)->getMessage();
+
+            throw new MessageDecodingFailedException($message, 0, $e);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);

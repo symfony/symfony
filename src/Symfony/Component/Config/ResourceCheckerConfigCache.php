@@ -156,7 +156,11 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         });
 
         try {
-            $meta = unserialize($content);
+            try {
+                $meta = unserialize($content);
+            } catch (\UnserializationFailedException $e) {
+                throw $e instanceof \UnserializationFailedException && $e->getPrevious() === $signalingException ? $signalingException : $e;
+            }
         } catch (\Throwable $e) {
             if ($e !== $signalingException) {
                 throw $e;

@@ -264,7 +264,11 @@ class ContextListener extends AbstractListener
         });
 
         try {
-            $token = unserialize($serializedToken);
+            try {
+                $token = unserialize($serializedToken);
+            } catch (\UnserializationFailedException $e) {
+                throw 0x37313BC !== $e->getPrevious()->getCode() ? $e : $e->getPrevious();
+            }
         } catch (\ErrorException $e) {
             if (0x37313BC !== $e->getCode()) {
                 throw $e;

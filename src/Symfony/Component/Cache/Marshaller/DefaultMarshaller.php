@@ -81,6 +81,14 @@ class DefaultMarshaller implements MarshallerInterface
             }
 
             throw new \DomainException(error_get_last() ? error_get_last()['message'] : 'Failed to unserialize values.');
+        } catch (\UnserializationFailedException $e) {
+            $p = $e->getPrevious();
+
+            if ($p instanceof \Error) {
+                throw new \ErrorException($p->getMessage(), $p->getCode(), \E_ERROR, $p->getFile(), $p->getLine());
+            }
+
+            throw $p instanceof \DomainException ? $p : $e;
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), \E_ERROR, $e->getFile(), $e->getLine());
         } finally {

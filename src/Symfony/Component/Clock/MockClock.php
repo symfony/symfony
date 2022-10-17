@@ -40,21 +40,11 @@ final class MockClock implements ClockInterface
 
     public function sleep(float|int $seconds): void
     {
-        $now = explode('.', $this->now->format('U.u'));
-
-        if (0 < $s = (int) $seconds) {
-            $now[0] += $s;
-        }
-
-        if (0 < ($us = $seconds - $s) && 1E6 <= $now[1] += $us * 1E6) {
-            ++$now[0];
-            $now[1] -= 1E6;
-        }
-
-        $datetime = '@'.$now[0].'.'.str_pad($now[1], 6, '0', \STR_PAD_LEFT);
+        $now = (float) $this->now->format('Uu') + $seconds * 1e6;
+        $now = substr_replace(sprintf('@%07.0F', $now), '.', -6, 0);
         $timezone = $this->now->getTimezone();
 
-        $this->now = (new \DateTimeImmutable($datetime, $timezone))->setTimezone($timezone);
+        $this->now = (new \DateTimeImmutable($now, $timezone))->setTimezone($timezone);
     }
 
     public function withTimeZone(\DateTimeZone|string $timezone): static

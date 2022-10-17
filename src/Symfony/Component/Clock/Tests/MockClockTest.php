@@ -55,11 +55,11 @@ class MockClockTest extends TestCase
 
     public function testSleep()
     {
-        $clock = new MockClock((new \DateTimeImmutable('@123.456'))->setTimezone(new \DateTimeZone('UTC')));
+        $clock = new MockClock((new \DateTimeImmutable('2112-09-17 23:53:00.999Z'))->setTimezone(new \DateTimeZone('UTC')));
         $tz = $clock->now()->getTimezone()->getName();
 
-        $clock->sleep(4.999);
-        $this->assertSame('128.455000', $clock->now()->format('U.u'));
+        $clock->sleep(2.002001);
+        $this->assertSame('2112-09-17 23:53:03.001001', $clock->now()->format('Y-m-d H:i:s.u'));
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 

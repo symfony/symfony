@@ -19,112 +19,61 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface TokenInterface extends \Serializable
+interface TokenInterface
 {
     /**
      * Returns a string representation of the Token.
      *
      * This is only to be used for debugging purposes.
-     *
-     * @return string
      */
-    public function __toString();
+    public function __toString(): string;
+
+    /**
+     * Returns the user identifier used during authentication (e.g. a user's email address or username).
+     */
+    public function getUserIdentifier(): string;
 
     /**
      * Returns the user roles.
      *
-     * @return string[] The associated roles
+     * @return string[]
      */
     public function getRoleNames(): array;
 
     /**
-     * Returns the user credentials.
-     *
-     * @return mixed The user credentials
-     */
-    public function getCredentials();
-
-    /**
      * Returns a user representation.
-     *
-     * @return string|\Stringable|UserInterface
      *
      * @see AbstractToken::setUser()
      */
-    public function getUser();
+    public function getUser(): ?UserInterface;
 
     /**
-     * Sets the user in the token.
-     *
-     * The user can be a UserInterface instance, or an object implementing
-     * a __toString method or the username as a regular string.
-     *
-     * @param string|\Stringable|UserInterface $user
+     * Sets the authenticated user in the token.
      *
      * @throws \InvalidArgumentException
      */
-    public function setUser($user);
-
-    /**
-     * Returns the username.
-     *
-     * @return string
-     */
-    public function getUsername();
-
-    /**
-     * Returns whether the user is authenticated or not.
-     *
-     * @return bool true if the token has been authenticated, false otherwise
-     */
-    public function isAuthenticated();
-
-    /**
-     * Sets the authenticated flag.
-     */
-    public function setAuthenticated(bool $isAuthenticated);
+    public function setUser(UserInterface $user);
 
     /**
      * Removes sensitive information from the token.
      */
     public function eraseCredentials();
 
-    /**
-     * Returns the token attributes.
-     *
-     * @return array The token attributes
-     */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
-     * Sets the token attributes.
-     *
      * @param array $attributes The token attributes
      */
     public function setAttributes(array $attributes);
 
-    /**
-     * Returns true if the attribute exists.
-     *
-     * @return bool true if the attribute exists, false otherwise
-     */
-    public function hasAttribute(string $name);
+    public function hasAttribute(string $name): bool;
 
     /**
-     * Returns an attribute value.
-     *
-     * @return mixed The attribute value
-     *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute(string $name);
+    public function getAttribute(string $name): mixed;
 
-    /**
-     * Sets an attribute.
-     *
-     * @param mixed $value The attribute value
-     */
-    public function setAttribute(string $name, $value);
+    public function setAttribute(string $name, mixed $value);
 
     /**
      * Returns all the necessary state of the object for serialization purposes.

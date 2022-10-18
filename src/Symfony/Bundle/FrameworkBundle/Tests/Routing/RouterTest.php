@@ -14,11 +14,16 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\ResourceCheckerConfigCache;
+use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
+use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -405,16 +410,24 @@ class RouterTest extends TestCase
 
     public function testExceptionOnNonStringParameterWithSfContainer()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
 
         $sc = $this->getServiceContainer($routes);
-        $sc->setParameter('object', new \stdClass());
 
-        $router = new Router($sc, 'foo');
+        $pc = $this->createMock(ContainerInterface::class);
+        $pc
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn(new \stdClass())
+        ;
+
+        $router = new Router($sc, 'foo', [], null, $pc);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
+
         $router->getRouteCollection()->get('foo');
     }
 
@@ -501,6 +514,89 @@ class RouterTest extends TestCase
     public function getNonStringValues()
     {
         return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
+    }
+
+    /**
+     * @dataProvider getContainerParameterForRoute
+     */
+    public function testCacheValidityWithContainerParameters($parameter)
+    {
+        $cacheDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('router_', true);
+
+        try {
+            $container = new Container();
+            $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixtures')));
+
+            $container->setParameter('parameter.condition', $parameter);
+
+            $router = new Router($container, 'with_condition.yaml', [
+                'debug' => true,
+                'cache_dir' => $cacheDir,
+            ]);
+
+            $resourceCheckers = [
+                new ContainerParametersResourceChecker($container),
+            ];
+
+            $router->setConfigCacheFactory(new ResourceCheckerConfigCacheFactory($resourceCheckers));
+
+            $router->getMatcher(); // trigger cache build
+
+            $cache = new ResourceCheckerConfigCache($cacheDir.\DIRECTORY_SEPARATOR.'url_matching_routes.php', $resourceCheckers);
+
+            $this->assertTrue($cache->isFresh());
+        } finally {
+            if (is_dir($cacheDir)) {
+                array_map('unlink', glob($cacheDir.\DIRECTORY_SEPARATOR.'*'));
+                rmdir($cacheDir);
+            }
+        }
+    }
+
+    public function testResolvingSchemes()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('/test', [], [], [], '', ['%parameter.http%', '%parameter.https%']);
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag([
+            'parameter.http' => 'http',
+            'parameter.https' => 'https',
+        ]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertEquals(['http', 'https'], $route->getSchemes());
+    }
+
+    public function testResolvingMethods()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('/test', [], [], [], '', [], ['%parameter.get%', '%parameter.post%']);
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag([
+            'PARAMETER.GET' => 'GET',
+            'PARAMETER.POST' => 'POST',
+        ]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertEquals(['GET', 'POST'], $route->getMethods());
+    }
+
+    public function getContainerParameterForRoute()
+    {
+        yield 'String' => ['"foo"'];
+        yield 'Integer' => [0];
+        yield 'Boolean true' => [true];
+        yield 'Boolean false' => [false];
     }
 
     private function getServiceContainer(RouteCollection $routes): Container

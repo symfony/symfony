@@ -27,25 +27,19 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Esi extends AbstractSurrogate
 {
-    public function getName()
+    public function getName(): string
     {
         return 'esi';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addSurrogateControl(Response $response)
     {
-        if (false !== strpos($response->getContent(), '<esi:include')) {
+        if (str_contains($response->getContent(), '<esi:include')) {
             $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = '')
+    public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = ''): string
     {
         $html = sprintf('<esi:include src="%s"%s%s />',
             $uri,
@@ -60,10 +54,7 @@ class Esi extends AbstractSurrogate
         return $html;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(Request $request, Response $response)
+    public function process(Request $request, Response $response): Response
     {
         $type = $response->headers->get('Content-Type');
         if (empty($type)) {

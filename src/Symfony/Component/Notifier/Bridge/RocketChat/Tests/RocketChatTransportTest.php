@@ -15,8 +15,7 @@ use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,12 +23,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class RocketChatTransportTest extends TransportTestCase
 {
-    /**
-     * @return RocketChatTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null, string $channel = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $channel = null): RocketChatTransport
     {
-        return new RocketChatTransport('testAccessToken', $channel, $client ?: $this->createMock(HttpClientInterface::class));
+        return new RocketChatTransport('testAccessToken', $channel, $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

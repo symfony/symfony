@@ -386,6 +386,22 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>This value is not a valid International Securities Identification Number (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>This value should be a valid expression.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>This value is not a valid CSS color.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>This value is not a valid CIDR notation.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>The value of the netmask should be between {{ min }} and {{ max }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

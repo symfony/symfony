@@ -89,6 +89,16 @@ class MicroKernelTraitTest extends TestCase
         $response = $kernel->handle($request);
 
         $this->assertEquals('Have a great day!', $response->getContent());
+
+        $request = Request::create('/h');
+        $response = $kernel->handle($request);
+
+        $this->assertEquals('Have a great day!', $response->getContent());
+
+        $request = Request::create('/easter');
+        $response = $kernel->handle($request);
+
+        $this->assertSame('easter', $response->getContent());
     }
 
     public function testSecretLoadedFromExtension()
@@ -101,7 +111,7 @@ class MicroKernelTraitTest extends TestCase
 
     public function testAnonymousMicroKernel()
     {
-        $kernel = new class('anonymous_kernel') extends MinimalKernel {
+        $kernel = $this->kernel = new class('anonymous_kernel') extends MinimalKernel {
             public function helloAction(): Response
             {
                 return new Response('Hello World!');
@@ -110,53 +120,23 @@ class MicroKernelTraitTest extends TestCase
             protected function configureContainer(ContainerConfigurator $c): void
             {
                 $c->extension('framework', [
+                    'http_method_override' => false,
                     'router' => ['utf8' => true],
+                    'catch_all_throwables' => true,
                 ]);
                 $c->services()->set('logger', NullLogger::class);
             }
 
             protected function configureRoutes(RoutingConfigurator $routes): void
             {
-                $routes->add('hello', '/')->controller([$this, 'helloAction']);
+                $routes->add('hello', '/')->controller($this->helloAction(...));
             }
         };
 
         $request = Request::create('/');
-        $response = $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
 
         $this->assertSame('Hello World!', $response->getContent());
-    }
-
-    public function testMissingConfigureContainer()
-    {
-        $kernel = new class('missing_configure_container') extends MinimalKernel {
-            protected function configureRoutes(RoutingConfigurator $routes): void
-            {
-            }
-        };
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('"Symfony\Bundle\FrameworkBundle\Tests\Kernel\MinimalKernel@anonymous" uses "Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait", but does not implement the required method "protected function configureContainer(ContainerConfigurator $c): void".');
-
-        $kernel->boot();
-    }
-
-    public function testMissingConfigureRoutes()
-    {
-        $kernel = new class('missing_configure_routes') extends MinimalKernel {
-            protected function configureContainer(ContainerConfigurator $c): void
-            {
-                $c->extension('framework', [
-                    'router' => ['utf8' => true],
-                ]);
-            }
-        };
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('"Symfony\Bundle\FrameworkBundle\Tests\Kernel\MinimalKernel@anonymous" uses "Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait", but does not implement the required method "protected function configureRoutes(RoutingConfigurator $routes): void".');
-
-        $request = Request::create('/');
-        $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
     }
 }
 

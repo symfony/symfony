@@ -57,7 +57,7 @@ class EventDispatcherTest extends TestCase
     public function testAddListener()
     {
         $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
-        $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo']);
+        $this->dispatcher->addListener('post.foo', $this->listener->postFoo(...));
         $this->assertTrue($this->dispatcher->hasListeners());
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
@@ -71,21 +71,25 @@ class EventDispatcherTest extends TestCase
         $listener1 = new TestEventListener();
         $listener2 = new TestEventListener();
         $listener3 = new TestEventListener();
+        $listener4 = new TestEventListener();
         $listener1->name = '1';
         $listener2->name = '2';
         $listener3->name = '3';
+        $listener4->name = '4';
 
         $this->dispatcher->addListener('pre.foo', [$listener1, 'preFoo'], -10);
         $this->dispatcher->addListener('pre.foo', [$listener2, 'preFoo'], 10);
         $this->dispatcher->addListener('pre.foo', [$listener3, 'preFoo']);
+        $this->dispatcher->addListener('pre.foo', $listener4->preFoo(...), 20);
 
         $expected = [
+            $listener4->preFoo(...),
             [$listener2, 'preFoo'],
             [$listener3, 'preFoo'],
             [$listener1, 'preFoo'],
         ];
 
-        $this->assertSame($expected, $this->dispatcher->getListeners('pre.foo'));
+        $this->assertEquals($expected, $this->dispatcher->getListeners('pre.foo'));
     }
 
     public function testGetAllListenersSortsByPriority()
@@ -129,7 +133,7 @@ class EventDispatcherTest extends TestCase
     public function testDispatch()
     {
         $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
-        $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo']);
+        $this->dispatcher->addListener('post.foo', $this->listener->postFoo(...));
         $this->dispatcher->dispatch(new Event(), self::preFoo);
         $this->assertTrue($this->listener->preFooInvoked);
         $this->assertFalse($this->listener->postFooInvoked);
@@ -160,7 +164,7 @@ class EventDispatcherTest extends TestCase
         // be executed
         // Manually set priority to enforce $this->listener to be called first
         $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo'], 10);
-        $this->dispatcher->addListener('post.foo', [$otherListener, 'postFoo']);
+        $this->dispatcher->addListener('post.foo', $otherListener->postFoo(...));
         $this->dispatcher->dispatch(new Event(), self::postFoo);
         $this->assertTrue($this->listener->postFooInvoked);
         $this->assertFalse($otherListener->postFooInvoked);
@@ -386,7 +390,7 @@ class EventDispatcherTest extends TestCase
     {
         $testLoaded = false;
         $test = new TestEventListener();
-        $this->dispatcher->addListener('foo', [$test, 'postFoo']);
+        $this->dispatcher->addListener('foo', $test->postFoo(...));
         $this->dispatcher->addListener('foo', [function () use ($test, &$testLoaded) {
             $testLoaded = true;
 
@@ -398,12 +402,38 @@ class EventDispatcherTest extends TestCase
         $this->assertTrue($test->postFooInvoked);
         $this->assertFalse($test->preFooInvoked);
 
-        $this->assertsame(0, $this->dispatcher->getListenerPriority('foo', [$test, 'preFoo']));
+        $this->assertEquals(0, $this->dispatcher->getListenerPriority('foo', $test->postFoo(...)));
 
         $test->preFoo(new Event());
         $this->dispatcher->dispatch(new Event(), 'foo');
 
         $this->assertTrue($testLoaded);
+    }
+
+    public function testNamedClosures()
+    {
+        $listener = new TestEventListener();
+
+        $callback1 = $listener(...);
+        $callback2 = $listener(...);
+        $callback3 = (new TestEventListener())(...);
+
+        $this->assertNotSame($callback1, $callback2);
+        $this->assertNotSame($callback1, $callback3);
+        $this->assertNotSame($callback2, $callback3);
+        $this->assertEquals($callback1, $callback2);
+        $this->assertEquals($callback1, $callback3);
+
+        $this->dispatcher->addListener('foo', $callback1, 3);
+        $this->dispatcher->addListener('foo', $callback2, 2);
+        $this->dispatcher->addListener('foo', $callback3, 1);
+
+        $this->assertSame(3, $this->dispatcher->getListenerPriority('foo', $callback1));
+        $this->assertSame(3, $this->dispatcher->getListenerPriority('foo', $callback2));
+
+        $this->dispatcher->removeListener('foo', $callback1);
+
+        $this->assertSame(['foo' => [$callback3]], $this->dispatcher->getListeners());
     }
 }
 
@@ -416,6 +446,7 @@ class CallableClass
 
 class TestEventListener
 {
+    public $name;
     public $preFooInvoked = false;
     public $postFooInvoked = false;
 
@@ -433,6 +464,10 @@ class TestEventListener
         if (!$this->preFooInvoked) {
             $e->stopPropagation();
         }
+    }
+
+    public function __invoke()
+    {
     }
 }
 

@@ -12,12 +12,13 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
@@ -27,23 +28,27 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  * @author Wouter de Jong <wouter@driveamber.com>
  *
  * @final
- * @experimental in 5.3
  */
 class CheckCredentialsListener implements EventSubscriberInterface
 {
-    private $encoderFactory;
+    private PasswordHasherFactoryInterface $hasherFactory;
 
-    public function __construct(EncoderFactoryInterface $encoderFactory)
+    public function __construct(PasswordHasherFactoryInterface $hasherFactory)
     {
-        $this->encoderFactory = $encoderFactory;
+        $this->hasherFactory = $hasherFactory;
     }
 
     public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
-        if ($passport instanceof UserPassportInterface && $passport->hasBadge(PasswordCredentials::class)) {
-            // Use the password encoder to validate the credentials
+        if ($passport->hasBadge(PasswordCredentials::class)) {
+            // Use the password hasher to validate the credentials
             $user = $passport->getUser();
+
+            if (!$user instanceof PasswordAuthenticatedUserInterface) {
+                throw new \LogicException(sprintf('Class "%s" must implement "%s" for using password-based authentication.', get_debug_type($user), PasswordAuthenticatedUserInterface::class));
+            }
+
             /** @var PasswordCredentials $badge */
             $badge = $passport->getBadge(PasswordCredentials::class);
 
@@ -60,7 +65,7 @@ class CheckCredentialsListener implements EventSubscriberInterface
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
-            if (!$this->encoderFactory->getEncoder($user)->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
+            if (!$this->hasherFactory->getPasswordHasher($user)->verify($user->getPassword(), $presentedPassword, $user instanceof LegacyPasswordAuthenticatedUserInterface ? $user->getSalt() : null)) {
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 

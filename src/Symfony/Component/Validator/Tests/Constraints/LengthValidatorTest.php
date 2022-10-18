@@ -30,16 +30,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAllowEmptyString()
-    {
-        $this->validator->validate('', new Length(['value' => 6, 'allowEmptyString' => true]));
-
-        $this->assertNoViolation();
-    }
-
     public function testEmptyStringIsInvalid()
     {
         $this->validator->validate('', new Length([
@@ -52,7 +42,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', $limit)
             ->setInvalidValue('')
             ->setPlural($limit)
-            ->setCode(Length::TOO_SHORT_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 
@@ -188,12 +178,11 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getThreeOrLessCharacters
      */
     public function testInvalidValuesMinNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Length(min: 4, minMessage: "myMessage");');
+        $constraint = new Length(min: 4, minMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -228,12 +217,11 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getFiveOrMoreCharacters
      */
     public function testInvalidValuesMaxNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Length(max: 4, maxMessage: "myMessage");');
+        $constraint = new Length(max: 4, maxMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -264,17 +252,16 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Length::TOO_SHORT_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getThreeOrLessCharacters
      */
     public function testInvalidValuesExactLessThanFourNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Length(exactly: 4, exactMessage: "myMessage");');
+        $constraint = new Length(exactly: 4, exactMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -283,7 +270,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Length::TOO_SHORT_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 
@@ -305,7 +292,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Length::TOO_LONG_ERROR)
+            ->setCode(Length::NOT_EQUAL_LENGTH_ERROR)
             ->assertRaised();
     }
 

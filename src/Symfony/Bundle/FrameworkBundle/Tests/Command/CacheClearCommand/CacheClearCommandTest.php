@@ -19,6 +19,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -38,13 +39,14 @@ class CacheClearCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->fs->remove($this->kernel->getProjectDir());
+        try {
+            $this->fs->remove($this->kernel->getProjectDir());
+        } catch (IOException $e) {
+        }
     }
 
     public function testCacheIsFreshAfterCacheClearedWithWarmup()
     {
-        $this->fs->mkdir($this->kernel->getProjectDir());
-
         $input = new ArrayInput(['cache:clear']);
         $application = new Application($this->kernel);
         $application->setCatchExceptions(false);
@@ -72,13 +74,13 @@ class CacheClearCommandTest extends TestCase
         $containerRef = new \ReflectionClass($containerClass);
         $containerFile = \dirname($containerRef->getFileName(), 2).'/'.$containerClass.'.php';
         $containerMetaFile = $containerFile.'.meta';
-        $this->kernelRef = new \ReflectionObject($this->kernel);
-        $this->kernelFile = $this->kernelRef->getFileName();
+        $kernelRef = new \ReflectionObject($this->kernel);
+        $kernelFile = $kernelRef->getFileName();
         /** @var ResourceInterface[] $meta */
         $meta = unserialize(file_get_contents($containerMetaFile));
         $found = false;
         foreach ($meta as $resource) {
-            if ((string) $resource === $this->kernelFile) {
+            if ((string) $resource === $kernelFile) {
                 $found = true;
                 break;
             }
@@ -124,7 +126,7 @@ class CacheClearCommandTest extends TestCase
         \Closure::bind(function (Container $class) {
             unset($class->loadedDynamicParameters['kernel.build_dir']);
             unset($class->parameters['kernel.build_dir']);
-        }, null, \get_class($container))($container);
+        }, null, $container::class)($container);
 
         $input = new ArrayInput(['cache:clear']);
         $application = new Application($kernel);

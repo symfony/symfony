@@ -15,18 +15,14 @@ use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OctopushTransportTest extends TransportTestCase
 {
-    /**
-     * @return OctopushTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): OctopushTransport
     {
-        return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?: $this->createMock(HttpClientInterface::class));
+        return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

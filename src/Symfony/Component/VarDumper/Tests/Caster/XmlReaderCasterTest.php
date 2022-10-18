@@ -26,7 +26,7 @@ class XmlReaderCasterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->reader = new \XmlReader();
+        $this->reader = new \XMLReader();
         $this->reader->open(__DIR__.'/../Fixtures/xml_reader.xml');
     }
 
@@ -244,5 +244,19 @@ XMLReader {
 EODUMP
             ],
         ];
+    }
+
+    public function testWithUninitializedXMLReader()
+    {
+        $this->reader = new \XMLReader();
+
+        $expectedDump = <<<'EODUMP'
+XMLReader {
+  +nodeType: NONE
+   …13
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $this->reader);
     }
 }

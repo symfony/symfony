@@ -29,8 +29,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 abstract class Composite extends Constraint
 {
     /**
-     * {@inheritdoc}
-     *
      * The groups of the composite and its nested constraints are made
      * consistent using the following strategy:
      *
@@ -51,9 +49,9 @@ abstract class Composite extends Constraint
      * cached. When constraints are loaded from the cache, no more group
      * checks need to be done.
      */
-    public function __construct($options = null)
+    public function __construct(mixed $options = null, array $groups = null, mixed $payload = null)
     {
-        parent::__construct($options);
+        parent::__construct($options, $groups, $payload);
 
         $this->initializeNestedConstraints();
 
@@ -68,7 +66,7 @@ abstract class Composite extends Constraint
         foreach ($nestedConstraints as $constraint) {
             if (!$constraint instanceof Constraint) {
                 if (\is_object($constraint)) {
-                    $constraint = \get_class($constraint);
+                    $constraint = $constraint::class;
                 }
 
                 throw new ConstraintDefinitionException(sprintf('The value "%s" is not an instance of Constraint in constraint "%s".', $constraint, static::class));
@@ -79,7 +77,7 @@ abstract class Composite extends Constraint
             }
         }
 
-        if (!property_exists($this, 'groups')) {
+        if (!isset(((array) $this)['groups'])) {
             $mergedGroups = [];
 
             foreach ($nestedConstraints as $constraint) {
@@ -96,7 +94,7 @@ abstract class Composite extends Constraint
         }
 
         foreach ($nestedConstraints as $constraint) {
-            if (property_exists($constraint, 'groups')) {
+            if (isset(((array) $constraint)['groups'])) {
                 $excessGroups = array_diff($constraint->groups, $this->groups);
 
                 if (\count($excessGroups) > 0) {
@@ -111,13 +109,9 @@ abstract class Composite extends Constraint
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Implicit group names are forwarded to nested constraints.
-     *
-     * @param string $group
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName(string $group)
     {
         parent::addImplicitGroupName($group);
 
@@ -131,17 +125,15 @@ abstract class Composite extends Constraint
 
     /**
      * Returns the name of the property that contains the nested constraints.
-     *
-     * @return string The property name
      */
-    abstract protected function getCompositeOption();
+    abstract protected function getCompositeOption(): string;
 
     /**
      * @internal Used by metadata
      *
      * @return Constraint[]
      */
-    public function getNestedContraints()
+    public function getNestedConstraints(): array
     {
         /* @var Constraint[] $nestedConstraints */
         return $this->{$this->getCompositeOption()};

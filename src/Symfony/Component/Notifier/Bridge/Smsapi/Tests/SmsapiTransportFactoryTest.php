@@ -12,15 +12,11 @@
 namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
 
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SmsapiTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SmsapiTransportFactory
     {
         return new SmsapiTransportFactory();
     }
@@ -31,11 +27,53 @@ final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
             'smsapi://host.test?from=testFrom',
             'smsapi://token@host.test?from=testFrom',
         ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&test=0',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&fast=0',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&test=false',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom&fast=false',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&test=1',
+            'smsapi://token@host.test?from=testFrom&test=1',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&fast=1',
+            'smsapi://token@host.test?from=testFrom&fast=1',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&test=1',
+            'smsapi://token@host.test?from=testFrom&test=true',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&fast=1',
+            'smsapi://token@host.test?from=testFrom&fast=true',
+        ];
     }
 
     public function supportsProvider(): iterable
     {
         yield [true, 'smsapi://host?from=testFrom'];
+        yield [true, 'smsapi://host?from=testFrom&fast=1'];
+        yield [true, 'smsapi://host?from=testFrom&test=1'];
         yield [false, 'somethingElse://host?from=testFrom'];
     }
 

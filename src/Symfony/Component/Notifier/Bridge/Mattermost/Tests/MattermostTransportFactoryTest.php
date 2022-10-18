@@ -12,18 +12,14 @@
 namespace Symfony\Component\Notifier\Bridge\Mattermost\Tests;
 
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
 final class MattermostTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return MattermostTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): MattermostTransportFactory
     {
         return new MattermostTransportFactory();
     }

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -153,7 +162,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
   [łabądź] baz
  >
 EOT
-        , $output, true);
+            , $output, true);
     }
 
     public function testChoiceQuestionCustomPrompt()
@@ -172,7 +181,7 @@ EOT
   [0] foo
  >ccc>
 EOT
-        , $output, true);
+            , $output, true);
     }
 
     protected function getInputStream($input)
@@ -218,7 +227,7 @@ EOT
     {
         $expected = 'Write an essay (press Ctrl+D to continue)';
 
-        if (false !== strpos(\PHP_OS, 'WIN')) {
+        if ('Windows' === \PHP_OS_FAMILY) {
             $expected = 'Write an essay (press Ctrl+Z then Enter to continue)';
         }
 

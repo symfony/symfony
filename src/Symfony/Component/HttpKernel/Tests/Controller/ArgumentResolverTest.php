@@ -173,6 +173,9 @@ class ArgumentResolverTest extends TestCase
         self::$resolver->getArguments($request, $controller);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetArgumentWithoutArray()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -186,7 +189,7 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
-        $controller = [$this, 'controllerWithFooAndDefaultBar'];
+        $controller = $this->controllerWithFooAndDefaultBar(...);
         $resolver->getArguments($request, $controller);
     }
 
@@ -194,7 +197,7 @@ class ArgumentResolverTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $request = Request::create('/');
-        $controller = [$this, 'controllerWithFoo'];
+        $controller = $this->controllerWithFoo(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -224,7 +227,7 @@ class ArgumentResolverTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithSession'];
+        $controller = $this->controllerWithSession(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
@@ -234,7 +237,7 @@ class ArgumentResolverTest extends TestCase
         $session = new ExtendingSession(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
@@ -244,7 +247,7 @@ class ArgumentResolverTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithSessionInterface'];
+        $controller = $this->controllerWithSessionInterface(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
@@ -255,7 +258,7 @@ class ArgumentResolverTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -266,7 +269,7 @@ class ArgumentResolverTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -275,7 +278,7 @@ class ArgumentResolverTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $request = Request::create('/');
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }

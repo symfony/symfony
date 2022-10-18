@@ -13,13 +13,17 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * A console command for retrieving information about event dispatcher.
@@ -28,13 +32,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @final
  */
+#[AsCommand(name: 'debug:event-dispatcher', description: 'Display configured listeners for an application')]
 class EventDispatcherDebugCommand extends Command
 {
     private const DEFAULT_DISPATCHER = 'event_dispatcher';
 
-    protected static $defaultName = 'debug:event-dispatcher';
-    protected static $defaultDescription = 'Displays configured listeners for an application';
-    private $dispatchers;
+    private ContainerInterface $dispatchers;
 
     public function __construct(ContainerInterface $dispatchers)
     {
@@ -43,9 +46,6 @@ class EventDispatcherDebugCommand extends Command
         $this->dispatchers = $dispatchers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -55,7 +55,6 @@ class EventDispatcherDebugCommand extends Command
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured listeners:
 
@@ -70,8 +69,6 @@ EOF
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -120,12 +117,38 @@ EOF
         return 0;
     }
 
-    private function searchForEvent(EventDispatcherInterface $dispatcher, $needle): array
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('event')) {
+            $dispatcherServiceName = $input->getOption('dispatcher');
+            if ($this->dispatchers->has($dispatcherServiceName)) {
+                $dispatcher = $this->dispatchers->get($dispatcherServiceName);
+                $suggestions->suggestValues(array_keys($dispatcher->getListeners()));
+            }
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('dispatcher')) {
+            if ($this->dispatchers instanceof ServiceProviderInterface) {
+                $suggestions->suggestValues(array_keys($this->dispatchers->getProvidedServices()));
+            }
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues((new DescriptorHelper())->getFormats());
+        }
+    }
+
+    private function searchForEvent(EventDispatcherInterface $dispatcher, string $needle): array
     {
         $output = [];
+        $lcNeedle = strtolower($needle);
         $allEvents = array_keys($dispatcher->getListeners());
         foreach ($allEvents as $event) {
-            if (str_contains($event, $needle)) {
+            if (str_contains(strtolower($event), $lcNeedle)) {
                 $output[] = $event;
             }
         }

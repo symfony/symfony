@@ -16,7 +16,8 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -31,11 +32,11 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private $registry;
-    private $managerName;
-    private $classOrAlias;
-    private $class;
-    private $property;
+    private ManagerRegistry $registry;
+    private ?string $managerName;
+    private string $classOrAlias;
+    private string $class;
+    private ?string $property;
 
     public function __construct(ManagerRegistry $registry, string $classOrAlias, string $property = null, string $managerName = null)
     {
@@ -45,25 +46,22 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         $this->property = $property;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadUserByUsername(string $username)
+    public function loadUserByIdentifier(string $identifier): UserInterface
     {
         $repository = $this->getRepository();
         if (null !== $this->property) {
-            $user = $repository->findOneBy([$this->property => $username]);
+            $user = $repository->findOneBy([$this->property => $identifier]);
         } else {
             if (!$repository instanceof UserLoaderInterface) {
                 throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_debug_type($repository)));
             }
 
-            $user = $repository->loadUserByUsername($username);
+            $user = $repository->loadUserByIdentifier($identifier);
         }
 
         if (null === $user) {
-            $e = new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
-            $e->setUsername($username);
+            $e = new UserNotFoundException(sprintf('User "%s" not found.', $identifier));
+            $e->setUserIdentifier($identifier);
 
             throw $e;
         }
@@ -71,10 +69,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $class = $this->getClass();
         if (!$user instanceof $class) {
@@ -95,8 +90,8 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
             $refreshedUser = $repository->find($id);
             if (null === $refreshedUser) {
-                $e = new UsernameNotFoundException('User with id '.json_encode($id).' not found.');
-                $e->setUsername(json_encode($id));
+                $e = new UserNotFoundException('User with id '.json_encode($id).' not found.');
+                $e->setUserIdentifier(json_encode($id));
 
                 throw $e;
             }
@@ -105,18 +100,15 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $refreshedUser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }
 
     /**
-     * {@inheritdoc}
+     * @final
      */
-    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         $class = $this->getClass();
         if (!$user instanceof $class) {
@@ -125,7 +117,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
         $repository = $this->getRepository();
         if ($repository instanceof PasswordUpgraderInterface) {
-            $repository->upgradePassword($user, $newEncodedPassword);
+            $repository->upgradePassword($user, $newHashedPassword);
         }
     }
 
@@ -141,10 +133,10 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
     private function getClass(): string
     {
-        if (null === $this->class) {
+        if (!isset($this->class)) {
             $class = $this->classOrAlias;
 
-            if (false !== strpos($class, ':')) {
+            if (str_contains($class, ':')) {
                 $class = $this->getClassMetadata()->getName();
             }
 

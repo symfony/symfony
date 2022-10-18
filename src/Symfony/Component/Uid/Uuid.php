@@ -24,25 +24,28 @@ class Uuid extends AbstractUid
     public const NAMESPACE_X500 = '6ba7b814-9dad-11d1-80b4-00c04fd430c8';
 
     protected const TYPE = 0;
+    protected const NIL = '00000000-0000-0000-0000-000000000000';
+    protected const MAX = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
-    public function __construct(string $uuid)
+    public function __construct(string $uuid, bool $checkVariant = false)
     {
-        $type = uuid_is_valid($uuid) ? uuid_type($uuid) : false;
+        $type = preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uuid) ? (int) $uuid[14] : false;
 
-        if (false === $type || \UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
+        if (false === $type || (static::TYPE ?: $type) !== $type) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
         }
 
-        $this->uid = strtr($uuid, 'ABCDEF', 'abcdef');
+        $this->uid = strtolower($uuid);
+
+        if ($checkVariant && !\in_array($this->uid[19], ['8', '9', 'a', 'b'], true)) {
+            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+        }
     }
 
-    /**
-     * @return static
-     */
-    public static function fromString(string $uuid): parent
+    public static function fromString(string $uuid): static
     {
         if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
-            $uuid = BinaryUtil::fromBase($uuid, BinaryUtil::BASE58);
+            $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
         }
 
         if (16 === \strlen($uuid)) {
@@ -53,27 +56,37 @@ class Uuid extends AbstractUid
             $uuid = substr_replace($uuid, '-', 18, 0);
             $uuid = substr_replace($uuid, '-', 23, 0);
         } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
-            $uuid = (new Ulid($uuid))->toRfc4122();
+            $ulid = new Ulid('00000000000000000000000000');
+            $ulid->uid = strtoupper($uuid);
+            $uuid = $ulid->toRfc4122();
         }
 
         if (__CLASS__ !== static::class || 36 !== \strlen($uuid)) {
             return new static($uuid);
         }
 
-        if (!uuid_is_valid($uuid)) {
-            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+        if (self::NIL === $uuid) {
+            return new NilUuid();
         }
 
-        switch (uuid_type($uuid)) {
-            case UuidV1::TYPE: return new UuidV1($uuid);
-            case UuidV3::TYPE: return new UuidV3($uuid);
-            case UuidV4::TYPE: return new UuidV4($uuid);
-            case UuidV5::TYPE: return new UuidV5($uuid);
-            case UuidV6::TYPE: return new UuidV6($uuid);
-            case NilUuid::TYPE: return new NilUuid();
+        if (self::MAX === $uuid = strtr($uuid, 'F', 'f')) {
+            return new MaxUuid();
         }
 
-        return new self($uuid);
+        if (!\in_array($uuid[19], ['8', '9', 'a', 'b', 'A', 'B'], true)) {
+            return new self($uuid);
+        }
+
+        return match ((int) $uuid[14]) {
+            UuidV1::TYPE => new UuidV1($uuid),
+            UuidV3::TYPE => new UuidV3($uuid),
+            UuidV4::TYPE => new UuidV4($uuid),
+            UuidV5::TYPE => new UuidV5($uuid),
+            UuidV6::TYPE => new UuidV6($uuid),
+            UuidV7::TYPE => new UuidV7($uuid),
+            UuidV8::TYPE => new UuidV8($uuid),
+            default => new self($uuid),
+        };
     }
 
     final public static function v1(): UuidV1
@@ -107,13 +120,23 @@ class Uuid extends AbstractUid
         return new UuidV6();
     }
 
+    final public static function v7(): UuidV7
+    {
+        return new UuidV7();
+    }
+
+    final public static function v8(string $uuid): UuidV8
+    {
+        return new UuidV8($uuid);
+    }
+
     public static function isValid(string $uuid): bool
     {
-        if (__CLASS__ === static::class) {
-            return uuid_is_valid($uuid);
+        if (!preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){2}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$}Di', $uuid)) {
+            return false;
         }
 
-        return uuid_is_valid($uuid) && static::TYPE === uuid_type($uuid);
+        return __CLASS__ === static::class || static::TYPE === (int) $uuid[14];
     }
 
     public function toBinary(): string
@@ -126,7 +149,7 @@ class Uuid extends AbstractUid
         return $this->uid;
     }
 
-    public function compare(parent $other): int
+    public function compare(AbstractUid $other): int
     {
         if (false !== $cmp = uuid_compare($this->uid, $other->uid)) {
             return $cmp;

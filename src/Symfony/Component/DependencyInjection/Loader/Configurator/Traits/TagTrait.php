@@ -20,14 +20,14 @@ trait TagTrait
      *
      * @return $this
      */
-    final public function tag(string $name, array $attributes = []): self
+    final public function tag(string $name, array $attributes = []): static
     {
         if ('' === $name) {
             throw new InvalidArgumentException(sprintf('The tag name for service "%s" must be a non-empty string.', $this->id));
         }
 
         foreach ($attributes as $attribute => $value) {
-            if (!is_scalar($value) && null !== $value) {
+            if (!\is_scalar($value) && null !== $value) {
                 throw new InvalidArgumentException(sprintf('A tag attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $this->id, $name, $attribute));
             }
         }

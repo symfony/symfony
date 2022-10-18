@@ -25,7 +25,7 @@ use Amp\Success;
  */
 class AmpResolver implements Dns\Resolver
 {
-    private $dnsMap;
+    private array $dnsMap;
 
     public function __construct(array &$dnsMap)
     {

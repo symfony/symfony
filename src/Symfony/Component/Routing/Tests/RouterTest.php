@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
@@ -128,7 +129,20 @@ class RouterTest extends TestCase
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
+        $this->assertInstanceOf(CompiledUrlGenerator::class, $this->router->getGenerator());
+    }
+
+    public function testGeneratorIsCreatedIfCacheIsNotConfiguredNotCompiled()
+    {
+        $this->router->setOption('cache_dir', null);
+        $this->router->setOption('generator_class', UrlGenerator::class);
+
+        $this->loader->expects($this->once())
+            ->method('load')->with('routing.yml', null)
+            ->willReturn(new RouteCollection());
+
         $this->assertInstanceOf(UrlGenerator::class, $this->router->getGenerator());
+        $this->assertNotInstanceOf(CompiledUrlGenerator::class, $this->router->getGenerator());
     }
 
     public function testMatchRequestWithUrlMatcherInterface()
@@ -137,7 +151,6 @@ class RouterTest extends TestCase
         $matcher->expects($this->once())->method('match');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -149,7 +162,6 @@ class RouterTest extends TestCase
         $matcher->expects($this->once())->method('matchRequest');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -170,7 +182,6 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }
@@ -190,7 +201,6 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }

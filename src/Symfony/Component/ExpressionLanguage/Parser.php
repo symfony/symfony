@@ -26,12 +26,12 @@ class Parser
     public const OPERATOR_LEFT = 1;
     public const OPERATOR_RIGHT = 2;
 
-    private $stream;
-    private $unaryOperators;
-    private $binaryOperators;
-    private $functions;
-    private $names;
-    private $lint;
+    private TokenStream $stream;
+    private array $unaryOperators;
+    private array $binaryOperators;
+    private array $functions;
+    private ?array $names;
+    private bool $lint = false;
 
     public function __construct(array $functions)
     {
@@ -61,6 +61,9 @@ class Parser
             '<=' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             'not in' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             'in' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
+            'contains' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
+            'starts with' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
+            'ends with' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             'matches' => ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT],
             '..' => ['precedence' => 25, 'associativity' => self::OPERATOR_LEFT],
             '+' => ['precedence' => 30, 'associativity' => self::OPERATOR_LEFT],
@@ -86,11 +89,9 @@ class Parser
      * variable 'container' can be used in the expression
      * but the compiled code will use 'this'.
      *
-     * @return Node\Node A node tree
-     *
      * @throws SyntaxError
      */
-    public function parse(TokenStream $stream, array $names = [])
+    public function parse(TokenStream $stream, array $names = []): Node\Node
     {
         $this->lint = false;
 
@@ -124,8 +125,7 @@ class Parser
             throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s".', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
         }
 
-        $this->stream = null;
-        $this->names = null;
+        unset($this->stream, $this->names);
 
         return $node;
     }
@@ -176,6 +176,13 @@ class Parser
 
     protected function parseConditionalExpression(Node\Node $expr)
     {
+        while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '??')) {
+            $this->stream->next();
+            $expr2 = $this->parseExpression();
+
+            $expr = new Node\NullCoalesceNode($expr, $expr2);
+        }
+
         while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '?')) {
             $this->stream->next();
             if (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ':')) {
@@ -335,7 +342,8 @@ class Parser
     {
         $token = $this->stream->current;
         while (Token::PUNCTUATION_TYPE == $token->type) {
-            if ('.' === $token->value) {
+            if ('.' === $token->value || '?.' === $token->value) {
+                $isNullSafe = '?.' === $token->value;
                 $this->stream->next();
                 $token = $this->stream->current;
                 $this->stream->next();
@@ -359,7 +367,7 @@ class Parser
                     throw new SyntaxError('Expected name.', $token->cursor, $this->stream->getExpression());
                 }
 
-                $arg = new Node\ConstantNode($token->value, true);
+                $arg = new Node\ConstantNode($token->value, true, $isNullSafe);
 
                 $arguments = new Node\ArgumentsNode();
                 if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '(')) {
@@ -396,7 +404,7 @@ class Parser
         $args = [];
         $this->stream->expect(Token::PUNCTUATION_TYPE, '(', 'A list of arguments must begin with an opening parenthesis');
         while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
-            if (!empty($args)) {
+            if ($args) {
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'Arguments must be separated by a comma');
             }
 

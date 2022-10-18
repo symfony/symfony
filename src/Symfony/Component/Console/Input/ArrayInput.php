@@ -25,7 +25,7 @@ use Symfony\Component\Console\Exception\InvalidOptionException;
  */
 class ArrayInput extends Input
 {
-    private $parameters;
+    private array $parameters;
 
     public function __construct(array $parameters, InputDefinition $definition = null)
     {
@@ -34,10 +34,7 @@ class ArrayInput extends Input
         parent::__construct($definition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFirstArgument()
+    public function getFirstArgument(): ?string
     {
         foreach ($this->parameters as $param => $value) {
             if ($param && \is_string($param) && '-' === $param[0]) {
@@ -50,10 +47,7 @@ class ArrayInput extends Input
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasParameterOption($values, bool $onlyParams = false)
+    public function hasParameterOption(string|array $values, bool $onlyParams = false): bool
     {
         $values = (array) $values;
 
@@ -74,10 +68,7 @@ class ArrayInput extends Input
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParameterOption($values, $default = false, bool $onlyParams = false)
+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed
     {
         $values = (array) $values;
 
@@ -100,41 +91,37 @@ class ArrayInput extends Input
 
     /**
      * Returns a stringified representation of the args passed to the command.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $params = [];
         foreach ($this->parameters as $param => $val) {
             if ($param && \is_string($param) && '-' === $param[0]) {
+                $glue = ('-' === $param[1]) ? '=' : ' ';
                 if (\is_array($val)) {
                     foreach ($val as $v) {
-                        $params[] = $param.('' != $v ? '='.$this->escapeToken($v) : '');
+                        $params[] = $param.('' != $v ? $glue.$this->escapeToken($v) : '');
                     }
                 } else {
-                    $params[] = $param.('' != $val ? '='.$this->escapeToken($val) : '');
+                    $params[] = $param.('' != $val ? $glue.$this->escapeToken($val) : '');
                 }
             } else {
-                $params[] = \is_array($val) ? implode(' ', array_map([$this, 'escapeToken'], $val)) : $this->escapeToken($val);
+                $params[] = \is_array($val) ? implode(' ', array_map($this->escapeToken(...), $val)) : $this->escapeToken($val);
             }
         }
 
         return implode(' ', $params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {
             if ('--' === $key) {
                 return;
             }
-            if (0 === strpos($key, '--')) {
+            if (str_starts_with($key, '--')) {
                 $this->addLongOption(substr($key, 2), $value);
-            } elseif (0 === strpos($key, '-')) {
+            } elseif (str_starts_with($key, '-')) {
                 $this->addShortOption(substr($key, 1), $value);
             } else {
                 $this->addArgument($key, $value);
@@ -147,7 +134,7 @@ class ArrayInput extends Input
      *
      * @throws InvalidOptionException When option given doesn't exist
      */
-    private function addShortOption(string $shortcut, $value)
+    private function addShortOption(string $shortcut, mixed $value)
     {
         if (!$this->definition->hasShortcut($shortcut)) {
             throw new InvalidOptionException(sprintf('The "-%s" option does not exist.', $shortcut));
@@ -162,7 +149,7 @@ class ArrayInput extends Input
      * @throws InvalidOptionException When option given doesn't exist
      * @throws InvalidOptionException When a required value is missing
      */
-    private function addLongOption(string $name, $value)
+    private function addLongOption(string $name, mixed $value)
     {
         if (!$this->definition->hasOption($name)) {
             if (!$this->definition->hasNegation($name)) {
@@ -193,12 +180,9 @@ class ArrayInput extends Input
     /**
      * Adds an argument value.
      *
-     * @param string|int $name  The argument name
-     * @param mixed      $value The value for the argument
-     *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    private function addArgument($name, $value)
+    private function addArgument(string|int $name, mixed $value)
     {
         if (!$this->definition->hasArgument($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));

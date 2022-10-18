@@ -2,21 +2,63 @@
 
 {% block head %}
     <style>
+        {{ include('@WebProfiler/Profiler/profiler.css.twig') }}
         {{ include('@WebProfiler/Profiler/open.css.twig') }}
     </style>
 {% endblock %}
 
 {% block body %}
-    {% set source = filename|file_excerpt(line, -1) %}
-    <div class="header">
-        <h1>{{ file }}{% if 0 < line %} <small>line {{ line }}</small>{% endif %}</h1>
-        <a class="doc" href="https://symfony.com/doc/{{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}/reference/configuration/framework.html#ide" rel="help">Open in your IDE?</a>
+    <div class="container">
+        {{ include('@WebProfiler/Profiler/header.html.twig', with_context = false) }}
+
+        {% set source = file_info.pathname|file_excerpt(line, -1) %}
+        <div id="content">
+            <div id="main">
+                <div id="source">
+                    <h1 class="source-file-name">{{ file }}{% if 0 < line %} <small>line {{ line }}</small>{% endif %}</h1>
+
+                    <div class="source-content">
+                        {% if source is null %}
+                            <p class="empty empty-panel">The file is not readable.</p>
+                        {% else %}
+                            {{ source|raw }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="sidebar">
+                    <dl class="file-metadata">
+                        <dt>Filepath:</dt>
+                        <dd>{{ file_info.pathname }}</dd>
+
+                        <dt>Last modified:</dt>
+                        <dd>{{ file_info.mTime|date }}</dd>
+
+                        <dt>Size:</dt>
+                        {% set file_size_in_kb = file_info.size / 1024 %}
+                        {% set file_num_lines = source|split("\n")|length - 1 %}
+                        <dd>
+                            {{ file_size_in_kb < 1 ? file_info.size ~ ' bytes' : file_size_in_kb|number_format(0) ~ ' KB' }}
+                            / {{ file_num_lines }} lines
+                        </dd>
+                    </dl>
+
+                    <a class="doc-link" href="https://symfony.com/doc/{{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}/reference/configuration/framework.html#ide" rel="help">Open this file in your IDE?</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="source">
-        {% if source is null %}
-            <p class="empty">The file is not readable.</p>
-        {% else %}
-            {{ source|raw }}
-        {% endif %}
-    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            const selectedLineElement = document.querySelector('.source-content li.selected');
+            if (null === selectedLineElement) {
+                return;
+            }
+
+            const selectedLineYCoordinate = selectedLineElement.getBoundingClientRect().y;
+            console.log(selectedLineYCoordinate);
+            window.scrollTo({ top: selectedLineYCoordinate - 20, left: 0, behavior: 'smooth' });
+        });
+    </script>
 {% endblock %}

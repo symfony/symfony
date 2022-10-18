@@ -19,5 +19,11 @@
         <target><![CDATA[<source> & <target>]]></target>
       </segment>
     </unit>
+    <unit id="aF1tx51">
+      <segment>
+        <source>translation.key.that.is.longer.than.eighty.characters.should.not.have.name.attribute</source>
+        <target>value</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

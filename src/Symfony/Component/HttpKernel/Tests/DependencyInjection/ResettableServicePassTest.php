@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
@@ -59,7 +68,7 @@ class ResettableServicePassTest extends TestCase
     public function testMissingMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set.');
+        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set on service "Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService".');
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');
@@ -68,6 +77,26 @@ class ResettableServicePassTest extends TestCase
         $container->addCompilerPass(new ResettableServicePass());
 
         $container->compile();
+    }
+
+    public function testIgnoreInvalidMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->register(ResettableService::class)
+            ->setPublic(true)
+            ->addTag('kernel.reset', ['method' => 'missingMethod', 'on_invalid' => 'ignore']);
+        $container->register('services_resetter', ServicesResetter::class)
+            ->setPublic(true)
+            ->setArguments([null, []]);
+        $container->addCompilerPass(new ResettableServicePass());
+
+        $container->compile();
+
+        $this->assertSame([ResettableService::class => ['?missingMethod']], $container->getDefinition('services_resetter')->getArgument(1));
+
+        $resettable = $container->get(ResettableService::class);
+        $resetter = $container->get('services_resetter');
+        $resetter->reset();
     }
 
     public function testCompilerPassWithoutResetters()

@@ -1,0 +1,329 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% import _self as helper %}
+
+{% block toolbar %}
+    {% if collector.handledCount > 0 %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/serializer.svg') }}
+            <span class="sf-toolbar-value">
+                {{ collector.handledCount }}
+            </span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Total calls</b>
+                <span class="sf-toolbar-status">{{ collector.handledCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Total time</b>
+                <span>
+                    {{ '%.2f'|format(collector.totalTime * 1000) }} <span class="unit">ms</span>
+                </span>
+            </div>
+
+            <div class="detailed-metrics">
+                <div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Serialize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.serialize|length }}</span>
+                    </div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Deserialize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.deserialize|length }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Encode</b>
+                        <span class="sf-toolbar-status">{{ collector.data.encode|length }}</span>
+                    </div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Decode</b>
+                        <span class="sf-toolbar-status">{{ collector.data.decode|length }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Normalize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.normalize|length }}</span>
+                    </div>
+                    <div class="sf-toolbar-info-piece">
+                        <b>Denormalize</b>
+                        <span class="sf-toolbar-status">{{ collector.data.denormalize|length }}</span>
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ not collector.handledCount ? 'disabled' }}">
+        <span class="icon">{{ source('@WebProfiler/Icon/serializer.svg') }}</span>
+        <strong>Serializer</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Serializer</h2>
+    <div class="sf-serializer sf-reset">
+        {% if not collector.handledCount %}
+            <div class="empty empty-panel">
+                <p>Nothing was handled by the serializer for this request.</p>
+            </div>
+        {% else %}
+            <div class="metrics">
+                <div class="metric">
+                    <span class="value">{{ collector.handledCount }}</span>
+                    <span class="label">Handled</span>
+                </div>
+
+                <div class="metric">
+                    <span class="value">{{ '%.2f'|format(collector.totalTime * 1000) }} <span class="unit">ms</span></span>
+                    <span class="label">Total time</span>
+                </div>
+            </div>
+
+            <div class="sf-tabs">
+                {{ helper.render_serialize_tab(collector.data, true) }}
+                {{ helper.render_serialize_tab(collector.data, false) }}
+
+                {{ helper.render_normalize_tab(collector.data, true) }}
+                {{ helper.render_normalize_tab(collector.data, false) }}
+
+                {{ helper.render_encode_tab(collector.data, true) }}
+                {{ helper.render_encode_tab(collector.data, false) }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% macro render_serialize_tab(collectorData, serialize) %}
+    {% set data = serialize ? collectorData.serialize : collectorData.deserialize %}
+    {% set cellPrefix = serialize ? 'serialize' : 'deserialize' %}
+
+    <div class="tab {{ not data ? 'disabled' }}">
+        <h3 class="tab-title">{{ serialize ? 'serialize' : 'deserialize' }} <span class="badge">{{ data|length }}</h3>
+        <div class="tab-content">
+            {% if not data|length %}
+                <div class="empty">
+                    <p>Nothing was {{ serialize ? 'serialized' : 'deserialized' }}.</p>
+                </div>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Context</th>
+                            <th>Normalizer</th>
+                            <th>Encoder</th>
+                            <th>Time</th>
+                            <th>Caller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{ helper.render_data_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_context_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_normalizer_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_encoder_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_time_cell(item) }}</td>
+                                <td>{{ helper.render_caller_cell(item, loop.index, cellPrefix) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_caller_cell(item, index, method) %}
+    {% if item.caller is defined %}
+        <span class="metadata">
+            {% set caller = item.caller %}
+            {% if caller.line %}
+                {% set link = caller.file|file_link(caller.line) %}
+                {% if link %}
+                    <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
+                {% else %}
+                    <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
+                {% endif %}
+            {% else %}
+                {{ caller.name }}
+            {% endif %}
+            line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ method }}-{{ index }}">{{ caller.line }}</a>
+        </span>
+
+        <div class="sf-serializer-compact hidden" id="sf-trace-{{ method }}-{{ index }}">
+            <div class="trace">
+                {{ caller.file|file_excerpt(caller.line)|replace({
+                    '#DD0000': 'var(--highlight-string)',
+                    '#007700': 'var(--highlight-keyword)',
+                    '#0000BB': 'var(--highlight-default)',
+                    '#FF8000': 'var(--highlight-comment)'
+                })|raw }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_normalize_tab(collectorData, normalize) %}
+    {% set data = normalize ? collectorData.normalize : collectorData.denormalize %}
+    {% set cellPrefix = normalize ? 'normalize' : 'denormalize' %}
+
+    <div class="tab {{ not data ? 'disabled' }}">
+        <h3 class="tab-title">{{ normalize ? 'normalize' : 'denormalize' }} <span class="badge">{{ data|length }}</h3>
+        <div class="tab-content">
+            {% if not data|length %}
+                <div class="empty">
+                    <p>Nothing was {{ normalize ? 'normalized' : 'denormalized' }}.</p>
+                </div>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Context</th>
+                            <th>Normalizer</th>
+                            <th>Time</th>
+                            <th>Caller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{ helper.render_data_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_context_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_normalizer_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_time_cell(item) }}</td>
+                                <td>{{ helper.render_caller_cell(item, loop.index, cellPrefix) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_encode_tab(collectorData, encode) %}
+    {% set data = encode ? collectorData.encode : collectorData.decode %}
+    {% set cellPrefix = encode ? 'encode' : 'decode' %}
+
+    <div class="tab {{ not data ? 'disabled' }}">
+        <h3 class="tab-title">{{ encode ? 'encode' : 'decode' }} <span class="badge">{{ data|length }}</h3>
+        <div class="tab-content">
+            {% if not data|length %}
+                <div class="empty">
+                    <p>Nothing was {{ encode ? 'encoded' : 'decoded' }}.</p>
+                </div>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Context</th>
+                            <th>Encoder</th>
+                            <th>Time</th>
+                            <th>Caller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{ helper.render_data_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_context_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_encoder_cell(item, loop.index, cellPrefix) }}</td>
+                                <td>{{ helper.render_time_cell(item) }}</td>
+                                <td>{{ helper.render_caller_cell(item, loop.index, cellPrefix) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_data_cell(item, index, method) %}
+    {% set data_id = 'data-' ~ method ~ '-' ~ index %}
+
+    <span class="nowrap">{{ item.dataType }}</span>
+
+    <div>
+        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ data_id }}" data-toggle-alt-content="Hide contents">Show contents</a>
+        <div id="{{ data_id }}" class="context sf-toggle-content sf-toggle-hidden">
+            {{ profiler_dump(item.data) }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_context_cell(item, index, method) %}
+    {% set context_id = 'context-' ~ method ~ '-' ~ index %}
+
+    {% if item.type %}
+        <span class="nowrap">Type: {{ item.type }}</span>
+        <div class="nowrap">Format: {{ item.format ? item.format : 'none' }}</div>
+    {% else %}
+        <span class="nowrap">Format: {{ item.format ? item.format : 'none' }}</span>
+    {% endif %}
+
+    <div>
+        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
+        <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+            {{ profiler_dump(item.context) }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_normalizer_cell(item, index, method) %}
+    {% set nested_normalizers_id = 'nested-normalizers-' ~ method ~ '-' ~ index %}
+
+    {% if item.normalizer is defined %}
+        <span class="nowrap"><a href="{{ item.normalizer.file|file_link(item.normalizer.line) }}" title="{{ item.normalizer.file }}">{{ item.normalizer.class }}</a> ({{ '%.2f'|format(item.normalizer.time * 1000) }} ms)</span>
+    {% endif %}
+
+    {% if item.normalization|length > 1 %}
+        <div>
+            <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ nested_normalizers_id }}" data-toggle-alt-content="Hide nested normalizers">Show nested normalizers</a>
+            <div id="{{ nested_normalizers_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                <ul class="text-small" style="line-height:80%;margin-top:10px">
+                    {% for normalizer in item.normalization %}
+                        <li><span class="nowrap">x{{ normalizer.calls }} <a href="{{ normalizer.file|file_link(normalizer.line) }}" title="{{ normalizer.file }}">{{ normalizer.class }}</a> ({{ '%.2f'|format(normalizer.time * 1000) }} ms)</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_encoder_cell(item, index, method) %}
+    {% set nested_encoders_id = 'nested-encoders-' ~ method ~ '-' ~ index %}
+
+    {% if item.encoder is defined %}
+        <span class="nowrap"><a href="{{ item.encoder.file|file_link(item.encoder.line) }}" title="{{ item.encoder.file }}">{{ item.encoder.class }}</a> ({{ '%.2f'|format(item.encoder.time * 1000) }} ms)</span>
+    {% endif %}
+
+    {% if item.encoding|length > 1 %}
+        <div>
+            <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ nested_encoders_id }}" data-toggle-alt-content="Hide nested encoders">Show nested encoders</a>
+            <div id="{{ nested_encoders_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                <ul class="text-small" style="line-height:80%;margin-top:10px">
+                    {% for encoder in item.encoding %}
+                        <li><span class="nowrap">x{{ encoder.calls }} <a href="{{ encoder.file|file_link(encoder.line) }}" title="{{ encoder.file }}">{{ encoder.class }}</a> ({{ '%.2f'|format(encoder.time * 1000) }} ms)</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_time_cell(item) %}
+    <span class="nowrap">{{ '%.2f'|format(item.time * 1000) }} ms</span>
+{% endmacro %}

@@ -17,8 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
@@ -42,7 +41,6 @@ class RegisterTokenUsageTrackingPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->setParameter('security.token_storage.class', TokenStorage::class);
-        $container->register('session', Session::class);
         $container->register('security.context_listener', ContextListener::class)
             ->setArguments([
                 new Reference('security.untracked_token_storage'),
@@ -66,7 +64,7 @@ class RegisterTokenUsageTrackingPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->setParameter('security.token_storage.class', UsageTrackingTokenStorage::class);
-        $container->register('session.storage', NativeSessionStorage::class);
+        $container->register('session.factory', SessionFactory::class);
         $container->register('security.context_listener', ContextListener::class)
             ->setArguments([
                 new Reference('security.untracked_token_storage'),

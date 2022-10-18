@@ -3,14 +3,15 @@
 $container->loadFromExtension('framework', [
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
+    'enabled_locales' => ['fr', 'en'],
     'csrf_protection' => true,
     'form' => [
         'csrf_protection' => [
             'field_name' => '_csrf',
         ],
-        'legacy_error_messages' => false,
     ],
     'http_method_override' => false,
+    'trust_x_sendfile_type_header' => true,
     'esi' => [
         'enabled' => true,
     ],
@@ -27,7 +28,7 @@ $container->loadFromExtension('framework', [
         'utf8' => true,
     ],
     'session' => [
-        'storage_id' => 'session.storage.native',
+        'storage_factory_id' => 'session.storage.factory.native',
         'handler_id' => 'session.handler.native_file',
         'name' => '_SYMFONY',
         'cookie_lifetime' => 86400,
@@ -51,7 +52,6 @@ $container->loadFromExtension('framework', [
         'fallback' => 'fr',
         'paths' => ['%kernel.project_dir%/Fixtures/translations'],
         'cache_dir' => '%kernel.cache_dir%/translations',
-        'enabled_locales' => ['fr', 'en'],
     ],
     'validation' => [
         'enabled' => true,
@@ -67,6 +67,7 @@ $container->loadFromExtension('framework', [
         'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
         'circular_reference_handler' => 'my.circular.reference.handler',
         'max_depth_handler' => 'my.max.depth.handler',
+        'default_context' => ['enable_max_depth' => true],
     ],
     'property_info' => true,
     'ide' => 'file%%link%%format',
@@ -78,5 +79,8 @@ $container->loadFromExtension('framework', [
             ],
             'pdf' => 'application/pdf',
         ],
+    ],
+    'html_sanitizer' => [
+        'enabled' => true,
     ],
 ]);

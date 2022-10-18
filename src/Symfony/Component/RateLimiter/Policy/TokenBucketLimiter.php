@@ -21,24 +21,15 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 final class TokenBucketLimiter implements LimiterInterface
 {
-    private $id;
-    private $maxBurst;
-    private $rate;
-    private $storage;
-
-    /**
-     * @var LockInterface
-     */
-    private $lock;
-
     use ResetLimiterTrait;
 
-    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, ?LockInterface $lock = null)
+    private int $maxBurst;
+    private Rate $rate;
+
+    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, LockInterface $lock = null)
     {
         $this->id = $id;
         $this->maxBurst = $maxBurst;
@@ -60,7 +51,7 @@ final class TokenBucketLimiter implements LimiterInterface
      * @throws MaxWaitDurationExceededException if $maxTime is set and the process needs to wait longer than its value (in seconds)
      * @throws \InvalidArgumentException        if $tokens is larger than the maximum burst size
      */
-    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
     {
         if ($tokens > $this->maxBurst) {
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the burst size of the rate limiter (%d).', $tokens, $this->maxBurst));
@@ -76,7 +67,8 @@ final class TokenBucketLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
-            if ($availableTokens >= $tokens) {
+
+            if ($availableTokens >= max(1, $tokens)) {
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
                 $bucket->setTimer($now);
@@ -95,13 +87,15 @@ final class TokenBucketLimiter implements LimiterInterface
 
                 // at $now + $waitDuration all tokens will be reserved for this process,
                 // so no tokens are left for other processes.
-                $bucket->setTokens(0);
-                $bucket->setTimer($now + $waitDuration);
+                $bucket->setTokens($availableTokens - $tokens);
+                $bucket->setTimer($now);
 
-                $reservation = new Reservation($bucket->getTimer(), new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
             }
 
-            $this->storage->save($bucket);
+            if (0 < $tokens) {
+                $this->storage->save($bucket);
+            }
         } finally {
             $this->lock->release();
         }
@@ -109,9 +103,6 @@ final class TokenBucketLimiter implements LimiterInterface
         return $reservation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(int $tokens = 1): RateLimit
     {
         try {

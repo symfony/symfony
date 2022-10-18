@@ -22,15 +22,15 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
 {
     public function __construct()
     {
-        parent::__construct(new EventDispatcher(), $this, null, $this);
+        parent::__construct(new EventDispatcher(), $this, null, $this, true);
     }
 
-    public function getController(Request $request)
+    public function getController(Request $request): callable|false
     {
-        return [$this, 'callController'];
+        return $this->callController(...);
     }
 
-    public function getArguments(Request $request, callable $controller): array
+    public function getArguments(Request $request, callable $controller, \ReflectionFunctionAbstract $reflector = null): array
     {
         return [$request];
     }

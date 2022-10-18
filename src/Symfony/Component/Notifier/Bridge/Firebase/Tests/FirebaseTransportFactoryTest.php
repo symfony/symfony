@@ -12,18 +12,14 @@
 namespace Symfony\Component\Notifier\Bridge\Firebase\Tests;
 
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
 final class FirebaseTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return FirebaseTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): FirebaseTransportFactory
     {
         return new FirebaseTransportFactory();
     }

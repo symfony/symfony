@@ -15,18 +15,14 @@ use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class AllMySmsTransportTest extends TransportTestCase
 {
-    /**
-     * @return AllMySmsTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null, string $from = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $from = null): AllMySmsTransport
     {
-        return new AllMySmsTransport('login', 'apiKey', $from, $client ?: $this->createMock(HttpClientInterface::class));
+        return new AllMySmsTransport('login', 'apiKey', $from, $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

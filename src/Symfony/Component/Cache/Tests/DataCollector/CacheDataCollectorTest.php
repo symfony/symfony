@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Marshaller;
+namespace Symfony\Component\Cache\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;

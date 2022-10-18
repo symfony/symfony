@@ -37,7 +37,29 @@
         <xsd:element name="services" type="services" />
         <xsd:group ref="foreign" />
       </xsd:sequence>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="when" type="when" />
+      </xsd:sequence>
     </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="when">
+    <xsd:sequence>
+      <xsd:group ref="foreign" />
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="imports" type="imports" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="parameters" type="parameters" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="services" type="services" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+    </xsd:sequence>
+    <xsd:attribute name="env" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:group name="foreign">
@@ -93,6 +115,17 @@
     <xsd:attribute name="function" type="xsd:string" />
   </xsd:complexType>
 
+  <xsd:complexType name="factory">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="service" type="service" minOccurs="0" maxOccurs="1" />
+    </xsd:choice>
+    <xsd:attribute name="service" type="xsd:string" />
+    <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="function" type="xsd:string" />
+    <xsd:attribute name="expression" type="xsd:string" />
+  </xsd:complexType>
+
   <xsd:complexType name="defaults">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -113,7 +146,7 @@
       <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="factory" minOccurs="0" maxOccurs="1" />
       <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
@@ -157,7 +190,7 @@
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="factory" minOccurs="0" maxOccurs="1" />
       <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
@@ -197,9 +230,8 @@
   <xsd:complexType name="deprecated">
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
-        <!-- In Symfony 6, make these attributes required -->
-        <xsd:attribute name="package" type="xsd:string" />
-        <xsd:attribute name="version" type="xsd:string" />
+        <xsd:attribute name="package" type="xsd:string" use="required" />
+        <xsd:attribute name="version" type="xsd:string" use="required" />
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
@@ -291,6 +323,8 @@
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="binary" />
       <xsd:enumeration value="iterator" />
+      <xsd:enumeration value="closure" />
+      <xsd:enumeration value="service_closure" />
       <xsd:enumeration value="service_locator" />
       <!-- "tagged" is an alias of "tagged_iterator", using "tagged_iterator" is preferred. -->
       <xsd:enumeration value="tagged" />

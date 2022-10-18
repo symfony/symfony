@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
@@ -102,6 +111,14 @@ class DateIntervalNormalizerTest extends TestCase
     {
         $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
         $this->assertDateIntervalEquals($this->getInterval($output), $normalizer->denormalize($input, \DateInterval::class));
+    }
+
+    public function testDenormalizeIntervalsWithOmittedPartsBeingZero()
+    {
+        $normalizer = new DateIntervalNormalizer();
+
+        $this->assertDateIntervalEquals($this->getInterval('P3Y2M4DT0H0M0S'), $normalizer->denormalize('P3Y2M4D', \DateInterval::class));
+        $this->assertDateIntervalEquals($this->getInterval('P0Y0M0DT12H34M0S'), $normalizer->denormalize('PT12H34M', \DateInterval::class));
     }
 
     public function testDenormalizeExpectsString()

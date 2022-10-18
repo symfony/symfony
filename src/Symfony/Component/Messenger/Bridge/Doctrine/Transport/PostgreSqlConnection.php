@@ -28,13 +28,12 @@ final class PostgreSqlConnection extends Connection
      * * get_notify_timeout: The length of time to wait for a response when calling PDO::pgsqlGetNotify, in milliseconds. Default: 0.
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
+        'use_notify' => true,
         'check_delayed_interval' => 60000,
         'get_notify_timeout' => 0,
     ];
 
-    private $listening = false;
-
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -61,14 +60,20 @@ final class PostgreSqlConnection extends Connection
             return parent::get();
         }
 
-        if (!$this->listening) {
-            // This is secure because the table name must be a valid identifier:
-            // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-            $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
-            $this->listening = true;
+        // This is secure because the table name must be a valid identifier:
+        // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+        $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
+
+        if (method_exists($this->driverConnection, 'getNativeConnection')) {
+            $wrappedConnection = $this->driverConnection->getNativeConnection();
+        } else {
+            $wrappedConnection = $this->driverConnection;
+            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
+                $wrappedConnection = $wrappedConnection->getWrappedConnection();
+            }
         }
 
-        $notification = $this->driverConnection->getWrappedConnection()->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
+        $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name']) &&
@@ -108,33 +113,38 @@ final class PostgreSqlConnection extends Connection
 
     private function getTriggerSql(): array
     {
+        $functionName = $this->createTriggerFunctionName();
+
         return [
-            'BEGIN;',
-            sprintf('LOCK TABLE %s;', $this->configuration['table_name']),
             // create trigger function
             sprintf(<<<'SQL'
-CREATE OR REPLACE FUNCTION notify_%1$s() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION %1$s() RETURNS TRIGGER AS $$
     BEGIN
-        PERFORM pg_notify('%1$s', NEW.queue_name::text);
+        PERFORM pg_notify('%2$s', NEW.queue_name::text);
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
 SQL
-            , $this->configuration['table_name']),
+                , $functionName, $this->configuration['table_name']),
             // register trigger
             sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
-            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();', $this->configuration['table_name']),
-            'COMMIT;',
+            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE %2$s();', $this->configuration['table_name'], $functionName),
         ];
+    }
+
+    private function createTriggerFunctionName(): string
+    {
+        $tableConfig = explode('.', $this->configuration['table_name']);
+
+        if (1 === \count($tableConfig)) {
+            return sprintf('notify_%1$s', $tableConfig[0]);
+        }
+
+        return sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
     }
 
     private function unlisten()
     {
-        if (!$this->listening) {
-            return;
-        }
-
         $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
-        $this->listening = false;
     }
 }

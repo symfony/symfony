@@ -12,15 +12,11 @@
 namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SendinblueTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SendinblueTransportFactory
     {
         return new SendinblueTransportFactory();
     }

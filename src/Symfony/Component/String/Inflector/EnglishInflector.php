@@ -58,8 +58,14 @@ final class EnglishInflector implements InflectorInterface
         // selfies (selfie)
         ['seifles', 7, true, true, 'selfie'],
 
+        // zombies (zombie)
+        ['seibmoz', 7, true, true, 'zombie'],
+
         // movies (movie)
         ['seivom', 6, true, true, 'movie'],
+
+        // conspectuses (conspectus), prospectuses (prospectus)
+        ['sesutcep', 8, true, true, 'pectus'],
 
         // feet (foot)
         ['teef', 4, true, true, 'foot'],
@@ -117,6 +123,9 @@ final class EnglishInflector implements InflectorInterface
 
         // fees (fee), trees (tree), employees (employee)
         ['see', 3, true, true, 'ee'],
+
+        // edges (edge)
+        ['segd', 4, true, true, 'dge'],
 
         // roses (rose), garages (garage), cassettes (cassette),
         // waltzes (waltz), heroes (hero), bushes (bush), arches (arch),
@@ -226,6 +235,9 @@ final class EnglishInflector implements InflectorInterface
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
         ['noi', 3, true, true, 'ions'],
 
+        // coupon (coupons)
+        ['nop', 3, true, true, 'pons'],
+
         // seasons (season), treasons (treason), poisons (poison), lessons (lesson)
         ['nos', 3, true, true, 'sons'],
 
@@ -260,6 +272,9 @@ final class EnglishInflector implements InflectorInterface
 
         // circuses (circus)
         ['suc', 3, true, true, 'cuses'],
+
+        // conspectuses (conspectus), prospectuses (prospectus)
+        ['sutcep', 6, true, true, 'pectuses'],
 
         // fungi (fungus), alumni (alumnus), syllabi (syllabus), radii (radius)
         ['su', 2, true, true, 'i'],
@@ -306,20 +321,35 @@ final class EnglishInflector implements InflectorInterface
      */
     private const UNINFLECTED = [
         '',
+
+        // data
         'atad',
+
+        // deer
         'reed',
+
+        // feedback
         'kcabdeef',
+
+        // fish
         'hsif',
+
+        // info
         'ofni',
+
+        // moose
         'esoom',
+
+        // series
         'seires',
+
+        // sheep
         'peehs',
+
+        // species
         'seiceps',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function singularize(string $plural): array
     {
         $pluralRev = strrev($plural);
@@ -351,7 +381,7 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $pluralLength) {
-                        $nextIsVocal = false !== strpos('aeiou', $lowerPluralRev[$j]);
+                        $nextIsVocal = str_contains('aeiou', $lowerPluralRev[$j]);
 
                         if (!$map[2] && $nextIsVocal) {
                             // suffix may not succeed a vocal but next char is one
@@ -396,9 +426,6 @@ final class EnglishInflector implements InflectorInterface
         return [$plural];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pluralize(string $singular): array
     {
         $singularRev = strrev($singular);
@@ -431,7 +458,7 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $singularLength) {
-                        $nextIsVocal = false !== strpos('aeiou', $lowerSingularRev[$j]);
+                        $nextIsVocal = str_contains('aeiou', $lowerSingularRev[$j]);
 
                         if (!$map[2] && $nextIsVocal) {
                             // suffix may not succeed a vocal but next char is one

@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Tests\Mime;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -49,7 +59,7 @@ class TemplatedEmailTest extends TestCase
         $e->textTemplate('email.txt.twig');
         $e->htmlTemplate('email.html.twig');
         $e->context(['foo' => 'bar']);
-        $e->attach('Some Text file', 'test.txt');
+        $e->addPart(new DataPart('Some Text file', 'test.txt'));
         $expected = clone $e;
 
         $expectedJson = <<<EOF
@@ -65,10 +75,16 @@ class TemplatedEmailTest extends TestCase
     "htmlCharset": null,
     "attachments": [
         {
+            "filename": "test.txt",
+            "mediaType": "application",
             "body": "Some Text file",
+            "charset": null,
+            "subtype": "octet-stream",
+            "disposition": "attachment",
             "name": "test.txt",
-            "content-type": null,
-            "inline": false
+            "encoding": "base64",
+            "headers": [],
+            "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
         }
     ],
     "headers": {
@@ -101,11 +117,11 @@ EOF;
             $propertyNormalizer,
         ], [new JsonEncoder()]);
 
-        $serialized = $serializer->serialize($e, 'json');
+        $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
         $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, TemplatedEmail::class, 'json');
-        $serialized = $serializer->serialize($e, 'json');
+        $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
         $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n->from('fabien@symfony.com');

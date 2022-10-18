@@ -4,9 +4,15 @@
         "preferred-install": {
             "symfony/form": "source",
             "symfony/http-kernel": "source",
+            "symfony/messenger": "source",
             "symfony/notifier": "source",
+            "symfony/proxy-manager-bridge": "source",
+            "symfony/translation": "source",
             "symfony/validator": "source",
             "*": "dist"
+        },
+        "allow-plugins": {
+            "symfony/flex": true
         }
     }
 }

@@ -49,36 +49,42 @@ return static function (ContainerConfigurator $container) {
         ->set('routing.loader.xml', XmlFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.yml', YamlFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.php', PhpFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.glob', GlobFileLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.directory', DirectoryLoader::class)
             ->args([
                 service('file_locator'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
         ->set('routing.loader.container', ContainerLoader::class)
             ->args([
                 tagged_locator('routing.route_loader'),
+                '%kernel.environment%',
             ])
             ->tag('routing.loader')
 
@@ -95,7 +101,7 @@ return static function (ContainerConfigurator $container) {
                 service(ContainerInterface::class),
                 param('router.resource'),
                 [
-                    'cache_dir' => param('kernel.cache_dir'),
+                    'cache_dir' => param('router.cache_dir'),
                     'debug' => param('kernel.debug'),
                     'generator_class' => CompiledUrlGenerator::class,
                     'generator_dumper_class' => CompiledUrlGeneratorDumper::class,

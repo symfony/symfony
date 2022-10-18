@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Bridge\GatewayApi\Tests;
 
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 /**
  * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
@@ -12,10 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
  */
 final class GatewayApiTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return GatewayApiTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): GatewayApiTransportFactory
     {
         return new GatewayApiTransportFactory();
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
@@ -212,6 +213,28 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertEquals([new Author('s_first', 's_last')], $form->getData());
     }
 
+    public function testNotDeleteEmptyIfInvalid()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => ChoiceType::class,
+            'entry_options' => [
+                'choices' => ['a', 'b'],
+            ],
+            'allow_add' => true,
+            'allow_delete' => true,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['a', 'x', '']);
+
+        $this->assertSame(['a'], $form->getData());
+        $this->assertCount(2, $form);
+        $this->assertTrue($form->has('1'));
+        $this->assertFalse($form[1]->isValid());
+        $this->assertNull($form[1]->getData());
+        $this->assertSame('x', $form[1]->getViewData());
+    }
+
     public function testNotResizedIfSubmittedWithExtraData()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -405,6 +428,23 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertFalse($parent->createView()->vars['required'], 'Parent is not required');
         $this->assertFalse($child->createView()->vars['required'], 'Child is not required');
         $this->assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
+    }
+
+    public function testPrototypeOptionsOverrideEntryOptions()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'entry_options' => [
+                'help' => null,
+            ],
+            'prototype_options' => [
+                'help' => 'foo',
+            ],
+        ]);
+
+        $this->assertSame('foo', $form->createView()->vars['prototype']->vars['help']);
     }
 
     public function testEntriesBlockPrefixes()

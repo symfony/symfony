@@ -23,10 +23,7 @@ final class TelegramOptions implements MessageOptionsInterface
     public const PARSE_MODE_MARKDOWN = 'Markdown';
     public const PARSE_MODE_MARKDOWN_V2 = 'MarkdownV2';
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     public function __construct(array $options = [])
     {
@@ -43,42 +40,60 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this->options['chat_id'] ?? null;
     }
 
-    public function chatId(string $id): self
+    /**
+     * @return $this
+     */
+    public function chatId(string $id): static
     {
         $this->options['chat_id'] = $id;
 
         return $this;
     }
 
-    public function parseMode(string $mode): self
+    /**
+     * @return $this
+     */
+    public function parseMode(string $mode): static
     {
         $this->options['parse_mode'] = $mode;
 
         return $this;
     }
 
-    public function disableWebPagePreview(bool $bool): self
+    /**
+     * @return $this
+     */
+    public function disableWebPagePreview(bool $bool): static
     {
         $this->options['disable_web_page_preview'] = $bool;
 
         return $this;
     }
 
-    public function disableNotification(bool $bool): self
+    /**
+     * @return $this
+     */
+    public function disableNotification(bool $bool): static
     {
         $this->options['disable_notification'] = $bool;
 
         return $this;
     }
 
-    public function replyTo(int $messageId): self
+    /**
+     * @return $this
+     */
+    public function replyTo(int $messageId): static
     {
         $this->options['reply_to_message_id'] = $messageId;
 
         return $this;
     }
 
-    public function replyMarkup(AbstractTelegramReplyMarkup $markup): self
+    /**
+     * @return $this
+     */
+    public function replyMarkup(AbstractTelegramReplyMarkup $markup): static
     {
         $this->options['reply_markup'] = $markup->toArray();
 

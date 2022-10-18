@@ -35,7 +35,7 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
             $this->headers[] = $response['headers'];
         }
 
-        parent::__construct(new EventDispatcher(), $this, null, $this);
+        parent::__construct(new EventDispatcher(), $this, null, $this, true);
     }
 
     public function getBackendRequest()
@@ -43,19 +43,19 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
         return $this->backendRequest;
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false): Response
+    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = false): Response
     {
         $this->backendRequest = $request;
 
         return parent::handle($request, $type, $catch);
     }
 
-    public function getController(Request $request)
+    public function getController(Request $request): callable|false
     {
-        return [$this, 'callController'];
+        return $this->callController(...);
     }
 
-    public function getArguments(Request $request, callable $controller): array
+    public function getArguments(Request $request, callable $controller, \ReflectionFunctionAbstract $reflector = null): array
     {
         return [$request];
     }

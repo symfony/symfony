@@ -12,15 +12,11 @@
 namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 final class DiscordTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return DiscordTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): DiscordTransportFactory
     {
         return new DiscordTransportFactory();
     }

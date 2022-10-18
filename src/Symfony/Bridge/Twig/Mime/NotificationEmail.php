@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Mime;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\DataPart;
 use Twig\Extra\CssInliner\CssInlinerExtension;
 use Twig\Extra\Inky\InkyExtension;
 use Twig\Extra\Markdown\MarkdownExtension;
@@ -28,8 +29,8 @@ class NotificationEmail extends TemplatedEmail
     public const IMPORTANCE_MEDIUM = 'medium';
     public const IMPORTANCE_LOW = 'low';
 
-    private $theme = 'default';
-    private $context = [
+    private string $theme = 'default';
+    private array $context = [
         'importance' => self::IMPORTANCE_LOW,
         'content' => '',
         'exception' => false,
@@ -44,7 +45,7 @@ class NotificationEmail extends TemplatedEmail
     {
         $missingPackages = [];
         if (!class_exists(CssInlinerExtension::class)) {
-            $missingPackages['twig/cssinliner-extra'] = ' CSS Inliner';
+            $missingPackages['twig/cssinliner-extra'] = 'CSS Inliner';
         }
 
         if (!class_exists(InkyExtension::class)) {
@@ -64,8 +65,7 @@ class NotificationEmail extends TemplatedEmail
     public static function asPublicEmail(Headers $headers = null, AbstractPart $body = null): self
     {
         $email = new static($headers, $body);
-        $email->context['importance'] = null;
-        $email->context['footer_text'] = null;
+        $email->markAsPublic();
 
         return $email;
     }
@@ -73,7 +73,18 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function markdown(string $content)
+    public function markAsPublic(): static
+    {
+        $this->context['importance'] = null;
+        $this->context['footer_text'] = null;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function markdown(string $content): static
     {
         if (!class_exists(MarkdownExtension::class)) {
             throw new \LogicException(sprintf('You cannot use "%s" if the Markdown Twig extension is not available; try running "composer require twig/markdown-extra".', __METHOD__));
@@ -87,7 +98,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function content(string $content, bool $raw = false)
+    public function content(string $content, bool $raw = false): static
     {
         $this->context['content'] = $content;
         $this->context['raw'] = $raw;
@@ -98,7 +109,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function action(string $text, string $url)
+    public function action(string $text, string $url): static
     {
         $this->context['action_text'] = $text;
         $this->context['action_url'] = $url;
@@ -109,7 +120,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function importance(string $importance)
+    public function importance(string $importance): static
     {
         $this->context['importance'] = $importance;
 
@@ -117,20 +128,14 @@ class NotificationEmail extends TemplatedEmail
     }
 
     /**
-     * @param \Throwable|FlattenException $exception
-     *
      * @return $this
      */
-    public function exception($exception)
+    public function exception(\Throwable|FlattenException $exception): static
     {
-        if (!$exception instanceof \Throwable && !$exception instanceof FlattenException) {
-            throw new \LogicException(sprintf('"%s" accepts "%s" or "%s" instances.', __METHOD__, \Throwable::class, FlattenException::class));
-        }
-
         $exceptionAsString = $this->getExceptionAsString($exception);
 
         $this->context['exception'] = true;
-        $this->attach($exceptionAsString, 'exception.txt', 'text/plain');
+        $this->addPart(new DataPart($exceptionAsString, 'exception.txt', 'text/plain'));
         $this->importance(self::IMPORTANCE_URGENT);
 
         if (!$this->getSubject()) {
@@ -143,7 +148,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function theme(string $theme)
+    public function theme(string $theme): static
     {
         $this->theme = $theme;
 
@@ -188,20 +193,15 @@ class NotificationEmail extends TemplatedEmail
 
     private function determinePriority(string $importance): int
     {
-        switch ($importance) {
-            case self::IMPORTANCE_URGENT:
-                return self::PRIORITY_HIGHEST;
-            case self::IMPORTANCE_HIGH:
-                return self::PRIORITY_HIGH;
-            case self::IMPORTANCE_MEDIUM:
-                return self::PRIORITY_NORMAL;
-            case self::IMPORTANCE_LOW:
-            default:
-                return self::PRIORITY_LOW;
-        }
+        return match ($importance) {
+            self::IMPORTANCE_URGENT => self::PRIORITY_HIGHEST,
+            self::IMPORTANCE_HIGH => self::PRIORITY_HIGH,
+            self::IMPORTANCE_MEDIUM => self::PRIORITY_NORMAL,
+            default => self::PRIORITY_LOW,
+        };
     }
 
-    private function getExceptionAsString($exception): string
+    private function getExceptionAsString(\Throwable|FlattenException $exception): string
     {
         if (class_exists(FlattenException::class)) {
             $exception = $exception instanceof FlattenException ? $exception : FlattenException::createFromThrowable($exception);
@@ -209,7 +209,7 @@ class NotificationEmail extends TemplatedEmail
             return $exception->getAsString();
         }
 
-        $message = \get_class($exception);
+        $message = $exception::class;
         if ('' !== $exception->getMessage()) {
             $message .= ': '.$exception->getMessage();
         }

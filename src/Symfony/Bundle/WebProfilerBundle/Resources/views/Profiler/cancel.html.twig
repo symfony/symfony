@@ -1,0 +1,25 @@
+{% block toolbar %}
+    {% set icon %}
+        {{ source('@WebProfiler/Icon/symfony.svg') }}
+
+        <span class="sf-toolbar-value sf-toolbar-ajax-request-counter">
+            Loading&hellip;
+        </span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Loading the web debug toolbar&hellip;</b>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            Attempt #<span id="sfLoadCounter-{{ token }}"></span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>
+                <button class="sf-cancel-button" type="button" id="sfLoadCancel-{{ token }}" title="Cancel loading">Cancel</button>
+            </b>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+{% endblock %}

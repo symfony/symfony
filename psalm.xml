@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="5"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    cacheDirectory="./.github/psalm/cache/"
+    errorBaseline=".github/psalm/psalm.baseline.xml"
+>
+    <projectFiles>
+        <directory name="src" />
+        <ignoreFiles>
+            <directory name="src/Symfony/*/*/Tests" />
+            <directory name="src/Symfony/*/*/*/Tests" />
+            <directory name="src/Symfony/*/*/*/*/Tests" />
+            <directory name="src/Symfony/Component/Intl/Resources/emoji/" />
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <!-- These classes have been added in PHP 8.1 -->
+                <referencedClass name="BackedEnum"/>
+                <referencedClass name="ReflectionIntersectionType"/>
+                <referencedClass name="UnitEnum"/>
+            </errorLevel>
+        </UndefinedClass>
+        <UndefinedDocblockClass>
+            <errorLevel type="suppress">
+                <!-- These classes have been added in PHP 8.1 -->
+                <referencedClass name="BackedEnum"/>
+                <referencedClass name="ReflectionIntersectionType"/>
+                <referencedClass name="UnitEnum"/>
+            </errorLevel>
+        </UndefinedDocblockClass>
+        <UndefinedAttributeClass>
+            <errorLevel type="suppress">
+                <!-- These classes have been added in PHP 8.2 -->
+                <referencedClass name="SensitiveParameter"/>
+            </errorLevel>
+        </UndefinedAttributeClass>
+    </issueHandlers>
+
+    <forbiddenFunctions>
+        <function name="empty"/>
+    </forbiddenFunctions>
+</psalm>

@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -81,8 +81,6 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar2' => true,
             'bar6' => true,
             'config' => true,
@@ -124,7 +122,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $this->services['bar3'] = $instance = new \BarCircular();
 
-        $a = ($this->services['foobar3'] ?? ($this->services['foobar3'] = new \FoobarCircular()));
+        $a = ($this->services['foobar3'] ??= new \FoobarCircular());
 
         $instance->addFoobar($a, $a);
 

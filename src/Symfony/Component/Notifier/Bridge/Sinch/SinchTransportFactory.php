@@ -14,14 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Sinch;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Iliya Miroslavov Iliev <i.miroslavov@gmail.com>
  */
 final class SinchTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): SinchTransport
     {
         $scheme = $dsn->getScheme();
 

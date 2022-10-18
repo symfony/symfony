@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\AllMySMs;
+namespace Symfony\Component\Notifier\Bridge\AllMySms;
 
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,9 +28,9 @@ final class AllMySmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.allmysms.com';
 
-    private $login;
-    private $apiKey;
-    private $from;
+    private string $login;
+    private string $apiKey;
+    private ?string $from;
 
     public function __construct(string $login, string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -60,17 +61,25 @@ final class AllMySmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => $this->login.':'.$this->apiKey,
-            'body' => [
-                'from' => $this->from,
+            'json' => [
+                'from' => $from,
                 'to' => $message->getPhone(),
                 'text' => $message->getSubject(),
             ],
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote AllMySms server.', $response, 0, $e);
+        }
+
+        if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);

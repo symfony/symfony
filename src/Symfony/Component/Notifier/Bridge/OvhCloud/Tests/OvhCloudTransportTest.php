@@ -17,23 +17,21 @@ use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OvhCloudTransportTest extends TransportTestCase
 {
-    /**
-     * @return OvhCloudTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $sender = null, bool $noStopClause = false): OvhCloudTransport
     {
-        return new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?: $this->createMock(HttpClientInterface::class));
+        return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? $this->createMock(HttpClientInterface::class)))->setSender($sender)->setNoStopClause($noStopClause);
     }
 
     public function toStringProvider(): iterable
     {
-        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName', $this->createTransport()];
+        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=0', $this->createTransport()];
+        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName&no_stop_clause=1', $this->createTransport(null, null, true)];
+        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName&sender=sender&no_stop_clause=0', $this->createTransport(null, 'sender')];
     }
 
     public function supportedMessagesProvider(): iterable

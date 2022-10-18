@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'assets' => [
         'version' => 'SomeVersionScheme',
         'base_urls' => 'http://cdn.example.com',
@@ -35,6 +36,10 @@ $container->loadFromExtension('framework', [
             ],
             'env_manifest' => [
                 'json_manifest_path' => '%env(env_manifest)%',
+            ],
+            'strict_manifest_strategy' => [
+                'json_manifest_path' => '/path/to/manifest.json',
+                'strict_mode' => true,
             ],
         ],
     ],

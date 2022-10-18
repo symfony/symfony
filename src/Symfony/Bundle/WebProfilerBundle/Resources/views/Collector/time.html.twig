@@ -6,10 +6,10 @@
     {% set has_time_events = collector.events|length > 0 %}
     {% set total_time = has_time_events ? '%.0f'|format(collector.duration) : 'n/a' %}
     {% set initialization_time = collector.events|length ? '%.0f'|format(collector.inittime) : 'n/a' %}
-    {% set status_color = has_time_events and collector.duration > 1000 ? 'yellow' : '' %}
+    {% set status_color = has_time_events and collector.duration > 1000 ? 'yellow' %}
 
     {% set icon %}
-        {{ include('@WebProfiler/Icon/time.svg') }}
+        {{ source('@WebProfiler/Icon/time.svg') }}
         <span class="sf-toolbar-value">{{ total_time }}</span>
         <span class="sf-toolbar-label">ms</span>
     {% endset %}
@@ -30,7 +30,7 @@
 
 {% block menu %}
     <span class="label">
-        <span class="icon">{{ include('@WebProfiler/Icon/time.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/time.svg') }}</span>
         <strong>Performance</strong>
     </span>
 {% endblock %}
@@ -40,17 +40,21 @@
     <h2>Performance metrics</h2>
 
     <div class="metrics">
-        <div class="metric">
-            <span class="value">{{ '%.0f'|format(collector.duration) }} <span class="unit">ms</span></span>
-            <span class="label">Total execution time</span>
-        </div>
+        <div class="metric-group">
+            <div class="metric">
+                <span class="value">{{ '%.0f'|format(collector.duration) }} <span class="unit">ms</span></span>
+                <span class="label">Total execution time</span>
+            </div>
 
-        <div class="metric">
-            <span class="value">{{ '%.0f'|format(collector.inittime) }} <span class="unit">ms</span></span>
-            <span class="label">Symfony initialization</span>
+            <div class="metric">
+                <span class="value">{{ '%.0f'|format(collector.inittime) }} <span class="unit">ms</span></span>
+                <span class="label">Symfony initialization</span>
+            </div>
         </div>
 
         {% if profile.collectors.memory %}
+            <div class="metric-divider"></div>
+
             <div class="metric">
                 <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MiB</span></span>
                 <span class="label">Peak memory usage</span>
@@ -60,23 +64,25 @@
         {% if profile.children|length > 0 %}
             <div class="metric-divider"></div>
 
-            <div class="metric">
-                <span class="value">{{ profile.children|length }}</span>
-                <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }}</span>
-            </div>
+            <div class="metric-group">
+                <div class="metric">
+                    <span class="value">{{ profile.children|length }}</span>
+                    <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }}</span>
+                </div>
 
-            {% if has_time_events %}
-                {% set subrequests_time = 0 %}
-                {% for child in profile.children %}
-                    {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
-                {% endfor %}
-            {% else %}
-                {% set subrequests_time = 'n/a' %}
-            {% endif %}
+                {% if has_time_events %}
+                    {% set subrequests_time = 0 %}
+                    {% for child in profile.children %}
+                        {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
+                    {% endfor %}
+                {% else %}
+                    {% set subrequests_time = 'n/a' %}
+                {% endif %}
 
-            <div class="metric">
-                <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
-                <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }} time</span>
+                <div class="metric">
+                    <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
+                    <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }} time</span>
+                </div>
             </div>
         {% endif %}
     </div>
@@ -84,7 +90,7 @@
     <h2>Execution timeline</h2>
 
     {% if not collector.isStopwatchInstalled() %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>The Stopwatch component is not installed. If you want to see timing events, run: <code>composer require symfony/stopwatch</code>.</p>
         </div>
     {% elseif collector.events is empty %}
@@ -144,10 +150,10 @@
   </defs>
 </svg>
 <style type="text/css">
-{% include '@WebProfiler/Collector/time.css.twig' %}
+{{ include('@WebProfiler/Collector/time.css.twig') }}
 </style>
 <script>
-{% include '@WebProfiler/Collector/time.js' %}
+{{ source('@WebProfiler/Collector/time.js') }}
 </script>
 {% endblock %}
 

@@ -29,7 +29,7 @@ class MaxIdLengthAdapterTest extends TestCase
             ->withConsecutive(
                 [$this->equalTo('----------:nWfzGiCgLczv3SSUzXL3kg:')],
                 [$this->equalTo('----------:---------------------------------------')]
-            );
+            )->willReturn(false);
 
         $cache->hasItem(str_repeat('-', 40));
         $cache->hasItem(str_repeat('-', 39));
@@ -48,7 +48,6 @@ class MaxIdLengthAdapterTest extends TestCase
         $reflectionClass = new \ReflectionClass(AbstractAdapter::class);
 
         $reflectionMethod = $reflectionClass->getMethod('getId');
-        $reflectionMethod->setAccessible(true);
 
         // No versioning enabled
         $this->assertEquals('--------------------------:------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
@@ -57,7 +56,6 @@ class MaxIdLengthAdapterTest extends TestCase
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
 
         $reflectionProperty = $reflectionClass->getProperty('versioningIsEnabled');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($cache, true);
 
         // Versioning enabled
@@ -79,10 +77,10 @@ class MaxIdLengthAdapterTest extends TestCase
 
 abstract class MaxIdLengthAdapter extends AbstractAdapter
 {
-    protected $maxIdLength = 50;
-
     public function __construct(string $ns)
     {
+        $this->maxIdLength = 50;
+
         parent::__construct($ns);
     }
 }

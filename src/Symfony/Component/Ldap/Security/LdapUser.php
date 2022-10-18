@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -20,22 +21,22 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @final
  */
-class LdapUser implements UserInterface, EquatableInterface
+class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private $entry;
-    private $username;
-    private $password;
-    private $roles;
-    private $extraFields;
+    private Entry $entry;
+    private string $identifier;
+    private ?string $password;
+    private array $roles;
+    private array $extraFields;
 
-    public function __construct(Entry $entry, string $username, ?string $password, array $roles = [], array $extraFields = [])
+    public function __construct(Entry $entry, string $identifier, #[\SensitiveParameter] ?string $password, array $roles = [], array $extraFields = [])
     {
-        if (!$username) {
+        if (!$identifier) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
 
         $this->entry = $entry;
-        $this->username = $username;
+        $this->identifier = $identifier;
         $this->password = $password;
         $this->roles = $roles;
         $this->extraFields = $extraFields;
@@ -46,41 +47,34 @@ class LdapUser implements UserInterface, EquatableInterface
         return $this->entry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         return $this->roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): ?string
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
+     * @internal for compatibility with Symfony 5.4
      */
     public function getUsername(): string
     {
-        return $this->username;
+        return $this->getUserIdentifier();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getUserIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
     public function eraseCredentials()
     {
         $this->password = null;
@@ -91,14 +85,11 @@ class LdapUser implements UserInterface, EquatableInterface
         return $this->extraFields;
     }
 
-    public function setPassword(string $password)
+    public function setPassword(#[\SensitiveParameter] string $password)
     {
         $this->password = $password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof self) {
@@ -113,7 +104,7 @@ class LdapUser implements UserInterface, EquatableInterface
             return false;
         }
 
-        if ($this->getUsername() !== $user->getUsername()) {
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
             return false;
         }
 

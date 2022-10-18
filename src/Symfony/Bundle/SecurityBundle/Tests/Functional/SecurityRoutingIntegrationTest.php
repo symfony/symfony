@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 {
     /**
-     * @dataProvider provideClientOptions
+     * @dataProvider provideConfigs
      */
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
     {
@@ -25,7 +25,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider provideClientOptions
+     * @dataProvider provideConfigs
      */
     public function testRoutingErrorIsExposedWhenNotProtected(array $options)
     {
@@ -36,7 +36,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider provideClientOptions
+     * @dataProvider provideConfigs
      */
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
     {
@@ -53,7 +53,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider provideClientOptions
+     * @dataProvider provideConfigs
      */
     public function testSecurityConfigurationForSingleIPAddress(array $options)
     {
@@ -68,7 +68,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider provideClientOptions
+     * @dataProvider provideConfigs
      */
     public function testSecurityConfigurationForMultipleIPAddresses(array $options)
     {
@@ -120,29 +120,23 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertAllowed($allowedClient, '/protected-via-expression');
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testInvalidIpsInAccessControl(array $options)
+    public function testInvalidIpsInAccessControl()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
 
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml'] + $options);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
         $client->request('GET', '/unprotected_resource');
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testPublicHomepage(array $options)
+    public function testPublicHomepage()
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml'] + $options);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
         $client->request('GET', '/en/');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
         $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::$container->get('session')->getUsageIndex());
+        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
     private function assertAllowed($client, $path)
@@ -157,17 +151,9 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
-    public function provideClientOptions()
-    {
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
-    }
-
     public function provideConfigs()
     {
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 }

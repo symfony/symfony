@@ -1,16 +1,25 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 use Symfony\Component\Filesystem\Filesystem;
 
 class AnnotationsCacheWarmerTest extends TestCase
@@ -42,9 +51,9 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFileExists($cacheFile);
 
         // Assert cache is valid
-        $reader = new CachedReader(
+        $reader = new PsrCachedReader(
             $this->getReadOnlyReader(),
-            new DoctrineProvider(new PhpArrayAdapter($cacheFile, new NullAdapter()))
+            new PhpArrayAdapter($cacheFile, new NullAdapter())
         );
         $refClass = new \ReflectionClass($this);
         $reader->getClassAnnotations($refClass);
@@ -60,10 +69,12 @@ class AnnotationsCacheWarmerTest extends TestCase
         $warmer = new AnnotationsCacheWarmer($reader, $cacheFile, null, true);
         $warmer->warmUp($this->cacheDir);
         $this->assertFileExists($cacheFile);
+
         // Assert cache is valid
-        $reader = new CachedReader(
+        $phpArrayAdapter = new PhpArrayAdapter($cacheFile, new NullAdapter());
+        $reader = new PsrCachedReader(
             $this->getReadOnlyReader(),
-            new DoctrineProvider(new PhpArrayAdapter($cacheFile, new NullAdapter())),
+            $phpArrayAdapter,
             true
         );
         $refClass = new \ReflectionClass($this);
@@ -120,10 +131,36 @@ class AnnotationsCacheWarmerTest extends TestCase
         spl_autoload_unregister($classLoader);
     }
 
-    /**
-     * @return MockObject|Reader
-     */
-    private function getReadOnlyReader(): object
+    public function testWarmupRemoveCacheMisses()
+    {
+        $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
+        $warmer = $this->getMockBuilder(AnnotationsCacheWarmer::class)
+            ->setConstructorArgs([new AnnotationReader(), $cacheFile])
+            ->setMethods(['doWarmUp'])
+            ->getMock();
+
+        $warmer->method('doWarmUp')->willReturnCallback(function ($cacheDir, ArrayAdapter $arrayAdapter) {
+            $arrayAdapter->getItem('foo_miss');
+
+            $item = $arrayAdapter->getItem('bar_hit');
+            $item->set('data');
+            $arrayAdapter->save($item);
+
+            $item = $arrayAdapter->getItem('baz_hit_null');
+            $item->set(null);
+            $arrayAdapter->save($item);
+
+            return true;
+        });
+
+        $warmer->warmUp($this->cacheDir);
+        $data = include $cacheFile;
+
+        $this->assertCount(1, $data[0]);
+        $this->assertTrue(isset($data[0]['bar_hit']));
+    }
+
+    private function getReadOnlyReader(): MockObject&Reader
     {
         $readerMock = $this->createMock(Reader::class);
         $readerMock->expects($this->exactly(0))->method('getClassAnnotations');

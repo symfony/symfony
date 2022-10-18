@@ -64,7 +64,7 @@ class GithubActionReporterTest extends TestCase
             'foo/bar.php',
             2,
             4,
-            '::warning file=foo/bar.php, line=2, col=4::A warning',
+            '::warning file=foo/bar.php,line=2,col=4::A warning',
         ];
 
         yield 'with file property to escape' => [
@@ -73,7 +73,7 @@ class GithubActionReporterTest extends TestCase
             'foo,bar:baz%quz.php',
             2,
             4,
-            '::warning file=foo%2Cbar%3Abaz%25quz.php, line=2, col=4::A warning',
+            '::warning file=foo%2Cbar%3Abaz%25quz.php,line=2,col=4::A warning',
         ];
 
         yield 'without file ignores col & line' => ['warning', 'A warning', null, 2, 4, '::warning::A warning'];

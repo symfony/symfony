@@ -25,6 +25,8 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper\Fixtures\Issue;
+use Symfony\Component\Form\Tests\Fixtures\DummyFormRendererEngine;
+use Symfony\Component\Form\Tests\Fixtures\FixedTranslator;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -1598,16 +1600,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabel1()
     {
-        $renderer = $this->getMockBuilder(FormRenderer::class)
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['Name', [], null, null, 'Custom Name'],
-        ]);
-        $this->mapper = new ViolationMapper($renderer, $translator);
+        $this->mapper = new ViolationMapper(new FormRenderer(new DummyFormRendererEngine()), new FixedTranslator(['Name' => 'Custom Name']));
 
         $parent = $this->getForm('parent');
         $child = $this->getForm('name', 'name');
@@ -1630,11 +1623,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabel2()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['options_label', [], null, null, 'Translated Label'],
-        ]);
-        $this->mapper = new ViolationMapper(null, $translator);
+        $this->mapper = new ViolationMapper(null, new FixedTranslator(['options_label' => 'Translated Label']));
 
         $parent = $this->getForm('parent');
 
@@ -1668,11 +1657,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat1()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['form.custom', [], null, null, 'Translated 1st Custom Label'],
-        ]);
-        $this->mapper = new ViolationMapper(null, $translator);
+        $this->mapper = new ViolationMapper(null, new FixedTranslator(['form.custom' => 'Translated 1st Custom Label']));
 
         $parent = $this->getForm('parent');
 
@@ -1706,11 +1691,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat2()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['form_custom-id', [], null, null, 'Translated 2nd Custom Label'],
-        ]);
-        $this->mapper = new ViolationMapper(null, $translator);
+        $this->mapper = new ViolationMapper(null, new FixedTranslator(['form_custom-id' => 'Translated 2nd Custom Label']));
 
         $parent = $this->getForm('parent');
 
@@ -1786,16 +1767,49 @@ class ViolationMapperTest extends TestCase
         $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
     }
 
+    public function testLabelPlaceholderTranslatedWithTranslationParametersMergedFromParentForm()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ])
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_translation_parameters' => [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child parent value',
+            ],
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+            'label_translation_parameters' => [
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ],
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
     public function testTranslatorNotCalledWithoutLabel()
     {
-        $renderer = $this->getMockBuilder(FormRenderer::class)
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->never())->method('trans');
-        $this->mapper = new ViolationMapper($renderer, $translator);
+        $this->mapper = new ViolationMapper(new FormRenderer(new DummyFormRendererEngine()), $translator);
 
         $parent = $this->getForm('parent');
         $child = $this->getForm('name', 'name');

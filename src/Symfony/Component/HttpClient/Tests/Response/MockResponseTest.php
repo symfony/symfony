@@ -1,9 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
@@ -11,6 +22,24 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  */
 class MockResponseTest extends TestCase
 {
+    public function testTotalTimeShouldBeSimulatedWhenNotProvided()
+    {
+        $response = new MockResponse('body');
+        $response = MockResponse::fromRequest('GET', 'https://example.com/file.txt', [], $response);
+
+        $this->assertNotNull($response->getInfo('total_time'));
+        $this->assertGreaterThan(0.0, $response->getInfo('total_time'));
+    }
+
+    public function testTotalTimeShouldNotBeSimulatedWhenProvided()
+    {
+        $totalTime = 4.2;
+        $response = new MockResponse('body', ['total_time' => $totalTime]);
+        $response = MockResponse::fromRequest('GET', 'https://example.com/file.txt', [], $response);
+
+        $this->assertEquals($totalTime, $response->getInfo('total_time'));
+    }
+
     public function testToArray()
     {
         $data = ['color' => 'orange', 'size' => 42];
@@ -77,5 +106,23 @@ class MockResponseTest extends TestCase
             'responseHeaders' => [],
             'message' => 'JSON content was expected to decode to an array, "int" returned for "https://example.com/file.json".',
         ];
+    }
+
+    public function testErrorIsTakenIntoAccountInInitialization()
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('ccc error');
+
+        MockResponse::fromRequest('GET', 'https://symfony.com', [], new MockResponse('', [
+            'error' => 'ccc error',
+        ]))->getStatusCode();
+    }
+
+    public function testMustBeIssuedByMockHttpClient()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('MockResponse instances must be issued by MockHttpClient before processing.');
+
+        (new MockResponse())->getContent();
     }
 }

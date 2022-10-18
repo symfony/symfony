@@ -12,7 +12,8 @@ MbString åpplicätion
   <info>-v|vv|vvv, --verbose</info>  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 <comment>Available commands:</comment>
-  <info>help</info>            Displays help for a command
-  <info>list</info>            Lists commands
+  <info>completion</info>      Dump the shell completion script
+  <info>help</info>            Display help for a command
+  <info>list</info>            List commands
  <comment>descriptor</comment>
   <info>descriptor:åèä</info>  command åèä description

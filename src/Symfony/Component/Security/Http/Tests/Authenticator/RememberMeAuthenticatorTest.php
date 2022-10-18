@@ -12,74 +12,89 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
+use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
+use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 class RememberMeAuthenticatorTest extends TestCase
 {
-    private $rememberMeServices;
+    private $rememberMeHandler;
     private $tokenStorage;
     private $authenticator;
-    private $request;
 
     protected function setUp(): void
     {
-        $this->rememberMeServices = $this->createMock(RememberMeServicesInterface::class);
-        $this->tokenStorage = $this->createMock(TokenStorage::class);
-        $this->authenticator = new RememberMeAuthenticator($this->rememberMeServices, 's3cr3t', $this->tokenStorage, [
-            'name' => '_remember_me_cookie',
-        ]);
-        $this->request = new Request();
+        $this->rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
+        $this->tokenStorage = new TokenStorage();
+        $this->authenticator = new RememberMeAuthenticator($this->rememberMeHandler, 's3cr3t', $this->tokenStorage, '_remember_me_cookie');
     }
 
     public function testSupportsTokenStorageWithToken()
     {
-        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn(TokenInterface::class);
+        $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('username', 'credentials'), 'main'));
 
-        $this->assertFalse($this->authenticator->supports($this->request));
+        $this->assertFalse($this->authenticator->supports(Request::create('/')));
     }
 
     /**
      * @dataProvider provideSupportsData
      */
-    public function testSupports($autoLoginResult, $support)
+    public function testSupports($request, $support)
     {
-        $this->rememberMeServices->expects($this->once())->method('autoLogin')->with($this->request)->willReturn($autoLoginResult);
-
-        $this->assertSame($support, $this->authenticator->supports($this->request));
+        $this->assertSame($support, $this->authenticator->supports($request));
     }
 
     public function provideSupportsData()
     {
-        yield [null, false];
-        yield [$this->createMock(TokenInterface::class), null];
-    }
+        yield [Request::create('/'), false];
 
-    public function testConsecutiveSupportsCalls()
-    {
-        $this->rememberMeServices->expects($this->once())->method('autoLogin')->with($this->request)->willReturn($this->createMock(TokenInterface::class));
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']);
+        yield [$request, null];
 
-        $this->assertNull($this->authenticator->supports($this->request));
-        $this->assertNull($this->authenticator->supports($this->request));
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']);
+        $request->attributes->set(ResponseListener::COOKIE_ATTR_NAME, new Cookie('_remember_me_cookie', null));
+        yield [$request, false];
     }
 
     public function testAuthenticate()
     {
-        $this->request->attributes->set('_remember_me_token', new RememberMeToken($user = new User('wouter', 'test'), 'main', 'secret'));
-        $passport = $this->authenticator->authenticate($this->request);
+        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 1, 'secret');
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => $rememberMeDetails->toString()]);
+        $passport = $this->authenticator->authenticate($request);
 
-        $this->assertSame($user, $passport->getUser());
+        $this->rememberMeHandler->expects($this->once())->method('consumeRememberMeCookie')->with($this->callback(function ($arg) use ($rememberMeDetails) {
+            return $rememberMeDetails == $arg;
+        }));
+        $passport->getUser(); // trigger the user loader
     }
 
     public function testAuthenticateWithoutToken()
     {
         $this->expectException(\LogicException::class);
 
-        $this->authenticator->authenticate($this->request);
+        $this->authenticator->authenticate(Request::create('/'));
+    }
+
+    public function testAuthenticateWithoutOldToken()
+    {
+        $this->expectException(AuthenticationException::class);
+
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
+        $this->authenticator->authenticate($request);
+    }
+
+    public function testAuthenticateWithTokenWithoutDelimiter()
+    {
+        $this->expectException(AuthenticationException::class);
+
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'invalid']);
+        $this->authenticator->authenticate($request);
     }
 }

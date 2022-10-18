@@ -18,10 +18,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  */
 class StaticConstructorNormalizer extends ObjectNormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes): ?\ReflectionMethod
+    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes): ?\ReflectionMethod
     {
         if (is_a($class, StaticConstructorDummy::class, true)) {
             return new \ReflectionMethod($class, 'create');

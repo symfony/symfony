@@ -11,19 +11,31 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 interface AuthenticatorFactoryInterface
 {
+    /**
+     * Defines the priority at which the authenticator is called.
+     */
+    public function getPriority(): int;
+
+    /**
+     * Defines the configuration key used to reference the provider
+     * in the firewall configuration.
+     */
+    public function getKey(): string;
+
+    public function addConfiguration(NodeDefinition $builder);
+
     /**
      * Creates the authenticator service(s) for the provided configuration.
      *
      * @return string|string[] The authenticator service ID(s) to be used by the firewall
      */
-    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId);
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string|array;
 }

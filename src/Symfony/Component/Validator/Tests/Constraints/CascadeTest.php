@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class CascadeTest extends TestCase
 {
     public function testCascadeAttribute()

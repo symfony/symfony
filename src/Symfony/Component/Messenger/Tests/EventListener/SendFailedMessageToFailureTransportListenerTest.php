@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
@@ -20,21 +21,26 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class SendFailedMessageToFailureTransportListenerTest extends TestCase
 {
-    public function testItSendsToTheFailureTransport()
+    public function testItSendsToTheFailureTransportWithSenderLocator()
     {
+        $receiverName = 'my_receiver';
         $sender = $this->createMock(SenderInterface::class);
-        $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) {
+        $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) use ($receiverName) {
             /* @var Envelope $envelope */
             $this->assertInstanceOf(Envelope::class, $envelope);
 
             /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
             $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
             $this->assertNotNull($sentToFailureTransportStamp);
-            $this->assertSame('my_receiver', $sentToFailureTransportStamp->getOriginalReceiverName());
+            $this->assertSame($receiverName, $sentToFailureTransportStamp->getOriginalReceiverName());
 
             return true;
         }))->willReturnArgument(0);
-        $listener = new SendFailedMessageToFailureTransportListener($sender);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->willReturn(true);
+        $serviceLocator->expects($this->once())->method('get')->with($receiverName)->willReturn($sender);
+        $listener = new SendFailedMessageToFailureTransportListener($serviceLocator);
 
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());
@@ -43,11 +49,13 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $listener->onMessageFailed($event);
     }
 
-    public function testDoNothingOnRetry()
+    public function testDoNothingOnRetryWithServiceLocator()
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->never())->method('send');
-        $listener = new SendFailedMessageToFailureTransportListener($sender);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $listener = new SendFailedMessageToFailureTransportListener($serviceLocator);
 
         $envelope = new Envelope(new \stdClass());
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', new \Exception());
@@ -56,16 +64,63 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $listener->onMessageFailed($event);
     }
 
-    public function testDoNotRedeliverToFailed()
+    public function testDoNotRedeliverToFailedWithServiceLocator()
+    {
+        $receiverName = 'my_receiver';
+
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->never())->method('send');
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+
+        $listener = new SendFailedMessageToFailureTransportListener($serviceLocator);
+        $envelope = new Envelope(new \stdClass(), [
+            new SentToFailureTransportStamp($receiverName),
+        ]);
+        $event = new WorkerMessageFailedEvent($envelope, $receiverName, new \Exception());
+
+        $listener->onMessageFailed($event);
+    }
+
+    public function testDoNothingIfFailureTransportIsNotDefined()
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->never())->method('send');
-        $listener = new SendFailedMessageToFailureTransportListener($sender);
 
-        $envelope = new Envelope(new \stdClass(), [
-            new SentToFailureTransportStamp('my_receiver'),
-        ]);
-        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', new \Exception());
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $listener = new SendFailedMessageToFailureTransportListener($serviceLocator, null);
+
+        $exception = new \Exception('no!');
+        $envelope = new Envelope(new \stdClass());
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
+
+        $listener->onMessageFailed($event);
+    }
+
+    public function testItSendsToTheFailureTransportWithMultipleFailedTransports()
+    {
+        $receiverName = 'my_receiver';
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) use ($receiverName) {
+            /* @var Envelope $envelope */
+            $this->assertInstanceOf(Envelope::class, $envelope);
+
+            /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
+            $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
+            $this->assertNotNull($sentToFailureTransportStamp);
+            $this->assertSame($receiverName, $sentToFailureTransportStamp->getOriginalReceiverName());
+
+            return true;
+        }))->willReturnArgument(0);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->method('has')->with($receiverName)->willReturn(true);
+        $serviceLocator->method('get')->with($receiverName)->willReturn($sender);
+
+        $listener = new SendFailedMessageToFailureTransportListener($serviceLocator);
+
+        $exception = new \Exception('no!');
+        $envelope = new Envelope(new \stdClass());
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
     }

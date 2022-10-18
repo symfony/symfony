@@ -16,6 +16,10 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\FooReadonly;
+use Symfony\Component\VarExporter\Tests\Fixtures\FooSerializable;
+use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\VarExporter\Tests\Fixtures\MySerializable;
 use Symfony\Component\VarExporter\VarExporter;
 
 class VarExporterTest extends TestCase
@@ -89,12 +93,10 @@ class VarExporterTest extends TestCase
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
-        if (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
-        } elseif (\PHP_VERSION_ID < 70400) {
+        $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+
+        if (\PHP_VERSION_ID < 80200 && 'datetime' === $testName) {
             $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
-        } else {
-            $this->markTestSkipped('PHP >= 7.4.6 required.');
         }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
@@ -121,9 +123,15 @@ class VarExporterTest extends TestCase
         yield ['bool', true, true];
         yield ['simple-array', [123, ['abc']], true];
         yield ['partially-indexed-array', [5 => true, 1 => true, 2 => true, 6 => true], true];
-        yield ['datetime', \DateTime::createFromFormat('U', 0)];
+        yield ['datetime', [
+            \DateTime::createFromFormat('U', 0),
+            \DateTimeImmutable::createFromFormat('U', 0),
+            $tz = new \DateTimeZone('Europe/Paris'),
+            $interval = ($start = new \DateTime('2009-10-11', $tz))->diff(new \DateTime('2009-10-18', $tz)),
+            new \DatePeriod($start, $interval, 4),
+        ]];
 
-        $value = new \ArrayObject();
+        $value = new ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
@@ -133,9 +141,28 @@ class VarExporterTest extends TestCase
         yield ['array-iterator', new \ArrayIterator([123], 1)];
         yield ['array-object-custom', new MyArrayObject([234])];
 
-        $value = new MySerializable();
+        $errorHandler = set_error_handler(static function (int $errno, string $errstr) use (&$errorHandler) {
+            if (\E_DEPRECATED === $errno && str_contains($errstr, 'implements the Serializable interface, which is deprecated. Implement __serialize() and __unserialize() instead')) {
+                // We're testing if the component handles deprecated Serializable implementations well.
+                // This kind of implementation triggers a deprecation warning since PHP 8.1 that we explicitly want to
+                // ignore here. We probably need to reevaluate this piece of code for PHP 9.
+                return true;
+            }
 
-        yield ['serializable', [$value, $value]];
+            return $errorHandler ? $errorHandler(...\func_get_args()) : false;
+        });
+
+        try {
+            $mySerializable = new MySerializable();
+            $fooSerializable = new FooSerializable('bar');
+        } finally {
+            restore_error_handler();
+        }
+
+        yield ['serializable', [$mySerializable, $mySerializable]];
+        yield ['foo-serializable', $fooSerializable];
+
+        unset($mySerializable, $fooSerializable, $errorHandler);
 
         $value = new MyWakeup();
         $value->sub = new MyWakeup();
@@ -176,11 +203,9 @@ class VarExporterTest extends TestCase
         $value = new \Error();
 
         $rt = new \ReflectionProperty(\Error::class, 'trace');
-        $rt->setAccessible(true);
         $rt->setValue($value, ['file' => __FILE__, 'line' => 123]);
 
         $rl = new \ReflectionProperty(\Error::class, 'line');
-        $rl->setAccessible(true);
         $rl->setValue($value, 234);
 
         yield ['error', $value];
@@ -204,24 +229,17 @@ class VarExporterTest extends TestCase
 
         yield ['abstract-parent', new ConcreteClass()];
 
-        yield ['foo-serializable', new FooSerializable('bar')];
-
         yield ['private-constructor', PrivateConstructor::create('bar')];
 
         yield ['php74-serializable', new Php74Serializable()];
-    }
-}
 
-class MySerializable implements \Serializable
-{
-    public function serialize(): string
-    {
-        return '123';
+        yield ['unit-enum', [FooUnitEnum::Bar], true];
+        yield ['readonly', new FooReadonly('k', 'v')];
     }
 
-    public function unserialize($data)
+    public function testUnicodeDirectionality()
     {
-        // no-op
+        $this->assertSame('"\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"', VarExporter::export("\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"));
     }
 }
 
@@ -302,7 +320,7 @@ class MyArrayObject extends \ArrayObject
         parent::__construct($array, 1);
     }
 
-    public function setFlags($flags)
+    public function setFlags($flags): void
     {
         throw new \BadMethodCallException('Calling MyArrayObject::setFlags() is forbidden');
     }
@@ -310,6 +328,13 @@ class MyArrayObject extends \ArrayObject
 
 class GoodNight
 {
+    public $good;
+
+    public function __construct()
+    {
+        unset($this->good);
+    }
+
     public function __sleep(): array
     {
         $this->good = 'night';
@@ -335,7 +360,7 @@ final class FinalArrayIterator extends \ArrayIterator
         return serialize([123, parent::serialize()]);
     }
 
-    public function unserialize($data)
+    public function unserialize($data): void
     {
         if ('' === $data) {
             throw new \InvalidArgumentException('Serialized data is empty.');
@@ -373,33 +398,10 @@ class ConcreteClass extends AbstractClass
     }
 }
 
-class FooSerializable implements \Serializable
-{
-    private $foo;
-
-    public function __construct(string $foo)
-    {
-        $this->foo = $foo;
-    }
-
-    public function getFoo(): string
-    {
-        return $this->foo;
-    }
-
-    public function serialize(): string
-    {
-        return serialize([$this->getFoo()]);
-    }
-
-    public function unserialize($str)
-    {
-        [$this->foo] = unserialize($str);
-    }
-}
-
 class Php74Serializable implements \Serializable
 {
+    public $foo;
+
     public function __serialize(): array
     {
         return [$this->foo = new \stdClass()];
@@ -429,4 +431,9 @@ class Php74Serializable implements \Serializable
     {
         throw new \BadMethodCallException();
     }
+}
+
+#[\AllowDynamicProperties]
+class ArrayObject extends \ArrayObject
+{
 }

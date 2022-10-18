@@ -39,7 +39,7 @@ final class NativeTransportFactory extends AbstractTransportFactory
 
         // Only for windows hosts; at this point non-windows
         // host have already thrown an exception or returned a transport
-        $host = ini_get('smtp');
+        $host = ini_get('SMTP');
         $port = (int) ini_get('smtp_port');
 
         if (!$host || !$port) {

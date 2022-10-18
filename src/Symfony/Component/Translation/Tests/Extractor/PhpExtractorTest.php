@@ -130,6 +130,24 @@ EOF;
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
     }
 
+    public function testExtractionFromIndentedHeredocNowdoc()
+    {
+        $catalogue = new MessageCatalogue('en');
+
+        $extractor = new PhpExtractor();
+        $extractor->setPrefix('prefix');
+        $extractor->extract(__DIR__.'/../fixtures/extractor-7.3/translation.html.php', $catalogue);
+
+        $expectedCatalogue = [
+            'messages' => [
+                "heredoc\nindented\n  further" => "prefixheredoc\nindented\n  further",
+                "nowdoc\nindented\n  further" => "prefixnowdoc\nindented\n  further",
+            ],
+        ];
+
+        $this->assertEquals($expectedCatalogue, $catalogue->all());
+    }
+
     public function resourcesProvider()
     {
         $directory = __DIR__.'/../fixtures/extractor/';

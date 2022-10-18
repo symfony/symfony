@@ -16,18 +16,16 @@ use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.3
  */
 class UserCheckerListener implements EventSubscriberInterface
 {
-    private $userChecker;
+    private UserCheckerInterface $userChecker;
 
     public function __construct(UserCheckerInterface $userChecker)
     {
@@ -37,7 +35,7 @@ class UserCheckerListener implements EventSubscriberInterface
     public function preCheckCredentials(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
-        if (!$passport instanceof UserPassportInterface || $passport->hasBadge(PreAuthenticatedUserBadge::class)) {
+        if ($passport->hasBadge(PreAuthenticatedUserBadge::class)) {
             return;
         }
 

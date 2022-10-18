@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient;
 
 use GuzzleHttp\Promise\Promise as GuzzlePromise;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Promise\Utils;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
 use Http\Client\HttpAsyncClient;
@@ -22,7 +23,6 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Message\RequestFactory;
 use Http\Message\StreamFactory;
 use Http\Message\UriFactory;
-use Http\Promise\Promise;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Uri;
@@ -39,6 +39,7 @@ use Symfony\Component\HttpClient\Response\HttplugPromise;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 if (!interface_exists(HttplugInterface::class)) {
     throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/httplug" package is not installed. Try running "composer require php-http/httplug".');
@@ -46,6 +47,10 @@ if (!interface_exists(HttplugInterface::class)) {
 
 if (!interface_exists(RequestFactory::class)) {
     throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/message-factory" package is not installed. Try running "composer require nyholm/psr7".');
+}
+
+if (!interface_exists(RequestFactoryInterface::class)) {
+    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as the "psr/http-factory" package is not installed. Try running "composer require nyholm/psr7".');
 }
 
 /**
@@ -56,41 +61,44 @@ if (!interface_exists(RequestFactory::class)) {
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactory, StreamFactory, UriFactory
+final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface, RequestFactory, StreamFactory, UriFactory, ResetInterface
 {
-    private $client;
-    private $responseFactory;
-    private $streamFactory;
-    private $promisePool;
-    private $waitLoop;
+    private HttpClientInterface $client;
+    private ResponseFactoryInterface $responseFactory;
+    private StreamFactoryInterface $streamFactory;
+
+    /**
+     * @var \SplObjectStorage<ResponseInterface, array{RequestInterface, Promise}>|null
+     */
+    private ?\SplObjectStorage $promisePool;
+
+    private HttplugWaitLoop $waitLoop;
 
     public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)
     {
         $this->client = $client ?? HttpClient::create();
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory ?? ($responseFactory instanceof StreamFactoryInterface ? $responseFactory : null);
-        $this->promisePool = \function_exists('GuzzleHttp\Promise\queue') ? new \SplObjectStorage() : null;
+        $streamFactory ??= $responseFactory instanceof StreamFactoryInterface ? $responseFactory : null;
+        $this->promisePool = class_exists(Utils::class) ? new \SplObjectStorage() : null;
 
-        if (null === $this->responseFactory || null === $this->streamFactory) {
+        if (null === $responseFactory || null === $streamFactory) {
             if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
             }
 
             try {
                 $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
-                $this->responseFactory = $this->responseFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
-                $this->streamFactory = $this->streamFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
+                $responseFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
+                $streamFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
             } catch (NotFoundException $e) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been found. Try running "composer require nyholm/psr7".', 0, $e);
             }
         }
 
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory = $streamFactory;
         $this->waitLoop = new HttplugWaitLoop($this->client, $this->promisePool, $this->responseFactory, $this->streamFactory);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function sendRequest(RequestInterface $request): Psr7ResponseInterface
     {
         try {
@@ -100,12 +108,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return HttplugPromise
-     */
-    public function sendAsyncRequest(RequestInterface $request): Promise
+    public function sendAsyncRequest(RequestInterface $request): HttplugPromise
     {
         if (!$promisePool = $this->promisePool) {
             throw new \LogicException(sprintf('You cannot use "%s()" as the "guzzlehttp/promises" package is not installed. Try running "composer require guzzlehttp/promises".', __METHOD__));
@@ -144,10 +147,14 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
     }
 
     /**
-     * {@inheritdoc}
+     * @param string              $method
+     * @param UriInterface|string $uri
      */
     public function createRequest($method, $uri, array $headers = [], $body = null, $protocolVersion = '1.1'): RequestInterface
     {
+        if (2 < \func_num_args()) {
+            trigger_deprecation('symfony/http-client', '6.2', 'Passing more than 2 arguments to "%s()" is deprecated.', __METHOD__);
+        }
         if ($this->responseFactory instanceof RequestFactoryInterface) {
             $request = $this->responseFactory->createRequest($method, $uri);
         } elseif (class_exists(Request::class)) {
@@ -160,7 +167,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
 
         $request = $request
             ->withProtocolVersion($protocolVersion)
-            ->withBody($this->createStream($body))
+            ->withBody($this->createStream($body ?? ''))
         ;
 
         foreach ($headers as $name => $value) {
@@ -171,20 +178,24 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $content
      */
-    public function createStream($body = null): StreamInterface
+    public function createStream($content = ''): StreamInterface
     {
-        if ($body instanceof StreamInterface) {
-            return $body;
+        if (!\is_string($content)) {
+            trigger_deprecation('symfony/http-client', '6.2', 'Passing a "%s" to "%s()" is deprecated, use "createStreamFrom*()" instead.', get_debug_type($content), __METHOD__);
         }
 
-        if (\is_string($body ?? '')) {
-            $stream = $this->streamFactory->createStream($body ?? '');
-        } elseif (\is_resource($body)) {
-            $stream = $this->streamFactory->createStreamFromResource($body);
+        if ($content instanceof StreamInterface) {
+            return $content;
+        }
+
+        if (\is_string($content ?? '')) {
+            $stream = $this->streamFactory->createStream($content ?? '');
+        } elseif (\is_resource($content)) {
+            $stream = $this->streamFactory->createStreamFromResource($content);
         } else {
-            throw new \InvalidArgumentException(sprintf('"%s()" expects string, resource or StreamInterface, "%s" given.', __METHOD__, get_debug_type($body)));
+            throw new \InvalidArgumentException(sprintf('"%s()" expects string, resource or StreamInterface, "%s" given.', __METHOD__, get_debug_type($content)));
         }
 
         if ($stream->isSeekable()) {
@@ -194,11 +205,25 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         return $stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createUri($uri): UriInterface
+    public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
+        return $this->streamFactory->createStreamFromFile($filename, $mode);
+    }
+
+    public function createStreamFromResource($resource): StreamInterface
+    {
+        return $this->streamFactory->createStreamFromResource($resource);
+    }
+
+    /**
+     * @param string $uri
+     */
+    public function createUri($uri = ''): UriInterface
+    {
+        if (!\is_string($uri)) {
+            trigger_deprecation('symfony/http-client', '6.2', 'Passing a "%s" to "%s()" is deprecated, pass a string instead.', get_debug_type($uri), __METHOD__);
+        }
+
         if ($uri instanceof UriInterface) {
             return $uri;
         }
@@ -218,7 +243,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -231,6 +256,13 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
     public function __destruct()
     {
         $this->wait();
+    }
+
+    public function reset()
+    {
+        if ($this->client instanceof ResetInterface) {
+            $this->client->reset();
+        }
     }
 
     private function sendPsr7Request(RequestInterface $request, bool $buffer = null): ResponseInterface

@@ -1,15 +1,17 @@
 framework:
+    http_method_override: false
     secret:        test
     router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
     validation:    { enabled: true, enable_annotations: true }
     csrf_protection: true
     form:
         enabled: true
-        legacy_error_messages: false
     test: true
     default_locale: en
+    enabled_locales: ['en', 'fr']
     session:
-        storage_id:     session.storage.mock_file
+        storage_factory_id: session.storage.factory.mock_file
+    catch_all_throwables: true
 
 services:
     logger: { class: Psr\Log\NullLogger }

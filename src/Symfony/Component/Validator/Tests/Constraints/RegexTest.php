@@ -110,9 +110,6 @@ class RegexTest extends TestCase
         new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(RegexDummy::class);

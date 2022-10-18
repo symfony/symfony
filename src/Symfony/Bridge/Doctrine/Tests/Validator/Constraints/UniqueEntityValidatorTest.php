@@ -13,9 +13,9 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
@@ -37,6 +37,7 @@ use Symfony\Bridge\Doctrine\Tests\TestRepositoryFactory;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -110,7 +111,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($repositoryMock)
         ;
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $classMetadata
             ->expects($this->any())
             ->method('hasField')
@@ -193,9 +194,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'em' => self::EM_NAME,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo')];
     }
 
     /**
@@ -229,9 +228,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'errorPath' => 'bar',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", errorPath: "bar");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', errorPath: 'bar')];
     }
 
     /**
@@ -290,9 +287,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => false,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: false);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: false)];
     }
 
     /**
@@ -339,9 +334,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => true,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: true);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: true)];
     }
 
     public function testValidateUniquenessWithValidCustomErrorPath()
@@ -440,9 +433,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'repositoryMethod' => 'findByCustom',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", repositoryMethod: "findByCustom");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', repositoryMethod: 'findByCustom')];
     }
 
     /**
@@ -830,5 +821,114 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->setCause([$entity1])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
+    }
+
+    /**
+     * @dataProvider resultWithEmptyIterator
+     */
+    public function testValidateUniquenessWithEmptyIterator($entity, $result)
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+            'repositoryMethod' => 'findByCustom',
+        ]);
+
+        $repository = $this->createRepositoryMock();
+        $repository->expects($this->once())
+            ->method('findByCustom')
+            ->willReturn($result)
+        ;
+        $this->em = $this->createEntityManagerMock($repository);
+        $this->registry = $this->createRegistryMock($this->em);
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValueMustBeObject()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+        ]);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $this->validator->validate('foo', $constraint);
+    }
+
+    public function testValueCanBeNull()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+        ]);
+
+        $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function resultWithEmptyIterator(): array
+    {
+        $entity = new SingleIntIdEntity(1, 'foo');
+
+        return [
+            [$entity, new class() implements \Iterator {
+                public function current(): mixed
+                {
+                    return null;
+                }
+
+                public function valid(): bool
+                {
+                    return false;
+                }
+
+                public function next(): void
+                {
+                }
+
+                public function key(): mixed
+                {
+                    return false;
+                }
+
+                public function rewind(): void
+                {
+                }
+            }],
+            [$entity, new class() implements \Iterator {
+                public function current(): mixed
+                {
+                    return false;
+                }
+
+                public function valid(): bool
+                {
+                    return false;
+                }
+
+                public function next(): void
+                {
+                }
+
+                public function key(): mixed
+                {
+                    return false;
+                }
+
+                public function rewind(): void
+                {
+                }
+            }],
+        ];
     }
 }

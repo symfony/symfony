@@ -18,11 +18,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -32,25 +28,24 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
- * @experimental in 5.3
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
-    private $httpUtils;
-    private $userProvider;
-    private $successHandler;
-    private $failureHandler;
-    private $options;
-    private $httpKernel;
+    private HttpUtils $httpUtils;
+    private UserProviderInterface $userProvider;
+    private AuthenticationSuccessHandlerInterface $successHandler;
+    private AuthenticationFailureHandlerInterface $failureHandler;
+    private array $options;
+    private HttpKernelInterface $httpKernel;
 
     public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options)
     {
@@ -63,6 +58,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             'password_parameter' => '_password',
             'check_path' => '/login_check',
             'post_only' => true,
+            'form_only' => false,
             'enable_csrf' => false,
             'csrf_parameter' => '_csrf_token',
             'csrf_token_id' => 'authenticate',
@@ -77,21 +73,17 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     public function supports(Request $request): bool
     {
         return ($this->options['post_only'] ? $request->isMethod('POST') : true)
-            && $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
+            && $this->httpUtils->checkRequestPath($request, $this->options['check_path'])
+            && ($this->options['form_only'] ? 'form' === (method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType()) : true);
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         $credentials = $this->getCredentials($request);
 
-        $passport = new Passport(new UserBadge($credentials['username'], function ($username) {
-            $user = $this->userProvider->loadUserByUsername($username);
-            if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
-            }
+        $userBadge = new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...));
+        $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']), [new RememberMeBadge()]);
 
-            return $user;
-        }), new PasswordCredentials($credentials['password']), [new RememberMeBadge()]);
         if ($this->options['enable_csrf']) {
             $passport->addBadge(new CsrfTokenBadge($this->options['csrf_token_id'], $credentials['csrf_token']));
         }
@@ -103,12 +95,9 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         return $passport;
     }
 
-    /**
-     * @param Passport $passport
-     */
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
+        return new UsernamePasswordToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
@@ -134,17 +123,13 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             $credentials['password'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']) ?? '';
         }
 
-        if (!\is_string($credentials['username']) && (!\is_object($credentials['username']) || !method_exists($credentials['username'], '__toString'))) {
+        if (!\is_string($credentials['username']) && !$credentials['username'] instanceof \Stringable) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($credentials['username'])));
         }
 
         $credentials['username'] = trim($credentials['username']);
 
-        if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
-            throw new BadCredentialsException('Invalid username.');
-        }
-
-        $request->getSession()->set(Security::LAST_USERNAME, $credentials['username']);
+        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['username']);
 
         return $credentials;
     }

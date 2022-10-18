@@ -58,7 +58,7 @@ class MailgunApiTransportTest extends TestCase
     public function testCustomHeader()
     {
         $json = json_encode(['foo' => 'bar']);
-        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeImmutable::RFC2822);
+        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
 
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
@@ -73,11 +73,10 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
-        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+        $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
+        $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
 
         $this->assertArrayHasKey('h:foo', $payload);
         $this->assertEquals('foo-value', $payload['h:foo']);
@@ -101,7 +100,7 @@ class MailgunApiTransportTest extends TestCase
     public function testPrefixHeaderWithH()
     {
         $json = json_encode(['foo' => 'bar']);
-        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeImmutable::RFC2822);
+        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
 
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:bar', 'bar-value');
@@ -110,7 +109,6 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('h:bar', $payload, 'We should prefix headers with "h:" to keep BC');
@@ -130,8 +128,8 @@ class MailgunApiTransportTest extends TestCase
             }
 
             $this->assertStringContainsString('Hello!', $content);
-            $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
-            $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
+            $this->assertStringContainsString('"Saif Eddin" <saif.gmati@symfony.com>', $content);
+            $this->assertStringContainsString('"Fabien" <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
             return new MockResponse(json_encode(['id' => 'foobar']), [
@@ -150,6 +148,38 @@ class MailgunApiTransportTest extends TestCase
         $message = $transport->send($mail);
 
         $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testSendWithMultipleTagHeaders()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $content = '';
+            while ($chunk = $options['body']()) {
+                $content .= $chunk;
+            }
+
+            $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\npassword-reset\r\n", $content);
+            $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\nproduct-name\r\n", $content);
+
+            return new MockResponse(json_encode(['id' => 'foobar2']), [
+                'http_code' => 200,
+            ]);
+        });
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us-east-1', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $mail->getHeaders()
+            ->add(new TagHeader('password-reset'))
+            ->add(new TagHeader('product-name'));
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar2', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
@@ -214,20 +244,24 @@ class MailgunApiTransportTest extends TestCase
         $json = json_encode(['foo' => 'bar']);
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
+        $email->getHeaders()->addTextHeader('Custom-Header', 'value');
         $email->getHeaders()->add(new TagHeader('password-reset'));
+        $email->getHeaders()->add(new TagHeader('product-name'));
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
-
-        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
-        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
-        $this->assertArrayHasKey('o:tag', $payload);
-        $this->assertSame('password-reset', $payload['o:tag']);
+        $this->assertArrayHasKey('h:X-Mailgun-Variables', $payload);
+        $this->assertEquals($json, $payload['h:X-Mailgun-Variables']);
+        $this->assertArrayHasKey('h:Custom-Header', $payload);
+        $this->assertEquals('value', $payload['h:Custom-Header']);
+        $this->assertArrayHasKey(0, $payload);
+        $this->assertArrayHasKey(1, $payload);
+        $this->assertSame('password-reset', $payload[0]['o:tag']);
+        $this->assertSame('product-name', $payload[1]['o:tag']);
         $this->assertArrayHasKey('v:Color', $payload);
         $this->assertSame('blue', $payload['v:Color']);
         $this->assertArrayHasKey('v:Client-ID', $payload);

@@ -1,10 +1,30 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for ACL auth in RedisAdapter
+ * Improve reliability and performance of `TagAwareAdapter` by making tag versions an integral part of item value
+
+6.0
+---
+
+ * Remove `DoctrineProvider` and `DoctrineAdapter`
+ * Remove support of Doctrine DBAL in `PdoAdapter`
+
+5.4
+---
+
+ * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
+ * Add `DoctrineDbalAdapter` identical to `PdoAdapter` for `Doctrine\DBAL\Connection` or DBAL URL
+ * Deprecate usage of `PdoAdapter` with `Doctrine\DBAL\Connection` or DBAL URL
+
 5.3
 ---
 
  * added support for connecting to Redis Sentinel clusters when using the Redis PHP extension
+ * add support for a custom serializer to the `ApcuAdapter` class
 
 5.2.0
 -----

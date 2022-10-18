@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <container>
   <alias id=".alias_2" service=".service_2" public="false"/>
-  <definition id=".definition_2" class="Full\Qualified\Class2" public="false" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file="/path/to/file">
+  <definition id=".definition_2" class="Full\Qualified\Class2" public="false" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
     <factory service="factory.service" method="get"/>
     <calls>
       <call method="setMailer"/>
@@ -16,5 +16,8 @@
       </tag>
       <tag name="tag2"/>
     </tags>
+  </definition>
+  <definition id=".definition_3" class="Full\Qualified\Class3" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
+    <factory service="inline factory service (Full\Qualified\FactoryClass)" method="get"/>
   </definition>
 </container>

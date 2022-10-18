@@ -21,7 +21,7 @@ use Symfony\Component\Form\Util\ServerParams;
  */
 class NativeRequestHandler implements RequestHandlerInterface
 {
-    private $serverParams;
+    private ServerParams $serverParams;
 
     /**
      * The allowed keys of the $_FILES array.
@@ -36,15 +36,13 @@ class NativeRequestHandler implements RequestHandlerInterface
 
     public function __construct(ServerParams $params = null)
     {
-        $this->serverParams = $params ?: new ServerParams();
+        $this->serverParams = $params ?? new ServerParams();
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws Exception\UnexpectedTypeException If the $request is not null
      */
-    public function handleRequest(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, mixed $request = null)
     {
         if (null !== $request) {
             throw new UnexpectedTypeException($request, 'null');
@@ -124,10 +122,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         $form->submit($data, 'PATCH' !== $method);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFileUpload($data)
+    public function isFileUpload(mixed $data): bool
     {
         // POST data will always be strings or arrays of strings. Thus, we can be sure
         // that the submitted data is a file upload if the "error" value is an integer
@@ -135,10 +130,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         return \is_array($data) && isset($data['error']) && \is_int($data['error']);
     }
 
-    /**
-     * @return int|null
-     */
-    public function getUploadFileError($data)
+    public function getUploadFileError(mixed $data): ?int
     {
         if (!\is_array($data)) {
             return null;
@@ -159,9 +151,6 @@ class NativeRequestHandler implements RequestHandlerInterface
         return $data['error'];
     }
 
-    /**
-     * Returns the method used to submit the request to the server.
-     */
     private static function getRequestMethod(): string
     {
         $method = isset($_SERVER['REQUEST_METHOD'])
@@ -189,15 +178,15 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * This method is identical to {@link \Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
      * and should be kept as such in order to port fixes quickly and easily.
-     *
-     * @return mixed
      */
-    private static function fixPhpFilesArray($data)
+    private static function fixPhpFilesArray(mixed $data): mixed
     {
         if (!\is_array($data)) {
             return $data;
         }
 
+        // Remove extra key added by PHP 8.1.
+        unset($data['full_path']);
         $keys = array_keys($data);
         sort($keys);
 
@@ -223,12 +212,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         return $files;
     }
 
-    /**
-     * Sets empty uploaded files to NULL in the given uploaded files array.
-     *
-     * @return mixed Returns the stripped upload data
-     */
-    private static function stripEmptyFiles($data)
+    private static function stripEmptyFiles(mixed $data): mixed
     {
         if (!\is_array($data)) {
             return $data;

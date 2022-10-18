@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,11 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $this->getService = $this->getService(...);
         $this->services = $this->privates = [];
         $this->syntheticIds = [
             'foo5' => true,
@@ -46,8 +46,6 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     {
         return [
             '.service_locator.ZP1tNYN' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
             'foo4' => true,
@@ -121,11 +119,6 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected function getFoo4Service()
     {
-        $this->throw('BOOM');
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
+        throw new RuntimeException('BOOM');
     }
 }

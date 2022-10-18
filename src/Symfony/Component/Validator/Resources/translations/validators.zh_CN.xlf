@@ -131,24 +131,24 @@
                 <target>该值应该为有效的数字。</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>该值不是有效的国家名。</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>该文件不是有效的图片。</target>
             </trans-unit>
-            <trans-unit id="38">
-                <source>This is not a valid IP address.</source>
-                <target>该值不是有效的IP地址。</target>
-            </trans-unit>
+            <trans-unit id="37">
+                 <source>This is not a valid IP address.</source>
+                 <target>该值不是有效的IP地址。</target>
+             </trans-unit>
+             <trans-unit id="38">
+                 <source>This value is not a valid language.</source>
+                 <target>该值不是有效的语言名。</target>
+             </trans-unit>
             <trans-unit id="39">
-                <source>This value is not a valid language.</source>
-                <target>该值不是有效的语言名。</target>
-            </trans-unit>
-            <trans-unit id="40">
                 <source>This value is not a valid locale.</source>
                 <target>该值不是有效的区域值（locale）。</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>该值不是有效的国家名。</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -368,7 +368,7 @@
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
-                <target>该数值不是有效的主机名称。</target>
+                <target>该值不是有效的主机名称。</target>
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
@@ -376,7 +376,7 @@
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>该数值需符合以下其中一个约束：</target>
+                <target>该值需符合以下其中一个约束：</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
@@ -384,7 +384,23 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>该数值不是有效的国际证券识别码 （ISIN）。</target>
+                <target>该值不是有效的国际证券识别码 （ISIN）。</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>该值需为一个有效的表达式。</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>该值不是有效的CSS颜色。</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>该值不是一个有效的CIDR表示。</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>网络掩码的值应当在 {{ min }} 和 {{ max }} 之间。</target>
             </trans-unit>
         </body>
     </file>

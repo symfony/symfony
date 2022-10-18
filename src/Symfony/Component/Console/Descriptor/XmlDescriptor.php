@@ -120,41 +120,26 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         $this->writeDocument($this->getInputArgumentDocument($argument));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         $this->writeDocument($this->getInputDefinitionDocument($definition));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeCommand(Command $command, array $options = [])
     {
         $this->writeDocument($this->getCommandDocument($command, $options['short'] ?? false));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeApplication(Application $application, array $options = [])
     {
         $this->writeDocument($this->getApplicationDocument($application, $options['namespace'] ?? null, $options['short'] ?? false));
@@ -206,7 +191,7 @@ class XmlDescriptor extends Descriptor
 
         $dom->appendChild($objectXML = $dom->createElement('option'));
         $objectXML->setAttribute('name', '--'.$option->getName());
-        $pos = strpos($option->getShortcut(), '|');
+        $pos = strpos($option->getShortcut() ?? '', '|');
         if (false !== $pos) {
             $objectXML->setAttribute('shortcut', '-'.substr($option->getShortcut(), 0, $pos));
             $objectXML->setAttribute('shortcuts', '-'.str_replace('|', '|-', $option->getShortcut()));

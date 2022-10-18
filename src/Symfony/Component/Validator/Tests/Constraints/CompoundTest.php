@@ -46,7 +46,7 @@ class ForwardingOptionCompound extends Compound
 {
     public $min;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'min';
     }

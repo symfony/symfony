@@ -31,10 +31,7 @@ class XmlFileLoader extends FileLoader
      */
     private $classes;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         if (null === $this->classes) {
             $this->classes = $this->getClassesFromXml();
@@ -72,7 +69,26 @@ class XmlFileLoader extends FileLoader
                 }
 
                 if (isset($attribute['ignore'])) {
-                    $attributeMetadata->setIgnore((bool) $attribute['ignore']);
+                    $attributeMetadata->setIgnore(XmlUtils::phpize($attribute['ignore']));
+                }
+
+                foreach ($attribute->context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                    $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                }
+
+                foreach ($attribute->normalization_context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                }
+
+                foreach ($attribute->denormalization_context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
                 }
             }
 
@@ -98,9 +114,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[] The classes names
+     * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->classes = $this->getClassesFromXml();
@@ -110,7 +126,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML File.
+     * Parses an XML File.
      *
      * @throws MappingException
      */
@@ -135,5 +151,30 @@ class XmlFileLoader extends FileLoader
         }
 
         return $classes;
+    }
+
+    private function parseContext(\SimpleXMLElement $nodes): array
+    {
+        $context = [];
+
+        foreach ($nodes as $node) {
+            if (\count($node) > 0) {
+                if (\count($node->entry) > 0) {
+                    $value = $this->parseContext($node->entry);
+                } else {
+                    $value = [];
+                }
+            } else {
+                $value = XmlUtils::phpize($node);
+            }
+
+            if (isset($node['name'])) {
+                $context[(string) $node['name']] = $value;
+            } else {
+                $context[] = $value;
+            }
+        }
+
+        return $context;
     }
 }

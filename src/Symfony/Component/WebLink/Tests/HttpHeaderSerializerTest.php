@@ -44,4 +44,12 @@ class HttpHeaderSerializerTest extends TestCase
     {
         $this->assertNull($this->serializer->serialize([]));
     }
+
+    public function testSerializeDoubleQuotesInAttributeValue()
+    {
+        $this->assertSame('</foo>; rel="alternate"; title="\"escape me\" \"already escaped\" \"\"\""', $this->serializer->serialize([
+            (new Link('alternate', '/foo'))
+                ->withAttribute('title', '"escape me" \"already escaped\" ""\"'),
+        ]));
+    }
 }

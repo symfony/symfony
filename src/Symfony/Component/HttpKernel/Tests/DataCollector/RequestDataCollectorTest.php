@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -122,6 +123,17 @@ class RequestDataCollectorTest extends TestCase
             ],
 
             [
+                'First-class callable closure',
+                $this->testControllerInspection(...),
+                [
+                    'class' => self::class,
+                    'method' => 'testControllerInspection',
+                    'file' => __FILE__,
+                    'line' => $r1->getStartLine(),
+                ],
+            ],
+
+            [
                 'Static callback as string',
                 __NAMESPACE__.'\RequestDataCollectorTest::staticControllerMethod',
                 [
@@ -210,7 +222,7 @@ class RequestDataCollectorTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
 
         $c = new RequestDataCollector();
-        $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $this->createResponse()));
+        $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $this->createResponse()));
 
         $this->assertTrue($request->attributes->get('_redirected'));
     }
@@ -268,6 +280,8 @@ class RequestDataCollectorTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $session->method('getMetadataBag')->willReturnCallback(static function () use ($collector) {
             $collector->collectSessionUsage();
+
+            return new MetadataBag();
         });
         $session->getMetadataBag();
 
@@ -309,6 +323,15 @@ class RequestDataCollectorTest extends TestCase
         $collector->lateCollect();
 
         $this->assertTrue($collector->getStatelessCheck());
+
+        $requestStack = new RequestStack();
+        $request = $this->createRequest();
+
+        $collector = new RequestDataCollector($requestStack);
+        $collector->collect($request, $response = $this->createResponse());
+        $collector->lateCollect();
+
+        $this->assertFalse($collector->getStatelessCheck());
     }
 
     public function testItHidesPassword()
@@ -361,7 +384,7 @@ class RequestDataCollectorTest extends TestCase
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('X-Foo-Bar', null);
         $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true, false, null));
-        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTime('@946684800'), '/', null, false, true, false, null));
+        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTimeImmutable('@946684800'), '/', null, false, true, false, null));
         $response->headers->setCookie(new Cookie('bazz', 'foo', '2000-12-12', '/', null, false, true, false, null));
 
         return $response;
@@ -373,8 +396,8 @@ class RequestDataCollectorTest extends TestCase
     protected function injectController($collector, $controller, $request)
     {
         $resolver = $this->createMock(ControllerResolverInterface::class);
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
-        $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class), true);
+        $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST);
         $collector->onKernelController($event);
     }
 

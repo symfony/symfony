@@ -66,6 +66,8 @@ $foo->testLegacyFoo();
 $foo->testNonLegacyBar();
 ?>
 --EXPECTF--
+Legacy deprecation notices (1)
+
 Other deprecation notices (2)
 
   1x: root deprecation

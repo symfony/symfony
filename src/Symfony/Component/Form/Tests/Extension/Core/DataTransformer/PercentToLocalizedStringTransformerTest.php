@@ -12,15 +12,12 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class PercentToLocalizedStringTransformerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private $defaultLocale;
 
     protected function setUp(): void
@@ -73,16 +70,11 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('12,34', $transformer->transform(0.1234));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testReverseTransformWithScaleAndRoundingDisabled()
+    public function testReverseTransformWithScaleAndImplicitRounding()
     {
-        $this->expectDeprecation('Since symfony/form 5.1: Not passing a rounding mode to "Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer::__construct()" is deprecated. Starting with Symfony 6.0 it will default to "\NumberFormatter::ROUND_HALFUP".');
-
         $transformer = new PercentToLocalizedStringTransformer(2, PercentToLocalizedStringTransformer::FRACTIONAL);
 
-        $this->assertEquals(0.0123456, $transformer->reverseTransform('1.23456'));
+        $this->assertEquals(0.0123, $transformer->reverseTransform('1.23456'));
     }
 
     public function testReverseTransform()
@@ -338,17 +330,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed()
     {
-        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
-        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
-        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
-
-        $transformer = $this->getMockBuilder(PercentToLocalizedStringTransformer::class)
-            ->setMethods(['getNumberFormatter'])
-            ->setConstructorArgs([1, 'integer', \NumberFormatter::ROUND_HALFUP])
-            ->getMock();
-        $transformer->expects($this->any())
-            ->method('getNumberFormatter')
-            ->willReturn($formatter);
+        $transformer = new PercentToLocalizedStringTransformerWithoutGrouping(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
@@ -492,5 +474,16 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer = new PercentToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_HALFUP, true);
 
         $this->assertEquals(0.1234, $transformer->reverseTransform('12.34'));
+    }
+}
+
+class PercentToLocalizedStringTransformerWithoutGrouping extends PercentToLocalizedStringTransformer
+{
+    protected function getNumberFormatter(): \NumberFormatter
+    {
+        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
+        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
+
+        return $formatter;
     }
 }

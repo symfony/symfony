@@ -11,7 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,6 +39,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @final
  */
+#[AsCommand(name: 'debug:translation', description: 'Display translation messages information')]
 class TranslationDebugCommand extends Command
 {
     public const EXIT_CODE_GENERAL_ERROR = 64;
@@ -46,18 +50,16 @@ class TranslationDebugCommand extends Command
     public const MESSAGE_UNUSED = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
-    protected static $defaultName = 'debug:translation';
-    protected static $defaultDescription = 'Displays translation messages information';
+    private TranslatorInterface $translator;
+    private TranslationReaderInterface $reader;
+    private ExtractorInterface $extractor;
+    private ?string $defaultTransPath;
+    private ?string $defaultViewsPath;
+    private array $transPaths;
+    private array $codePaths;
+    private array $enabledLocales;
 
-    private $translator;
-    private $reader;
-    private $extractor;
-    private $defaultTransPath;
-    private $defaultViewsPath;
-    private $transPaths;
-    private $viewsPaths;
-
-    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $viewsPaths = [])
+    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
     {
         parent::__construct();
 
@@ -67,12 +69,10 @@ class TranslationDebugCommand extends Command
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
         $this->transPaths = $transPaths;
-        $this->viewsPaths = $viewsPaths;
+        $this->codePaths = $codePaths;
+        $this->enabledLocales = $enabledLocales;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -80,11 +80,10 @@ class TranslationDebugCommand extends Command
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
-                new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
-                new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
+                new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Display only missing messages'),
+                new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Display only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the
@@ -119,9 +118,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -129,20 +125,14 @@ EOF
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
 
-        $exitCode = 0;
+        $exitCode = self::SUCCESS;
 
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
         // Define Root Paths
-        $transPaths = $this->transPaths;
-        if ($this->defaultTransPath) {
-            $transPaths[] = $this->defaultTransPath;
-        }
-        $viewsPaths = $this->viewsPaths;
-        if ($this->defaultViewsPath) {
-            $viewsPaths[] = $this->defaultViewsPath;
-        }
+        $transPaths = $this->getRootTransPaths();
+        $codePaths = $this->getRootCodePaths($kernel);
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
@@ -150,21 +140,21 @@ EOF
                 $bundle = $kernel->getBundle($input->getArgument('bundle'));
                 $bundleDir = $bundle->getPath();
                 $transPaths = [is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundleDir.'/translations'];
-                $viewsPaths = [is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates'];
+                $codePaths = [is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates'];
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
                 if ($this->defaultViewsPath) {
-                    $viewsPaths[] = $this->defaultViewsPath;
+                    $codePaths[] = $this->defaultViewsPath;
                 }
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // such a bundle does not exist, so treat the argument as path
                 $path = $input->getArgument('bundle');
 
                 $transPaths = [$path.'/translations'];
-                $viewsPaths = [$path.'/templates'];
+                $codePaths = [$path.'/templates'];
 
-                if (!is_dir($transPaths[0]) && !isset($transPaths[1])) {
+                if (!is_dir($transPaths[0])) {
                     throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
@@ -172,12 +162,12 @@ EOF
             foreach ($kernel->getBundles() as $bundle) {
                 $bundleDir = $bundle->getPath();
                 $transPaths[] = is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundle->getPath().'/translations';
-                $viewsPaths[] = is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundle->getPath().'/templates';
+                $codePaths[] = is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundle->getPath().'/templates';
             }
         }
 
         // Extract used messages
-        $extractedCatalogue = $this->extractMessages($locale, $viewsPaths);
+        $extractedCatalogue = $this->extractMessages($locale, $codePaths);
 
         // Load defined messages
         $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths);
@@ -190,7 +180,7 @@ EOF
         }
 
         // No defined or extracted messages
-        if (empty($allMessages) || null !== $domain && empty($allMessages[$domain])) {
+        if (!$allMessages || null !== $domain && empty($allMessages[$domain])) {
             $outputMessage = sprintf('No defined or extracted messages for locale "%s"', $locale);
 
             if (null !== $domain) {
@@ -221,16 +211,21 @@ EOF
                     if (!$currentCatalogue->defines($messageId, $domain)) {
                         $states[] = self::MESSAGE_MISSING;
 
-                        $exitCode = $exitCode | self::EXIT_CODE_MISSING;
+                        if (!$input->getOption('only-unused')) {
+                            $exitCode = $exitCode | self::EXIT_CODE_MISSING;
+                        }
                     }
                 } elseif ($currentCatalogue->defines($messageId, $domain)) {
                     $states[] = self::MESSAGE_UNUSED;
 
-                    $exitCode = $exitCode | self::EXIT_CODE_UNUSED;
+                    if (!$input->getOption('only-missing')) {
+                        $exitCode = $exitCode | self::EXIT_CODE_UNUSED;
+                    }
                 }
 
-                if (!\in_array(self::MESSAGE_UNUSED, $states) && true === $input->getOption('only-unused')
-                    || !\in_array(self::MESSAGE_MISSING, $states) && true === $input->getOption('only-missing')) {
+                if (!\in_array(self::MESSAGE_UNUSED, $states) && $input->getOption('only-unused')
+                    || !\in_array(self::MESSAGE_MISSING, $states) && $input->getOption('only-missing')
+                ) {
                     continue;
                 }
 
@@ -256,6 +251,44 @@ EOF
         $io->table($headers, $rows);
 
         return $exitCode;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('locale')) {
+            $suggestions->suggestValues($this->enabledLocales);
+
+            return;
+        }
+
+        /** @var KernelInterface $kernel */
+        $kernel = $this->getApplication()->getKernel();
+
+        if ($input->mustSuggestArgumentValuesFor('bundle')) {
+            $availableBundles = [];
+            foreach ($kernel->getBundles() as $bundle) {
+                $availableBundles[] = $bundle->getName();
+
+                if ($extension = $bundle->getContainerExtension()) {
+                    $availableBundles[] = $extension->getAlias();
+                }
+            }
+
+            $suggestions->suggestValues($availableBundles);
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('domain')) {
+            $locale = $input->getArgument('locale');
+
+            $mergeOperation = new MergeOperation(
+                $this->extractMessages($locale, $this->getRootCodePaths($kernel)),
+                $this->loadCurrentMessages($locale, $this->getRootTransPaths())
+            );
+
+            $suggestions->suggestValues($mergeOperation->getDomains());
+        }
     }
 
     private function formatState(int $state): string
@@ -352,5 +385,26 @@ EOF
         }
 
         return $fallbackCatalogues;
+    }
+
+    private function getRootTransPaths(): array
+    {
+        $transPaths = $this->transPaths;
+        if ($this->defaultTransPath) {
+            $transPaths[] = $this->defaultTransPath;
+        }
+
+        return $transPaths;
+    }
+
+    private function getRootCodePaths(KernelInterface $kernel): array
+    {
+        $codePaths = $this->codePaths;
+        $codePaths[] = $kernel->getProjectDir().'/src';
+        if ($this->defaultViewsPath) {
+            $codePaths[] = $this->defaultViewsPath;
+        }
+
+        return $codePaths;
     }
 }

@@ -20,18 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseTest extends ResponseTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = Response::create('foo', 301, ['Foo' => 'bar']);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('bar', $response->headers->get('foo'));
-    }
-
     public function testToString()
     {
         $response = new Response();
@@ -62,13 +50,13 @@ class ResponseTest extends ResponseTestCase
     public function testSend()
     {
         $response = new Response();
-        $responseSend = $response->send();
-        $this->assertObjectHasAttribute('headers', $responseSend);
-        $this->assertObjectHasAttribute('content', $responseSend);
-        $this->assertObjectHasAttribute('version', $responseSend);
-        $this->assertObjectHasAttribute('statusCode', $responseSend);
-        $this->assertObjectHasAttribute('statusText', $responseSend);
-        $this->assertObjectHasAttribute('charset', $responseSend);
+        $responseSent = $response->send();
+        $this->assertObjectHasAttribute('headers', $responseSent);
+        $this->assertObjectHasAttribute('content', $responseSent);
+        $this->assertObjectHasAttribute('version', $responseSent);
+        $this->assertObjectHasAttribute('statusCode', $responseSent);
+        $this->assertObjectHasAttribute('statusText', $responseSent);
+        $this->assertObjectHasAttribute('charset', $responseSent);
     }
 
     public function testGetCharset()
@@ -197,7 +185,7 @@ class ResponseTest extends ResponseTestCase
         $etagTwo = 'randomly_generated_etag_2';
 
         $request = new Request();
-        $request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
+        $request->headers->set('If-None-Match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
 
         $response = new Response();
 
@@ -209,6 +197,38 @@ class ResponseTest extends ResponseTestCase
 
         $response->headers->set('ETag', '');
         $this->assertFalse($response->isNotModified($request));
+
+        // Test wildcard
+        $request = new Request();
+        $request->headers->set('If-None-Match', '*');
+
+        $response->headers->set('ETag', $etagOne);
+        $this->assertTrue($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedWeakEtag()
+    {
+        $etag = 'randomly_generated_etag';
+        $weakEtag = 'W/randomly_generated_etag';
+
+        $request = new Request();
+        $request->headers->set('If-None-Match', $etag);
+        $response = new Response();
+
+        $response->headers->set('ETag', $etag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', $weakEtag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $request->headers->set('If-None-Match', $weakEtag);
+        $response = new Response();
+
+        $response->headers->set('ETag', $etag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', $weakEtag);
+        $this->assertTrue($response->isNotModified($request));
     }
 
     public function testIsNotModifiedLastModifiedAndEtag()
@@ -219,14 +239,14 @@ class ResponseTest extends ResponseTestCase
         $etag = 'randomly_generated_etag';
 
         $request = new Request();
-        $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
+        $request->headers->set('If-None-Match', sprintf('%s, %s', $etag, 'etagThree'));
         $request->headers->set('If-Modified-Since', $modified);
 
         $response = new Response();
 
         $response->headers->set('ETag', $etag);
         $response->headers->set('Last-Modified', $after);
-        $this->assertFalse($response->isNotModified($request));
+        $this->assertTrue($response->isNotModified($request));
 
         $response->headers->set('ETag', 'non-existent-etag');
         $response->headers->set('Last-Modified', $before);
@@ -243,7 +263,7 @@ class ResponseTest extends ResponseTestCase
         $etag = 'randomly_generated_etag';
 
         $request = new Request();
-        $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
+        $request->headers->set('If-None-Match', sprintf('%s, %s', $etag, 'etagThree'));
         $request->headers->set('If-Modified-Since', $modified);
 
         $response = new Response();
@@ -253,6 +273,20 @@ class ResponseTest extends ResponseTestCase
 
         $response->headers->set('ETag', 'non-existent-etag');
         $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIfNoneMatchWithoutETag()
+    {
+        $request = new Request();
+        $request->headers->set('If-None-Match', 'randomly_generated_etag');
+
+        $this->assertFalse((new Response())->isNotModified($request));
+
+        // Test wildcard
+        $request = new Request();
+        $request->headers->set('If-None-Match', '*');
+
+        $this->assertFalse((new Response())->isNotModified($request));
     }
 
     public function testIsValidateable()
@@ -322,6 +356,44 @@ class ResponseTest extends ResponseTestCase
 
         $cacheControl = $response->headers->get('Cache-Control');
         $this->assertEquals('public, s-maxage=20', $cacheControl);
+    }
+
+    public function testSetStaleIfError()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-if-error=86400', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidate()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(20);
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('public, s-maxage=20, stale-while-revalidate=300', $cacheControl);
+    }
+
+    public function testSetStaleIfErrorWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleIfError(86400);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-if-error=86400, private', $cacheControl);
+    }
+
+    public function testSetStaleWhileRevalidateWithoutSharedMaxAge()
+    {
+        $response = new Response();
+        $response->setStaleWhileRevalidate(300);
+
+        $cacheControl = $response->headers->get('Cache-Control');
+        $this->assertEquals('stale-while-revalidate=300, private', $cacheControl);
     }
 
     public function testIsPrivate()
@@ -581,6 +653,12 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('no-cache', $response->headers->get('pragma'));
         $this->assertEquals('-1', $response->headers->get('expires'));
 
+        $response = new Response('foo');
+        $response->headers->remove('cache-control');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('pragma'));
+        $this->assertFalse($response->headers->has('expires'));
+
         $request->server->set('SERVER_PROTOCOL', 'HTTP/1.1');
         $response = new Response('foo');
         $response->prepare($request);
@@ -718,17 +796,17 @@ class ResponseTest extends ResponseTestCase
     public function testSetDate()
     {
         $response = new Response();
-        $response->setDate(\DateTime::createFromFormat(\DateTime::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
+        $response->setDate(\DateTime::createFromFormat(\DateTimeInterface::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
 
-        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTime::ATOM));
+        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTimeInterface::ATOM));
     }
 
     public function testSetDateWithImmutable()
     {
         $response = new Response();
-        $response->setDate(\DateTimeImmutable::createFromFormat(\DateTime::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
+        $response->setDate(\DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
 
-        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTime::ATOM));
+        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTimeInterface::ATOM));
     }
 
     public function testSetExpires()
@@ -806,7 +884,6 @@ class ResponseTest extends ResponseTestCase
         $response->setStatusCode($code, $text);
 
         $statusText = new \ReflectionProperty($response, 'statusText');
-        $statusText->setAccessible(true);
 
         $this->assertEquals($expectedText, $statusText->getValue($response));
     }
@@ -918,7 +995,7 @@ class ResponseTest extends ResponseTestCase
     public function testSetEtag()
     {
         $response = new Response('', 200, ['ETag' => '"12345"']);
-        $response->setEtag();
+        $response->setEtag(null);
 
         $this->assertNull($response->headers->get('Etag'), '->setEtag() removes Etags when call with null');
     }
@@ -1012,25 +1089,10 @@ class ResponseTest extends ResponseTestCase
      */
     public function ianaCodesReasonPhrasesProvider()
     {
-        if (!\in_array('https', stream_get_wrappers(), true)) {
-            $this->markTestSkipped('The "https" wrapper is not available');
-        }
-
+        // XML taken from https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
+        // (might not be up-to-date for older Symfony versions)
         $ianaHttpStatusCodes = new \DOMDocument();
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'GET',
-                'timeout' => 30,
-                'user_agent' => __METHOD__,
-            ],
-        ]);
-
-        if (!$rawStatusCodes = file_get_contents('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml', false, $context)) {
-            $this->markTestSkipped('The IANA server is throttling the list of status codes');
-        }
-
-        $ianaHttpStatusCodes->loadXML($rawStatusCodes);
+        $ianaHttpStatusCodes->load(__DIR__.'/Fixtures/xml/http-status-codes.xml');
         if (!$ianaHttpStatusCodes->relaxNGValidate(__DIR__.'/schema/http-status-codes.rng')) {
             self::fail('Invalid IANA\'s HTTP status code list.');
         }

@@ -12,15 +12,14 @@
 namespace Symfony\Component\Notifier\Bridge\Gitter\Tests;
 
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 /**
  * @author Christin Gruber <c.gruber@touchdesign.de>
  */
 final class GitterTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): GitterTransportFactory
     {
         return new GitterTransportFactory();
     }

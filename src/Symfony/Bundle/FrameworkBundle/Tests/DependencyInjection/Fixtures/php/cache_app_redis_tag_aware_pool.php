@@ -1,0 +1,13 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'http_method_override' => false,
+    'cache' => [
+        'app' => 'cache.redis_tag_aware.foo',
+        'pools' => [
+            'cache.redis_tag_aware.foo' => [
+                'adapter' => 'cache.adapter.redis_tag_aware',
+            ],
+        ],
+    ],
+]);

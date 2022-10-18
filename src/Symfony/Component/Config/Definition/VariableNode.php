@@ -27,24 +27,18 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     protected $defaultValue;
     protected $allowEmptyValue = true;
 
-    public function setDefaultValue($value)
+    public function setDefaultValue(mixed $value)
     {
         $this->defaultValueSet = true;
         $this->defaultValue = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return $this->defaultValueSet;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultValue()
+    public function getDefaultValue(): mixed
     {
         $v = $this->defaultValue;
 
@@ -61,25 +55,16 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         $this->allowEmptyValue = $boolean;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function validateType($value)
+    protected function validateType(mixed $value)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function finalizeValue($value)
+    protected function finalizeValue(mixed $value): mixed
     {
         // deny environment variables only when using custom validators
         // this avoids ever passing an empty value to final validation closures
@@ -106,18 +91,12 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function mergeValues($leftSide, $rightSide)
+    protected function mergeValues(mixed $leftSide, mixed $rightSide): mixed
     {
         return $rightSide;
     }
@@ -129,13 +108,9 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      * method may be overridden by subtypes to better match their understanding
      * of empty data.
      *
-     * @param mixed $value
-     *
-     * @return bool
-     *
      * @see finalizeValue()
      */
-    protected function isValueEmpty($value)
+    protected function isValueEmpty(mixed $value): bool
     {
         return empty($value);
     }

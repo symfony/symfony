@@ -2,6 +2,7 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
+    http_method_override: false
     translator: true
     validation: true
     serializer: true

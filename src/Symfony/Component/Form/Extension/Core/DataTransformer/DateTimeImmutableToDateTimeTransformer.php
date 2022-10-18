@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * Transforms between a DateTimeImmutable object and a DateTime object.
  *
  * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
+ *
+ * @implements DataTransformerInterface<\DateTimeImmutable, \DateTime>
  */
 final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInterface
 {
@@ -28,7 +30,7 @@ final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInt
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeImmutable
      */
-    public function transform($value): ?\DateTime
+    public function transform(mixed $value): ?\DateTime
     {
         if (null === $value) {
             return null;
@@ -38,11 +40,7 @@ final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInt
             throw new TransformationFailedException('Expected a \DateTimeImmutable.');
         }
 
-        if (\PHP_VERSION_ID >= 70300) {
-            return \DateTime::createFromImmutable($value);
-        }
-
-        return \DateTime::createFromFormat('U.u', $value->format('U.u'))->setTimezone($value->getTimezone());
+        return \DateTime::createFromImmutable($value);
     }
 
     /**
@@ -52,7 +50,7 @@ final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInt
      *
      * @throws TransformationFailedException If the given value is not a \DateTime
      */
-    public function reverseTransform($value): ?\DateTimeImmutable
+    public function reverseTransform(mixed $value): ?\DateTimeImmutable
     {
         if (null === $value) {
             return null;

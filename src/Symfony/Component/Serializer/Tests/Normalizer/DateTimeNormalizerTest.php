@@ -177,6 +177,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class));
         $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeImmutable::class));
         $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTime::class));
+        $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('  2016-01-01T00:00:00+00:00  ', \DateTime::class));
     }
 
     public function testDenormalizeUsingTimezonePassedInConstructor()
@@ -254,6 +255,42 @@ class DateTimeNormalizerTest extends TestCase
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize('', \DateTimeInterface::class);
+    }
+
+    public function testDenormalizeStringWithSpacesOnlyThrowsAnException()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
+        $this->normalizer->denormalize('  ', \DateTimeInterface::class);
+    }
+
+    public function testDenormalizeDateTimeStringWithSpacesUsingFormatPassedInContextThrowsAnException()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage("Parsing datetime string \"  2016.01.01  \" using format \"Y.m.d|\" resulted in 2 errors: \nat position 0: Unexpected data found.\nat position 12: Trailing data");
+        $this->normalizer->denormalize('  2016.01.01  ', \DateTime::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']);
+    }
+
+    public function testDenormalizeDateTimeStringWithDefaultContextFormat()
+    {
+        $format = 'd/m/Y';
+        $string = '01/10/2018';
+
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => $format]);
+        $denormalizedDate = $normalizer->denormalize($string, \DateTimeInterface::class);
+
+        $this->assertSame('01/10/2018', $denormalizedDate->format($format));
+    }
+
+    public function testDenormalizeDateTimeStringWithDefaultContextAllowsErrorFormat()
+    {
+        $format = 'd/m/Y'; // the default format
+        $string = '2020-01-01'; // the value which is in the wrong format, but is accepted because of `new \DateTime` in DateTimeNormalizer::denormalize
+
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => $format]);
+        $denormalizedDate = $normalizer->denormalize($string, \DateTimeInterface::class);
+
+        $this->assertSame('2020-01-01', $denormalizedDate->format('Y-m-d'));
     }
 
     public function testDenormalizeFormatMismatchThrowsException()

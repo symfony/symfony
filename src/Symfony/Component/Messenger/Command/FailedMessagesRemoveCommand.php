@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,23 +25,18 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
+#[AsCommand(name: 'messenger:failed:remove', description: 'Remove given messages from the failure transport')]
 class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
 {
-    protected static $defaultName = 'messenger:failed:remove';
-    protected static $defaultDescription = 'Remove given messages from the failure transport';
-
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
             ->setDefinition([
                 new InputArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
+                new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> removes given messages that are pending in the failure transport.
 
@@ -52,31 +48,39 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        $receiver = $this->getReceiver();
+        $failureTransportName = $input->getOption('transport');
+        if (self::DEFAULT_TRANSPORT_OPTION === $failureTransportName) {
+            $failureTransportName = $this->getGlobalFailureReceiverName();
+        }
+
+        $receiver = $this->getReceiver($failureTransportName);
 
         $shouldForce = $input->getOption('force');
         $ids = (array) $input->getArgument('id');
         $shouldDisplayMessages = $input->getOption('show-messages') || 1 === \count($ids);
-        $this->removeMessages($ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
+        $this->removeMessages($failureTransportName, $ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
 
         return 0;
     }
 
-    private function removeMessages(array $ids, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
+    private function removeMessages(string $failureTransportName, array $ids, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
     {
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $this->getReceiverName()));
+            throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
         }
 
         foreach ($ids as $id) {
-            $envelope = $receiver->find($id);
+            $this->phpSerializer?->acceptPhpIncompleteClass();
+            try {
+                $envelope = $receiver->find($id);
+            } finally {
+                $this->phpSerializer?->rejectPhpIncompleteClass();
+            }
+
             if (null === $envelope) {
                 $io->error(sprintf('The message with id "%s" was not found.', $id));
                 continue;

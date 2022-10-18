@@ -71,8 +71,8 @@ class DoctrineTransportTest extends TestCase
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): DoctrineTransport
     {
-        $serializer = $serializer ?: $this->createMock(SerializerInterface::class);
-        $connection = $connection ?: $this->createMock(Connection::class);
+        $serializer ??= $this->createMock(SerializerInterface::class);
+        $connection ??= $this->createMock(Connection::class);
 
         return new DoctrineTransport($connection, $serializer);
     }

@@ -56,75 +56,9 @@ class RdKafkaCasterTest extends TestCase
 
         $expectedDump = <<<EODUMP
 RdKafka\Conf {
-  builtin.features: "gzip,snappy,ssl,sasl,regex,lz4,sasl_gssapi,sasl_plain,sasl_scram,plugins"
+  builtin.features: "gzip,snappy,ssl,sasl,regex,lz4,sasl_gssapi,sasl_plain,sasl_scram,plugins%S"
   client.id: "rdkafka"
-  message.max.bytes: "1000000"
-  message.copy.max.bytes: "65535"
-  receive.message.max.bytes: "100000000"
-  max.in.flight.requests.per.connection: "1000000"
-  metadata.request.timeout.ms: "60000"
-  topic.metadata.refresh.interval.ms: "300000"
-  metadata.max.age.ms: "-1"
-  topic.metadata.refresh.fast.interval.ms: "250"
-  topic.metadata.refresh.fast.cnt: "10"
-  topic.metadata.refresh.sparse: "true"
-  debug: ""
-  socket.timeout.ms: "60000"
-  socket.blocking.max.ms: "1000"
-  socket.send.buffer.bytes: "0"
-  socket.receive.buffer.bytes: "0"
-  socket.keepalive.enable: "false"
-  socket.nagle.disable: "false"
-  socket.max.fails: "%d"
-  broker.address.ttl: "1000"
-  broker.address.family: "any"
-  reconnect.backoff.jitter.ms: "500"
-  statistics.interval.ms: "0"
-  enabled_events: "0"
-  error_cb: "0x%x"
 %A
-  log_level: "6"
-  log.queue: "%s"
-  log.thread.name: "true"
-  log.connection.close: "true"
-  socket_cb: "0x%x"
-  open_cb: "0x%x"
-  internal.termination.signal: "0"
-  api.version.request: "true"
-  api.version.request.timeout.ms: "10000"
-  api.version.fallback.ms: "1200000"
-  broker.version.fallback: "0.9.0"
-  security.protocol: "plaintext"
-  sasl.mechanisms: "GSSAPI"
-  sasl.kerberos.service.name: "kafka"
-  sasl.kerberos.principal: "kafkaclient"
-  sasl.kerberos.kinit.cmd: "kinit -S "%{sasl.kerberos.service.name}/%{broker.name}" -k -t "%{sasl.kerberos.keytab}" %{sasl.kerberos.principal}"
-  sasl.kerberos.min.time.before.relogin: "60000"
-  partition.assignment.strategy: "range,roundrobin"
-  session.timeout.ms: "30000"
-  heartbeat.interval.ms: "1000"
-  group.protocol.type: "consumer"
-  coordinator.query.interval.ms: "600000"
-  enable.auto.commit: "true"
-  auto.commit.interval.ms: "5000"
-  enable.auto.offset.store: "true"
-  queued.min.messages: "100000"
-  queued.max.messages.kbytes: "1048576"
-  fetch.wait.max.ms: "100"
-%A
-  fetch.min.bytes: "1"
-  fetch.error.backoff.ms: "500"
-  offset.store.method: "broker"
-%A
-  enable.partition.eof: "true"
-  check.crcs: "false"
-  queue.buffering.max.messages: "100000"
-  queue.buffering.max.kbytes: "1048576"
-  queue.buffering.max.ms: "0"
-%A
-  compression.codec: "none"
-  batch.num.messages: "10000"
-  delivery.report.only.error: "false"
   dr_msg_cb: "0x%x"
 }
 EODUMP;
@@ -143,9 +77,7 @@ EODUMP;
 
         $expectedDump = <<<EODUMP
 RdKafka\Producer {
-  -error_cb: null
-  -dr_cb: null
-  out_q_len: %d
+%Aout_q_len: %d
   orig_broker_id: 1001
   orig_broker_name: "$this->broker/1001"
   brokers: RdKafka\Metadata\Collection {
@@ -180,7 +112,7 @@ EODUMP;
 
         $expectedDump = <<<EODUMP
 RdKafka\TopicConf {
-  request.required.acks: "1"
+  request.required.acks: "%i"
   request.timeout.ms: "5000"
   message.timeout.ms: "300000"
 %A
@@ -212,10 +144,7 @@ EODUMP;
 
         $expectedDump = <<<EODUMP
 RdKafka\KafkaConsumer {
-  -error_cb: null
-  -rebalance_cb: null
-  -dr_msg_cb: null
-  subscription: array:1 [
+%Asubscription: array:1 [
     0 => "test-topic"
   ]
   assignment: []
@@ -252,7 +181,7 @@ EODUMP;
         $producer->addBrokers($this->broker);
 
         $topic = $producer->newTopic('test');
-        $topic->produce(RD_KAFKA_PARTITION_UA, 0, '{}');
+        $topic->produce(\RD_KAFKA_PARTITION_UA, 0, '{}');
 
         $expectedDump = <<<EODUMP
 RdKafka\ProducerTopic {

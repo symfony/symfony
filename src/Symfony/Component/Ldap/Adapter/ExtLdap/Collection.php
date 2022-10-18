@@ -20,9 +20,10 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Collection implements CollectionInterface
 {
-    private $connection;
-    private $search;
-    private $entries;
+    private Connection $connection;
+    private Query $search;
+    /** @var list<Entry> */
+    private array $entries;
 
     public function __construct(Connection $connection, Query $search)
     {
@@ -30,22 +31,12 @@ class Collection implements CollectionInterface
         $this->search = $search;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray()
+    public function toArray(): array
     {
-        if (null === $this->entries) {
-            $this->entries = iterator_to_array($this->getIterator(), false);
-        }
-
-        return $this->entries;
+        return $this->entries ??= iterator_to_array($this->getIterator(), false);
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
@@ -61,10 +52,7 @@ class Collection implements CollectionInterface
         return $count;
     }
 
-    /**
-     * @return \Traversable
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if (0 === $this->count()) {
             return;
@@ -87,31 +75,28 @@ class Collection implements CollectionInterface
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         $this->toArray();
 
         return isset($this->entries[$offset]);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): ?Entry
     {
         $this->toArray();
 
         return $this->entries[$offset] ?? null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->toArray();
 
         $this->entries[$offset] = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->toArray();
 

@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -188,22 +185,6 @@ class DefinitionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $def = new Definition('stdClass');
-        $def->setDeprecated(true, '%service_id%');
-
-        $deprecation = $def->getDeprecation('deprecated_service');
-        $this->assertSame('deprecated_service', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
-    }
-
-    /**
      * @dataProvider invalidDeprecationMessageProvider
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
@@ -303,7 +284,7 @@ class DefinitionTest extends TestCase
     public function testReplaceArgumentShouldCheckBounds()
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('The index "1" is not in the range [0, 0].');
+        $this->expectExceptionMessage('The index "1" is not in the range [0, 0] of the arguments of class "stdClass".');
         $def = new Definition('stdClass');
 
         $def->addArgument('foo');
@@ -313,7 +294,7 @@ class DefinitionTest extends TestCase
     public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('Cannot replace arguments if none have been configured yet.');
+        $this->expectExceptionMessage('Cannot replace arguments for class "stdClass" if none have been configured yet.');
         $def = new Definition('stdClass');
         $def->replaceArgument(0, 'bar');
     }
@@ -410,5 +391,21 @@ class DefinitionTest extends TestCase
         $def->addError('First error');
         $def->addError('Second error');
         $this->assertSame(['First error', 'Second error'], $def->getErrors());
+    }
+
+    public function testMultipleMethodCalls()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addMethodCall('configure', ['arg1']);
+        $this->assertTrue($def->hasMethodCall('configure'));
+        $this->assertCount(1, $def->getMethodCalls());
+
+        $def->addMethodCall('configure', ['arg2']);
+        $this->assertTrue($def->hasMethodCall('configure'));
+        $this->assertCount(2, $def->getMethodCalls());
+
+        $def->removeMethodCall('configure');
+        $this->assertFalse($def->hasMethodCall('configure'));
     }
 }

@@ -23,7 +23,7 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class LinkedInOptions implements MessageOptionsInterface
 {
-    private $options = [];
+    private array $options = [];
 
     public function __construct(array $options = [])
     {
@@ -55,63 +55,90 @@ final class LinkedInOptions implements MessageOptionsInterface
         return $options;
     }
 
-    public function contentCertificationRecord(string $contentCertificationRecord): self
+    /**
+     * @return $this
+     */
+    public function contentCertificationRecord(string $contentCertificationRecord): static
     {
         $this->options['contentCertificationRecord'] = $contentCertificationRecord;
 
         return $this;
     }
 
-    public function firstPublishedAt(int $firstPublishedAt): self
+    /**
+     * @return $this
+     */
+    public function firstPublishedAt(int $firstPublishedAt): static
     {
         $this->options['firstPublishedAt'] = $firstPublishedAt;
 
         return $this;
     }
 
-    public function lifecycleState(LifecycleStateShare $lifecycleStateOption): self
+    /**
+     * @return $this
+     */
+    public function lifecycleState(LifecycleStateShare $lifecycleStateOption): static
     {
         $this->options['lifecycleState'] = $lifecycleStateOption->lifecycleState();
 
         return $this;
     }
 
-    public function origin(string $origin): self
+    /**
+     * @return $this
+     */
+    public function origin(string $origin): static
     {
         $this->options['origin'] = $origin;
 
         return $this;
     }
 
-    public function ugcOrigin(string $ugcOrigin): self
+    /**
+     * @return $this
+     */
+    public function ugcOrigin(string $ugcOrigin): static
     {
         $this->options['ugcOrigin'] = $ugcOrigin;
 
         return $this;
     }
 
-    public function versionTag(string $versionTag): self
+    /**
+     * @return $this
+     */
+    public function versionTag(string $versionTag): static
     {
         $this->options['versionTag'] = $versionTag;
 
         return $this;
     }
 
-    public function specificContent(ShareContentShare $specificContent): self
+    /**
+     * @return $this
+     */
+    public function specificContent(ShareContentShare $specificContent): static
     {
         $this->options['specificContent']['com.linkedin.ugc.ShareContent'] = $specificContent->toArray();
 
         return $this;
     }
 
-    public function author(AuthorShare $authorOption): self
+    /**
+     * @return $this
+     */
+    public function author(AuthorShare $authorOption): static
     {
         $this->options['author'] = $authorOption->author();
 
         return $this;
     }
 
-    public function visibility(VisibilityShare $visibilityOption): self
+    /**
+     * @return $this
+     */
+    public function visibility(VisibilityShare $visibilityOption): static
     {
         $this->options['visibility'] = $visibilityOption->toArray();
 

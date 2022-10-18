@@ -14,10 +14,13 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Doctrine\Common\EventSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private $container;
     private $evm;
 
@@ -27,9 +30,23 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm = new ContainerAwareEventManager($this->container);
     }
 
+    public function testDispatchEventRespectOrder()
+    {
+        $this->evm = new ContainerAwareEventManager($this->container, ['sub1', [['foo'], 'list1'], 'sub2']);
+
+        $this->container->set('list1', $listener1 = new MyListener());
+        $this->container->set('sub1', $subscriber1 = new MySubscriber(['foo']));
+        $this->container->set('sub2', $subscriber2 = new MySubscriber(['foo']));
+
+        $this->assertSame([$subscriber1, $listener1, $subscriber2], array_values($this->evm->getListeners('foo')));
+    }
+
     public function testDispatchEvent()
     {
         $this->evm = new ContainerAwareEventManager($this->container, ['lazy4']);
+
+        $this->container->set('lazy4', $subscriber1 = new MySubscriber(['foo']));
+        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
 
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
@@ -40,10 +57,8 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('lazy3', $listener5 = new MyListener());
         $this->evm->addEventListener('foo', $listener5 = new MyListener());
         $this->evm->addEventListener('bar', $listener5);
-        $this->container->set('lazy4', $subscriber1 = new MySubscriber(['foo']));
         $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
 
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
         $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
@@ -72,8 +87,13 @@ class ContainerAwareEventManagerTest extends TestCase
     {
         $this->evm = new ContainerAwareEventManager($this->container, ['lazy7']);
 
+        $this->container->set('lazy7', $subscriber1 = new MySubscriber(['foo']));
+        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
+
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
+        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
+
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
         $this->container->set('lazy2', $listener3 = new MyListener());
         $this->evm->addEventListener('bar', 'lazy2');
@@ -81,10 +101,8 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('lazy3', $listener5 = new MyListener());
         $this->evm->addEventListener('foo', $listener5 = new MyListener());
         $this->evm->addEventListener('bar', $listener5);
-        $this->container->set('lazy7', $subscriber1 = new MySubscriber(['foo']));
         $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
 
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
         $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
@@ -146,20 +164,37 @@ class ContainerAwareEventManagerTest extends TestCase
 
     public function testGetListenersForEvent()
     {
+        $this->evm = new ContainerAwareEventManager($this->container, ['lazy2']);
+
         $this->container->set('lazy', $listener1 = new MyListener());
+        $this->container->set('lazy2', $subscriber1 = new MySubscriber(['foo']));
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
-        $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
+        $this->assertSame([$subscriber1, $listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetListeners()
     {
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.2: Calling "Symfony\Bridge\Doctrine\ContainerAwareEventManager::getListeners()" without an event name is deprecated. Call "getAllListeners()" instead.');
+
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners()['foo']));
+    }
+
+    public function testGetAllListeners()
+    {
+        $this->container->set('lazy', $listener1 = new MyListener());
+        $this->evm->addEventListener('foo', 'lazy');
+        $this->evm->addEventListener('foo', $listener2 = new MyListener());
+
+        $this->assertSame([$listener1, $listener2], array_values($this->evm->getAllListeners()['foo']));
     }
 
     public function testRemoveEventListener()

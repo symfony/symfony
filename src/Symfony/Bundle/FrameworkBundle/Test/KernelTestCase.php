@@ -12,7 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -24,6 +26,7 @@ use Symfony\Contracts\Service\ResetInterface;
 abstract class KernelTestCase extends TestCase
 {
     use MailerAssertionsTrait;
+    use NotificationAssertionsTrait;
 
     protected static $class;
 
@@ -32,29 +35,21 @@ abstract class KernelTestCase extends TestCase
      */
     protected static $kernel;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected static $container;
-
     protected static $booted = false;
-
-    private static $kernelContainer;
 
     protected function tearDown(): void
     {
         static::ensureKernelShutdown();
+        static::$class = null;
         static::$kernel = null;
         static::$booted = false;
     }
 
     /**
-     * @return string The Kernel class name
-     *
      * @throws \RuntimeException
      * @throws \LogicException
      */
-    protected static function getKernelClass()
+    protected static function getKernelClass(): string
     {
         if (!isset($_SERVER['KERNEL_CLASS']) && !isset($_ENV['KERNEL_CLASS'])) {
             throw new \LogicException(sprintf('You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel in phpunit.xml / phpunit.xml.dist or override the "%1$s::createKernel()" or "%1$s::getKernelClass()" method.', static::class));
@@ -69,21 +64,40 @@ abstract class KernelTestCase extends TestCase
 
     /**
      * Boots the Kernel for this test.
-     *
-     * @return KernelInterface A KernelInterface instance
      */
-    protected static function bootKernel(array $options = [])
+    protected static function bootKernel(array $options = []): KernelInterface
     {
         static::ensureKernelShutdown();
 
-        static::$kernel = static::createKernel($options);
-        static::$kernel->boot();
+        $kernel = static::createKernel($options);
+        $kernel->boot();
+        static::$kernel = $kernel;
         static::$booted = true;
 
-        self::$kernelContainer = $container = static::$kernel->getContainer();
-        static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
-
         return static::$kernel;
+    }
+
+    /**
+     * Provides a dedicated test container with access to both public and private
+     * services. The container will not include private services that have been
+     * inlined or removed. Private services will be removed when they are not
+     * used by other services.
+     *
+     * Using this method is the best way to get a container from your test code.
+     *
+     * @return Container
+     */
+    protected static function getContainer(): ContainerInterface
+    {
+        if (!static::$booted) {
+            static::bootKernel();
+        }
+
+        try {
+            return self::$kernel->getContainer()->get('test.service_container');
+        } catch (ServiceNotFoundException $e) {
+            throw new \LogicException('Could not find service "test.service_container". Try updating the "framework.test" config to "true".', 0, $e);
+        }
     }
 
     /**
@@ -93,10 +107,8 @@ abstract class KernelTestCase extends TestCase
      *
      *  * environment
      *  * debug
-     *
-     * @return KernelInterface A KernelInterface instance
      */
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         if (null === static::$class) {
             static::$class = static::getKernelClass();
@@ -131,14 +143,14 @@ abstract class KernelTestCase extends TestCase
     protected static function ensureKernelShutdown()
     {
         if (null !== static::$kernel) {
+            static::$kernel->boot();
+            $container = static::$kernel->getContainer();
             static::$kernel->shutdown();
             static::$booted = false;
-        }
 
-        if (self::$kernelContainer instanceof ResetInterface) {
-            self::$kernelContainer->reset();
+            if ($container instanceof ResetInterface) {
+                $container->reset();
+            }
         }
-
-        static::$container = self::$kernelContainer = null;
     }
 }

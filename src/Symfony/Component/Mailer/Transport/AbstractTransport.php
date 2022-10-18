@@ -11,37 +11,39 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Event\FailedMessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AbstractTransport implements TransportInterface
 {
-    private $dispatcher;
-    private $logger;
-    private $rate = 0;
-    private $lastSent = 0;
+    private ?EventDispatcherInterface $dispatcher;
+    private LoggerInterface $logger;
+    private float $rate = 0;
+    private float $lastSent = 0;
 
     public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
-        $this->logger = $logger ?: new NullLogger();
+        $this->dispatcher = $dispatcher;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
      * Sets the maximum number of messages to send per second (0 to disable).
+     *
+     * @return $this
      */
-    public function setMaxPerSecond(float $rate): self
+    public function setMaxPerSecond(float $rate): static
     {
         if (0 >= $rate) {
             $rate = 0;
@@ -58,18 +60,36 @@ abstract class AbstractTransport implements TransportInterface
         $message = clone $message;
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
 
-        if (null !== $this->dispatcher) {
+        try {
+            if (!$this->dispatcher) {
+                $sentMessage = new SentMessage($message, $envelope);
+                $this->doSend($sentMessage);
+
+                return $sentMessage;
+            }
+
             $event = new MessageEvent($message, $envelope, (string) $this);
             $this->dispatcher->dispatch($event);
             $envelope = $event->getEnvelope();
+            $message = $event->getMessage();
+
+            $sentMessage = new SentMessage($message, $envelope);
+
+            try {
+                $this->doSend($sentMessage);
+            } catch (\Throwable $error) {
+                $this->dispatcher->dispatch(new FailedMessageEvent($message, $error));
+                $this->checkThrottling();
+
+                throw $error;
+            }
+
+            $this->dispatcher->dispatch(new SentMessageEvent($sentMessage));
+
+            return $sentMessage;
+        } finally {
+            $this->checkThrottling();
         }
-
-        $message = new SentMessage($message, $envelope);
-        $this->doSend($message);
-
-        $this->checkThrottling();
-
-        return $message;
     }
 
     abstract protected function doSend(SentMessage $message): void;

@@ -33,7 +33,6 @@ class FilesystemAdapterTest extends AdapterTestCase
     protected function isPruned(CacheItemPoolInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
-        $getFileMethod->setAccessible(true);
 
         return !file_exists($getFileMethod->invoke($cache, $name));
     }

@@ -12,11 +12,13 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -24,10 +26,9 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 abstract class AnnotationLoaderTest extends TestCase
 {
-    /**
-     * @var AnnotationLoader
-     */
-    private $loader;
+    use ContextMappingTestTrait;
+
+    protected AnnotationLoader $loader;
 
     protected function setUp(): void
     {
@@ -114,7 +115,69 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
     }
 
+    public function testLoadContexts()
+    {
+        $this->assertLoadedContexts($this->getNamespace().'\ContextDummy', $this->getNamespace().'\ContextDummyParent');
+    }
+
+    public function testLoadContextsPropertiesPromoted()
+    {
+        $this->assertLoadedContexts($this->getNamespace().'\ContextDummyPromotedProperties', $this->getNamespace().'\ContextDummyParent');
+    }
+
+    public function testThrowsOnContextOnInvalidMethod()
+    {
+        $class = $this->getNamespace().'\BadMethodContextDummy';
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', $class));
+
+        $loader = $this->getLoaderForContextMapping();
+
+        $classMetadata = new ClassMetadata($class);
+
+        $loader->loadClassMetadata($classMetadata);
+    }
+
+    public function testCanHandleUnrelatedIgnoredMethods()
+    {
+        $class = $this->getNamespace().'\Entity45016';
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', $class));
+
+        $metadata = new ClassMetadata($class);
+        $loader = $this->getLoaderForContextMapping();
+
+        $loader->loadClassMetadata($metadata);
+    }
+
+    public function testIgnoreGetterWirhRequiredParameterIfIgnoreAnnotationIsUsed()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetter');
+        $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
+
+        $attributes = $classMetadata->getAttributesMetadata();
+        self::assertArrayNotHasKey('extraValue', $attributes);
+        self::assertArrayHasKey('extraValue2', $attributes);
+    }
+
+    public function testIgnoreGetterWirhRequiredParameterIfIgnoreAnnotationIsNotUsed()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations');
+        $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
+
+        $attributes = $classMetadata->getAttributesMetadata();
+        self::assertArrayNotHasKey('extraValue', $attributes);
+        self::assertArrayHasKey('extraValue2', $attributes);
+    }
+
     abstract protected function createLoader(): AnnotationLoader;
 
     abstract protected function getNamespace(): string;
+
+    protected function getLoaderForContextMapping(): LoaderInterface
+    {
+        return $this->loader;
+    }
 }

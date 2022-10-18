@@ -22,13 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TestServiceContainerWeakRefPass implements CompilerPassInterface
 {
-    private $privateTagName;
-
-    public function __construct(string $privateTagName = 'container.private')
-    {
-        $this->privateTagName = $privateTagName;
-    }
-
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('test.private_services_locator')) {
@@ -40,7 +33,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         $hasErrors = method_exists(Definition::class, 'hasErrors') ? 'hasErrors' : 'getErrors';
 
         foreach ($definitions as $id => $definition) {
-            if ($id && '.' !== $id[0] && (!$definition->isPublic() || $definition->isPrivate() || $definition->hasTag($this->privateTagName)) && !$definition->$hasErrors() && !$definition->isAbstract()) {
+            if ($id && '.' !== $id[0] && (!$definition->isPublic() || $definition->isPrivate() || $definition->hasTag('container.private')) && !$definition->$hasErrors() && !$definition->isAbstract()) {
                 $privateServices[$id] = new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE);
             }
         }

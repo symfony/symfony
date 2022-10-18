@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpClient\Internal;
 
 use Http\Client\Exception\NetworkException;
+use Http\Promise\Promise;
+use Psr\Http\Message\RequestInterface as Psr7RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -28,11 +30,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class HttplugWaitLoop
 {
-    private $client;
-    private $promisePool;
-    private $responseFactory;
-    private $streamFactory;
+    private HttpClientInterface $client;
+    private ?\SplObjectStorage $promisePool;
+    private ResponseFactoryInterface $responseFactory;
+    private StreamFactoryInterface $streamFactory;
 
+    /**
+     * @param \SplObjectStorage<ResponseInterface, array{Psr7RequestInterface, Promise}>|null $promisePool
+     */
     public function __construct(HttpClientInterface $client, ?\SplObjectStorage $promisePool, ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory)
     {
         $this->client = $client;
@@ -47,7 +52,7 @@ final class HttplugWaitLoop
             return 0;
         }
 
-        $guzzleQueue = \GuzzleHttp\Promise\queue();
+        $guzzleQueue = \GuzzleHttp\Promise\Utils::queue();
 
         if (0.0 === $remainingDuration = $maxDuration) {
             $idleTimeout = 0.0;

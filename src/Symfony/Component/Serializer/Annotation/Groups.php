@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * Annotation class for @Groups().
  *
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"PROPERTY", "METHOD"})
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -27,35 +28,30 @@ class Groups
     /**
      * @var string[]
      */
-    private $groups;
+    private array $groups;
 
     /**
-     * @throws InvalidArgumentException
+     * @param string|string[] $groups
      */
-    public function __construct(array $groups)
+    public function __construct(string|array $groups)
     {
-        if (isset($groups['value'])) {
-            $groups = (array) $groups['value'];
-        }
-        if (empty($groups)) {
+        $this->groups = (array) $groups;
+
+        if (!$this->groups) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', static::class));
         }
 
-        foreach ($groups as $group) {
-            if (!\is_string($group)) {
-                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of strings.', static::class));
+        foreach ($this->groups as $group) {
+            if (!\is_string($group) || '' === $group) {
+                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of non-empty strings.', static::class));
             }
         }
-
-        $this->groups = $groups;
     }
 
     /**
-     * Gets groups.
-     *
      * @return string[]
      */
-    public function getGroups()
+    public function getGroups(): array
     {
         return $this->groups;
     }

@@ -156,4 +156,34 @@ EOF;
             null
         );
     }
+
+    public function testRetrievedPropertyPathIsAStringEvenIfNotSet()
+    {
+        self::assertSame(
+            '',
+            (new ConstraintViolation(
+                'irrelevant',
+                '',
+                [],
+                'irrelevant',
+                null,
+                null
+            ))->getPropertyPath()
+        );
+    }
+
+    public function testRetrievedMessageTemplateIsAStringEvenIfNotSet()
+    {
+        self::assertSame(
+            '',
+            (new ConstraintViolation(
+                'irrelevant',
+                null,
+                [],
+                'irrelevant',
+                'irrelevant',
+                null
+            ))->getMessageTemplate()
+        );
+    }
 }

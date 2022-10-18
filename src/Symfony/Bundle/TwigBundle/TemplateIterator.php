@@ -20,53 +20,57 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
+ * @implements \IteratorAggregate<int, string>
  */
 class TemplateIterator implements \IteratorAggregate
 {
-    private $kernel;
-    private $templates;
-    private $paths;
-    private $defaultPath;
+    private KernelInterface $kernel;
+    private \Traversable $templates;
+    private array $paths;
+    private ?string $defaultPath;
+    private array $namePatterns;
 
     /**
-     * @param array       $paths       Additional Twig paths to warm
-     * @param string|null $defaultPath The directory where global templates can be stored
+     * @param array       $paths        Additional Twig paths to warm
+     * @param string|null $defaultPath  The directory where global templates can be stored
+     * @param string[]    $namePatterns Pattern of file names
      */
-    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null)
+    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null, array $namePatterns = [])
     {
         $this->kernel = $kernel;
         $this->paths = $paths;
         $this->defaultPath = $defaultPath;
+        $this->namePatterns = $namePatterns;
     }
 
     public function getIterator(): \Traversable
     {
-        if (null !== $this->templates) {
+        if (isset($this->templates)) {
             return $this->templates;
         }
 
-        $templates = null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles']) : [];
+        $templates = null !== $this->defaultPath ? [$this->findTemplatesInDirectory($this->defaultPath, null, ['bundles'])] : [];
 
         foreach ($this->kernel->getBundles() as $bundle) {
             $name = $bundle->getName();
-            if ('Bundle' === substr($name, -6)) {
+            if (str_ends_with($name, 'Bundle')) {
                 $name = substr($name, 0, -6);
             }
 
             $bundleTemplatesDir = is_dir($bundle->getPath().'/Resources/views') ? $bundle->getPath().'/Resources/views' : $bundle->getPath().'/templates';
 
-            $templates = array_merge(
-                $templates,
-                $this->findTemplatesInDirectory($bundleTemplatesDir, $name),
-                null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name) : []
-            );
+            $templates[] = $this->findTemplatesInDirectory($bundleTemplatesDir, $name);
+            if (null !== $this->defaultPath) {
+                $templates[] = $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name);
+            }
         }
 
         foreach ($this->paths as $dir => $namespace) {
-            $templates = array_merge($templates, $this->findTemplatesInDirectory($dir, $namespace));
+            $templates[] = $this->findTemplatesInDirectory($dir, $namespace);
         }
 
-        return $this->templates = new \ArrayIterator(array_unique($templates));
+        return $this->templates = new \ArrayIterator(array_unique(array_merge([], ...$templates)));
     }
 
     /**
@@ -81,7 +85,7 @@ class TemplateIterator implements \IteratorAggregate
         }
 
         $templates = [];
-        foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs) as $file) {
+        foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs)->name($this->namePatterns) as $file) {
             $templates[] = (null !== $namespace ? '@'.$namespace.'/' : '').str_replace('\\', '/', $file->getRelativePathname());
         }
 

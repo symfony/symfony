@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,8 +37,10 @@ class KernelTest extends TestCase
 {
     protected function tearDown(): void
     {
-        $fs = new Filesystem();
-        $fs->remove(__DIR__.'/Fixtures/var');
+        try {
+            (new Filesystem())->remove(__DIR__.'/Fixtures/var');
+        } catch (IOException $e) {
+        }
     }
 
     public function testConstructor()
@@ -50,6 +53,14 @@ class KernelTest extends TestCase
         $this->assertEquals($debug, $kernel->isDebug());
         $this->assertFalse($kernel->isBooted());
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
+    }
+
+    public function testEmptyEnv()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
+
+        new KernelForTest('', false);
     }
 
     public function testClone()
@@ -187,7 +198,7 @@ class KernelTest extends TestCase
 
     public function testHandleCallsHandleOnHttpKernel()
     {
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
         $request = new Request();
 
@@ -209,7 +220,7 @@ class KernelTest extends TestCase
 
     public function testHandleBootsTheKernel()
     {
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
         $request = new Request();
 
@@ -473,7 +484,7 @@ EOF
 
     public function testKernelReset()
     {
-        (new Filesystem())->remove(__DIR__.'/Fixtures/var/cache');
+        $this->tearDown();
 
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
@@ -505,17 +516,17 @@ EOF
                 $container->setParameter('test.extension-registered', true);
             }
 
-            public function getNamespace()
+            public function getNamespace(): string
             {
                 return '';
             }
 
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
 
-            public function getAlias()
+            public function getAlias(): string
             {
                 return 'test-extension';
             }
@@ -582,7 +593,7 @@ EOF
         $kernel->boot();
         $preReBoot = $kernel->getStartTime();
 
-        sleep(3600); //Intentionally large value to detect if ClockMock ever breaks
+        sleep(3600); // Intentionally large value to detect if ClockMock ever breaks
         $kernel->reboot(null);
 
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
@@ -629,7 +640,7 @@ EOF
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->willReturn(null === $bundleName ? \get_class($bundle) : $bundleName)
+            ->willReturn($bundleName ?? $bundle::class)
         ;
 
         $bundle
@@ -675,7 +686,7 @@ class TestKernel implements HttpKernelInterface
         $this->terminateCalled = true;
     }
 
-    public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true): Response
+    public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
     }
 

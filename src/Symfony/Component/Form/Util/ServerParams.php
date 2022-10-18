@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ServerParams
 {
-    private $requestStack;
+    private ?RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
     {
@@ -27,10 +27,8 @@ class ServerParams
 
     /**
      * Returns true if the POST max size has been exceeded in the request.
-     *
-     * @return bool
      */
-    public function hasPostMaxSizeBeenExceeded()
+    public function hasPostMaxSizeBeenExceeded(): bool
     {
         $contentLength = $this->getContentLength();
         $maxContentLength = $this->getPostMaxSize();
@@ -40,10 +38,8 @@ class ServerParams
 
     /**
      * Returns maximum post size in bytes.
-     *
-     * @return int|null The maximum post size in bytes
      */
-    public function getPostMaxSize()
+    public function getPostMaxSize(): int|float|null
     {
         $iniMax = strtolower($this->getNormalizedIniPostMaxSize());
 
@@ -52,9 +48,9 @@ class ServerParams
         }
 
         $max = ltrim($iniMax, '+');
-        if (0 === strpos($max, '0x')) {
+        if (str_starts_with($max, '0x')) {
             $max = \intval($max, 16);
-        } elseif (0 === strpos($max, '0')) {
+        } elseif (str_starts_with($max, '0')) {
             $max = \intval($max, 8);
         } else {
             $max = (int) $max;
@@ -62,11 +58,11 @@ class ServerParams
 
         switch (substr($iniMax, -1)) {
             case 't': $max *= 1024;
-            // no break
+                // no break
             case 'g': $max *= 1024;
-            // no break
+                // no break
             case 'm': $max *= 1024;
-            // no break
+                // no break
             case 'k': $max *= 1024;
         }
 
@@ -75,20 +71,16 @@ class ServerParams
 
     /**
      * Returns the normalized "post_max_size" ini setting.
-     *
-     * @return string
      */
-    public function getNormalizedIniPostMaxSize()
+    public function getNormalizedIniPostMaxSize(): string
     {
-        return strtoupper(trim(ini_get('post_max_size')));
+        return strtoupper(trim(\ini_get('post_max_size')));
     }
 
     /**
      * Returns the content length of the request.
-     *
-     * @return mixed The request content length
      */
-    public function getContentLength()
+    public function getContentLength(): mixed
     {
         if (null !== $this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {
             return $request->server->get('CONTENT_LENGTH');

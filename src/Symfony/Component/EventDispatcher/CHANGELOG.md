@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `LegacyEventDispatcherProxy`
+
+5.4
+---
+
+ * Allow `#[AsEventListener]` attribute on methods
+
+5.3
+---
+
+ * Add `#[AsEventListener]` attribute for declaring listeners on PHP 8
+
 5.1.0
 -----
 
@@ -43,21 +58,21 @@ CHANGELOG
 3.4.0
 -----
 
-  * Implementing `TraceableEventDispatcherInterface` without the `reset()` method has been deprecated.
+ * Implementing `TraceableEventDispatcherInterface` without the `reset()` method has been deprecated.
 
 3.3.0
 -----
 
-  * The ContainerAwareEventDispatcher class has been deprecated. Use EventDispatcher with closure factories instead.
+ * The ContainerAwareEventDispatcher class has been deprecated. Use EventDispatcher with closure factories instead.
 
 3.0.0
 -----
 
-  * The method `getListenerPriority($eventName, $listener)` has been added to the
-    `EventDispatcherInterface`.
-  * The methods `Event::setDispatcher()`, `Event::getDispatcher()`, `Event::setName()`
-    and `Event::getName()` have been removed.
-    The event dispatcher and the event name are passed to the listener call.
+ * The method `getListenerPriority($eventName, $listener)` has been added to the
+   `EventDispatcherInterface`.
+ * The methods `Event::setDispatcher()`, `Event::getDispatcher()`, `Event::setName()`
+   and `Event::getName()` have been removed.
+   The event dispatcher and the event name are passed to the listener call.
 
 2.5.0
 -----

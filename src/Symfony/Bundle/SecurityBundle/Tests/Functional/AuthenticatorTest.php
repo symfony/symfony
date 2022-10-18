@@ -14,9 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class AuthenticatorTest extends AbstractWebTestCase
 {
     /**
+     * @group legacy
+     *
      * @dataProvider provideEmails
      */
-    public function testGlobalUserProvider($email)
+    public function testLegacyGlobalUserProvider($email)
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'implicit_user_provider.yml']);
 
@@ -40,7 +42,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         if ($withinFirewall) {
             $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
         } else {
-            $this->assertJsonStringEqualsJsonString('{"error":"Username could not be found."}', $client->getResponse()->getContent());
+            $this->assertJsonStringEqualsJsonString('{"error":"Invalid credentials."}', $client->getResponse()->getContent());
         }
     }
 
@@ -62,5 +64,42 @@ class AuthenticatorTest extends AbstractWebTestCase
     {
         yield ['jane@example.org', true];
         yield ['john@example.org', false];
+    }
+
+    /**
+     * @dataProvider provideEmailsWithFirewalls
+     */
+    public function testLoginUsersWithMultipleFirewalls(string $username, string $firewallContext)
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'multiple_firewall_user_provider.yml']);
+        $client->request('GET', '/main/login/check');
+
+        $client->request('POST', '/'.$firewallContext.'/login/check', [
+            '_username' => $username,
+            '_password' => 'test',
+        ]);
+        $this->assertResponseRedirects('/'.$firewallContext.'/user_profile');
+
+        $client->request('GET', '/'.$firewallContext.'/user_profile');
+        $this->assertEquals('Welcome '.$username.'!', $client->getResponse()->getContent());
+    }
+
+    public function provideEmailsWithFirewalls()
+    {
+        yield ['jane@example.org', 'main'];
+        yield ['john@example.org', 'custom'];
+    }
+
+    public function testMultipleFirewalls()
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'multiple_firewalls.yml']);
+
+        $client->request('POST', '/firewall1/login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'test',
+        ]);
+
+        $client->request('GET', '/firewall2/profile');
+        $this->assertResponseRedirects('http://localhost/login');
     }
 }

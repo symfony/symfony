@@ -29,11 +29,11 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private $store;
-    private $key;
-    private $ttl;
-    private $autoRelease;
-    private $dirty = false;
+    private PersistingStoreInterface $store;
+    private Key $key;
+    private ?float $ttl;
+    private bool $autoRelease;
+    private bool $dirty = false;
 
     /**
      * @param float|null $ttl         Maximum expected lock duration in seconds
@@ -49,7 +49,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -71,9 +71,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         $this->release();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquire(bool $blocking = false): bool
     {
         $this->key->resetLifetime();
@@ -84,7 +81,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
                         try {
                             $this->store->save($this->key);
                             break;
-                        } catch (LockConflictedException $e) {
+                        } catch (LockConflictedException) {
                             usleep((100 + random_int(-10, 10)) * 1000);
                         }
                     }
@@ -105,7 +102,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
             if ($this->key->isExpired()) {
                 try {
                     $this->release();
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     // swallow exception to not hide the original issue
                 }
                 throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $this->key));
@@ -127,9 +124,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquireRead(bool $blocking = false): bool
     {
         $this->key->resetLifetime();
@@ -145,7 +139,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
                         try {
                             $this->store->saveRead($this->key);
                             break;
-                        } catch (LockConflictedException $e) {
+                        } catch (LockConflictedException) {
                             usleep((100 + random_int(-10, 10)) * 1000);
                         }
                     }
@@ -166,7 +160,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
             if ($this->key->isExpired()) {
                 try {
                     $this->release();
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     // swallow exception to not hide the original issue
                 }
                 throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $this->key));
@@ -188,9 +182,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refresh(float $ttl = null)
     {
         if (null === $ttl) {
@@ -208,7 +199,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
             if ($this->key->isExpired()) {
                 try {
                     $this->release();
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     // swallow exception to not hide the original issue
                 }
                 throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $this->key));
@@ -225,17 +216,11 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function release()
     {
         try {
@@ -251,23 +236,19 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
             if ($this->store->exists($this->key)) {
                 throw new LockReleasingException(sprintf('Failed to release the "%s" lock, the resource is still locked.', $this->key));
             }
+
+            $this->logger->debug('Successfully released the "{resource}" lock.', ['resource' => $this->key]);
         } catch (LockReleasingException $e) {
             $this->logger->notice('Failed to release the "{resource}" lock.', ['resource' => $this->key]);
             throw $e;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isExpired(): bool
     {
         return $this->key->isExpired();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemainingLifetime(): ?float
     {
         return $this->key->getRemainingLifetime();

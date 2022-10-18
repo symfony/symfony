@@ -12,7 +12,6 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\Store\ZookeeperStore;
 
@@ -20,15 +19,13 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
  *
  * @requires extension zookeeper
+ * @group integration
  */
 class ZookeeperStoreTest extends AbstractStoreTest
 {
     use UnserializableTestTrait;
 
-    /**
-     * @return ZookeeperStore
-     */
-    public function getStore(): PersistingStoreInterface
+    public function getStore(): ZookeeperStore
     {
         $zookeeper_server = getenv('ZOOKEEPER_HOST').':2181';
 

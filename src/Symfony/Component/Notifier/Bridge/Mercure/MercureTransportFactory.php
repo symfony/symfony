@@ -11,53 +11,43 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mercure;
 
-use Symfony\Bundle\MercureBundle\MercureBundle;
-use Symfony\Component\Mercure\PublisherInterface;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Mercure\Exception\InvalidArgumentException;
+use Symfony\Component\Mercure\HubRegistry;
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
 final class MercureTransportFactory extends AbstractTransportFactory
 {
-    private $publisherLocator;
+    private HubRegistry $registry;
 
-    /**
-     * @param ServiceProviderInterface $publisherLocator A container that holds {@see PublisherInterface} instances
-     */
-    public function __construct(ServiceProviderInterface $publisherLocator)
+    public function __construct(HubRegistry $registry)
     {
         parent::__construct();
 
-        $this->publisherLocator = $publisherLocator;
+        $this->registry = $registry;
     }
 
-    /**
-     * @return MercureTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MercureTransport
     {
         if ('mercure' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'mercure', $this->getSupportedSchemes());
         }
 
-        $publisherId = $dsn->getHost();
-        if (!$this->publisherLocator->has($publisherId)) {
-            if (!class_exists(MercureBundle::class) && !$this->publisherLocator->getProvidedServices()) {
-                throw new LogicException('No publishers found. Did you forget to install the MercureBundle? Try running "composer require symfony/mercure-bundle".');
-            }
-
-            throw new LogicException(sprintf('"%s" not found. Did you mean one of: %s?', $publisherId, implode(', ', array_keys($this->publisherLocator->getProvidedServices()))));
-        }
-
+        $hubId = $dsn->getHost();
         $topic = $dsn->getOption('topic');
 
-        return new MercureTransport($this->publisherLocator->get($publisherId), $publisherId, $topic);
+        try {
+            $hub = $this->registry->getHub($hubId);
+        } catch (InvalidArgumentException) {
+            throw new IncompleteDsnException(sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
+        }
+
+        return new MercureTransport($hub, $hubId, $topic);
     }
 
     protected function getSupportedSchemes(): array

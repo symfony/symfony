@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,9 +28,9 @@ final class SinchTransport extends AbstractTransport
 {
     protected const HOST = 'sms.api.sinch.com';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
+    private string $accountSid;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $accountSid, string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -56,17 +57,25 @@ final class SinchTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/xms/v1/%s/batches', $this->getEndpoint(), $this->accountSid);
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => [$message->getPhone()],
                 'body' => $message->getSubject(),
             ],
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Sinch server.', $response, 0, $e);
+        }
+
+        if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $error['text'], $error['code']), $response);

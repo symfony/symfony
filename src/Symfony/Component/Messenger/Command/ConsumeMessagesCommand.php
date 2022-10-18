@@ -13,7 +13,10 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,6 +26,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
@@ -33,31 +37,32 @@ use Symfony\Component\Messenger\Worker;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+#[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
 class ConsumeMessagesCommand extends Command
 {
-    protected static $defaultName = 'messenger:consume';
-    protected static $defaultDescription = 'Consumes messages';
+    private RoutableMessageBus $routableBus;
+    private ContainerInterface $receiverLocator;
+    private EventDispatcherInterface $eventDispatcher;
+    private ?LoggerInterface $logger;
+    private array $receiverNames;
+    private ?ResetServicesListener $resetServicesListener;
+    private array $busIds;
+    private ?ContainerInterface $rateLimiterLocator;
 
-    private $routableBus;
-    private $receiverLocator;
-    private $logger;
-    private $receiverNames;
-    private $eventDispatcher;
-
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
+        $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->resetServicesListener = $resetServicesListener;
+        $this->busIds = $busIds;
+        $this->rateLimiterLocator = $rateLimiterLocator;
 
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $defaultReceiverName = 1 === \count($this->receiverNames) ? current($this->receiverNames) : null;
@@ -71,8 +76,9 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can handle new messages'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
+                new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
+                new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
 
@@ -104,14 +110,19 @@ to instead of trying to determine it automatically. This is required if the
 messages didn't originate from Messenger:
 
     <info>php %command.full_name% <receiver-name> --bus=event_bus</info>
+
+Use the --queues option to limit a receiver to only certain queues (only supported by some receivers):
+
+    <info>php %command.full_name% <receiver-name> --queues=fasttrack</info>
+
+Use the --no-reset option to prevent services resetting after each message (may lead to leaking services' state between messages):
+
+    <info>php %command.full_name% <receiver-name> --no-reset</info>
 EOF
             )
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
@@ -135,12 +146,10 @@ EOF
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $receivers = [];
+        $rateLimiters = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
                 $message = sprintf('The receiver "%s" does not exist.', $receiverName);
@@ -152,6 +161,13 @@ EOF
             }
 
             $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
+            if ($this->rateLimiterLocator?->has($receiverName)) {
+                $rateLimiters[$receiverName] = $this->rateLimiterLocator->get($receiverName);
+            }
+        }
+
+        if (null !== $this->resetServicesListener && !$input->getOption('no-reset')) {
+            $this->eventDispatcher->addSubscriber($this->resetServicesListener);
         }
 
         $stopsWhen = [];
@@ -170,7 +186,7 @@ EOF
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
         }
 
-        if ($timeLimit = $input->getOption('time-limit')) {
+        if (null !== ($timeLimit = $input->getOption('time-limit'))) {
             $stopsWhen[] = "been running for {$timeLimit}s";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }
@@ -194,21 +210,38 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
-        $worker->run([
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
+        $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
-        ]);
+        ];
+        if ($queues = $input->getOption('queues')) {
+            $options['queues'] = $queues;
+        }
+        $worker->run($options);
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('receivers')) {
+            $suggestions->suggestValues(array_diff($this->receiverNames, array_diff($input->getArgument('receivers'), [$input->getCompletionValue()])));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('bus')) {
+            $suggestions->suggestValues($this->busIds);
+        }
     }
 
     private function convertToBytes(string $memoryLimit): int
     {
         $memoryLimit = strtolower($memoryLimit);
         $max = ltrim($memoryLimit, '+');
-        if (0 === strpos($max, '0x')) {
+        if (str_starts_with($max, '0x')) {
             $max = \intval($max, 16);
-        } elseif (0 === strpos($max, '0')) {
+        } elseif (str_starts_with($max, '0')) {
             $max = \intval($max, 8);
         } else {
             $max = (int) $max;
@@ -216,11 +249,11 @@ EOF
 
         switch (substr(rtrim($memoryLimit, 'b'), -1)) {
             case 't': $max *= 1024;
-            // no break
+                // no break
             case 'g': $max *= 1024;
-            // no break
+                // no break
             case 'm': $max *= 1024;
-            // no break
+                // no break
             case 'k': $max *= 1024;
         }
 

@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -48,6 +50,15 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('    custom:', $tester->getDisplay());
     }
 
+    public function testDumpExtensionConfigWithoutBundle()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'test_dump']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('enabled:              true', $tester->getDisplay());
+    }
+
     public function testDumpAtPath()
     {
         $tester = $this->createCommandTester();
@@ -79,6 +90,23 @@ EOL
 
         $this->assertSame(1, $ret);
         $this->assertStringContainsString('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $this->application->add(new ConfigDumpReferenceCommand());
+        $tester = new CommandCompletionTester($this->application->get('config:dump-reference'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'name' => [[''], ['DefaultConfigTestBundle', 'default_config_test', 'ExtensionWithoutConfigTestBundle', 'extension_without_config_test', 'FrameworkBundle', 'framework', 'TestBundle', 'test']];
+        yield 'option --format' => [['--format', ''], ['yaml', 'xml']];
     }
 
     private function createCommandTester(): CommandTester

@@ -26,7 +26,6 @@ class RememberMeTokenTest extends TestCase
         $this->assertEquals('foo', $token->getSecret());
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertSame($user, $token->getUser());
-        $this->assertTrue($token->isAuthenticated());
     }
 
     public function testConstructorSecretCannotBeEmptyString()

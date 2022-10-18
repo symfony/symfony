@@ -12,7 +12,9 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
@@ -29,14 +31,17 @@ use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
  */
 class DebugCommandTest extends TestCase
 {
+    private $colSize;
+
     protected function setUp(): void
     {
+        $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
     }
 
     protected function tearDown(): void
     {
-        putenv('COLUMNS=');
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     public function testOutput()
@@ -162,5 +167,25 @@ TXT
 
         $tester = new CommandTester($command);
         $tester->execute(['bus' => 'unknown_bus'], ['decorated' => false]);
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandCompletionTester($application->get('debug:messenger'));
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'bus' => [
+            [''],
+            ['command_bus', 'query_bus'],
+        ];
     }
 }

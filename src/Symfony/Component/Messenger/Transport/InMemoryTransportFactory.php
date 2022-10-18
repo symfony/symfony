@@ -22,7 +22,7 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
     /**
      * @var InMemoryTransport[]
      */
-    private $createdTransports = [];
+    private array $createdTransports = [];
 
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
@@ -33,7 +33,7 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
 
     public function supports(string $dsn, array $options): bool
     {
-        return 0 === strpos($dsn, 'in-memory://');
+        return str_starts_with($dsn, 'in-memory://');
     }
 
     public function reset()
@@ -51,7 +51,7 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
         }
 
         return [
-            'serialize' => filter_var($query['serialize'] ?? false, \FILTER_VALIDATE_BOOLEAN),
+            'serialize' => filter_var($query['serialize'] ?? false, \FILTER_VALIDATE_BOOL),
         ];
     }
 }

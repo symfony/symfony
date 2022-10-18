@@ -193,6 +193,26 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertFalse($manager->isTokenValid(new CsrfToken('token_id', 'FOOBAR')));
     }
 
+    public function testTokenShouldNotTriggerDivisionByZero()
+    {
+        [$generator, $storage] = $this->getGeneratorAndStorage();
+        $manager = new CsrfTokenManager($generator, $storage);
+
+        // Scenario: the token that was returned is abc.def.ghi, and gets modified in the browser to abc..ghi
+
+        $storage->expects($this->once())
+            ->method('hasToken')
+            ->with('https-token_id')
+            ->willReturn(true);
+
+        $storage->expects($this->once())
+            ->method('getToken')
+            ->with('https-token_id')
+            ->willReturn('def');
+
+        $this->assertFalse($manager->isTokenValid(new CsrfToken('token_id', 'abc..ghi')));
+    }
+
     /**
      * @dataProvider getManagerGeneratorAndStorage
      */

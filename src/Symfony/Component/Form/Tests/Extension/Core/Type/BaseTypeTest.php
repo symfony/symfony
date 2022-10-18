@@ -25,14 +25,14 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassDisabledAsOption()
     {
-        $form = $this->factory->create($this->getTestedType(), null, ['disabled' => true]);
+        $form = $this->factory->create($this->getTestedType(), null, array_merge($this->getTestOptions(), ['disabled' => true]));
 
         $this->assertTrue($form->isDisabled());
     }
 
     public function testPassIdAndNameToView()
     {
-        $view = $this->factory->createNamed('name', $this->getTestedType())
+        $view = $this->factory->createNamed('name', $this->getTestedType(), null, $this->getTestOptions())
             ->createView();
 
         $this->assertEquals('name', $view->vars['id']);
@@ -42,7 +42,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testStripLeadingUnderscoresAndDigitsFromId()
     {
-        $view = $this->factory->createNamed('_09name', $this->getTestedType())
+        $view = $this->factory->createNamed('_09name', $this->getTestedType(), null, $this->getTestOptions())
             ->createView();
 
         $this->assertEquals('name', $view->vars['id']);
@@ -53,7 +53,7 @@ abstract class BaseTypeTest extends TypeTestCase
     public function testPassIdAndNameToViewWithParent()
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
-            ->add('child', $this->getTestedType())
+            ->add('child', $this->getTestedType(), $this->getTestOptions())
             ->getForm()
             ->createView();
 
@@ -66,7 +66,7 @@ abstract class BaseTypeTest extends TypeTestCase
     {
         $builder = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', FormTypeTest::TESTED_TYPE);
-        $builder->get('child')->add('grand_child', $this->getTestedType());
+        $builder->get('child')->add('grand_child', $this->getTestedType(), $this->getTestOptions());
         $view = $builder->getForm()->createView();
 
         $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
@@ -76,9 +76,9 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassTranslationDomainToView()
     {
-        $view = $this->factory->create($this->getTestedType(), null, [
+        $view = $this->factory->create($this->getTestedType(), null, array_merge($this->getTestOptions(), [
             'translation_domain' => 'domain',
-        ])
+        ]))
             ->createView();
 
         $this->assertSame('domain', $view->vars['translation_domain']);
@@ -90,7 +90,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'translation_domain' => 'domain',
             ])
-            ->add('child', $this->getTestedType())
+            ->add('child', $this->getTestedType(), $this->getTestOptions())
             ->getForm()
             ->createView();
 
@@ -103,9 +103,9 @@ abstract class BaseTypeTest extends TypeTestCase
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'translation_domain' => 'parent_domain',
             ])
-            ->add('child', $this->getTestedType(), [
+            ->add('child', $this->getTestedType(), array_merge($this->getTestOptions(), [
                 'translation_domain' => 'domain',
-            ])
+            ]))
             ->getForm()
             ->createView();
 
@@ -115,7 +115,7 @@ abstract class BaseTypeTest extends TypeTestCase
     public function testDefaultTranslationDomain()
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
-            ->add('child', $this->getTestedType())
+            ->add('child', $this->getTestedType(), $this->getTestOptions())
             ->getForm()
             ->createView();
 
@@ -126,9 +126,9 @@ abstract class BaseTypeTest extends TypeTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $view = $this->factory->create($this->getTestedType(), null, [
+        $view = $this->factory->create($this->getTestedType(), null, array_merge($this->getTestOptions(), [
             'label_translation_parameters' => ['%param%' => 'value'],
-        ])
+        ]))
             ->createView();
 
         $this->assertSame(['%param%' => 'value'], $view->vars['label_translation_parameters']);
@@ -138,9 +138,9 @@ abstract class BaseTypeTest extends TypeTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $view = $this->factory->create($this->getTestedType(), null, [
+        $view = $this->factory->create($this->getTestedType(), null, array_merge($this->getTestOptions(), [
             'attr_translation_parameters' => ['%param%' => 'value'],
-        ])
+        ]))
             ->createView();
 
         $this->assertSame(['%param%' => 'value'], $view->vars['attr_translation_parameters']);
@@ -154,7 +154,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'label_translation_parameters' => ['%param%' => 'value'],
             ])
-            ->add('child', $this->getTestedType())
+            ->add('child', $this->getTestedType(), $this->getTestOptions())
             ->getForm()
             ->createView();
 
@@ -169,7 +169,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'attr_translation_parameters' => ['%param%' => 'value'],
             ])
-            ->add('child', $this->getTestedType())
+            ->add('child', $this->getTestedType(), $this->getTestOptions())
             ->getForm()
             ->createView();
 
@@ -184,9 +184,9 @@ abstract class BaseTypeTest extends TypeTestCase
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'label_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
             ])
-            ->add('child', $this->getTestedType(), [
+            ->add('child', $this->getTestedType(), array_merge($this->getTestOptions(), [
                 'label_translation_parameters' => ['%override_param%' => 'child_value'],
-            ])
+            ]))
             ->getForm()
             ->createView();
 
@@ -201,9 +201,9 @@ abstract class BaseTypeTest extends TypeTestCase
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'attr_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
             ])
-            ->add('child', $this->getTestedType(), [
+            ->add('child', $this->getTestedType(), array_merge($this->getTestOptions(), [
                 'attr_translation_parameters' => ['%override_param%' => 'child_value'],
-            ])
+            ]))
             ->getForm()
             ->createView();
 
@@ -215,7 +215,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->requiresFeatureSet(403);
 
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
-            ->add('child', $this->getTestedType())
+            ->add('child', $this->getTestedType(), $this->getTestOptions())
             ->getForm()
             ->createView();
 
@@ -227,7 +227,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->requiresFeatureSet(403);
 
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
-            ->add('child', $this->getTestedType())
+            ->add('child', $this->getTestedType(), $this->getTestOptions())
             ->getForm()
             ->createView();
 
@@ -236,7 +236,10 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassLabelToView()
     {
-        $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, ['label' => 'My label'])
+        $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array_merge(
+            $this->getTestOptions(),
+            ['label' => 'My label']
+        ))
             ->createView();
 
         $this->assertSame('My label', $view->vars['label']);
@@ -244,7 +247,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassMultipartFalseToView()
     {
-        $view = $this->factory->create($this->getTestedType())
+        $view = $this->factory->create($this->getTestedType(), null, $this->getTestOptions())
             ->createView();
 
         $this->assertFalse($view->vars['multipart']);
@@ -252,7 +255,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
-        $form = $this->factory->create($this->getTestedType());
+        $form = $this->factory->create($this->getTestedType(), null, $this->getTestOptions());
         $form->submit(null);
 
         $this->assertSame($expected, $form->getData());
@@ -262,7 +265,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
     {
-        $builder = $this->factory->createBuilder($this->getTestedType());
+        $builder = $this->factory->createBuilder($this->getTestedType(), null, $this->getTestOptions());
 
         if ($builder->getCompound()) {
             $emptyData = [];
@@ -285,5 +288,10 @@ abstract class BaseTypeTest extends TypeTestCase
     protected function getTestedType()
     {
         return static::TESTED_TYPE;
+    }
+
+    protected function getTestOptions(): array
+    {
+        return [];
     }
 }

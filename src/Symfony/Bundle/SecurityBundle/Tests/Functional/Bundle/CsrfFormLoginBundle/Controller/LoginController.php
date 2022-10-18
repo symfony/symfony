@@ -51,10 +51,7 @@ class LoginController implements ServiceSubscriberInterface
         throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'form.factory' => FormFactoryInterface::class,

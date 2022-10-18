@@ -21,18 +21,18 @@ use Symfony\Component\Config\Exception\LoaderLoadException;
 abstract class Loader implements LoaderInterface
 {
     protected $resolver;
+    protected $env;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResolver()
+    public function __construct(string $env = null)
+    {
+        $this->env = $env;
+    }
+
+    public function getResolver(): LoaderResolverInterface
     {
         return $this->resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setResolver(LoaderResolverInterface $resolver)
     {
         $this->resolver = $resolver;
@@ -41,12 +41,9 @@ abstract class Loader implements LoaderInterface
     /**
      * Imports a resource.
      *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
      * @return mixed
      */
-    public function import($resource, string $type = null)
+    public function import(mixed $resource, string $type = null)
     {
         return $this->resolve($resource, $type)->load($resource, $type);
     }
@@ -54,14 +51,9 @@ abstract class Loader implements LoaderInterface
     /**
      * Finds a loader able to load an imported resource.
      *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
-     * @return $this|LoaderInterface
-     *
      * @throws LoaderLoadException If no loader is found
      */
-    public function resolve($resource, string $type = null)
+    public function resolve(mixed $resource, string $type = null): LoaderInterface
     {
         if ($this->supports($resource, $type)) {
             return $this;
@@ -70,7 +62,7 @@ abstract class Loader implements LoaderInterface
         $loader = null === $this->resolver ? false : $this->resolver->resolve($resource, $type);
 
         if (false === $loader) {
-            throw new LoaderLoadException($resource, null, null, null, $type);
+            throw new LoaderLoadException($resource, null, 0, null, $type);
         }
 
         return $loader;

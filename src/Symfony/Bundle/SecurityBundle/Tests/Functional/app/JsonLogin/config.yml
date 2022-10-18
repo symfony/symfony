@@ -2,11 +2,13 @@ imports:
     - { resource: ./../config/framework.yml }
 
 framework:
+    http_method_override: false
     serializer: ~
 
 security:
-    encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
+    enable_authenticator_manager: true
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
     providers:
         in_memory:

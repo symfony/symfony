@@ -36,9 +36,6 @@ class TranslationFilesTest extends TestCase
     {
         $document = new \DOMDocument();
         $document->loadXML(file_get_contents($filePath));
-        if (\LIBXML_VERSION < 20900) {
-            libxml_disable_entity_loader(true);
-        }
 
         $errors = XliffUtils::validateSchema($document);
 

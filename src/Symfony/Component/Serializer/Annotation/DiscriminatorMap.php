@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * Annotation class for @DiscriminatorMap().
  *
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"CLASS"})
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -24,30 +25,10 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap
 {
-    /**
-     * @var string
-     */
-    private $typeProperty;
-
-    /**
-     * @var array
-     */
-    private $mapping;
-
-    /**
-     * @param string|array $typeProperty
-     *
-     * @throws InvalidArgumentException
-     */
-    public function __construct($typeProperty, array $mapping = null)
-    {
-        if (\is_array($typeProperty)) {
-            $mapping = $typeProperty['mapping'] ?? null;
-            $typeProperty = $typeProperty['typeProperty'] ?? null;
-        } elseif (!\is_string($typeProperty)) {
-            throw new \TypeError(sprintf('"%s": Argument $typeProperty was expected to be a string or array, got "%s".', __METHOD__, get_debug_type($typeProperty)));
-        }
-
+    public function __construct(
+        private string $typeProperty,
+        private array $mapping,
+    ) {
         if (empty($typeProperty)) {
             throw new InvalidArgumentException(sprintf('Parameter "typeProperty" of annotation "%s" cannot be empty.', static::class));
         }
@@ -55,9 +36,6 @@ class DiscriminatorMap
         if (empty($mapping)) {
             throw new InvalidArgumentException(sprintf('Parameter "mapping" of annotation "%s" cannot be empty.', static::class));
         }
-
-        $this->typeProperty = $typeProperty;
-        $this->mapping = $mapping;
     }
 
     public function getTypeProperty(): string

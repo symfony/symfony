@@ -16,10 +16,9 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/cache": "^4.4|^5.0",
-        "symfony/polyfill-php80": "^1.15",
-        "symfony/service-contracts": "^1.1|^2"
+        "php": ">=8.1",
+        "symfony/cache": "^5.4|^6.0",
+        "symfony/service-contracts": "^1.1|^2|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ExpressionLanguage\\": "" },

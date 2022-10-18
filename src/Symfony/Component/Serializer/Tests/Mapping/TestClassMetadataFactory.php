@@ -33,6 +33,10 @@ class TestClassMetadataFactory
         $bar->addGroup('name_converter');
         $expected->addAttributeMetadata($bar);
 
+        $quux = new AttributeMetadata('quux');
+        $quux->addGroup('d');
+        $expected->addAttributeMetadata($quux);
+
         $fooBar = new AttributeMetadata('fooBar');
         $fooBar->addGroup('a');
         $fooBar->addGroup('b');

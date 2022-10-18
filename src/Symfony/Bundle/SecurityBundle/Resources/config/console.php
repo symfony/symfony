@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
+use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('security.command.user_password_encoder', UserPasswordEncoderCommand::class)
+        ->set('security.command.user_password_hash', UserPasswordHashCommand::class)
             ->args([
-                service('security.encoder_factory'),
-                abstract_arg('encoders user classes'),
+                service('security.password_hasher_factory'),
+                abstract_arg('list of user classes'),
             ])
             ->tag('console.command')
     ;

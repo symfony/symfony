@@ -18,17 +18,17 @@ use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormConfigBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 class FormType extends BaseType
 {
-    private $dataMapper;
+    private DataMapper $dataMapper;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -38,9 +38,6 @@ class FormType extends BaseType
         ]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
@@ -66,18 +63,9 @@ class FormType extends BaseType
             $builder->addEventSubscriber(new TrimListener());
         }
 
-        if (!method_exists($builder, 'setIsEmptyCallback')) {
-            trigger_deprecation('symfony/form', '5.1', 'Not implementing the "%s::setIsEmptyCallback()" method in "%s" is deprecated.', FormConfigBuilderInterface::class, get_debug_type($builder));
-
-            return;
-        }
-
         $builder->setIsEmptyCallback($options['is_empty_callback']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         parent::buildView($view, $form, $options);
@@ -96,6 +84,16 @@ class FormType extends BaseType
             }
 
             $helpTranslationParameters = array_merge($view->parent->vars['help_translation_parameters'], $helpTranslationParameters);
+
+            $rootFormAttrOption = $form->getRoot()->getConfig()->getOption('form_attr');
+            if ($options['form_attr'] || $rootFormAttrOption) {
+                $view->vars['attr']['form'] = \is_string($rootFormAttrOption) ? $rootFormAttrOption : $form->getRoot()->getName();
+                if (empty($view->vars['attr']['form'])) {
+                    throw new LogicException('"form_attr" option must be a string identifier on root form when it has no id.');
+                }
+            }
+        } elseif (\is_string($options['form_attr'])) {
+            $view->vars['id'] = $options['form_attr'];
         }
 
         $formConfig = $form->getConfig();
@@ -105,7 +103,6 @@ class FormType extends BaseType
             'value' => $form->getViewData(),
             'data' => $form->getNormData(),
             'required' => $form->isRequired(),
-            'size' => null,
             'label_attr' => $options['label_attr'],
             'help' => $options['help'],
             'help_attr' => $options['help_attr'],
@@ -118,9 +115,6 @@ class FormType extends BaseType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $multipart = false;
@@ -135,9 +129,6 @@ class FormType extends BaseType
         $view->vars['multipart'] = $multipart;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -210,34 +201,30 @@ class FormType extends BaseType
             'is_empty_callback' => null,
             'getter' => null,
             'setter' => null,
+            'form_attr' => false,
         ]);
 
         $resolver->setAllowedTypes('label_attr', 'array');
         $resolver->setAllowedTypes('action', 'string');
         $resolver->setAllowedTypes('upload_max_size_message', ['callable']);
-        $resolver->setAllowedTypes('help', ['string', 'null']);
+        $resolver->setAllowedTypes('help', ['string', 'null', TranslatableInterface::class]);
         $resolver->setAllowedTypes('help_attr', 'array');
         $resolver->setAllowedTypes('help_html', 'bool');
         $resolver->setAllowedTypes('is_empty_callback', ['null', 'callable']);
         $resolver->setAllowedTypes('getter', ['null', 'callable']);
         $resolver->setAllowedTypes('setter', ['null', 'callable']);
+        $resolver->setAllowedTypes('form_attr', ['bool', 'string']);
 
         $resolver->setInfo('getter', 'A callable that accepts two arguments (the view data and the current form field) and must return a value.');
         $resolver->setInfo('setter', 'A callable that accepts three arguments (a reference to the view data, the submitted value and the current form field).');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'form';
     }

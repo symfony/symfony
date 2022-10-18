@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -28,10 +29,9 @@ final class FirebaseTransport extends AbstractTransport
 {
     protected const HOST = 'fcm.googleapis.com/fcm/send';
 
-    /** @var string */
-    private $token;
+    private string $token;
 
-    public function __construct(string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->client = $client;
@@ -63,8 +63,10 @@ final class FirebaseTransport extends AbstractTransport
         if (null === $options['to']) {
             throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
-        $options['notification'] = $options['notification'] ?? [];
+        $options['notification'] ??= [];
         $options['notification']['body'] = $message->getSubject();
+        $options['data'] ??= [];
+
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Authorization' => sprintf('key=%s', $this->token),
@@ -72,22 +74,30 @@ final class FirebaseTransport extends AbstractTransport
             'json' => array_filter($options),
         ]);
 
-        $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
-
-        if (200 !== $response->getStatusCode()) {
-            $errorMessage = $jsonContents ? $jsonContents['results']['error'] : $response->getContent(false);
-
-            throw new TransportException('Unable to post the Firebase message: '.$errorMessage, $response);
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Firebase server.', $response, 0, $e);
         }
-        if ($jsonContents && isset($jsonContents['results']['error'])) {
-            throw new TransportException('Unable to post the Firebase message: '.$jsonContents['error'], $response);
+
+        $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
+        $jsonContents = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
+        $errorMessage = null;
+
+        if ($jsonContents && isset($jsonContents['results'][0]['error'])) {
+            $errorMessage = $jsonContents['results'][0]['error'];
+        } elseif (200 !== $statusCode) {
+            $errorMessage = $response->getContent(false);
+        }
+
+        if (null !== $errorMessage) {
+            throw new TransportException('Unable to post the Firebase message: '.$errorMessage, $response);
         }
 
         $success = $response->toArray(false);
 
         $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId($success['results'][0]['message_id']);
+        $sentMessage->setMessageId($success['results'][0]['message_id'] ?? '');
 
         return $sentMessage;
     }

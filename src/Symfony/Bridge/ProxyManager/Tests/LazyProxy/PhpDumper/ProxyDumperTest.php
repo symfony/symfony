@@ -28,9 +28,6 @@ class ProxyDumperTest extends TestCase
      */
     protected $dumper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->dumper = new ProxyDumper();
@@ -185,8 +182,11 @@ EOPHP;
     }
 }
 
+#[\AllowDynamicProperties]
 final class DummyClass implements DummyInterface, SunnyInterface
 {
+    private $ref;
+
     public function dummy()
     {
         return $this;

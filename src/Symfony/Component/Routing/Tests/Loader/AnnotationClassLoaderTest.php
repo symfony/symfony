@@ -46,6 +46,7 @@ abstract class AnnotationClassLoaderTest extends TestCase
     public function testSupportsChecksTypeIfSpecified()
     {
         $this->assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');
+        $this->assertTrue($this->loader->supports('class', 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports('class', 'foo'), '->supports() checks the resource type if specified');
     }
 
@@ -245,6 +246,29 @@ abstract class AnnotationClassLoaderTest extends TestCase
         $routes = $this->loader->load($this->getNamespace().'\RouteWithPrefixController');
         $this->assertCount(1, $routes);
         $this->assertEquals('/prefix/path', $routes->get('action')->getPath());
+    }
+
+    public function testWhenEnv()
+    {
+        $routes = $this->loader->load($this->getNamespace().'\RouteWithEnv');
+        $this->assertCount(0, $routes);
+
+        $this->setUp('some-env');
+        $routes = $this->loader->load($this->getNamespace().'\RouteWithEnv');
+        $this->assertCount(1, $routes);
+        $this->assertSame('/path', $routes->get('action')->getPath());
+    }
+
+    public function testMethodsAndSchemes()
+    {
+        $routes = $this->loader->load($this->getNamespace().'\MethodsAndSchemes');
+
+        $this->assertSame(['GET', 'POST'], $routes->get('array_many')->getMethods());
+        $this->assertSame(['http', 'https'], $routes->get('array_many')->getSchemes());
+        $this->assertSame(['GET'], $routes->get('array_one')->getMethods());
+        $this->assertSame(['http'], $routes->get('array_one')->getSchemes());
+        $this->assertSame(['POST'], $routes->get('string')->getMethods());
+        $this->assertSame(['https'], $routes->get('string')->getSchemes());
     }
 
     abstract protected function getNamespace(): string;

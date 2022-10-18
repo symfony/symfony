@@ -29,7 +29,7 @@ class ValidateRequestListener implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
         $request = $event->getRequest();
@@ -41,9 +41,6 @@ class ValidateRequestListener implements EventSubscriberInterface
         $request->getHost();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

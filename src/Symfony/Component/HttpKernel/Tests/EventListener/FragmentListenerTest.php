@@ -112,7 +112,7 @@ class FragmentListenerTest extends TestCase
         $this->assertFalse($request->query->has('_path'));
     }
 
-    private function createRequestEvent(Request $request, $requestType = HttpKernelInterface::MASTER_REQUEST)
+    private function createRequestEvent(Request $request, int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
         return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, $requestType);
     }

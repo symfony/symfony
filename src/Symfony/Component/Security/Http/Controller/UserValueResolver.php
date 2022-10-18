@@ -13,9 +13,10 @@ namespace Symfony\Component\Security\Http\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -24,39 +25,61 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-final class UserValueResolver implements ArgumentValueResolverInterface
+final class UserValueResolver implements ArgumentValueResolverInterface, ValueResolverInterface
 {
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
     }
 
+    /**
+     * @deprecated since Symfony 6.2, use resolve() instead
+     */
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        if ($argument->getAttribute() instanceof CurrentUser) {
-            return true;
-        }
+        @trigger_deprecation('symfony/http-kernel', '6.2', 'The "%s()" method is deprecated, use "resolve()" instead.', __METHOD__);
 
-        // only security user implementations are supported
-        if (UserInterface::class !== $argument->getType()) {
+        // with the attribute, the type can be any UserInterface implementation
+        // otherwise, the type must be UserInterface
+        if (UserInterface::class !== $argument->getType() && !$argument->getAttributesOfType(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
             return false;
         }
 
-        $token = $this->tokenStorage->getToken();
-        if (!$token instanceof TokenInterface) {
+        // if no user is present but a default value exists we delegate to DefaultValueResolver
+        if ($argument->hasDefaultValue() && null === $this->tokenStorage->getToken()?->getUser()) {
             return false;
         }
 
-        $user = $token->getUser();
-
-        // in case it's not an object we cannot do anything with it; E.g. "anon."
-        return $user instanceof UserInterface;
+        return true;
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
-        yield $this->tokenStorage->getToken()->getUser();
+        // with the attribute, the type can be any UserInterface implementation
+        // otherwise, the type must be UserInterface
+        if (UserInterface::class !== $argument->getType() && !$argument->getAttributesOfType(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
+            return [];
+        }
+        $user = $this->tokenStorage->getToken()?->getUser();
+
+        // if no user is present but a default value exists we delegate to DefaultValueResolver
+        if ($argument->hasDefaultValue() && null === $user) {
+            return [];
+        }
+
+        if (null === $user) {
+            if (!$argument->isNullable()) {
+                throw new AccessDeniedException(sprintf('There is no logged-in user to pass to $%s, make the argument nullable if you want to allow anonymous access to the action.', $argument->getName()));
+            }
+
+            return [null];
+        }
+        if (null === $argument->getType() || $user instanceof ($argument->getType())) {
+            return [$user];
+        }
+
+        throw new AccessDeniedException(sprintf('The logged-in user is an instance of "%s" but a user of type "%s" is expected.', $user::class, $argument->getType()));
     }
 }

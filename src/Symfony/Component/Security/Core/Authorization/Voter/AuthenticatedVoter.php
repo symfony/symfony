@@ -17,34 +17,30 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY,
- * IS_AUTHENTICATED_REMEMBERED, or IS_AUTHENTICATED_ANONYMOUSLY is present.
+ * IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED is present.
  *
  * This list is most restrictive to least restrictive checking.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class AuthenticatedVoter implements VoterInterface
+class AuthenticatedVoter implements CacheableVoterInterface
 {
     public const IS_AUTHENTICATED_FULLY = 'IS_AUTHENTICATED_FULLY';
     public const IS_AUTHENTICATED_REMEMBERED = 'IS_AUTHENTICATED_REMEMBERED';
-    public const IS_AUTHENTICATED_ANONYMOUSLY = 'IS_AUTHENTICATED_ANONYMOUSLY';
-    public const IS_ANONYMOUS = 'IS_ANONYMOUS';
+    public const IS_AUTHENTICATED = 'IS_AUTHENTICATED';
     public const IS_IMPERSONATOR = 'IS_IMPERSONATOR';
     public const IS_REMEMBERED = 'IS_REMEMBERED';
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
 
-    private $authenticationTrustResolver;
+    private AuthenticationTrustResolverInterface $authenticationTrustResolver;
 
     public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver)
     {
         $this->authenticationTrustResolver = $authenticationTrustResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         if ($attributes === [self::PUBLIC_ACCESS]) {
             return VoterInterface::ACCESS_GRANTED;
@@ -54,8 +50,7 @@ class AuthenticatedVoter implements VoterInterface
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
-                    && self::IS_AUTHENTICATED_ANONYMOUSLY !== $attribute
-                    && self::IS_ANONYMOUS !== $attribute
+                    && self::IS_AUTHENTICATED !== $attribute
                     && self::IS_IMPERSONATOR !== $attribute
                     && self::IS_REMEMBERED !== $attribute)) {
                 continue;
@@ -74,18 +69,11 @@ class AuthenticatedVoter implements VoterInterface
                 return VoterInterface::ACCESS_GRANTED;
             }
 
-            if (self::IS_AUTHENTICATED_ANONYMOUSLY === $attribute
-                && ($this->authenticationTrustResolver->isAnonymous($token)
-                    || $this->authenticationTrustResolver->isRememberMe($token)
-                    || $this->authenticationTrustResolver->isFullFledged($token))) {
+            if (self::IS_AUTHENTICATED === $attribute && $this->authenticationTrustResolver->isAuthenticated($token)) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_REMEMBERED === $attribute && $this->authenticationTrustResolver->isRememberMe($token)) {
-                return VoterInterface::ACCESS_GRANTED;
-            }
-
-            if (self::IS_ANONYMOUS === $attribute && $this->authenticationTrustResolver->isAnonymous($token)) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
@@ -95,5 +83,22 @@ class AuthenticatedVoter implements VoterInterface
         }
 
         return $result;
+    }
+
+    public function supportsAttribute(string $attribute): bool
+    {
+        return \in_array($attribute, [
+            self::IS_AUTHENTICATED_FULLY,
+            self::IS_AUTHENTICATED_REMEMBERED,
+            self::IS_AUTHENTICATED,
+            self::IS_IMPERSONATOR,
+            self::IS_REMEMBERED,
+            self::PUBLIC_ACCESS,
+        ], true);
+    }
+
+    public function supportsType(string $subjectType): bool
+    {
+        return true;
     }
 }

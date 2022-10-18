@@ -1,5 +1,6 @@
 security:
-    encoders:
+    enable_authenticator_manager: true
+    password_hashers:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:
             algorithm: sha1
@@ -8,7 +9,7 @@ security:
         JMS\FooBundle\Entity\User3:
             algorithm: md5
         JMS\FooBundle\Entity\User4:
-            id: security.encoder.foo
+            id: security.hasher.foo
         JMS\FooBundle\Entity\User5:
             algorithm: pbkdf2
             hash_algorithm: sha1
@@ -51,7 +52,6 @@ security:
             stateless: true
             http_basic: true
             form_login: true
-            anonymous: true
             switch_user:
             x509: true
             remote_user: true
@@ -59,18 +59,17 @@ security:
             remember_me:
                 secret: TheSecret
             user_checker: ~
+            entry_point: form_login
 
         host:
             provider: default
             pattern: /test
             host: foo\.example\.org
             methods: [GET,POST]
-            anonymous: true
             http_basic: true
 
         with_user_checker:
             provider: default
-            anonymous: ~
             http_basic: ~
             user_checker: app.user_checker
 
@@ -84,4 +83,4 @@ security:
         -
             path: /blog/.*
             role: IS_AUTHENTICATED_ANONYMOUSLY
-        - { path: /blog/524, role: IS_AUTHENTICATED_ANONYMOUSLY, allow_if: "token.getUsername() matches '/^admin/'" }
+        - { path: /blog/524, role: IS_AUTHENTICATED_ANONYMOUSLY, allow_if: "token.getUserIdentifier() matches '/^admin/'" }

@@ -13,13 +13,12 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\FilesystemCache;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -32,15 +31,19 @@ return static function (ContainerConfigurator $container) {
         ->set('annotations.dummy_registry', AnnotationRegistry::class)
             ->call('registerUniqueLoader', ['class_exists'])
 
-        ->set('annotations.cached_reader', CachedReader::class)
+        ->set('annotations.cached_reader', PsrCachedReader::class)
             ->args([
                 service('annotations.reader'),
-                inline_service(ArrayCache::class),
+                inline_service(ArrayAdapter::class),
                 abstract_arg('Debug-Flag'),
             ])
+            ->tag('annotations.cached_reader')
+            ->tag('container.do_not_inline')
 
-        ->set('annotations.filesystem_cache', FilesystemCache::class)
+        ->set('annotations.filesystem_cache_adapter', FilesystemAdapter::class)
             ->args([
+                '',
+                0,
                 abstract_arg('Cache-Directory'),
             ])
 
@@ -52,15 +55,13 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.debug'),
             ])
 
-        ->set('annotations.cache', DoctrineProvider::class)
+        ->set('annotations.cache_adapter', PhpArrayAdapter::class)
+            ->factory([PhpArrayAdapter::class, 'create'])
             ->args([
-                inline_service(PhpArrayAdapter::class)
-                    ->factory([PhpArrayAdapter::class, 'create'])
-                    ->args([
-                        param('kernel.cache_dir').'/annotations.php',
-                        service('cache.annotations'),
-                    ]),
+                param('kernel.cache_dir').'/annotations.php',
+                service('cache.annotations'),
             ])
+            ->tag('container.hot_path')
 
         ->alias('annotation_reader', 'annotations.reader')
         ->alias(Reader::class, 'annotation_reader');

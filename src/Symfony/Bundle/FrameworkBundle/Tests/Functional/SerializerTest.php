@@ -20,7 +20,7 @@ class SerializerTest extends AbstractWebTestCase
     {
         static::bootKernel(['test_case' => 'Serializer']);
 
-        $result = static::$container->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
+        $result = static::getContainer()->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
 
         $bar1 = new Bar();
         $bar1->id = 1;
@@ -31,6 +31,41 @@ class SerializerTest extends AbstractWebTestCase
         $expected->bars = [$bar1, $bar2];
 
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @dataProvider provideNormalizersAndEncodersWithDefaultContextOption
+     */
+    public function testNormalizersAndEncodersUseDefaultContextConfigOption(string $normalizerId)
+    {
+        static::bootKernel(['test_case' => 'Serializer']);
+
+        $normalizer = static::getContainer()->get($normalizerId);
+
+        $reflectionObject = new \ReflectionObject($normalizer);
+        $property = $reflectionObject->getProperty('defaultContext');
+        $property->setAccessible(true);
+
+        $defaultContext = $property->getValue($normalizer);
+
+        self::assertArrayHasKey('fake_context_option', $defaultContext);
+        self::assertEquals('foo', $defaultContext['fake_context_option']);
+    }
+
+    public function provideNormalizersAndEncodersWithDefaultContextOption(): array
+    {
+        return [
+            ['serializer.normalizer.constraint_violation_list.alias'],
+            ['serializer.normalizer.dateinterval.alias'],
+            ['serializer.normalizer.datetime.alias'],
+            ['serializer.normalizer.json_serializable.alias'],
+            ['serializer.normalizer.problem.alias'],
+            ['serializer.normalizer.uid.alias'],
+            ['serializer.normalizer.object.alias'],
+            ['serializer.encoder.xml.alias'],
+            ['serializer.encoder.yaml.alias'],
+            ['serializer.encoder.csv.alias'],
+        ];
     }
 }
 

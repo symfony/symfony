@@ -33,8 +33,8 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 class FragmentListener implements EventSubscriberInterface
 {
-    private $signer;
-    private $fragmentPath;
+    private UriSigner $signer;
+    private string $fragmentPath;
 
     /**
      * @param string $fragmentPath The path that triggers this listener
@@ -65,7 +65,7 @@ class FragmentListener implements EventSubscriberInterface
             return;
         }
 
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $this->validateRequest($request);
         }
 

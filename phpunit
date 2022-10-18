@@ -1,7 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-// Cache-Id: 2020-04-10 20:30 UTC
+// Cache-Id: 2021-05-27 20:30 UTC
+// For caching to work properly on appveyor, this file
+// must be exactly the same in all maintained branches
 
 if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     echo "Unable to find the `simple-phpunit` script in `vendor/symfony/phpunit-bridge/bin/`.\nPlease run `composer update` before running this command.\n";
@@ -11,12 +13,12 @@ if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
     if (\PHP_VERSION_ID < 70200) {
         putenv('SYMFONY_PHPUNIT_VERSION=7.5');
     } elseif (\PHP_VERSION_ID < 70300) {
-        putenv('SYMFONY_PHPUNIT_VERSION=8.5');
+        putenv('SYMFONY_PHPUNIT_VERSION=8.5.26');
     } else {
         putenv('SYMFONY_PHPUNIT_VERSION=9.5');
     }
 }
-if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
+if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') && \PHP_VERSION_ID >= 70300) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
 }
 if (getcwd() === realpath(__DIR__.'/src/Symfony/Bridge/PhpUnit')) {

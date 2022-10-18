@@ -13,9 +13,10 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 
 class RemoteUserAuthenticatorTest extends TestCase
@@ -23,7 +24,7 @@ class RemoteUserAuthenticatorTest extends TestCase
     /**
      * @dataProvider provideAuthenticators
      */
-    public function testSupport(UserProviderInterface $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
+    public function testSupport(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
     {
         $request = $this->createRequest([$parameterName => 'TheUsername']);
 
@@ -32,35 +33,43 @@ class RemoteUserAuthenticatorTest extends TestCase
 
     public function testSupportNoUser()
     {
-        $authenticator = new RemoteUserAuthenticator($this->createMock(UserProviderInterface::class), new TokenStorage(), 'main');
+        $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), new TokenStorage(), 'main');
 
         $this->assertFalse($authenticator->supports($this->createRequest([])));
+    }
+
+    public function testSupportTokenStorageWithToken()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
+
+        $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), $tokenStorage, 'main');
+
+        $this->assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => 'username'])));
+        $this->assertTrue($authenticator->supports($this->createRequest(['REMOTE_USER' => 'another_username'])));
     }
 
     /**
      * @dataProvider provideAuthenticators
      */
-    public function testAuthenticate(UserProviderInterface $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
+    public function testAuthenticate(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
     {
         $request = $this->createRequest([$parameterName => 'TheUsername']);
 
         $authenticator->supports($request);
 
-        $userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('TheUsername')
-            ->willReturn($user = new User('TheUsername', null));
+        $userProvider->createUser($user = new InMemoryUser('TheUsername', null));
 
         $passport = $authenticator->authenticate($request);
-        $this->assertEquals($user, $passport->getUser());
+        $this->assertTrue($user->isEqualTo($passport->getUser()));
     }
 
     public function provideAuthenticators()
     {
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = new InMemoryUserProvider();
         yield [$userProvider, new RemoteUserAuthenticator($userProvider, new TokenStorage(), 'main'), 'REMOTE_USER'];
 
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = new InMemoryUserProvider();
         yield [$userProvider, new RemoteUserAuthenticator($userProvider, new TokenStorage(), 'main', 'CUSTOM_USER_PARAMETER'), 'CUSTOM_USER_PARAMETER'];
     }
 

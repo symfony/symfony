@@ -15,8 +15,7 @@ use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,12 +23,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MattermostTransportTest extends TransportTestCase
 {
-    /**
-     * @return MattermostTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): MattermostTransport
     {
-        return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable

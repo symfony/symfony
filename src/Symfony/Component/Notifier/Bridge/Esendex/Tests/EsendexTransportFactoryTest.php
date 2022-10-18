@@ -12,15 +12,11 @@
 namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 final class EsendexTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return EsendexTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): EsendexTransportFactory
     {
         return new EsendexTransportFactory();
     }

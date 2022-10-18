@@ -92,13 +92,8 @@ class ErrorHandlerTest extends TestCase
             $this->fail('ErrorException expected');
         } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
-            if (\PHP_VERSION_ID < 80000) {
-                $this->assertEquals(\E_NOTICE, $exception->getSeverity());
-                $this->assertMatchesRegularExpression('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
-            } else {
-                $this->assertEquals(\E_WARNING, $exception->getSeverity());
-                $this->assertMatchesRegularExpression('/^Warning: Undefined variable \$(foo|bar)/', $exception->getMessage());
-            }
+            $this->assertEquals(\E_WARNING, $exception->getSeverity());
+            $this->assertMatchesRegularExpression('/^Warning: Undefined variable \$(foo|bar)/', $exception->getMessage());
             $this->assertEquals(__FILE__, $exception->getFile());
 
             $trace = $exception->getTrace();
@@ -155,13 +150,8 @@ class ErrorHandlerTest extends TestCase
             $this->fail('An \ErrorException should have been raised');
         } catch (\ErrorException $e) {
             $trace = $e->getTrace();
-            if (\PHP_VERSION_ID < 80000) {
-                $this->assertEquals(\E_NOTICE, $e->getSeverity());
-                $this->assertSame('Undefined variable: foo', $e->getMessage());
-            } else {
-                $this->assertEquals(\E_WARNING, $e->getSeverity());
-                $this->assertSame('Undefined variable $foo', $e->getMessage());
-            }
+            $this->assertEquals(\E_WARNING, $e->getSeverity());
+            $this->assertSame('Undefined variable $foo', $e->getMessage());
             $this->assertSame(__FILE__, $e->getFile());
             $this->assertSame(0, $e->getCode());
             $this->assertSame('Symfony\Component\ErrorHandler\{closure}', $trace[0]['function']);
@@ -302,13 +292,8 @@ class ErrorHandlerTest extends TestCase
                 $this->assertArrayHasKey('exception', $context);
                 $exception = $context['exception'];
 
-                if (\PHP_VERSION_ID < 80000) {
-                    $this->assertEquals('Notice: Undefined variable: undefVar', $message);
-                    $this->assertSame(\E_NOTICE, $exception->getSeverity());
-                } else {
-                    $this->assertEquals('Warning: Undefined variable $undefVar', $message);
-                    $this->assertSame(\E_WARNING, $exception->getSeverity());
-                }
+                $this->assertEquals('Warning: Undefined variable $undefVar', $message);
+                $this->assertSame(\E_WARNING, $exception->getSeverity());
 
                 $this->assertInstanceOf(SilencedErrorContext::class, $exception);
                 $this->assertSame(__FILE__, $exception->getFile());
@@ -324,13 +309,8 @@ class ErrorHandlerTest extends TestCase
             ;
 
             $handler = ErrorHandler::register();
-            if (\PHP_VERSION_ID < 80000) {
-                $handler->setDefaultLogger($logger, \E_NOTICE);
-                $handler->screamAt(\E_NOTICE);
-            } else {
-                $handler->setDefaultLogger($logger, \E_WARNING);
-                $handler->screamAt(\E_WARNING);
-            }
+            $handler->setDefaultLogger($logger, \E_WARNING);
+            $handler->screamAt(\E_WARNING);
             unset($undefVar);
             $line = __LINE__ + 1;
             @$undefVar++;
@@ -340,39 +320,14 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
-    public function testHandleUserError()
-    {
-        if (\PHP_VERSION_ID >= 70400) {
-            $this->markTestSkipped('PHP 7.4 allows __toString to throw exceptions');
-        }
-
-        try {
-            $handler = ErrorHandler::register();
-            $handler->throwAt(0, true);
-
-            $e = null;
-            $x = new \Exception('Foo');
-
-            try {
-                $f = new Fixtures\ToStringThrower($x);
-                $f .= ''; // Trigger $f->__toString()
-            } catch (\Exception $e) {
-            }
-
-            $this->assertSame($x, $e);
-        } finally {
-            restore_error_handler();
-            restore_exception_handler();
-        }
-    }
-
     public function testHandleErrorWithAnonymousClass()
     {
+        $anonymousObject = new class() extends \stdClass {
+        };
+
         $handler = ErrorHandler::register();
-        $handler->throwAt(3, true);
         try {
-            $handler->handleError(3, 'foo '.\get_class(new class() extends \stdClass {
-            }).' bar', 'foo.php', 12);
+            trigger_error('foo '.$anonymousObject::class.' bar', \E_USER_WARNING);
             $this->fail('Exception expected.');
         } catch (\ErrorException $e) {
         } finally {
@@ -380,10 +335,7 @@ class ErrorHandlerTest extends TestCase
             restore_exception_handler();
         }
 
-        $this->assertSame('foo stdClass@anonymous bar', $e->getMessage());
-        $this->assertSame(3, $e->getSeverity());
-        $this->assertSame('foo.php', $e->getFile());
-        $this->assertSame(12, $e->getLine());
+        $this->assertSame('User Warning: foo stdClass@anonymous bar', $e->getMessage());
     }
 
     public function testHandleDeprecation()
@@ -420,7 +372,7 @@ class ErrorHandlerTest extends TestCase
             $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception) {
                 $this->assertSame($expectedMessage, $message);
                 $this->assertArrayHasKey('exception', $context);
-                $this->assertInstanceOf(\get_class($exception), $context['exception']);
+                $this->assertInstanceOf($exception::class, $context['exception']);
             };
 
             $logger
@@ -663,7 +615,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testAssertQuietEval()
     {
-        if ('-1' === ini_get('zend.assertions')) {
+        if ('-1' === \ini_get('zend.assertions')) {
             $this->markTestSkipped('zend.assertions is forcibly disabled');
         }
 

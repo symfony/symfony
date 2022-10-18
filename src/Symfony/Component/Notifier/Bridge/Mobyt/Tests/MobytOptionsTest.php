@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -16,7 +25,7 @@ final class MobytOptionsTest extends TestCase
     {
         $notification = (new Notification('Foo'))->importance($importance);
 
-        $options = (MobytOptions::fromNotification($notification))->toArray();
+        $options = MobytOptions::fromNotification($notification)->toArray();
 
         $this->assertSame($expectedMessageType, $options['message_type']);
     }
@@ -36,7 +45,7 @@ final class MobytOptionsTest extends TestCase
     {
         $notification = (new Notification('Foo'))->importance('Bar');
 
-        $options = (MobytOptions::fromNotification($notification))->toArray();
+        $options = MobytOptions::fromNotification($notification)->toArray();
 
         $this->assertSame(MobytOptions::MESSAGE_TYPE_QUALITY_HIGH, $options['message_type']);
     }

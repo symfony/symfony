@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
-use Symfony\Component\Yaml\Dumper;
-use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -58,9 +56,20 @@ class YamlEncoderTest extends TestCase
         $this->assertFalse($encoder->supportsDecoding('json'));
     }
 
+    public function testIndentation()
+    {
+        $encoder = new YamlEncoder(null, null, [YamlEncoder::YAML_INLINE => 100, YamlEncoder::YAML_INDENTATION => 7]);
+
+        $expected = <<<'END'
+foo:
+       bar: baz
+END;
+        $this->assertSame($expected."\n", $encoder->encode(['foo' => ['bar' => 'baz']], 'yaml'));
+    }
+
     public function testContext()
     {
-        $encoder = new YamlEncoder(new Dumper(), new Parser(), [YamlEncoder::YAML_INLINE => 1, YamlEncoder::YAML_INDENT => 4, YamlEncoder::YAML_FLAGS => Yaml::DUMP_OBJECT | Yaml::PARSE_OBJECT]);
+        $encoder = new YamlEncoder(null, null, [YamlEncoder::YAML_INLINE => 1, YamlEncoder::YAML_INDENT => 4, YamlEncoder::YAML_FLAGS => Yaml::DUMP_OBJECT | Yaml::PARSE_OBJECT]);
 
         $obj = new \stdClass();
         $obj->bar = 2;

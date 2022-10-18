@@ -2,12 +2,14 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
+    http_method_override: false
     esi: true
     ssi: true
     fragments: true
     profiler: true
     router: true
-    session: true
+    session:
+        storage_factory_id: session.storage.factory.native
     request: true
     assets: true
     translator: true

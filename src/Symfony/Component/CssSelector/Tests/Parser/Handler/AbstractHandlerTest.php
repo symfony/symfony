@@ -52,7 +52,6 @@ abstract class AbstractHandlerTest extends TestCase
     protected function assertStreamEmpty(TokenStream $stream)
     {
         $property = new \ReflectionProperty($stream, 'tokens');
-        $property->setAccessible(true);
 
         $this->assertEquals([], $property->getValue($stream));
     }

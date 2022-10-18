@@ -26,10 +26,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
  */
 class TextBundleWriter implements BundleWriterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function write(string $path, string $locale, $data, bool $fallback = true)
+    public function write(string $path, string $locale, mixed $data, bool $fallback = true)
     {
         $file = fopen($path.'/'.$locale.'.txt', 'w');
 
@@ -46,7 +43,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResourceBundle($file, string $bundleName, $value, bool $fallback)
+    private function writeResourceBundle($file, string $bundleName, mixed $value, bool $fallback)
     {
         fwrite($file, $bundleName);
 
@@ -63,7 +60,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResource($file, $value, int $indentation, bool $requireBraces = true)
+    private function writeResource($file, mixed $value, int $indentation, bool $requireBraces = true)
     {
         if (\is_int($value)) {
             $this->writeInteger($file, $value);
@@ -78,10 +75,8 @@ class TextBundleWriter implements BundleWriterInterface
         if (\is_array($value)) {
             $intValues = \count($value) === \count(array_filter($value, 'is_int'));
 
-            $keys = array_keys($value);
-
             // check that the keys are 0-indexed and ascending
-            $intKeys = $keys === range(0, \count($keys) - 1);
+            $intKeys = array_is_list($value);
 
             if ($intValues && $intKeys) {
                 $this->writeIntVector($file, $value, $indentation);
@@ -194,7 +189,7 @@ class TextBundleWriter implements BundleWriterInterface
             fwrite($file, str_repeat('    ', $indentation + 1));
 
             // escape colons, otherwise they are interpreted as resource types
-            if (false !== strpos($key, ':') || false !== strpos($key, ' ')) {
+            if (str_contains($key, ':') || str_contains($key, ' ')) {
                 $key = '"'.$key.'"';
             }
 

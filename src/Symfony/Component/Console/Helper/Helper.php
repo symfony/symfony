@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * Helper is the base class for all helper classes.
@@ -22,29 +23,31 @@ abstract class Helper implements HelperInterface
 {
     protected $helperSet = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setHelperSet(HelperSet $helperSet = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->helperSet = $helperSet;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getHelperSet()
+    public function getHelperSet(): ?HelperSet
     {
         return $this->helperSet;
     }
 
     /**
-     * Returns the length of a string, using mb_strwidth if it is available.
-     *
-     * @return int The length of the string
+     * Returns the width of a string, using mb_strwidth if it is available.
+     * The width is how many characters positions the string will use.
      */
-    public static function strlen(?string $string)
+    public static function width(?string $string): int
     {
+        $string ??= '';
+
+        if (preg_match('//u', $string)) {
+            return (new UnicodeString($string))->width(false);
+        }
+
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return \strlen($string);
         }
@@ -53,12 +56,31 @@ abstract class Helper implements HelperInterface
     }
 
     /**
-     * Returns the subset of a string, using mb_substr if it is available.
-     *
-     * @return string The string subset
+     * Returns the length of a string, using mb_strlen if it is available.
+     * The length is related to how many bytes the string will use.
      */
-    public static function substr(string $string, int $from, int $length = null)
+    public static function length(?string $string): int
     {
+        $string ??= '';
+
+        if (preg_match('//u', $string)) {
+            return (new UnicodeString($string))->length();
+        }
+
+        if (false === $encoding = mb_detect_encoding($string, null, true)) {
+            return \strlen($string);
+        }
+
+        return mb_strlen($string, $encoding);
+    }
+
+    /**
+     * Returns the subset of a string, using mb_substr if it is available.
+     */
+    public static function substr(?string $string, int $from, int $length = null): string
+    {
+        $string ??= '';
+
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
         }
@@ -66,7 +88,7 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    public static function formatTime($secs)
+    public static function formatTime(int|float $secs)
     {
         static $timeFormats = [
             [0, '< 1 sec'],
@@ -112,19 +134,16 @@ abstract class Helper implements HelperInterface
         return sprintf('%d B', $memory);
     }
 
-    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, $string)
-    {
-        return self::strlen(self::removeDecoration($formatter, $string));
-    }
-
-    public static function removeDecoration(OutputFormatterInterface $formatter, $string)
+    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
     {
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);
         // remove <...> formatting
-        $string = $formatter->format($string);
+        $string = $formatter->format($string ?? '');
         // remove already formatted characters
-        $string = preg_replace("/\033\[[^m]*m/", '', $string);
+        $string = preg_replace("/\033\[[^m]*m/", '', $string ?? '');
+        // remove terminal hyperlinks
+        $string = preg_replace('/\\033]8;[^;]*;[^\\033]*\\033\\\\/', '', $string ?? '');
         $formatter->setDecorated($isDecorated);
 
         return $string;

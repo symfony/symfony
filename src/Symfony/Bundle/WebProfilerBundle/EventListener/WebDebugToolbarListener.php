@@ -11,11 +11,13 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
+use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -38,14 +40,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public const DISABLED = 1;
     public const ENABLED = 2;
 
-    protected $twig;
-    protected $urlGenerator;
-    protected $interceptRedirects;
-    protected $mode;
-    protected $excludedAjaxPaths;
-    private $cspHandler;
+    private Environment $twig;
+    private ?UrlGeneratorInterface $urlGenerator;
+    private bool $interceptRedirects;
+    private int $mode;
+    private string $excludedAjaxPaths;
+    private ?ContentSecurityPolicyHandler $cspHandler;
+    private ?DumpDataCollector $dumpDataCollector;
 
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
+    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null, DumpDataCollector $dumpDataCollector = null)
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
@@ -53,6 +56,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = $mode;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
         $this->cspHandler = $cspHandler;
+        $this->dumpDataCollector = $dumpDataCollector;
     }
 
     public function isEnabled(): bool
@@ -81,15 +85,22 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
-                $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
+                $response->headers->set('X-Debug-Error', $e::class.': '.preg_replace('/\s+/', ' ', $e->getMessage()));
             }
         }
 
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
-        $nonces = $this->cspHandler ? $this->cspHandler->updateResponseHeaders($request, $response) : [];
+        $nonces = [];
+        if ($this->cspHandler) {
+            if ($this->dumpDataCollector?->getDumpsCount() > 0) {
+                $this->cspHandler->disableCsp();
+            }
+
+            $nonces = $this->cspHandler->updateResponseHeaders($request, $response);
+        }
 
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
@@ -102,7 +113,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location')]));
+            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -110,9 +121,9 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         if (self::DISABLED === $this->mode
             || !$response->headers->has('X-Debug-Token')
             || $response->isRedirection()
-            || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
+            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
-            || false !== stripos($response->headers->get('Content-Disposition'), 'attachment;')
+            || false !== stripos($response->headers->get('Content-Disposition', ''), 'attachment;')
         ) {
             return;
         }
@@ -132,6 +143,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             $toolbar = "\n".str_replace("\n", '', $this->twig->render(
                 '@WebProfiler/Profiler/toolbar_js.html.twig',
                 [
+                    'full_stack' => class_exists(FullStack::class),
                     'excluded_ajax_paths' => $this->excludedAjaxPaths,
                     'token' => $response->headers->get('X-Debug-Token'),
                     'request' => $request,

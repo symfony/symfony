@@ -1,1 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#AAA" d="M11 5.1C11 3.4 9.6 2 7.9 2H5.1A3.1 3.1 0 0 0 2 5.1V18c0 1.6 1.4 3 3.1 3H8c1.7 0 3.1-1.4 3.1-3.1V5.1zM5.2 4h2.7C8.4 4 9 4.8 9 5.3V11H4V5.3C4 4.8 4.6 4 5.2 4zM22 5.1C22 3.4 20.6 2 18.9 2H16c-1.6 0-3 1.4-3 3.1V18c0 1.7 1.4 3.1 3.1 3.1H19c1.7 0 3.1-1.4 3.1-3.1V5.1zM16 4h2.8c.6 0 1.2.8 1.2 1.3V8h-5V5.3c0-.5.5-1.3 1-1.3z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" data-icon-name="icon-tabler-adjustments" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="6" cy="10" r="2"></circle>
+    <line x1="6" y1="4" x2="6" y2="8"></line>
+    <line x1="6" y1="12" x2="6" y2="20"></line>
+    <circle cx="12" cy="16" r="2"></circle>
+    <line x1="12" y1="4" x2="12" y2="14"></line>
+    <line x1="12" y1="18" x2="12" y2="20"></line>
+    <circle cx="18" cy="7" r="2"></circle>
+    <line x1="18" y1="4" x2="18" y2="5"></line>
+    <line x1="18" y1="9" x2="18" y2="20"></line>
+</svg>

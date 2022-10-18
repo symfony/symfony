@@ -74,9 +74,6 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidNumberNamedArguments()
     {
         $this->validator->validate(
@@ -130,6 +127,9 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ['MASTERCARD', '2709999999999999'],
             ['MASTERCARD', '2720995105105100'],
             ['MIR', '2200381427330082'],
+            ['MIR', '22003814273300821'],
+            ['MIR', '220038142733008212'],
+            ['MIR', '2200381427330082123'],
             ['UATP', '110165309696173'],
             ['VISA', '4111111111111111'],
             ['VISA', '4012888888881881'],
@@ -162,7 +162,8 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ['MASTERCARD', '2721001234567890', CardScheme::INVALID_FORMAT_ERROR], // Not assigned yet
             ['MASTERCARD', '2220991234567890', CardScheme::INVALID_FORMAT_ERROR], // Not assigned yet
             ['UATP', '11016530969617', CardScheme::INVALID_FORMAT_ERROR], // invalid length
-            ['MIR', '22003814273300821', CardScheme::INVALID_FORMAT_ERROR], // invalid length
+            ['MIR', '220038142733008', CardScheme::INVALID_FORMAT_ERROR], // invalid length
+            ['MIR', '22003814273300821234', CardScheme::INVALID_FORMAT_ERROR], // invalid length
         ];
     }
 }

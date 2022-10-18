@@ -30,24 +30,17 @@ interface LdapInterface
      *
      * @throws ConnectionException if dn / password could not be bound
      */
-    public function bind(string $dn = null, string $password = null);
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null);
 
     /**
      * Queries a ldap server for entries matching the given criteria.
-     *
-     * @return QueryInterface
      */
-    public function query(string $dn, string $query, array $options = []);
+    public function query(string $dn, string $query, array $options = []): QueryInterface;
 
-    /**
-     * @return EntryManagerInterface
-     */
-    public function getEntryManager();
+    public function getEntryManager(): EntryManagerInterface;
 
     /**
      * Escape a string for use in an LDAP filter or DN.
-     *
-     * @return string
      */
-    public function escape(string $subject, string $ignore = '', int $flags = 0);
+    public function escape(string $subject, string $ignore = '', int $flags = 0): string;
 }

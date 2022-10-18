@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\Mailer\Mailer;
 
 class TwigExtensionTest extends TestCase
 {
@@ -43,6 +44,10 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
         $this->assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
         $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
+
+        if (class_exists(Mailer::class)) {
+            $this->assertCount(1, $container->getDefinition('twig.mime_body_renderer')->getArguments());
+        }
     }
 
     /**
@@ -82,7 +87,7 @@ class TwigExtensionTest extends TestCase
         // Twig options
         $options = $container->getDefinition('twig')->getArgument(1);
         $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
-        $this->assertTrue($options['autoescape'], '->load() sets the autoescape option');
+        $this->assertSame('name', $options['autoescape'], '->load() sets the autoescape option');
         $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
         $this->assertEquals('/tmp', $options['cache'], '->load() sets the cache option');
         $this->assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
@@ -181,7 +186,7 @@ class TwigExtensionTest extends TestCase
         $def = $container->getDefinition('twig.loader.native_filesystem');
         $paths = [];
         foreach ($def->getMethodCalls() as $call) {
-            if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
+            if ('addPath' === $call[0] && !str_contains($call[1][0], 'Form')) {
                 $paths[] = $call[1];
             }
         }
@@ -225,7 +230,6 @@ class TwigExtensionTest extends TestCase
 
         $tokenParsers = $container->get('test.twig.extension.debug.stopwatch')->getTokenParsers();
         $stopwatchIsAvailable = new \ReflectionProperty($tokenParsers[0], 'stopwatchIsAvailable');
-        $stopwatchIsAvailable->setAccessible(true);
 
         $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }
@@ -264,6 +268,25 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
     }
 
+    /**
+     * @dataProvider getFormats
+     */
+    public function testCustomHtmlToTextConverterService(string $format)
+    {
+        if (!class_exists(Mailer::class)) {
+            $this->markTestSkipped('The "twig.mime_body_renderer" service requires the Mailer component');
+        }
+
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'mailer', $format);
+        $this->compileContainer($container);
+
+        $bodyRenderer = $container->getDefinition('twig.mime_body_renderer');
+        $this->assertCount(2, $bodyRenderer->getArguments());
+        $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
+    }
+
     private function createContainer()
     {
         $container = new ContainerBuilder(new ParameterBag([
@@ -297,19 +320,11 @@ class TwigExtensionTest extends TestCase
     {
         $locator = new FileLocator(__DIR__.'/Fixtures/'.$format);
 
-        switch ($format) {
-            case 'php':
-                $loader = new PhpFileLoader($container, $locator);
-                break;
-            case 'xml':
-                $loader = new XmlFileLoader($container, $locator);
-                break;
-            case 'yml':
-                $loader = new YamlFileLoader($container, $locator);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported format: "%s"', $format));
-        }
+        $loader = match ($format) {
+            'php' => new PhpFileLoader($container, $locator),
+            'xml' => new XmlFileLoader($container, $locator),
+            'yml' => new YamlFileLoader($container, $locator),
+        };
 
         $loader->load($file.'.'.$format);
     }

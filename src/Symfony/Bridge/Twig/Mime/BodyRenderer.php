@@ -11,9 +11,12 @@
 
 namespace Symfony\Bridge\Twig\Mime;
 
-use League\HTMLToMarkdown\HtmlConverter;
+use League\HTMLToMarkdown\HtmlConverterInterface;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\HtmlToTextConverter\DefaultHtmlToTextConverter;
+use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
+use Symfony\Component\Mime\HtmlToTextConverter\LeagueHtmlToMarkdownConverter;
 use Symfony\Component\Mime\Message;
 use Twig\Environment;
 
@@ -22,21 +25,15 @@ use Twig\Environment;
  */
 final class BodyRenderer implements BodyRendererInterface
 {
-    private $twig;
-    private $context;
-    private $converter;
+    private Environment $twig;
+    private array $context;
+    private HtmlToTextConverterInterface $converter;
 
-    public function __construct(Environment $twig, array $context = [])
+    public function __construct(Environment $twig, array $context = [], HtmlToTextConverterInterface $converter = null)
     {
         $this->twig = $twig;
         $this->context = $context;
-        if (class_exists(HtmlConverter::class)) {
-            $this->converter = new HtmlConverter([
-                'hard_break' => true,
-                'strip_tags' => true,
-                'remove_nodes' => 'head style',
-            ]);
-        }
+        $this->converter = $converter ?: (interface_exists(HtmlConverterInterface::class) ? new LeagueHtmlToMarkdownConverter() : new DefaultHtmlToTextConverter());
     }
 
     public function render(Message $message): void
@@ -45,7 +42,13 @@ final class BodyRenderer implements BodyRendererInterface
             return;
         }
 
+        if (null === $message->getTextTemplate() && null === $message->getHtmlTemplate()) {
+            // email has already been rendered
+            return;
+        }
+
         $messageContext = $message->getContext();
+
         if (isset($messageContext['email'])) {
             throw new InvalidArgumentException(sprintf('A "%s" context cannot have an "email" entry as this is a reserved variable.', get_debug_type($message)));
         }
@@ -56,24 +59,20 @@ final class BodyRenderer implements BodyRendererInterface
 
         if ($template = $message->getTextTemplate()) {
             $message->text($this->twig->render($template, $vars));
+            $message->textTemplate(null);
         }
 
         if ($template = $message->getHtmlTemplate()) {
             $message->html($this->twig->render($template, $vars));
+            $message->htmlTemplate(null);
         }
+
+        $message->context([]);
 
         // if text body is empty, compute one from the HTML body
         if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
-            $message->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
+            $text = $this->converter->convert(\is_resource($html) ? stream_get_contents($html) : $html, $message->getHtmlCharset());
+            $message->text($text, $message->getHtmlCharset());
         }
-    }
-
-    private function convertHtmlToText(string $html): string
-    {
-        if (null !== $this->converter) {
-            return $this->converter->convert($html);
-        }
-
-        return strip_tags(preg_replace('{<(head|style)\b.*?</\1>}is', '', $html));
     }
 }

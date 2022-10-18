@@ -18,13 +18,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
+/**
+ * @group legacy
+ */
 class SecurityTest extends TestCase
 {
     public function testGetToken()
     {
-        $token = new UsernamePasswordToken('foo', 'bar', 'provider');
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar'), 'provider');
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $tokenStorage->expects($this->once())
@@ -62,11 +65,7 @@ class SecurityTest extends TestCase
     {
         yield [null, null];
 
-        yield ['string_username', null];
-
-        yield [new StringishUser(), null];
-
-        $user = new User('nice_user', 'foo');
+        $user = new InMemoryUser('nice_user', 'foo');
         yield [$user, $user];
     }
 
@@ -95,13 +94,5 @@ class SecurityTest extends TestCase
             ->willReturn($serviceObject);
 
         return $container;
-    }
-}
-
-class StringishUser
-{
-    public function __toString(): string
-    {
-        return 'stringish_user';
     }
 }

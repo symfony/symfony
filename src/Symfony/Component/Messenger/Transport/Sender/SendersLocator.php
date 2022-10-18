@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 /**
  * Maps a message to a list of senders.
@@ -23,12 +24,12 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
  */
 class SendersLocator implements SendersLocatorInterface
 {
-    private $sendersMap;
-    private $sendersLocator;
+    private array $sendersMap;
+    private ContainerInterface $sendersLocator;
 
     /**
-     * @param string[][]         $sendersMap     An array, keyed by "type", set to an array of sender aliases
-     * @param ContainerInterface $sendersLocator Locator of senders, keyed by sender alias
+     * @param array<string, list<string>> $sendersMap     An array, keyed by "type", set to an array of sender aliases
+     * @param ContainerInterface          $sendersLocator Locator of senders, keyed by sender alias
      */
     public function __construct(array $sendersMap, ContainerInterface $sendersLocator)
     {
@@ -36,25 +37,35 @@ class SendersLocator implements SendersLocatorInterface
         $this->sendersLocator = $sendersLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSenders(Envelope $envelope): iterable
     {
+        if ($envelope->all(TransportNamesStamp::class)) {
+            foreach ($envelope->last(TransportNamesStamp::class)->getTransportNames() as $senderAlias) {
+                yield from $this->getSenderFromAlias($senderAlias);
+            }
+
+            return;
+        }
+
         $seen = [];
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
             foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
                 if (!\in_array($senderAlias, $seen, true)) {
-                    if (!$this->sendersLocator->has($senderAlias)) {
-                        throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
-                    }
-
                     $seen[] = $senderAlias;
-                    $sender = $this->sendersLocator->get($senderAlias);
-                    yield $senderAlias => $sender;
+
+                    yield from $this->getSenderFromAlias($senderAlias);
                 }
             }
         }
+    }
+
+    private function getSenderFromAlias(string $senderAlias): iterable
+    {
+        if (!$this->sendersLocator->has($senderAlias)) {
+            throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
+        }
+
+        yield $senderAlias => $this->sendersLocator->get($senderAlias);
     }
 }

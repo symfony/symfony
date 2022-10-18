@@ -239,6 +239,20 @@ class HeadersTest extends TestCase
         $this->assertFalse($headers->has('Message-ID'));
     }
 
+    public function testAddHeaderIsNotCaseSensitive()
+    {
+        $headers = new Headers();
+        $headers->addHeader('From', ['from@example.com']);
+
+        $this->assertInstanceOf(MailboxListHeader::class, $headers->get('from'));
+        $this->assertEquals([new Address('from@example.com')], $headers->get('from')->getBody());
+    }
+
+    public function testIsUniqueHeaderIsNotCaseSensitive()
+    {
+        $this->assertTrue(Headers::isUniqueHeader('From'));
+    }
+
     public function testToStringJoinsHeadersTogether()
     {
         $headers = new Headers();
@@ -264,5 +278,68 @@ class HeadersTest extends TestCase
             'Message-ID: <some@id>',
             "Foo: =?utf-8?Q?aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?=\r\n =?utf-8?Q?aaaa?=",
         ], $headers->toArray());
+    }
+
+    public function testInReplyToAcceptsNonIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('In-Reply-To', 'foobar');
+        $this->assertEquals('foobar', $headers->get('In-Reply-To')->getBody());
+    }
+
+    public function testInReplyToAcceptsIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addIdHeader('In-Reply-To', 'foo@bar.com');
+        $this->assertEquals('<foo@bar.com>', $headers->get('In-Reply-To')->getBodyAsString());
+    }
+
+    public function testReferencesAcceptsNonIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('References', 'foobar');
+        $this->assertEquals('foobar', $headers->get('References')->getBody());
+    }
+
+    public function testReferencesAcceptsIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addIdHeader('References', 'foo@bar.com');
+        $this->assertEquals('<foo@bar.com>', $headers->get('References')->getBodyAsString());
+    }
+
+    public function testHeaderBody()
+    {
+        $headers = new Headers();
+        $this->assertNull($headers->getHeaderBody('Content-Type'));
+        $headers->setHeaderBody('Text', 'Content-Type', 'type');
+        $this->assertSame('type', $headers->getHeaderBody('Content-Type'));
+    }
+
+    public function testHeaderParameter()
+    {
+        $headers = new Headers();
+        $this->assertNull($headers->getHeaderParameter('Content-Disposition', 'name'));
+
+        $headers->addParameterizedHeader('Content-Disposition', 'name');
+        $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
+        $this->assertSame('foo', $headers->getHeaderParameter('Content-Disposition', 'name'));
+    }
+
+    public function testHeaderParameterNotDefined()
+    {
+        $headers = new Headers();
+
+        $this->expectException(\LogicException::class);
+        $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
+    }
+
+    public function testSetHeaderParameterNotParameterized()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('Content-Disposition', 'name');
+
+        $this->expectException(\LogicException::class);
+        $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
     }
 }

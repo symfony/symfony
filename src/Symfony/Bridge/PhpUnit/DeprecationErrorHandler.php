@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use PHPUnit\Framework\TestResult;
+use PHPUnit\Util\Error\Handler;
 use PHPUnit\Util\ErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
@@ -38,7 +39,7 @@ class DeprecationErrorHandler
     private $deprecationGroups = [];
 
     private static $isRegistered = false;
-    private static $isAtLeastPhpUnit83;
+    private static $errorHandler;
 
     public function __construct()
     {
@@ -125,43 +126,50 @@ class DeprecationErrorHandler
             return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
         }
 
-        $deprecation = new Deprecation($msg, debug_backtrace(), $file);
+        $trace = debug_backtrace();
+
+        if (isset($trace[1]['function'], $trace[1]['args'][0]) && ('trigger_error' === $trace[1]['function'] || 'user_error' === $trace[1]['function'])) {
+            $msg = $trace[1]['args'][0];
+        }
+
+        $deprecation = new Deprecation($msg, $trace, $file);
         if ($deprecation->isMuted()) {
+            return null;
+        }
+        if ($this->getConfiguration()->isIgnoredDeprecation($deprecation)) {
             return null;
         }
         if ($this->getConfiguration()->isBaselineDeprecation($deprecation)) {
             return null;
         }
-        $group = 'other';
 
-        if ($deprecation->originatesFromAnObject()) {
+        $msg = $deprecation->getMessage();
+
+        if (\E_DEPRECATED !== $type && (error_reporting() & $type)) {
+            $group = 'unsilenced';
+        } elseif ($deprecation->isLegacy()) {
+            $group = 'legacy';
+        } else {
+            $group = [
+                Deprecation::TYPE_SELF => 'self',
+                Deprecation::TYPE_DIRECT => 'direct',
+                Deprecation::TYPE_INDIRECT => 'indirect',
+                Deprecation::TYPE_UNDETERMINED => 'other',
+            ][$deprecation->getType()];
+        }
+
+        if ($this->getConfiguration()->shouldDisplayStackTrace($msg)) {
+            echo "\n".ucfirst($group).' '.$deprecation->toString();
+
+            exit(1);
+        }
+
+        if ('legacy' === $group) {
+            $this->deprecationGroups[$group]->addNotice();
+        } elseif ($deprecation->originatesFromAnObject()) {
             $class = $deprecation->originatingClass();
             $method = $deprecation->originatingMethod();
-            $msg = $deprecation->getMessage();
-
-            if (error_reporting() & $type) {
-                $group = 'unsilenced';
-            } elseif ($deprecation->isLegacy()) {
-                $group = 'legacy';
-            } else {
-                $group = [
-                    Deprecation::TYPE_SELF => 'self',
-                    Deprecation::TYPE_DIRECT => 'direct',
-                    Deprecation::TYPE_INDIRECT => 'indirect',
-                    Deprecation::TYPE_UNDETERMINED => 'other',
-                ][$deprecation->getType()];
-            }
-
-            if ($this->getConfiguration()->shouldDisplayStackTrace($msg)) {
-                echo "\n".ucfirst($group).' '.$deprecation->toString();
-
-                exit(1);
-            }
-            if ('legacy' !== $group) {
-                $this->deprecationGroups[$group]->addNoticeFromObject($msg, $class, $method);
-            } else {
-                $this->deprecationGroups[$group]->addNotice();
-            }
+            $this->deprecationGroups[$group]->addNoticeFromObject($msg, $class, $method);
         } else {
             $this->deprecationGroups[$group]->addNoticeFromProceduralCode($msg);
         }
@@ -183,7 +191,7 @@ class DeprecationErrorHandler
         if (class_exists(DebugClassLoader::class, false)) {
             DebugClassLoader::checkClasses();
         }
-        $currErrorHandler = set_error_handler('var_dump');
+        $currErrorHandler = set_error_handler('is_int');
         restore_error_handler();
 
         if ($currErrorHandler !== [$this, 'handleError']) {
@@ -326,9 +334,14 @@ class DeprecationErrorHandler
 
                     $countsByCaller = $notice->getCountsByCaller();
                     arsort($countsByCaller);
+                    $limit = 5;
 
                     foreach ($countsByCaller as $method => $count) {
                         if ('count' !== $method) {
+                            if (!$limit--) {
+                                fwrite($handle, "    ...\n");
+                                break;
+                            }
                             fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
                         }
                     }
@@ -343,16 +356,23 @@ class DeprecationErrorHandler
 
     private static function getPhpUnitErrorHandler()
     {
-        if (!isset(self::$isAtLeastPhpUnit83)) {
-            self::$isAtLeastPhpUnit83 = class_exists(ErrorHandler::class) && method_exists(ErrorHandler::class, '__invoke');
+        if (!$eh = self::$errorHandler) {
+            if (class_exists(Handler::class)) {
+                $eh = self::$errorHandler = Handler::class;
+            } elseif (method_exists(ErrorHandler::class, '__invoke')) {
+                $eh = self::$errorHandler = ErrorHandler::class;
+            } else {
+                return self::$errorHandler = 'PHPUnit\Util\ErrorHandler::handleError';
+            }
         }
-        if (!self::$isAtLeastPhpUnit83) {
-            return 'PHPUnit\Util\ErrorHandler::handleError';
+
+        if ('PHPUnit\Util\ErrorHandler::handleError' === $eh) {
+            return $eh;
         }
 
         foreach (debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
             if (isset($frame['object']) && $frame['object'] instanceof TestResult) {
-                return new ErrorHandler(
+                return new $eh(
                     $frame['object']->getConvertDeprecationsToExceptions(),
                     $frame['object']->getConvertErrorsToExceptions(),
                     $frame['object']->getConvertNoticesToExceptions(),
@@ -396,11 +416,11 @@ class DeprecationErrorHandler
         }
 
         if (\function_exists('stream_isatty')) {
-            return stream_isatty(\STDOUT);
+            return @stream_isatty(\STDOUT);
         }
 
         if (\function_exists('posix_isatty')) {
-            return posix_isatty(\STDOUT);
+            return @posix_isatty(\STDOUT);
         }
 
         $stat = fstat(\STDOUT);

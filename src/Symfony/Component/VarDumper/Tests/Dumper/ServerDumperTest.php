@@ -39,6 +39,10 @@ class ServerDumperTest extends TestCase
 
     public function testDump()
     {
+        if ('True' === getenv('APPVEYOR')) {
+            $this->markTestSkipped('Skip transient test on AppVeyor');
+        }
+
         $wrappedDumper = $this->createMock(DataDumperInterface::class);
         $wrappedDumper->expects($this->never())->method('dump'); // test wrapped dumper is not used
 
@@ -79,7 +83,7 @@ class ServerDumperTest extends TestCase
 ]
 %d
 DUMP
-        , $dumped);
+            , $dumped);
     }
 
     private function getServerProcess(): Process

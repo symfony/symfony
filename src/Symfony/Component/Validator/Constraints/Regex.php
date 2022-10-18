@@ -25,9 +25,14 @@ class Regex extends Constraint
 {
     public const REGEX_FAILED_ERROR = 'de1e3db3-5ed4-4941-aae4-59f3667cc3a3';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::REGEX_FAILED_ERROR => 'REGEX_FAILED_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This value is not valid.';
     public $pattern;
@@ -35,19 +40,14 @@ class Regex extends Constraint
     public $match = true;
     public $normalizer;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|array $pattern The pattern to evaluate or an array of options
-     */
     public function __construct(
-        $pattern,
+        string|array|null $pattern,
         string $message = null,
         string $htmlPattern = null,
         bool $match = null,
         callable $normalizer = null,
         array $groups = null,
-        $payload = null,
+        mixed $payload = null,
         array $options = []
     ) {
         if (\is_array($pattern)) {
@@ -68,18 +68,12 @@ class Regex extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'pattern';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['pattern'];
     }
@@ -89,14 +83,9 @@ class Regex extends Constraint
      * Example: /^[a-z]+$/ would be converted to [a-z]+
      * However, if options are specified, it cannot be converted.
      *
-     * Pattern is also ignored if match=false since the pattern should
-     * then be reversed before application.
-     *
      * @see http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
-     *
-     * @return string|null
      */
-    public function getHtmlPattern()
+    public function getHtmlPattern(): ?string
     {
         // If htmlPattern is specified, use it
         if (null !== $this->htmlPattern) {
@@ -123,7 +112,7 @@ class Regex extends Constraint
 
         // If the pattern contains an or statement, wrap the pattern in
         // .*(pattern).* and quit. Otherwise we'd need to parse the pattern
-        if (false !== strpos($pattern, '|')) {
+        if (str_contains($pattern, '|')) {
             return '.*('.$pattern.').*';
         }
 

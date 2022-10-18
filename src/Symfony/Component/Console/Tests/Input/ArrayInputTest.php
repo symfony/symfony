@@ -162,10 +162,10 @@ class ArrayInputTest extends TestCase
     public function testToString()
     {
         $input = new ArrayInput(['-f' => null, '-b' => 'bar', '--foo' => 'b a z', '--lala' => null, 'test' => 'Foo', 'test2' => "A\nB'C"]);
-        $this->assertEquals('-f -b=bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
+        $this->assertEquals('-f -b bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
 
         $input = new ArrayInput(['-b' => ['bval_1', 'bval_2'], '--f' => ['fval_1', 'fval_2']]);
-        $this->assertSame('-b=bval_1 -b=bval_2 --f=fval_1 --f=fval_2', (string) $input);
+        $this->assertSame('-b bval_1 -b bval_2 --f=fval_1 --f=fval_2', (string) $input);
 
         $input = new ArrayInput(['array_arg' => ['val_1', 'val_2']]);
         $this->assertSame('val_1 val_2', (string) $input);

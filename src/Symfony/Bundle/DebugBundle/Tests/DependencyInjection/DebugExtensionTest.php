@@ -43,10 +43,6 @@ class DebugExtensionTest extends TestCase
 
     public function testUnsetClosureFileInfoShouldBeRegisteredInVarCloner()
     {
-        if (!method_exists(ReflectionCaster::class, 'unsetClosureFileInfo')) {
-            $this->markTestSkipped('Method not available');
-        }
-
         $container = $this->createContainer();
         $container->registerExtension(new DebugExtension());
         $container->loadFromExtension('debug', []);

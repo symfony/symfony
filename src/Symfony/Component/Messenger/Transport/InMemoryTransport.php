@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -25,69 +27,64 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     /**
      * @var Envelope[]
      */
-    private $sent = [];
+    private array $sent = [];
 
     /**
      * @var Envelope[]
      */
-    private $acknowledged = [];
+    private array $acknowledged = [];
 
     /**
      * @var Envelope[]
      */
-    private $rejected = [];
+    private array $rejected = [];
 
     /**
      * @var Envelope[]
      */
-    private $queue = [];
+    private array $queue = [];
 
-    /**
-     * @var SerializerInterface|null
-     */
-    private $serializer;
+    private int $nextId = 1;
+    private ?SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializer = null)
     {
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         return array_values($this->decode($this->queue));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         $this->acknowledged[] = $this->encode($envelope);
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
+
+        if (!$transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class)) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
+
+        unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $this->rejected[] = $this->encode($envelope);
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
+
+        if (!$transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class)) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
+
+        unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
+        $id = $this->nextId++;
+        $envelope = $envelope->with(new TransportMessageIdStamp($id));
         $encodedEnvelope = $this->encode($envelope);
         $this->sent[] = $encodedEnvelope;
-        $id = spl_object_hash($envelope->getMessage());
         $this->queue[$id] = $encodedEnvelope;
 
         return $envelope;
@@ -122,10 +119,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         return $this->decode($this->sent);
     }
 
-    /**
-     * @return Envelope|array
-     */
-    private function encode(Envelope $envelope)
+    private function encode(Envelope $envelope): Envelope|array
     {
         if (null === $this->serializer) {
             return $envelope;
@@ -145,9 +139,6 @@ class InMemoryTransport implements TransportInterface, ResetInterface
             return $messagesEncoded;
         }
 
-        return array_map(
-            [$this->serializer, 'decode'],
-            $messagesEncoded
-        );
+        return array_map($this->serializer->decode(...), $messagesEncoded);
     }
 }

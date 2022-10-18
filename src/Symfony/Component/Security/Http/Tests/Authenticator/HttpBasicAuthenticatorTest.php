@@ -1,13 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
-use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
@@ -16,19 +25,19 @@ use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgrade
 class HttpBasicAuthenticatorTest extends TestCase
 {
     private $userProvider;
-    private $encoderFactory;
-    private $encoder;
+    private $hasherFactory;
+    private $hasher;
     private $authenticator;
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
-        $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
-        $this->encoder = $this->createMock(PasswordEncoderInterface::class);
-        $this->encoderFactory
+        $this->userProvider = new InMemoryUserProvider();
+        $this->hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
+        $this->hasher = $this->createMock(PasswordHasherInterface::class);
+        $this->hasherFactory
             ->expects($this->any())
-            ->method('getEncoder')
-            ->willReturn($this->encoder);
+            ->method('getPasswordHasher')
+            ->willReturn($this->hasher);
 
         $this->authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
     }
@@ -40,16 +49,12 @@ class HttpBasicAuthenticatorTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $this->userProvider
-            ->expects($this->any())
-            ->method('loadUserByUsername')
-            ->with('TheUsername')
-            ->willReturn($user = new User('TheUsername', 'ThePassword'));
+        $this->userProvider->createUser($user = new InMemoryUser('TheUsername', 'ThePassword'));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals('ThePassword', $passport->getBadge(PasswordCredentials::class)->getPassword());
 
-        $this->assertSame($user, $passport->getUser());
+        $this->assertTrue($user->isEqualTo($passport->getUser()));
     }
 
     /**
@@ -77,8 +82,8 @@ class HttpBasicAuthenticatorTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $this->userProvider = $this->createMock(PasswordUpgraderProvider::class);
-        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new User('test', 's$cr$t'));
+        $this->userProvider = new PasswordUpgraderProvider(['test' => ['password' => 's$cr$t']]);
+
         $authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
 
         $passport = $authenticator->authenticate($request);

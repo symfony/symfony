@@ -39,13 +39,10 @@ class DateType extends AbstractType
     ];
 
     private const WIDGETS = [
-        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+        'text' => TextType::class,
+        'choice' => ChoiceType::class,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
@@ -58,7 +55,7 @@ class DateType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            if ('' !== $pattern && false === strpos($pattern, 'y') && false === strpos($pattern, 'M') && false === strpos($pattern, 'd')) {
+            if ('' !== $pattern && !str_contains($pattern, 'y') && !str_contains($pattern, 'M') && !str_contains($pattern, 'd')) {
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));
             }
 
@@ -71,7 +68,7 @@ class DateType extends AbstractType
                 $pattern
             ));
         } else {
-            if ('' !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
+            if ('' !== $pattern && (!str_contains($pattern, 'y') || !str_contains($pattern, 'M') || !str_contains($pattern, 'd'))) {
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
             }
 
@@ -182,14 +179,11 @@ class DateType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget'] = $options['widget'];
 
-        // Change the input to a HTML5 date input if
+        // Change the input to an HTML5 date input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
         //  * the html5 is set to true
@@ -222,9 +216,6 @@ class DateType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
@@ -299,11 +290,7 @@ class DateType extends AbstractType
             },
             'choice_translation_domain' => false,
             'input_format' => 'Y-m-d',
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid date.';
-            },
+            'invalid_message' => 'Please enter a valid date.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -337,10 +324,7 @@ class DateType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'date';
     }
@@ -375,9 +359,7 @@ class DateType extends AbstractType
         $result = [];
 
         foreach ($years as $year) {
-            if (false !== $y = gmmktime(0, 0, 0, 6, 15, $year)) {
-                $result[$y] = $year;
-            }
+            $result[\PHP_INT_SIZE === 4 ? \DateTime::createFromFormat('Y e', $year.' UTC')->format('U') : gmmktime(0, 0, 0, 6, 15, $year)] = $year;
         }
 
         return $result;

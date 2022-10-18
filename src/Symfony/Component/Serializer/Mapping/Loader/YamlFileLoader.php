@@ -34,10 +34,7 @@ class YamlFileLoader extends FileLoader
      */
     private $classes;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         if (null === $this->classes) {
             $this->classes = $this->getClassesFromYaml();
@@ -101,6 +98,23 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setIgnore($data['ignore']);
                 }
+
+                foreach ($data['contexts'] ?? [] as $line) {
+                    $groups = $line['groups'] ?? [];
+
+                    if ($context = $line['context'] ?? false) {
+                        $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                        $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                    }
+
+                    if ($context = $line['normalization_context'] ?? false) {
+                        $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                    }
+
+                    if ($context = $line['denormalization_context'] ?? false) {
+                        $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                    }
+                }
             }
         }
 
@@ -125,9 +139,9 @@ class YamlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[] The classes names
+     * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->classes = $this->getClassesFromYaml();

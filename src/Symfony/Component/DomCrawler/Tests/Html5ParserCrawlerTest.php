@@ -29,8 +29,6 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
     /** @dataProvider validHtml5Provider */
     public function testHtml5ParserParseContentStartingWithValidHeading(string $content)
     {
-        $this->skipTestIfHTML5LibraryNotAvailable();
-
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($content);
         self::assertEquals(
@@ -43,8 +41,6 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
     /** @dataProvider invalidHtml5Provider */
     public function testHtml5ParserWithInvalidHeadedContent(string $content)
     {
-        $this->skipTestIfHTML5LibraryNotAvailable();
-
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($content);
         self::assertEmpty($crawler->filterXPath('//h1')->text(), '->addHtmlContent failed as expected');
@@ -69,12 +65,5 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
 
         yield 'Text' => ['hello world'.$html];
         yield 'Text between comments' => ['<!--c--> test <!--cc-->'.$html];
-    }
-
-    private function skipTestIfHTML5LibraryNotAvailable(): void
-    {
-        if (!class_exists(\Masterminds\HTML5::class)) {
-            self::markTestSkipped('HTML5 library is not available');
-        }
     }
 }

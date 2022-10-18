@@ -37,31 +37,28 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     private static $setterAccessibleCache = [];
 
     /**
-     * {@inheritdoc}
+     * @param array $context
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
-        return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
+        return parent::supportsNormalization($data, $format) && $this->supports($data::class);
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $context
      */
-    public function supportsDenormalization($data, string $type, string $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;
     }
 
     /**
-     * Checks if the given class has any get{Property} method.
+     * Checks if the given class has any getter method.
      */
     private function supports(string $class): bool
     {
@@ -77,7 +74,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Checks if a method's name is get.* or is.*, and can be called without parameters.
+     * Checks if a method's name matches /^(get|is|has).+$/ and can be called non-statically without parameters.
      */
     private function isGetMethod(\ReflectionMethod $method): bool
     {
@@ -86,18 +83,15 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return
             !$method->isStatic() &&
             (
-                ((0 === strpos($method->name, 'get') && 3 < $methodLength) ||
-                (0 === strpos($method->name, 'is') && 2 < $methodLength) ||
-                (0 === strpos($method->name, 'has') && 3 < $methodLength)) &&
+                ((str_starts_with($method->name, 'get') && 3 < $methodLength) ||
+                (str_starts_with($method->name, 'is') && 2 < $methodLength) ||
+                (str_starts_with($method->name, 'has') && 3 < $methodLength)) &&
                 0 === $method->getNumberOfRequiredParameters()
             )
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function extractAttributes(object $object, string $format = null, array $context = [])
+    protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -108,7 +102,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
                 continue;
             }
 
-            $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
+            $attributeName = lcfirst(substr($method->name, str_starts_with($method->name, 'is') ? 2 : 3));
 
             if ($this->isAllowedAttribute($object, $attributeName, $format, $context)) {
                 $attributes[] = $attributeName;
@@ -118,10 +112,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return $attributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
         $ucfirsted = ucfirst($attribute);
 
@@ -143,13 +134,10 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         $setter = 'set'.ucfirst($attribute);
-        $key = \get_class($object).':'.$setter;
+        $key = $object::class.':'.$setter;
 
         if (!isset(self::$setterAccessibleCache[$key])) {
             self::$setterAccessibleCache[$key] = \is_callable([$object, $setter]) && !(new \ReflectionMethod($object, $setter))->isStatic();

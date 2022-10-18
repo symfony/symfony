@@ -30,28 +30,15 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  * That means our sliding window hit count is (75% * 8) + 3 = 9.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @experimental in 5.3
  */
 final class SlidingWindowLimiter implements LimiterInterface
 {
-    private $id;
-    private $limit;
-    private $storage;
-
-    /**
-     * @var int seconds
-     */
-    private $interval;
-
-    /**
-     * @var LockInterface
-     */
-    private $lock;
-
     use ResetLimiterTrait;
 
-    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, ?LockInterface $lock = null)
+    private int $limit;
+    private int $interval;
+
+    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
     {
         $this->storage = $storage;
         $this->lock = $lock ?? new NoLock();
@@ -60,14 +47,11 @@ final class SlidingWindowLimiter implements LimiterInterface
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
     }
 
-    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
     {
         throw new ReserveNotSupportedException(__CLASS__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(int $tokens = 1): RateLimit
     {
         $this->lock->acquire(true);
@@ -87,7 +71,10 @@ final class SlidingWindowLimiter implements LimiterInterface
             }
 
             $window->add($tokens);
-            $this->storage->save($window);
+
+            if (0 < $tokens) {
+                $this->storage->save($window);
+            }
 
             return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit);
         } finally {

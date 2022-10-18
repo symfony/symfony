@@ -23,32 +23,26 @@ class GroupsTest extends TestCase
     public function testEmptyGroupsParameter()
     {
         $this->expectException(InvalidArgumentException::class);
-        new Groups(['value' => []]);
-    }
-
-    public function testNotAnArrayGroupsParameter()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new Groups(['value' => 12]);
+        new Groups([]);
     }
 
     public function testInvalidGroupsParameter()
     {
         $this->expectException(InvalidArgumentException::class);
-        new Groups(['value' => ['a', 1, new \stdClass()]]);
+        new Groups(['a', 1, new \stdClass()]);
     }
 
     public function testGroupsParameters()
     {
         $validData = ['a', 'b'];
 
-        $groups = new Groups(['value' => $validData]);
+        $groups = new Groups($validData);
         $this->assertEquals($validData, $groups->getGroups());
     }
 
     public function testSingleGroup()
     {
-        $groups = new Groups(['value' => 'a']);
+        $groups = new Groups('a');
         $this->assertEquals(['a'], $groups->getGroups());
     }
 }

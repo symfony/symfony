@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config http-method-override="false">
+        <framework:messenger failure-transport="failure_transport_global">
+            <framework:transport name="transport_1" dsn="null://" failure-transport="failure_transport_1" />
+            <framework:transport name="transport_2" dsn="null://" />
+            <framework:transport name="transport_3" dsn="null://" failure-transport="failure_transport_3" />
+            <framework:transport name="failure_transport_global" dsn="null://" />
+            <framework:transport name="failure_transport_1" dsn="null://" />
+            <framework:transport name="failure_transport_3" dsn="null://" />
+        </framework:messenger>
+    </framework:config>
+</container>

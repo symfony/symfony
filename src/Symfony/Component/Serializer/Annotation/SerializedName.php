@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * Annotation class for @SerializedName().
  *
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"PROPERTY", "METHOD"})
  *
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
@@ -24,28 +25,11 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 final class SerializedName
 {
-    /**
-     * @var string
-     */
-    private $serializedName;
-
-    /**
-     * @param string|array $serializedName
-     */
-    public function __construct($serializedName)
+    public function __construct(private string $serializedName)
     {
-        if (\is_array($serializedName)) {
-            if (!isset($serializedName['value'])) {
-                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" should be set.', static::class));
-            }
-            $serializedName = $serializedName['value'];
-        }
-
-        if (!\is_string($serializedName) || empty($serializedName)) {
+        if (empty($serializedName)) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', static::class));
         }
-
-        $this->serializedName = $serializedName;
     }
 
     public function getSerializedName(): string

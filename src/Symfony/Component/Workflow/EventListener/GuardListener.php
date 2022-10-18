@@ -17,7 +17,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
-use Symfony\Component\Workflow\Exception\InvalidTokenConfigurationException;
 use Symfony\Component\Workflow\TransitionBlocker;
 
 /**
@@ -25,13 +24,13 @@ use Symfony\Component\Workflow\TransitionBlocker;
  */
 class GuardListener
 {
-    private $configuration;
-    private $expressionLanguage;
-    private $tokenStorage;
-    private $authorizationChecker;
-    private $trustResolver;
-    private $roleHierarchy;
-    private $validator;
+    private array $configuration;
+    private ExpressionLanguage $expressionLanguage;
+    private TokenStorageInterface $tokenStorage;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private AuthenticationTrustResolverInterface $trustResolver;
+    private ?RoleHierarchyInterface $roleHierarchy;
+    private ?ValidatorInterface $validator;
 
     public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
@@ -76,15 +75,8 @@ class GuardListener
     {
         $token = $this->tokenStorage->getToken();
 
-        if (null === $token) {
-            throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow "%s".', $event->getWorkflowName()));
-        }
-
         $variables = [
-            'token' => $token,
-            'user' => $token->getUser(),
             'subject' => $event->getSubject(),
-            'role_names' => $this->roleHierarchy->getReachableRoleNames($token->getRoleNames()),
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
             // needed for the is_* expression function
@@ -93,6 +85,18 @@ class GuardListener
             'validator' => $this->validator,
         ];
 
-        return $variables;
+        if (null === $token) {
+            return $variables + [
+                'token' => null,
+                'user' => null,
+                'role_names' => [],
+            ];
+        }
+
+        return $variables + [
+            'token' => $token,
+            'user' => $token->getUser(),
+            'role_names' => $this->roleHierarchy->getReachableRoleNames($token->getRoleNames()),
+        ];
     }
 }

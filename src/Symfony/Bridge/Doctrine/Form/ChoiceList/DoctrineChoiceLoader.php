@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader;
+use Symfony\Component\Form\Exception\LogicException;
 
 /**
  * Loads choices using a Doctrine object manager.
@@ -21,10 +22,10 @@ use Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader;
  */
 class DoctrineChoiceLoader extends AbstractChoiceLoader
 {
-    private $manager;
-    private $class;
-    private $idReader;
-    private $objectLoader;
+    private ObjectManager $manager;
+    private string $class;
+    private ?IdReader $idReader;
+    private ?EntityLoaderInterface $objectLoader;
 
     /**
      * Creates a new choice loader.
@@ -49,9 +50,6 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
         $this->objectLoader = $objectLoader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadChoices(): iterable
     {
         return $this->objectLoader
@@ -68,16 +66,7 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
         // know that the IDs are used as values
         // Attention: This optimization does not check choices for existence
         if ($this->idReader) {
-            trigger_deprecation('symfony/doctrine-bridge', '5.1', 'Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "%s" or define the "choice_value" option instead.', __CLASS__);
-            // Maintain order and indices of the given objects
-            $values = [];
-            foreach ($choices as $i => $object) {
-                if ($object instanceof $this->class) {
-                    $values[$i] = $this->idReader->getIdValue($object);
-                }
-            }
-
-            return $values;
+            throw new LogicException('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
         }
 
         return parent::doLoadValuesForChoices($choices);
@@ -85,15 +74,20 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
 
     protected function doLoadChoicesForValues(array $values, ?callable $value): array
     {
-        $legacy = $this->idReader && null === $value;
+        if ($this->idReader && null === $value) {
+            throw new LogicException('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
+        }
 
-        if ($legacy) {
-            trigger_deprecation('symfony/doctrine-bridge', '5.1', 'Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "%s" or define the "choice_value" option instead.', __CLASS__);
+        $idReader = null;
+        if (\is_array($value) && $value[0] instanceof IdReader) {
+            $idReader = $value[0];
+        } elseif ($value instanceof \Closure && ($rThis = (new \ReflectionFunction($value))->getClosureThis()) instanceof IdReader) {
+            $idReader = $rThis;
         }
 
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        if (($legacy || \is_array($value) && $this->idReader === $value[0]) && $this->objectLoader) {
+        if ($idReader && $this->objectLoader) {
             $objects = [];
             $objectsById = [];
 
@@ -101,8 +95,8 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
             // An alternative approach to the following loop is to add the
             // "INDEX BY" clause to the Doctrine query in the loader,
             // but I'm not sure whether that's doable in a generic fashion.
-            foreach ($this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values) as $object) {
-                $objectsById[$this->idReader->getIdValue($object)] = $object;
+            foreach ($this->objectLoader->getEntitiesByIds($idReader->getIdField(), $values) as $object) {
+                $objectsById[$idReader->getIdValue($object)] = $object;
             }
 
             foreach ($values as $i => $id) {

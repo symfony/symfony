@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class WebProfilerExtensionTest extends TestCase
@@ -30,14 +31,10 @@ class WebProfilerExtensionTest extends TestCase
      */
     private $container;
 
-    public static function assertSaneContainer(Container $container, $message = '', $knownPrivates = [])
+    public static function assertSaneContainer(Container $container)
     {
         $errors = [];
-        $knownPrivates[] = 'debug.file_link_formatter.url_format';
         foreach ($container->getServiceIds() as $id) {
-            if (\in_array($id, $knownPrivates, true)) { // for BC with 3.4
-                continue;
-            }
             try {
                 $container->get($id);
             } catch (\Exception $e) {
@@ -45,7 +42,7 @@ class WebProfilerExtensionTest extends TestCase
             }
         }
 
-        self::assertEquals([], $errors, $message);
+        self::assertSame([], $errors);
     }
 
     protected function setUp(): void
@@ -55,6 +52,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->kernel = $this->createMock(KernelInterface::class);
 
         $this->container = new ContainerBuilder();
+        $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
         $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
@@ -120,7 +118,7 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
-        self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
+        self::assertSaneContainer($this->getCompiledContainer());
 
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
@@ -161,7 +159,7 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
-        self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
+        self::assertSaneContainer($this->getCompiledContainer());
 
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());

@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,10 +28,12 @@ final class OvhCloudTransport extends AbstractTransport
 {
     protected const HOST = 'eu.api.ovh.com';
 
-    private $applicationKey;
-    private $applicationSecret;
-    private $consumerKey;
-    private $serviceName;
+    private string $applicationKey;
+    private string $applicationSecret;
+    private string $consumerKey;
+    private string $serviceName;
+    private ?string $sender = null;
+    private bool $noStopClause = false;
 
     public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -44,7 +47,31 @@ final class OvhCloudTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName);
+        if (null !== $this->sender) {
+            return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s&sender=%s&no_stop_clause=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName, $this->sender, (int) $this->noStopClause);
+        }
+
+        return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s&no_stop_clause=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName, (int) $this->noStopClause);
+    }
+
+    /**
+     * @return $this
+     */
+    public function setNoStopClause(bool $noStopClause): static
+    {
+        $this->noStopClause = $noStopClause;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setSender(?string $sender): static
+    {
+        $this->sender = $sender;
+
+        return $this;
     }
 
     public function supports(MessageInterface $message): bool
@@ -66,10 +93,17 @@ final class OvhCloudTransport extends AbstractTransport
             'coding' => '8bit',
             'message' => $message->getSubject(),
             'receivers' => [$message->getPhone()],
-            'noStopClause' => false,
+            'noStopClause' => $this->noStopClause,
             'priority' => 'medium',
-            'senderForResponse' => true,
         ];
+
+        if ('' !== $message->getFrom()) {
+            $content['sender'] = $message->getFrom();
+        } elseif ($this->sender) {
+            $content['sender'] = $this->sender;
+        } else {
+            $content['senderForResponse'] = true;
+        }
 
         $now = time() + $this->calculateTimeDelta();
         $headers['X-Ovh-Application'] = $this->applicationKey;
@@ -86,7 +120,13 @@ final class OvhCloudTransport extends AbstractTransport
             'body' => $body,
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote OvhCloud server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to send the SMS: %s.', $error['message']), $response);

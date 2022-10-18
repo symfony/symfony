@@ -5,10 +5,6 @@
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This code is partially based on the Rack-Cache library by Ryan Tomayko,
- * which is released under the MIT license.
- * (based on commit 02d2b48d75bcb63cf1c0c7149c077ad256542801)
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -58,7 +54,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
-    public function testSharedMaxAgeNotSetIfNotSetInMasterRequest()
+    public function testSharedMaxAgeNotSetIfNotSetInMainRequest()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -76,7 +72,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
-    public function testMasterResponseNotCacheableWhenEmbeddedResponseRequiresValidation()
+    public function testMainResponseNotCacheableWhenEmbeddedResponseRequiresValidation()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -84,66 +80,88 @@ class ResponseCacheStrategyTest extends TestCase
         $embeddedResponse->setLastModified(new \DateTime());
         $cacheStrategy->add($embeddedResponse);
 
-        $masterResponse = new Response();
-        $masterResponse->setSharedMaxAge(3600);
-        $cacheStrategy->update($masterResponse);
+        $mainResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600);
+        $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertFalse($masterResponse->isFresh());
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertFalse($mainResponse->isFresh());
     }
 
-    public function testValidationOnMasterResponseIsNotPossibleWhenItContainsEmbeddedResponses()
+    public function testValidationOnMainResponseIsNotPossibleWhenItContainsEmbeddedResponses()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
+        // This main response uses the "validation" model
+        $mainResponse = new Response();
+        $mainResponse->setLastModified(new \DateTime());
+        $mainResponse->setEtag('foo');
+
+        // Embedded response uses "expiry" model
+        $embeddedResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600);
+        $cacheStrategy->add($embeddedResponse);
+
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertFalse($mainResponse->isValidateable());
+        $this->assertFalse($mainResponse->headers->has('Last-Modified'));
+        $this->assertFalse($mainResponse->headers->has('ETag'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
+    }
+
+    public function testMainResponseWithValidationIsUnchangedWhenThereIsNoEmbeddedResponse()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+        $mainResponse->setLastModified(new \DateTime());
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertTrue($mainResponse->isValidateable());
+    }
+
+    public function testMainResponseWithExpirationIsUnchangedWhenThereIsNoEmbeddedResponse()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600);
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertTrue($mainResponse->isFresh());
+    }
+
+    public function testLastModifiedIsMergedWithEmbeddedResponse()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $embeddedDate = new \DateTime('-1 hour');
+
         // This master response uses the "validation" model
         $masterResponse = new Response();
-        $masterResponse->setLastModified(new \DateTime());
+        $masterResponse->setLastModified(new \DateTime('-2 hour'));
         $masterResponse->setEtag('foo');
 
         // Embedded response uses "expiry" model
         $embeddedResponse = new Response();
-        $masterResponse->setSharedMaxAge(3600);
+        $embeddedResponse->setLastModified($embeddedDate);
         $cacheStrategy->add($embeddedResponse);
 
         $cacheStrategy->update($masterResponse);
 
-        $this->assertFalse($masterResponse->isValidateable());
-        $this->assertFalse($masterResponse->headers->has('Last-Modified'));
-        $this->assertFalse($masterResponse->headers->has('ETag'));
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('must-revalidate'));
-    }
-
-    public function testMasterResponseWithValidationIsUnchangedWhenThereIsNoEmbeddedResponse()
-    {
-        $cacheStrategy = new ResponseCacheStrategy();
-
-        $masterResponse = new Response();
-        $masterResponse->setLastModified(new \DateTime());
-        $cacheStrategy->update($masterResponse);
-
         $this->assertTrue($masterResponse->isValidateable());
+        $this->assertSame($embeddedDate->getTimestamp(), $masterResponse->getLastModified()->getTimestamp());
     }
 
-    public function testMasterResponseWithExpirationIsUnchangedWhenThereIsNoEmbeddedResponse()
+    public function testMainResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
-        $masterResponse = new Response();
-        $masterResponse->setSharedMaxAge(3600);
-        $cacheStrategy->update($masterResponse);
-
-        $this->assertTrue($masterResponse->isFresh());
-    }
-
-    public function testMasterResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()
-    {
-        $cacheStrategy = new ResponseCacheStrategy();
-
-        $masterResponse = new Response();
-        $masterResponse->setSharedMaxAge(3600); // Public, cacheable
+        $mainResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600); // Public, cacheable
 
         /* This response has no validation or expiration information.
            That makes it uncacheable, it is always stale.
@@ -152,19 +170,19 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($embeddedResponse->isFresh()); // not fresh, as no lifetime is provided
 
         $cacheStrategy->add($embeddedResponse);
-        $cacheStrategy->update($masterResponse);
+        $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertFalse($masterResponse->isFresh());
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertFalse($mainResponse->isFresh());
     }
 
     public function testEmbeddingPrivateResponseMakesMainResponsePrivate()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
-        $masterResponse = new Response();
-        $masterResponse->setSharedMaxAge(3600); // public, cacheable
+        $mainResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600); // public, cacheable
 
         // The embedded response might for example contain per-user data that remains valid for 60 seconds
         $embeddedResponse = new Response();
@@ -172,29 +190,29 @@ class ResponseCacheStrategyTest extends TestCase
         $embeddedResponse->setMaxAge(60); // this would implicitly set "private" as well, but let's be explicit
 
         $cacheStrategy->add($embeddedResponse);
-        $cacheStrategy->update($masterResponse);
+        $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($masterResponse->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
     }
 
     public function testEmbeddingPublicResponseDoesNotMakeMainResponsePublic()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
-        $masterResponse = new Response();
-        $masterResponse->setPrivate(); // this is the default, but let's be explicit
-        $masterResponse->setMaxAge(100);
+        $mainResponse = new Response();
+        $mainResponse->setPrivate(); // this is the default, but let's be explicit
+        $mainResponse->setMaxAge(100);
 
         $embeddedResponse = new Response();
         $embeddedResponse->setPublic();
         $embeddedResponse->setSharedMaxAge(100);
 
         $cacheStrategy->add($embeddedResponse);
-        $cacheStrategy->update($masterResponse);
+        $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($masterResponse->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
     }
 
     public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation()
@@ -206,36 +224,36 @@ class ResponseCacheStrategyTest extends TestCase
          */
         $cacheStrategy = new ResponseCacheStrategy();
 
-        $masterResponse = new Response();
-        $masterResponse->setSharedMaxAge(3600);
+        $mainResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600);
 
         $embeddedResponse = new Response();
         $embeddedResponse->setSharedMaxAge(60);
         $embeddedResponse->setEtag('foo');
 
         $cacheStrategy->add($embeddedResponse);
-        $cacheStrategy->update($masterResponse);
+        $cacheStrategy->update($mainResponse);
 
-        $this->assertEqualsWithDelta(60, (int) $masterResponse->headers->getCacheControlDirective('s-maxage'), 1);
+        $this->assertEqualsWithDelta(60, (int) $mainResponse->headers->getCacheControlDirective('s-maxage'), 1);
     }
 
-    public function testResponseIsExpirableButNotValidateableWhenMasterResponseCombinesExpirationAndValidation()
+    public function testResponseIsExpirableButNotValidateableWhenMainResponseCombinesExpirationAndValidation()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
-        $masterResponse = new Response();
-        $masterResponse->setSharedMaxAge(3600);
-        $masterResponse->setEtag('foo');
-        $masterResponse->setLastModified(new \DateTime());
+        $mainResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600);
+        $mainResponse->setEtag('foo');
+        $mainResponse->setLastModified(new \DateTime());
 
         $embeddedResponse = new Response();
         $embeddedResponse->setSharedMaxAge(60);
 
         $cacheStrategy->add($embeddedResponse);
-        $cacheStrategy->update($masterResponse);
+        $cacheStrategy->update($mainResponse);
 
-        $this->assertSame('60', $masterResponse->headers->getCacheControlDirective('s-maxage'));
-        $this->assertFalse($masterResponse->isValidateable());
+        $this->assertSame('60', $mainResponse->headers->getCacheControlDirective('s-maxage'));
+        $this->assertFalse($mainResponse->isValidateable());
     }
 
     /**
@@ -370,10 +388,50 @@ class ResponseCacheStrategyTest extends TestCase
         ];
 
         yield 'merge max-age and s-maxage' => [
-            ['public' => true, 's-maxage' => '60', 'max-age' => null],
+            ['public' => true, 'max-age' => '60'],
             ['public' => true, 's-maxage' => 3600],
             [
                 ['public' => true, 'max-age' => 60],
+            ],
+        ];
+
+        yield 's-maxage may be set to 0' => [
+            ['public' => true, 's-maxage' => '0', 'max-age' => null],
+            ['public' => true, 's-maxage' => '0'],
+            [
+                ['public' => true, 's-maxage' => '60'],
+            ],
+        ];
+
+        yield 's-maxage may be set to 0, and works independently from maxage' => [
+            ['public' => true, 's-maxage' => '0', 'max-age' => '30'],
+            ['public' => true, 's-maxage' => '0', 'max-age' => '30'],
+            [
+                ['public' => true, 'max-age' => '60'],
+            ],
+        ];
+
+        yield 'public subresponse without lifetime does not remove lifetime for main response' => [
+            ['public' => true, 's-maxage' => '30', 'max-age' => null],
+            ['public' => true, 's-maxage' => '30'],
+            [
+                ['public' => true],
+            ],
+        ];
+
+        yield 'lifetime for subresponse is kept when main response has no lifetime' => [
+            ['public' => true, 'max-age' => '30'],
+            ['public' => true],
+            [
+                ['public' => true, 'max-age' => '30'],
+            ],
+        ];
+
+        yield 's-maxage on the subresponse implies public, so the result is public as well' => [
+            ['public' => true, 'max-age' => '10', 's-maxage' => null],
+            ['public' => true, 'max-age' => '10'],
+            [
+                ['max-age' => '30', 's-maxage' => '20'],
             ],
         ];
 

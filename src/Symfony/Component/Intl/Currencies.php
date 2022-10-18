@@ -25,6 +25,8 @@ final class Currencies extends ResourceBundle
     private const INDEX_NAME = 1;
     private const INDEX_FRACTION_DIGITS = 0;
     private const INDEX_ROUNDING_INCREMENT = 1;
+    private const INDEX_CASH_FRACTION_DIGITS = 2;
+    private const INDEX_CASH_ROUNDING_INCREMENT = 3;
 
     /**
      * @return string[]
@@ -40,7 +42,7 @@ final class Currencies extends ResourceBundle
             self::readEntry(['Names', $currency, self::INDEX_NAME]);
 
             return true;
-        } catch (MissingResourceException $e) {
+        } catch (MissingResourceException) {
             return false;
         }
     }
@@ -89,20 +91,35 @@ final class Currencies extends ResourceBundle
     {
         try {
             return self::readEntry(['Meta', $currency, self::INDEX_FRACTION_DIGITS], 'meta');
-        } catch (MissingResourceException $e) {
+        } catch (MissingResourceException) {
             return self::readEntry(['Meta', 'DEFAULT', self::INDEX_FRACTION_DIGITS], 'meta');
         }
     }
 
-    /**
-     * @return float|int
-     */
-    public static function getRoundingIncrement(string $currency)
+    public static function getRoundingIncrement(string $currency): int
     {
         try {
             return self::readEntry(['Meta', $currency, self::INDEX_ROUNDING_INCREMENT], 'meta');
-        } catch (MissingResourceException $e) {
+        } catch (MissingResourceException) {
             return self::readEntry(['Meta', 'DEFAULT', self::INDEX_ROUNDING_INCREMENT], 'meta');
+        }
+    }
+
+    public static function getCashFractionDigits(string $currency): int
+    {
+        try {
+            return self::readEntry(['Meta', $currency, self::INDEX_CASH_FRACTION_DIGITS], 'meta');
+        } catch (MissingResourceException) {
+            return self::readEntry(['Meta', 'DEFAULT', self::INDEX_CASH_FRACTION_DIGITS], 'meta');
+        }
+    }
+
+    public static function getCashRoundingIncrement(string $currency): int
+    {
+        try {
+            return self::readEntry(['Meta', $currency, self::INDEX_CASH_ROUNDING_INCREMENT], 'meta');
+        } catch (MissingResourceException) {
+            return self::readEntry(['Meta', 'DEFAULT', self::INDEX_CASH_ROUNDING_INCREMENT], 'meta');
         }
     }
 

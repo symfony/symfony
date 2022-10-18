@@ -12,20 +12,27 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\InputBag;
 
 class InputBagTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testGet()
     {
-        $bag = new InputBag(['foo' => 'bar', 'null' => null]);
+        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return 'strval';
+            }
+        }]);
 
-        $this->assertEquals('bar', $bag->get('foo'), '->get() gets the value of a parameter');
-        $this->assertEquals('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
+        $this->assertSame('bar', $bag->get('foo'), '->get() gets the value of a string parameter');
+        $this->assertSame('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
+        $this->assertSame(1, $bag->get('int'), '->get() gets the value of an int parameter');
+        $this->assertSame(1.0, $bag->get('float'), '->get() gets the value of a float parameter');
+        $this->assertSame('strval', $bag->get('stringable'), '->get() gets the string value of a \Stringable parameter');
+        $this->assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
     }
 
     public function testGetDoesNotUseDeepByDefault()
@@ -45,54 +52,58 @@ class InputBagTest extends TestCase
         $this->assertSame([12, 8], $result);
     }
 
-    /**
-     * @group legacy
-     */
     public function testFilterCallback()
     {
-        $bag = new InputBag(['foo' => 'bar']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A Closure must be passed to "Symfony\Component\HttpFoundation\InputBag::filter()" when FILTER_CALLBACK is used, "string" given.');
 
-        $this->expectDeprecation('Since symfony/http-foundation 5.2: Not passing a Closure together with FILTER_CALLBACK to "Symfony\Component\HttpFoundation\InputBag::filter()" is deprecated. Wrap your filter in a closure instead.');
-        $this->assertSame('BAR', $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']));
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testSetWithNonStringishOrArrayIsDeprecated()
+    public function testFilterClosure()
     {
+        $bag = new InputBag(['foo' => 'bar']);
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => function ($value) {
+            return strtoupper($value);
+        }]);
+
+        $this->assertSame('BAR', $result);
+    }
+
+    public function testSetWithNonScalarOrArray()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected a scalar, or an array as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::set()", "Symfony\Component\HttpFoundation\InputBag" given.');
+
         $bag = new InputBag();
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing "Symfony\Component\HttpFoundation\InputBag" as a 2nd Argument to "Symfony\Component\HttpFoundation\InputBag::set()" is deprecated, pass a string, array, or null instead.');
         $bag->set('foo', new InputBag());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGettingANonStringValueIsDeprecated()
+    public function testGettingANonStringValue()
     {
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Input value "foo" contains a non-scalar value.');
+
         $bag = new InputBag(['foo' => ['a', 'b']]);
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Retrieving a non-string value from "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" exception in Symfony 6.0, use "Symfony\Component\HttpFoundation\InputBag::all($key)" instead.');
         $bag->get('foo');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetWithNonStringDefaultValueIsDeprecated()
+    public function testGetWithNonStringDefaultValue()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected a scalar value as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::get()", "array" given.');
+
         $bag = new InputBag(['foo' => 'bar']);
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing a non-string value as 2nd argument to "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, pass a string or null instead.');
         $bag->get('foo', ['a', 'b']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testFilterArrayWithoutArrayFlagIsDeprecated()
+    public function testFilterArrayWithoutArrayFlag()
     {
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Input value "foo" contains an array, but "FILTER_REQUIRE_ARRAY" or "FILTER_FORCE_ARRAY" flags were not set.');
+
         $bag = new InputBag(['foo' => ['bar', 'baz']]);
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Filtering an array value with "Symfony\Component\HttpFoundation\InputBag::filter()" without passing the FILTER_REQUIRE_ARRAY or FILTER_FORCE_ARRAY flag is deprecated');
         $bag->filter('foo', \FILTER_VALIDATE_INT);
     }
 }

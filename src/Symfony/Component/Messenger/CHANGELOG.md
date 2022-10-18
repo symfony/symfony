@@ -1,10 +1,48 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add new `messenger:stats` command that returns a list of transports with their "to be processed" message count
+ * Add `TransportNamesStamp` to change the transport while dispatching a message
+ * Add support for rate limited transports by using the RateLimiter component.
+ * Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+
+6.1
+---
+
+ * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs
+ * Automatically resolve handled message type when method different from `__invoke` is used as handler
+ * Allow `#[AsMessageHandler]` attribute on methods
+
+6.0
+---
+
+ * Remove deprecated classes `Symfony/Component/Messenger/Transport/AmqpExt`, `Symfony/Component/Messenger/Transport/Doctrine` and `Symfony/Component/Messenger/Transport/Redis`.
+ * Class `MessengerPass` cannot be configured with constructor arguments
+ * Remove constructor arguments and getters for `RedeliveryStamp`'s properties `exceptionMessage` and `flattenException`
+
+5.4
+---
+
+ * Add `AsMessageHandler` attribute for declaring message handlers on PHP 8.
+ * Add support for handling messages in batches with `BatchHandlerInterface` and corresponding trait
+ * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+ * Add support for resetting container services after each messenger message.
+ * Added `WorkerMetadata` class which allows you to access the configuration details of a worker, like `queueNames` and `transportNames` it consumes from.
+ * New method `getMetadata()` was added to `Worker` class which returns the `WorkerMetadata` object.
+ * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
+ * Add log when worker should stop.
+ * Add log when `SIGTERM` is received.
+ * Add `--stats` and `--class-filter` options to `FailedMessagesShowCommand`
+
 5.3
 ---
 
+ * Add the `RouterContextMiddleware` to restore the original router context when handling a message
  * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
+ * Added `queues` option to `Worker` to only fetch messages from a specific queue from a receiver implementing `QueueReceiverInterface`.
 
 5.2.0
 -----

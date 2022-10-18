@@ -18,6 +18,8 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,8 +29,10 @@ final class SmsapiTransport extends AbstractTransport
 {
     protected const HOST = 'api.smsapi.pl';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
+    private bool $fast = false;
+    private bool $test = false;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -38,9 +42,39 @@ final class SmsapiTransport extends AbstractTransport
         parent::__construct($client, $dispatcher);
     }
 
+    /**
+     * @return $this
+     */
+    public function setFast(bool $fast): static
+    {
+        $this->fast = $fast;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTest(bool $test): static
+    {
+        $this->test = $test;
+
+        return $this;
+    }
+
     public function __toString(): string
     {
-        return sprintf('smsapi://%s?from=%s', $this->getEndpoint(), $this->from);
+        $dsn = sprintf('smsapi://%s?from=%s', $this->getEndpoint(), $this->from);
+
+        if ($this->fast) {
+            $dsn .= sprintf('&fast=%d', (int) $this->fast);
+        }
+
+        if ($this->test) {
+            $dsn .= sprintf('&test=%d', (int) $this->test);
+        }
+
+        return $dsn;
     }
 
     public function supports(MessageInterface $message): bool
@@ -54,21 +88,36 @@ final class SmsapiTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/sms.do', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'body' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => $message->getPhone(),
                 'message' => $message->getSubject(),
+                'fast' => $this->fast,
                 'format' => 'json',
+                'encoding' => 'utf-8',
+                'test' => $this->test,
             ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
-            $error = $response->toArray(false);
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Smsapi server.', $response, 0, $e);
+        }
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['message']), $response);
+        try {
+            $content = $response->toArray(false);
+        } catch (DecodingExceptionInterface $e) {
+            throw new TransportException('Could not decode body to an array.', $response, 0, $e);
+        }
+
+        if (isset($content['error']) || 200 !== $statusCode) {
+            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $response);
         }
 
         return new SentMessage($message, (string) $this);

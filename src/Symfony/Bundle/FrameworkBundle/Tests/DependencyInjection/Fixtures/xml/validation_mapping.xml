@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:framework="http://symfony.com/schema/dic/symfony">
 
-    <framework:config>
+    <framework:config http-method-override="false">
         <framework:validation>
             <framework:mapping>
                 <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/files</framework:path>

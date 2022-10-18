@@ -22,8 +22,15 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $currentHandler;
-    private $writeOnlyHandler;
+    /**
+     * @var \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface
+     */
+    private \SessionHandlerInterface $currentHandler;
+
+    /**
+     * @var \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface
+     */
+    private \SessionHandlerInterface $writeOnlyHandler;
 
     public function __construct(\SessionHandlerInterface $currentHandler, \SessionHandlerInterface $writeOnlyHandler)
     {
@@ -38,10 +45,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
         $this->writeOnlyHandler = $writeOnlyHandler;
     }
 
-    /**
-     * @return bool
-     */
-    public function close()
+    public function close(): bool
     {
         $result = $this->currentHandler->close();
         $this->writeOnlyHandler->close();
@@ -49,10 +53,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
         return $result;
     }
 
-    /**
-     * @return bool
-     */
-    public function destroy($sessionId)
+    public function destroy(string $sessionId): bool
     {
         $result = $this->currentHandler->destroy($sessionId);
         $this->writeOnlyHandler->destroy($sessionId);
@@ -60,10 +61,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
         return $result;
     }
 
-    /**
-     * @return bool
-     */
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         $result = $this->currentHandler->gc($maxlifetime);
         $this->writeOnlyHandler->gc($maxlifetime);
@@ -71,10 +69,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
         return $result;
     }
 
-    /**
-     * @return bool
-     */
-    public function open($savePath, $sessionName)
+    public function open(string $savePath, string $sessionName): bool
     {
         $result = $this->currentHandler->open($savePath, $sessionName);
         $this->writeOnlyHandler->open($savePath, $sessionName);
@@ -82,19 +77,13 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    public function read($sessionId)
+    public function read(string $sessionId): string
     {
         // No reading from new handler until switch-over
         return $this->currentHandler->read($sessionId);
     }
 
-    /**
-     * @return bool
-     */
-    public function write($sessionId, $sessionData)
+    public function write(string $sessionId, string $sessionData): bool
     {
         $result = $this->currentHandler->write($sessionId, $sessionData);
         $this->writeOnlyHandler->write($sessionId, $sessionData);
@@ -102,19 +91,13 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
         return $result;
     }
 
-    /**
-     * @return bool
-     */
-    public function validateId($sessionId)
+    public function validateId(string $sessionId): bool
     {
         // No reading from new handler until switch-over
         return $this->currentHandler->validateId($sessionId);
     }
 
-    /**
-     * @return bool
-     */
-    public function updateTimestamp($sessionId, $sessionData)
+    public function updateTimestamp(string $sessionId, string $sessionData): bool
     {
         $result = $this->currentHandler->updateTimestamp($sessionId, $sessionData);
         $this->writeOnlyHandler->updateTimestamp($sessionId, $sessionData);

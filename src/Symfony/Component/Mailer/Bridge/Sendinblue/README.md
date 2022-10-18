@@ -34,19 +34,19 @@ $email
 
 This example allow you to set :
 
-*   templateId
-*   params
-*   tags
-*   headers
-    *   sender.ip
-    *   X-Mailin-Custom
+ * templateId
+ * params
+ * tags
+ * headers
+    * sender.ip
+    * X-Mailin-Custom
 
 For more informations, you can refer to [Sendinblue API documentation](https://developers.sendinblue.com/reference#sendtransacemail).
 
 Resources
 ---------
 
-  * [Contributing](https://symfony.com/doc/current/contributing/index.html)
-  * [Report issues](https://github.com/symfony/symfony/issues) and
-    [send Pull Requests](https://github.com/symfony/symfony/pulls)
-    in the [main Symfony repository](https://github.com/symfony/symfony)
+ * [Contributing](https://symfony.com/doc/current/contributing/index.html)
+ * [Report issues](https://github.com/symfony/symfony/issues) and
+   [send Pull Requests](https://github.com/symfony/symfony/pulls)
+   in the [main Symfony repository](https://github.com/symfony/symfony)

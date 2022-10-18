@@ -53,7 +53,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
-'/legend
+            '/legend
     [@class="col-form-label col-sm-2 col-form-label required"]
     [.="[trans]Name[/trans]"]
 '
@@ -70,7 +70,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         ]);
 
         $this->assertMatchesXpath($html,
-'/label
+            '/label
     [@for="name"]
     [@class="col-form-label col-sm-2 required"]
 '
@@ -87,7 +87,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         ]);
 
         $this->assertMatchesXpath($html,
-'/label
+            '/label
     [@for="name"]
     [@class="my&class col-form-label col-sm-2 required"]
 '
@@ -104,7 +104,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         ]);
 
         $this->assertMatchesXpath($html,
-'/label
+            '/label
     [@for="name"]
     [@class="my&class col-form-label col-sm-2 required"]
     [.="[trans]Custom label[/trans]"]
@@ -124,7 +124,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         ]);
 
         $this->assertMatchesXpath($html,
-'/label
+            '/label
     [@for="name"]
     [@class="my&class col-form-label col-sm-2 required"]
     [.="[trans]Custom label[/trans]"]
@@ -177,7 +177,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
-'/legend
+            '/legend
     [@class="col-sm-2 col-form-label required"]
     [.="[trans]Custom label[/trans]"]
 '
@@ -255,7 +255,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $html = $this->renderRow($view, ['label' => 'foo', 'help' => 'really helpful text']);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [@class="form-group row"]
     [
         ./div[@class="col-sm-2" or @class="col-sm-10"]
@@ -274,7 +274,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [@class="form-group row"]
     [
         ./div[@class="col-sm-2" or @class="col-sm-10"]

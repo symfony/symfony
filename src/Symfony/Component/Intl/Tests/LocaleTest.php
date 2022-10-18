@@ -70,4 +70,16 @@ class LocaleTest extends TestCase
 
         Locale::setDefaultFallback($prev);
     }
+
+    /**
+     * @requires function locale_parse
+     */
+    public function testLongLocaleFallback()
+    {
+        $locale = 'LC_TYPE=fr_FR.UTF-8;LC_NUMERIC=C;LC_TIME=fr_FR.UTF-8;LC_COLLATE=fr_FR.UTF-8;'.
+            'LC_MONETARY=fr_FR.UTF-8;LC_MESSAGES=fr_FR.UTF-8;LC_PAPER=fr_FR.UTF-8;LC_NAME=fr_FR.UTF-8;'.
+            'LC_ADDRESS=fr_FR.UTF-8;LC_TELEPHONE=fr_FR.UTF-8;LC_MEASUREMENT=fr_FR.UTF-8;LC_IDENTIFICATION=fr_FR.UTF-8';
+
+        $this->assertNull(Locale::getFallback($locale));
+    }
 }

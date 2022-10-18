@@ -15,8 +15,7 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Tests\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,9 +23,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class GitterTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): GitterTransport
     {
-        return (new GitterTransport('token', '5539a3ee5etest0d3255bfef', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('api.gitter.im');
+        return (new GitterTransport('token', '5539a3ee5etest0d3255bfef', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('api.gitter.im');
     }
 
     public function toStringProvider(): iterable

@@ -37,6 +37,62 @@
     <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy">
         <attribute name="ignored1" ignore="true" />
         <attribute name="ignored2" ignore="true" />
+        <attribute name="notIgnored" ignore="false" />
+    </class>
+
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent">
+        <attribute name="parentProperty">
+            <normalization_context>
+                <entry name="prop">dummy_parent_value</entry>
+            </normalization_context>
+        </attribute>
+        <attribute name="overriddenParentProperty">
+            <normalization_context>
+                <entry name="prop">dummy_parent_value</entry>
+            </normalization_context>
+        </attribute>
+    </class>
+
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy">
+        <attribute name="foo">
+            <context>
+                <entry name="foo">value</entry>
+                <entry name="bar">value</entry>
+                <entry name="nested">
+                    <entry name="nested_key">nested_value</entry>
+                </entry>
+                <entry name="array">
+                    <entry>first</entry>
+                    <entry>second</entry>
+                </entry>
+            </context>
+            <context>
+                <group>a</group>
+                <entry name="bar">value_for_group_a</entry>
+            </context>
+        </attribute>
+        <attribute name="bar">
+            <normalization_context>
+                <group>a</group>
+                <group>b</group>
+                <entry name="format">d/m/Y</entry>
+            </normalization_context>
+            <denormalization_context>
+                <group>a</group>
+                <group>b</group>
+                <entry name="format">m-d-Y H:i</entry>
+            </denormalization_context>
+        </attribute>
+        <attribute name="overriddenParentProperty">
+            <normalization_context>
+                <entry name="prop">dummy_value</entry>
+            </normalization_context>
+        </attribute>
+        <attribute name="methodWithContext">
+            <context>
+                <entry name="method">method_with_context</entry>
+            </context>
+        </attribute>
     </class>
 
 </serializer>

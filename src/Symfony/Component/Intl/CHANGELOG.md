@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `EmojiTransliterator` to translate emoji to many locales
+
+6.0
+---
+
+ * Remove `DateFormatter\*`, `Collator`, `NumberFormatter`, `Locale`, `IntlGlobals`, `MethodArgumentNotImplementedException`, `MethodArgumentValueNotImplementedException`, `MethodNotImplementedException`and `NotImplementedException` classes, use symfony/polyfill-intl-icu ^1.21 instead
+
+5.3
+---
+
+ * Add `Currencies::getCashFractionDigits()` and `Currencies::getCashRoundingIncrement()`
+
 5.0.0
 -----
 

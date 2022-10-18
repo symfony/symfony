@@ -1,0 +1,59 @@
+name: Static analysis
+
+on:
+  pull_request: ~
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  psalm:
+    name: Psalm
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: "json,couchbase,memcached,mongodb,redis,xsl,ldap,dom"
+          ini-values: "memory_limit=-1"
+          coverage: none
+
+      - name: Checkout target branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Checkout PR
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+          composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
+          composer require --no-progress --ansi psalm/phar phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
+
+      - name: Generate Psalm baseline
+        run: |
+          git checkout composer.json
+          git checkout -m ${{ github.base_ref }}
+
+          # to be removed when psalm adds support for intersection types
+          sed -i 's/Uuid&/Uuid|/' src/Symfony/Component/Uid/Factory/TimeBasedUuidFactory.php
+          ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
+          git checkout -m FETCH_HEAD
+
+      - name: Psalm
+        run: |
+          ./vendor/bin/psalm.phar --no-progress || ./vendor/bin/psalm.phar --output-format=github --no-progress

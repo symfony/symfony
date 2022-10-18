@@ -6,7 +6,7 @@
     {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
         {% set icon %}
             {% set status_color = collector.counterrors ? 'red' : collector.countwarnings ? 'yellow' : 'none' %}
-            {{ include('@WebProfiler/Icon/logger.svg') }}
+            {{ source('@WebProfiler/Icon/logger.svg') }}
             <span class="sf-toolbar-value">{{ collector.counterrors ?: (collector.countdeprecations + collector.countwarnings) }}</span>
         {% endset %}
 
@@ -33,7 +33,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.counterrors ? 'error' : collector.countwarnings ? 'warning' : 'none' }} {{ collector.logs is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/logger.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/logger.svg') }}</span>
         <strong>Logs</strong>
         {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
             <span class="count">
@@ -46,189 +46,185 @@
 {% block panel %}
     <h2>Log Messages</h2>
 
-    {% if collector.logs is empty %}
-        <div class="empty">
+    {% if collector.processedLogs is empty %}
+        <div class="empty empty-panel">
             <p>No log messages available.</p>
         </div>
     {% else %}
-        {# sort collected logs in groups #}
-        {% set deprecation_logs, debug_logs, info_and_error_logs, silenced_logs = [], [], [], [] %}
-        {% set has_error_logs = false %}
-        {% for log in collector.logs %}
-            {% if log.scream is defined and not log.scream %}
-                {% set deprecation_logs = deprecation_logs|merge([log]) %}
-            {% elseif log.scream is defined and log.scream %}
-                {% set silenced_logs = silenced_logs|merge([log]) %}
-            {% elseif log.priorityName == 'DEBUG' %}
-                {% set debug_logs = debug_logs|merge([log]) %}
-            {% else %}
-                {% set info_and_error_logs = info_and_error_logs|merge([log]) %}
-                {% if log.priorityName != 'INFO' %}
-                    {% set has_error_logs = true %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
+        {% set has_error_logs = collector.processedLogs|column('type')|filter(type => 'error' == type)|length > 0 %}
+        {% set has_deprecation_logs = collector.processedLogs|column('type')|filter(type => 'deprecation' == type)|length > 0 %}
 
-        <div class="sf-tabs">
-            <div class="tab {{ has_error_logs ? 'active' }}">
-                <h3 class="tab-title">Info. &amp; Errors <span class="badge status-{{ collector.counterrors ? 'error' : collector.countwarnings ? 'warning' }}">{{ collector.counterrors ?: info_and_error_logs|length }}</span></h3>
-                <p class="text-muted">Informational and error log messages generated during the execution of the application.</p>
+        {% set filters = collector.filters %}
+        <div class="log-filters">
+            <div id="log-filter-type" class="log-filter">
+                <ul class="tab-navigation">
+                    <li class="{{ not has_error_logs and not has_deprecation_logs ? 'active' }}">
+                        <input {{ not has_error_logs and not has_deprecation_logs ? 'checked' }} type="radio" id="filter-log-type-all" name="filter-log-type" value="all">
+                        <label for="filter-log-type-all">All messages</label>
+                    </li>
 
-                <div class="tab-content">
-                    {% if info_and_error_logs is empty %}
-                        <div class="empty">
-                            <p>There are no log messages of this level.</p>
-                        </div>
-                    {% else %}
-                        {{ helper.render_table(info_and_error_logs, 'info', true) }}
-                    {% endif %}
-                </div>
+                    <li class="{{ has_error_logs ? 'active' }}">
+                        <input {{ has_error_logs ? 'checked' }} type="radio" id="filter-log-type-error" name="filter-log-type" value="error">
+                        <label for="filter-log-type-error">
+                            Errors
+                            <span class="badge status-{{ collector.counterrors ? 'error' }}">{{ collector.counterrors|default(0) }}</span>
+                        </label>
+                    </li>
+
+                    <li class="{{ not has_error_logs and has_deprecation_logs ? 'active' }}">
+                        <input {{ not has_error_logs and has_deprecation_logs ? 'checked' }} type="radio" id="filter-log-type-deprecation" name="filter-log-type" value="deprecation">
+                        <label for="filter-log-type-deprecation">
+                            Deprecations
+                            <span class="badge status-{{ collector.countdeprecations ? 'warning' }}">{{ collector.countdeprecations|default(0) }}</span>
+                        </label>
+                    </li>
+                </ul>
             </div>
 
-            <div class="tab {{ not has_error_logs and collector.countdeprecations > 0 ? 'active' }}">
-                {# 'deprecation_logs|length' is not used because deprecations are
-                now grouped and the group count doesn't match the message count #}
-                <h3 class="tab-title">Deprecations <span class="badge status-{{ collector.countdeprecations ? 'none' }}">{{ collector.countdeprecations|default(0) }}</span></h3>
-                <p class="text-muted">Log messages generated by using features marked as deprecated.</p>
+            <details id="log-filter-priority" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    Level (<span class="filter-active-num">{{ filters.priority|length - 1 }}</span>)
+                </summary>
 
-                <div class="tab-content">
-                    {% if deprecation_logs is empty %}
-                        <div class="empty">
-                            <p>There are no log messages about deprecated features.</p>
+                <div class="log-filter-content">
+                    <div class="filter-select-all-or-none">
+                        <button type="button" class="btn btn-link select-all">Select All</button>
+                        <button type="button" class="btn btn-link select-none">Select None</button>
+                    </div>
+
+                    {% for label, value in filters.priority %}
+                        <div class="log-filter-option">
+                            <input {{ 'debug' != value ? 'checked' }} type="checkbox" id="filter-log-level-{{ value }}" name="filter-log-level-{{ value }}" value="{{ value }}">
+                            <label for="filter-log-level-{{ value }}">{{ label }}</label>
                         </div>
-                    {% else %}
-                        {{ helper.render_table(deprecation_logs, 'deprecation', false, true) }}
-                    {% endif %}
+                    {% endfor %}
                 </div>
-            </div>
+            </details>
 
-            <div class="tab">
-                <h3 class="tab-title">Debug <span class="badge">{{ debug_logs|length }}</span></h3>
-                <p class="text-muted">Unimportant log messages generated during the execution of the application.</p>
+            <details id="log-filter-channel" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    Channel (<span class="filter-active-num">{{ filters.channel|length - 1 }}</span>)
+                </summary>
 
-                <div class="tab-content">
-                    {% if debug_logs is empty %}
-                        <div class="empty">
-                            <p>There are no log messages of this level.</p>
+                <div class="log-filter-content">
+                    <div class="filter-select-all-or-none">
+                        <button type="button" class="btn btn-link select-all">Select All</button>
+                        <button type="button" class="btn btn-link select-none">Select None</button>
+                    </div>
+
+                    {% for value in filters.channel %}
+                        <div class="log-filter-option">
+                            <input {{ 'event' != value ? 'checked' }} type="checkbox" id="filter-log-channel-{{ value }}" name="filter-log-channel-{{ value }}" value="{{ value }}">
+                            <label for="filter-log-channel-{{ value }}">{{ value|title }}</label>
                         </div>
-                    {% else %}
-                        {{ helper.render_table(debug_logs, 'debug') }}
-                    {% endif %}
+                    {% endfor %}
                 </div>
-            </div>
-
-            <div class="tab">
-                <h3 class="tab-title">PHP Notices <span class="badge">{{ collector.countscreams|default(0) }}</span></h3>
-                <p class="text-muted">Log messages generated by PHP notices silenced with the @ operator.</p>
-
-                <div class="tab-content">
-                    {% if silenced_logs is empty %}
-                        <div class="empty">
-                            <p>There are no log messages of this level.</p>
-                        </div>
-                    {% else %}
-                        {{ helper.render_table(silenced_logs, 'silenced') }}
-                    {% endif %}
-                </div>
-            </div>
-
-            {% set compilerLogTotal = 0 %}
-            {% for logs in collector.compilerLogs %}
-                {% set compilerLogTotal = compilerLogTotal + logs|length %}
-            {% endfor %}
-            <div class="tab">
-                <h3 class="tab-title">Container <span class="badge">{{ compilerLogTotal }}</span></h3>
-                <p class="text-muted">Log messages generated during the compilation of the service container.</p>
-
-                <div class="tab-content">
-                    {% if collector.compilerLogs is empty %}
-                        <div class="empty">
-                            <p>There are no compiler log messages.</p>
-                        </div>
-                    {% else %}
-                        <table class="logs">
-                            <thead>
-                                <tr>
-                                    <th class="full-width">Class</th>
-                                    <th>Messages</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {% for class, logs in collector.compilerLogs %}
-                                    <tr class="">
-                                        <td class="font-normal">
-                                            {% set context_id = 'context-compiler-' ~ loop.index %}
-
-                                             <a class="btn btn-link sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="{{ class }}">{{ class }}</a>
-
-                                             <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
-                                                <ul>
-                                                {% for log in logs %}
-                                                    <li>{{ profiler_dump_log(log.message) }}</li>
-                                                {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </td>
-                                        <td class="font-normal text-right">{{ logs|length }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% endif %}
-                </div>
-            </div>
-
+            </details>
         </div>
 
-        <script>Sfjs.createFilters();</script>
-    {% endif %}
-{% endblock %}
+        <table class="logs">
+            <colgroup>
+                <col width="140px">
+                <col>
+            </colgroup>
 
-{% macro render_table(logs, category = '', show_level = false, is_deprecation = false) %}
-    {% import _self as helper %}
-    {% set channel_is_defined = (logs|first).channel is defined %}
-    {% set filter = show_level or channel_is_defined %}
+            <thead>
+                <th>Time</th>
+                <th>Message</th>
+            </thead>
 
-    <table class="logs"{% if show_level %} data-filter-level="Emergency,Alert,Critical,Error,Warning,Notice,Info"{% endif %}{% if filter %} data-filters{% endif %}>
-        <thead>
-            <tr>
-                {% if show_level %}<th data-filter="level">Level</th>{% else %}<th>Time</th>{% endif %}
-                {% if channel_is_defined %}<th data-filter="channel">Channel</th>{% endif %}
-                <th class="full-width">Message</th>
-            </tr>
-        </thead>
+            <tbody>
+                {% for log in collector.processedLogs %}
+                    {% set css_class = 'error' == log.type ? 'error'
+                        : (log.priorityName == 'WARNING' or 'deprecation' == log.type) ? 'warning'
+                        : 'silenced' == log.type ? 'silenced'
+                    %}
+                    <tr class="log-status-{{ css_class }}" data-type="{{ log.type }}" data-priority="{{ log.priority }}" data-channel="{{ log.channel }}" style="{{ 'event' == log.channel or 'DEBUG' == log.priorityName ? 'display: none' }}">
+                        <td class="log-timestamp">
+                            <time title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date('c') }}">
+                                {{ log.timestamp|date('H:i:s.v') }}
+                            </time>
 
-        <tbody>
-            {% for log in logs %}
-                {% set css_class = is_deprecation ? ''
-                    : log.priorityName in ['CRITICAL', 'ERROR', 'ALERT', 'EMERGENCY'] ? 'status-error'
-                    : log.priorityName == 'WARNING' ? 'status-warning'
-                %}
-                <tr class="{{ css_class }}"{% if show_level %} data-filter-level="{{ log.priorityName|lower }}"{% endif %}{% if channel_is_defined %} data-filter-channel="{{ log.channel is not null ? log.channel : '' }}"{% endif %}>
-                    <td class="font-normal text-small" nowrap>
-                        {% if show_level %}
-                            <span class="colored text-bold">{{ log.priorityName }}</span>
-                        {% endif %}
-                        <time class="text-muted newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date('c') }}">{{ log.timestamp|date('H:i:s') }}</time>
-                    </td>
-
-                    {% if channel_is_defined %}
-                        <td class="font-normal text-small text-bold" nowrap>
-                            {% if log.channel is null %}<em>n/a</em>{% else %}{{ log.channel }}{% endif %}
-                            {% if log.errorCount is defined and log.errorCount > 1 %}
-                                <span class="text-muted">({{ log.errorCount }} times)</span>
+                            {% if log.type in ['error', 'deprecation', 'silenced'] or 'WARNING' == log.priorityName %}
+                                <span class="log-type-badge badge badge-{{ css_class }}">
+                                    {% if 'error' == log.type or 'WARNING' == log.priorityName %}
+                                        {{ log.priorityName|lower }}
+                                    {% else %}
+                                        {{ log.type|lower }}
+                                    {% endif %}
+                                </span>
+                            {% else %}
+                                <span class="log-type-badge badge badge-{{ css_class }}">
+                                    {{ log.priorityName|lower }}
+                                </span>
                             {% endif %}
                         </td>
 
-                    {% endif %}
+                        <td class="font-normal">
+                            {{ helper.render_log_message('debug', loop.index, log) }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-                    <td class="font-normal">{{ helper.render_log_message(category, loop.index, log) }}</td>
+        <div class="no-logs-message empty">
+            <p>There are no log messages.</p>
+        </div>
+
+        <script>Sfjs.initializeLogsTable();</script>
+    {% endif %}
+
+    {% set compilerLogTotal = 0 %}
+    {% for logs in collector.compilerLogs %}
+        {% set compilerLogTotal = compilerLogTotal + logs|length %}
+    {% endfor %}
+
+    <details class="container-compilation-logs">
+        <summary>
+            <h4>Container Compilation Logs <span class="text-muted">({{ compilerLogTotal }})</span></h4>
+            <p class="text-muted">Log messages generated during the compilation of the service container.</p>
+        </summary>
+
+        {% if collector.compilerLogs is empty %}
+            <div class="empty">
+                <p>There are no compiler log messages.</p>
+            </div>
+        {% else %}
+            <table class="container-logs">
+                <thead>
+                <tr>
+                    <th>Messages</th>
+                    <th class="full-width">Class</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% endmacro %}
+                </thead>
+
+                <tbody>
+                {% for class, logs in collector.compilerLogs %}
+                    <tr>
+                        <td class="font-normal text-right">{{ logs|length }}</td>
+                        <td class="font-normal">
+                            {% set context_id = 'context-compiler-' ~ loop.index %}
+
+                            <button type="button" class="btn btn-link sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="{{ class }}">{{ class }}</button>
+
+                            <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                                <ul class="break-long-words">
+                                    {% for log in logs %}
+                                        <li>{{ profiler_dump_log(log.message) }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </details>
+{% endblock %}
 
 {% macro render_log_message(category, log_index, log) %}
     {% set has_context = log.context is defined and log.context is not empty %}
@@ -238,26 +234,41 @@
         {{ profiler_dump_log(log.message) }}
     {% else %}
         {{ profiler_dump_log(log.message, log.context) }}
+    {% endif %}
 
-        <div class="text-small font-normal">
+    <div class="log-metadata">
+        {% if log.channel %}
+            <span class="badge">{{ log.channel }}</span>
+        {% endif %}
+
+        {% if log.errorCount is defined and log.errorCount > 1 %}
+            <span class="log-num-occurrences">{{ log.errorCount }} times</span>
+        {% endif %}
+
+        {% if has_context %}
             {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
-            <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
+            <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</button></span>
+        {% endif %}
 
-            {% if has_trace %}
-                &nbsp;&nbsp;
-                {% set trace_id = 'trace-' ~ category ~ '-' ~ log_index %}
-                <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
-            {% endif %}
-        </div>
+        {% if has_trace %}
+            {% set trace_id = 'trace-' ~ category ~ '-' ~ log_index %}
+            <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}" data-toggle-alt-content="Hide trace">Show trace</button></span>
 
-        <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
-            {{ profiler_dump(log.context, maxDepth=1) }}
-        </div>
+            <div id="{{ trace_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                {{ profiler_dump(log.context.exception.trace, maxDepth=1) }}
+            </div>
+        {% endif %}
+
+        {% if has_context %}
+            <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                {{ profiler_dump(log.context, maxDepth=1) }}
+            </div>
+        {% endif %}
 
         {% if has_trace %}
             <div id="{{ trace_id }}" class="context sf-toggle-content sf-toggle-hidden">
                 {{ profiler_dump(log.context.exception.trace, maxDepth=1) }}
             </div>
         {% endif %}
-    {% endif %}
+    </div>
 {% endmacro %}

@@ -18,7 +18,7 @@ final class AuthorShare extends AbstractLinkedInShare
 {
     public const PERSON = 'person';
 
-    private $author;
+    private string $author;
 
     public function __construct(string $value, string $organisation = self::PERSON)
     {

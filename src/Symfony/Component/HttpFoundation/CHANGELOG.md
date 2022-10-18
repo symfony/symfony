@@ -1,12 +1,57 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * The HTTP cache store uses the `xxh128` algorithm
+ * Deprecate calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()` without arguments
+ * Add request matchers under the `Symfony\Component\HttpFoundation\RequestMatcher` namespace
+ * Deprecate `RequestMatcher` in favor of `ChainRequestMatcher`
+ * Deprecate `Symfony\Component\HttpFoundation\ExpressionRequestMatcher` in favor of `Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher`
+
+6.1
+---
+
+ * Add stale while revalidate and stale if error cache header
+ * Allow dynamic session "ttl" when using a remote storage
+ * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
+
+6.0
+---
+
+ * Remove the `NamespacedAttributeBag` class
+ * Removed `Response::create()`, `JsonResponse::create()`,
+   `RedirectResponse::create()`, `StreamedResponse::create()` and
+   `BinaryFileResponse::create()` methods (use `__construct()` instead)
+ * Not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()` throws an `\InvalidArgumentException`; wrap your filter in a closure instead
+ * Not passing a `Closure` together with `FILTER_CALLBACK` to `InputBag::filter()` throws an `\InvalidArgumentException`; wrap your filter in a closure instead
+ * Removed the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead
+ * Rename `RequestStack::getMasterRequest()` to `getMainRequest()`
+ * Not passing `FILTER_REQUIRE_ARRAY` or `FILTER_FORCE_ARRAY` flags to `InputBag::filter()` when filtering an array will throw `BadRequestException`
+ * Removed the `Request::HEADER_X_FORWARDED_ALL` constant
+ * Retrieving non-scalar values using `InputBag::get()` will throw `BadRequestException` (use `InputBad::all()` instead to retrieve an array)
+ * Passing non-scalar default value as the second argument `InputBag::get()` will throw `\InvalidArgumentException`
+ * Passing non-scalar, non-array value as the second argument `InputBag::set()` will throw `\InvalidArgumentException`
+ * Passing `null` as `$requestIp` to `IpUtils::__checkIp()`, `IpUtils::__checkIp4()` or `IpUtils::__checkIp6()` is not supported anymore.
+
+5.4
+---
+
+ * Deprecate passing `null` as `$requestIp` to `IpUtils::__checkIp()`, `IpUtils::__checkIp4()` or `IpUtils::__checkIp6()`, pass an empty string instead.
+ * Add the `litespeed_finish_request` method to work with Litespeed
+ * Deprecate `upload_progress.*` and `url_rewriter.tags` session options
+ * Allow setting session options via DSN
+
 5.3
 ---
 
+ * Add the `SessionFactory`, `NativeSessionStorageFactory`, `PhpBridgeSessionStorageFactory` and `MockFileSessionStorageFactory` classes
+ * Calling `Request::getSession()` when there is no available session throws a `SessionNotFoundException`
  * Add the `RequestStack::getSession` method
  * Deprecate the `NamespacedAttributeBag` class
- * added `ResponseFormatSame` PHPUnit constraint
+ * Add `ResponseFormatSame` PHPUnit constraint
+ * Deprecate the `RequestStack::getMasterRequest()` method and add `getMainRequest()` as replacement
 
 5.2.0
 -----

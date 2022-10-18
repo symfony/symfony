@@ -23,14 +23,17 @@ use Symfony\Component\Mime\Message;
  */
 class EnvelopeListener implements EventSubscriberInterface
 {
-    private $sender;
-    private $recipients;
+    private ?Address $sender = null;
 
     /**
-     * @param Address|string     $sender
-     * @param (Address|string)[] $recipients
+     * @var Address[]|null
      */
-    public function __construct($sender = null, array $recipients = null)
+    private ?array $recipients = null;
+
+    /**
+     * @param array<Address|string> $recipients
+     */
+    public function __construct(Address|string $sender = null, array $recipients = null)
     {
         if (null !== $sender) {
             $this->sender = Address::create($sender);
@@ -48,7 +51,7 @@ class EnvelopeListener implements EventSubscriberInterface
             $message = $event->getMessage();
             if ($message instanceof Message) {
                 if (!$message->getHeaders()->has('Sender') && !$message->getHeaders()->has('From')) {
-                    $message->getHeaders()->addMailboxHeader('Sender', $this->sender->getAddress());
+                    $message->getHeaders()->addMailboxHeader('Sender', $this->sender);
                 }
             }
         }
@@ -58,7 +61,7 @@ class EnvelopeListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // should be the last one to allow header changes by other listeners first

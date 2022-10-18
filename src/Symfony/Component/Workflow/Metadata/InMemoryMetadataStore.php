@@ -20,15 +20,18 @@ final class InMemoryMetadataStore implements MetadataStoreInterface
 {
     use GetMetadataTrait;
 
-    private $workflowMetadata;
-    private $placesMetadata;
-    private $transitionsMetadata;
+    private array $workflowMetadata;
+    private array $placesMetadata;
+    private \SplObjectStorage $transitionsMetadata;
 
+    /**
+     * @param \SplObjectStorage<Transition, array>|null $transitionsMetadata
+     */
     public function __construct(array $workflowMetadata = [], array $placesMetadata = [], \SplObjectStorage $transitionsMetadata = null)
     {
         $this->workflowMetadata = $workflowMetadata;
         $this->placesMetadata = $placesMetadata;
-        $this->transitionsMetadata = $transitionsMetadata ?: new \SplObjectStorage();
+        $this->transitionsMetadata = $transitionsMetadata ?? new \SplObjectStorage();
     }
 
     public function getWorkflowMetadata(): array

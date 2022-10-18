@@ -30,16 +30,6 @@ EOPHP
 );
 require __DIR__.'/fake_vendor/autoload.php';
 
-// We need the real DebugClassLoader FQCN but in a vendor path.
-if (!file_exists($errorHandlerRootDir = __DIR__.'/../../../../Component/ErrorHandler')) {
-    if (!file_exists($errorHandlerRootDir = __DIR__.'/../../vendor/symfony/error-handler')) {
-        die('Could not find the ErrorHandler component root directory.');
-    }
-}
-
-file_put_contents($fakeDebugClassLoadPath = __DIR__.'/fake_vendor/symfony/error-handler/DebugClassLoader.php', file_get_contents($errorHandlerRootDir.'/DebugClassLoader.php'));
-require $fakeDebugClassLoadPath;
-
 \Symfony\Component\ErrorHandler\DebugClassLoader::enable();
 new \App\Services\BarService();
 

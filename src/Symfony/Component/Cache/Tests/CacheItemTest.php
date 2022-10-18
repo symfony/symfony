@@ -59,7 +59,6 @@ class CacheItemTest extends TestCase
     {
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
-        $r->setAccessible(true);
         $r->setValue($item, true);
 
         $this->assertSame($item, $item->tag('foo'));
@@ -81,7 +80,6 @@ class CacheItemTest extends TestCase
         $this->expectExceptionMessage('Cache tag');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
-        $r->setAccessible(true);
         $r->setValue($item, true);
 
         $item->tag($tag);
@@ -93,7 +91,6 @@ class CacheItemTest extends TestCase
         $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'key');
-        $r->setAccessible(true);
         $r->setValue($item, 'foo');
 
         $item->tag([]);

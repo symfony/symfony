@@ -4,15 +4,135 @@
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
-                <target>Այս ձևը չպետք է պարունակի լրացուցիչ տողեր.</target>
+                <target>Այս ձևը չպետք է պարունակի լրացուցիչ տողեր։</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>Վերբեռնված ֆայլը չափազանց մեծ է: Խնդրվում է վերբեռնել ավելի փոքր չափսի ֆայլ.</target>
+                <target>Վերբեռնված ֆայլը չափազանց մեծ է. Խնդրվում է վերբեռնել ավելի փոքր չափսի ֆայլ։</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>CSRF արժեքը անթույլատրելի է: Փորձեք նորից ուղարկել ձևը.</target>
+                <target>CSRF արժեքը անթույլատրելի է. Փորձեք նորից ուղարկել ձևը։</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>Այս արժեքը վավեր HTML5 գույն չէ։</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>Please enter a valid birthdate.</source>
+                <target>Խնդրում ենք մուտքագրել վավեր ծննդյան ամսաթիվ։</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>The selected choice is invalid.</source>
+                <target>Ընտրված ընտրությունն անվավեր է։</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>The collection is invalid.</source>
+                <target>Համախումբն անվավեր է։</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>Please select a valid color.</source>
+                <target>Խնդրում ենք ընտրել վավեր գույն։</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>Please select a valid country.</source>
+                <target>Խնդրում ենք ընտրել վավեր երկիր։</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>Please select a valid currency.</source>
+                <target>Խնդրում ենք ընտրել վավեր արժույթ։</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>Please choose a valid date interval.</source>
+                <target>Խնդրում ենք ընտրել ճիշտ ամսաթվերի միջակայք։</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Please enter a valid date and time.</source>
+                <target>Խնդրում ենք մուտքագրել վավեր ամսաթիվ և ժամ։</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Please enter a valid date.</source>
+                <target>Խնդրում ենք մուտքագրել վավեր ամսաթիվ։</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Please select a valid file.</source>
+                <target>Խնդրում ենք ընտրել վավեր ֆայլ։</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The hidden field is invalid.</source>
+                <target>Թաքնված դաշտը անվավեր է։</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>Please enter an integer.</source>
+                <target>Խնդրում ենք մուտքագրել ամբողջ թիվ։</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>Please select a valid language.</source>
+                <target>Խնդրում ենք ընտրել վավեր լեզու։</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>Please select a valid locale.</source>
+                <target>Խնդրում ենք ընտրել վավեր տեղայնացում։</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>Please enter a valid money amount.</source>
+                <target>Խնդրում ենք մուտքագրել վավեր գումար։</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>Please enter a number.</source>
+                <target>Խնդրում ենք մուտքագրել համար։</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>The password is invalid.</source>
+                <target>Գաղտնաբառն անվավեր է։</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>Please enter a percentage value.</source>
+                <target>Խնդրում ենք մուտքագրել տոկոսային արժեք։</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>The values do not match.</source>
+                <target>Արժեքները չեն համընկնում։</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>Please enter a valid time.</source>
+                <target>Մուտքագրեք վավեր ժամանակ։</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>Please select a valid timezone.</source>
+                <target>Խնդրում ենք ընտրել վավեր ժամային գոտի։</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>Please enter a valid URL.</source>
+                <target>Խնդրում ենք մուտքագրել վավեր URL։</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>Please enter a valid search term.</source>
+                <target>Խնդրում ենք մուտքագրել վավեր որոնման տերմին։</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>Please provide a valid phone number.</source>
+                <target>Խնդրում ենք տրամադրել վավեր հեռախոսահամար։</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Նշման վանդակը անվավեր արժեք ունի։</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Խնդրում ենք մուտքագրել վավեր էլ-հասցե։</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Խնդրում ենք ընտրել ճիշտ տարբերակ։</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Խնդրում ենք ընտրել վավեր տիրույթ։</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Մուտքագրեք վավեր շաբաթ։</target>
             </trans-unit>
         </body>
     </file>

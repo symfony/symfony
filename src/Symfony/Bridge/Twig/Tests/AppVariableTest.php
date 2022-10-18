@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -93,13 +102,6 @@ class AppVariableTest extends TestCase
         $this->setTokenStorage($user = $this->createMock(UserInterface::class));
 
         $this->assertEquals($user, $this->appVariable->getUser());
-    }
-
-    public function testGetUserWithUsernameAsTokenUser()
-    {
-        $this->setTokenStorage($user = 'username');
-
-        $this->assertNull($this->appVariable->getUser());
     }
 
     public function testGetTokenWithNoToken()
@@ -224,6 +226,40 @@ class AppVariableTest extends TestCase
             ['this-does-not-exist' => []],
             $this->appVariable->getFlashes(['this-does-not-exist'])
         );
+    }
+
+    public function testGetCurrentRoute()
+    {
+        $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
+
+        $this->assertSame('some_route', $this->appVariable->getCurrent_Route());
+    }
+
+    public function testGetCurrentRouteWithRequestStackNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->appVariable->getCurrent_Route();
+    }
+
+    public function testGetCurrentRouteParameters()
+    {
+        $routeParams = ['some_param' => true];
+        $this->setRequestStack(new Request(attributes: ['_route_params' => $routeParams]));
+
+        $this->assertSame($routeParams, $this->appVariable->getCurrent_Route_Parameters());
+    }
+
+    public function testGetCurrentRouteParametersWithoutAttribute()
+    {
+        $this->setRequestStack(new Request());
+
+        $this->assertSame([], $this->appVariable->getCurrent_Route_Parameters());
+    }
+
+    public function testGetCurrentRouteParametersWithRequestStackNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->appVariable->getCurrent_Route_Parameters();
     }
 
     protected function setRequestStack($request)

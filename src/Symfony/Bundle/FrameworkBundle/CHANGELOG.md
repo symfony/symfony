@@ -1,15 +1,107 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
+ * Add `NotificationAssertionsTrait`
+ * Add option `framework.catch_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to catch all kinds of `Throwable`
+ * Make `AbstractController::render()` able to deal with forms and deprecate `renderForm()`
+ * Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+   `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Add service usages list to the `debug:container` command output
+ * Add service and alias deprecation message to `debug:container [<name>]` output
+ * Tag all workflows services with `workflow`, those with type=workflow are
+   tagged with `workflow.workflow`, and those with type=state_machine with
+   `workflow.state_machine`
+ * Add `rate_limiter` configuration option to `messenger.transport` to allow rate limited transports using the RateLimiter component
+ * Remove `@internal` tag from secret vaults to allow them to be used directly outside the framework bundle and custom vaults to be added
+ * Deprecate `framework.form.legacy_error_messages` config node
+ * Add a `framework.router.cache_dir` configuration option to configure the default `Router` `cache_dir` option
+
+6.1
+---
+
+ * Add support for configuring semaphores
+ * Environment variable `SYMFONY_IDE` is read by default when `framework.ide` config is not set
+ * Load PHP configuration files by default in the `MicroKernelTrait`
+ * Add `cache:pool:invalidate-tags` command
+ * Add `xliff` support in addition to `xlf` for `XliffFileDumper`
+ * Deprecate the `reset_on_message` config option. It can be set to `true` only and does nothing now
+ * Add `trust_x_sendfile_type_header` option
+ * Add support for first-class callable route controller in `MicroKernelTrait`
+ * Add tag `routing.condition_service` to autoconfigure routing condition services
+ * Automatically register kernel methods marked with the `Symfony\Component\Routing\Annotation\Route` attribute or annotation as controllers in `MicroKernelTrait`
+ * Deprecate not setting the `http_method_override` config option. The default value will change to `false` in 7.0.
+ * Add `framework.profiler.collect_serializer_data` config option, set it to `true` to enable the serializer data collector and profiler panel
+
+6.0
+---
+
+ * Remove the `session.storage` alias and `session.storage.*` services, use the `session.storage.factory` alias and `session.storage.factory.*` services instead
+ * Remove `framework.session.storage_id` configuration option, use the `framework.session.storage_factory_id` configuration option instead
+ * Remove the `session` service and the `SessionInterface` alias, use the `\Symfony\Component\HttpFoundation\Request::getSession()` or the new `\Symfony\Component\HttpFoundation\RequestStack::getSession()` methods instead
+ * Remove the `session.attribute_bag` service and `session.flash_bag` service
+ * Remove the `lock.RESOURCE_NAME` and `lock.RESOURCE_NAME.store` services and the `lock`, `LockInterface`, `lock.store` and `PersistingStoreInterface` aliases, use `lock.RESOURCE_NAME.factory`, `lock.factory` or `LockFactory` instead
+ * The `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
+   `cache_clearer`, `filesystem` and `validator` services are now private
+ * Remove the `output-format` and `xliff-version` options from `TranslationUpdateCommand`
+ * Remove `has()`, `get()`, `getDoctrine()`n and `dispatchMessage()` from `AbstractController`, use method/constructor injection instead
+ * Make the "framework.router.utf8" configuration option default to `true`
+ * Remove the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+ * Make the `profiler` service private
+ * Remove all other values than "none", "php_array" and "file" for `framework.annotation.cache`
+ * Register workflow services as private
+ * Remove support for passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
+ * Remove the `cache.adapter.doctrine` service
+ * Remove the `framework.translator.enabled_locales` config option, use `framework.enabled_locales` instead
+ * Make the `framework.messenger.reset_on_message` configuration option default to `true`
+
+5.4
+---
+
+ * Add `set_locale_from_accept_language` config option to automatically set the request locale based on the `Accept-Language`
+   HTTP request header and the `framework.enabled_locales` config option
+ * Add `set_content_language_from_locale` config option to automatically set the `Content-Language` HTTP response header based on the Request locale
+ * Deprecate the `framework.translator.enabled_locales`, use `framework.enabled_locales` instead
+ * Add autowiring alias for `HttpCache\StoreInterface`
+ * Add the ability to enable the profiler using a request query parameter, body parameter or attribute
+ * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+ * Deprecate the public `profiler` service to private
+ * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
+ * Deprecate the `cache.adapter.doctrine` service
+ * Add support for resetting container services after each messenger message
+ * Add `configureContainer()`, `configureRoutes()`, `getConfigDir()` and `getBundlesPath()` to `MicroKernelTrait`
+ * Add support for configuring log level, and status code by exception class
+ * Bind the `default_context` parameter onto serializer's encoders and normalizers
+ * Add support for `statusCode` default parameter when loading a template directly from route using the `Symfony\Bundle\FrameworkBundle\Controller\TemplateController` controller
+ * Deprecate `translation:update` command, use `translation:extract` instead
+ * Add `PhpStanExtractor` support for the PropertyInfo component
+ * Add `cache.adapter.doctrine_dbal` service to replace `cache.adapter.pdo` when a Doctrine DBAL connection is used.
+
 5.3
 ---
 
+ * Deprecate the `session.storage` alias and `session.storage.*` services, use the `session.storage.factory` alias and `session.storage.factory.*` services instead
+ * Deprecate the `framework.session.storage_id` configuration option, use the `framework.session.storage_factory_id` configuration option instead
  * Deprecate the `session` service and the `SessionInterface` alias, use the `Request::getSession()` or the new `RequestStack::getSession()` methods instead
- * Added `AbstractController::renderForm()` to render a form and set the appropriate HTTP status code
- * Added support for configuring PHP error level to log levels
- * Added the `dispatcher` option to `debug:event-dispatcher`
- * Added the `event_dispatcher.dispatcher` tag
- * Added `assertResponseFormatSame()` in `BrowserKitAssertionsTrait`
+ * Add `AbstractController::renderForm()` to render a form and set the appropriate HTTP status code
+ * Add support for configuring PHP error level to log levels
+ * Add the `dispatcher` option to `debug:event-dispatcher`
+ * Add the `event_dispatcher.dispatcher` tag
+ * Add `assertResponseFormatSame()` in `BrowserKitAssertionsTrait`
+ * Add support for configuring UUID factory services
+ * Add tag `assets.package` to register asset packages
+ * Add support to use a PSR-6 compatible cache for Doctrine annotations
+ * Deprecate all other values than "none", "php_array" and "file" for `framework.annotation.cache`
+ * Add `KernelTestCase::getContainer()` as the best way to get a container in tests
+ * Rename the container parameter `profiler_listener.only_master_requests` to `profiler_listener.only_main_requests`
+ * Add service `fragment.uri_generator` to generate the URI of a fragment
+ * Deprecate registering workflow services as public
+ * Deprecate option `--xliff-version` of the `translation:update` command, use e.g. `--format=xlf20` instead
+ * Deprecate option `--output-format` of the `translation:update` command, use e.g. `--format=xlf20` instead
 
 5.2.0
 -----

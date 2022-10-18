@@ -28,12 +28,12 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchSections()
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());
-        $kernel = $this->getHttpKernel($dispatcher, function () { return new Response('', 200, ['X-Debug-Token' => '292e1e']); });
+        $kernel = $this->getHttpKernel($dispatcher);
         $request = Request::create('/');
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
 
-        $events = $stopwatch->getSectionEvents($response->headers->get('X-Debug-Token'));
+        $events = $stopwatch->getSectionEvents($request->attributes->get('_stopwatch_token'));
         $this->assertEquals([
             '__section__',
             'kernel.request',
@@ -56,7 +56,7 @@ class TraceableEventDispatcherTest extends TestCase
 
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch);
 
-        $kernel = $this->getHttpKernel($dispatcher, function () { return new Response(); });
+        $kernel = $this->getHttpKernel($dispatcher);
         $request = Request::create('/');
         $kernel->handle($request);
     }
@@ -69,12 +69,12 @@ class TraceableEventDispatcherTest extends TestCase
         $stopwatch->expects($this->once())
             ->method('isStarted')
             ->willReturn(true);
-        $stopwatch->expects($this->once())
+        $stopwatch->expects($this->exactly(3))
             ->method('stop');
 
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch);
 
-        $kernel = $this->getHttpKernel($dispatcher, function () { return new Response(); });
+        $kernel = $this->getHttpKernel($dispatcher);
         $request = Request::create('/');
         $kernel->handle($request);
     }
@@ -110,13 +110,15 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
 
-    protected function getHttpKernel($dispatcher, $controller)
+    protected function getHttpKernel($dispatcher)
     {
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
-        $controllerResolver->expects($this->once())->method('getController')->willReturn($controller);
+        $controllerResolver->expects($this->once())->method('getController')->willReturn(function () {
+            return new Response();
+        });
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
 
-        return new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
+        return new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver, true);
     }
 }

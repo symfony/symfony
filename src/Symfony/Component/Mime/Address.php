@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime;
 
 use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\MessageIDValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
@@ -32,11 +33,11 @@ final class Address
      */
     private const FROM_STRING_PATTERN = '~(?<displayName>[^<]*)<(?<addrSpec>.*)>[^>]*~';
 
-    private static $validator;
-    private static $encoder;
+    private static EmailValidator $validator;
+    private static IdnAddressEncoder $encoder;
 
-    private $address;
-    private $name;
+    private string $address;
+    private string $name;
 
     public function __construct(string $address, string $name = '')
     {
@@ -44,14 +45,12 @@ final class Address
             throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s"; try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
         }
 
-        if (null === self::$validator) {
-            self::$validator = new EmailValidator();
-        }
+        self::$validator ??= new EmailValidator();
 
         $this->address = trim($address);
         $this->name = trim(str_replace(["\n", "\r"], '', $name));
 
-        if (!self::$validator->isValid($this->address, new RFCValidation())) {
+        if (!self::$validator->isValid($this->address, class_exists(MessageIDValidation::class) ? new MessageIDValidation() : new RFCValidation())) {
             throw new RfcComplianceException(sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
         }
     }
@@ -68,43 +67,44 @@ final class Address
 
     public function getEncodedAddress(): string
     {
-        if (null === self::$encoder) {
-            self::$encoder = new IdnAddressEncoder();
-        }
+        self::$encoder ??= new IdnAddressEncoder();
 
         return self::$encoder->encodeString($this->address);
     }
 
     public function toString(): string
     {
-        return ($n = $this->getName()) ? $n.' <'.$this->getEncodedAddress().'>' : $this->getEncodedAddress();
+        return ($n = $this->getEncodedName()) ? $n.' <'.$this->getEncodedAddress().'>' : $this->getEncodedAddress();
     }
 
-    /**
-     * @param Address|string $address
-     */
-    public static function create($address): self
+    public function getEncodedName(): string
+    {
+        if ('' === $this->getName()) {
+            return '';
+        }
+
+        return sprintf('"%s"', preg_replace('/"/u', '\"', $this->getName()));
+    }
+
+    public static function create(self|string $address): self
     {
         if ($address instanceof self) {
             return $address;
         }
-        if (\is_string($address)) {
-            if (false === strpos($address, '<')) {
-                return new self($address);
-            }
 
-            if (!preg_match(self::FROM_STRING_PATTERN, $address, $matches)) {
-                throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $address, self::class));
-            }
-
-            return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
+        if (!str_contains($address, '<')) {
+            return new self($address);
         }
 
-        throw new InvalidArgumentException(sprintf('An address can be an instance of Address or a string ("%s" given).', get_debug_type($address)));
+        if (!preg_match(self::FROM_STRING_PATTERN, $address, $matches)) {
+            throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $address, self::class));
+        }
+
+        return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
     }
 
     /**
-     * @param (Address|string)[] $addresses
+     * @param array<Address|string> $addresses
      *
      * @return Address[]
      */
@@ -116,23 +116,5 @@ final class Address
         }
 
         return $addrs;
-    }
-
-    /**
-     * @deprecated since Symfony 5.2, use "create()" instead.
-     */
-    public static function fromString(string $string): self
-    {
-        trigger_deprecation('symfony/mime', '5.2', '"%s()" is deprecated, use "%s::create()" instead.', __METHOD__, __CLASS__);
-
-        if (false === strpos($string, '<')) {
-            return new self($string, '');
-        }
-
-        if (!preg_match(self::FROM_STRING_PATTERN, $string, $matches)) {
-            throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $string, self::class));
-        }
-
-        return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
     }
 }

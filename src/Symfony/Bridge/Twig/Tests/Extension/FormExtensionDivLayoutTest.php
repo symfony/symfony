@@ -32,8 +32,6 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     private $renderer;
 
-    protected static $supportedFeatureSetVersion = 404;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -205,7 +203,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="class-test help-text"]
     [.="[trans]Help text test![/trans]"]
@@ -223,7 +221,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -231,7 +229,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -251,7 +249,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -259,7 +257,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -279,7 +277,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -287,7 +285,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -331,7 +329,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderForm(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->renderBlock($view, 'form', $vars);
+        return $this->renderer->renderBlock($view, 'form', $vars);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = [])
@@ -340,42 +338,42 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             $vars += ['label' => $label];
         }
 
-        return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderHelp(FormView $view)
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'help');
+        return $this->renderer->searchAndRenderBlock($view, 'help');
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
+        return $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'row', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function renderStart(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->renderBlock($view, 'form_start', $vars);
+        return $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
     protected function renderEnd(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
+        return $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)

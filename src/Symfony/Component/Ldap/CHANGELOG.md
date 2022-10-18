@@ -1,9 +1,27 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate `{username}` parameter use in favour of `{user_identifier}`
+
+6.1
+---
+
+ * Return a 500 Internal Server Error if LDAP server in unavailable during user enumeration / authentication
+ * Introduce `InvalidSearchCredentialsException` to differentiate between cases where user-provided credentials are invalid and cases where the configured search credentials are invalid
+
+6.0
+---
+
+ * Removed `LdapUser::getUsername()` method, use `getUserIdentifier()` instead
+ * Removed `LdapUserProvider::loadUserByUsername()` method, use `loadUserByIdentifier()` instead
+
 5.3
 ---
 
+ * The authenticator system is no longer experimental
  * Added caseSensitive option for attribute keys in the Entry class.
 
 5.1.0

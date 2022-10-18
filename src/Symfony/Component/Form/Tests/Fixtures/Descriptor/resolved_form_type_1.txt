@@ -17,8 +17,9 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   expanded                                             by_reference                                          
   group_by                                             data                                                  
   multiple                                             disabled                                              
-  placeholder                                          getter                                                
-  preferred_choices                                    help                                                  
+  placeholder                                          form_attr                                             
+  preferred_choices                                    getter                                                
+                                                       help                                                  
                                                        help_attr                                             
                                                        help_html                                             
                                                        help_translation_parameters                           
@@ -33,6 +34,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                        mapped                                                
                                                        method                                                
                                                        post_max_size_message                                 
+                                                       priority                                              
                                                        property_path                                         
                                                        required                                              
                                                        row_attr                                              

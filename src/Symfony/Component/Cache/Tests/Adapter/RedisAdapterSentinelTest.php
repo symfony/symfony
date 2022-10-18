@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -23,16 +24,16 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
     public static function setUpBeforeClass(): void
     {
         if (!class_exists(\RedisSentinel::class)) {
-            self::markTestSkipped('The RedisSentinel class is required.');
+            throw new SkippedTestSuiteError('The RedisSentinel class is required.');
         }
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
-            self::markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
+            throw new SkippedTestSuiteError('REDIS_SENTINEL_HOSTS env var is not defined.');
         }
         if (!$service = getenv('REDIS_SENTINEL_SERVICE')) {
-            self::markTestSkipped('REDIS_SENTINEL_SERVICE env var is not defined.');
+            throw new SkippedTestSuiteError('REDIS_SENTINEL_SERVICE env var is not defined.');
         }
 
-        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => $service]);
+        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => $service, 'prefix' => 'prefix_']);
     }
 
     public function testInvalidDSNHasBothClusterAndSentinel()
@@ -46,9 +47,9 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
     public function testExceptionMessageWhenFailingToRetrieveMasterInformation()
     {
         $hosts = getenv('REDIS_SENTINEL_HOSTS');
-        $firstHost = explode(' ', $hosts)[0];
+        $dsn = 'redis:?host['.str_replace(' ', ']&host[', $hosts).']';
         $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to retrieve master information from master name "invalid-masterset-name" and address "'.$firstHost.'".');
-        AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => 'invalid-masterset-name']);
+        $this->expectExceptionMessage('Failed to retrieve master information from sentinel "invalid-masterset-name" and dsn "'.$dsn.'".');
+        AbstractAdapter::createConnection($dsn, ['redis_sentinel' => 'invalid-masterset-name']);
     }
 }

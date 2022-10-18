@@ -11,18 +11,19 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class DateTimeToLocalizedStringTransformerTest extends TestCase
+class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTest
 {
     use DateTimeEqualsTrait;
 
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
+    private $defaultLocale;
 
     protected function setUp(): void
     {
@@ -37,6 +38,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '57.1');
 
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('de_AT');
 
         $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
@@ -47,6 +49,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function dataProvider()
@@ -194,9 +197,9 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
 
         // HOW TO REPRODUCE?
 
-        //$this->expectException(\Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException::class);
+        // $this->expectException(\Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException::class);
 
-        //$transformer->transform(1.5);
+        // $transformer->transform(1.5);
     }
 
     /**
@@ -368,5 +371,10 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->reverseTransform('12345');
+    }
+
+    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    {
+        return new DateTimeToLocalizedStringTransformer($inputTimezone, $outputTimezone);
     }
 }

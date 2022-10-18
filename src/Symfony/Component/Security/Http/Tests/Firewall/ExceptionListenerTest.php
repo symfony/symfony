@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -74,8 +75,17 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
+    /**
+     * This test should be removed in Symfony 7.0 when adding native return types to AuthenticationEntryPointInterface::start().
+     *
+     * @group legacy
+     */
     public function testExceptionWhenEntryPointReturnsBadValue()
     {
+        if ((new \ReflectionMethod(AuthenticationEntryPointInterface::class, 'start'))->hasReturnType()) {
+            $this->markTestSkipped('Native return type found');
+        }
+
         $event = $this->createEvent(new AuthenticationException());
 
         $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
@@ -99,7 +109,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -122,7 +132,7 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertEquals('Unauthorized', $event->getResponse()->getContent());
         $this->assertEquals(401, $event->getResponse()->getStatusCode());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -139,7 +149,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertEquals('error', $event->getResponse()->getContent());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -156,7 +166,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertEquals('OK', $event->getResponse()->getContent());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     public function testLogoutException()
@@ -168,6 +178,18 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertEquals('Invalid CSRF.', $event->getThrowable()->getMessage());
         $this->assertEquals(403, $event->getThrowable()->getStatusCode());
+    }
+
+    public function testUnregister()
+    {
+        $listener = $this->createExceptionListener();
+        $dispatcher = new EventDispatcher();
+
+        $listener->register($dispatcher);
+        $this->assertNotEmpty($dispatcher->getListeners());
+
+        $listener->unregister($dispatcher);
+        $this->assertEmpty($dispatcher->getListeners());
     }
 
     public function getAccessDeniedExceptionProvider()
@@ -184,7 +206,7 @@ class ExceptionListenerTest extends TestCase
     private function createEntryPoint(Response $response = null)
     {
         $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint->expects($this->once())->method('start')->willReturn($response ?: new Response('OK'));
+        $entryPoint->expects($this->once())->method('start')->willReturn($response ?? new Response('OK'));
 
         return $entryPoint;
     }
@@ -203,15 +225,15 @@ class ExceptionListenerTest extends TestCase
             $kernel = $this->createMock(HttpKernelInterface::class);
         }
 
-        return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
+        return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }
 
     private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
     {
         return new ExceptionListener(
-            $tokenStorage ?: $this->createMock(TokenStorageInterface::class),
-            $trustResolver ?: $this->createMock(AuthenticationTrustResolverInterface::class),
-            $httpUtils ?: $this->createMock(HttpUtils::class),
+            $tokenStorage ?? $this->createMock(TokenStorageInterface::class),
+            $trustResolver ?? $this->createMock(AuthenticationTrustResolverInterface::class),
+            $httpUtils ?? $this->createMock(HttpUtils::class),
             'key',
             $authenticationEntryPoint,
             $errorPage,

@@ -1,17 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Tests;
 
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
 final class LinkedInTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return LinkedInTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): LinkedInTransportFactory
     {
         return new LinkedInTransportFactory();
     }

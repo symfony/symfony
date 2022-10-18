@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
-
 class FormLoginTest extends AbstractWebTestCase
 {
     /**
@@ -109,42 +107,49 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     /**
-     * @dataProvider provideInvalidCredentials
      * @group time-sensitive
      */
-    public function testLoginThrottling($username, $password)
+    public function testLoginThrottling()
     {
-        if (!class_exists(LoginThrottlingListener::class)) {
-            $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml']);
+
+        $attempts = [
+            ['johannes', 'wrong'],
+            ['johannes', 'also_wrong'],
+            ['wrong', 'wrong'],
+            ['johannes', 'wrong_again'],
+        ];
+        foreach ($attempts as $i => $attempt) {
+            $form = $client->request('GET', '/login')->selectButton('login')->form();
+            $form['_username'] = $attempt[0];
+            $form['_password'] = $attempt[1];
+            $client->submit($form);
+
+            $text = $client->followRedirect()->text(null, true);
+            switch ($i) {
+                case 0: // First attempt : Invalid credentials (OK)
+                    $this->assertStringContainsString('Invalid credentials', $text, 'Invalid response on 1st attempt');
+
+                    break;
+                case 1: // Second attempt : login throttling !
+                    $this->assertStringContainsString('Too many failed login attempts, please try again', $text, 'Invalid response on 2nd attempt');
+
+                    break;
+                case 2: // Third attempt with unexisting username
+                    $this->assertStringContainsString('Invalid credentials.', $text, 'Invalid response on 3rd attempt');
+
+                    break;
+                case 3: // Fourth attempt : still login throttling !
+                    $this->assertStringContainsString('Too many failed login attempts, please try again', $text, 'Invalid response on 4th attempt');
+
+                    break;
+            }
         }
-
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml', 'enable_authenticator_manager' => true]);
-
-        $form = $client->request('GET', '/login')->selectButton('login')->form();
-        $form['_username'] = $username;
-        $form['_password'] = $password;
-        $client->submit($form);
-
-        $client->followRedirect()->selectButton('login')->form();
-        $form['_username'] = $username;
-        $form['_password'] = $password;
-        $client->submit($form);
-
-        $text = $client->followRedirect()->text(null, true);
-        $this->assertStringMatchesFormat('%sToo many failed login attempts, please try again in %d minute%s', $text);
-    }
-
-    public function provideInvalidCredentials()
-    {
-        yield 'invalid_password' => ['johannes', 'wrong'];
-        yield 'invalid_username' => ['wrong', 'wrong'];
     }
 
     public function provideClientOptions()
     {
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 }

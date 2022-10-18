@@ -1,0 +1,21 @@
+route:
+  path: /hello
+overrided:
+  path: /
+alias:
+  alias: route
+deprecated:
+  alias: route
+  deprecated:
+    package: "foo/bar"
+    version: "1.0.0"
+deprecated-with-custom-message:
+  alias: route
+  deprecated:
+    package: "foo/bar"
+    version: "1.0.0"
+    message: "foo %alias_id%."
+deep:
+  alias: alias
+_import:
+  resource: override.yaml

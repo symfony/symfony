@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Sendinblue;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Pierre Tondereau <pierre.tondereau@protonmail.com>
  */
 final class SendinblueTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return SendinblueTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): SendinblueTransport
     {
         $scheme = $dsn->getScheme();
 

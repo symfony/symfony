@@ -14,19 +14,22 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Countries;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountryType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
+                if (!class_exists(Intl::class)) {
+                    throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s". Try running "composer require symfony/intl".', static::class));
+                }
+
                 $choiceTranslationLocale = $options['choice_translation_locale'];
                 $alpha3 = $options['alpha3'];
 
@@ -37,29 +40,19 @@ class CountryType extends AbstractType
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'alpha3' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid country.';
-            },
+            'invalid_message' => 'Please select a valid country.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
         $resolver->setAllowedTypes('alpha3', 'bool');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'country';
     }

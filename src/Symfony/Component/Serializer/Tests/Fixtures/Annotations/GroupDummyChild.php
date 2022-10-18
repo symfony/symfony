@@ -15,18 +15,12 @@ class GroupDummyChild extends GroupDummy
 {
     private $baz;
 
-    /**
-     * @return mixed
-     */
-    public function getBaz()
+    public function getBaz(): mixed
     {
         return $this->baz;
     }
 
-    /**
-     * @param mixed $baz
-     */
-    public function setBaz($baz)
+    public function setBaz(mixed $baz)
     {
         $this->baz = $baz;
     }

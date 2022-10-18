@@ -15,7 +15,6 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -27,33 +26,20 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.3
  */
 class UserAuthenticator implements UserAuthenticatorInterface
 {
-    private $firewallMap;
-    private $userAuthenticators;
-    private $requestStack;
+    use FirewallAwareTrait;
 
     public function __construct(FirewallMap $firewallMap, ContainerInterface $userAuthenticators, RequestStack $requestStack)
     {
         $this->firewallMap = $firewallMap;
-        $this->userAuthenticators = $userAuthenticators;
+        $this->locator = $userAuthenticators;
         $this->requestStack = $requestStack;
     }
 
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request): ?Response
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
-        return $this->getUserAuthenticator()->authenticateUser($user, $authenticator, $request);
-    }
-
-    private function getUserAuthenticator(): UserAuthenticatorInterface
-    {
-        $firewallConfig = $this->firewallMap->getFirewallConfig($this->requestStack->getMasterRequest());
-        if (null === $firewallConfig) {
-            throw new LogicException('Cannot call authenticate on this request, as it is not behind a firewall.');
-        }
-
-        return $this->userAuthenticators->get($firewallConfig->getName());
+        return $this->getForFirewall()->authenticateUser($user, $authenticator, $request, $badges);
     }
 }

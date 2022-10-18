@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
+
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -49,9 +51,43 @@ class ParentDummy
     public $files;
 
     /**
+     * @var static
+     */
+    public $propertyTypeStatic;
+
+    /**
+     * @var parent
+     */
+    public $parentAnnotationNoParent;
+
+    /**
+     * @var RootDummyItem[]
+     */
+    public $rootDummyItems;
+
+    /**
+     * @var \Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem
+     */
+    public $rootDummyItem;
+
+    /**
      * @return bool|null
      */
     public function isC()
+    {
+    }
+
+    /**
+     * @return true|null
+     */
+    public function isCt()
+    {
+    }
+
+    /**
+     * @return false|null
+     */
+    public function isCf()
     {
     }
 
@@ -63,6 +99,20 @@ class ParentDummy
     }
 
     /**
+     * @return true
+     */
+    public function canDt()
+    {
+    }
+
+    /**
+     * @return false
+     */
+    public function canDf()
+    {
+    }
+
+    /**
      * @param resource $e
      */
     public function addE($e)
@@ -70,9 +120,9 @@ class ParentDummy
     }
 
     /**
-     * @param \DateTime $f
+     * @param \DateTimeImmutable $f
      */
-    public function removeF(\DateTime $f)
+    public function removeF(\DateTimeImmutable $f)
     {
     }
 }

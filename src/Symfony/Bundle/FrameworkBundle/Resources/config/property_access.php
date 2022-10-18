@@ -19,9 +19,8 @@ return static function (ContainerConfigurator $container) {
         ->set('property_accessor', PropertyAccessor::class)
             ->args([
                 abstract_arg('magic methods allowed, set by the extension'),
-                abstract_arg('throwExceptionOnInvalidIndex, set by the extension'),
+                abstract_arg('throw exceptions, set by the extension'),
                 service('cache.property_access')->ignoreOnInvalid(),
-                abstract_arg('throwExceptionOnInvalidPropertyPath, set by the extension'),
                 abstract_arg('propertyReadInfoExtractor, set by the extension'),
                 abstract_arg('propertyWriteInfoExtractor, set by the extension'),
             ])

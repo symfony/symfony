@@ -47,9 +47,10 @@ class DebugHandlersListenerTest extends TestCase
         try {
             $listener->configure();
         } catch (\Exception $exception) {
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
         }
-        restore_exception_handler();
-        restore_error_handler();
 
         if (null !== $exception) {
             throw $exception;
@@ -70,7 +71,7 @@ class DebugHandlersListenerTest extends TestCase
         $event = new KernelEvent(
             $this->createMock(HttpKernelInterface::class),
             Request::create('/'),
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
 
         $exception = null;
@@ -113,9 +114,10 @@ class DebugHandlersListenerTest extends TestCase
         try {
             $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
         } catch (\Exception $exception) {
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
         }
-        restore_exception_handler();
-        restore_error_handler();
 
         if (null !== $exception) {
             throw $exception;
@@ -190,10 +192,6 @@ class DebugHandlersListenerTest extends TestCase
      */
     public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, $levels, $expectedLoggerLevels, $expectedDeprecationLoggerLevels)
     {
-        if (!class_exists(ErrorHandler::class)) {
-            $this->markTestSkipped('ErrorHandler component is required to run this test.');
-        }
-
         $handler = $this->createMock(ErrorHandler::class);
 
         $expectedCalls = [];
@@ -219,7 +217,7 @@ class DebugHandlersListenerTest extends TestCase
             ->method('setDefaultLogger')
             ->withConsecutive(...$expectedCalls);
 
-        $sut = new DebugHandlersListener(null, $logger, $levels, null, true, null, true, $deprecationLogger);
+        $sut = new DebugHandlersListener(null, $logger, $levels, null, true, true, $deprecationLogger);
         $prevHander = set_exception_handler([$handler, 'handleError']);
 
         try {

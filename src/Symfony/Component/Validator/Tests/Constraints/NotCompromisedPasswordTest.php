@@ -28,9 +28,6 @@ class NotCompromisedPasswordTest extends TestCase
         $this->assertFalse($constraint->skipOnError);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(NotCompromisedPasswordDummy::class);

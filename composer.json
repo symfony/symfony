@@ -15,34 +15,49 @@
             "homepage": "https://symfony.com/contributors"
         }
     ],
+    "provide": {
+        "php-http/async-client-implementation": "*",
+        "php-http/client-implementation": "*",
+        "psr/cache-implementation": "2.0|3.0",
+        "psr/container-implementation": "1.1|2.0",
+        "psr/event-dispatcher-implementation": "1.0",
+        "psr/http-client-implementation": "1.0",
+        "psr/link-implementation": "1.0|2.0",
+        "psr/log-implementation": "1.0|2.0|3.0",
+        "psr/simple-cache-implementation": "1.0|2.0|3.0",
+        "symfony/cache-implementation": "1.1|2.0|3.0",
+        "symfony/event-dispatcher-implementation": "2.0|3.0",
+        "symfony/http-client-implementation": "3.0",
+        "symfony/service-implementation": "1.1|2.0|3.0",
+        "symfony/translation-implementation": "2.3|3.0"
+    },
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
+        "composer-runtime-api": ">=2.1",
         "ext-xml": "*",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
-        "doctrine/event-manager": "~1.0",
-        "doctrine/persistence": "^2",
+        "doctrine/event-manager": "^1.2|^2",
+        "doctrine/persistence": "^2|^3",
         "twig/twig": "^2.13|^3.0.4",
-        "psr/cache": "~1.0",
-        "psr/container": "^1.0",
+        "psr/cache": "^2.0|^3.0",
+        "psr/container": "^1.1|^2.0",
         "psr/event-dispatcher": "^1.0",
-        "psr/link": "^1.0",
-        "psr/log": "~1.0",
-        "symfony/contracts": "^2.1",
+        "psr/link": "^1.1|^2.0",
+        "psr/log": "^1|^2|^3",
+        "symfony/contracts": "^2.5|^3.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php73": "^1.11",
-        "symfony/polyfill-php80": "^1.15",
         "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {
         "symfony/asset": "self.version",
-        "symfony/amazon-mailer": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/cache": "self.version",
+        "symfony/clock": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
@@ -58,23 +73,19 @@
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
         "symfony/framework-bundle": "self.version",
-        "symfony/google-mailer": "self.version",
         "symfony/http-client": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
-        "symfony/inflector": "self.version",
         "symfony/intl": "self.version",
         "symfony/ldap": "self.version",
         "symfony/lock": "self.version",
-        "symfony/mailchimp-mailer": "self.version",
         "symfony/mailer": "self.version",
-        "symfony/mailgun-mailer": "self.version",
         "symfony/messenger": "self.version",
         "symfony/mime": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/notifier": "self.version",
         "symfony/options-resolver": "self.version",
-        "symfony/postmark-mailer": "self.version",
+        "symfony/password-hasher": "self.version",
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
@@ -84,10 +95,8 @@
         "symfony/security-bundle": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
-        "symfony/security-guard": "self.version",
         "symfony/security-http": "self.version",
         "symfony/semaphore": "self.version",
-        "symfony/sendgrid-mailer": "self.version",
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
         "symfony/string": "self.version",
@@ -110,42 +119,49 @@
         "amphp/http-tunnel": "^1.0",
         "async-aws/ses": "^1.0",
         "async-aws/sqs": "^1.0",
+        "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
-        "composer/package-versions-deprecated": "^1.8",
-        "doctrine/annotations": "^1.10.4",
-        "doctrine/cache": "~1.6",
+        "doctrine/annotations": "^1.13.1",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
-        "doctrine/dbal": "^2.10|^3.0",
-        "doctrine/orm": "^2.7.3",
-        "doctrine/doctrine-bundle": "^2.0",
+        "doctrine/dbal": "^2.13.1|^3.0",
+        "doctrine/orm": "^2.7.4",
+        "egulias/email-validator": "^2.1.10|^3.1",
         "guzzlehttp/promises": "^1.4",
-        "masterminds/html5": "^2.6",
+        "league/html-to-markdown": "^5.0",
+        "masterminds/html5": "^2.7.2",
         "monolog/monolog": "^1.25.1|^2",
         "nyholm/psr7": "^1.0",
-        "paragonie/sodium_compat": "^1.8",
         "pda/pheanstalk": "^4.0",
         "php-http/httplug": "^1.0|^2.0",
+        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpstan/phpdoc-parser": "^1.0",
         "predis/predis": "~1.1",
         "psr/http-client": "^1.0",
-        "psr/simple-cache": "^1.0",
-        "egulias/email-validator": "^2.1.10",
-        "symfony/mercure-bundle": "^0.2",
-        "symfony/phpunit-bridge": "^5.2",
+        "psr/simple-cache": "^1.0|^2.0|^3.0",
+        "symfony/mercure-bundle": "^0.3",
+        "symfony/phpunit-bridge": "^5.4|^6.0",
+        "symfony/runtime": "self.version",
         "symfony/security-acl": "~2.8|~3.0",
-        "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
-        "twig/cssinliner-extra": "^2.12",
-        "twig/inky-extra": "^2.12",
-        "twig/markdown-extra": "^2.12"
+        "twig/cssinliner-extra": "^2.12|^3",
+        "twig/inky-extra": "^2.12|^3",
+        "twig/markdown-extra": "^2.12|^3"
     },
     "conflict": {
+        "ext-psr": "<1.1|>=2",
         "async-aws/core": "<1.5",
-        "doctrine/dbal": "<2.10",
+        "doctrine/annotations": "<1.13.1",
+        "doctrine/dbal": "<2.13.1",
+        "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",
-        "phpdocumentor/reflection-docblock": "<3.2.2",
-        "phpdocumentor/type-resolver": "<1.4.0",
-        "ocramius/proxy-manager": "<2.1",
+        "phpdocumentor/reflection-docblock": "<5.2",
+        "phpdocumentor/type-resolver": "<1.5.1",
         "phpunit/phpunit": "<5.4.3"
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
     },
     "autoload": {
         "psr-4": {
@@ -156,8 +172,11 @@
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
+        "files": [
+            "src/Symfony/Component/String/Resources/functions.php"
+        ],
         "classmap": [
-            "src/Symfony/Component/Intl/Resources/stubs"
+            "src/Symfony/Component/Cache/Traits/ValueWrapper.php"
         ],
         "exclude-from-classmap": [
             "**/Tests/"
@@ -165,7 +184,6 @@
     },
     "autoload-dev": {
         "files": [
-            "src/Symfony/Component/String/Resources/functions.php",
             "src/Symfony/Component/VarDumper/Resources/functions/dump.php"
         ]
     },
@@ -175,7 +193,20 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "2.3.x-dev"
+                    "symfony/contracts": "3.2.x-dev"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "src/Symfony/Component/Runtime"
+        },
+        {
+            "type": "path",
+            "url": "src/Symfony/Component/Notifier/Bridge/Mercure/Tests/stella-maris-clock",
+            "options": {
+                "versions": {
+                    "stella-maris/clock": "0.1.x-dev"
                 }
             }
         }

@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+* Remove the `NotSupportedException`. It shouldn't be thrown anymore
+* Remove the `RetryTillSaveStore`. Logic has been moved in `Lock` and is not needed anymore
+* Remove support of Doctrine DBAL in `PdoStore` and `PostgreSqlStore`
+
+5.4
+---
+
+* Add `DoctrineDbalStore` identical to `PdoStore` for `Doctrine\DBAL\Connection` or DBAL url
+* Deprecate usage of `PdoStore` with `Doctrine\DBAL\Connection` or DBAL url
+* Add `DoctrineDbalPostgreSqlStore` identical to `PdoPostgreSqlStore` for `Doctrine\DBAL\Connection` or DBAL url
+* Deprecate usage of `PdoPostgreSqlStore` with `Doctrine\DBAL\Connection` or DBAL url
+
 5.2.0
 -----
 

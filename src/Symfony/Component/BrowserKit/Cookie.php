@@ -40,13 +40,13 @@ class Cookie
     protected $secure;
     protected $httponly;
     protected $rawValue;
-    private $samesite;
+    private ?string $samesite;
 
     /**
      * Sets a cookie.
      *
      * @param string      $name         The cookie name
-     * @param string      $value        The value of the cookie
+     * @param string|null $value        The value of the cookie
      * @param string|null $expires      The time the cookie expires
      * @param string|null $path         The path on the server in which the cookie will be available on
      * @param string      $domain       The domain that the cookie is available
@@ -62,7 +62,7 @@ class Cookie
             $this->rawValue = $value;
         } else {
             $this->value = $value;
-            $this->rawValue = rawurlencode($value);
+            $this->rawValue = rawurlencode($value ?? '');
         }
         $this->name = $name;
         $this->path = empty($path) ? '/' : $path;
@@ -72,7 +72,7 @@ class Cookie
         $this->samesite = $samesite;
 
         if (null !== $expires) {
-            $timestampAsDateTime = \DateTime::createFromFormat('U', $expires);
+            $timestampAsDateTime = \DateTimeImmutable::createFromFormat('U', $expires);
             if (false === $timestampAsDateTime) {
                 throw new \UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.', $expires));
             }
@@ -83,15 +83,13 @@ class Cookie
 
     /**
      * Returns the HTTP representation of the Cookie.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
-            $dateTime = \DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
+            $dateTime = \DateTimeImmutable::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
             $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::DATE_FORMATS[0]));
         }
 
@@ -121,15 +119,13 @@ class Cookie
     /**
      * Creates a Cookie instance from a Set-Cookie header value.
      *
-     * @return static
-     *
      * @throws \InvalidArgumentException
      */
-    public static function fromString(string $cookie, string $url = null)
+    public static function fromString(string $cookie, string $url = null): static
     {
         $parts = explode(';', $cookie);
 
-        if (false === strpos($parts[0], '=')) {
+        if (!str_contains($parts[0], '=')) {
             throw new \InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
         }
 
@@ -161,7 +157,7 @@ class Cookie
 
             if ('secure' === strtolower($part)) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
-                if (!$url || !isset($urlParts['scheme']) || 'https' != $urlParts['scheme']) {
+                if (!$url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
                     continue;
                 }
 
@@ -206,13 +202,13 @@ class Cookie
         }
 
         foreach (self::DATE_FORMATS as $dateFormat) {
-            if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
+            if (false !== $date = \DateTimeImmutable::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
                 return $date->format('U');
             }
         }
 
         // attempt a fallback for unusual formatting
-        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+        if (false !== $date = date_create_immutable($dateValue, new \DateTimeZone('GMT'))) {
             return $date->format('U');
         }
 
@@ -221,98 +217,78 @@ class Cookie
 
     /**
      * Gets the name of the cookie.
-     *
-     * @return string The cookie name
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * Gets the value of the cookie.
-     *
-     * @return string The cookie value
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
 
     /**
      * Gets the raw value of the cookie.
-     *
-     * @return string The cookie value
      */
-    public function getRawValue()
+    public function getRawValue(): string
     {
         return $this->rawValue;
     }
 
     /**
      * Gets the expires time of the cookie.
-     *
-     * @return string|null The cookie expires time
      */
-    public function getExpiresTime()
+    public function getExpiresTime(): ?string
     {
         return $this->expires;
     }
 
     /**
      * Gets the path of the cookie.
-     *
-     * @return string The cookie path
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
      * Gets the domain of the cookie.
-     *
-     * @return string The cookie domain
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
      * Returns the secure flag of the cookie.
-     *
-     * @return bool The cookie secure flag
      */
-    public function isSecure()
+    public function isSecure(): bool
     {
         return $this->secure;
     }
 
     /**
      * Returns the httponly flag of the cookie.
-     *
-     * @return bool The cookie httponly flag
      */
-    public function isHttpOnly()
+    public function isHttpOnly(): bool
     {
         return $this->httponly;
     }
 
     /**
      * Returns true if the cookie has expired.
-     *
-     * @return bool true if the cookie has expired, false otherwise
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return null !== $this->expires && 0 != $this->expires && $this->expires <= time();
     }
 
     /**
      * Gets the samesite attribute of the cookie.
-     *
-     * @return string|null The cookie samesite attribute
      */
     public function getSameSite(): ?string
     {

@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
 /**
@@ -27,17 +26,12 @@ use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
  *
  * @internal
  */
-class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface
+class LoginThrottlingFactory implements AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function getPriority(): int
     {
-        throw new \LogicException('Login throttling is not supported when "security.enable_authenticator_manager" is not set to true.');
-    }
-
-    public function getPosition(): string
-    {
-        // this factory doesn't register any authenticators, this position doesn't matter
-        return 'pre_auth';
+        // this factory doesn't register any authenticators, this priority doesn't matter
+        return 0;
     }
 
     public function getKey(): string
@@ -54,17 +48,15 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
             ->children()
                 ->scalarNode('limiter')->info(sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
                 ->integerNode('max_attempts')->defaultValue(5)->end()
+                ->scalarNode('interval')->defaultValue('1 minute')->end()
+                ->scalarNode('lock_factory')->info('The service ID of the lock factory used by the login rate limiter (or null to disable locking)')->defaultNull()->end()
             ->end();
     }
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): array
     {
-        if (!class_exists(LoginThrottlingListener::class)) {
-            throw new \LogicException('Login throttling requires symfony/security-http:^5.2.');
-        }
-
         if (!class_exists(RateLimiterFactory::class)) {
-            throw new \LogicException('Login throttling requires symfony/rate-limiter to be installed and enabled.');
+            throw new \LogicException('Login throttling requires the Rate Limiter component. Try running "composer require symfony/rate-limiter".');
         }
 
         if (!isset($config['limiter'])) {
@@ -75,7 +67,8 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
             $limiterOptions = [
                 'policy' => 'fixed_window',
                 'limit' => $config['max_attempts'],
-                'interval' => '1 minute',
+                'interval' => $config['interval'],
+                'lock_factory' => $config['lock_factory'],
             ];
             FrameworkExtension::registerRateLimiter($container, $localId = '_login_local_'.$firewallName, $limiterOptions);
 

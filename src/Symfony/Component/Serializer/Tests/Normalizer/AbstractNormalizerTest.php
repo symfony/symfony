@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,6 +28,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\NullableOptionalConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDummy;
@@ -36,7 +46,7 @@ class AbstractNormalizerTest extends TestCase
     private $normalizer;
 
     /**
-     * @var ClassMetadataFactoryInterface|MockObject
+     * @var MockObject&ClassMetadataFactoryInterface
      */
     private $classMetadata;
 
@@ -127,7 +137,31 @@ class AbstractNormalizerTest extends TestCase
     public function testObjectWithNullableConstructorArgument()
     {
         $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize(['foo' => null], NullableOptionalConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithNullableConstructorArgumentWithoutInput()
+    {
+        $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize([], NullableOptionalConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithNullableNonOptionalConstructorArgument()
+    {
+        $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize(['foo' => null], NullableConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInput()
+    {
+        $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize([], NullableConstructorArgumentDummy::class);
 
         $this->assertNull($dummy->getFoo());
     }

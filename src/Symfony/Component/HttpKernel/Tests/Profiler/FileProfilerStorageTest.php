@@ -297,7 +297,7 @@ class FileProfilerStorageTest extends TestCase
             $profile->setUrl('http://example.net/');
             $profile->setMethod('GET');
 
-            ///three duplicates
+            // three duplicates
             $this->storage->write($profile);
             $this->storage->write($profile);
             $this->storage->write($profile);
@@ -347,8 +347,6 @@ class FileProfilerStorageTest extends TestCase
     public function testReadLineFromFile()
     {
         $r = new \ReflectionMethod($this->storage, 'readLineFromFile');
-
-        $r->setAccessible(true);
 
         $h = tmpfile();
 

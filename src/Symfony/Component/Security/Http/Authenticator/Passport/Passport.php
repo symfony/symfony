@@ -17,38 +17,29 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CredentialsInterface;
 
 /**
- * The default implementation for passports.
+ * A Passport contains all security-related information that needs to be
+ * validated during authentication.
+ *
+ * A passport badge can be used to add any additional information to the
+ * passport.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
-class Passport implements UserPassportInterface
+class Passport
 {
-    use PassportTrait;
-
     protected $user;
 
-    private $attributes = [];
+    private array $badges = [];
+    private array $attributes = [];
 
     /**
-     * @param UserBadge            $userBadge
      * @param CredentialsInterface $credentials the credentials to check for this authentication, use
      *                                          SelfValidatingPassport if no credentials should be checked
      * @param BadgeInterface[]     $badges
      */
-    public function __construct($userBadge, CredentialsInterface $credentials, array $badges = [])
+    public function __construct(UserBadge $userBadge, CredentialsInterface $credentials, array $badges = [])
     {
-        if ($userBadge instanceof UserInterface) {
-            trigger_deprecation('symfony/security-http', '5.2', 'The 1st argument of "%s" must be an instance of "%s", support for "%s" will be removed in symfony/security-http 5.3.', __CLASS__, UserBadge::class, UserInterface::class);
-
-            $this->user = $userBadge;
-        } elseif ($userBadge instanceof UserBadge) {
-            $this->addBadge($userBadge);
-        } else {
-            throw new \TypeError(sprintf('Argument 1 of "%s" must be an instance of "%s", "%s" given.', __METHOD__, UserBadge::class, get_debug_type($userBadge)));
-        }
-
+        $this->addBadge($userBadge);
         $this->addBadge($credentials);
         foreach ($badges as $badge) {
             $this->addBadge($badge);
@@ -69,20 +60,58 @@ class Passport implements UserPassportInterface
     }
 
     /**
-     * @param mixed $value
+     * Adds a new security badge.
+     *
+     * A passport can hold only one instance of the same security badge.
+     * This method replaces the current badge if it is already set on this
+     * passport.
+     *
+     * @return $this
      */
-    public function setAttribute(string $name, $value): void
+    public function addBadge(BadgeInterface $badge): static
+    {
+        $this->badges[$badge::class] = $badge;
+
+        return $this;
+    }
+
+    public function hasBadge(string $badgeFqcn): bool
+    {
+        return isset($this->badges[$badgeFqcn]);
+    }
+
+    /**
+     * @template TBadge of BadgeInterface
+     *
+     * @param class-string<TBadge> $badgeFqcn
+     *
+     * @return TBadge|null
+     */
+    public function getBadge(string $badgeFqcn): ?BadgeInterface
+    {
+        return $this->badges[$badgeFqcn] ?? null;
+    }
+
+    /**
+     * @return array<class-string<BadgeInterface>, BadgeInterface>
+     */
+    public function getBadges(): array
+    {
+        return $this->badges;
+    }
+
+    public function setAttribute(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
-    /**
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    public function getAttribute(string $name, $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return $this->attributes[$name] ?? $default;
+    }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
     }
 }

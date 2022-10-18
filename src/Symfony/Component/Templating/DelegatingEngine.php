@@ -33,18 +33,12 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function render($name, array $parameters = [])
+    public function render(string|TemplateReferenceInterface $name, array $parameters = []): string
     {
         return $this->getEngine($name)->render($name, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function stream($name, array $parameters = [])
+    public function stream(string|TemplateReferenceInterface $name, array $parameters = [])
     {
         $engine = $this->getEngine($name);
         if (!$engine instanceof StreamingEngineInterface) {
@@ -54,10 +48,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         $engine->stream($name, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function exists($name)
+    public function exists(string|TemplateReferenceInterface $name): bool
     {
         return $this->getEngine($name)->exists($name);
     }
@@ -67,14 +58,11 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         $this->engines[] = $engine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($name)
+    public function supports(string|TemplateReferenceInterface $name): bool
     {
         try {
             $this->getEngine($name);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return false;
         }
 
@@ -84,13 +72,9 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * Get an engine able to render the given template.
      *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return EngineInterface The engine
-     *
      * @throws \RuntimeException if no engine able to work with the template is found
      */
-    public function getEngine($name)
+    public function getEngine(string|TemplateReferenceInterface $name): EngineInterface
     {
         foreach ($this->engines as $engine) {
             if ($engine->supports($name)) {

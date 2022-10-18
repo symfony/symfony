@@ -3,3 +3,5 @@ services:
         calls:
             - foo: [1, 2, 3]
             - bar: !returns_clone [1, 2, 3]
+            - method:
+                  - url

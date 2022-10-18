@@ -20,10 +20,8 @@ final class TimeUtil
 {
     public static function dateIntervalToSeconds(\DateInterval $interval): int
     {
-        return (float) $interval->format('%s')      // seconds
-            + $interval->format('%i') * 60          // minutes
-            + $interval->format('%H') * 3600        // hours
-            + $interval->format('%d') * 3600 * 24   // days
-            ;
+        $now = new \DateTimeImmutable();
+
+        return $now->add($interval)->getTimestamp() - $now->getTimestamp();
     }
 }

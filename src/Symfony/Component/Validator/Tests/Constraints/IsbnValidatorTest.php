@@ -177,14 +177,11 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidIsbn10Named()
     {
         $this->validator->validate(
             '978-2723442282',
-            eval('return new \Symfony\Component\Validator\Constraints\Isbn(type: \Symfony\Component\Validator\Constraints\Isbn::ISBN_10, isbn10Message: "myMessage");')
+            new Isbn(type: Isbn::ISBN_10, isbn10Message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')
@@ -223,14 +220,11 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidIsbn13Named()
     {
         $this->validator->validate(
             '2723442284',
-            eval('return new \Symfony\Component\Validator\Constraints\Isbn(type: \Symfony\Component\Validator\Constraints\Isbn::ISBN_13, isbn13Message: "myMessage");')
+            new Isbn(type: Isbn::ISBN_13, isbn13Message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')

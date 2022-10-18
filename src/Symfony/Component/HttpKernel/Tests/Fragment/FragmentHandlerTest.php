@@ -19,9 +19,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
-/**
- * @group time-sensitive
- */
 class FragmentHandlerTest extends TestCase
 {
     private $requestStack;
@@ -71,7 +68,20 @@ class FragmentHandlerTest extends TestCase
 
     public function testRender()
     {
-        $handler = $this->getHandler($this->returnValue(new Response('foo')), ['/', Request::create('/'), ['foo' => 'foo', 'ignore_errors' => true]]);
+        $expectedRequest = Request::create('/');
+        $handler = $this->getHandler(
+            $this->returnValue(new Response('foo')),
+            [
+                '/',
+                $this->callback(function (Request $request) use ($expectedRequest) {
+                    $expectedRequest->server->remove('REQUEST_TIME_FLOAT');
+                    $request->server->remove('REQUEST_TIME_FLOAT');
+
+                    return $expectedRequest == $request;
+                }),
+                ['foo' => 'foo', 'ignore_errors' => true],
+            ]
+        );
 
         $this->assertEquals('foo', $handler->render('/', 'foo', ['foo' => 'foo']));
     }

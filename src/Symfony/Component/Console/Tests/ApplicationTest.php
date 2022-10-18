@@ -13,13 +13,16 @@ namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\NamespaceNotFoundException;
@@ -36,9 +39,14 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\SignalRegistry\SignalRegistry;
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
 {
@@ -90,7 +98,7 @@ class ApplicationTest extends TestCase
     /**
      * Replaces the dynamic placeholders of the command help text with a static version.
      * The placeholder %command.full_name% includes the script path that is not predictable
-     * and can not be tested against.
+     * and cannot be tested against.
      */
     protected function ensureStaticCommandHelp(Application $application)
     {
@@ -104,7 +112,7 @@ class ApplicationTest extends TestCase
         $application = new Application('foo', 'bar');
         $this->assertEquals('foo', $application->getName(), '__construct() takes the application name as its first argument');
         $this->assertEquals('bar', $application->getVersion(), '__construct() takes the application version as its second argument');
-        $this->assertEquals(['help', 'list'], array_keys($application->all()), '__construct() registered the help and list commands by default');
+        $this->assertEquals(['help', 'list', '_complete', 'completion'], array_keys($application->all()), '__construct() registered the help and list commands by default');
     }
 
     public function testSetGetName()
@@ -229,7 +237,6 @@ class ApplicationTest extends TestCase
         // simulate --help
         $r = new \ReflectionObject($application);
         $p = $r->getProperty('wantHelps');
-        $p->setAccessible(true);
         $p->setValue($application, true);
         $command = $application->get('foo:bar');
         $this->assertInstanceOf(HelpCommand::class, $command, '->get() returns the help command if --help is provided as the input');
@@ -546,6 +553,22 @@ class ApplicationTest extends TestCase
             ['foo3:barr'],
             ['fooo3:bar'],
         ];
+    }
+
+    public function testRunNamespace()
+    {
+        putenv('COLUMNS=120');
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'foo'], ['decorated' => false]);
+        $display = trim($tester->getDisplay(true));
+        $this->assertStringContainsString('Available commands for the "foo" namespace:', $display);
+        $this->assertStringContainsString('The foo:bar command', $display);
+        $this->assertStringContainsString('The foo:bar1 command', $display);
     }
 
     public function testFindAlternativeExceptionMessageMultiple()
@@ -881,6 +904,9 @@ class ApplicationTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_linebreaks.txt', $tester->getDisplay(true), '->renderException() keep multiple line breaks');
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testRenderAnonymousException()
     {
         $application = new Application();
@@ -904,6 +930,9 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Dummy type "class@anonymous" is invalid.', $tester->getDisplay(true));
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testRenderExceptionStackTraceContainsRootException()
     {
         $application = new Application();
@@ -925,6 +954,23 @@ class ApplicationTest extends TestCase
 
         $tester->run(['command' => 'foo'], ['decorated' => false]);
         $this->assertStringContainsString('Dummy type "class@anonymous" is invalid.', $tester->getDisplay(true));
+    }
+
+    public function testRenderExceptionEscapesLinesOfSynopsis()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application
+            ->register('foo')
+            ->setCode(function () {
+                throw new \Exception('some exception');
+            })
+            ->addArgument('info')
+        ;
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'foo'], ['decorated' => false]);
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_rendersynopsis_escapesline.txt', $tester->getDisplay(true), '->renderException() escapes lines containing formatting of synopsis');
     }
 
     public function testRun()
@@ -1143,6 +1189,25 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'test']);
 
         $this->assertTrue($passedRightValue, '-> exit code 1 was passed in the console.terminate event');
+    }
+
+    /**
+     * @testWith [-1]
+     *           [-32000]
+     */
+    public function testRunReturnsExitCodeOneForNegativeExceptionCode($exceptionCode)
+    {
+        $exception = new \Exception('', $exceptionCode);
+
+        $application = $this->getMockBuilder(Application::class)->setMethods(['doRun'])->getMock();
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+            ->method('doRun')
+            ->willThrowException($exception);
+
+        $exitCode = $application->run(new ArrayInput([]), new NullOutput());
+
+        $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is '.$exceptionCode);
     }
 
     public function testAddingOptionWithDuplicateShortcut()
@@ -1655,7 +1720,7 @@ class ApplicationTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());
         $container
-            ->register('lazy-command', LazyCommand::class)
+            ->register('lazy-command', LazyTestCommand::class)
             ->addTag('console.command', ['command' => 'lazy:command'])
             ->addTag('console.command', ['command' => 'lazy:alias'])
             ->addTag('console.command', ['command' => 'lazy:alias2']);
@@ -1816,7 +1881,27 @@ class ApplicationTest extends TestCase
     /**
      * @requires extension pcntl
      */
-    public function testSignal()
+    public function testSignalListenerNotCalledByDefault()
+    {
+        $command = new SignableCommand(false);
+
+        $dispatcherCalled = false;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.signal', function () use (&$dispatcherCalled) {
+            $dispatcherCalled = true;
+        });
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+        $this->assertFalse($command->signaled);
+        $this->assertFalse($dispatcherCalled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignalListener()
     {
         $command = new SignableCommand();
 
@@ -1826,24 +1911,129 @@ class ApplicationTest extends TestCase
             $dispatcherCalled = true;
         });
 
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($dispatcherCalled);
+        $this->assertTrue($command->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignalSubscriberNotCalledByDefault()
+    {
+        $command = new BaseSignableCommand(false);
+
+        $subscriber = new SignalEventSubscriber();
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+        $this->assertFalse($subscriber->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignalSubscriber()
+    {
+        $command = new BaseSignableCommand();
+
+        $subscriber1 = new SignalEventSubscriber();
+        $subscriber2 = new SignalEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber1);
+        $dispatcher->addSubscriber($subscriber2);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($subscriber1->signaled);
+        $this->assertTrue($subscriber2->signaled);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSetSignalsToDispatchEvent()
+    {
+        $command = new BaseSignableCommand();
+
+        $subscriber = new SignalEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+        $application->setSignalsToDispatchEvent(\SIGUSR2);
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+        $this->assertFalse($subscriber->signaled);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+        $application->setSignalsToDispatchEvent(\SIGUSR1);
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($subscriber->signaled);
+    }
+
+    public function testSignalableCommandInterfaceWithoutSignals()
+    {
+        $command = new SignableCommand(false);
+
+        $dispatcher = new EventDispatcher();
         $application = new Application();
         $application->setAutoExit(false);
         $application->setDispatcher($dispatcher);
-        $application->setSignalsToDispatchEvent(\SIGALRM);
         $application->add($command);
-
-        $this->assertFalse($command->signaled);
-        $this->assertFalse($dispatcherCalled);
-
         $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
-        $this->assertFalse($command->signaled);
-        $this->assertFalse($dispatcherCalled);
+    }
 
-        $command->loop = 100000;
-        pcntl_alarm(1);
-        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
-        $this->assertTrue($command->signaled);
-        $this->assertTrue($dispatcherCalled);
+    /**
+     * @group tty
+     */
+    public function testSignalableRestoresStty()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('stty not available');
+        }
+
+        if (!SignalRegistry::isSupported()) {
+            $this->markTestSkipped('pcntl signals not available');
+        }
+
+        $previousSttyMode = shell_exec('stty -g');
+
+        $p = new Process(['php', __DIR__.'/Fixtures/application_signalable.php']);
+        $p->setTty(true);
+        $p->start();
+
+        for ($i = 0; $i < 10 && shell_exec('stty -g') === $previousSttyMode; ++$i) {
+            usleep(100000);
+        }
+
+        $this->assertNotSame($previousSttyMode, shell_exec('stty -g'));
+        $p->signal(\SIGINT);
+        $p->wait();
+
+        $sttyMode = shell_exec('stty -g');
+        shell_exec('stty '.$previousSttyMode);
+
+        $this->assertSame($previousSttyMode, $sttyMode);
+    }
+
+    private function createSignalableApplication(Command $command, ?EventDispatcherInterface $dispatcher): Application
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        if ($dispatcher) {
+            $application->setDispatcher($dispatcher);
+        }
+        $application->add(new LazyCommand('signal', [], '', false, function () use ($command) { return $command; }, true));
+
+        return $application;
     }
 }
 
@@ -1851,8 +2041,6 @@ class CustomApplication extends Application
 {
     /**
      * Overwrites the default input definition.
-     *
-     * @return InputDefinition An InputDefinition instance
      */
     protected function getDefaultInputDefinition(): InputDefinition
     {
@@ -1861,8 +2049,6 @@ class CustomApplication extends Application
 
     /**
      * Gets the default helper set with the helpers that should always be available.
-     *
-     * @return HelperSet A HelperSet instance
      */
     protected function getDefaultHelperSet(): HelperSet
     {
@@ -1872,9 +2058,6 @@ class CustomApplication extends Application
 
 class CustomDefaultCommandApplication extends Application
 {
-    /**
-     * Overwrites the constructor in order to set a different default command.
-     */
     public function __construct()
     {
         parent::__construct();
@@ -1885,7 +2068,7 @@ class CustomDefaultCommandApplication extends Application
     }
 }
 
-class LazyCommand extends Command
+class LazyTestCommand extends Command
 {
     public function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -1903,25 +2086,25 @@ class DisabledCommand extends Command
     }
 }
 
-class SignableCommand extends Command implements SignalableCommandInterface
+#[AsCommand(name: 'signal')]
+class BaseSignableCommand extends Command
 {
     public $signaled = false;
-    public $loop = 100;
+    public $loop = 1000;
+    private $emitsSignal;
 
-    protected static $defaultName = 'signal';
-
-    public function getSubscribedSignals(): array
+    public function __construct(bool $emitsSignal = true)
     {
-        return [\SIGALRM];
+        parent::__construct();
+        $this->emitsSignal = $emitsSignal;
     }
 
-    public function handleSignal(int $signal): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->signaled = true;
-    }
+        if ($this->emitsSignal) {
+            posix_kill(posix_getpid(), \SIGUSR1);
+        }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
         for ($i = 0; $i < $this->loop; ++$i) {
             usleep(100);
             if ($this->signaled) {
@@ -1930,5 +2113,35 @@ class SignableCommand extends Command implements SignalableCommandInterface
         }
 
         return 0;
+    }
+}
+
+#[AsCommand(name: 'signal')]
+class SignableCommand extends BaseSignableCommand implements SignalableCommandInterface
+{
+    public function getSubscribedSignals(): array
+    {
+        return SignalRegistry::isSupported() ? [\SIGUSR1] : [];
+    }
+
+    public function handleSignal(int $signal): void
+    {
+        $this->signaled = true;
+    }
+}
+
+class SignalEventSubscriber implements EventSubscriberInterface
+{
+    public $signaled = false;
+
+    public function onSignal(ConsoleSignalEvent $event): void
+    {
+        $this->signaled = true;
+        $event->getCommand()->signaled = true;
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return ['console.signal' => 'onSignal'];
     }
 }

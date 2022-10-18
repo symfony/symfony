@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
@@ -55,9 +56,7 @@ class HttpCacheTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->cache) {
-            $this->cache->getStore()->cleanup();
-        }
+        $this->cache?->getStore()->cleanup();
         $this->kernel = null;
         $this->cache = null;
         $this->caches = null;
@@ -126,12 +125,16 @@ class HttpCacheTestCase extends TestCase
             $this->cacheConfig['debug'] = true;
         }
 
+        if (!isset($this->cacheConfig['terminate_on_cache_hit'])) {
+            $this->cacheConfig['terminate_on_cache_hit'] = false;
+        }
+
         $this->esi = $esi ? new Esi() : null;
         $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);
         $this->request = Request::create($uri, $method, [], $cookies, [], $server);
         $this->request->headers->add($headers);
 
-        $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);
+        $this->response = $this->cache->handle($this->request, HttpKernelInterface::MAIN_REQUEST, $this->catch);
 
         $this->responses[] = $this->response;
     }
@@ -147,9 +150,9 @@ class HttpCacheTestCase extends TestCase
     }
 
     // A basic response with 200 status code and a tiny body.
-    public function setNextResponse($statusCode = 200, array $headers = [], $body = 'Hello World', \Closure $customizer = null)
+    public function setNextResponse($statusCode = 200, array $headers = [], $body = 'Hello World', \Closure $customizer = null, EventDispatcher $eventDispatcher = null)
     {
-        $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer);
+        $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer, $eventDispatcher);
     }
 
     public function setNextResponses($responses)

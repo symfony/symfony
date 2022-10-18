@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 
 /**
  * @group functional
@@ -27,12 +28,12 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container']);
 
-        $this->assertFileExists(static::$container->getParameter('debug.container.dump'));
+        $this->assertFileExists(static::getContainer()->getParameter('debug.container.dump'));
     }
 
     public function testNoDebug()
@@ -68,6 +69,22 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('The "private_alias" service or alias has been removed', $tester->getDisplay());
     }
 
+    public function testDeprecatedServiceAndAlias()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'debug:container', 'name' => 'deprecated', '--format' => 'txt']);
+        $this->assertStringContainsString('[WARNING] The "deprecated" service is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
+
+        $tester->run(['command' => 'debug:container', 'name' => 'deprecated_alias', '--format' => 'txt']);
+        $this->assertStringContainsString('[WARNING] The "deprecated_alias" alias is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
+    }
+
     /**
      * @dataProvider provideIgnoreBackslashWhenFindingService
      */
@@ -83,6 +100,27 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringNotContainsString('No services found', $tester->getDisplay());
     }
 
+    public function testTagsPartialSearch()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->setInputs(['0']);
+        $tester->run(['command' => 'debug:container', '--tag' => 'kernel.'], ['decorated' => false]);
+
+        $this->assertStringContainsString('Select one of the following tags to display its information', $tester->getDisplay());
+        $this->assertStringContainsString('[0] kernel.event_subscriber', $tester->getDisplay());
+        $this->assertStringContainsString('[1] kernel.locale_aware', $tester->getDisplay());
+        $this->assertStringContainsString('[2] kernel.cache_warmer', $tester->getDisplay());
+        $this->assertStringContainsString('[3] kernel.fragment_renderer', $tester->getDisplay());
+        $this->assertStringContainsString('[4] kernel.reset', $tester->getDisplay());
+        $this->assertStringContainsString('[5] kernel.cache_clearer', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony Container Services Tagged with "kernel.event_subscriber" Tag', $tester->getDisplay());
+    }
+
     public function testDescribeEnvVars()
     {
         putenv('REAL=value');
@@ -91,7 +129,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-vars' => true], ['decorated' => false]);
@@ -116,7 +154,7 @@ Symfony Container Environment Variables
  * UNKNOWN
 
 TXT
-        , $tester->getDisplay(true));
+            , $tester->getDisplay(true));
 
         putenv('REAL');
     }
@@ -128,7 +166,7 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-var' => 'js'], ['decorated' => false]);
@@ -156,12 +194,12 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Controller\Controller', $tester->getDisplay());
         $this->assertStringContainsString('/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php', $tester->getDisplay());
     }
@@ -176,12 +214,12 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] There are no deprecations in the logs!', $tester->getDisplay());
     }
 
@@ -194,12 +232,12 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
     }
 
@@ -209,6 +247,70 @@ TXT
             [BackslashClass::class],
             ['FixturesBackslashClass'],
             ['\\'.BackslashClass::class],
+        ];
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions, array $notExpectedSuggestions = [])
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $tester = new CommandCompletionTester($application->find('debug:container'));
+        $suggestions = $tester->complete($input);
+
+        foreach ($expectedSuggestions as $expectedSuggestion) {
+            $this->assertContains($expectedSuggestion, $suggestions);
+        }
+        foreach ($notExpectedSuggestions as $notExpectedSuggestion) {
+            $this->assertNotContains($notExpectedSuggestion, $suggestions);
+        }
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        $serviceId = 'console.command.container_debug';
+        $hiddenServiceId = '.console.command.container_debug.lazy';
+        $interfaceServiceId = 'Symfony\Component\HttpKernel\HttpKernelInterface';
+
+        yield 'name' => [
+            [''],
+            [$serviceId, $interfaceServiceId],
+            [$hiddenServiceId],
+        ];
+
+        yield 'name (with hidden)' => [
+            ['--show-hidden', ''],
+            [$serviceId, $interfaceServiceId, $hiddenServiceId],
+        ];
+
+        yield 'name (with current value)' => [
+            ['--show-hidden', 'console'],
+            [$serviceId, $hiddenServiceId],
+            [$interfaceServiceId],
+        ];
+
+        yield 'name (no suggestion with --tags)' => [
+            ['--tags', ''],
+            [],
+            [$serviceId, $interfaceServiceId, $hiddenServiceId],
+        ];
+
+        yield 'option --tag' => [
+            ['--tag', ''],
+            ['console.command'],
+        ];
+
+        yield 'option --parameter' => [
+            ['--parameter', ''],
+            ['kernel.debug'],
+        ];
+
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'xml', 'json', 'md'],
         ];
     }
 }

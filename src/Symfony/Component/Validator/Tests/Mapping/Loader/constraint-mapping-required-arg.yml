@@ -1,0 +1,5 @@
+Symfony\Component\Validator\Tests\Fixtures\Entity_81:
+  properties:
+    title:
+      - Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument:
+          requiredArg: 'X'

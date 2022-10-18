@@ -13,12 +13,13 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniqueValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): UniqueValidator
     {
         return new UniqueValidator();
     }
@@ -86,17 +87,208 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidValueNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Unique(message: "myMessage");');
+        $constraint = new Unique(message: 'myMessage');
         $this->validator->validate([1, 2, 3, 3], $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getCallback
+     */
+    public function testExpectsUniqueObjects($callback)
+    {
+        $object1 = new \stdClass();
+        $object1->name = 'Foo';
+        $object1->email = 'foo@email.com';
+
+        $object2 = new \stdClass();
+        $object2->name = 'Foo';
+        $object2->email = 'foobar@email.com';
+
+        $object3 = new \stdClass();
+        $object3->name = 'Bar';
+        $object3->email = 'foo@email.com';
+
+        $value = [$object1, $object2, $object3];
+
+        $this->validator->validate($value, new Unique([
+            'normalizer' => $callback,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getCallback
+     */
+    public function testExpectsNonUniqueObjects($callback)
+    {
+        $object1 = new \stdClass();
+        $object1->name = 'Foo';
+        $object1->email = 'bar@email.com';
+
+        $object2 = new \stdClass();
+        $object2->name = 'Foo';
+        $object2->email = 'foo@email.com';
+
+        $object3 = new \stdClass();
+        $object3->name = 'Foo';
+        $object3->email = 'foo@email.com';
+
+        $value = [$object1, $object2, $object3];
+
+        $this->validator->validate($value, new Unique([
+            'message' => 'myMessage',
+            'normalizer' => $callback,
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function getCallback(): array
+    {
+        return [
+            'static function' => [static function (\stdClass $object) {
+                return [$object->name, $object->email];
+            }],
+            'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\CallableClass::execute'],
+            'callable with static notation' => [[CallableClass::class, 'execute']],
+            'callable with first-class callable notation' => [CallableClass::execute(...)],
+            'callable with object' => [[new CallableClass(), 'execute']],
+        ];
+    }
+
+    public function testExpectsInvalidNonStrictComparison()
+    {
+        $this->validator->validate([1, '1', 1.0, '1.0'], new Unique([
+            'message' => 'myMessage',
+            'normalizer' => 'intval',
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function testExpectsValidNonStrictComparison()
+    {
+        $callback = static function ($item) {
+            return (int) $item;
+        };
+
+        $this->validator->validate([1, '2', 3, '4.0'], new Unique([
+            'normalizer' => $callback,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function testExpectsInvalidCaseInsensitiveComparison()
+    {
+        $callback = static function ($item) {
+            return mb_strtolower($item);
+        };
+
+        $this->validator->validate(['Hello', 'hello', 'HELLO', 'hellO'], new Unique([
+            'message' => 'myMessage',
+            'normalizer' => $callback,
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function testExpectsValidCaseInsensitiveComparison()
+    {
+        $callback = static function ($item) {
+            return mb_strtolower($item);
+        };
+
+        $this->validator->validate(['Hello', 'World'], new Unique([
+            'normalizer' => $callback,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function testCollectionFieldsAreOptional()
+    {
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: 'id'));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getInvalidFieldNames
+     */
+    public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf('Expected argument of type "string", "%s" given', $type));
+
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: [$field]));
+    }
+
+    public function getInvalidFieldNames(): array
+    {
+        return [
+            ['stdClass', new \stdClass()],
+            ['int', 2],
+            ['bool', false],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidCollectionValues
+     */
+    public function testInvalidCollectionValues(array $value, array $fields)
+    {
+        $this->validator->validate($value, new Unique([
+            'message' => 'myMessage',
+        ], fields: $fields));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function getInvalidCollectionValues(): array
+    {
+        return [
+            'unique string' => [[
+                ['lang' => 'eng', 'translation' => 'hi'],
+                ['lang' => 'eng', 'translation' => 'hello'],
+            ], ['lang']],
+            'unique floats' => [[
+                ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
+                ['latitude' => 52.520008, 'longitude' => 13.404954],
+                ['latitude' => 51.509865, 'longitude' => -0.118092],
+            ], ['latitude', 'longitude']],
+            'unique int' => [[
+                ['id' => 1, 'email' => 'bar@email.com'],
+                ['id' => 1, 'email' => 'foo@email.com'],
+            ], ['id']],
+        ];
+    }
+}
+
+class CallableClass
+{
+    public static function execute(\stdClass $object)
+    {
+        return [$object->name, $object->email];
     }
 }

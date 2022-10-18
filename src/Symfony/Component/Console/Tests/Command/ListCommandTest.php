@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class ListCommandTest extends TestCase
@@ -23,7 +24,7 @@ class ListCommandTest extends TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
 
-        $this->assertMatchesRegularExpression('/help\s{2,}Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
+        $this->assertMatchesRegularExpression('/help\s{2,}Display help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
     }
 
     public function testExecuteListsCommandsWithXmlOption()
@@ -40,8 +41,9 @@ class ListCommandTest extends TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--raw' => true]);
         $output = <<<'EOF'
-help   Displays help for a command
-list   Lists commands
+completion   Dump the shell completion script
+help         Display help for a command
+list         List commands
 
 EOF;
 
@@ -85,10 +87,11 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Available commands:
-  help      Displays help for a command
-  list      Lists commands
+  completion  Dump the shell completion script
+  help        Display help for a command
+  list        List commands
  0foo
-  0foo:bar  0foo:bar command
+  0foo:bar    0foo:bar command
 EOF;
 
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));
@@ -102,11 +105,43 @@ EOF;
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--raw' => true]);
         $output = <<<'EOF'
-help       Displays help for a command
-list       Lists commands
-0foo:bar   0foo:bar command
+completion   Dump the shell completion script
+help         Display help for a command
+list         List commands
+0foo:bar     0foo:bar command
 EOF;
 
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        require_once realpath(__DIR__.'/../Fixtures/FooCommand.php');
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $tester = new CommandCompletionTester($application->get('list'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'xml', 'json', 'md'],
+        ];
+
+        yield 'namespace' => [
+            [''],
+            ['_global', 'foo'],
+        ];
+
+        yield 'namespace started' => [
+            ['f'],
+            ['_global', 'foo'],
+        ];
     }
 }

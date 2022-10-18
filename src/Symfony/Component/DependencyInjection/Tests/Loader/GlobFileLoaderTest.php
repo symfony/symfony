@@ -32,13 +32,13 @@ class GlobFileLoaderTest extends TestCase
         $loader = new GlobFileLoaderWithoutImport($container = new ContainerBuilder(), new FileLocator());
         $loader->load(__DIR__.'/../Fixtures/config/*');
 
-        $this->assertEquals(new GlobResource(__DIR__.'/../Fixtures/config', '/*', false), $container->getResources()[1]);
+        $this->assertEquals(new GlobResource(__DIR__.'/../Fixtures/config', '/*', false), $container->getResources()[0]);
     }
 }
 
 class GlobFileLoaderWithoutImport extends GlobFileLoader
 {
-    public function import($resource, string $type = null, $ignoreErrors = false, string $sourceResource = null, $exclude = null)
+    public function import(mixed $resource, string $type = null, bool|string $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed
     {
         return null;
     }

@@ -177,6 +177,9 @@ class PhpFileLoaderTest extends TestCase
         $expectedCollection->add('buz', (new Route('/zub'))
             ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
         );
+        $expectedCollection->add('controller_class', (new Route('/controller'))
+            ->setDefaults(['_controller' => ['Acme\MyApp\MyController', 'myAction']])
+        );
         $expectedCollection->add('c_root', (new Route('/sub/pub/'))
             ->setRequirements(['id' => '\d+'])
         );
@@ -281,6 +284,16 @@ class PhpFileLoaderTest extends TestCase
         $routes = $loader->load('importer-with-single-host.php');
 
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testImportingAliases()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
 
         $this->assertEquals($expectedRoutes('php'), $routes);
     }

@@ -104,6 +104,7 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
     {
         $routes = new RouteCollection();
         $routes->add('foo', new Route('/foo', [], [], [], 'baz', [], [], "request.headers.get('User-Agent') matches '/firefox/i'"));
+        $routes->add('bar', new Route('/bar/{id}', [], [], [], 'baz', [], [], "params['id'] < 100"));
 
         $context = new RequestContext();
         $context->setHost('baz');
@@ -117,10 +118,18 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
         $matchingRequest = Request::create('/foo', 'GET', [], [], [], ['HTTP_USER_AGENT' => 'Firefox']);
         $traces = $matcher->getTracesForRequest($matchingRequest);
         $this->assertEquals('Route matches!', $traces[0]['log']);
+
+        $notMatchingRequest = Request::create('/bar/1000', 'GET');
+        $traces = $matcher->getTracesForRequest($notMatchingRequest);
+        $this->assertEquals("Condition \"params['id'] < 100\" does not evaluate to \"true\"", $traces[1]['log']);
+
+        $matchingRequest = Request::create('/bar/10', 'GET');
+        $traces = $matcher->getTracesForRequest($matchingRequest);
+        $this->assertEquals('Route matches!', $traces[1]['log']);
     }
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
-        return new TraceableUrlMatcher($routes, $context ?: new RequestContext());
+        return new TraceableUrlMatcher($routes, $context ?? new RequestContext());
     }
 }

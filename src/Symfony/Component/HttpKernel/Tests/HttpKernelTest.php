@@ -128,7 +128,7 @@ class HttpKernelTest extends TestCase
             $event->setResponse(new Response($event->getThrowable()->getMessage()));
         });
 
-        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \TypeError('foo'); });
+        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \TypeError('foo'); }, handleAllThrowables: true);
         $response = $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
 
         $this->assertEquals('500', $response->getStatusCode());
@@ -147,7 +147,7 @@ class HttpKernelTest extends TestCase
             $event->setResponse(new Response($event->getThrowable()->getMessage()));
         });
 
-        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \TypeError('foo'); });
+        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \TypeError('foo'); }, handleAllThrowables: true);
         $this->expectException(\TypeError::class);
         $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
     }
@@ -156,8 +156,6 @@ class HttpKernelTest extends TestCase
      * Catch exceptions: true
      * Throwable type: TypeError
      * Listener: true.
-     *
-     * @group legacy
      */
     public function testHandleWhenControllerThrowsAThrowableAndCatchIsTrueNotHandlingThrowables()
     {
@@ -178,7 +176,7 @@ class HttpKernelTest extends TestCase
             ->method('getArguments')
             ->willReturn([]);
 
-        $kernel = new HttpKernel($dispatcher, $controllerResolver, null, $argumentResolver, false);
+        $kernel = new HttpKernel($dispatcher, $controllerResolver, null, $argumentResolver);
 
         $this->expectException(\TypeError::class);
         $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
@@ -479,7 +477,7 @@ class HttpKernelTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [])
+    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false)
     {
         if (null === $controller) {
             $controller = function () { return new Response('Hello'); };
@@ -497,7 +495,7 @@ class HttpKernelTest extends TestCase
             ->method('getArguments')
             ->willReturn($arguments);
 
-        return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver, true);
+        return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver, $handleAllThrowables);
     }
 
     private function assertResponseEquals(Response $expected, Response $actual)

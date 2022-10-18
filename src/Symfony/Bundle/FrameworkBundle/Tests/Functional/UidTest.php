@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Bundle\FrameworkBundle\Test\ExceptionSubscriber;
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV4;
@@ -30,15 +28,12 @@ class UidTest extends AbstractWebTestCase
     public function testArgumentValueResolverDisabled()
     {
         $client = $this->createClient(['test_case' => 'Uid', 'root_config' => 'config_disabled.yml']);
+        $client->catchExceptions(false);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController::anyFormat(): Argument #1 ($userId) must be of type Symfony\Component\Uid\UuidV1, string given');
 
         $client->request('GET', '/1/uuid-v1/'.new UuidV1());
-        $this->assertSame(500, $client->getResponse()->getStatusCode());
-        $exceptions = ExceptionSubscriber::shiftAll();
-        $this->assertCount(1, $exceptions);
-        $exception = reset($exceptions);
-
-        $this->assertInstanceOf(\TypeError::class, $exception);
-        $this->assertStringContainsString(UidController::class.'::anyFormat(): Argument #1 ($userId) must be of type Symfony\Component\Uid\UuidV1, string given', $exception->getMessage());
     }
 
     public function testArgumentValueResolverEnabled()

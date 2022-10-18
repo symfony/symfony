@@ -657,7 +657,6 @@ class ConfigurationTest extends TestCase
                 'sanitizers' => [],
             ],
             'exceptions' => [],
-            'catch_all_throwables' => false,
         ];
     }
 }

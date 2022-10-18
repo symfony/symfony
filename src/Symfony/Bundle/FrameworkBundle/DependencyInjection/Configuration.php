@@ -133,7 +133,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('error_controller')
                     ->defaultValue('error_controller')
                 ->end()
-                ->booleanNode('catch_all_throwables')->defaultFalse()->info('HttpKernel will catch all kinds of \Throwable')->end()
+                ->booleanNode('handle_all_throwables')->info('HttpKernel will handle all kinds of \Throwable')->end()
             ->end()
         ;
 

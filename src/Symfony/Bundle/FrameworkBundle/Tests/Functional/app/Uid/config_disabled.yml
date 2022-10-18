@@ -5,8 +5,3 @@ framework:
     http_method_override: false
     uid:
         enabled: false
-
-services:
-    Symfony\Bundle\FrameworkBundle\Test\ExceptionSubscriber:
-        tags:
-            - { name: kernel.event_subscriber }

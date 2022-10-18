@@ -103,7 +103,6 @@ class FlexStyleMicroKernel extends Kernel
         $c->extension('framework', [
             'http_method_override' => false,
             'router' => ['utf8' => true],
-            'catch_all_throwables' => true,
         ]);
     }
 }

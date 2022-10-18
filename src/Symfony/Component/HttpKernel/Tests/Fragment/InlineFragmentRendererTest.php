@@ -142,7 +142,7 @@ class InlineFragmentRendererTest extends TestCase
             ->willReturn([])
         ;
 
-        $kernel = new HttpKernel(new EventDispatcher(), $controllerResolver, new RequestStack(), $argumentResolver, true);
+        $kernel = new HttpKernel(new EventDispatcher(), $controllerResolver, new RequestStack(), $argumentResolver);
         $renderer = new InlineFragmentRenderer($kernel);
 
         // simulate a main request with output buffering

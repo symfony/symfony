@@ -6,7 +6,7 @@ CHANGELOG
 
  * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
  * Add `NotificationAssertionsTrait`
- * Add option `framework.catch_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to catch all kinds of `Throwable`
+ * Add option `framework.handle_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to handle all kinds of `Throwable`
  * Make `AbstractController::render()` able to deal with forms and deprecate `renderForm()`
  * Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
    `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against

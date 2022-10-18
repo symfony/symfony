@@ -101,3 +101,21 @@ final class AsNonPermittedBar
 {
     public function __construct(private readonly AsSealedBar $asSealedBar) {}
 }
+
+#[Sealed(permits: [
+    AsPermittedBar::class,
+    AsPermittedBaz::class,
+])]
+final class AsSealedFoo
+{
+}
+
+final class AsPermittedBar
+{
+    public function __construct(private readonly AsSealedFoo $asSealedFoo) {}
+}
+
+final class AsPermittedBaz
+{
+    public function __construct(private readonly AsSealedFoo $asSealedFoo) {}
+}

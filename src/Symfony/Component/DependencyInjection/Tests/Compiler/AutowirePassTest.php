@@ -1257,7 +1257,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testSealedAttribute()
+    public function testSealedAttributeCannotBeUsedWithInvalidPermittedList()
     {
         $container = new ContainerBuilder();
 
@@ -1275,5 +1275,20 @@ class AutowirePassTest extends TestCase
         } catch (SealedClassException $e) {
             $this->assertSame('Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Compiler\AsNonPermittedBar", argument "$asSealedBar" of method "Symfony\Component\DependencyInjection\Tests\Compiler\AsNonPermittedBar::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\AsSealedBar" but this class is sealed.', (string) $e->getMessage());
         }
+    }
+
+    public function testSealedAttributeCanBeUsedWithValidPermittedList()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AsSealedFoo::class);
+        $container->register(AsPermittedBar::class)->setArgument(0, new Reference(AsSealedFoo::class));
+        $container->register(AsPermittedBaz::class)->setArgument(0, new Reference(AsSealedFoo::class));
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireSealedPass())->process($container);
+
+        $this->assertSame(AsSealedFoo::class, (string) $container->getDefinition(AsPermittedBar::class)->getArgument(0));
+        $this->assertSame(AsSealedFoo::class, (string) $container->getDefinition(AsPermittedBaz::class)->getArgument(0));
     }
 }

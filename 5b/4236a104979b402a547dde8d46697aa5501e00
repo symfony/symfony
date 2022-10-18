@@ -1,0 +1,195 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-09-02T14:31:16Z
+
+Thank you.
+
+What is the plan for 7.0? Just to change the default behaviour without warning?
+
+---------------------------------------------------------------------------
+
+by catch56 at 2022-09-03T06:03:11Z
+
+Just to say for Drupal this was an easy change for us - we had to add the parameter to our container definition, and update one test (it tests what happens with an specific uncaught exception, that is now caught), nothing else.
+
+I think this also means that if the behaviour changes without warning in Symfony 7, this would also be OK - we'd still have to update one test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-03T12:30:35Z
+
+> What is the plan for 7.0? Just to change the default behaviour without warning?
+
+The plan on my side should be to keep things as is, aka no change of the default. It's fine to let Error throw out on short-living processes, *and in tests*. The deprecation + behavior change would require ppl to 1. opt-in for the new default and 2. update their test cases. Both worry me, like in "not worth it, cost is too high compared to the benefits". (+ I'm not sure it's good defaults to swallow Error, in tests especially).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-03T14:12:35Z
+
+Here is another thought I had when looking at your use case @Nyholm: should it be possible to handle exceptions without cooperation from configuration? If that'd be desirable, there could be two ways to do it:
+1. add an argument to handle() to say "do catch `Error`"
+2. pass false as $catch to handle, then catch outside and add a method to render an exception, which kinda means making handleThrowable public.
+
+Did you consider those options? Would they fit better for you? (as in: no change in config to support both long and short-living runtimes.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-03T15:25:33Z
+
+Two more options: 3. a setter/wither, 4. a decorator.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-03T15:40:59Z
+
+👍 for reverting the deprecation as short-lived processes is still the main use case. No strong opinion about the alternative, the config option is fine to me.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-09-28T21:12:21Z
+
+I think there are two questions here.
+
+1. Do we want change the defaults or not.
+2. Do we want to support proper handling of `Error` (ie non-Exceptions but `Throwable`.
+
+I think (Please confirm) what we are happy to do 2. But @nicolas-grekas is hesitant about 1.
+What is really important for me is that we do 2. If that is opt-in or default.. it doesn't matter.
+
+Except for the potential cost of migrations, is there any other reason we should not change the defaults?
+Wouldn't it bring a more coherent user experience?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-29T08:27:54Z
+
+Thanks for having a look. You're right about 1. and 2. I know that we already tried doing this change and that this broke some apps that did expect to catch `Error` in their `index.php` file, before Runtime was a thing.
+
+While considering your questions, I figured out another approach that might be a better fit.
+Instead of adding a constructor argument, the behavior can now be configured via a request attribute. I named it `_handle_all_throwables`. When it's set to `true`, all throwables are handled the same way as exceptions.
+And I turned on this flag in the Runtime component.
+
+This means ppl that use modern stacks (aka Runtime) will have the new behavior enabled by default. I think this is safe and legit because Runtime is expected to work on both on long-running and short-living engines.
+
+And ppl that still use the old index.php won't see any difference.
+
+If we want to enable this behavior by default, we can still consider deprecating *not* setting the new attribute in >= 7.1, and handle all throwables by default in 8.0. But meanwhile, we provide a smooth upgrade.
+
+Makes sense?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-09-29T10:05:30Z
+
+> While considering your questions, I figured out another approach that might be a better fit. Instead of adding a constructor argument, the behavior can now be configured via a request attribute. I named it `_handle_all_throwables`. When it's set to `true`, all throwables are handles as exceptions right now. And I turned on this flag in the Runtime component.
+
+I'd throw in another option: Change the interface of the `HttpKernelInterface::handle()` method. It already has a parameter where we can control if exceptions are caught. Before we add a request attribute that is not really well discoverable for developers, we could think about repurposing that parameter.
+
+On Symfony 7, this could look like this:
+
+```php
+interface HttpKernelInterface
+{
+    public const MAIN_REQUEST = 1;
+    public const SUB_REQUEST = 2;
+
+    public function handle(
+        Request $request,
+        int $type = self::MAIN_REQUEST,
+        CatchThrowables $catch = CatchThrowables::AllThrowables
+    ): Response;
+}
+
+enum CatchThrowables
+{
+    case AllThrowables;
+    case ExceptionsOnly; // like $catch === true on 6.1
+    case None; // like $catch === false on 6.1
+}
+```
+
+We should be able to create a smooth upgrade path for that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-29T10:16:28Z
+
+I considered this @derrabus but I don't see any smooth upgrade path to make it happen. Do you have one in mind?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-09-29T10:28:58Z
+
+For 6.2, we can add the enum already comment out the `$catch` parameter. It's optional, so downstream implementations of the interface with the old `bool $catch = true` parameter should not be broken by that.
+
+```php
+interface HttpKernelInterface
+{
+    public const MAIN_REQUEST = 1;
+    public const SUB_REQUEST = 2;
+
+    public function handle(
+        Request $request,
+        int $type = self::MAIN_REQUEST,
+        /* CatchThrowables $catch = CatchThrowables::AllThrowables, */
+    ): Response;
+}
+```
+
+Our `HttpKernel` implementation triggers a deprecation if `$catch` is not passed explicitly or if a boolean is passed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-29T10:43:52Z
+
+Actually, I just realized that `$catch` and the new behavior are not entirely connected. If you look at the code, we *always* catch exceptions, even if `$catch` is `false`. When it's false, we rethrow the exception, but before that, *we call `finishRequest()`*.
+Errors right now are ignored. When we'll go with *handling* them too, we'll still need to decide if we'll also want to `$catch` them, with this definition of `$catch` that I just described for exceptions.
+
+There is another thing that the attribute provides and that highlights the difference: the attribute I'm proposing allows deciding if errors should be handled only for the main request or also for subrequests. That's not something that `$catch` is meant to control.
+
+In the current patch, only the main request will handle errors. I think that's appropriate.
+
+You mention that adding an attribute is not really well discoverable. That's true, but the vast majority of devs won't have to discover it because this is outside of the scope of coding in Symfony. Only ppl that work at the runtime/bootstrap level might be interested in using that attribute. Our Runtime component will enable the flag by default and done.
+
+IF we really want to make this more discoverable, I suggested an approach that could work for v7.1+/8.0. By the time, we might have more clues on the topic and decide if we need something else.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-11T15:05:03Z
+
+Any other input here? I don't want us to release the deprecation if that's not what we want.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-17T17:25:30Z
+
+> enum CatchThrowables
+
+About this proposal, I'm not convinced it makes sense: exposing the behavior as public API doesn't look desired to me as the difference is too subtle. Better keep this as an implementation detail IMHO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-18T15:26:52Z
+
+After talking with ppl in the core-team, I updated the implementation:
+- the new argument on HttpKernel is back, but it's named handleAllThrowables since we discovered that's a more appropriate name, and more importantly, it defaults to false and it comes with *no* deprecation attached
+- the request attribute is gone
+- the config option is back also, under  `framework.handle_all_throwables`. Name updated also, and no explicit default value to keep things simple, and anticipate a future where the option might go away.
+
+People that use a long-running runtime SHOULD enable the new option (that's doc to write on php-runtime @Nyholm), and ppl on short-lived runtime MIGHT enable it without any nasty side-effect, unless they rely on the previous behavior.
+
+This means we SHOULD enable the option by default in the recipe for 6.2.
+
+As ppl migrate to 6.2+, they will sync their recipes and the majority should get the option turned on by 7.1. This should make it cheap to trigger a deprecation *if* we want everybody to use it by then.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-18T15:32:23Z
+
+So basically, we revert the deprecation and change the name of the config flag? That sounds good to me. Thanks. 👍🏻
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-18T15:37:41Z
+
+Basically yes. We also remove `Test\ExceptionSubscriber` because `$client->catchExceptions(false);` already exists and works great for the need.

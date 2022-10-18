@@ -236,6 +236,8 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
             if ($this->store->exists($this->key)) {
                 throw new LockReleasingException(sprintf('Failed to release the "%s" lock, the resource is still locked.', $this->key));
             }
+
+            $this->logger->debug('Successfully released the "{resource}" lock.', ['resource' => $this->key]);
         } catch (LockReleasingException $e) {
             $this->logger->notice('Failed to release the "{resource}" lock.', ['resource' => $this->key]);
             throw $e;

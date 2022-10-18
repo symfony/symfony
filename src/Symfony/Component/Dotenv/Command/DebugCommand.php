@@ -49,30 +49,33 @@ final class DebugCommand extends Command
             return 1;
         }
 
-        $envFiles = $this->getEnvFiles();
-        $availableFiles = array_filter($envFiles, function (string $file) {
-            return is_file($this->getFilePath($file));
+        $dotenvDirectory = $this->getDotenvDirectory();
+        $envFiles = $this->getEnvFiles($dotenvDirectory);
+        $availableFiles = array_filter($envFiles, function (string $file) use ($dotenvDirectory) {
+            return is_file($this->getFilePath($dotenvDirectory, $file));
         });
 
         if (\in_array('.env.local.php', $availableFiles, true)) {
             $io->warning('Due to existing dump file (.env.local.php) all other dotenv files are skipped.');
         }
 
-        if (is_file($this->getFilePath('.env')) && is_file($this->getFilePath('.env.dist'))) {
+        if (is_file($this->getFilePath($dotenvDirectory, '.env')) && is_file($this->getFilePath($dotenvDirectory, '.env.dist'))) {
             $io->warning('The file .env.dist gets skipped due to the existence of .env.');
         }
 
         $io->section('Scanned Files (in descending priority)');
-        $io->listing(array_map(static function (string $envFile) use ($availableFiles) {
+        $io->listing(array_map(static function (string $envFile) use ($availableFiles, $dotenvDirectory) {
+            $file = (null === $dotenvDirectory ? '' : $dotenvDirectory.\DIRECTORY_SEPARATOR).$envFile;
+
             return \in_array($envFile, $availableFiles, true)
-                ? sprintf('<fg=green>✓</> %s', $envFile)
-                : sprintf('<fg=red>⨯</> %s', $envFile);
+                ? sprintf('<fg=green>✓</> %s', $file)
+                : sprintf('<fg=red>⨯</> %s', $file);
         }, $envFiles));
 
         $io->section('Variables');
         $io->table(
             array_merge(['Variable', 'Value'], $availableFiles),
-            $this->getVariables($availableFiles)
+            $this->getVariables($dotenvDirectory, $availableFiles)
         );
 
         $io->comment('Note real values might be different between web and CLI.');
@@ -80,7 +83,7 @@ final class DebugCommand extends Command
         return 0;
     }
 
-    private function getVariables(array $envFiles): array
+    private function getVariables(?string $dotenvDirectory, array $envFiles): array
     {
         $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
         sort($vars);
@@ -91,7 +94,7 @@ final class DebugCommand extends Command
             $realValue = $_SERVER[$var];
             $varDetails = [$var, $realValue];
             foreach ($envFiles as $envFile) {
-                $values = $fileValues[$envFile] ?? $fileValues[$envFile] = $this->loadValues($envFile);
+                $values = $fileValues[$envFile] ?? $fileValues[$envFile] = $this->loadValues($dotenvDirectory, $envFile);
 
                 $varString = $values[$var] ?? '<fg=yellow>n/a</>';
                 $shortenedVar = $this->getHelper('formatter')->truncate($varString, 30);
@@ -104,7 +107,7 @@ final class DebugCommand extends Command
         return $output;
     }
 
-    private function getEnvFiles(): array
+    private function getEnvFiles(?string $dotenvDirectory): array
     {
         $files = [
             '.env.local.php',
@@ -116,7 +119,7 @@ final class DebugCommand extends Command
             $files[] = '.env.local';
         }
 
-        if (!is_file($this->getFilePath('.env')) && is_file($this->getFilePath('.env.dist'))) {
+        if (!is_file($this->getFilePath($dotenvDirectory, '.env')) && is_file($this->getFilePath($dotenvDirectory, '.env.dist'))) {
             $files[] = '.env.dist';
         } else {
             $files[] = '.env';
@@ -125,19 +128,36 @@ final class DebugCommand extends Command
         return $files;
     }
 
-    private function getFilePath(string $file): string
+    private function getFilePath(?string $dotenvDirectory, string $file): string
     {
-        return $this->projectDirectory.\DIRECTORY_SEPARATOR.$file;
+        return $this->projectDirectory.(null === $dotenvDirectory ? '' : \DIRECTORY_SEPARATOR.$dotenvDirectory).\DIRECTORY_SEPARATOR.$file;
     }
 
-    private function loadValues(string $file): array
+    private function loadValues(?string $dotenvDirectory, string $file): array
     {
-        $filePath = $this->getFilePath($file);
+        $filePath = $this->getFilePath($dotenvDirectory, $file);
 
         if (str_ends_with($filePath, '.php')) {
             return include $filePath;
         }
 
         return (new Dotenv())->parse(file_get_contents($filePath));
+    }
+
+    private function getDotenvDirectory(): ?string
+    {
+        $projectDir = is_file($projectDir = $this->projectDirectory) ? basename($projectDir) : $projectDir;
+
+        $composerFile = $projectDir.'/composer.json';
+        if (is_file($composerFile)) {
+            $composerContent = json_decode(file_get_contents($composerFile), true);
+            $dotenvPath = $composerContent['extra']['runtime']['dotenv_path'] ?? null;
+
+            if (null !== $dotenvPath) {
+                return \dirname($dotenvPath);
+            }
+        }
+
+        return null;
     }
 }

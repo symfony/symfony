@@ -122,6 +122,28 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
     }
 
+    public function testScenario4InProdEnv()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario4', 'prod');
+
+        // Scanned Files
+        $this->assertStringContainsString('✓ sub/path/.env.local.php', $output);
+        $this->assertStringContainsString('⨯ sub/path/.env.prod.local', $output);
+        $this->assertStringContainsString('⨯ sub/path/.env.prod', $output);
+        $this->assertStringContainsString('✓ sub/path/.env.local', $output);
+        $this->assertStringContainsString('⨯ sub/path/.env'.\PHP_EOL, $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env.dist', $output);
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   .env.local.php   .env.local', $output);
+        $this->assertStringContainsString('FOO        BaR     BaR              n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234             1111', $output);
+    }
+
     public function testWarningOnEnvAndEnvDistFile()
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario3', 'dev');

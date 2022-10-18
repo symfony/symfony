@@ -1,0 +1,7 @@
+{
+    "extra": {
+        "runtime": {
+            "dotenv_path": "sub/path/.env"
+        }
+    }
+}

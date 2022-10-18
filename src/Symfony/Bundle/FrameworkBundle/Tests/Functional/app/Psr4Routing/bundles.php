@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
 
-class AnnotatedControllerTest extends AbstractAttributeRoutingTest
-{
-    protected function getTestCaseApp(): string
-    {
-        return 'AnnotatedController';
-    }
-}
+return [
+    new FrameworkBundle(),
+    new TestBundle(),
+];

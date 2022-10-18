@@ -25,7 +25,6 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\MercureBundle\MercureBundle;
@@ -194,8 +193,7 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
-use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
-use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -1157,29 +1155,9 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(0, $config['default_uri']);
         }
 
-        $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
-            ->setPublic(false)
-            ->addTag('routing.loader', ['priority' => -10])
-            ->setArguments([
-                new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                '%kernel.environment%',
-            ]);
-
-        $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
-            ->setPublic(false)
-            ->addTag('routing.loader', ['priority' => -10])
-            ->setArguments([
-                new Reference('file_locator'),
-                new Reference('routing.loader.annotation'),
-            ]);
-
-        $container->register('routing.loader.annotation.file', AnnotationFileLoader::class)
-            ->setPublic(false)
-            ->addTag('routing.loader', ['priority' => -10])
-            ->setArguments([
-                new Reference('file_locator'),
-                new Reference('routing.loader.annotation'),
-            ]);
+        if (!class_exists(Psr4DirectoryLoader::class)) {
+            $container->removeDefinition('routing.loader.psr4');
+        }
     }
 
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

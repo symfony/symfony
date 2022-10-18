@@ -48,7 +48,7 @@ class LoggerTest extends TestCase
     public static function assertLogsMatch(array $expected, array $given)
     {
         foreach ($given as $k => $line) {
-            self::assertThat(1 === preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[\+-][0-9]{2}:[0-9]{2} '.preg_quote($expected[$k]).'/', $line), self::isTrue(), "\"$line\" do not match expected pattern \"$expected[$k]\"");
+            self::assertSame(1, preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[\+-][0-9]{2}:[0-9]{2} '.preg_quote($expected[$k]).'/', $line), "\"$line\" do not match expected pattern \"$expected[$k]\"");
         }
     }
 
@@ -186,7 +186,7 @@ class LoggerTest extends TestCase
     public function testFormatter()
     {
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile, function ($level, $message, $context) {
-            return json_encode(['level' => $level, 'message' => $message, 'context' => $context]).\PHP_EOL;
+            return json_encode(['level' => $level, 'message' => $message, 'context' => $context]);
         });
 
         $this->logger->error('An error', ['foo' => 'bar']);
@@ -195,6 +195,26 @@ class LoggerTest extends TestCase
             '{"level":"error","message":"An error","context":{"foo":"bar"}}',
             '{"level":"warning","message":"A warning","context":{"baz":"bar"}}',
         ], $this->getLogs());
+    }
+
+    public function testLogsWithoutOutput()
+    {
+        $oldErrorLog = ini_set('error_log', $this->tmpFile);
+
+        $logger = new Logger();
+        $logger->error('test');
+        $logger->critical('test');
+
+        $expected = [
+            '[error] test',
+            '[critical] test',
+        ];
+
+        foreach ($this->getLogs() as $k => $line) {
+            $this->assertSame(1, preg_match('/\[[\w\/\-: ]+\] '.preg_quote($expected[$k]).'/', $line), "\"$line\" do not match expected pattern \"$expected[$k]\"");
+        }
+
+        ini_set('error_log', $oldErrorLog);
     }
 }
 

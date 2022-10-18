@@ -189,7 +189,7 @@ EOLUA;
         // and removes the linked items. When the set is still not empty after
         // the scan, it means we're in cluster mode and that the linked items
         // are on other nodes: we move the links to a temporary set and we
-        // gargage collect that set from the client side.
+        // garbage collect that set from the client side.
 
         $lua = <<<'EOLUA'
             redis.replicate_commands()

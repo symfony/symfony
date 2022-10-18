@@ -15,7 +15,7 @@ namespace Symfony\Component\Form\ChoiceList;
  * A list of choices with arbitrary data types.
  *
  * The user of this class is responsible for assigning string values to the
- * choices annd for their uniqueness.
+ * choices and for their uniqueness.
  * Both the choices and their values are passed to the constructor.
  * Each choice must have a corresponding value (with the same key) in
  * the values array.

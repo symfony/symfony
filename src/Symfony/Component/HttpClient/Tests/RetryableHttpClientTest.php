@@ -225,4 +225,22 @@ class RetryableHttpClientTest extends TestCase
         $this->assertNotNull($delay);
         $this->assertSame((int) ($retryAfter * 1000), $delay);
     }
+
+    public function testRetryOnErrorAssertContent()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+               new MockResponse('', ['http_code' => 500]),
+               new MockResponse('Test out content', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            1
+        );
+
+        $response = $client->request('GET', 'http://example.com/foo-bar');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('Test out content', $response->getContent());
+        self::assertSame('Test out content', $response->getContent(), 'Content should be buffered');
+    }
 }

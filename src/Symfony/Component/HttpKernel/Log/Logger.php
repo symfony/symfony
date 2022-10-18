@@ -81,7 +81,7 @@ class Logger extends AbstractLogger
 
         $formatter = $this->formatter;
         if ($this->handle) {
-            @fwrite($this->handle, $formatter($level, $message, $context));
+            @fwrite($this->handle, $formatter($level, $message, $context).\PHP_EOL);
         } else {
             error_log($formatter($level, $message, $context, false));
         }
@@ -106,7 +106,7 @@ class Logger extends AbstractLogger
             $message = strtr($message, $replacements);
         }
 
-        $log = sprintf('[%s] %s', $level, $message).\PHP_EOL;
+        $log = sprintf('[%s] %s', $level, $message);
         if ($prefixDate) {
             $log = date(\DateTimeInterface::RFC3339).' '.$log;
         }

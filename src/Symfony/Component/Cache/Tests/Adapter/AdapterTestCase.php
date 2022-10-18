@@ -341,6 +341,19 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $this->assertSame(123, $cache->getItem("a\0b")->get());
     }
+
+    public function testNumericKeysWorkAfterMemoryLeakPrevention()
+    {
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        for ($i = 0; $i < 1001; ++$i) {
+            $cacheItem = $cache->getItem((string) $i);
+            $cacheItem->set('value-'.$i);
+            $cache->save($cacheItem);
+        }
+
+        $this->assertEquals('value-50', $cache->getItem((string) 50)->get());
+    }
 }
 
 class NotUnserializable

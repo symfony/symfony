@@ -14,5 +14,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class Sealed
 {
-    public function __construct(public readonly array $permits = []) {}
+    public function __construct(public readonly array $permits = [])
+    {
+    }
 }

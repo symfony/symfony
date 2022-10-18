@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by PabloKowalczyk at 2022-10-10T10:23:58Z
+
+CI issues seems unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-18T07:28:30Z
+
+As far as I checked correctly, we already log the acquisition part, debug level, so why not the release :shrug:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-18T08:22:42Z
+
+To be honest, I didn't check. Let's do it then for consistency.

@@ -24,6 +24,7 @@ use Symfony\Component\Console\Terminal;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Chris Jones <leeked@gmail.com>
  */
+#[\AllowDynamicProperties]
 final class ProgressBar
 {
     public const FORMAT_VERBOSE = 'verbose';

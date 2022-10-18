@@ -8,12 +8,32 @@ services:
         class: Foo
         tags:
             - foo
+    baz_service:
+        class: Baz
+        tags:
+            - foo
+    qux_service:
+        class: Qux
+        tags:
+            - foo
     foo_service_tagged_iterator:
         class: Bar
         arguments: [!tagged_iterator { tag: foo, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]
+    foo2_service_tagged_iterator:
+        class: Bar
+        arguments: [!tagged_iterator { tag: foo, exclude: baz }]
+    foo3_service_tagged_iterator:
+        class: Bar
+        arguments: [!tagged_iterator { tag: foo, exclude: [baz, qux] }]
     foo_service_tagged_locator:
         class: Bar
         arguments: [!tagged_locator { tag: foo, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]
+    foo2_service_tagged_locator:
+        class: Bar
+        arguments: [!tagged_locator { tag: foo, exclude: baz }]
+    foo3_service_tagged_locator:
+        class: Bar
+        arguments: [!tagged_locator { tag: foo, exclude: [baz, qux] }]
     bar_service_tagged_locator:
         class: Bar
         arguments: [!tagged_locator foo]

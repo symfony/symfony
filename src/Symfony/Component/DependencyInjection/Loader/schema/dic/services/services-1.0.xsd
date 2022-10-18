@@ -284,6 +284,7 @@
     <xsd:choice minOccurs="0">
       <xsd:element name="argument" type="argument" maxOccurs="unbounded" />
       <xsd:element name="service" type="service" />
+      <xsd:element name="exclude" type="xsd:string" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="type" type="argument_type" />
     <xsd:attribute name="id" type="xsd:string" />
@@ -294,6 +295,7 @@
     <xsd:attribute name="index-by" type="xsd:string" />
     <xsd:attribute name="default-index-method" type="xsd:string" />
     <xsd:attribute name="default-priority-method" type="xsd:string" />
+    <xsd:attribute name="exclude" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">

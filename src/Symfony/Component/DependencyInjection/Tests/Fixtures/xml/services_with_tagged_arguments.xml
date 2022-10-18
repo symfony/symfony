@@ -5,11 +5,35 @@
     <service id="foo" class="Foo">
       <tag name="foo_tag"/>
     </service>
+    <service id="baz" class="Baz">
+      <tag name="foo_tag"/>
+    </service>
+    <service id="qux" class="Qux">
+      <tag name="foo_tag"/>
+    </service>
     <service id="foo_tagged_iterator" class="Bar" public="true">
       <argument type="tagged_iterator" tag="foo_tag" index-by="barfoo" default-index-method="foobar" default-priority-method="getPriority"/>
     </service>
+    <service id="foo2_tagged_iterator" class="Bar" public="true">
+      <argument type="tagged_iterator" tag="foo_tag" exclude="baz"/>
+    </service>
+    <service id="foo3_tagged_iterator" class="Bar" public="true">
+      <argument type="tagged_iterator" tag="foo_tag">
+        <exclude>baz</exclude>
+        <exclude>qux</exclude>
+      </argument>
+    </service>
     <service id="foo_tagged_locator" class="Bar" public="true">
       <argument type="tagged_locator" tag="foo_tag" index-by="barfoo" default-index-method="foobar" default-priority-method="getPriority"/>
+    </service>
+    <service id="foo2_tagged_locator" class="Bar" public="true">
+      <argument type="tagged_locator" tag="foo_tag" exclude="baz"/>
+    </service>
+    <service id="foo3_tagged_locator" class="Bar" public="true">
+      <argument type="tagged_locator" tag="foo_tag">
+        <exclude>baz</exclude>
+        <exclude>qux</exclude>
+      </argument>
     </service>
   </services>
 </container>

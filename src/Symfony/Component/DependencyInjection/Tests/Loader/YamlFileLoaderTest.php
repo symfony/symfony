@@ -392,9 +392,17 @@ class YamlFileLoaderTest extends TestCase
 
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
         $this->assertEquals($taggedIterator, $container->getDefinition('foo_service_tagged_iterator')->getArgument(0));
+        $taggedIterator2 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz']);
+        $this->assertEquals($taggedIterator2, $container->getDefinition('foo2_service_tagged_iterator')->getArgument(0));
+        $taggedIterator3 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz', 'qux']);
+        $this->assertEquals($taggedIterator3, $container->getDefinition('foo3_service_tagged_iterator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', true, 'getPriority');
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
+        $taggedIterator2 = new TaggedIteratorArgument('foo', 'foo', 'getDefaultFooName', true, 'getDefaultFooPriority', ['baz']);
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator2), $container->getDefinition('foo2_service_tagged_locator')->getArgument(0));
+        $taggedIterator3 = new TaggedIteratorArgument('foo', 'foo', 'getDefaultFooName', true, 'getDefaultFooPriority', ['baz', 'qux']);
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator3), $container->getDefinition('foo3_service_tagged_locator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo', null, null, true);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));

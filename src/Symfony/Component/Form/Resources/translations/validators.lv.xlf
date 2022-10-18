@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="128">
                 <source>Please enter a valid week.</source>
-                <target>Lūdzu, ievadiet derīgu nedeļu.</target>
+                <target>Lūdzu, ievadiet derīgu nedēļu.</target>
             </trans-unit>
         </body>
     </file>

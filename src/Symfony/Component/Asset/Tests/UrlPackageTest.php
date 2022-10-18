@@ -48,10 +48,10 @@ class UrlPackageTest extends TestCase
             ['file:///example/com/foo/', '', 'foo', 'file:///example/com/foo/foo?v1'],
 
             [['http://example.com'], '', '/foo', 'http://example.com/foo?v1'],
-            [['http://example.com', 'http://example.net'], '', '/foo', 'http://example.com/foo?v1'],
-            [['http://example.com', 'http://example.net'], '', '/fooa', 'http://example.net/fooa?v1'],
-            [['file:///example/com', 'file:///example/net'], '', '/foo', 'file:///example/com/foo?v1'],
-            [['ftp://example.com', 'ftp://example.net'], '', '/fooa', 'ftp://example.net/fooa?v1'],
+            [['http://example.com', 'http://example.net'], '', '/foo', 'http://example.net/foo?v1'],
+            [['http://example.com', 'http://example.net'], '', '/fooa', 'http://example.com/fooa?v1'],
+            [['file:///example/com', 'file:///example/net'], '', '/foo', 'file:///example/net/foo?v1'],
+            [['ftp://example.com', 'ftp://example.net'], '', '/fooa', 'ftp://example.com/fooa?v1'],
 
             ['http://example.com', 'version-%2$s/%1$s', '/foo', 'http://example.com/version-v1/foo'],
             ['http://example.com', 'version-%2$s/%1$s', 'foo', 'http://example.com/version-v1/foo'],
@@ -77,15 +77,16 @@ class UrlPackageTest extends TestCase
         return [
             [false, 'http://example.com', '', 'foo', 'http://example.com/foo?v1'],
             [false, ['http://example.com'], '', 'foo', 'http://example.com/foo?v1'],
-            [false, ['http://example.com', 'https://example.com'], '', 'foo', 'http://example.com/foo?v1'],
-            [false, ['http://example.com', 'https://example.com'], '', 'fooa', 'https://example.com/fooa?v1'],
+            [false, ['http://example.com', 'https://example.com'], '', 'foo', 'https://example.com/foo?v1'],
+            [false, ['http://example.com', 'https://example.com'], '', 'fooa', 'http://example.com/fooa?v1'],
             [false, ['http://example.com/bar'], '', 'foo', 'http://example.com/bar/foo?v1'],
             [false, ['http://example.com/bar/'], '', 'foo', 'http://example.com/bar/foo?v1'],
             [false, ['//example.com/bar/'], '', 'foo', '//example.com/bar/foo?v1'],
 
             [true, ['http://example.com'], '', 'foo', 'http://example.com/foo?v1'],
             [true, ['http://example.com', 'https://example.com'], '', 'foo', 'https://example.com/foo?v1'],
-            [true, ['', 'https://example.com'], '', 'foo', '/foo?v1'],
+            [true, ['', 'https://example.com'], '', 'foo', 'https://example.com/foo?v1'],
+            [true, ['', 'https://example.com'], '', 'bar', '/bar?v1'],
         ];
     }
 

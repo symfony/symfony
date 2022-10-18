@@ -106,7 +106,17 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             throw $exception;
         }
 
-        $response = $this->handleThrowable($exception, $request, self::MAIN_REQUEST);
+        if ($pop = $request !== $this->requestStack->getMainRequest()) {
+            $this->requestStack->push($request);
+        }
+
+        try {
+            $response = $this->handleThrowable($exception, $request, self::MAIN_REQUEST);
+        } finally {
+            if ($pop) {
+                $this->requestStack->pop();
+            }
+        }
 
         $response->sendHeaders();
         $response->sendContent();

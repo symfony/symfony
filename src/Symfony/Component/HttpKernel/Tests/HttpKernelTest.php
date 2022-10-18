@@ -341,6 +341,22 @@ class HttpKernelTest extends TestCase
         $this->assertEquals($response, $capturedResponse);
     }
 
+    public function testTerminateWithException()
+    {
+        $dispatcher = new EventDispatcher();
+        $requestStack = new RequestStack();
+        $kernel = $this->getHttpKernel($dispatcher, null, $requestStack);
+
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (ExceptionEvent $event) use (&$capturedRequest, $requestStack) {
+            $capturedRequest = $requestStack->getCurrentRequest();
+            $event->setResponse(new Response());
+        });
+
+        $kernel->terminateWithException(new \Exception('boo'), $request = Request::create('/'));
+        $this->assertSame($request, $capturedRequest);
+        $this->assertNull($requestStack->getCurrentRequest());
+    }
+
     public function testVerifyRequestStackPushPopDuringHandle()
     {
         $request = new Request();

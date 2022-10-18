@@ -184,9 +184,15 @@ final class AsyncContext
 
     /**
      * Replaces or removes the chunk filter iterator.
+     *
+     * @param ?callable(ChunkInterface, self): ?\Iterator $passthru
      */
     public function passthru(callable $passthru = null): void
     {
-        $this->passthru = $passthru;
+        $this->passthru = $passthru ?? static function ($chunk, $context) {
+            $context->passthru = null;
+
+            yield $chunk;
+        };
     }
 }

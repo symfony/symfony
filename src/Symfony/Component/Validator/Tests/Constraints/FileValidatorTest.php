@@ -640,5 +640,22 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testUploadedFileExtensions()
+    {
+        $file = new UploadedFile(__DIR__.'/Fixtures/bar', 'bar.txt', 'text/plain', \UPLOAD_ERR_OK, true);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['txt']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
+    }
+
     abstract protected function getFile($filename);
 }

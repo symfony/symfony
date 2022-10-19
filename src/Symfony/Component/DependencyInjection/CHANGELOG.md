@@ -12,6 +12,7 @@ CHANGELOG
  * Change the signature of `ContainerAwareInterface::setContainer()` to `setContainer(?ContainerInterface)`
  * Deprecate calling `ContainerAwareTrait::setContainer()` without arguments
  * Deprecate using numeric parameter names
+ * Add support for tagged iterators/locators `exclude` option to the xml and yaml loaders/dumpers
 
 6.1
 ---

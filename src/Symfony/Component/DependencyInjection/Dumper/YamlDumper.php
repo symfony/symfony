@@ -266,6 +266,12 @@ class YamlDumper extends Dumper
                         $content['default_priority_method'] = $tag->getDefaultPriorityMethod();
                     }
                 }
+                if ($excludes = $tag->getExclude()) {
+                    if (!\is_array($content)) {
+                        $content = ['tag' => $content];
+                    }
+                    $content['exclude'] = 1 === \count($excludes) ? $excludes[0] : $excludes;
+                }
 
                 return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
             }

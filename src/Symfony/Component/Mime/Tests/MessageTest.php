@@ -201,7 +201,7 @@ EOF;
                         "subtype": "plain",
                         "disposition": null,
                         "name": null,
-                        "encoding": "quoted-printable",
+                        "encoding": "quoted-printable",%A
                         "headers": [],
                         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\TextPart"
                     },
@@ -211,7 +211,7 @@ EOF;
                         "subtype": "html",
                         "disposition": null,
                         "name": null,
-                        "encoding": "quoted-printable",
+                        "encoding": "quoted-printable",%A
                         "headers": [],
                         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\TextPart"
                     }
@@ -221,13 +221,13 @@ EOF;
             },
             {
                 "filename": "text.txt",
-                "mediaType": "application",
+                "mediaType": "application",%A
                 "body": "text data",
                 "charset": null,
                 "subtype": "octet-stream",
                 "disposition": "attachment",
                 "name": "text.txt",
-                "encoding": "base64",
+                "encoding": "base64",%A
                 "headers": [],
                 "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
             }
@@ -249,12 +249,12 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, Message::class, 'json');
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());
 
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
     }
 }

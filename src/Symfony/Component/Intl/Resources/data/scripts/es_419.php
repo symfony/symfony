@@ -7,6 +7,7 @@ return [
         'Laoo' => 'lao',
         'Latn' => 'latín',
         'Mlym' => 'malabar',
-        'Olck' => 'ol chiki',
+        'Mtei' => 'manipuri',
+        'Syrc' => 'siríaco',
     ],
 ];

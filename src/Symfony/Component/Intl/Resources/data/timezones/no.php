@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'tidssone for Tyrkia (Istanbul)',
         'Europe/Jersey' => 'Greenwich middeltid (Jersey)',
         'Europe/Kaliningrad' => 'østeuropeisk tid (Kaliningrad)',
-        'Europe/Kiev' => 'østeuropeisk tid (Kiev)',
+        'Europe/Kiev' => 'østeuropeisk tid (Kyiv)',
         'Europe/Kirov' => 'tidssone for Russland (Kirov)',
         'Europe/Lisbon' => 'vesteuropeisk tid (Lisboa)',
         'Europe/Ljubljana' => 'sentraleuropeisk tid (Ljubljana)',

@@ -204,7 +204,7 @@ return [
         ],
         'CVE' => [
             0 => 'CVE',
-            1 => 'escudo din Capul Verde',
+            1 => 'escudo caboverdian',
         ],
         'CYP' => [
             0 => 'CYP',
@@ -372,7 +372,7 @@ return [
         ],
         'ILS' => [
             0 => 'ILS',
-            1 => 'șechel israelian nou',
+            1 => 'shekel israelian nou',
         ],
         'INR' => [
             0 => 'INR',
@@ -692,7 +692,7 @@ return [
         ],
         'SCR' => [
             0 => 'SCR',
-            1 => 'rupie din Seychelles',
+            1 => 'rupie seychelleză',
         ],
         'SDD' => [
             0 => 'SDD',
@@ -716,7 +716,7 @@ return [
         ],
         'SHP' => [
             0 => 'SHP',
-            1 => 'liră Insula Sf. Elena',
+            1 => 'liră din Sfânta Elena (Sfânta Elena și Ascension)',
         ],
         'SIT' => [
             0 => 'SIT',
@@ -752,7 +752,7 @@ return [
         ],
         'STN' => [
             0 => 'STN',
-            1 => 'dobra Sao Tome și Principe',
+            1 => 'dobra din São Tomé și Príncipe',
         ],
         'SUR' => [
             0 => 'SUR',

@@ -449,6 +449,7 @@ return [
         'sd_Arab_PK' => 'sindhgbe (Arabiagbeŋɔŋlɔ, Pakistan nutome)',
         'sd_Deva' => 'sindhgbe (devanagarigbeŋɔŋlɔ)',
         'sd_Deva_IN' => 'sindhgbe (devanagarigbeŋɔŋlɔ, India nutome)',
+        'sd_IN' => 'sindhgbe (India nutome)',
         'sd_PK' => 'sindhgbe (Pakistan nutome)',
         'se' => 'dziehe samigbe',
         'se_FI' => 'dziehe samigbe (Finland nutome)',

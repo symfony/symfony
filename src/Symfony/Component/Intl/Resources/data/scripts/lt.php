@@ -2,9 +2,11 @@
 
 return [
     'Names' => [
+        'Adlm' => 'ADLAM',
         'Afak' => 'Afaka',
         'Aghb' => 'Kaukazo Albanijos',
         'Arab' => 'arabų',
+        'Aran' => 'Nastalik',
         'Armi' => 'imperinė aramaikų',
         'Armn' => 'armėnų',
         'Avst' => 'avestano',
@@ -120,6 +122,7 @@ return [
         'Plrd' => 'polard fonetinė',
         'Prti' => 'rašytiniai partų',
         'Rjng' => 'rejang',
+        'Rohg' => 'Hanifi',
         'Roro' => 'rongorongo',
         'Runr' => 'runų',
         'Samr' => 'samariečių',

@@ -214,7 +214,7 @@ return [
         'SV' => 'El Salvador',
         'SX' => 'Sint Maarten',
         'SY' => 'Siria',
-        'SZ' => 'Suazilandia',
+        'SZ' => 'Esuatini',
         'TC' => 'Islas Turcas y Caicos',
         'TD' => 'Chad',
         'TF' => 'Territorios Australes Franceses',

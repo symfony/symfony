@@ -3,7 +3,6 @@
 return [
     'Names' => [
         'Africa/Bujumbura' => 'hora de África central (Buyumbura)',
-        'Africa/Conakry' => 'hora del meridiano de Greenwich (Conakri)',
         'Africa/Dar_es_Salaam' => 'hora de África oriental (Dar es-Salaam)',
         'America/Rio_Branco' => 'Hora de Acre (Rio Branco)',
         'Asia/Almaty' => 'hora de Kazajistán oriental (Almatý)',

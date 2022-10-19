@@ -12,7 +12,7 @@ return [
         ],
         'ALL' => [
             0 => 'ALL',
-            1 => 'Albanian Lek',
+            1 => 'Lek ng Albania',
         ],
         'AMD' => [
             0 => 'AMD',
@@ -96,7 +96,7 @@ return [
         ],
         'BYN' => [
             0 => 'BYN',
-            1 => 'Belarusian Ruble',
+            1 => 'Ruble ng Belarus',
         ],
         'BYR' => [
             0 => 'BYR',
@@ -152,7 +152,7 @@ return [
         ],
         'CZK' => [
             0 => 'CZK',
-            1 => 'Czech Republic Koruna',
+            1 => 'Koruna ng Czech Republic',
         ],
         'DEM' => [
             0 => 'DEM',
@@ -180,7 +180,7 @@ return [
         ],
         'EGP' => [
             0 => 'EGP',
-            1 => 'Egyptian Pound',
+            1 => 'Pound ng Egypt',
         ],
         'ERN' => [
             0 => 'ERN',
@@ -220,7 +220,7 @@ return [
         ],
         'GIP' => [
             0 => 'GIP',
-            1 => 'Gibraltar Pound',
+            1 => 'Pound ng Gibraltar',
         ],
         'GMD' => [
             0 => 'GMD',
@@ -248,7 +248,7 @@ return [
         ],
         'HRK' => [
             0 => 'HRK',
-            1 => 'Croatian Kuna',
+            1 => 'Kuna ng Croatia',
         ],
         'HTG' => [
             0 => 'HTG',
@@ -256,7 +256,7 @@ return [
         ],
         'HUF' => [
             0 => 'HUF',
-            1 => 'Hungarian Forint',
+            1 => 'Forint ng Hungary',
         ],
         'IDR' => [
             0 => 'IDR',
@@ -264,7 +264,7 @@ return [
         ],
         'ILS' => [
             0 => '₪',
-            1 => 'Israeli New Sheqel',
+            1 => 'New Shekel ng Israel',
         ],
         'INR' => [
             0 => '₹',
@@ -360,7 +360,7 @@ return [
         ],
         'LYD' => [
             0 => 'LYD',
-            1 => 'Libyan Dinar',
+            1 => 'Dinar ng Libya',
         ],
         'MAD' => [
             0 => 'MAD',
@@ -368,7 +368,7 @@ return [
         ],
         'MDL' => [
             0 => 'MDL',
-            1 => 'Moldovan Leu',
+            1 => 'Leu ng Moldova',
         ],
         'MGA' => [
             0 => 'MGA',
@@ -376,7 +376,7 @@ return [
         ],
         'MKD' => [
             0 => 'MKD',
-            1 => 'Macedonian Denar',
+            1 => 'Denar ng Macedonia',
         ],
         'MMK' => [
             0 => 'MMK',
@@ -472,7 +472,7 @@ return [
         ],
         'PLN' => [
             0 => 'PLN',
-            1 => 'Polish Zloty',
+            1 => 'Zloty ng Poland',
         ],
         'PYG' => [
             0 => 'PYG',
@@ -484,15 +484,15 @@ return [
         ],
         'RON' => [
             0 => 'RON',
-            1 => 'Romanian Leu',
+            1 => 'Leu ng Romania',
         ],
         'RSD' => [
             0 => 'RSD',
-            1 => 'Serbian Dinar',
+            1 => 'Dinar ng Serbia',
         ],
         'RUB' => [
             0 => 'RUB',
-            1 => 'Russian Ruble',
+            1 => 'Ruble ng Russia',
         ],
         'RWF' => [
             0 => 'RWF',
@@ -604,7 +604,7 @@ return [
         ],
         'UAH' => [
             0 => 'UAH',
-            1 => 'Ukrainian Hryvnia',
+            1 => 'Hryvnia ng Ukraine',
         ],
         'UGX' => [
             0 => 'UGX',

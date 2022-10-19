@@ -83,7 +83,7 @@ class PropertyPathAccessor implements DataAccessorInterface
         try {
             return $this->propertyAccessor->getValue($data, $propertyPath);
         } catch (PropertyAccessException $e) {
-            if (\is_array($data) && $e instanceof NoSuchPropertyException) {
+            if (\is_array($data) && $e instanceof NoSuchIndexException) {
                 return null;
             }
 

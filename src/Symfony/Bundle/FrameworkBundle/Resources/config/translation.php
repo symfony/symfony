@@ -27,6 +27,8 @@ use Symfony\Component\Translation\Dumper\YamlFileDumper;
 use Symfony\Component\Translation\Extractor\ChainExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
+use Symfony\Component\Translation\FallbackLocaleProvider;
+use Symfony\Component\Translation\FallbackLocaleProviderInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
@@ -61,6 +63,7 @@ return static function (ContainerConfigurator $container) {
                     'debug' => param('kernel.debug'),
                 ],
                 abstract_arg('enabled locales'),
+                service('translation.fallback_locale_provider')->ignoreOnInvalid(),
             ])
             ->call('setConfigCacheFactory', [service('config_cache_factory')])
             ->tag('kernel.locale_aware')
@@ -175,4 +178,10 @@ return static function (ContainerConfigurator $container) {
         ->alias(LocaleAwareInterface::class, 'translation.locale_switcher')
         ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
     ;
+
+    if (class_exists(FallbackLocaleProvider::class)) {
+        $container->services()
+            ->set('translation.fallback_locale_provider', FallbackLocaleProvider::class)
+            ->alias(FallbackLocaleProviderInterface::class, 'translation.fallback_locale_provider');
+    }
 };

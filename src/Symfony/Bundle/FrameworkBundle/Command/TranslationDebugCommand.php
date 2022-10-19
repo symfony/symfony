@@ -369,7 +369,7 @@ EOF
     {
         $fallbackCatalogues = [];
         if ($this->translator instanceof Translator || $this->translator instanceof DataCollectorTranslator || $this->translator instanceof LoggingTranslator) {
-            foreach ($this->translator->getFallbackLocales() as $fallbackLocale) {
+            foreach ($this->translator->getFallbackLocaleProvider()->getUltimateFallbackLocales() as $fallbackLocale) {
                 if ($fallbackLocale === $locale) {
                     continue;
                 }

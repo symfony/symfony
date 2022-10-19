@@ -41,11 +41,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     private string $locale;
 
     /**
-     * @var string[]
-     */
-    private array $fallbackLocales = [];
-
-    /**
      * @var LoaderInterface[]
      */
     private array $loaders = [];
@@ -62,14 +57,14 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     private ?ConfigCacheFactoryInterface $configCacheFactory;
 
-    private array $parentLocales;
-
     private bool $hasIntlFormatter;
+
+    private FallbackLocaleProviderInterface $fallbackLocaleProvider;
 
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [])
+    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [], FallbackLocaleProviderInterface $fallbackLocaleProvider = null)
     {
         $this->setLocale($locale);
 
@@ -82,11 +77,26 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $this->debug = $debug;
         $this->cacheVary = $cacheVary;
         $this->hasIntlFormatter = $formatter instanceof IntlFormatterInterface;
+        $this->fallbackLocaleProvider = $fallbackLocaleProvider ?? new FallbackLocaleProvider();
     }
 
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
         $this->configCacheFactory = $configCacheFactory;
+    }
+
+    public function setFallbackLocaleProvider(FallbackLocaleProviderInterface $fallbackLocaleProvider)
+    {
+        $this->fallbackLocaleProvider = $fallbackLocaleProvider;
+
+        // needed as the fallback locales are linked to the already loaded catalogues
+        $this->catalogues = [];
+        $this->cacheVary['fallback_locales'] = $fallbackLocaleProvider->getUltimateFallbackLocales();
+    }
+
+    public function getFallbackLocaleProvider(): FallbackLocaleProviderInterface
+    {
+        return $this->fallbackLocaleProvider;
     }
 
     /**
@@ -118,7 +128,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
         $this->resources[$locale][] = [$format, $resource, $domain];
 
-        if (\in_array($locale, $this->fallbackLocales)) {
+        if (\in_array($locale, $this->fallbackLocaleProvider->getUltimateFallbackLocales())) {
             $this->catalogues = [];
         } else {
             unset($this->catalogues[$locale]);
@@ -145,24 +155,19 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function setFallbackLocales(array $locales)
     {
-        // needed as the fallback locales are linked to the already loaded catalogues
-        $this->catalogues = [];
+        trigger_deprecation('symfony/translation', '6.2', 'Changing the fallback locales on the Translator is deprecated. Provide a new FallbackLocaleProviderInterface instance instead.');
 
-        foreach ($locales as $locale) {
-            $this->assertValidLocale($locale);
-        }
-
-        $this->fallbackLocales = $this->cacheVary['fallback_locales'] = $locales;
+        $this->setFallbackLocaleProvider(new FallbackLocaleProvider($locales));
     }
 
     /**
-     * Gets the fallback locales.
-     *
      * @internal
      */
     public function getFallbackLocales(): array
     {
-        return $this->fallbackLocales;
+        trigger_deprecation('symfony/translation', '6.2', 'Querying fallback locales on the Translator is deprecated. Get the FallbackLocaleProvider instead and either use it to compute the fallback locale order, or query its ultimate fallback locale list.');
+
+        return $this->fallbackLocaleProvider->getUltimateFallbackLocales();
     }
 
     public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
@@ -378,43 +383,7 @@ EOF
 
     protected function computeFallbackLocales(string $locale)
     {
-        $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
-
-        $originLocale = $locale;
-        $locales = [];
-
-        while ($locale) {
-            $parent = $this->parentLocales[$locale] ?? null;
-
-            if ($parent) {
-                $locale = 'root' !== $parent ? $parent : null;
-            } elseif (\function_exists('locale_parse')) {
-                $localeSubTags = locale_parse($locale);
-                $locale = null;
-                if (1 < \count($localeSubTags)) {
-                    array_pop($localeSubTags);
-                    $locale = locale_compose($localeSubTags) ?: null;
-                }
-            } elseif ($i = strrpos($locale, '_') ?: strrpos($locale, '-')) {
-                $locale = substr($locale, 0, $i);
-            } else {
-                $locale = null;
-            }
-
-            if (null !== $locale) {
-                $locales[] = $locale;
-            }
-        }
-
-        foreach ($this->fallbackLocales as $fallback) {
-            if ($fallback === $originLocale) {
-                continue;
-            }
-
-            $locales[] = $fallback;
-        }
-
-        return array_unique($locales);
+        return $this->fallbackLocaleProvider->computeFallbackLocales($locale);
     }
 
     /**
@@ -424,9 +393,7 @@ EOF
      */
     protected function assertValidLocale(string $locale)
     {
-        if (!preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
-            throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
-        }
+        LocaleValidator::validate($locale);
     }
 
     /**

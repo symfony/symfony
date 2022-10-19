@@ -85,6 +85,8 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     public function getFallbackLocales(): array
     {
+        trigger_deprecation('symfony/translation', '6.2', 'DataCollectorTranslator::getFallbackLocales() is deprecated. Get the FallbackLocaleProvider instead.');
+
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {
             return $this->translator->getFallbackLocales();
         }

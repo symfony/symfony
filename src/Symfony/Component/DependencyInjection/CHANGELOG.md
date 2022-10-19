@@ -13,6 +13,7 @@ CHANGELOG
  * Deprecate calling `ContainerAwareTrait::setContainer()` without arguments
  * Deprecate using numeric parameter names
  * Add support for tagged iterators/locators `exclude` option to the xml and yaml loaders/dumpers
+ * Allow injecting `string $env` into php config closures
 
 6.1
 ---

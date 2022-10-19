@@ -123,6 +123,12 @@ class PhpFileLoader extends FileLoader
                 case self::class:
                     $arguments[] = $this;
                     break;
+                case 'string':
+                    if (null !== $this->env && 'env' === $parameter->getName()) {
+                        $arguments[] = $this->env;
+                        break;
+                    }
+                    // no break
                 default:
                     try {
                         $configBuilder = $this->configBuilder($type);
@@ -163,7 +169,7 @@ class PhpFileLoader extends FileLoader
             return new $namespace();
         }
 
-        // If it does not start with Symfony\Config\ we dont know how to handle this
+        // If it does not start with Symfony\Config\ we don't know how to handle this
         if (!str_starts_with($namespace, 'Symfony\\Config\\')) {
             throw new InvalidArgumentException(sprintf('Could not find or generate class "%s".', $namespace));
         }

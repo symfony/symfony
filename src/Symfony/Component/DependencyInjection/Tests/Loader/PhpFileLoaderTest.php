@@ -99,6 +99,7 @@ class PhpFileLoaderTest extends TestCase
         yield ['config_builder'];
         yield ['expression_factory'];
         yield ['closure'];
+        yield ['env_param'];
     }
 
     public function testAutoConfigureAndChildDefinition()

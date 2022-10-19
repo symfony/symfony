@@ -54,6 +54,11 @@ class ArgvInput extends Input
 
         parent::__construct($definition);
     }
+    
+    public function getTokens()
+    {
+        return $this->tokens;
+    }
 
     protected function setTokens(array $tokens)
     {

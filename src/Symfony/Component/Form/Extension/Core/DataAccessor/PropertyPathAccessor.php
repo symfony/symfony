@@ -84,7 +84,7 @@ class PropertyPathAccessor implements DataAccessorInterface
             return $this->propertyAccessor->getValue($data, $propertyPath);
         } catch (PropertyAccessException $e) {
             if (\is_array($data) && $e instanceof NoSuchPropertyException) {
-                throw new NoSuchPropertyException($e->getMessage().' Make the property public, add a getter, or set the "mapped" field option in the form type to be false.');
+                return null;
             }
 
             if (!$e instanceof UninitializedPropertyException

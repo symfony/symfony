@@ -33,7 +33,7 @@ interface DenormalizerInterface
      *
      * @param mixed  $data    Data to restore
      * @param class-string<TObject> $type    The expected class to instantiate
-     * @param string|null $format  Format the given data was extracted from
+     * @param string $format  Format the given data was extracted from
      * @param array  $context Options available to the denormalizer
      *
      * @return TObject
@@ -46,17 +46,17 @@ interface DenormalizerInterface
      * @throws RuntimeException         Occurs if the class cannot be instantiated
      * @throws ExceptionInterface       Occurs for all the other cases of errors
      */
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed;
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.
      *
      * @param mixed  $data    Data to denormalize from
-     * @param class-string $type    The class to which the data should be denormalized
+     * @param string $type    The class to which the data should be denormalized
      * @param string|null $format  The format being deserialized from
      * @param array  $context Options available to the denormalizer
      *
      * @return bool
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool;
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
 }

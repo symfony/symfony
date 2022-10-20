@@ -6,6 +6,7 @@ CHANGELOG
 
  * Make `HttplugClient` implement `Psr\Http\Message\RequestFactoryInterface`, `StreamFactoryInterface` and `UriFactoryInterface`
  * Deprecate implementing `Http\Message\RequestFactory`, `StreamFactory` and `UriFactory` on `HttplugClient`
+ * Add `withOptions()` to `HttplugClient` and `Psr18Client`
 
 6.1
 ---

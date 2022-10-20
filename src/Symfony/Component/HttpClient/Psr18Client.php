@@ -79,6 +79,14 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         $this->streamFactory = $streamFactory;
     }
 
+    public function withOptions(array $options): static
+    {
+        $clone = clone $this;
+        $clone->client = $clone->client->withOptions($options);
+
+        return $clone;
+    }
+
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         try {

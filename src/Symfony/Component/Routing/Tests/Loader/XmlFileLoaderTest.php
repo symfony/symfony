@@ -13,11 +13,15 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
+use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 
 class XmlFileLoaderTest extends TestCase
 {
@@ -591,5 +595,41 @@ class XmlFileLoaderTest extends TestCase
         $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
 
         $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportAttributesWithPsr4Prefix()
+    {
+        $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
+        new LoaderResolver([
+            $loader = new XmlFileLoader($locator),
+            new Psr4DirectoryLoader($locator),
+            new class() extends AnnotationClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
+                {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $route = $loader->load('psr4-attributes.xml')->get('my_route');
+        $this->assertSame('/my-prefix/my/route', $route->getPath());
+        $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
+    }
+
+    public function testImportAttributesFromClass()
+    {
+        new LoaderResolver([
+            $loader = new XmlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
+            new class() extends AnnotationClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
+                {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $route = $loader->load('class-attributes.xml')->get('my_route');
+        $this->assertSame('/my-prefix/my/route', $route->getPath());
+        $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
     }
 }

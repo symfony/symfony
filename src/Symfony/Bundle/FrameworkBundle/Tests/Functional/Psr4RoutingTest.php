@@ -11,10 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-class AnnotatedControllerTest extends AbstractAttributeRoutingTest
+/**
+ * @requires function Symfony\Component\Routing\Loader\Psr4DirectoryLoader::__construct
+ */
+final class Psr4RoutingTest extends AbstractAttributeRoutingTest
 {
     protected function getTestCaseApp(): string
     {
-        return 'AnnotatedController';
+        return 'Psr4Routing';
     }
 }

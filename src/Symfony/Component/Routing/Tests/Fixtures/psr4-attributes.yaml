@@ -1,0 +1,4 @@
+my_controllers:
+    resource: ./Psr4Controllers
+    type: attribute@Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers
+    prefix: /my-prefix

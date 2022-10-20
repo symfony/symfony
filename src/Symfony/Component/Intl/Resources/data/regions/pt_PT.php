@@ -33,6 +33,7 @@ return [
         'LK' => 'Sri Lanca',
         'LV' => 'Letónia',
         'MC' => 'Mónaco',
+        'MF' => 'São Martinho (Saint-Martin)',
         'MG' => 'Madagáscar',
         'MK' => 'Macedónia do Norte',
         'MS' => 'Monserrate',

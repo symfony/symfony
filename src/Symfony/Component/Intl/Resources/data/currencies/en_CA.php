@@ -40,7 +40,7 @@ return [
         ],
         'SHP' => [
             0 => 'SHP',
-            1 => 'St Helena Pound',
+            1 => 'Saint Helena Pound',
         ],
         'STN' => [
             0 => 'STN',
@@ -56,7 +56,7 @@ return [
         ],
         'USD' => [
             0 => 'US$',
-            1 => 'U.S. Dollar',
+            1 => 'US Dollar',
         ],
     ],
 ];

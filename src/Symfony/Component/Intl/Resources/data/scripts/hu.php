@@ -2,6 +2,7 @@
 
 return [
     'Names' => [
+        'Adlm' => 'Adlam',
         'Arab' => 'Arab',
         'Aran' => 'Nasztalik',
         'Armi' => 'Birodalmi arámi',
@@ -97,6 +98,7 @@ return [
         'Prti' => 'Feliratos parthian',
         'Qaag' => 'Zawgyi',
         'Rjng' => 'Redzsang',
+        'Rohg' => 'Hanifi',
         'Roro' => 'Rongorongo',
         'Runr' => 'Runikus',
         'Samr' => 'Szamaritán',

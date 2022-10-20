@@ -2,6 +2,7 @@
 
 return [
     'Names' => [
+        'Adlm' => 'Adlam',
         'Afak' => 'Afaka',
         'Aghb' => 'Kafkas Albanyası',
         'Arab' => 'Arap',
@@ -121,6 +122,7 @@ return [
         'Prti' => 'Partça Kitabe Dili',
         'Qaag' => 'Zawgyi',
         'Rjng' => 'Rejang',
+        'Rohg' => 'Hanifi',
         'Roro' => 'Rongorongo',
         'Runr' => 'Runik',
         'Samr' => 'Samarit',
@@ -149,7 +151,7 @@ return [
         'Tavt' => 'Tai Viet',
         'Telu' => 'Telugu',
         'Teng' => 'Tengvar',
-        'Tfng' => 'Tifinagh',
+        'Tfng' => 'Tifinag',
         'Tglg' => 'Takalot',
         'Thaa' => 'Thaana',
         'Thai' => 'Tay',

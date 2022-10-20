@@ -898,6 +898,10 @@ return [
             0 => 'SKK',
             1 => 'corona islovaca',
         ],
+        'SLE' => [
+            0 => 'SLE',
+            1 => 'leone nou de sa Sierra Leone',
+        ],
         'SLL' => [
             0 => 'SLL',
             1 => 'leone de sa Sierra Leone',
@@ -1045,6 +1049,10 @@ return [
         'VEB' => [
             0 => 'VEB',
             1 => 'bolivar venezuelanu (1871–2008)',
+        ],
+        'VED' => [
+            0 => 'VED',
+            1 => 'bolivar soberanu',
         ],
         'VEF' => [
             0 => 'VEF',

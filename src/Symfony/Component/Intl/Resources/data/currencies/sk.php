@@ -688,7 +688,7 @@ return [
         ],
         'MRU' => [
             0 => 'MRU',
-            1 => 'mauritánska ukija',
+            1 => 'mauritánska ouguiya',
         ],
         'MTL' => [
             0 => 'MTL',
@@ -940,7 +940,7 @@ return [
         ],
         'SZL' => [
             0 => 'SZL',
-            1 => 'svazijské lilangeni',
+            1 => 'svazijský lilangeni',
         ],
         'THB' => [
             0 => 'THB',

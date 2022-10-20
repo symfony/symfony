@@ -25,6 +25,8 @@ return [
         'en_SD' => 'Kiingereza (Sudani)',
         'es_PR' => 'Kihispania (Puetoriko)',
         'fa_AF' => 'Kiajemi (Afuganistani)',
+        'ff_Adlm_NE' => 'Kifulani (Kiadlamu, Nijeri)',
+        'ff_Adlm_NG' => 'Kifulani (Kiadlamu, Nijeria)',
         'ff_Latn_NE' => 'Kifulani (Kilatini, Nijeri)',
         'ff_Latn_NG' => 'Kifulani (Kilatini, Nijeria)',
         'fr_BJ' => 'Kifaransa (Benini)',

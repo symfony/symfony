@@ -12,6 +12,7 @@ return [
         'ebu' => 'Èdè Ɛmbù',
         'en' => 'Èdè Gɛ̀ɛ́sì',
         'es' => 'Èdè Sípáníìshì',
+        'gez' => 'Ede Gɛ́sì',
         'id' => 'Èdè Indonéshíà',
         'ii' => 'Shíkuán Yì',
         'jmc' => 'Máshámè',

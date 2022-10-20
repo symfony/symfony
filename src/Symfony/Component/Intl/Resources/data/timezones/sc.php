@@ -288,7 +288,7 @@ return [
         'Asia/Tbilisi' => 'Ora de sa Geòrgia (Tbilisi)',
         'Asia/Tehran' => 'Ora de s’Iràn (Teheràn)',
         'Asia/Thimphu' => 'Ora de su Bhutàn (Thimphu)',
-        'Asia/Tokyo' => 'Ora de su Giapone (Tòkyo)',
+        'Asia/Tokyo' => 'Ora de su Giapone (Tokyo)',
         'Asia/Tomsk' => 'Ora Rùssia (Tomsk)',
         'Asia/Ulaanbaatar' => 'Ora de Ulàn Bator',
         'Asia/Urumqi' => 'Ora Tzina (Urumqi)',

@@ -2,6 +2,7 @@
 
 return [
     'Names' => [
+        'Adlm' => 'adlam',
         'Arab' => 'arabe',
         'Aran' => 'nastaliq',
         'Armi' => 'araméen impérial',
@@ -87,7 +88,7 @@ return [
         'Nand' => 'nandinagari',
         'Nkoo' => 'n’ko',
         'Ogam' => 'ogam',
-        'Olck' => 'ol tchiki',
+        'Olck' => 'ol-chiki',
         'Orkh' => 'orkhon',
         'Orya' => 'odia',
         'Osma' => 'osmanais',
@@ -101,6 +102,7 @@ return [
         'Prti' => 'parthe des inscriptions',
         'Qaag' => 'zawgyi',
         'Rjng' => 'rejang',
+        'Rohg' => 'hanifi',
         'Roro' => 'rongorongo',
         'Runr' => 'runique',
         'Samr' => 'samaritain',

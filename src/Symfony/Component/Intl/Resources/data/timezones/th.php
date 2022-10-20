@@ -298,7 +298,7 @@ return [
         'Asia/Yakutsk' => 'เวลายาคุตสค์',
         'Asia/Yekaterinburg' => 'เวลาเยคาเตรินบูร์ก (ยีคาเตอรินเบิร์ก)',
         'Asia/Yerevan' => 'เวลาอาร์เมเนีย (เยเรวาน)',
-        'Atlantic/Azores' => 'เวลาอะโซร์ส (อาซอเรส)',
+        'Atlantic/Azores' => 'เวลาอะโซร์ส',
         'Atlantic/Bermuda' => 'เวลาแอตแลนติก (เบอร์มิวดา)',
         'Atlantic/Canary' => 'เวลายุโรปตะวันตก (คะเนรี)',
         'Atlantic/Cape_Verde' => 'เวลาเคปเวิร์ด',

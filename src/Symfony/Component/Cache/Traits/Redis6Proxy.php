@@ -182,7 +182,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->command(...\func_get_args());
     }
 
-    public function config($operation, $key = null, $value = null): mixed
+    public function config($operation, $key_or_settings = null, $value = null): mixed
     {
         return $this->lazyObjectReal->config(...\func_get_args());
     }
@@ -912,7 +912,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->slaveof(...\func_get_args());
     }
 
-    public function slowlog($mode, $option = 0): mixed
+    public function slowlog($operation, $length = 0): mixed
     {
         return $this->lazyObjectReal->slowlog(...\func_get_args());
     }

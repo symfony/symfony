@@ -103,7 +103,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
             $this->fail('No LogicException thrown');
         } catch (LogicException $e) {
-            $this->assertEquals('Rate limiter "with_lock" requires the Lock component to be installed and configured.', $e->getMessage());
+            $this->assertEquals('Rate limiter "with_lock" requires the Lock component to be configured.', $e->getMessage());
         }
 
         $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {

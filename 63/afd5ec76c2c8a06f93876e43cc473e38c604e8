@@ -1,0 +1,156 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-04-01T12:03:20Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-04-01T12:06:57Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-04-02T08:11:41Z
+
+Hey!
+
+I think @monteiro has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-04-03T09:23:47Z
+
+Thanks for the PR.
+
+Please rebase and target 6.1 since that's a new feature. Please also update the description of the PR a bit so that ppl that wonder about what the attached patch does can have some clues (eg to start writing the doc about this).
+Then, please add a line in the CHANGELOG file of the bundle, and please add a test case if possible :pray:
+
+---------------------------------------------------------------------------
+
+by freiondrej-lmc at 2022-04-22T14:05:41Z
+
+@carsonbot please find me a reviewer
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-04-23T16:31:18Z
+
+@freiondrej-lmc Thanks for the PR!
+
+> @carsonbot please find me a reviewer
+
+The 6.1 branch is feature-frozen, as such the current focus should be about stabilizing 6.1. So this is for 6.2 and we have 6 months to review and fine-tune it.
+
+---------------------------------------------------------------------------
+
+by freiondrej-lmc at 2022-04-25T12:28:43Z
+
+@chalasr thanks for the information :) just so I know, when was the feature freeze? (so that I can plan better the next time)
+
+---------------------------------------------------------------------------
+
+by stof at 2022-04-25T12:52:01Z
+
+@freiondrej-lmc 2 months before the release, so end of March
+
+---------------------------------------------------------------------------
+
+by stof at 2022-04-25T12:52:49Z
+
+See https://symfony.com/doc/current/contributing/community/releases.html#development
+
+---------------------------------------------------------------------------
+
+by freiondrej-lmc at 2022-09-21T14:04:24Z
+
+I don't really understand why the tests fail now, when prior to my fixup commit https://github.com/symfony/symfony/pull/45907/commits/4983fd5ccaaa16fa3bf701fb1e89eb23b84fa7ef they passed and I don't see how it could have broken it ... any suggestions would be very welcome 🙂
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-09-21T14:40:15Z
+
+> I don't really understand why the tests fail now, when prior to my fixup commit https://github.com/symfony/symfony/commit/4983fd5ccaaa16fa3bf701fb1e89eb23b84fa7ef they passed and I don't see how it could have broken it ... any suggestions would be very welcome 🙂
+
+I think you can ignore the failing test case, its from another PR
+
+---------------------------------------------------------------------------
+
+by freiondrej-lmc at 2022-09-21T17:53:56Z
+
+> > I don't really understand why the tests fail now, when prior to my fixup commit [4983fd5](https://github.com/symfony/symfony/commit/4983fd5ccaaa16fa3bf701fb1e89eb23b84fa7ef) they passed and I don't see how it could have broken it ... any suggestions would be very welcome 🙂
+>
+> I think you can ignore the failing test case, its from another PR
+
+@OskarStark
+
+Well most of it is, but also mine:
+```
+1) Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\SecurityExtensionTest::testRegisterAccessControlWithSpecifiedAttributes
+[961](https://github.com/symfony/symfony/actions/runs/3098415653/jobs/5016303268#step:8:1006)
+Failed asserting that an array has the key 4.
+[962](https://github.com/symfony/symfony/actions/runs/3098415653/jobs/5016303268#step:8:1007)
+
+[963](https://github.com/symfony/symfony/actions/runs/3098415653/jobs/5016303268#step:8:1008)
+/home/runner/work/symfony/symfony/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/SecurityExtensionTest.php:360
+[964](https://github.com/symfony/symfony/actions/runs/3098415653/jobs/5016303268#step:8:1009)
+
+[965](https://github.com/symfony/symfony/actions/runs/3098415653/jobs/5016303268#step:8:1010)
+2) Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\SecurityExtensionTest::testRegisterAccessControlWithSpecifiedRoute
+[966](https://github.com/symfony/symfony/actions/runs/3098415653/jobs/5016303268#step:8:1011)
+Failed asserting that an array has the key 4.
+```
+https://github.com/symfony/symfony/actions/runs/3098415653/jobs/5016302933
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-09-21T21:11:45Z
+
+Indeed, sorry I just saw the following:
+<img width="861" alt="CleanShot 2022-09-21 at 23 11 16@2x" src="https://user-images.githubusercontent.com/995707/191611274-63fbe76c-ffc0-4944-9f35-a0c3ba61bf10.png">
+
+---------------------------------------------------------------------------
+
+by freiondrej-lmc at 2022-09-22T06:57:11Z
+
+@OskarStark I now ran the tests locally and I did not get this error with my code. Maybe there are some changes from a different PR involved? I don’t know the details of the pipeline and how isolated the PRs are from each other 😕 any help will be much appreciated!
+
+---------------------------------------------------------------------------
+
+by freiondrej-lmc at 2022-09-27T08:23:58Z
+
+@OskarStark any ideas would be very welcome. Will this PR even make it into 6.2?

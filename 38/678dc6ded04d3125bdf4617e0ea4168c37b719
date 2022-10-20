@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-04-25T17:30:32Z
+
+I've rewrite the first draft by inspiring from https://github.com/php-translation/extractor.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-07-28T16:20:44Z
+
+@nicolas-grekas It's quite ready for me. Just two questions:
+
+- When will we deprecate `PhpExtractor` in favor of `PhpAstExtractor`?
+- `PhpAstExtractor` is actually registered as service only if nikic/php-parser is installed, should we let it as it is?
+
+(failures in CI are unrelated, including fabbot)
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-09-02T17:20:13Z
+
+I rework the ConstraintVistor to cover more case (and I discover some that can not be covered, [see comment](https://github.com/symfony/symfony/pull/46161/files#diff-0a9cc926e96f229280529914957f004a1337a054a51e26349294ce91fe428c26R71)).
+
+Let me know if I miss something about those not covered cases.

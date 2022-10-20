@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-15T13:28:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-10-16T06:06:36Z
+
+@guillemfondin could you please add some unit tests for the change.
+
+---------------------------------------------------------------------------
+
+by guillemfondin at 2022-10-17T07:58:24Z
+
+@maxbeckers Of course :)
+
+---------------------------------------------------------------------------
+
+by Sajito at 2022-10-17T18:58:28Z
+
+Weird having discussion in two seperate places, thanks @guillemfondin for notifying me :)
+
+Personally I feel a bit uncomfortable with this change. Not because I need the ability to allow emails without a tld, actually I don't have an use-case for this feature. I have filed the issue only because during some tests I got to the point, where the browser validator said the email is fine, while the backend validator said it's invalid and that made me curious.
+
+Having a validator, which claims it does the same check as the browser and is also named to represent this, but actually having a difference is weird. It get's even more weird, when the html5 mode (named after the html5 validator), does something different than the actual html5 validator and the "real" html5 validator has a name not even related to html5.
+
+I'd say the naming should move to something like "html5" and "html5-force-tld". The only issue is the BC implication.
+But changing this really feels hacky and I can understand, if that's not the way to go. I've pushed my proposal into my fork, just to make them visible. [Commit is here](https://github.com/Sajito/symfony/commit/fef5b082b7d165006814fb3bdecccab67a7f0f5e).
+Alternatively this new mode should make clear it's actually html5. Maybe `strict-html5` or something like that.

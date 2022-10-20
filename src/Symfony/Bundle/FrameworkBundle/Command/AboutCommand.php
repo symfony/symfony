@@ -114,15 +114,15 @@ EOT
 
     private static function isExpired(string $date): bool
     {
-        $date = \DateTime::createFromFormat('d/m/Y', '01/'.$date);
+        $date = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.$date);
 
-        return false !== $date && new \DateTime() > $date->modify('last day of this month 23:59:59');
+        return false !== $date && new \DateTimeImmutable() > $date->modify('last day of this month 23:59:59');
     }
 
     private static function daysBeforeExpiration(string $date): string
     {
-        $date = \DateTime::createFromFormat('d/m/Y', '01/'.$date);
+        $date = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.$date);
 
-        return (new \DateTime())->diff($date->modify('last day of this month 23:59:59'))->format('in %R%a days');
+        return (new \DateTimeImmutable())->diff($date->modify('last day of this month 23:59:59'))->format('in %R%a days');
     }
 }

@@ -343,14 +343,14 @@ class SecurityExtensionTest extends TestCase
         $call = $accessMap->getMethodCalls()[0];
         $this->assertSame('add', $call[0]);
         $args = $call[1];
-        $requestMatcherId = (string) $args[0];
 
-        $requestMatcherDefinition = $container->getDefinition($requestMatcherId);
-        $requestMatcherConstructorArguments = $requestMatcherDefinition->getArguments();
-        $this->assertArrayHasKey(4, $requestMatcherConstructorArguments);
-        $attributes = $requestMatcherConstructorArguments[4];
-        $this->assertArrayHasKey('_route', $attributes);
-        $this->assertSame('foo_route', $attributes['_route']);
+        $chainRequestMatcherDefinition = $container->getDefinition((string) $args[0]);
+        $chainRequestMatcherConstructorArguments = $chainRequestMatcherDefinition->getArguments();
+        $attributesRequestMatcher = $container->getDefinition((string) $chainRequestMatcherConstructorArguments[0][0]);
+
+        $this->assertCount(1, $attributesRequestMatcher->getArguments());
+        $this->assertArrayHasKey('_route', $attributesRequestMatcher->getArgument(0));
+        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
     }
 
     public function testRegisterAccessControlWithSpecifiedRoute()
@@ -379,14 +379,14 @@ class SecurityExtensionTest extends TestCase
         $call = $accessMap->getMethodCalls()[0];
         $this->assertSame('add', $call[0]);
         $args = $call[1];
-        $requestMatcherId = (string) $args[0];
 
-        $requestMatcherDefinition = $container->getDefinition($requestMatcherId);
-        $requestMatcherConstructorArguments = $requestMatcherDefinition->getArguments();
-        $this->assertArrayHasKey(4, $requestMatcherConstructorArguments);
-        $attributes = $requestMatcherConstructorArguments[4];
-        $this->assertArrayHasKey('_route', $attributes);
-        $this->assertSame('foo_route', $attributes['_route']);
+        $chainRequestMatcherDefinition = $container->getDefinition((string) $args[0]);
+        $chainRequestMatcherConstructorArguments = $chainRequestMatcherDefinition->getArguments();
+        $attributesRequestMatcher = $container->getDefinition((string) $chainRequestMatcherConstructorArguments[0][0]);
+
+        $this->assertCount(1, $attributesRequestMatcher->getArguments());
+        $this->assertArrayHasKey('_route', $attributesRequestMatcher->getArgument(0));
+        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
     }
 
     public function testRegisterAccessControlWithSpecifiedAttributesThrowsException()

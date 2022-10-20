@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-19T14:08:57Z
+
+If we accept this feature, we can consider deprecating `AnnotationDirectoryLoader` and `AnnotationFileLoader`.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-19T15:06:00Z
+
+Recipe: symfony/recipes#1136
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-10-19T15:07:31Z
+
+> We always need an additional piece of information which is the namespace root for the given directory.
+
+Could we make the namespace root part (`@App\Controller` in your example) optional and just try to use `App\` + follow the directory structure? It would work most of the time isn't it?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-19T15:12:00Z
+
+> > We always need an additional piece of information which is the namespace root for the given directory.
+>
+> Could we make the namespace root part (`@App\Controller` in your example) optional and just try to use `App\` + follow the directory structure? It would work most of the time isn't it?
+
+The `App` namespace is a convention we use in the recipes, but afaik we don't materialize it in the components. Plus, I'm not really keen on implementing fancy guesswork, tbh.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-19T16:00:21Z
+
+Docs: symfony/symfony-docs#17373
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-19T16:18:15Z
+
+What about replacing `psr4@App\Controller` by `attribute@App\Controller`? That'd might be more explicit.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-19T16:27:49Z
+
+> What about replacing `psr4@App\Controller` by `attribute@App\Controller`? That'd might be more explicit.
+
+It would be more consistent with the other loaders, yes. Let's try that.
+
+This way, the namespace would in fact become optional because if you omit it, the old `AnnotationDirectoryLoader` would kick in and parse all PHP files again. I'm not sure if that's a pro or a con, I must admit. 😓
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-19T16:45:58Z
+
+Done. I like the change. I'll update the recipe and the docs right away.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-10-19T16:46:59Z
+
+Should I rename `Psr4DirectoryLoader` to `AttributePsr4DirectoryLoader`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-19T16:47:38Z
+
+Nah, not needed IMHO.

@@ -65,7 +65,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
-                ->booleanNode('enable_authenticator_manager')->defaultTrue()->end()
+                ->booleanNode('enable_authenticator_manager')->setDeprecated('symfony/security-bundle', '6.2', 'The "%node%" option at "%path%" is deprecated.')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()

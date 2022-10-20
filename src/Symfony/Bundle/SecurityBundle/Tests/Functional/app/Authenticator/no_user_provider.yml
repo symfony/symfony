@@ -6,8 +6,6 @@ services:
         - true
 
 security:
-    enable_authenticator_manager: true
-
     firewalls:
         api:
             pattern: /

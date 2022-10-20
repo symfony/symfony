@@ -12,6 +12,7 @@ CHANGELOG
  * Add `security.firewalls.logout.enable_csrf` to enable CSRF protection using the default CSRF token generator
  * Add RFC6750 Access Token support to allow token-based authentication
  * Add `security.firewalls.switch_user.target_route` option to configure redirect target route on switch user
+ * Deprecate the `security.enable_authenticator_manager` config option
 
 6.1
 ---

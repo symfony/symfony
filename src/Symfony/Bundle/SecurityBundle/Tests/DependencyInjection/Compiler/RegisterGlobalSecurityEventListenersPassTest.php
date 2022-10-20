@@ -56,7 +56,6 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
     public function testEventIsPropagated(string $configuredEvent, string $registeredEvent)
     {
         $this->container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
         ]);
 
@@ -90,7 +89,6 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
     public function testRegisterCustomListener()
     {
         $this->container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
         ]);
 
@@ -111,7 +109,6 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
     public function testRegisterCustomSubscriber()
     {
         $this->container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
         ]);
 
@@ -131,7 +128,6 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
     public function testMultipleFirewalls()
     {
         $this->container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true], 'api' => ['pattern' => '/api', 'http_basic' => true]],
         ]);
 
@@ -161,7 +157,6 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
     public function testListenerAlreadySpecific()
     {
         $this->container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
         ]);
 

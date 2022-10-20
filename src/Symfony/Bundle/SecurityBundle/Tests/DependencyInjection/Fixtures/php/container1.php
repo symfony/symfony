@@ -1,7 +1,6 @@
 <?php
 
 $container->loadFromExtension('security', [
-    'enable_authenticator_manager' => true,
     'password_hashers' => [
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => [

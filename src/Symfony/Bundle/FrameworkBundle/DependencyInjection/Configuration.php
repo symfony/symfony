@@ -1521,15 +1521,36 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
-                            ->defaultValue(['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]])
+                            ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]])
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->addDefaultsIfNotSet()
                                 ->children()
-                                    ->enumNode('default_middleware')
-                                        ->values([true, false, 'allow_no_handlers'])
-                                        ->defaultTrue()
+                                    ->arrayNode('default_middleware')
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($defaultMiddleware) { return \is_string($defaultMiddleware) || \is_bool($defaultMiddleware); })
+                                            ->then(function ($defaultMiddleware): array {
+                                                if (\is_string($defaultMiddleware) && 'allow_no_handlers' === $defaultMiddleware) {
+                                                    return [
+                                                        'enabled' => true,
+                                                        'allow_no_handlers' => true,
+                                                        'allow_no_senders' => true,
+                                                    ];
+                                                }
+
+                                                return [
+                                                    'enabled' => $defaultMiddleware,
+                                                    'allow_no_handlers' => false,
+                                                    'allow_no_senders' => true,
+                                                ];
+                                            })
+                                        ->end()
+                                        ->canBeDisabled()
+                                        ->children()
+                                            ->booleanNode('allow_no_handlers')->defaultFalse()->end()
+                                            ->booleanNode('allow_no_senders')->defaultTrue()->end()
+                                        ->end()
                                     ->end()
                                     ->arrayNode('middleware')
                                         ->performNoDeepMerging()

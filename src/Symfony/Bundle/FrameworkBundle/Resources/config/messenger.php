@@ -55,6 +55,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('senders service locator'),
             ])
         ->set('messenger.middleware.send_message', SendMessageMiddleware::class)
+            ->abstract()
             ->args([
                 service('messenger.senders_locator'),
                 service('event_dispatcher'),

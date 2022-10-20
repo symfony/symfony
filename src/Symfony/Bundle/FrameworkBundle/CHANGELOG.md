@@ -20,6 +20,7 @@ CHANGELOG
  * Remove `@internal` tag from secret vaults to allow them to be used directly outside the framework bundle and custom vaults to be added
  * Deprecate `framework.form.legacy_error_messages` config node
  * Add a `framework.router.cache_dir` configuration option to configure the default `Router` `cache_dir` option
+ * Add option `framework.messenger.buses.*.default_middleware.allow_no_senders` to enable throwing when a message doesn't have a sender
 
 6.1
 ---

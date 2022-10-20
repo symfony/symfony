@@ -383,19 +383,19 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(
             [
                 'existing_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'existing_bus.middleware', 'arguments' => []],
                     ],
                 ],
                 'common_bus' => [
-                    'default_middleware' => false,
+                    'default_middleware' => ['enabled' => false, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'common_bus.new_middleware', 'arguments' => []],
                     ],
                 ],
                 'new_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'new_bus.middleware', 'arguments' => []],
                     ],
@@ -607,7 +607,7 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 'default_bus' => null,
-                'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
                 'reset_on_message' => true,
             ],
             'disallow_search_engine_index' => true,

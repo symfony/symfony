@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-19T14:16:14Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-10-19T14:52:00Z
+
+In previous versions, we also patched the oldest maintained branch (aka 4.4). See https://github.com/symfony/symfony/pulls?q=is%3Apr+icu+author%3Ajderusse+is%3Aclosed
+
+But this branch still use the `json` format, which required a second BIG PR and merge conflicts.
+
+Given 4.4 is soon EOL, should I open a second PR for ICU 72.1?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-20T06:55:59Z
+
+I'm okay with not updating 4.4.

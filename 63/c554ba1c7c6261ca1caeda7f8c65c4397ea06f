@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by sveneld at 2022-08-04T09:52:43Z
+
+@nicolas-grekas can you look?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-08-04T10:20:16Z
+
+Adding this to the 6.2 milestone as performance optimisations should be handled as new features.
+
+---------------------------------------------------------------------------
+
+by sveneld at 2022-10-06T12:01:16Z
+
+@nicolas-grekas can you look once again?
+
+---------------------------------------------------------------------------
+
+by sveneld at 2022-10-19T13:30:45Z
+
+> (rebased for 6.2 and tweaked a bit)
+
+Will be this optimization available in 5.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-19T13:33:28Z
+
+5.4 accepts only bug fixes now. Only 6.2 gets improvements.
+
+---------------------------------------------------------------------------
+
+by sveneld at 2022-10-19T13:40:21Z
+
+> 5.4 accepts only bug fixes now. Only 6.2 gets improvements.
+
+Too bad for my project, but it will a motivation for updating %)

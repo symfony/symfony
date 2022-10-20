@@ -89,9 +89,18 @@ class Request
     /**
      * Request body parameters ($_POST).
      *
+     * @deprecated since Symfony 6.2
+     *
      * @var InputBag
      */
     public $request;
+
+    /**
+     * Request body parameters ($_POST).
+     *
+     * @var InputBag
+     */
+    public $form;
 
     /**
      * Query string parameters ($_GET).
@@ -266,7 +275,7 @@ class Request
      */
     public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
-        $this->request = new InputBag($request);
+        $this->request = $this->form = new InputBag($request);
         $this->query = new InputBag($query);
         $this->attributes = new ParameterBag($attributes);
         $this->cookies = new InputBag($cookies);
@@ -486,7 +495,7 @@ class Request
     public function __clone()
     {
         $this->query = clone $this->query;
-        $this->request = clone $this->request;
+        $this->request = $this->form = clone $this->form;
         $this->attributes = clone $this->attributes;
         $this->cookies = clone $this->cookies;
         $this->files = clone $this->files;
@@ -527,7 +536,7 @@ class Request
         $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
 
         $_GET = $this->query->all();
-        $_POST = $this->request->all();
+        $_POST = $this->form->all();
         $_SERVER = $this->server->all();
         $_COOKIE = $this->cookies->all();
 
@@ -685,8 +694,8 @@ class Request
             return $this->query->all()[$key];
         }
 
-        if ($this->request->has($key)) {
-            return $this->request->all()[$key];
+        if ($this->form->has($key)) {
+            return $this->form->all()[$key];
         }
 
         return $default;
@@ -1206,7 +1215,7 @@ class Request
         $method = $this->headers->get('X-HTTP-METHOD-OVERRIDE');
 
         if (!$method && self::$httpMethodParameterOverride) {
-            $method = $this->request->get('_method', $this->query->get('_method', 'POST'));
+            $method = $this->form->get('_method', $this->query->get('_method', 'POST'));
         }
 
         if (!\is_string($method)) {

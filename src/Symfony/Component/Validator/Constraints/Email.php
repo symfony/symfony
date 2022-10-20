@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Exception\LogicException;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Email extends Constraint
 {
+    public const VALIDATION_MODE_HTML5_ALLOW_NO_TLD = 'html5-allow-no-tld';
     public const VALIDATION_MODE_HTML5 = 'html5';
     public const VALIDATION_MODE_STRICT = 'strict';
     /**
@@ -35,6 +36,7 @@ class Email extends Constraint
     public const INVALID_FORMAT_ERROR = 'bd79c0ab-ddba-46cc-a703-a7a4b08de310';
 
     public const VALIDATION_MODES = [
+        self::VALIDATION_MODE_HTML5_ALLOW_NO_TLD,
         self::VALIDATION_MODE_HTML5,
         self::VALIDATION_MODE_STRICT,
         self::VALIDATION_MODE_LOOSE,

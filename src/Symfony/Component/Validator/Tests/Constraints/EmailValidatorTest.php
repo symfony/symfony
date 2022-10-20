@@ -232,6 +232,35 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @dataProvider getInvalidAllowNoTldEmails
+     */
+    public function testInvalidAllowNoTldEmails($email)
+    {
+        $constraint = new Email([
+            'message' => 'myMessage',
+            'mode' => Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD,
+        ]);
+
+        $this->validator->validate($email, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$email.'"')
+            ->setCode(Email::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
+    public function getInvalidAllowNoTldEmails()
+    {
+        return [
+            ['example bar'],
+            ['example@'],
+            ['example@ bar'],
+            ['example@localhost bar'],
+            ['foo@example.com bar'],
+        ];
+    }
+
     public function testModeStrict()
     {
         $constraint = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);
@@ -251,6 +280,15 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
              ->setParameter('{{ value }}', '"example@example..com"')
              ->setCode(Email::INVALID_FORMAT_ERROR)
              ->assertRaised();
+    }
+
+    public function testModeHtml5AllowNoTld()
+    {
+        $constraint = new Email(['mode' => Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD]);
+
+        $this->validator->validate('example@example', $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**

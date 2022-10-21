@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
@@ -59,14 +68,13 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
 
     public function testProcessWithNonPublicService()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "foo" service is private: it cannot have the "container.private" tag.');
-
         $container = new ContainerBuilder();
         $container
             ->register('foo')
             ->addTag('container.private', ['package' => 'foo/bar', 'version' => '1.2']);
 
         (new AliasDeprecatedPublicServicesPass())->process($container);
+
+        $this->assertTrue($container->hasDefinition('foo'));
     }
 }

@@ -29,8 +29,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
-    private $stderr;
-    private $consoleSectionOutputs = [];
+    private OutputInterface $stderr;
+    private array $consoleSectionOutputs = [];
 
     /**
      * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
@@ -64,44 +64,29 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         return new ConsoleSectionOutput($this->getStream(), $this->consoleSectionOutputs, $this->getVerbosity(), $this->isDecorated(), $this->getFormatter());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDecorated(bool $decorated)
     {
         parent::setDecorated($decorated);
         $this->stderr->setDecorated($decorated);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
         parent::setFormatter($formatter);
         $this->stderr->setFormatter($formatter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setVerbosity(int $level)
     {
         parent::setVerbosity($level);
         $this->stderr->setVerbosity($level);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrorOutput()
+    public function getErrorOutput(): OutputInterface
     {
         return $this->stderr;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setErrorOutput(OutputInterface $error)
     {
         $this->stderr = $error;
@@ -110,10 +95,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDOUT.
-     *
-     * @return bool
      */
-    protected function hasStdoutSupport()
+    protected function hasStdoutSupport(): bool
     {
         return false === $this->isRunningOS400();
     }
@@ -121,10 +104,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDERR.
-     *
-     * @return bool
      */
-    protected function hasStderrSupport()
+    protected function hasStderrSupport(): bool
     {
         return false === $this->isRunningOS400();
     }
@@ -153,7 +134,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
             return fopen('php://output', 'w');
         }
 
-        return @fopen('php://stdout', 'w') ?: fopen('php://output', 'w');
+        // Use STDOUT when possible to prevent from opening too many file descriptors
+        return \defined('STDOUT') ? \STDOUT : (@fopen('php://stdout', 'w') ?: fopen('php://output', 'w'));
     }
 
     /**
@@ -161,6 +143,11 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function openErrorStream()
     {
-        return fopen($this->hasStderrSupport() ? 'php://stderr' : 'php://output', 'w');
+        if (!$this->hasStderrSupport()) {
+            return fopen('php://output', 'w');
+        }
+
+        // Use STDERR when possible to prevent from opening too many file descriptors
+        return \defined('STDERR') ? \STDERR : (@fopen('php://stderr', 'w') ?: fopen('php://output', 'w'));
     }
 }

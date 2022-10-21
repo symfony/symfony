@@ -18,8 +18,10 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
@@ -53,6 +55,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('senders service locator'),
             ])
         ->set('messenger.middleware.send_message', SendMessageMiddleware::class)
+            ->abstract()
             ->args([
                 service('messenger.senders_locator'),
                 service('event_dispatcher'),
@@ -157,6 +160,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('max delay ms'),
             ])
 
+        // rate limiter
+        ->set('messenger.rate_limiter_locator', ServiceLocator::class)
+            ->args([[]])
+            ->tag('container.service_locator')
+
         // worker event listener
         ->set('messenger.retry.send_failed_message_for_retry_listener', SendFailedMessageForRetryListener::class)
             ->args([
@@ -191,7 +199,18 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.listener.stop_worker_on_sigterm_signal_listener', StopWorkerOnSigtermSignalListener::class)
+            ->args([
+                service('logger')->ignoreOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
+
+        ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
+            ->tag('kernel.event_subscriber')
+
+        ->set('messenger.listener.reset_services', ResetServicesListener::class)
+            ->args([
+                service('services_resetter'),
+            ])
 
         ->set('messenger.routable_message_bus', RoutableMessageBus::class)
             ->args([

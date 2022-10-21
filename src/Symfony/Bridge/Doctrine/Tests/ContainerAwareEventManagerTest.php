@@ -14,10 +14,13 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Doctrine\Common\EventSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private $container;
     private $evm;
 
@@ -171,13 +174,27 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([$subscriber1, $listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetListeners()
     {
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
+        $this->expectDeprecation('Since symfony/doctrine-bridge 6.2: Calling "Symfony\Bridge\Doctrine\ContainerAwareEventManager::getListeners()" without an event name is deprecated. Call "getAllListeners()" instead.');
+
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners()['foo']));
+    }
+
+    public function testGetAllListeners()
+    {
+        $this->container->set('lazy', $listener1 = new MyListener());
+        $this->evm->addEventListener('foo', 'lazy');
+        $this->evm->addEventListener('foo', $listener2 = new MyListener());
+
+        $this->assertSame([$listener1, $listener2], array_values($this->evm->getAllListeners()['foo']));
     }
 
     public function testRemoveEventListener()

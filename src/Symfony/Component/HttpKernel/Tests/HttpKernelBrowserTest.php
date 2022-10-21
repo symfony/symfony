@@ -59,16 +59,15 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new Response();
-        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTimeImmutable::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
         $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
-        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
-        $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTimeImmutable::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
+        $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTimeImmutable::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
         $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
         $this->assertSame([(string) $cookie1, (string) $cookie2], $domResponse->getHeader('Set-Cookie', false));
@@ -80,7 +79,6 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new StreamedResponse(function () {
             echo 'foo';
@@ -143,6 +141,10 @@ class HttpKernelBrowserTest extends TestCase
 
     public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
     {
+        if (UploadedFile::getMaxFilesize() > \PHP_INT_MAX) {
+            $this->markTestSkipped('Requires PHP_INT_MAX to be greater than "upload_max_filesize" and "post_max_size" ini settings');
+        }
+
         $source = tempnam(sys_get_temp_dir(), 'source');
 
         $kernel = new TestHttpKernel();
@@ -157,7 +159,7 @@ class HttpKernelBrowserTest extends TestCase
         /* should be modified when the getClientSize will be removed */
         $file->expects($this->any())
             ->method('getSize')
-            ->willReturn(\INF)
+            ->willReturn(\PHP_INT_MAX)
         ;
         $file->expects($this->any())
             ->method('getClientSize')

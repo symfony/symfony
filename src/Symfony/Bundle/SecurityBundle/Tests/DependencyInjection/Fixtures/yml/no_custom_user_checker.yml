@@ -11,7 +11,6 @@ security:
             stateless: true
             http_basic: true
             form_login: true
-            anonymous: true
             switch_user: true
             x509: true
             remote_user: true
@@ -19,3 +18,4 @@ security:
             remember_me:
                 secret: TheSecret
             user_checker: ~
+            entry_point: form_login

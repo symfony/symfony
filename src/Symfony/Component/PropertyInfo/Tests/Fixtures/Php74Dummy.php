@@ -20,6 +20,7 @@ class Php74Dummy
     private ?bool $nullableBoolProp;
     /** @var string[] */
     private array $stringCollection;
+    private ?int $nullableWithDefault = 1;
     public array $collection = [];
 
     public function addStringCollection(string $string): void

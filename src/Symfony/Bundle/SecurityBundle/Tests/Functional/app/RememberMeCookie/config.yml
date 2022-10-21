@@ -22,4 +22,3 @@ security:
                 secret: key
                 secure: auto
             logout: ~
-            anonymous: ~

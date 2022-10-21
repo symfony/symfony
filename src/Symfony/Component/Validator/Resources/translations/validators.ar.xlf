@@ -386,6 +386,22 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target> صالح (ISIN) هذه القيمة ليست رقم تعريف الأوراق المالية الدولي.</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>يجب أن تكون هذه القيمة تعبيرًا صالحًا.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>هذه القيمة ليست لون CSS صالحًا.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>هذه القيمة ليست تدوين CIDR صالحًا.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>يجب أن تكون قيمة netmask بين {{ min }} و {{ max }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

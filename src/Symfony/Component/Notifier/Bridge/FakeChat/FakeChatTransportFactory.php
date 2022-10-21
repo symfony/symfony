@@ -11,36 +11,32 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeChat;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
+ * @author Antoine Makdessi <amakdessi@me.com>
  */
 final class FakeChatTransportFactory extends AbstractTransportFactory
 {
-    protected $mailer;
+    private MailerInterface $mailer;
+    private LoggerInterface $logger;
 
-    public function __construct(MailerInterface $mailer)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger)
     {
         parent::__construct();
 
         $this->mailer = $mailer;
+        $this->logger = $logger;
     }
 
-    /**
-     * @return FakeChatEmailTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FakeChatEmailTransport|FakeChatLoggerTransport
     {
         $scheme = $dsn->getScheme();
-
-        if (!\in_array($scheme, $this->getSupportedSchemes())) {
-            throw new UnsupportedSchemeException($dsn, 'fakechat', $this->getSupportedSchemes());
-        }
 
         if ('fakechat+email' === $scheme) {
             $mailerTransport = $dsn->getHost();
@@ -49,10 +45,16 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
 
             return (new FakeChatEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
         }
+
+        if ('fakechat+logger' === $scheme) {
+            return new FakeChatLoggerTransport($this->logger);
+        }
+
+        throw new UnsupportedSchemeException($dsn, 'fakechat', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['fakechat+email'];
+        return ['fakechat+email', 'fakechat+logger'];
     }
 }

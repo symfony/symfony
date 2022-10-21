@@ -1,4 +1,5 @@
 framework:
+    http_method_override: false
     secret: test
     router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
     test: ~
@@ -14,4 +15,12 @@ services:
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags: [container.service_subscriber]
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\SecurityController:
+        public: true
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags: [container.service_subscriber]
     Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\LoginFormAuthenticator:
+        public: true
+        arguments: ['@router']

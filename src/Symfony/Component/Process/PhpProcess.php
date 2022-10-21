@@ -50,17 +50,11 @@ class PhpProcess extends Process
         parent::__construct($php, $cwd, $env, $script, $timeout);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, mixed $input = null, ?float $timeout = 60): static
     {
         throw new LogicException(sprintf('The "%s()" method cannot be called when using "%s".', __METHOD__, self::class));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start(callable $callback = null, array $env = [])
     {
         if (null === $this->getCommandLine()) {

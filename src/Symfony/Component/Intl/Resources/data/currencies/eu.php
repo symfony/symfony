@@ -2,13 +2,25 @@
 
 return [
     'Names' => [
+        'ADP' => [
+            0 => 'ADP',
+            1 => 'pezeta andorratarra',
+        ],
         'AED' => [
             0 => 'AED',
             1 => 'Arabiar Emirerri Batuetako dirhama',
         ],
+        'AFA' => [
+            0 => 'AFA',
+            1 => 'afghani afgandarra (1927–2002)',
+        ],
         'AFN' => [
             0 => 'AFN',
             1 => 'afgani afganiarra',
+        ],
+        'ALK' => [
+            0 => 'ALK',
+            1 => 'lek albaniarra (1946–1965)',
         ],
         'ALL' => [
             0 => 'ALL',
@@ -20,15 +32,47 @@ return [
         ],
         'ANG' => [
             0 => 'ANG',
-            1 => 'Holandarren Antilletako florina',
+            1 => 'florin antillarra',
         ],
         'AOA' => [
             0 => 'AOA',
             1 => 'kwanza angolarra',
         ],
+        'AOK' => [
+            0 => 'AOK',
+            1 => 'kwanza angolarra (1977–1991)',
+        ],
+        'AON' => [
+            0 => 'AON',
+            1 => 'kwanza angolar berria (1990–2000)',
+        ],
+        'AOR' => [
+            0 => 'AOR',
+            1 => 'kwanza angolar birdoitua (1995–1999)',
+        ],
+        'ARA' => [
+            0 => 'ARA',
+            1 => 'austral argentinarra',
+        ],
+        'ARL' => [
+            0 => 'ARL',
+            1 => 'peso ley argentinarra (1970–1983)',
+        ],
+        'ARM' => [
+            0 => 'ARM',
+            1 => 'peso argentinarra (1981–1970)',
+        ],
+        'ARP' => [
+            0 => 'ARP',
+            1 => 'peso argentinarra (1983–1985)',
+        ],
         'ARS' => [
             0 => 'ARS',
             1 => 'peso argentinarra',
+        ],
+        'ATS' => [
+            0 => 'ATS',
+            1 => 'txelin austriarra',
         ],
         'AUD' => [
             0 => 'A$',
@@ -38,13 +82,25 @@ return [
             0 => 'AWG',
             1 => 'florin arubarra',
         ],
+        'AZM' => [
+            0 => 'AZM',
+            1 => 'manat azerbaijandarra (1993–2006)',
+        ],
         'AZN' => [
             0 => 'AZN',
             1 => 'manat azerbaijandarra',
         ],
+        'BAD' => [
+            0 => 'BAD',
+            1 => 'dinar bosnia-herzegovinarra (1992–1994)',
+        ],
         'BAM' => [
             0 => 'BAM',
             1 => 'marko bihurgarri bosniarra',
+        ],
+        'BAN' => [
+            0 => 'BAN',
+            1 => 'dinar bosnia-herzegovinar berria (1994–1997)',
         ],
         'BBD' => [
             0 => 'BBD',
@@ -54,9 +110,33 @@ return [
             0 => 'BDT',
             1 => 'taka bangladeshtarra',
         ],
+        'BEC' => [
+            0 => 'BEC',
+            1 => 'franko belgikarra (bihurgarria)',
+        ],
+        'BEF' => [
+            0 => 'BEF',
+            1 => 'franko belgikarra',
+        ],
+        'BEL' => [
+            0 => 'BEL',
+            1 => 'franko belgikarra (finantzarioa)',
+        ],
+        'BGL' => [
+            0 => 'BGL',
+            1 => 'Lev bulgariar indartsua',
+        ],
+        'BGM' => [
+            0 => 'BGM',
+            1 => 'Lev bulgariar sozialista',
+        ],
         'BGN' => [
             0 => 'BGN',
             1 => 'lev bulgariarra',
+        ],
+        'BGO' => [
+            0 => 'BGO',
+            1 => 'Lev bulgariarra (1879–1952)',
         ],
         'BHD' => [
             0 => 'BHD',
@@ -78,9 +158,45 @@ return [
             0 => 'BOB',
             1 => 'boliviano boliviarra',
         ],
+        'BOL' => [
+            0 => 'BOL',
+            1 => 'boliviano boliviarra (1863–1963)',
+        ],
+        'BOP' => [
+            0 => 'BOP',
+            1 => 'peso boliviarra',
+        ],
+        'BOV' => [
+            0 => 'BOV',
+            1 => 'mvdol boliviarra',
+        ],
+        'BRB' => [
+            0 => 'BRB',
+            1 => 'cruzeiro brasildar berria (1967–1986)',
+        ],
+        'BRC' => [
+            0 => 'BRC',
+            1 => 'cruzado brasildarra (1986–1989)',
+        ],
+        'BRE' => [
+            0 => 'BRE',
+            1 => 'cruzeiro brasildarra (1990–1993)',
+        ],
         'BRL' => [
             0 => 'R$',
             1 => 'erreal brasildarra',
+        ],
+        'BRN' => [
+            0 => 'BRN',
+            1 => 'cruzado brasildar berria (1989–1990)',
+        ],
+        'BRR' => [
+            0 => 'BRR',
+            1 => 'cruzeiro brasildar berria (1993–1994)',
+        ],
+        'BRZ' => [
+            0 => 'BRZ',
+            1 => 'cruzeiro brasildarra (1942–1967)',
         ],
         'BSD' => [
             0 => 'BSD',
@@ -90,9 +206,17 @@ return [
             0 => 'BTN',
             1 => 'ngultrum bhutandarra',
         ],
+        'BUK' => [
+            0 => 'BUK',
+            1 => 'kyat birmaniarra',
+        ],
         'BWP' => [
             0 => 'BWP',
             1 => 'pula botswanarra',
+        ],
+        'BYB' => [
+            0 => 'BYB',
+            1 => 'errublo bielorrusiarra (1994–1999)',
         ],
         'BYN' => [
             0 => 'BYN',
@@ -114,9 +238,25 @@ return [
             0 => 'CDF',
             1 => 'franko kongoarra',
         ],
+        'CHE' => [
+            0 => 'CHE',
+            1 => 'WIR euroa',
+        ],
         'CHF' => [
             0 => 'CHF',
             1 => 'franko suitzarra',
+        ],
+        'CHW' => [
+            0 => 'CHW',
+            1 => 'WIR frankoa',
+        ],
+        'CLE' => [
+            0 => 'CLE',
+            1 => 'ezkutu txiletarra',
+        ],
+        'CLF' => [
+            0 => 'CLF',
+            1 => 'kontu-unitate txiletarra (UF)',
         ],
         'CLP' => [
             0 => 'CLP',
@@ -126,6 +266,10 @@ return [
             0 => 'CNH',
             1 => 'yuan txinatarra (itsasoz haraindikoa)',
         ],
+        'CNX' => [
+            0 => 'CNX',
+            1 => 'Txinako Herri Bankuaren dolarra',
+        ],
         'CNY' => [
             0 => 'CN¥',
             1 => 'yuan txinatarra',
@@ -134,9 +278,21 @@ return [
             0 => 'COP',
             1 => 'peso kolonbiarra',
         ],
+        'COU' => [
+            0 => 'COU',
+            1 => 'erreal kolonbiarraren balio-unitatea',
+        ],
         'CRC' => [
             0 => 'CRC',
-            1 => 'Costa Ricako colona',
+            1 => 'colon costarricarra',
+        ],
+        'CSD' => [
+            0 => 'CSD',
+            1 => 'dinar serbiarra (2002–2006)',
+        ],
+        'CSK' => [
+            0 => 'CSK',
+            1 => 'Txekoslovakiako koroa indartsua',
         ],
         'CUC' => [
             0 => 'CUC',
@@ -150,9 +306,21 @@ return [
             0 => 'CVE',
             1 => 'ezkutu caboverdetarra',
         ],
+        'CYP' => [
+            0 => 'CYP',
+            1 => 'libera zipretarra',
+        ],
         'CZK' => [
             0 => 'CZK',
             1 => 'koroa txekiarra',
+        ],
+        'DDM' => [
+            0 => 'DDM',
+            1 => 'Ekialdeko Alemaniako markoa',
+        ],
+        'DEM' => [
+            0 => 'DEM',
+            1 => 'marko alemana',
         ],
         'DJF' => [
             0 => 'DJF',
@@ -170,6 +338,18 @@ return [
             0 => 'DZD',
             1 => 'dinar aljeriarra',
         ],
+        'ECS' => [
+            0 => 'ECS',
+            1 => 'sukre ekuadortarra',
+        ],
+        'ECV' => [
+            0 => 'ECV',
+            1 => 'balio-unitate konstante ekuadortarra',
+        ],
+        'EEK' => [
+            0 => 'EEK',
+            1 => 'kroon estoniarra',
+        ],
         'EGP' => [
             0 => 'EGP',
             1 => 'libera egiptoarra',
@@ -178,9 +358,17 @@ return [
             0 => 'ERN',
             1 => 'nakfa eritrearra',
         ],
+        'ESA' => [
+            0 => 'ESA',
+            1 => 'pezeta espainiarra (A kontua)',
+        ],
+        'ESB' => [
+            0 => 'ESB',
+            1 => 'pezeta espainiarra (kontu bihurgarria)',
+        ],
         'ESP' => [
             0 => '₧',
-            1 => 'ESP',
+            1 => 'pezeta espainiarra',
         ],
         'ETB' => [
             0 => 'ETB',
@@ -190,6 +378,10 @@ return [
             0 => '€',
             1 => 'euroa',
         ],
+        'FIM' => [
+            0 => 'FIM',
+            1 => 'markka finlandiarra',
+        ],
         'FJD' => [
             0 => 'FJD',
             1 => 'dolar fijiarra',
@@ -198,13 +390,25 @@ return [
             0 => 'FKP',
             1 => 'libera falklandarra',
         ],
+        'FRF' => [
+            0 => 'FRF',
+            1 => 'libera frantsesa',
+        ],
         'GBP' => [
             0 => '£',
             1 => 'libera esterlina',
         ],
+        'GEK' => [
+            0 => 'GEK',
+            1 => 'kupon larit georgiarra',
+        ],
         'GEL' => [
             0 => 'GEL',
             1 => 'lari georgiarra',
+        ],
+        'GHC' => [
+            0 => 'GHC',
+            1 => 'cedi ghanatarra (1979–2007)',
         ],
         'GHS' => [
             0 => 'GHS',
@@ -216,15 +420,35 @@ return [
         ],
         'GMD' => [
             0 => 'GMD',
-            1 => 'dalasi ganbiarra',
+            1 => 'dalasi gambiarra',
         ],
         'GNF' => [
             0 => 'GNF',
             1 => 'franko ginearra',
         ],
+        'GNS' => [
+            0 => 'GNS',
+            1 => 'syli ginearra',
+        ],
+        'GQE' => [
+            0 => 'GQE',
+            1 => 'ekwele ekuatoreginearra',
+        ],
+        'GRD' => [
+            0 => 'GRD',
+            1 => 'drakma greziarra',
+        ],
         'GTQ' => [
             0 => 'GTQ',
             1 => 'ketzal guatemalarra',
+        ],
+        'GWE' => [
+            0 => 'GWE',
+            1 => 'Gineako ezkutu portugesa',
+        ],
+        'GWP' => [
+            0 => 'GWP',
+            1 => 'peso gineabissautarra',
         ],
         'GYD' => [
             0 => 'GYD',
@@ -238,6 +462,10 @@ return [
             0 => 'HNL',
             1 => 'lempira hodurastarra',
         ],
+        'HRD' => [
+            0 => 'HRD',
+            1 => 'dinar kroaziarra',
+        ],
         'HRK' => [
             0 => 'HRK',
             1 => 'kuna kroaziarra',
@@ -248,11 +476,23 @@ return [
         ],
         'HUF' => [
             0 => 'HUF',
-            1 => 'florin hungariarra',
+            1 => 'forint hungariarra',
         ],
         'IDR' => [
             0 => 'IDR',
             1 => 'errupia indonesiarra',
+        ],
+        'IEP' => [
+            0 => 'IEP',
+            1 => 'libera irlandarra',
+        ],
+        'ILP' => [
+            0 => 'ILP',
+            1 => 'libera israeldarra',
+        ],
+        'ILR' => [
+            0 => 'ILR',
+            1 => 'shekel israeldarra (1980–1985)',
         ],
         'ILS' => [
             0 => '₪',
@@ -270,9 +510,17 @@ return [
             0 => 'IRR',
             1 => 'rial irandarra',
         ],
+        'ISJ' => [
+            0 => 'ISJ',
+            1 => 'koroa islandiarra (1918–1981)',
+        ],
         'ISK' => [
             0 => 'ISK',
             1 => 'koroa islandiarra',
+        ],
+        'ITL' => [
+            0 => 'ITL',
+            1 => 'lira italiarra',
         ],
         'JMD' => [
             0 => 'JMD',
@@ -305,6 +553,14 @@ return [
         'KPW' => [
             0 => 'KPW',
             1 => 'won iparkorearra',
+        ],
+        'KRH' => [
+            0 => 'KRH',
+            1 => 'hwan hegokorearra (1953–1962)',
+        ],
+        'KRO' => [
+            0 => 'KRO',
+            1 => 'won hegokorearra (1945–1953)',
         ],
         'KRW' => [
             0 => '₩',
@@ -340,15 +596,35 @@ return [
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'Lesothoko lotia',
+            1 => 'loti lesothoarra',
         ],
         'LTL' => [
             0 => 'LTL',
             1 => 'Lituaniako litasa',
         ],
+        'LTT' => [
+            0 => 'LTT',
+            1 => 'Lituaniako talonasa',
+        ],
+        'LUC' => [
+            0 => 'LUC',
+            1 => 'Luxenburgoko franko bihurgarria',
+        ],
+        'LUF' => [
+            0 => 'LUF',
+            1 => 'Luxenburgoko frankoa',
+        ],
+        'LUL' => [
+            0 => 'LUL',
+            1 => 'Luxenburgoko finantza-frankoa',
+        ],
         'LVL' => [
             0 => 'LVL',
             1 => 'Letoniako latsa',
+        ],
+        'LVR' => [
+            0 => 'LVR',
+            1 => 'Letoniako errubloa',
         ],
         'LYD' => [
             0 => 'LYD',
@@ -358,6 +634,18 @@ return [
             0 => 'MAD',
             1 => 'dirham marokoarra',
         ],
+        'MAF' => [
+            0 => 'MAF',
+            1 => 'franko marokoarra',
+        ],
+        'MCF' => [
+            0 => 'MCF',
+            1 => 'Monakoko frankoa',
+        ],
+        'MDC' => [
+            0 => 'MDC',
+            1 => 'kupoi moldaviarra',
+        ],
         'MDL' => [
             0 => 'MDL',
             1 => 'leu moldaviarra',
@@ -366,9 +654,21 @@ return [
             0 => 'MGA',
             1 => 'ariary madagaskartarra',
         ],
+        'MGF' => [
+            0 => 'MGF',
+            1 => 'franko malagasiarra',
+        ],
         'MKD' => [
             0 => 'MKD',
             1 => 'dinar mazedoniarra',
+        ],
+        'MKN' => [
+            0 => 'MKN',
+            1 => 'dinar mazedoniarra (1992–1993)',
+        ],
+        'MLF' => [
+            0 => 'MLF',
+            1 => 'franko maliarra',
         ],
         'MMK' => [
             0 => 'MMK',
@@ -390,9 +690,21 @@ return [
             0 => 'MRU',
             1 => 'uguiya mauritaniarra',
         ],
+        'MTL' => [
+            0 => 'MTL',
+            1 => 'lira maltarra',
+        ],
+        'MTP' => [
+            0 => 'MTP',
+            1 => 'libera maltar',
+        ],
         'MUR' => [
             0 => 'MUR',
             1 => 'errupia mauriziarra',
+        ],
+        'MVP' => [
+            0 => 'MVP',
+            1 => 'errupia maldivarra (1947–1981)',
         ],
         'MVR' => [
             0 => 'MVR',
@@ -406,9 +718,25 @@ return [
             0 => 'MX$',
             1 => 'peso mexikarra',
         ],
+        'MXP' => [
+            0 => 'MXP',
+            1 => 'Zilar-peso amerikarra (1861–1992)',
+        ],
+        'MXV' => [
+            0 => 'MXV',
+            1 => 'Inbertsio-unitate mexikarra',
+        ],
         'MYR' => [
             0 => 'MYR',
             1 => 'ringgit malaysiarra',
+        ],
+        'MZE' => [
+            0 => 'MZE',
+            1 => 'ezkutu mozambiketarra',
+        ],
+        'MZM' => [
+            0 => 'MZM',
+            1 => 'metikal mozambiketarra',
         ],
         'MZN' => [
             0 => 'MZN',
@@ -422,9 +750,17 @@ return [
             0 => 'NGN',
             1 => 'naira nigeriarra',
         ],
+        'NIC' => [
+            0 => 'NIC',
+            1 => 'kordoba nikaraguar (1988–1991)',
+        ],
         'NIO' => [
             0 => 'NIO',
             1 => 'cordoba nikaraguarra',
+        ],
+        'NLG' => [
+            0 => 'NLG',
+            1 => 'gilder herbeheretarra',
         ],
         'NOK' => [
             0 => 'NOK',
@@ -446,9 +782,17 @@ return [
             0 => 'PAB',
             1 => 'balboa panamarra',
         ],
+        'PEI' => [
+            0 => 'PEI',
+            1 => 'inti perutarra',
+        ],
         'PEN' => [
             0 => 'PEN',
             1 => 'sol perutarra',
+        ],
+        'PES' => [
+            0 => 'PES',
+            1 => 'sol perutarra (1863–1965)',
         ],
         'PGK' => [
             0 => 'PGK',
@@ -466,6 +810,14 @@ return [
             0 => 'PLN',
             1 => 'zloty poloniarra',
         ],
+        'PLZ' => [
+            0 => 'PLZ',
+            1 => 'zloty poloniarra (1950–1995)',
+        ],
+        'PTE' => [
+            0 => 'PTE',
+            1 => 'ezkutu portugesa',
+        ],
         'PYG' => [
             0 => 'PYG',
             1 => 'guarani paraguaitarra',
@@ -473,6 +825,14 @@ return [
         'QAR' => [
             0 => 'QAR',
             1 => 'riyal qatartarra',
+        ],
+        'RHD' => [
+            0 => 'RHD',
+            1 => 'dolar rhodesiarra',
+        ],
+        'ROL' => [
+            0 => 'ROL',
+            1 => 'leu errumaniarra (1952–2006)',
         ],
         'RON' => [
             0 => 'RON',
@@ -485,6 +845,10 @@ return [
         'RUB' => [
             0 => 'RUB',
             1 => 'errublo errusiarra',
+        ],
+        'RUR' => [
+            0 => 'RUR',
+            1 => 'errublo errusiarra (1991–1998)',
         ],
         'RWF' => [
             0 => 'RWF',
@@ -502,9 +866,17 @@ return [
             0 => 'SCR',
             1 => 'errupia seychelletarra',
         ],
+        'SDD' => [
+            0 => 'SDD',
+            1 => 'dinar sudandarra (1992–2007)',
+        ],
         'SDG' => [
             0 => 'SDG',
             1 => 'libera sudandarra',
+        ],
+        'SDP' => [
+            0 => 'SDP',
+            1 => 'libera sudandarra (1957–1998)',
         ],
         'SEK' => [
             0 => 'SEK',
@@ -518,6 +890,14 @@ return [
             0 => 'SHP',
             1 => 'Santa Helenako libera',
         ],
+        'SIT' => [
+            0 => 'SIT',
+            1 => 'tolar esloveniarra',
+        ],
+        'SKK' => [
+            0 => 'SKK',
+            1 => 'koroa eslovakiarra',
+        ],
         'SLL' => [
             0 => 'SLL',
             1 => 'leone sierraleonarra',
@@ -529,6 +909,10 @@ return [
         'SRD' => [
             0 => 'SRD',
             1 => 'dolar surinamdarra',
+        ],
+        'SRG' => [
+            0 => 'SRG',
+            1 => 'gilder surinamdarra',
         ],
         'SSP' => [
             0 => 'SSP',
@@ -542,6 +926,14 @@ return [
             0 => 'STN',
             1 => 'dobra saotometarra',
         ],
+        'SUR' => [
+            0 => 'SUR',
+            1 => 'errublo sovietarra',
+        ],
+        'SVC' => [
+            0 => 'SVC',
+            1 => 'kolon salvadortarra',
+        ],
         'SYP' => [
             0 => 'SYP',
             1 => 'libera siriarra',
@@ -554,9 +946,17 @@ return [
             0 => '฿',
             1 => 'baht thailandiarra',
         ],
+        'TJR' => [
+            0 => 'TJR',
+            1 => 'errublo tajikistandarra',
+        ],
         'TJS' => [
             0 => 'TJS',
             1 => 'somoni tajikistandarra',
+        ],
+        'TMM' => [
+            0 => 'TMM',
+            1 => 'manat turkmenistandarra (1993–2009)',
         ],
         'TMT' => [
             0 => 'TMT',
@@ -570,13 +970,21 @@ return [
             0 => 'TOP',
             1 => 'paʻanga tongatarra',
         ],
+        'TPE' => [
+            0 => 'TPE',
+            1 => 'ezkutu timortarra',
+        ],
+        'TRL' => [
+            0 => 'TRL',
+            1 => 'lira turkiarra (1922–2005)',
+        ],
         'TRY' => [
             0 => 'TRY',
             1 => 'lira turkiarra',
         ],
         'TTD' => [
             0 => 'TTD',
-            1 => 'Trinidad eta Tobagoko dolarra',
+            1 => 'dolar trinitatearra',
         ],
         'TWD' => [
             0 => 'NT$',
@@ -590,6 +998,14 @@ return [
             0 => 'UAH',
             1 => 'hryvnia ukrainarra',
         ],
+        'UAK' => [
+            0 => 'UAK',
+            1 => 'karbovanets ukrainarra',
+        ],
+        'UGS' => [
+            0 => 'UGS',
+            1 => 'txelin ugandarra (1966–1987)',
+        ],
         'UGX' => [
             0 => 'UGX',
             1 => 'txelin ugandarra',
@@ -598,13 +1014,37 @@ return [
             0 => 'US$',
             1 => 'dolar estatubatuarra',
         ],
+        'USN' => [
+            0 => 'USN',
+            1 => 'dolar estatubatuar (Hurrengo eguna)',
+        ],
+        'USS' => [
+            0 => 'USS',
+            1 => 'dolar estatubatuar (Egun berean)',
+        ],
+        'UYI' => [
+            0 => 'UYI',
+            1 => 'peso uruguaitarra (unitate indexatuak)',
+        ],
+        'UYP' => [
+            0 => 'UYP',
+            1 => 'peso uruguaitarra (1975–1993)',
+        ],
         'UYU' => [
             0 => 'UYU',
             1 => 'peso uruguaitarra',
         ],
+        'UYW' => [
+            0 => 'UYW',
+            1 => 'soldata nominalaren indize-unitate uruguaitarra',
+        ],
         'UZS' => [
             0 => 'UZS',
             1 => 'sum uzbekistandarra',
+        ],
+        'VEB' => [
+            0 => 'VEB',
+            1 => 'Venezuelako bolivarra (1871–2008)',
         ],
         'VEF' => [
             0 => 'VEF',
@@ -617,6 +1057,10 @@ return [
         'VND' => [
             0 => '₫',
             1 => 'dong vietnamdarra',
+        ],
+        'VNN' => [
+            0 => 'VNN',
+            1 => 'dong vietnamdar (1978–1985)',
         ],
         'VUV' => [
             0 => 'VUV',
@@ -632,7 +1076,19 @@ return [
         ],
         'XCD' => [
             0 => 'EC$',
-            1 => 'Karibe ekialdeko dolarra',
+            1 => 'dolar ekikaribearra',
+        ],
+        'XEU' => [
+            0 => 'XEU',
+            1 => 'Europako dibisa-unitatea',
+        ],
+        'XFO' => [
+            0 => 'XFO',
+            1 => 'urrezko libera frantsesa',
+        ],
+        'XFU' => [
+            0 => 'XFU',
+            1 => 'UIC libera frantsesa',
         ],
         'XOF' => [
             0 => 'F CFA',
@@ -642,9 +1098,37 @@ return [
             0 => 'CFPF',
             1 => 'CFP frankoa',
         ],
+        'XRE' => [
+            0 => 'XRE',
+            1 => 'RINET funtsak',
+        ],
+        'YDD' => [
+            0 => 'YDD',
+            1 => 'dinar yemendarra',
+        ],
         'YER' => [
             0 => 'YER',
             1 => 'rial yemendarra',
+        ],
+        'YUD' => [
+            0 => 'YUD',
+            1 => 'dinar yugoslaviar indartsua (1966–1990)',
+        ],
+        'YUM' => [
+            0 => 'YUM',
+            1 => 'dinar yugoslaviar berria (1994–2002)',
+        ],
+        'YUN' => [
+            0 => 'YUN',
+            1 => 'dinar yugoslaviar bihurgarria (1990–1992)',
+        ],
+        'YUR' => [
+            0 => 'YUR',
+            1 => 'dinar yugoslaviar erreformatua (1992–1993)',
+        ],
+        'ZAL' => [
+            0 => 'ZAL',
+            1 => 'rand hegoafrikarra (finantzarioa)',
         ],
         'ZAR' => [
             0 => 'ZAR',
@@ -657,6 +1141,26 @@ return [
         'ZMW' => [
             0 => 'ZMW',
             1 => 'kwacha zambiarra',
+        ],
+        'ZRN' => [
+            0 => 'ZRN',
+            1 => 'zaire berri zairetarra (1993–1998)',
+        ],
+        'ZRZ' => [
+            0 => 'ZRZ',
+            1 => 'zaire zairetarra (1971–1993)',
+        ],
+        'ZWD' => [
+            0 => 'ZWD',
+            1 => 'dolar zimbabwetarra (1980–2008)',
+        ],
+        'ZWL' => [
+            0 => 'ZWL',
+            1 => 'dolar zimbabwetarra (2009)',
+        ],
+        'ZWR' => [
+            0 => 'ZWR',
+            1 => 'dolar zimbabwetarra (2008)',
         ],
     ],
 ];

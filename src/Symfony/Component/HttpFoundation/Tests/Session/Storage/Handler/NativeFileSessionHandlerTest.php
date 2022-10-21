@@ -29,10 +29,10 @@ class NativeFileSessionHandlerTest extends TestCase
     {
         new NativeSessionStorage(['name' => 'TESTING'], new NativeFileSessionHandler(sys_get_temp_dir()));
 
-        $this->assertEquals('user', ini_get('session.save_handler'));
+        $this->assertEquals('user', \ini_get('session.save_handler'));
 
-        $this->assertEquals(sys_get_temp_dir(), ini_get('session.save_path'));
-        $this->assertEquals('TESTING', ini_get('session.name'));
+        $this->assertEquals(sys_get_temp_dir(), \ini_get('session.save_path'));
+        $this->assertEquals('TESTING', \ini_get('session.name'));
     }
 
     /**
@@ -41,7 +41,7 @@ class NativeFileSessionHandlerTest extends TestCase
     public function testConstructSavePath($savePath, $expectedSavePath, $path)
     {
         new NativeFileSessionHandler($savePath);
-        $this->assertEquals($expectedSavePath, ini_get('session.save_path'));
+        $this->assertEquals($expectedSavePath, \ini_get('session.save_path'));
         $this->assertDirectoryExists(realpath($path));
 
         rmdir($path);
@@ -66,9 +66,9 @@ class NativeFileSessionHandlerTest extends TestCase
 
     public function testConstructDefault()
     {
-        $path = ini_get('session.save_path');
+        $path = \ini_get('session.save_path');
         new NativeSessionStorage(['name' => 'TESTING'], new NativeFileSessionHandler());
 
-        $this->assertEquals($path, ini_get('session.save_path'));
+        $this->assertEquals($path, \ini_get('session.save_path'));
     }
 }

@@ -1,11 +1,32 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add a `mailer:test` command
+ * Add `SentMessageEvent` and `FailedMessageEvent` events
+
+6.1
+---
+
+ * Make `start()` and `stop()` methods public on `SmtpTransport`
+ * Improve extensibility of `EsmtpTransport`
+
+6.0
+---
+
+ * The `HttpTransportException` class takes a string at first argument
+
+5.4
+---
+
+ * Enable the mailer to operate on any PSR-14-compatible event dispatcher
+
 5.3
 ---
 
  * added the `mailer` monolog channel and set it on all transport definitions
- * Add support for `X-SES-SOURCE-ARN` in `symfony/amazon-mailer`
 
 5.2.0
 -----

@@ -105,7 +105,6 @@ return [
         'Atlantic/Madeira' => 'heure de l’Europe de l’Ouest (Madère)',
         'CST6CDT' => 'heure du Centre',
         'EST5EDT' => 'heure de l’Est',
-        'Etc/UTC' => 'temps universel coordonné',
         'Europe/Amsterdam' => 'heure de l’Europe centrale (Amsterdam)',
         'Europe/Andorra' => 'heure de l’Europe centrale (Andorre)',
         'Europe/Athens' => 'heure de l’Europe de l’Est (Athènes)',

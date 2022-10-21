@@ -27,7 +27,9 @@ class_exists(ClosureResolver::class);
  *    to the "APP_DEBUG" environment variable;
  *  - "runtimes" maps types to a GenericRuntime implementation
  *    that knows how to deal with each of them;
- *  - "error_handler" defines the class to use to handle PHP errors.
+ *  - "error_handler" defines the class to use to handle PHP errors;
+ *  - "env_var_name" and "debug_var_name" define the name of the env
+ *    vars that hold the Symfony env and the debug flag respectively.
  *
  * The app-callable can declare arguments among either:
  * - "array $context" to get a local array similar to $_SERVER;
@@ -41,8 +43,6 @@ class_exists(ClosureResolver::class);
  * that throws exceptions when a PHP warning/notice is raised.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 5.3
  */
 class GenericRuntime implements RuntimeInterface
 {
@@ -53,40 +53,39 @@ class GenericRuntime implements RuntimeInterface
      *   debug?: ?bool,
      *   runtimes?: ?array,
      *   error_handler?: string|false,
+     *   env_var_name?: string,
+     *   debug_var_name?: string,
      * } $options
      */
     public function __construct(array $options = [])
     {
-        $debug = $options['debug'] ?? $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? true;
+        $options['env_var_name'] ??= 'APP_ENV';
+        $debugKey = $options['debug_var_name'] ??= 'APP_DEBUG';
+
+        $debug = $options['debug'] ?? $_SERVER[$debugKey] ?? $_ENV[$debugKey] ?? true;
 
         if (!\is_bool($debug)) {
-            $debug = filter_var($debug, \FILTER_VALIDATE_BOOLEAN);
+            $debug = filter_var($debug, \FILTER_VALIDATE_BOOL);
         }
 
         if ($debug) {
             umask(0000);
-            $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '1';
+            $_SERVER[$debugKey] = $_ENV[$debugKey] = '1';
 
             if (false !== $errorHandler = ($options['error_handler'] ?? BasicErrorHandler::class)) {
                 $errorHandler::register($debug);
                 $options['error_handler'] = false;
             }
         } else {
-            $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0';
+            $_SERVER[$debugKey] = $_ENV[$debugKey] = '0';
         }
 
         $this->options = $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResolver(callable $callable, \ReflectionFunction $reflector = null): ResolverInterface
     {
-        if (!$callable instanceof \Closure) {
-            $callable = \Closure::fromCallable($callable);
-        }
-
+        $callable = $callable(...);
         $parameters = ($reflector ?? new \ReflectionFunction($callable))->getParameters();
         $arguments = function () use ($parameters) {
             $arguments = [];
@@ -105,16 +104,13 @@ class GenericRuntime implements RuntimeInterface
             return $arguments;
         };
 
-        if ($_SERVER['APP_DEBUG']) {
+        if ($_SERVER[$this->options['debug_var_name']]) {
             return new DebugClosureResolver($callable, $arguments);
         }
 
         return new ClosureResolver($callable, $arguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRunner(?object $application): RunnerInterface
     {
         if (null === $application) {
@@ -126,7 +122,7 @@ class GenericRuntime implements RuntimeInterface
         }
 
         if (!$application instanceof \Closure) {
-            if ($runtime = $this->resolveRuntime(\get_class($application))) {
+            if ($runtime = $this->resolveRuntime($application::class)) {
                 return $runtime->getRunner($application);
             }
 
@@ -134,20 +130,17 @@ class GenericRuntime implements RuntimeInterface
                 throw new \LogicException(sprintf('"%s" doesn\'t know how to handle apps of type "%s".', get_debug_type($this), get_debug_type($application)));
             }
 
-            $application = \Closure::fromCallable($application);
+            $application = $application(...);
         }
 
-        if ($_SERVER['APP_DEBUG'] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
+        if ($_SERVER[$this->options['debug_var_name']] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
             throw new \ArgumentCountError(sprintf('Zero argument should be required by the runner callable, but at least one is in "%s" on line "%d.', $r->getFileName(), $r->getStartLine()));
         }
 
         return new ClosureRunner($application);
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getArgument(\ReflectionParameter $parameter, ?string $type)
+    protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed
     {
         if ('array' === $type) {
             switch ($parameter->name) {

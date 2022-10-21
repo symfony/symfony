@@ -1,0 +1,31 @@
+{
+    "name": "symfony/loco-translation-provider",
+    "type": "symfony-translation-bridge",
+    "description": "Symfony Loco Translation Provider Bridge",
+    "keywords": ["loco", "translation", "provider"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Santostefano",
+            "homepage": "https://github.com/welcomattic"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/config": "^5.4|^6.0",
+        "symfony/translation": "^6.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Loco\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

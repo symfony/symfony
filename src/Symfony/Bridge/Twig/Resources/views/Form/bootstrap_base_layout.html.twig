@@ -143,11 +143,6 @@
     {%- endif -%}
 {%- endblock dateinterval_widget -%}
 
-{% block choice_widget_collapsed -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
-    {{- parent() -}}
-{%- endblock choice_widget_collapsed %}
-
 {% block choice_widget_expanded -%}
     {%- if '-inline' in label_attr.class|default('') -%}
         {%- for child in form %}

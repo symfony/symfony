@@ -20,7 +20,7 @@ class FloatNodeTest extends TestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testNormalize($value)
+    public function testNormalize(int|float $value)
     {
         $node = new FloatNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -28,10 +28,8 @@ class FloatNodeTest extends TestCase
 
     /**
      * @dataProvider getValidValues
-     *
-     * @param int $value
      */
-    public function testValidNonEmptyValues($value)
+    public function testValidNonEmptyValues(int|float $value)
     {
         $node = new FloatNode('test');
         $node->setAllowEmptyValue(false);
@@ -39,7 +37,7 @@ class FloatNodeTest extends TestCase
         $this->assertSame($value, $node->finalize($value));
     }
 
-    public function getValidValues()
+    public function getValidValues(): array
     {
         return [
             [1798.0],
@@ -63,7 +61,7 @@ class FloatNodeTest extends TestCase
         $node->normalize($value);
     }
 
-    public function getInvalidValues()
+    public function getInvalidValues(): array
     {
         return [
             [null],

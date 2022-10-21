@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
+
 /**
  * @group integration
  */
@@ -19,18 +21,15 @@ class RedisClusterSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
     public static function setUpBeforeClass(): void
     {
         if (!class_exists(\RedisCluster::class)) {
-            self::markTestSkipped('The RedisCluster class is required.');
+            throw new SkippedTestSuiteError('The RedisCluster class is required.');
         }
 
         if (!$hosts = getenv('REDIS_CLUSTER_HOSTS')) {
-            self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
+            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
     }
 
-    /**
-     * @return \RedisCluster
-     */
-    protected function createRedisClient(string $host): object
+    protected function createRedisClient(string $host): \RedisCluster
     {
         return new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
     }

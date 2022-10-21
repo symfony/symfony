@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -28,10 +29,10 @@ final class RocketChatTransport extends AbstractTransport
 {
     protected const HOST = 'rocketchat.com';
 
-    private $accessToken;
-    private $chatChannel;
+    private string $accessToken;
+    private ?string $chatChannel;
 
-    public function __construct(string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accessToken = $accessToken;
         $this->chatChannel = $chatChannel;
@@ -80,7 +81,13 @@ final class RocketChatTransport extends AbstractTransport
             ]
         );
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote RocketChat server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             throw new TransportException(sprintf('Unable to post the RocketChat message: %s.', $response->getContent(false)), $response);
         }
 
@@ -92,7 +99,10 @@ final class RocketChatTransport extends AbstractTransport
         $success = $response->toArray(false);
 
         $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId($success['message']['_id']);
+
+        if (isset($success['message']['_id'])) {
+            $sentMessage->setMessageId($success['message']['_id']);
+        }
 
         return $sentMessage;
     }

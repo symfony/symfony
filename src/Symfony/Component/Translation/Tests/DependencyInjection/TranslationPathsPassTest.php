@@ -33,7 +33,7 @@ class TranslationPathsPassTest extends TestCase
         $debugCommand = $container->register('console.command.translation_debug')
             ->setArguments([null, null, null, null, null, [], []])
         ;
-        $updateCommand = $container->register('console.command.translation_update')
+        $updateCommand = $container->register('console.command.translation_extract')
             ->setArguments([null, null, null, null, null, null, [], []])
         ;
         $container->register(ControllerArguments::class, ControllerArguments::class)
@@ -72,7 +72,7 @@ class TranslationPathsPassTest extends TestCase
             ->setArguments([new Reference('.service_locator.bar')])
         ;
 
-        $pass = new TranslatorPathsPass('translator', 'console.command.translation_debug', 'console.command.translation_update', 'argument_resolver.service');
+        $pass = new TranslatorPathsPass();
         $pass->process($container);
 
         $expectedPaths = [

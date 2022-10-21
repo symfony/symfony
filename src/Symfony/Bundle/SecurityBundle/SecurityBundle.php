@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\CleanRememberMeVerifierPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeaturesPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterEntryPointPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
@@ -21,11 +22,10 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocat
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AnonymousFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AccessTokenFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\CustomAuthenticatorFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginLdapFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginFactory;
@@ -37,6 +37,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUse
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\LdapFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
@@ -55,27 +56,28 @@ class SecurityBundle extends Bundle
     {
         parent::build($container);
 
+        /** @var SecurityExtension $extension */
         $extension = $container->getExtension('security');
-        $extension->addSecurityListenerFactory(new FormLoginFactory());
-        $extension->addSecurityListenerFactory(new FormLoginLdapFactory());
-        $extension->addSecurityListenerFactory(new JsonLoginFactory());
-        $extension->addSecurityListenerFactory(new JsonLoginLdapFactory());
-        $extension->addSecurityListenerFactory(new HttpBasicFactory());
-        $extension->addSecurityListenerFactory(new HttpBasicLdapFactory());
-        $extension->addSecurityListenerFactory(new RememberMeFactory());
-        $extension->addSecurityListenerFactory(new X509Factory());
-        $extension->addSecurityListenerFactory(new RemoteUserFactory());
-        $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
-        $extension->addSecurityListenerFactory(new AnonymousFactory());
-        $extension->addSecurityListenerFactory(new CustomAuthenticatorFactory());
-        $extension->addSecurityListenerFactory(new LoginThrottlingFactory());
-        $extension->addSecurityListenerFactory(new LoginLinkFactory());
+        $extension->addAuthenticatorFactory(new FormLoginFactory());
+        $extension->addAuthenticatorFactory(new FormLoginLdapFactory());
+        $extension->addAuthenticatorFactory(new JsonLoginFactory());
+        $extension->addAuthenticatorFactory(new JsonLoginLdapFactory());
+        $extension->addAuthenticatorFactory(new HttpBasicFactory());
+        $extension->addAuthenticatorFactory(new HttpBasicLdapFactory());
+        $extension->addAuthenticatorFactory(new RememberMeFactory());
+        $extension->addAuthenticatorFactory(new X509Factory());
+        $extension->addAuthenticatorFactory(new RemoteUserFactory());
+        $extension->addAuthenticatorFactory(new CustomAuthenticatorFactory());
+        $extension->addAuthenticatorFactory(new LoginThrottlingFactory());
+        $extension->addAuthenticatorFactory(new LoginLinkFactory());
+        $extension->addAuthenticatorFactory(new AccessTokenFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new CleanRememberMeVerifierPass());
         $container->addCompilerPass(new RegisterCsrfFeaturesPass());
         $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
         $container->addCompilerPass(new RegisterLdapLocatorPass());

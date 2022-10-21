@@ -59,22 +59,23 @@ final class UuidFactoryTest extends TestCase
         $uuidFactory = new UuidFactory(6, 6, 5, 4, '6f80c216-0492-4421-bd82-c10ab929ae84');
 
         // Test custom timestamp
-        $uuid1 = $uuidFactory->timeBased()->create(new \DateTime('@1611076938.057800'));
+        $uuid1 = $uuidFactory->timeBased()->create(new \DateTimeImmutable('@1611076938.057800'));
         $this->assertInstanceOf(UuidV6::class, $uuid1);
         $this->assertSame('1611076938.057800', $uuid1->getDateTime()->format('U.u'));
         $this->assertSame('c10ab929ae84', $uuid1->getNode());
 
         // Test default node override
-        $uuid2 = $uuidFactory->timeBased('7c1ede70-3586-48ed-a984-23c8018d9174')->create();
-        $this->assertInstanceOf(UuidV6::class, $uuid2);
-        $this->assertSame('23c8018d9174', $uuid2->getNode());
+        $uuid2Factory = $uuidFactory->timeBased('7c1ede70-3586-48ed-a984-23c8018d9174');
+        $this->assertSame('1eb5a7ae-17e1-62d0-a984-23c8018d9174', (string) $uuid2Factory->create(new \DateTimeImmutable('@1611076938.057800')));
+        $this->assertSame('23c8018d9174', substr($uuid2Factory->create(), 24));
+        $this->assertNotSame('a984', substr($uuid2Factory->create(), 19, 4));
 
         // Test version override
         $uuid3 = (new UuidFactory(6, 1))->timeBased()->create();
         $this->assertInstanceOf(UuidV1::class, $uuid3);
 
         // Test negative timestamp and round
-        $uuid4 = $uuidFactory->timeBased()->create(new \DateTime('@-12219292800'));
+        $uuid4 = $uuidFactory->timeBased()->create(new \DateTimeImmutable('@-12219292800'));
         $this->assertSame('-12219292800.000000', $uuid4->getDateTime()->format('U.u'));
     }
 
@@ -83,7 +84,7 @@ final class UuidFactoryTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The given UUID date cannot be earlier than 1582-10-15.');
 
-        (new UuidFactory())->timeBased()->create(new \DateTime('@-12219292800.001000'));
+        (new UuidFactory())->timeBased()->create(new \DateTimeImmutable('@-12219292800.001000'));
     }
 
     public function testCreateRandom()

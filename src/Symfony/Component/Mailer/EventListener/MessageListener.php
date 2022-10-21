@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Mailer\EventListener;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Header\Headers;
@@ -39,9 +41,9 @@ class MessageListener implements EventSubscriberInterface
         'bcc' => self::HEADER_ADD,
     ];
 
-    private $headers;
-    private $headerRules = [];
-    private $renderer;
+    private ?Headers $headers;
+    private array $headerRules = [];
+    private ?BodyRendererInterface $renderer;
 
     public function __construct(Headers $headers = null, BodyRendererInterface $renderer = null, array $headerRules = self::DEFAULT_RULES)
     {
@@ -119,13 +121,17 @@ class MessageListener implements EventSubscriberInterface
     private function renderMessage(Message $message): void
     {
         if (!$this->renderer) {
+            if ($message instanceof TemplatedEmail && ($message->getTextTemplate() || $message->getHtmlTemplate())) {
+                throw new LogicException(sprintf('You must configure a "%s" when a "%s" instance has a text or HTML template set.', BodyRendererInterface::class, get_debug_type($message)));
+            }
+
             return;
         }
 
         $this->renderer->render($message);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             MessageEvent::class => 'onMessage',

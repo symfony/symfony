@@ -21,14 +21,16 @@ use Symfony\Component\Notifier\Message\SentMessage;
  */
 final class Transports implements TransportInterface
 {
-    private $transports;
+    /**
+     * @var array<string, TransportInterface>
+     */
+    private array $transports = [];
 
     /**
-     * @param TransportInterface[] $transports
+     * @param iterable<string, TransportInterface> $transports
      */
     public function __construct(iterable $transports)
     {
-        $this->transports = [];
         foreach ($transports as $name => $transport) {
             $this->transports[$name] = $transport;
         }
@@ -53,7 +55,7 @@ final class Transports implements TransportInterface
     public function send(MessageInterface $message): SentMessage
     {
         if (!$transport = $message->getTransport()) {
-            foreach ($this->transports as $transportName => $transport) {
+            foreach ($this->transports as $transport) {
                 if ($transport->supports($message)) {
                     return $transport->send($message);
                 }

@@ -16,13 +16,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
-use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
@@ -61,10 +61,27 @@ class LoginThrottlingListenerTest extends TestCase
 
         for ($i = 0; $i < 3; ++$i) {
             $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+            $this->listener->onFailedLogin($this->createLoginFailedEvent($passport));
         }
 
         $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
         $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+    }
+
+    public function testPreventsLoginWithMultipleCase()
+    {
+        $request = $this->createRequest();
+        $passports = [$this->createPassport('wouter'), $this->createPassport('Wouter'), $this->createPassport('wOuter')];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+            $this->listener->onFailedLogin($this->createLoginFailedEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
     public function testPreventsLoginWhenOverGlobalThreshold()
@@ -76,6 +93,7 @@ class LoginThrottlingListenerTest extends TestCase
 
         for ($i = 0; $i < 6; ++$i) {
             $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 2]));
+            $this->listener->onFailedLogin($this->createLoginFailedEvent($passports[$i % 2]));
         }
 
         $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
@@ -87,12 +105,9 @@ class LoginThrottlingListenerTest extends TestCase
         return new SelfValidatingPassport(new UserBadge($username));
     }
 
-    private function createLoginSuccessfulEvent($passport, $username = 'wouter')
+    private function createLoginFailedEvent($passport)
     {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->any())->method('getUserIdentifier')->willReturn($username);
-
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $token, $this->requestStack->getCurrentRequest(), null, 'main');
+        return new LoginFailureEvent($this->createMock(AuthenticationException::class), $this->createMock(AuthenticatorInterface::class), $this->requestStack->getCurrentRequest(), null, 'main', $passport);
     }
 
     private function createCheckPassportEvent($passport)

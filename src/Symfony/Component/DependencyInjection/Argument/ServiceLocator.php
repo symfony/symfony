@@ -20,9 +20,9 @@ use Symfony\Component\DependencyInjection\ServiceLocator as BaseServiceLocator;
  */
 class ServiceLocator extends BaseServiceLocator
 {
-    private $factory;
-    private $serviceMap;
-    private $serviceTypes;
+    private \Closure $factory;
+    private array $serviceMap;
+    private ?array $serviceTypes;
 
     public function __construct(\Closure $factory, array $serviceMap, array $serviceTypes = null)
     {
@@ -32,21 +32,17 @@ class ServiceLocator extends BaseServiceLocator
         parent::__construct($serviceMap);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    public function get($id)
+    public function get(string $id): mixed
     {
-        return isset($this->serviceMap[$id]) ? ($this->factory)(...$this->serviceMap[$id]) : parent::get($id);
+        return match (\count($this->serviceMap[$id] ?? [])) {
+            0 => parent::get($id),
+            1 => $this->serviceMap[$id][0],
+            default => ($this->factory)(...$this->serviceMap[$id]),
+        };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProvidedServices(): array
     {
-        return $this->serviceTypes ?? $this->serviceTypes = array_map(function () { return '?'; }, $this->serviceMap);
+        return $this->serviceTypes ??= array_map(function () { return '?'; }, $this->serviceMap);
     }
 }

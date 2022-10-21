@@ -19,7 +19,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 class MessageHandler
 {
-    private $transport;
+    private TransportInterface $transport;
 
     public function __construct(TransportInterface $transport)
     {

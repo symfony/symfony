@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,10 +28,10 @@ final class GitterTransport extends AbstractTransport
 {
     protected const HOST = 'api.gitter.im';
 
-    private $token;
-    private $roomId;
+    private string $token;
+    private string $roomId;
 
-    public function __construct(string $token, string $roomId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, string $roomId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->roomId = $roomId;
@@ -66,7 +67,11 @@ final class GitterTransport extends AbstractTransport
             ],
         ]);
 
-        $result = $response->toArray(false);
+        try {
+            $result = $response->toArray(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Gitter server.', $response, 0, $e);
+        }
 
         if (200 !== $response->getStatusCode()) {
             throw new TransportException(sprintf('Unable to post the Gitter message: "%s".', $result['error']), $response);

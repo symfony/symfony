@@ -59,4 +59,42 @@ class ProfilerListenerTest extends TestCase
 
         $listener->onKernelTerminate(new TerminateEvent($kernel, $mainRequest, $response));
     }
+
+    /**
+     * @dataProvider collectRequestProvider
+     */
+    public function testCollectParameter(Request $request, ?bool $enable)
+    {
+        $profile = new Profile('token');
+
+        $profiler = $this->createMock(Profiler::class);
+        $profiler->expects($this->once())
+            ->method('collect')
+            ->willReturn($profile);
+
+        $profiler
+            ->expects(null === $enable ? $this->never() : $this->once())
+            ->method($enable ? 'enable' : 'disable');
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $response = new Response();
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $listener = new ProfilerListener($profiler, $requestStack, null, false, false, 'profile');
+
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, Kernel::MAIN_REQUEST, $response));
+    }
+
+    public function collectRequestProvider(): iterable
+    {
+        yield [Request::create('/'), null];
+        yield [Request::create('/', 'GET', ['profile' => '1']), true];
+        yield [Request::create('/', 'GET', ['profile' => '0']), false];
+
+        $request = Request::create('/');
+        $request->attributes->set('profile', true);
+        yield [$request, true];
+    }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Composer\Autoload\ClassLoader;
-use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
@@ -25,24 +24,23 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 {
-    private $kernel;
+    private Kernel $kernel;
 
     public function __construct(Kernel $kernel)
     {
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
-        $annotatedClasses = $this->kernel->getAnnotatedClassesToCompile();
+        $annotatedClasses = [];
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof Extension) {
-                $annotatedClasses = array_merge($annotatedClasses, $extension->getAnnotatedClassesToCompile());
+                $annotatedClasses[] = $extension->getAnnotatedClassesToCompile();
             }
         }
+
+        $annotatedClasses = array_merge($this->kernel->getAnnotatedClassesToCompile(), ...$annotatedClasses);
 
         $existingClasses = $this->getClassesInComposerClassMaps();
 
@@ -62,7 +60,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
         // Explicit classes declared in the patterns are returned directly
         foreach ($patterns as $key => $pattern) {
-            if ('\\' !== substr($pattern, -1) && false === strpos($pattern, '*')) {
+            if (!str_ends_with($pattern, '\\') && !str_contains($pattern, '*')) {
                 unset($patterns[$key]);
                 $expanded[] = ltrim($pattern, '\\');
             }
@@ -91,7 +89,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
                 continue;
             }
 
-            if ($function[0] instanceof DebugClassLoader || $function[0] instanceof LegacyDebugClassLoader) {
+            if ($function[0] instanceof DebugClassLoader) {
                 $function = $function[0]->getClassLoader();
             }
 
@@ -115,7 +113,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
             $regex = strtr($regex, ['\\*\\*' => '.*?', '\\*' => '[^\\\\]*?']);
 
             // If this class does not end by a slash, anchor the end
-            if ('\\' !== substr($regex, -1)) {
+            if (!str_ends_with($regex, '\\')) {
                 $regex .= '$';
             }
 
@@ -127,10 +125,10 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
     private function matchAnyRegexps(string $class, array $regexps): bool
     {
-        $isTest = false !== strpos($class, 'Test');
+        $isTest = str_contains($class, 'Test');
 
         foreach ($regexps as $regex) {
-            if ($isTest && false === strpos($regex, 'Test')) {
+            if ($isTest && !str_contains($regex, 'Test')) {
                 continue;
             }
 

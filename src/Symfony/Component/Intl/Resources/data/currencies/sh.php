@@ -8,7 +8,7 @@ return [
         ],
         'AED' => [
             0 => 'AED',
-            1 => 'UAE dirham',
+            1 => 'dirham UAE',
         ],
         'AFA' => [
             0 => 'AFA',
@@ -16,23 +16,23 @@ return [
         ],
         'AFN' => [
             0 => 'AFN',
-            1 => 'Avganistanski avgani',
+            1 => 'avganistanski avgani',
         ],
         'ALL' => [
             0 => 'ALL',
-            1 => 'Albanski lek',
+            1 => 'albanski lek',
         ],
         'AMD' => [
             0 => 'AMD',
-            1 => 'Jermenski dram',
+            1 => 'jermenski dram',
         ],
         'ANG' => [
             0 => 'ANG',
-            1 => 'Holandskoantilski gulden',
+            1 => 'holandskoantilski gulden',
         ],
         'AOA' => [
             0 => 'AOA',
-            1 => 'Angolska kvanza',
+            1 => 'angolska kvanza',
         ],
         'AOK' => [
             0 => 'AOK',
@@ -56,7 +56,7 @@ return [
         ],
         'ARS' => [
             0 => 'ARS',
-            1 => 'Argentinski pezos',
+            1 => 'argentinski pezos',
         ],
         'ATS' => [
             0 => 'ATS',
@@ -64,11 +64,11 @@ return [
         ],
         'AUD' => [
             0 => 'AUD',
-            1 => 'Australijski dolar',
+            1 => 'australijski dolar',
         ],
         'AWG' => [
             0 => 'AWG',
-            1 => 'Arubanski florin',
+            1 => 'arubanski florin',
         ],
         'AZM' => [
             0 => 'AZM',
@@ -76,7 +76,7 @@ return [
         ],
         'AZN' => [
             0 => 'AZN',
-            1 => 'Azerbejdžanski manat',
+            1 => 'azerbejdžanski manat',
         ],
         'BAD' => [
             0 => 'BAD',
@@ -84,15 +84,15 @@ return [
         ],
         'BAM' => [
             0 => 'KM',
-            1 => 'Bosansko-hercegovačka konvertibilna marka',
+            1 => 'bosansko-hercegovačka konvertibilna marka',
         ],
         'BBD' => [
             0 => 'BBD',
-            1 => 'Barbadoški dolar',
+            1 => 'barbadoški dolar',
         ],
         'BDT' => [
             0 => 'BDT',
-            1 => 'Bangladeška taka',
+            1 => 'bangladeška taka',
         ],
         'BEC' => [
             0 => 'BEC',
@@ -112,27 +112,27 @@ return [
         ],
         'BGN' => [
             0 => 'BGN',
-            1 => 'Bugarski lev',
+            1 => 'bugarski lev',
         ],
         'BHD' => [
             0 => 'BHD',
-            1 => 'Bahreinski dinar',
+            1 => 'bahreinski dinar',
         ],
         'BIF' => [
             0 => 'BIF',
-            1 => 'Burundski franak',
+            1 => 'burundski franak',
         ],
         'BMD' => [
             0 => 'BMD',
-            1 => 'Bermudski dolar',
+            1 => 'bermudski dolar',
         ],
         'BND' => [
             0 => 'BND',
-            1 => 'Brunejski dolar',
+            1 => 'brunejski dolar',
         ],
         'BOB' => [
             0 => 'BOB',
-            1 => 'Bolivijski bolivijano',
+            1 => 'bolivijski bolivijano',
         ],
         'BOP' => [
             0 => 'BOP',
@@ -156,7 +156,7 @@ return [
         ],
         'BRL' => [
             0 => 'R$',
-            1 => 'Brazilski real',
+            1 => 'brazilski real',
         ],
         'BRN' => [
             0 => 'BRN',
@@ -168,11 +168,11 @@ return [
         ],
         'BSD' => [
             0 => 'BSD',
-            1 => 'Bahamski dolar',
+            1 => 'bahamski dolar',
         ],
         'BTN' => [
             0 => 'BTN',
-            1 => 'Butanski ngultrum',
+            1 => 'butanski ngultrum',
         ],
         'BUK' => [
             0 => 'BUK',
@@ -180,7 +180,7 @@ return [
         ],
         'BWP' => [
             0 => 'BWP',
-            1 => 'Bocvanska pula',
+            1 => 'bocvanska pula',
         ],
         'BYB' => [
             0 => 'BYB',
@@ -188,7 +188,7 @@ return [
         ],
         'BYN' => [
             0 => 'BYN',
-            1 => 'Beloruska rublja',
+            1 => 'beloruska rublja',
         ],
         'BYR' => [
             0 => 'BYR',
@@ -196,15 +196,15 @@ return [
         ],
         'BZD' => [
             0 => 'BZD',
-            1 => 'Beliski dolar',
+            1 => 'beliski dolar',
         ],
         'CAD' => [
             0 => 'CA$',
-            1 => 'Kanadski dolar',
+            1 => 'kanadski dolar',
         ],
         'CDF' => [
             0 => 'CDF',
-            1 => 'Kongoanski franak',
+            1 => 'kongoanski franak',
         ],
         'CHE' => [
             0 => 'CHE',
@@ -212,7 +212,7 @@ return [
         ],
         'CHF' => [
             0 => 'CHF',
-            1 => 'Švajcarski franak',
+            1 => 'švajcarski franak',
         ],
         'CHW' => [
             0 => 'CHW',
@@ -224,19 +224,19 @@ return [
         ],
         'CLP' => [
             0 => 'CLP',
-            1 => 'Čileanski pezos',
+            1 => 'čileanski pezos',
         ],
         'CNH' => [
             0 => 'CNH',
-            1 => 'Kineski juan (ostrvski)',
+            1 => 'kineski juan (ostrvski)',
         ],
         'CNY' => [
             0 => 'CN¥',
-            1 => 'Kineski juan',
+            1 => 'kineski juan',
         ],
         'COP' => [
             0 => 'COP',
-            1 => 'Kolumbijski pezos',
+            1 => 'kolumbijski pezos',
         ],
         'COU' => [
             0 => 'COU',
@@ -244,7 +244,7 @@ return [
         ],
         'CRC' => [
             0 => 'CRC',
-            1 => 'Kostarikanski kolon',
+            1 => 'kostarikanski kolon',
         ],
         'CSD' => [
             0 => 'CSD',
@@ -256,15 +256,15 @@ return [
         ],
         'CUC' => [
             0 => 'CUC',
-            1 => 'Kubanski konvertibilni pezos',
+            1 => 'kubanski konvertibilni pezos',
         ],
         'CUP' => [
             0 => 'CUP',
-            1 => 'Kubanski pezos',
+            1 => 'kubanski pezos',
         ],
         'CVE' => [
             0 => 'CVE',
-            1 => 'Zelenortski eskudo',
+            1 => 'zelenortski eskudo',
         ],
         'CYP' => [
             0 => 'CYP',
@@ -272,7 +272,7 @@ return [
         ],
         'CZK' => [
             0 => 'CZK',
-            1 => 'Češka kruna',
+            1 => 'češka kruna',
         ],
         'DDM' => [
             0 => 'DDM',
@@ -284,19 +284,19 @@ return [
         ],
         'DJF' => [
             0 => 'DJF',
-            1 => 'Džibutski franak',
+            1 => 'džibutski franak',
         ],
         'DKK' => [
             0 => 'DKK',
-            1 => 'Danska kruna',
+            1 => 'danska kruna',
         ],
         'DOP' => [
             0 => 'DOP',
-            1 => 'Dominikanski pezos',
+            1 => 'dominikanski pezos',
         ],
         'DZD' => [
             0 => 'DZD',
-            1 => 'Alžirski dinar',
+            1 => 'alžirski dinar',
         ],
         'ECS' => [
             0 => 'ECS',
@@ -312,11 +312,11 @@ return [
         ],
         'EGP' => [
             0 => 'EGP',
-            1 => 'Egipatska funta',
+            1 => 'egipatska funta',
         ],
         'ERN' => [
             0 => 'ERN',
-            1 => 'Eritrejska nakfa',
+            1 => 'eritrejska nakfa',
         ],
         'ESA' => [
             0 => 'ESA',
@@ -332,7 +332,7 @@ return [
         ],
         'ETB' => [
             0 => 'ETB',
-            1 => 'Etiopski bir',
+            1 => 'etiopijski bir',
         ],
         'EUR' => [
             0 => '€',
@@ -344,11 +344,11 @@ return [
         ],
         'FJD' => [
             0 => 'FJD',
-            1 => 'Fidžijski dolar',
+            1 => 'fidžijski dolar',
         ],
         'FKP' => [
             0 => 'FKP',
-            1 => 'Foklandska funta',
+            1 => 'folklandska funta',
         ],
         'FRF' => [
             0 => 'FRF',
@@ -356,7 +356,7 @@ return [
         ],
         'GBP' => [
             0 => '£',
-            1 => 'Britanska funta',
+            1 => 'britanska funta',
         ],
         'GEK' => [
             0 => 'GEK',
@@ -364,7 +364,7 @@ return [
         ],
         'GEL' => [
             0 => 'GEL',
-            1 => 'Gruzijski lari',
+            1 => 'gruzijski lari',
         ],
         'GHC' => [
             0 => 'GHC',
@@ -372,19 +372,19 @@ return [
         ],
         'GHS' => [
             0 => 'GHS',
-            1 => 'Ganski sedi',
+            1 => 'ganski sedi',
         ],
         'GIP' => [
             0 => 'GIP',
-            1 => 'Gibraltarska funta',
+            1 => 'gibraltarska funta',
         ],
         'GMD' => [
             0 => 'GMD',
-            1 => 'Gambijski dalasi',
+            1 => 'gambijski dalasi',
         ],
         'GNF' => [
             0 => 'GNF',
-            1 => 'Gvinejski franak',
+            1 => 'gvinejski franak',
         ],
         'GNS' => [
             0 => 'GNS',
@@ -400,7 +400,7 @@ return [
         ],
         'GTQ' => [
             0 => 'GTQ',
-            1 => 'Gvatemalski kecal',
+            1 => 'gvatemalski kecal',
         ],
         'GWE' => [
             0 => 'GWE',
@@ -412,15 +412,15 @@ return [
         ],
         'GYD' => [
             0 => 'GYD',
-            1 => 'Gvajanski dolar',
+            1 => 'gvajanski dolar',
         ],
         'HKD' => [
             0 => 'HK$',
-            1 => 'Hongkonški dolar',
+            1 => 'hongkonški dolar',
         ],
         'HNL' => [
             0 => 'HNL',
-            1 => 'Honduraška lempira',
+            1 => 'honduraška lempira',
         ],
         'HRD' => [
             0 => 'HRD',
@@ -428,19 +428,19 @@ return [
         ],
         'HRK' => [
             0 => 'HRK',
-            1 => 'Hrvatska kuna',
+            1 => 'hrvatska kuna',
         ],
         'HTG' => [
             0 => 'HTG',
-            1 => 'Haićanski gurd',
+            1 => 'haićanski gurd',
         ],
         'HUF' => [
             0 => 'HUF',
-            1 => 'Mađarska forinta',
+            1 => 'mađarska forinta',
         ],
         'IDR' => [
             0 => 'IDR',
-            1 => 'Indonežanska rupija',
+            1 => 'indonežanska rupija',
         ],
         'IEP' => [
             0 => 'IEP',
@@ -456,19 +456,19 @@ return [
         ],
         'ILS' => [
             0 => '₪',
-            1 => 'Izraelski novi šekel',
+            1 => 'izraelski novi šekel',
         ],
         'INR' => [
             0 => '₹',
-            1 => 'Indijska rupija',
+            1 => 'indijska rupija',
         ],
         'IQD' => [
             0 => 'IQD',
-            1 => 'Irački dinar',
+            1 => 'irački dinar',
         ],
         'IRR' => [
             0 => 'IRR',
-            1 => 'Iranski rijal',
+            1 => 'iranski rijal',
         ],
         'ISJ' => [
             0 => 'ISJ',
@@ -476,7 +476,7 @@ return [
         ],
         'ISK' => [
             0 => 'ISK',
-            1 => 'Islandska kruna',
+            1 => 'islandska kruna',
         ],
         'ITL' => [
             0 => 'ITL',
@@ -484,71 +484,71 @@ return [
         ],
         'JMD' => [
             0 => 'JMD',
-            1 => 'Jamajčanski dolar',
+            1 => 'jamajčanski dolar',
         ],
         'JOD' => [
             0 => 'JOD',
-            1 => 'Jordanski dinar',
+            1 => 'jordanski dinar',
         ],
         'JPY' => [
             0 => '¥',
-            1 => 'Japanski jen',
+            1 => 'japanski jen',
         ],
         'KES' => [
             0 => 'KES',
-            1 => 'Kenijski šiling',
+            1 => 'kenijski šiling',
         ],
         'KGS' => [
             0 => 'KGS',
-            1 => 'Kirgistanski som',
+            1 => 'kirgistanski som',
         ],
         'KHR' => [
             0 => 'KHR',
-            1 => 'Kambodžanski rijel',
+            1 => 'kambodžanski rijel',
         ],
         'KMF' => [
             0 => 'KMF',
-            1 => 'Komorski franak',
+            1 => 'komorski franak',
         ],
         'KPW' => [
             0 => 'KPW',
-            1 => 'Severnokorejski von',
+            1 => 'severnokorejski von',
         ],
         'KRW' => [
             0 => 'KRW',
-            1 => 'Južnokorejski von',
+            1 => 'južnokorejski von',
         ],
         'KWD' => [
             0 => 'KWD',
-            1 => 'Kuvajtski dinar',
+            1 => 'kuvajtski dinar',
         ],
         'KYD' => [
             0 => 'KYD',
-            1 => 'Kajmanski dolar',
+            1 => 'kajmanski dolar',
         ],
         'KZT' => [
             0 => 'KZT',
-            1 => 'Kazahstanski tenge',
+            1 => 'kazahstanski tenge',
         ],
         'LAK' => [
             0 => 'LAK',
-            1 => 'Laoški kip',
+            1 => 'laoski kip',
         ],
         'LBP' => [
             0 => 'LBP',
-            1 => 'Libanska funta',
+            1 => 'libanska funta',
         ],
         'LKR' => [
             0 => 'LKR',
-            1 => 'Šrilankanska rupija',
+            1 => 'šrilančanska rupija',
         ],
         'LRD' => [
             0 => 'LRD',
-            1 => 'Liberijski dolar',
+            1 => 'liberijski dolar',
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'Lesoto loti',
+            1 => 'lesotski loti',
         ],
         'LTL' => [
             0 => 'LTL',
@@ -580,11 +580,11 @@ return [
         ],
         'LYD' => [
             0 => 'LYD',
-            1 => 'Libijski dinar',
+            1 => 'libijski dinar',
         ],
         'MAD' => [
             0 => 'MAD',
-            1 => 'Marokanski dirham',
+            1 => 'marokanski dirham',
         ],
         'MAF' => [
             0 => 'MAF',
@@ -592,11 +592,11 @@ return [
         ],
         'MDL' => [
             0 => 'MDL',
-            1 => 'Moldavski lej',
+            1 => 'moldavski lej',
         ],
         'MGA' => [
             0 => 'MGA',
-            1 => 'Madagaskarski ariari',
+            1 => 'malgaški arijari',
         ],
         'MGF' => [
             0 => 'MGF',
@@ -604,7 +604,7 @@ return [
         ],
         'MKD' => [
             0 => 'MKD',
-            1 => 'Makedonski denar',
+            1 => 'makedonski denar',
         ],
         'MLF' => [
             0 => 'MLF',
@@ -612,15 +612,15 @@ return [
         ],
         'MMK' => [
             0 => 'MMK',
-            1 => 'Mjanmarski kjat',
+            1 => 'mjanmarski kjat',
         ],
         'MNT' => [
             0 => 'MNT',
-            1 => 'Mongolski tugrik',
+            1 => 'mongolski tugrik',
         ],
         'MOP' => [
             0 => 'MOP',
-            1 => 'Makaoska pataka',
+            1 => 'makaoska pataka',
         ],
         'MRO' => [
             0 => 'MRO',
@@ -628,7 +628,7 @@ return [
         ],
         'MRU' => [
             0 => 'MRU',
-            1 => 'Mauritanska ogija',
+            1 => 'mauritanska ogija',
         ],
         'MTL' => [
             0 => 'MTL',
@@ -640,19 +640,19 @@ return [
         ],
         'MUR' => [
             0 => 'MUR',
-            1 => 'Mauricijska rupija',
+            1 => 'mauricijska rupija',
         ],
         'MVR' => [
             0 => 'MVR',
-            1 => 'Maldivska rufija',
+            1 => 'maldivska rufija',
         ],
         'MWK' => [
             0 => 'MWK',
-            1 => 'Malavijska kvača',
+            1 => 'malavijska kvača',
         ],
         'MXN' => [
             0 => 'MX$',
-            1 => 'Meksički pezos',
+            1 => 'meksički pezos',
         ],
         'MXP' => [
             0 => 'MXP',
@@ -664,7 +664,7 @@ return [
         ],
         'MYR' => [
             0 => 'MYR',
-            1 => 'Malezijski ringit',
+            1 => 'malezijski ringit',
         ],
         'MZE' => [
             0 => 'MZE',
@@ -676,23 +676,23 @@ return [
         ],
         'MZN' => [
             0 => 'MZN',
-            1 => 'Mozambički metikal',
+            1 => 'mozambički metikal',
         ],
         'NAD' => [
             0 => 'NAD',
-            1 => 'Namibijski dolar',
+            1 => 'namibijski dolar',
         ],
         'NGN' => [
             0 => 'NGN',
-            1 => 'Nigerijska naira',
+            1 => 'nigerijska naira',
         ],
         'NIC' => [
             0 => 'NIC',
-            1 => 'Nikaragvanska kordoba',
+            1 => 'nikaragvanska kordoba (1988–1991)',
         ],
         'NIO' => [
             0 => 'NIO',
-            1 => 'Nikaragvanska zlatna kordoba',
+            1 => 'nikaragvanska kordoba',
         ],
         'NLG' => [
             0 => 'NLG',
@@ -700,23 +700,23 @@ return [
         ],
         'NOK' => [
             0 => 'NOK',
-            1 => 'Norveška kruna',
+            1 => 'norveška kruna',
         ],
         'NPR' => [
             0 => 'NPR',
-            1 => 'Nepalska rupija',
+            1 => 'nepalska rupija',
         ],
         'NZD' => [
             0 => 'NZD',
-            1 => 'Novozelandski dolar',
+            1 => 'novozelandski dolar',
         ],
         'OMR' => [
             0 => 'OMR',
-            1 => 'Omanski rijal',
+            1 => 'omanski rijal',
         ],
         'PAB' => [
             0 => 'PAB',
-            1 => 'Panamska balboa',
+            1 => 'panamska balboa',
         ],
         'PEI' => [
             0 => 'PEI',
@@ -724,7 +724,7 @@ return [
         ],
         'PEN' => [
             0 => 'PEN',
-            1 => 'Peruanski sol',
+            1 => 'peruanski sol',
         ],
         'PES' => [
             0 => 'PES',
@@ -732,19 +732,19 @@ return [
         ],
         'PGK' => [
             0 => 'PGK',
-            1 => 'Papuanska kina',
+            1 => 'papuanska kina',
         ],
         'PHP' => [
             0 => 'PHP',
-            1 => 'Filipinski pezos',
+            1 => 'filipinski pezos',
         ],
         'PKR' => [
             0 => 'PKR',
-            1 => 'Pakistanska rupija',
+            1 => 'pakistanska rupija',
         ],
         'PLN' => [
             0 => 'PLN',
-            1 => 'Poljski zlot',
+            1 => 'poljski zlot',
         ],
         'PLZ' => [
             0 => 'PLZ',
@@ -756,11 +756,11 @@ return [
         ],
         'PYG' => [
             0 => 'PYG',
-            1 => 'Paragvajski gvarani',
+            1 => 'paragvajski gvarani',
         ],
         'QAR' => [
             0 => 'QAR',
-            1 => 'Katarski rijal',
+            1 => 'katarski rijal',
         ],
         'RHD' => [
             0 => 'RHD',
@@ -772,15 +772,15 @@ return [
         ],
         'RON' => [
             0 => 'RON',
-            1 => 'Rumunski lej',
+            1 => 'rumunski lej',
         ],
         'RSD' => [
             0 => 'RSD',
-            1 => 'Srpski dinar',
+            1 => 'srpski dinar',
         ],
         'RUB' => [
             0 => 'RUB',
-            1 => 'Ruska rublja',
+            1 => 'ruska rublja',
         ],
         'RUR' => [
             0 => 'RUR',
@@ -788,19 +788,19 @@ return [
         ],
         'RWF' => [
             0 => 'RWF',
-            1 => 'Ruandski franak',
+            1 => 'ruandski franak',
         ],
         'SAR' => [
             0 => 'SAR',
-            1 => 'Saudijski rijal',
+            1 => 'saudijski rijal',
         ],
         'SBD' => [
             0 => 'SBD',
-            1 => 'Solomonski dolar',
+            1 => 'solomonski dolar',
         ],
         'SCR' => [
             0 => 'SCR',
-            1 => 'Sejšelska rupija',
+            1 => 'sejšelska rupija',
         ],
         'SDD' => [
             0 => 'SDD',
@@ -808,7 +808,7 @@ return [
         ],
         'SDG' => [
             0 => 'SDG',
-            1 => 'Sudanska funta',
+            1 => 'sudanska funta',
         ],
         'SDP' => [
             0 => 'SDP',
@@ -816,15 +816,15 @@ return [
         ],
         'SEK' => [
             0 => 'SEK',
-            1 => 'Švedska kruna',
+            1 => 'švedska kruna',
         ],
         'SGD' => [
             0 => 'SGD',
-            1 => 'Singapurski dolar',
+            1 => 'singapurski dolar',
         ],
         'SHP' => [
             0 => 'SHP',
-            1 => 'Svete Jelene funta',
+            1 => 'funta Svete Jelene',
         ],
         'SIT' => [
             0 => 'SIT',
@@ -836,15 +836,15 @@ return [
         ],
         'SLL' => [
             0 => 'SLL',
-            1 => 'Sijeraleonski leone',
+            1 => 'sijeraleonski leone',
         ],
         'SOS' => [
             0 => 'SOS',
-            1 => 'Somalijski šiling',
+            1 => 'somalijski šiling',
         ],
         'SRD' => [
             0 => 'SRD',
-            1 => 'Surinamski dolar',
+            1 => 'surinamski dolar',
         ],
         'SRG' => [
             0 => 'SRG',
@@ -852,7 +852,7 @@ return [
         ],
         'SSP' => [
             0 => 'SSP',
-            1 => 'Južnosudanska funta',
+            1 => 'južnosudanska funta',
         ],
         'STD' => [
             0 => 'STD',
@@ -860,7 +860,7 @@ return [
         ],
         'STN' => [
             0 => 'STN',
-            1 => 'Saotomska dobra',
+            1 => 'saotomska dobra',
         ],
         'SUR' => [
             0 => 'SUR',
@@ -872,15 +872,15 @@ return [
         ],
         'SYP' => [
             0 => 'SYP',
-            1 => 'Sirijska funta',
+            1 => 'sirijska funta',
         ],
         'SZL' => [
             0 => 'SZL',
-            1 => 'Svazilendski lilangeni',
+            1 => 'svazilendski lilangeni',
         ],
         'THB' => [
             0 => 'THB',
-            1 => 'Tajlandski bat',
+            1 => 'tajlandski bat',
         ],
         'TJR' => [
             0 => 'TJR',
@@ -888,7 +888,7 @@ return [
         ],
         'TJS' => [
             0 => 'TJS',
-            1 => 'Tadžikistanski somon',
+            1 => 'tadžikistanski somon',
         ],
         'TMM' => [
             0 => 'TMM',
@@ -896,15 +896,15 @@ return [
         ],
         'TMT' => [
             0 => 'TMT',
-            1 => 'Turkmenistanski manat',
+            1 => 'turkmenistanski manat',
         ],
         'TND' => [
             0 => 'TND',
-            1 => 'Tuniski dinar',
+            1 => 'tuniski dinar',
         ],
         'TOP' => [
             0 => 'TOP',
-            1 => 'Tonganska panga',
+            1 => 'tonganska panga',
         ],
         'TPE' => [
             0 => 'TPE',
@@ -916,7 +916,7 @@ return [
         ],
         'TRY' => [
             0 => 'TRY',
-            1 => 'Turska lira',
+            1 => 'turska lira',
         ],
         'TTD' => [
             0 => 'TTD',
@@ -924,15 +924,15 @@ return [
         ],
         'TWD' => [
             0 => 'NT$',
-            1 => 'Novi tajvanski dolar',
+            1 => 'novi tajvanski dolar',
         ],
         'TZS' => [
             0 => 'TZS',
-            1 => 'Tanzanijski šiling',
+            1 => 'tanzanijski šiling',
         ],
         'UAH' => [
             0 => 'UAH',
-            1 => 'Ukrajinska hrivnja',
+            1 => 'ukrajinska grivna',
         ],
         'UAK' => [
             0 => 'UAK',
@@ -944,11 +944,11 @@ return [
         ],
         'UGX' => [
             0 => 'UGX',
-            1 => 'Ugandski šiling',
+            1 => 'ugandski šiling',
         ],
         'USD' => [
             0 => 'US$',
-            1 => 'Američki dolar',
+            1 => 'američki dolar',
         ],
         'USN' => [
             0 => 'USN',
@@ -968,11 +968,11 @@ return [
         ],
         'UYU' => [
             0 => 'UYU',
-            1 => 'Urugvajski pezos',
+            1 => 'urugvajski pezos',
         ],
         'UZS' => [
             0 => 'UZS',
-            1 => 'Uzbekistanski som',
+            1 => 'uzbekistanski som',
         ],
         'VEB' => [
             0 => 'VEB',
@@ -984,11 +984,11 @@ return [
         ],
         'VES' => [
             0 => 'VES',
-            1 => 'Venecuelanski bolivar',
+            1 => 'venecuelanski bolivar',
         ],
         'VND' => [
             0 => 'VND',
-            1 => 'Vijetnamski dong',
+            1 => 'vijetnamski dong',
         ],
         'VNN' => [
             0 => 'VNN',
@@ -996,19 +996,19 @@ return [
         ],
         'VUV' => [
             0 => 'VUV',
-            1 => 'Vanuatski vatu',
+            1 => 'vanuatski vatu',
         ],
         'WST' => [
             0 => 'WST',
-            1 => 'Samoanska tala',
+            1 => 'samoanska tala',
         ],
         'XAF' => [
             0 => 'FCFA',
-            1 => 'CFA franak BEAC',
+            1 => 'centralnoafrički franak',
         ],
         'XCD' => [
             0 => 'EC$',
-            1 => 'Istočnokaripski dolar',
+            1 => 'istočnokaripski dolar',
         ],
         'XEU' => [
             0 => 'XEU',
@@ -1024,7 +1024,7 @@ return [
         ],
         'XOF' => [
             0 => 'F CFA',
-            1 => 'CFA franak BCEAO',
+            1 => 'zapadnoafrički franak',
         ],
         'XPF' => [
             0 => 'CFPF',
@@ -1040,7 +1040,7 @@ return [
         ],
         'YER' => [
             0 => 'YER',
-            1 => 'Jemenski rijal',
+            1 => 'jemenski rijal',
         ],
         'YUD' => [
             0 => 'YUD',
@@ -1060,7 +1060,7 @@ return [
         ],
         'ZAR' => [
             0 => 'ZAR',
-            1 => 'Južnoafrički rand',
+            1 => 'južnoafrički rand',
         ],
         'ZMK' => [
             0 => 'ZMK',
@@ -1068,7 +1068,7 @@ return [
         ],
         'ZMW' => [
             0 => 'ZMW',
-            1 => 'Zambijska kvača',
+            1 => 'zambijska kvača',
         ],
         'ZRN' => [
             0 => 'ZRN',

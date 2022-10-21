@@ -31,19 +31,13 @@ class FileBag extends ParameterBag
         $this->replace($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function replace(array $files = [])
     {
         $this->parameters = [];
         $this->add($files);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function set(string $key, $value)
+    public function set(string $key, mixed $value)
     {
         if (!\is_array($value) && !$value instanceof UploadedFile) {
             throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');
@@ -52,9 +46,6 @@ class FileBag extends ParameterBag
         parent::set($key, $this->convertFileInformation($value));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(array $files = [])
     {
         foreach ($files as $key => $file) {
@@ -65,32 +56,28 @@ class FileBag extends ParameterBag
     /**
      * Converts uploaded files to UploadedFile instances.
      *
-     * @param array|UploadedFile $file A (multi-dimensional) array of uploaded file information
-     *
-     * @return UploadedFile[]|UploadedFile|null A (multi-dimensional) array of UploadedFile instances
+     * @return UploadedFile[]|UploadedFile|null
      */
-    protected function convertFileInformation($file)
+    protected function convertFileInformation(array|UploadedFile $file): array|UploadedFile|null
     {
         if ($file instanceof UploadedFile) {
             return $file;
         }
 
-        if (\is_array($file)) {
-            $file = $this->fixPhpFilesArray($file);
-            $keys = array_keys($file);
-            sort($keys);
+        $file = $this->fixPhpFilesArray($file);
+        $keys = array_keys($file);
+        sort($keys);
 
-            if (self::FILE_KEYS == $keys) {
-                if (\UPLOAD_ERR_NO_FILE == $file['error']) {
-                    $file = null;
-                } else {
-                    $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['error'], false);
-                }
+        if (self::FILE_KEYS == $keys) {
+            if (\UPLOAD_ERR_NO_FILE == $file['error']) {
+                $file = null;
             } else {
-                $file = array_map([$this, 'convertFileInformation'], $file);
-                if (array_keys($keys) === $keys) {
-                    $file = array_filter($file);
-                }
+                $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['error'], false);
+            }
+        } else {
+            $file = array_map(function ($v) { return $v instanceof UploadedFile || \is_array($v) ? $this->convertFileInformation($v) : $v; }, $file);
+            if (array_keys($keys) === $keys) {
+                $file = array_filter($file);
             }
         }
 
@@ -108,13 +95,11 @@ class FileBag extends ParameterBag
      *
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
-     *
-     * @param array $data
-     *
-     * @return array
      */
-    protected function fixPhpFilesArray($data)
+    protected function fixPhpFilesArray(array $data): array
     {
+        // Remove extra key added by PHP 8.1.
+        unset($data['full_path']);
         $keys = array_keys($data);
         sort($keys);
 

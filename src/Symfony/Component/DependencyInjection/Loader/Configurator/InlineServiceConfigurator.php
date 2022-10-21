@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class InlineServiceConfigurator extends AbstractConfigurator
 {
-    public const FACTORY = 'service';
-
     use Traits\ArgumentTrait;
     use Traits\AutowireTrait;
     use Traits\BindTrait;
@@ -32,9 +30,11 @@ class InlineServiceConfigurator extends AbstractConfigurator
     use Traits\PropertyTrait;
     use Traits\TagTrait;
 
-    private $id = '[inline]';
-    private $allowParent = true;
-    private $path = null;
+    public const FACTORY = 'service';
+
+    private string $id = '[inline]';
+    private bool $allowParent = true;
+    private ?string $path = null;
 
     public function __construct(Definition $definition)
     {

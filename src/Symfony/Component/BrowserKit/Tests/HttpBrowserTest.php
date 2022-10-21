@@ -94,7 +94,11 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->with('POST', 'http://example.com/', $this->callback(function ($options) {
                 $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
                 $this->assertInstanceOf(\Generator::class, $options['body']);
-                $this->assertStringContainsString('my_file', implode('', iterator_to_array($options['body'])));
+                $values = implode('', iterator_to_array($options['body'], false));
+                $this->assertStringContainsString('name="foo[file]"', $values);
+                $this->assertStringContainsString('my_file', $values);
+                $this->assertStringContainsString('name="foo[bar]"', $values);
+                $this->assertStringContainsString('foo2', $values);
 
                 return true;
             }))
@@ -103,7 +107,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser = new HttpBrowser($client);
         $path = tempnam(sys_get_temp_dir(), 'http');
         file_put_contents($path, 'my_file');
-        $browser->request('POST', 'http://example.com/', [], ['file' => ['tmp_name' => $path, 'name' => 'foo']]);
+        $browser->request('POST', 'http://example.com/', ['foo' => ['bar' => 'foo2']], ['foo' => ['file' => ['tmp_name' => $path, 'name' => 'foo']]]);
     }
 
     public function testMultiPartRequestWithNormalFlatArray()
@@ -178,6 +182,30 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request('POST', 'http://example.com/', ['file1' => 'baz'], [
             'file1' => $this->getUploadedFile('file1'),
         ]);
+    }
+
+    /**
+     * @dataProvider forwardSlashesRequestPathProvider
+     */
+    public function testMultipleForwardSlashesRequestPath(string $requestPath)
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with('GET', 'http://localhost'.$requestPath)
+            ->willReturn($this->createMock(ResponseInterface::class));
+        $browser = new HttpBrowser($client);
+        $browser->request('GET', $requestPath);
+    }
+
+    public function forwardSlashesRequestPathProvider()
+    {
+        return [
+            'one slash' => ['/'],
+            'two slashes' => ['//'],
+            'multiple slashes' => ['////'],
+        ];
     }
 
     private function uploadFile(string $data): string

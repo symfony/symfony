@@ -21,8 +21,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -31,7 +29,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgrade
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -46,19 +43,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private $options;
-    private $httpUtils;
-    private $userProvider;
-    private $propertyAccessor;
-    private $successHandler;
-    private $failureHandler;
+    private array $options;
+    private HttpUtils $httpUtils;
+    private UserProviderInterface $userProvider;
+    private PropertyAccessorInterface $propertyAccessor;
+    private ?AuthenticationSuccessHandlerInterface $successHandler;
+    private ?AuthenticationFailureHandlerInterface $failureHandler;
+    private ?TranslatorInterface $translator = null;
 
-    /**
-     * @var TranslatorInterface|null
-     */
-    private $translator;
-
-    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, ?AuthenticationSuccessHandlerInterface $successHandler = null, ?AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], ?PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->httpUtils = $httpUtils;
@@ -70,7 +63,10 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 
     public function supports(Request $request): ?bool
     {
-        if (false === strpos($request->getRequestFormat(), 'json') && false === strpos($request->getContentType(), 'json')) {
+        if (
+            !str_contains($request->getRequestFormat() ?? '', 'json')
+            && !str_contains((method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType()) ?? '', 'json')
+        ) {
             return false;
         }
 
@@ -81,7 +77,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         return true;
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         try {
             $credentials = $this->getCredentials($request);
@@ -91,18 +87,9 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             throw $e;
         }
 
-        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-        $method = 'loadUserByIdentifier';
-        if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+        $userBadge = new UserBadge($credentials['username'], $this->userProvider->loadUserByIdentifier(...));
+        $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']));
 
-            $method = 'loadUserByUsername';
-        }
-
-        $passport = new Passport(
-            new UserBadge($credentials['username'], [$this->userProvider, $method]),
-            new PasswordCredentials($credentials['password'])
-        );
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($credentials['password'], $this->userProvider));
         }
@@ -110,9 +97,9 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         return $passport;
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
+        return new UsernamePasswordToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
@@ -163,10 +150,6 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             if (!\is_string($credentials['username'])) {
                 throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
             }
-
-            if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
-                throw new BadCredentialsException('Invalid username.');
-            }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
         }
@@ -179,6 +162,10 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
+        }
+
+        if ('' === $credentials['username'] || '' === $credentials['password']) {
+            trigger_deprecation('symfony/security', '6.2', 'Passing an empty string as username or password parameter is deprecated.');
         }
 
         return $credentials;

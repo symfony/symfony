@@ -17,10 +17,12 @@ use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @internal since Symfony 6.2. Inject the workflow where you need it.
  */
 class Registry
 {
-    private $workflows = [];
+    private array $workflows = [];
 
     public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
     {
@@ -38,10 +40,7 @@ class Registry
         return false;
     }
 
-    /**
-     * @return Workflow
-     */
-    public function get(object $subject, string $workflowName = null)
+    public function get(object $subject, string $workflowName = null): Workflow
     {
         $matched = [];
 

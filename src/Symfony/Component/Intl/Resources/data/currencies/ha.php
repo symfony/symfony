@@ -304,11 +304,11 @@ return [
         ],
         'KPW' => [
             0 => 'KPW',
-            1 => 'won na ƙasar Koriya ta Arewa',
+            1 => 'Won na ƙasar Koriya ta Arewa',
         ],
         'KRW' => [
             0 => '₩',
-            1 => 'won na Koriya ta Kudu',
+            1 => 'Won na Koriya ta Kudu',
         ],
         'KWD' => [
             0 => 'KWD',

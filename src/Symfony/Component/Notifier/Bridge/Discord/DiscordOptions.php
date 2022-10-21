@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class DiscordOptions implements MessageOptionsInterface
 {
-    private $options = [];
+    private array $options = [];
 
     public function __construct(array $options = [])
     {
@@ -37,28 +37,40 @@ final class DiscordOptions implements MessageOptionsInterface
         return '';
     }
 
-    public function username(string $username): self
+    /**
+     * @return $this
+     */
+    public function username(string $username): static
     {
         $this->options['username'] = $username;
 
         return $this;
     }
 
-    public function avatarUrl(string $avatarUrl): self
+    /**
+     * @return $this
+     */
+    public function avatarUrl(string $avatarUrl): static
     {
         $this->options['avatar_url'] = $avatarUrl;
 
         return $this;
     }
 
-    public function tts(bool $tts): self
+    /**
+     * @return $this
+     */
+    public function tts(bool $tts): static
     {
         $this->options['tts'] = $tts;
 
         return $this;
     }
 
-    public function addEmbed(DiscordEmbedInterface $embed): self
+    /**
+     * @return $this
+     */
+    public function addEmbed(DiscordEmbedInterface $embed): static
     {
         if (!isset($this->options['embeds'])) {
             $this->options['embeds'] = [];

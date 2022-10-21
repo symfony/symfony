@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `Crawler::parents()` method, use `ancestors()` instead
+
+5.4
+---
+
+ * Add `Crawler::innerText` method.
+
 5.3
 ---
 

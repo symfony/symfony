@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 trait HostTrait
 {
-    final protected function addHost(RouteCollection $routes, $hosts)
+    final protected function addHost(RouteCollection $routes, string|array $hosts)
     {
         if (!$hosts || !\is_array($hosts)) {
             $routes->setHost($hosts ?: '');

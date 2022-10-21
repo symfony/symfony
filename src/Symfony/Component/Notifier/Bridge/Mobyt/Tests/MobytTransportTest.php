@@ -17,7 +17,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -25,10 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MobytTransportTest extends TransportTestCase
 {
-    /**
-     * @return MobytTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): MobytTransport
     {
         return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

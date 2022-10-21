@@ -15,35 +15,50 @@ use Symfony\Component\Notifier\Bridge\Firebase\FirebaseOptions;
 
 final class IOSNotification extends FirebaseOptions
 {
-    public function sound(string $sound): self
+    /**
+     * @return $this
+     */
+    public function sound(string $sound): static
     {
         $this->options['sound'] = $sound;
 
         return $this;
     }
 
-    public function badge(string $badge): self
+    /**
+     * @return $this
+     */
+    public function badge(string $badge): static
     {
         $this->options['badge'] = $badge;
 
         return $this;
     }
 
-    public function clickAction(string $clickAction): self
+    /**
+     * @return $this
+     */
+    public function clickAction(string $clickAction): static
     {
         $this->options['click_action'] = $clickAction;
 
         return $this;
     }
 
-    public function subtitle(string $subtitle): self
+    /**
+     * @return $this
+     */
+    public function subtitle(string $subtitle): static
     {
         $this->options['subtitle'] = $subtitle;
 
         return $this;
     }
 
-    public function bodyLocKey(string $bodyLocKey): self
+    /**
+     * @return $this
+     */
+    public function bodyLocKey(string $bodyLocKey): static
     {
         $this->options['body_loc_key'] = $bodyLocKey;
 
@@ -52,15 +67,20 @@ final class IOSNotification extends FirebaseOptions
 
     /**
      * @param string[] $bodyLocArgs
+     *
+     * @return $this
      */
-    public function bodyLocArgs(array $bodyLocArgs): self
+    public function bodyLocArgs(array $bodyLocArgs): static
     {
         $this->options['body_loc_args'] = $bodyLocArgs;
 
         return $this;
     }
 
-    public function titleLocKey(string $titleLocKey): self
+    /**
+     * @return $this
+     */
+    public function titleLocKey(string $titleLocKey): static
     {
         $this->options['title_loc_key'] = $titleLocKey;
 
@@ -69,8 +89,10 @@ final class IOSNotification extends FirebaseOptions
 
     /**
      * @param string[] $titleLocArgs
+     *
+     * @return $this
      */
-    public function titleLocArgs(array $titleLocArgs): self
+    public function titleLocArgs(array $titleLocArgs): static
     {
         $this->options['title_loc_args'] = $titleLocArgs;
 

@@ -12,37 +12,23 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid search term.';
-            },
+            'invalid_message' => 'Please enter a valid search term.',
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'search';
     }

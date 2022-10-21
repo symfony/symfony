@@ -13,10 +13,12 @@ namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
+use PHPUnit\Metadata\Api\Groups;
 use PHPUnit\Util\Test;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
-use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
+
+class_exists(Groups::class);
 
 /**
  * @internal
@@ -78,13 +80,13 @@ class Deprecation
             }
 
             if ('trigger_error' === $trace[$j]['function'] && !isset($trace[$j]['class'])) {
-                if (\in_array($trace[1 + $j]['class'], [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
+                if (DebugClassLoader::class === $trace[1 + $j]['class']) {
                     $class = $trace[1 + $j]['args'][0];
                     $this->triggeringFile = isset($trace[1 + $j]['args'][1]) ? realpath($trace[1 + $j]['args'][1]) : (new \ReflectionClass($class))->getFileName();
                     $this->getOriginalFilesStack();
                     array_splice($this->originalFilesStack, 0, $j, [$this->triggeringFile]);
 
-                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || preg_match('/^(?:The|Method) "([^":]++)/', $message, $m)) {
+                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || (false === strpos($message, '()" will return') && false === strpos($message, 'native return type declaration') && preg_match('/^(?:The|Method) "([^":]++)/', $message, $m))) {
                         $this->triggeringFile = (new \ReflectionClass($m[1]))->getFileName();
                         array_unshift($this->originalFilesStack, $this->triggeringFile);
                     }
@@ -99,8 +101,11 @@ class Deprecation
         }
 
         set_error_handler(function () {});
-        $parsedMsg = unserialize($this->message);
-        restore_error_handler();
+        try {
+            $parsedMsg = unserialize($this->message);
+        } finally {
+            restore_error_handler();
+        }
         if ($parsedMsg && isset($parsedMsg['deprecation'])) {
             $this->message = $parsedMsg['deprecation'];
             $this->originClass = $parsedMsg['class'];
@@ -201,12 +206,13 @@ class Deprecation
         }
 
         $method = $this->originatingMethod();
+        $groups = class_exists(Groups::class, false) ? [new Groups(), 'groups'] : [Test::class, 'getGroups'];
 
         return 0 === strpos($method, 'testLegacy')
             || 0 === strpos($method, 'provideLegacy')
             || 0 === strpos($method, 'getLegacy')
             || strpos($this->originClass, '\Legacy')
-            || \in_array('legacy', Test::getGroups($this->originClass, $method), true);
+            || \in_array('legacy', $groups($this->originClass, $method), true);
     }
 
     /**
@@ -306,7 +312,7 @@ class Deprecation
     }
 
     /**
-     * @return string[] an array of paths
+     * @return string[]
      */
     private static function getVendors()
     {
@@ -315,9 +321,6 @@ class Deprecation
             self::$vendors[] = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Legacy';
             if (class_exists(DebugClassLoader::class, false)) {
                 self::$vendors[] = \dirname((new \ReflectionClass(DebugClassLoader::class))->getFileName());
-            }
-            if (class_exists(LegacyDebugClassLoader::class, false)) {
-                self::$vendors[] = \dirname((new \ReflectionClass(LegacyDebugClassLoader::class))->getFileName());
             }
             foreach (get_declared_classes() as $class) {
                 if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {

@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class AmazonSqsReceivedStamp implements NonSendableStampInterface
 {
-    private $id;
+    private string $id;
 
     public function __construct(string $id)
     {

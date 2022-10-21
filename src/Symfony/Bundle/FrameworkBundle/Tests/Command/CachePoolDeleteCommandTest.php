@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
@@ -84,9 +85,28 @@ class CachePoolDeleteCommandTest extends TestCase
     }
 
     /**
-     * @return MockObject|KernelInterface
+     * @dataProvider provideCompletionSuggestions
      */
-    private function getKernel(): object
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $application = new Application($this->getKernel());
+        $application->add(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => $this->cachePool]), ['foo']));
+        $tester = new CommandCompletionTester($application->get('cache:pool:delete'));
+
+        $suggestions = $tester->complete($input);
+
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'pool_name' => [
+            ['f'],
+            ['foo'],
+        ];
+    }
+
+    private function getKernel(): MockObject&KernelInterface
     {
         $container = $this->createMock(ContainerInterface::class);
 

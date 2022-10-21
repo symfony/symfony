@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use MongoDB\Client;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
 class MongoDbSessionHandlerTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&Client
      */
     private $mongo;
     private $storage;
@@ -33,11 +34,11 @@ class MongoDbSessionHandlerTest extends TestCase
     {
         parent::setUp();
 
-        if (!class_exists(\MongoDB\Client::class)) {
+        if (!class_exists(Client::class)) {
             $this->markTestSkipped('The mongodb/mongodb package is required.');
         }
 
-        $this->mongo = $this->getMockBuilder(\MongoDB\Client::class)
+        $this->mongo = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -120,7 +121,7 @@ class MongoDbSessionHandlerTest extends TestCase
                 $this->assertEquals(['upsert' => true], $options);
 
                 $data = $updateData['$set'];
-                $expectedExpiry = time() + (int) ini_get('session.gc_maxlifetime');
+                $expectedExpiry = time() + (int) \ini_get('session.gc_maxlifetime');
                 $this->assertInstanceOf(\MongoDB\BSON\Binary::class, $data[$this->options['data_field']]);
                 $this->assertEquals('bar', $data[$this->options['data_field']]->getData());
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['time_field']]);
@@ -184,17 +185,21 @@ class MongoDbSessionHandlerTest extends TestCase
             ->willReturnCallback(function ($criteria) {
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$lt']);
                 $this->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$this->options['expiry_field']]['$lt'] / 1000));
+
+                $result = $this->createMock(\MongoDB\DeleteResult::class);
+                $result->method('getDeletedCount')->willReturn(42);
+
+                return $result;
             });
 
-        $this->assertTrue($this->storage->gc(1));
+        $this->assertSame(42, $this->storage->gc(1));
     }
 
     public function testGetConnection()
     {
         $method = new \ReflectionMethod($this->storage, 'getMongo');
-        $method->setAccessible(true);
 
-        $this->assertInstanceOf(\MongoDB\Client::class, $method->invoke($this->storage));
+        $this->assertInstanceOf(Client::class, $method->invoke($this->storage));
     }
 
     private function createMongoCollectionMock(): \MongoDB\Collection

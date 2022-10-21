@@ -20,12 +20,11 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
 use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeChatEmailTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null, ?string $transportName = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $transportName = null): FakeChatEmailTransport
     {
         $transport = (new FakeChatEmailTransport($this->createMock(MailerInterface::class), 'recipient@email.net', 'sender@email.net', $client ?? $this->createMock(HttpClientInterface::class)));
 
@@ -120,7 +119,7 @@ final class FakeChatEmailTransportTest extends TransportTestCase
         $this->assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBodyAsString());
+        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 
     public function testSendWithCustomTransportAndWithoutRecipient()
@@ -144,6 +143,6 @@ final class FakeChatEmailTransportTest extends TransportTestCase
         $this->assertSame('New Chat message without specified recipient!', $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBodyAsString());
+        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 }

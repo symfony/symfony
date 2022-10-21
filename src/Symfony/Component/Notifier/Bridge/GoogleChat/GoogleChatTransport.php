@@ -20,6 +20,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -29,10 +30,10 @@ final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';
 
-    private $space;
-    private $accessKey;
-    private $accessToken;
-    private $threadKey;
+    private string $space;
+    private string $accessKey;
+    private string $accessToken;
+    private ?string $threadKey;
 
     /**
      * @param string      $space       The space name the the webhook url "/v1/spaces/<space>/messages"
@@ -43,7 +44,7 @@ final class GoogleChatTransport extends AbstractTransport
      *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
      *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
-    public function __construct(string $space, string $accessKey, string $accessToken, string $threadKey = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $space, string $accessKey, #[\SensitiveParameter] string $accessToken, string $threadKey = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->space = $space;
         $this->accessKey = $accessKey;
@@ -108,13 +109,19 @@ final class GoogleChatTransport extends AbstractTransport
         ]);
 
         try {
-            $result = $response->toArray(false);
-        } catch (JsonException $jsonException) {
-            throw new TransportException('Unable to post the Google Chat message: Invalid response.', $response, $response->getStatusCode(), $jsonException);
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote GoogleChat server.', $response, 0, $e);
         }
 
-        if (200 !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $response->getStatusCode());
+        try {
+            $result = $response->toArray(false);
+        } catch (JsonException $jsonException) {
+            throw new TransportException('Unable to post the Google Chat message: Invalid response.', $response, $statusCode, $jsonException);
+        }
+
+        if (200 !== $statusCode) {
+            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $statusCode);
         }
 
         if (!\array_key_exists('name', $result)) {

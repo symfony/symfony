@@ -56,6 +56,24 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testConfigureWithTemporaryCredentials()
+    {
+        $awsKey = 'some_aws_access_key_value';
+        $awsSecret = 'some_aws_secret_value';
+        $sessionToken = 'some_aws_sessionToken';
+        $region = 'eu-west-1';
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => $region, 'accessKeyId' => $awsKey, 'accessKeySecret' => $awsSecret, 'sessionToken' => $sessionToken], null, $httpClient)),
+            Connection::fromDsn('sqs://default/queue', [
+                'access_key' => $awsKey,
+                'secret_key' => $awsSecret,
+                'session_token' => $sessionToken,
+                'region' => $region,
+            ], $httpClient)
+        );
+    }
+
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -272,7 +290,6 @@ class ConnectionTest extends TestCase
 
         $r = new \ReflectionObject($connection);
         $queueProperty = $r->getProperty('queueUrl');
-        $queueProperty->setAccessible(true);
 
         $this->assertSame($queueUrl, $queueProperty->getValue($connection));
     }
@@ -293,7 +310,6 @@ class ConnectionTest extends TestCase
 
         $r = new \ReflectionObject($connection);
         $queueProperty = $r->getProperty('queueUrl');
-        $queueProperty->setAccessible(true);
 
         $this->assertNull($queueProperty->getValue($connection));
     }

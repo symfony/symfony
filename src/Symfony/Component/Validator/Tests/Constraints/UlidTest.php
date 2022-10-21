@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class UlidTest extends TestCase
 {
     public function testAttributes()

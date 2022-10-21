@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Config\Tests\Builder\Fixtures;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -18,6 +27,7 @@ class PrimitiveTypes implements ConfigurationInterface
                 ->floatNode('float_node')->end()
                 ->integerNode('integer_node')->end()
                 ->scalarNode('scalar_node')->end()
+                ->scalarNode('scalar_node_with_default')->defaultTrue()->end()
             ->end()
         ;
 

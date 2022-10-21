@@ -24,7 +24,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-'/tr
+            '/tr
     [
         ./td
             [./label[@for="name"]]
@@ -48,7 +48,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
-'/tr
+            '/tr
     [
         ./td
             [count(//label)=0]
@@ -65,7 +65,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
-'/tr
+            '/tr
     [
         ./td
             [./label[@for="name_first"]]
@@ -102,7 +102,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         // (see RepeatedTypeValidatorExtension)
 
         $this->assertMatchesXpath($html,
-'/tr
+            '/tr
     [
         ./td
             [./label[@for="name_first"]]
@@ -133,7 +133,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-'/tr
+            '/tr
     [
         ./td
             [.=""]
@@ -166,7 +166,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/tr
+            '/tr
     [
         ./td
             [./label[@for="name_field1"]]
@@ -199,7 +199,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/table
+            '/table
     [
         ./tr[./td/input[@type="text"][@value="a"]]
         /following-sibling::tr[./td/input[@type="text"][@value="b"]]
@@ -217,7 +217,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/table
+            '/table
     [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="names__token"]]]
     [count(./tr[./td/input])=1]
 '
@@ -240,7 +240,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertMatchesXpath($html,
-'/form
+            '/form
     [
         ./input[@type="hidden"][@name="_method"][@value="PUT"]
         /following-sibling::table
@@ -285,7 +285,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->createView();
 
         $this->assertWidgetMatchesXpath($view, [],
-'/table
+            '/table
     [
         ./tr
             [
@@ -325,7 +325,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $form->get('child')->addError(new FormError('[trans]Error![/trans]'));
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/table
+            '/table
     [
         ./tr/td/ul[./li[.="[trans]Error![/trans]"]]
         /following-sibling::table[@id="name_child"]
@@ -350,7 +350,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/table
+            '/table
     [
         ./tr[@style="display: none"]
             [./td[@colspan="2"]/input
@@ -370,7 +370,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/table
+            '/table
     [
         ./tr
             [
@@ -406,7 +406,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/table
+            '/table
     [
         ./tr
             [
@@ -444,7 +444,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/table
+            '/table
     [
         ./tr[./td/label[.="Custom label: [trans]0[/trans]"]]
         /following-sibling::tr[./td/label[.="Custom label: [trans]1[/trans]"]]
@@ -473,7 +473,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         // manually, they should call form_rest() explicitly within the <table>
         // tag.
         $this->assertMatchesXpath('<form>'.$html,
-'/form
+            '/form
     [
         ./tr
             [

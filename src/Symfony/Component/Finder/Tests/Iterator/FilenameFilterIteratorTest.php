@@ -39,16 +39,3 @@ class FilenameFilterIteratorTest extends IteratorTestCase
         ];
     }
 }
-
-class InnerNameIterator extends \ArrayIterator
-{
-    public function current()
-    {
-        return new \SplFileInfo(parent::current());
-    }
-
-    public function getFilename()
-    {
-        return parent::current();
-    }
-}

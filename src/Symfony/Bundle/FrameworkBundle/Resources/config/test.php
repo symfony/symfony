@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\TestContainer;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
+use Symfony\Component\HttpKernel\EventListener\SessionListener;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()->set('test.client.parameters', []);
@@ -35,11 +35,13 @@ return static function (ContainerConfigurator $container) {
         ->set('test.client.history', History::class)->share(false)
         ->set('test.client.cookiejar', CookieJar::class)->share(false)
 
-        ->set('test.session.listener', TestSessionListener::class)
+        ->set('test.session.listener', SessionListener::class)
             ->args([
                 service_locator([
-                    'session' => service('.session.do-not-use')->ignoreOnInvalid(),
+                    'session_factory' => service('session.factory')->ignoreOnInvalid(),
                 ]),
+                param('kernel.debug'),
+                param('session.storage.options'),
             ])
             ->tag('kernel.event_subscriber')
 

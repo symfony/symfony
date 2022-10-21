@@ -78,15 +78,13 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
             ['01ARZ3NDEKTSV4RRFFQ69G5FAVA', Ulid::TOO_LONG_ERROR],
             ['01ARZ3NDEKTSV4RRFFQ69G5FAO', Ulid::INVALID_CHARACTERS_ERROR],
             ['Z1ARZ3NDEKTSV4RRFFQ69G5FAV', Ulid::TOO_LARGE_ERROR],
+            ['not-even-ulid-like', Ulid::TOO_SHORT_ERROR],
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidUlidNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Ulid(message: "testMessage");');
+        $constraint = new Ulid(message: 'testMessage');
 
         $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FA', $constraint);
 

@@ -27,7 +27,6 @@ class StringInputTest extends TestCase
         $input = new StringInput($input);
         $r = new \ReflectionClass(ArgvInput::class);
         $p = $r->getProperty('tokens');
-        $p->setAccessible(true);
         $this->assertEquals($tokens, $p->getValue($input), $message);
     }
 
@@ -71,6 +70,7 @@ class StringInputTest extends TestCase
             ["--long-option='foo bar''another'", ['--long-option=foo baranother'], '->tokenize() parses long options with a value'],
             ["--long-option='foo bar'\"another\"", ['--long-option=foo baranother'], '->tokenize() parses long options with a value'],
             ['foo -a -ffoo --long bar', ['foo', '-a', '-ffoo', '--long', 'bar'], '->tokenize() parses when several arguments and options'],
+            ["--arg=\\\"'Jenny'\''s'\\\"", ["--arg=\"Jenny's\""], '->tokenize() parses quoted quotes'],
         ];
     }
 

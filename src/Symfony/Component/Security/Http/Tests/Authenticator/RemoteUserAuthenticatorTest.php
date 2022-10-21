@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -35,6 +36,17 @@ class RemoteUserAuthenticatorTest extends TestCase
         $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), new TokenStorage(), 'main');
 
         $this->assertFalse($authenticator->supports($this->createRequest([])));
+    }
+
+    public function testSupportTokenStorageWithToken()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
+
+        $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), $tokenStorage, 'main');
+
+        $this->assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => 'username'])));
+        $this->assertTrue($authenticator->supports($this->createRequest(['REMOTE_USER' => 'another_username'])));
     }
 
     /**

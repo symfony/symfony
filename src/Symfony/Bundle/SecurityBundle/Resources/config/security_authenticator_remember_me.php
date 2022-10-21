@@ -18,10 +18,14 @@ use Symfony\Component\Security\Http\EventListener\CheckRememberMeConditionsListe
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\RememberMe\PersistentRememberMeHandler;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
+use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 use Symfony\Component\Security\Http\RememberMe\SignatureRememberMeHandler;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('security.rememberme.response_listener', ResponseListener::class)
+            ->tag('kernel.event_subscriber')
+
         ->set('security.authenticator.remember_me_signature_hasher', SignatureHasher::class)
             ->args([
                 service('property_accessor'),
@@ -51,6 +55,7 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 abstract_arg('options'),
                 service('logger')->nullOnInvalid(),
+                abstract_arg('token verifier'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 
@@ -87,5 +92,11 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+
+        // Cache
+        ->set('cache.security_token_verifier')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
     ;
 };

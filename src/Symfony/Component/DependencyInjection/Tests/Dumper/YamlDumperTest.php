@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,6 +23,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
@@ -109,14 +112,54 @@ class YamlDumperTest extends TestCase
     public function testTaggedArguments()
     {
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
+        $taggedIterator2 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz', 'qux']);
+
         $container = new ContainerBuilder();
+
         $container->register('foo_service', 'Foo')->addTag('foo');
+        $container->register('baz_service', 'Baz')->addTag('foo');
+        $container->register('qux_service', 'Qux')->addTag('foo');
+
         $container->register('foo_service_tagged_iterator', 'Bar')->addArgument($taggedIterator);
+        $container->register('foo2_service_tagged_iterator', 'Bar')->addArgument($taggedIterator2);
+        $container->register('foo3_service_tagged_iterator', 'Bar')->addArgument($taggedIterator3);
+
         $container->register('foo_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator));
+        $container->register('foo2_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator2));
+        $container->register('foo3_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator3));
         $container->register('bar_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo')));
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_tagged_argument.yml', $dumper->dump());
+    }
+
+    public function testServiceClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
+        ;
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_service_closure.yml', $dumper->dump());
+    }
+
+    public function testDumpHandlesEnumeration()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register(FooClassWithEnumAttribute::class, FooClassWithEnumAttribute::class)
+            ->setPublic(true)
+            ->addArgument(FooUnitEnum::BAR);
+
+        $container->setParameter('unit_enum', FooUnitEnum::BAR);
+        $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
+
+        $container->compile();
+        $dumper = new YamlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration.yml'), $dumper->dump());
     }
 
     public function testDumpServiceWithAbstractArgument()

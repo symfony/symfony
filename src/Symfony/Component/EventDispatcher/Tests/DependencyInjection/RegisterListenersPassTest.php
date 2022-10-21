@@ -203,6 +203,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
+        $container->register('zar', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar_zar']);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -234,19 +235,20 @@ class RegisterListenersPassTest extends TestCase
                     0,
                 ],
             ],
+            [
+                'addListener',
+                [
+                    'foo.bar_zar',
+                    [new ServiceClosureArgument(new Reference('zar')), 'onFooBarZar'],
+                    0,
+                ],
+            ],
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedInvokableEventListener()
     {
-        if (!class_exists(AttributeAutoconfigurationPass::class)) {
-            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
-        }
-
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute): void {
             $definition->addTag('kernel.event_listener', get_object_vars($attribute));
@@ -272,19 +274,19 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedMultiEventListener()
     {
-        if (!class_exists(AttributeAutoconfigurationPass::class)) {
-            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
-        }
-
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute): void {
-            $definition->addTag('kernel.event_listener', get_object_vars($attribute));
-        });
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class,
+            static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+                $tagAttributes = get_object_vars($attribute);
+                if ($reflector instanceof \ReflectionMethod) {
+                    $tagAttributes['method'] = $reflector->getName();
+                }
+                $definition->addTag('kernel.event_listener', $tagAttributes);
+            }
+        );
+
         $container->register('foo', TaggedMultiListener::class)->setAutoconfigured(true);
         $container->register('event_dispatcher', \stdClass::class);
 
@@ -315,6 +317,14 @@ class RegisterListenersPassTest extends TestCase
                 [
                     'bar',
                     [new ServiceClosureArgument(new Reference('foo')), 'onBarEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'baz',
+                    [new ServiceClosureArgument(new Reference('foo')), 'onBazEvent'],
                     0,
                 ],
             ],

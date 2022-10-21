@@ -34,6 +34,90 @@ class ParserTest extends TestCase
         chmod(__DIR__.'/Fixtures/not_readable.yml', 0644);
     }
 
+    public function testTopLevelNumber()
+    {
+        $yml = '5';
+        $data = $this->parser->parse($yml);
+        $expected = 5;
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTopLevelNull()
+    {
+        $yml = 'null';
+        $data = $this->parser->parse($yml);
+        $expected = null;
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTaggedValueTopLevelNumber()
+    {
+        $yml = '!number 5';
+        $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        // @todo Preserve the number, don't turn into string.
+        $expected = new TaggedValue('number', '5');
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTaggedValueTopLevelNull()
+    {
+        $yml = '!tag null';
+        $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        // @todo Preserve literal null, don't turn into string.
+        $expected = new TaggedValue('tag', 'null');
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTaggedValueTopLevelString()
+    {
+        $yml = '!user barbara';
+        $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        $expected = new TaggedValue('user', 'barbara');
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTaggedValueTopLevelAssocInline()
+    {
+        $yml = '!user { name: barbara }';
+        $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        $expected = new TaggedValue('user', ['name' => 'barbara']);
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTaggedValueTopLevelAssoc()
+    {
+        $yml = <<<'YAML'
+!user
+name: barbara
+YAML;
+        $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        $expected = new TaggedValue('user', ['name' => 'barbara']);
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTaggedValueTopLevelList()
+    {
+        $yml = <<<'YAML'
+!users
+- barbara
+YAML;
+        $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        $expected = new TaggedValue('users', ['barbara']);
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testTaggedTextAsListItem()
+    {
+        $yml = <<<'YAML'
+- !text |
+  first line
+YAML;
+        // @todo Fix the parser, eliminate this exception.
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unable to parse at line 2 (near "!text |").');
+        $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+    }
+
     /**
      * @dataProvider getDataFormSpecifications
      */
@@ -52,26 +136,81 @@ class ParserTest extends TestCase
         return $this->loadTestsFromFixtureFiles('nonStringKeys.yml');
     }
 
-    public function testTabsInYaml()
+    /**
+     * @dataProvider invalidIndentation
+     */
+    public function testTabsAsIndentationInYaml(string $given, string $expectedMessage)
     {
-        // test tabs in YAML
-        $yamls = [
-            "foo:\n	bar",
-            "foo:\n 	bar",
-            "foo:\n	 bar",
-            "foo:\n 	 bar",
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $this->parser->parse($given);
+    }
+
+    public function invalidIndentation(): array
+    {
+        return [
+            [
+                "foo:\n\tbar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\tbar\").",
+            ],
+            [
+                "foo:\n \tbar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\tbar\").",
+            ],
+            [
+                "foo:\n\t bar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\t bar\").",
+            ],
+            [
+                "foo:\n \t bar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\t bar\").",
+            ],
         ];
+    }
 
-        foreach ($yamls as $yaml) {
-            try {
-                $this->parser->parse($yaml);
+    public function testParserIsStateless()
+    {
+        $yamlString = '# translations/messages.en.yaml
 
-                $this->fail('YAML files must not contain tabs');
-            } catch (\Exception $e) {
-                $this->assertInstanceOf(\Exception::class, $e, 'YAML files must not contain tabs');
-                $this->assertEquals('A YAML file cannot contain tabs as indentation at line 2 (near "'.strpbrk($yaml, "\t").'").', $e->getMessage(), 'YAML files must not contain tabs');
-            }
-        }
+';
+        $this->parser->parse($yamlString);
+        $this->parser->parse($yamlString);
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage("A YAML file cannot contain tabs as indentation at line 2 (near \"\tabc\")");
+
+        $this->parser->parse("abc:\n\tabc");
+    }
+
+    /**
+     * @dataProvider validTokenSeparators
+     */
+    public function testValidTokenSeparation(string $given, array $expected)
+    {
+        $actual = $this->parser->parse($given);
+        $this->assertSameData($expected, $actual);
+    }
+
+    public function validTokenSeparators(): array
+    {
+        return [
+            [
+                'foo: bar',
+                ['foo' => 'bar'],
+            ],
+            [
+                "foo:\tbar",
+                ['foo' => 'bar'],
+            ],
+            [
+                "foo: \tbar",
+                ['foo' => 'bar'],
+            ],
+            [
+                "foo:\t bar",
+                ['foo' => 'bar'],
+            ],
+        ];
     }
 
     public function testEndOfTheDocumentMarker()
@@ -427,7 +566,7 @@ EOF;
 foo: !php/object O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
-        $this->assertEquals(['foo' => new B(), 'bar' => 1], $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
+        $this->assertSameData(['foo' => new B(), 'bar' => 1], $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
     }
 
     public function testObjectSupportDisabledButNoExceptions()
@@ -436,7 +575,7 @@ EOF;
 foo: !php/object O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
-        $this->assertEquals(['foo' => null, 'bar' => 1], $this->parser->parse($input), '->parse() does not parse objects');
+        $this->assertSameData(['foo' => null, 'bar' => 1], $this->parser->parse($input), '->parse() does not parse objects');
     }
 
     /**
@@ -446,7 +585,7 @@ EOF;
     {
         $flags = Yaml::PARSE_OBJECT_FOR_MAP;
 
-        $this->assertEquals($expected, $this->parser->parse($yaml, $flags));
+        $this->assertSameData($expected, $this->parser->parse($yaml, $flags));
     }
 
     public function getObjectForMapTests()
@@ -901,12 +1040,12 @@ EOD;
 hash:
 EOF;
 
-        $this->assertEquals(['hash' => null], Yaml::parse($input));
+        $this->assertSame(['hash' => null], Yaml::parse($input));
     }
 
     public function testCommentAtTheRootIndent()
     {
-        $this->assertEquals([
+        $this->assertSame([
             'services' => [
                 'app.foo_service' => [
                     'class' => 'Foo',
@@ -932,7 +1071,7 @@ EOF
 
     public function testStringBlockWithComments()
     {
-        $this->assertEquals(['content' => <<<'EOT'
+        $this->assertSame(['content' => <<<'EOT'
 # comment 1
 header
 
@@ -960,7 +1099,7 @@ EOF
 
     public function testFoldedStringBlockWithComments()
     {
-        $this->assertEquals([['content' => <<<'EOT'
+        $this->assertSame([['content' => <<<'EOT'
 # comment 1
 header
 
@@ -989,7 +1128,7 @@ EOF
 
     public function testNestedFoldedStringBlockWithComments()
     {
-        $this->assertEquals([[
+        $this->assertSame([[
             'title' => 'some title',
             'content' => <<<'EOT'
 # comment 1
@@ -1021,7 +1160,7 @@ EOF
 
     public function testReferenceResolvingInInlineStrings()
     {
-        $this->assertEquals([
+        $this->assertSame([
             'var' => 'var-value',
             'scalar' => 'var-value',
             'list' => ['var-value'],
@@ -1031,6 +1170,10 @@ EOF
             'map' => ['key' => 'var-value'],
             'list_in_map' => ['key' => ['var-value']],
             'map_in_map' => ['foo' => ['bar' => 'var-value']],
+            'foo' => ['bar' => 'baz'],
+            'bar' => ['foo' => 'baz'],
+            'baz' => ['foo'],
+            'foobar' => ['foo'],
         ], Yaml::parse(<<<'EOF'
 var:  &var var-value
 scalar: *var
@@ -1041,6 +1184,10 @@ embedded_mapping: [ key: *var ]
 map: { key: *var }
 list_in_map: { key: [*var] }
 map_in_map: { foo: { bar: *var } }
+foo: { bar: &baz baz }
+bar: { foo: *baz }
+baz: [ &foo foo ]
+foobar: [ *foo ]
 EOF
         ));
     }
@@ -1053,7 +1200,7 @@ EOF
 foo: 1
 bar: 2
 EOF;
-        $this->assertEquals(['foo' => 1, 'bar' => 2], $this->parser->parse($yaml));
+        $this->assertSame(['foo' => 1, 'bar' => 2], $this->parser->parse($yaml));
     }
 
     public function testFloatKeys()
@@ -1103,7 +1250,7 @@ EOF;
             '~' => 'null',
         ];
 
-        $this->assertEquals($expected, $this->parser->parse($yaml));
+        $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testColonInMappingValueException()
@@ -1399,12 +1546,12 @@ EOT
         $yaml = <<<'EOT'
 date: 2002-12-14
 EOT;
-        $expectedDate = new \DateTime();
-        $expectedDate->setTimeZone(new \DateTimeZone('UTC'));
-        $expectedDate->setDate(2002, 12, 14);
-        $expectedDate->setTime(0, 0, 0);
+        $expectedDate = (new \DateTimeImmutable())
+            ->setTimeZone(new \DateTimeZone('UTC'))
+            ->setDate(2002, 12, 14)
+            ->setTime(0, 0, 0);
 
-        $this->assertEquals(['date' => $expectedDate], $this->parser->parse($yaml, Yaml::PARSE_DATETIME));
+        $this->assertSameData(['date' => $expectedDate], $this->parser->parse($yaml, Yaml::PARSE_DATETIME));
     }
 
     /**
@@ -1624,7 +1771,7 @@ YAML
 
     public function testParseMultiLineString()
     {
-        $this->assertEquals("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));
+        $this->assertSame("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));
     }
 
     /**
@@ -1632,7 +1779,7 @@ YAML
      */
     public function testParseMultiLineMappingValue($yaml, $expected, $parseError)
     {
-        $this->assertEquals($expected, $this->parser->parse($yaml));
+        $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function multiLineDataProvider()
@@ -1699,7 +1846,7 @@ EOF;
      */
     public function testInlineNotationSpanningMultipleLines($expected, string $yaml)
     {
-        $this->assertEquals($expected, $this->parser->parse($yaml));
+        $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function inlineNotationSpanningMultipleLinesProvider(): array
@@ -2073,7 +2220,7 @@ YAML;
 
     public function testTaggedInlineMapping()
     {
-        $this->assertEquals(new TaggedValue('foo', ['foo' => 'bar']), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertSameData(new TaggedValue('foo', ['foo' => 'bar']), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testInvalidInlineSequenceContainingStringWithEscapedQuotationCharacter()
@@ -2088,7 +2235,7 @@ YAML;
      */
     public function testCustomTagSupport($expected, $yaml)
     {
-        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function taggedValuesProvider()
@@ -2284,7 +2431,7 @@ INI;
         $yamlString = Yaml::dump($trickyVal);
         $arrayFromYaml = $this->parser->parse($yamlString);
 
-        $this->assertEquals($trickyVal, $arrayFromYaml);
+        $this->assertSame($trickyVal, $arrayFromYaml);
     }
 
     public function testParserCleansUpReferencesBetweenRuns()
@@ -2399,7 +2546,7 @@ YAML;
             ],
         ];
 
-        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+        $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
     public function testFilenamesAreParsedAsStringsWithoutFlag()
@@ -2492,7 +2639,7 @@ YAML;
             ],
         ];
 
-        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+        $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
     public function testEvalRefException()
@@ -2766,6 +2913,15 @@ YAML;
             'within_string' => 'a　b',
             'regular_space' => 'a b',
         ], $this->parser->parse($expected));
+    }
+
+    private function assertSameData($expected, $actual)
+    {
+        $this->assertEquals($expected, $actual);
+        $this->assertSame(
+            var_export($expected, true),
+            var_export($actual, true)
+        );
     }
 }
 

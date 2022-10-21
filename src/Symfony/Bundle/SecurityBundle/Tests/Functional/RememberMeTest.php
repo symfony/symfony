@@ -11,23 +11,21 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\Security\UserChangingUserProvider;
+
 class RememberMeTest extends AbstractWebTestCase
 {
-    public function provideRememberMeSystems()
+    protected function setUp(): void
     {
-        foreach ($this->provideSecuritySystems() as $securitySystem) {
-            yield [$securitySystem[0] + ['root_config' => 'config_session.yml']];
-            yield [$securitySystem[0] + ['root_config' => 'config_persistent.yml']];
-        }
+        UserChangingUserProvider::$changePassword = false;
     }
 
     /**
-     * @dataProvider provideRememberMeSystems
+     * @dataProvider provideConfigs
      */
     public function testRememberMe(array $options)
     {
         $client = $this->createClient(array_merge_recursive(['root_config' => 'config.yml', 'test_case' => 'RememberMe'], $options));
-
         $client->request('POST', '/login', [
             '_username' => 'johannes',
             '_password' => 'test',
@@ -49,12 +47,9 @@ class RememberMeTest extends AbstractWebTestCase
         $this->assertNull($client->getCookieJar()->get('REMEMBERME'));
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testUserChangeClearsCookie(array $options)
+    public function testUserChangeClearsCookie()
     {
-        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'clear_on_change_config.yml'] + $options);
+        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'clear_on_change_config.yml']);
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
@@ -63,19 +58,24 @@ class RememberMeTest extends AbstractWebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $cookieJar = $client->getCookieJar();
-        $this->assertNotNull($cookieJar->get('REMEMBERME'));
+        $this->assertNotNull($cookie = $cookieJar->get('REMEMBERME'));
 
+        UserChangingUserProvider::$changePassword = true;
+
+        // change password (through user provider), this deauthenticates the session
         $client->request('GET', '/profile');
         $this->assertRedirect($client->getResponse(), '/login');
         $this->assertNull($cookieJar->get('REMEMBERME'));
+
+        // restore the old remember me cookie, it should no longer be valid
+        $cookieJar->set($cookie);
+        $client->request('GET', '/profile');
+        $this->assertRedirect($client->getResponse(), '/login');
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testSessionLessRememberMeLogout(array $options)
+    public function testSessionLessRememberMeLogout()
     {
-        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'stateless_config.yml'] + $options);
+        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'stateless_config.yml']);
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
@@ -91,5 +91,11 @@ class RememberMeTest extends AbstractWebTestCase
         $client->request('GET', '/logout');
         $this->assertSame(302, $client->getResponse()->getStatusCode(), 'Logout unsuccessful.');
         $this->assertNull($cookieJar->get('REMEMBERME'));
+    }
+
+    public function provideConfigs()
+    {
+        yield [['root_config' => 'config_session.yml']];
+        yield [['root_config' => 'config_persistent.yml']];
     }
 }

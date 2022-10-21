@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,13 +27,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @internal
  */
+#[AsCommand(name: 'secrets:generate-keys', description: 'Generate new encryption keys')]
 final class SecretsGenerateKeysCommand extends Command
 {
-    protected static $defaultName = 'secrets:generate-keys';
-    protected static $defaultDescription = 'Generate new encryption keys';
-
-    private $vault;
-    private $localVault;
+    private AbstractVault $vault;
+    private ?AbstractVault $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {
@@ -45,7 +44,6 @@ final class SecretsGenerateKeysCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
             ->addOption('rotate', 'r', InputOption::VALUE_NONE, 'Re-encrypt existing secrets with the newly generated keys.')
             ->setHelp(<<<'EOF'

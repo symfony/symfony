@@ -13,12 +13,10 @@ namespace Symfony\Component\RateLimiter\Exception;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 class ReserveNotSupportedException extends \BadMethodCallException
 {
-    public function __construct(string $limiterClass, int $code = 0, ?\Throwable $previous = null)
+    public function __construct(string $limiterClass, int $code = 0, \Throwable $previous = null)
     {
         parent::__construct(sprintf('Reserving tokens is not supported by "%s".', $limiterClass), $code, $previous);
     }

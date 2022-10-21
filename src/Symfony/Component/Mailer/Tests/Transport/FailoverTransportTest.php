@@ -142,10 +142,10 @@ class FailoverTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(3))
             ->method('send')->willReturnOnConsecutiveCalls(
-            null,
-            null,
-            $this->throwException(new TransportException())
-        );
+                null,
+                null,
+                $this->throwException(new TransportException())
+            );
         $t = new FailoverTransport([$t1, $t2], 1);
         $t->send(new RawMessage(''));
         sleep(1);
@@ -157,11 +157,9 @@ class FailoverTransportTest extends TestCase
     private function assertTransports(RoundRobinTransport $transport, int $cursor, array $deadTransports)
     {
         $p = new \ReflectionProperty(RoundRobinTransport::class, 'cursor');
-        $p->setAccessible(true);
         $this->assertSame($cursor, $p->getValue($transport));
 
         $p = new \ReflectionProperty(RoundRobinTransport::class, 'deadTransports');
-        $p->setAccessible(true);
         $this->assertSame($deadTransports, iterator_to_array($p->getValue($transport)));
     }
 }

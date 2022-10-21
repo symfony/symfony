@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\DebugCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Twig\Environment;
 use Twig\Loader\ChainLoader;
@@ -291,6 +292,29 @@ TXT
         $display = $tester->getDisplay();
         $display2 = json_decode($display, true);
         $this->assertNotSame($display1, $display2);
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+        $loader = new FilesystemLoader([], $projectDir);
+        $environment = new Environment($loader);
+
+        $application = new Application();
+        $application->add(new DebugCommand($environment, $projectDir, [], null, null));
+
+        $tester = new CommandCompletionTester($application->find('debug:twig'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'name' => [['email'], []];
+        yield 'option --format' => [['--format', ''], ['text', 'json']];
     }
 
     private function createCommandTester(array $paths = [], array $bundleMetadata = [], string $defaultPath = null, bool $useChainLoader = false, array $globals = []): CommandTester

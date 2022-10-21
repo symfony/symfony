@@ -14,6 +14,7 @@ return [
         'es_419' => 'Sifaniyancin Latin Amirka',
         'es_ES' => 'Sifaniyanci Turai',
         'es_MX' => 'Sifaniyanci Mesiko',
+        'fa_AF' => 'Vote Farisanci na Afaganistan',
         'fr_CA' => 'Farasanci Kanada',
         'fr_CH' => 'Farasanci Suwizalan',
         'pt_BR' => 'Harshen Potugis na Birazil',

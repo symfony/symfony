@@ -15,13 +15,11 @@ use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @final
  */
 final class ExpiredSignatureStorage
 {
-    private $cache;
-    private $lifetime;
+    private CacheItemPoolInterface $cache;
+    private int $lifetime;
 
     public function __construct(CacheItemPoolInterface $cache, int $lifetime)
     {

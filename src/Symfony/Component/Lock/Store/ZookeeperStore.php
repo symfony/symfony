@@ -27,7 +27,7 @@ class ZookeeperStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $zookeeper;
+    private \Zookeeper $zookeeper;
 
     public function __construct(\Zookeeper $zookeeper)
     {
@@ -36,7 +36,7 @@ class ZookeeperStore implements PersistingStoreInterface
 
     public static function createConnection(string $dsn): \Zookeeper
     {
-        if (0 !== strpos($dsn, 'zookeeper:')) {
+        if (!str_starts_with($dsn, 'zookeeper:')) {
             throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
         }
 
@@ -45,16 +45,17 @@ class ZookeeperStore implements PersistingStoreInterface
         }
 
         $host = $params['host'] ?? '';
-        if (isset($params['port'])) {
-            $host .= ':'.$params['port'];
+        $hosts = explode(',', $host);
+
+        foreach ($hosts as $index => $host) {
+            if (isset($params['port'])) {
+                $hosts[$index] = $host.':'.$params['port'];
+            }
         }
 
-        return new \Zookeeper($host);
+        return new \Zookeeper(implode(',', $hosts));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         if ($this->exists($key)) {
@@ -70,9 +71,6 @@ class ZookeeperStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         if (!$this->exists($key)) {
@@ -88,22 +86,16 @@ class ZookeeperStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         $resource = $this->getKeyResource($key);
         try {
             return $this->zookeeper->get($resource) === $this->getUniqueToken($key);
-        } catch (\ZookeeperException $ex) {
+        } catch (\ZookeeperException) {
             return false;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, zookeeper locks forever.
@@ -142,7 +134,7 @@ class ZookeeperStore implements PersistingStoreInterface
         // For example: foo/bar will become /foo-bar and /foo/bar will become /-foo-bar
         $resource = (string) $key;
 
-        if (false !== strpos($resource, '/')) {
+        if (str_contains($resource, '/')) {
             $resource = strtr($resource, ['/' => '-']).'-'.sha1($resource);
         }
 

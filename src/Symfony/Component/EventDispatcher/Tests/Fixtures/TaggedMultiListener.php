@@ -29,4 +29,9 @@ final class TaggedMultiListener
     public function onBarEvent(): void
     {
     }
+
+    #[AsEventListener(event: 'baz')]
+    public function onBazEvent(): void
+    {
+    }
 }

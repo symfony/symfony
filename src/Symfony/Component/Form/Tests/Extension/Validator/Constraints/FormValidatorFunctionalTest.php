@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -321,6 +322,35 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[author].data.email', $violations[1]->getPropertyPath());
     }
 
+    public function testCascadeValidationToArrayChildForm()
+    {
+        $form = $this->formFactory->create(FormType::class, null, [
+            'data_class' => Review::class,
+        ])
+            ->add('title')
+            ->add('customers', CollectionType::class, [
+                'mapped' => false,
+                'entry_type' => CustomerType::class,
+                'allow_add' => true,
+                'constraints' => [new Valid()],
+            ]);
+
+        $form->submit([
+            'title' => 'Sample Title',
+            'customers' => [
+                ['email' => null],
+            ],
+        ]);
+
+        $violations = $this->validator->validate($form);
+
+        $this->assertCount(2, $violations);
+        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
+        $this->assertSame('data.rating', $violations[0]->getPropertyPath());
+        $this->assertSame('This value should not be blank.', $violations[1]->getMessage());
+        $this->assertSame('children[customers].data[0].email', $violations[1]->getPropertyPath());
+    }
+
     public function testCascadeValidationToChildFormsUsingPropertyPathsValidatedInSequence()
     {
         $form = $this->formFactory->create(FormType::class, null, [
@@ -409,9 +439,9 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertTrue($form->isSubmitted());
         $this->assertFalse($form->isValid());
         $this->assertCount(2, $form->getErrors());
-        $this->assertSame('This value is not valid.', $form->getErrors()[0]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[0]->getMessage());
         $this->assertSame($form->get('year'), $form->getErrors()[0]->getOrigin());
-        $this->assertSame('This value is not valid.', $form->getErrors()[1]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[1]->getMessage());
         $this->assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
     }
 
@@ -428,12 +458,12 @@ class FormValidatorFunctionalTest extends TestCase
                 }
             ));
         $formBuilder->get('field2')->addModelTransformer(new CallbackTransformer(
-                function () {
-                },
-                function () {
-                    throw new TransformationFailedException('This value is invalid.');
-                }
-            ));
+            function () {
+            },
+            function () {
+                throw new TransformationFailedException('This value is invalid.');
+            }
+        ));
         $form = $formBuilder->getForm();
 
         $form->submit([

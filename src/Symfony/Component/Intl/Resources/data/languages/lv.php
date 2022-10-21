@@ -370,6 +370,7 @@ return [
         'raj' => 'radžastāņu',
         'rap' => 'rapanuju',
         'rar' => 'rarotongiešu',
+        'rhg' => 'rohindžu',
         'rm' => 'retoromāņu',
         'rn' => 'rundu',
         'ro' => 'rumāņu',

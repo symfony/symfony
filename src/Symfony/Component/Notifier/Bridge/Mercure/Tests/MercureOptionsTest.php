@@ -44,6 +44,6 @@ final class MercureOptionsTest extends TestCase
     public function testConstructWithWrongTopicsThrows()
     {
         $this->expectException(TypeError::class);
-        new MercureOptions(1);
+        new MercureOptions(new \stdClass());
     }
 }

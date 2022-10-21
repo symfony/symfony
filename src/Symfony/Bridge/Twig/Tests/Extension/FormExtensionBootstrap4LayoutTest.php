@@ -106,12 +106,12 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
                     <span class="input-group-text">&euro; </span>
                 </div><input type="text" id="name" name="name" required="required" class="form-control" /></div>
 HTML
-        , trim($this->renderWidget($view)));
+            , trim($this->renderWidget($view)));
     }
 
     protected function renderForm(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->renderBlock($view, 'form', $vars);
+        return $this->renderer->renderBlock($view, 'form', $vars);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = [])
@@ -120,42 +120,42 @@ HTML
             $vars += ['label' => $label];
         }
 
-        return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderHelp(FormView $view)
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'help');
+        return $this->renderer->searchAndRenderBlock($view, 'help');
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
+        return $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'row', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
+        return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function renderStart(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->renderBlock($view, 'form_start', $vars);
+        return $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
     protected function renderEnd(FormView $view, array $vars = [])
     {
-        return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
+        return $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)

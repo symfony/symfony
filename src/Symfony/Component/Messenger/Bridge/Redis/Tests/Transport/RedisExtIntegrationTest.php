@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @requires extension redis
@@ -33,7 +34,7 @@ class RedisExtIntegrationTest extends TestCase
 
         try {
             $this->redis = new \Redis();
-            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
         } catch (\Exception $e) {
@@ -44,21 +45,33 @@ class RedisExtIntegrationTest extends TestCase
     public function testConnectionSendAndGet()
     {
         $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
-        $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => '{"message": "Hi"}',
+                'headers' => ['type' => DummyMessage::class],
+            ]),
+        ], $message['data']);
     }
 
     public function testGetTheFirstAvailableMessage()
     {
         $this->connection->add('{"message": "Hi1"}', ['type' => DummyMessage::class]);
         $this->connection->add('{"message": "Hi2"}', ['type' => DummyMessage::class]);
-        $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi1"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
-        $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi2"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => '{"message": "Hi1"}',
+                'headers' => ['type' => DummyMessage::class],
+            ]),
+        ], $message['data']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => '{"message": "Hi2"}',
+                'headers' => ['type' => DummyMessage::class],
+            ]),
+        ], $message['data']);
     }
 
     public function testConnectionSendWithSameContent()
@@ -69,24 +82,36 @@ class RedisExtIntegrationTest extends TestCase
         $this->connection->add($body, $headers);
         $this->connection->add($body, $headers);
 
-        $encoded = $this->connection->get();
-        $this->assertEquals($body, $encoded['body']);
-        $this->assertEquals($headers, $encoded['headers']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => $body,
+                'headers' => $headers,
+            ]),
+        ], $message['data']);
 
-        $encoded = $this->connection->get();
-        $this->assertEquals($body, $encoded['body']);
-        $this->assertEquals($headers, $encoded['headers']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => $body,
+                'headers' => $headers,
+            ]),
+        ], $message['data']);
     }
 
     public function testConnectionSendAndGetDelayed()
     {
         $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class], 500);
-        $encoded = $this->connection->get();
-        $this->assertNull($encoded);
+        $message = $this->connection->get();
+        $this->assertNull($message);
         sleep(2);
-        $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => '{"message": "Hi"}',
+                'headers' => ['type' => DummyMessage::class],
+            ]),
+        ], $message['data']);
     }
 
     public function testConnectionSendDelayedMessagesWithSameContent()
@@ -97,19 +122,27 @@ class RedisExtIntegrationTest extends TestCase
         $this->connection->add($body, $headers, 500);
         $this->connection->add($body, $headers, 500);
         sleep(2);
-        $encoded = $this->connection->get();
-        $this->assertEquals($body, $encoded['body']);
-        $this->assertEquals($headers, $encoded['headers']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => $body,
+                'headers' => $headers,
+            ]),
+        ], $message['data']);
 
-        $encoded = $this->connection->get();
-        $this->assertEquals($body, $encoded['body']);
-        $this->assertEquals($headers, $encoded['headers']);
+        $message = $this->connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => $body,
+                'headers' => $headers,
+            ]),
+        ], $message['data']);
     }
 
     public function testConnectionBelowRedeliverTimeout()
     {
         // lower redeliver timeout and claim interval
-        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')], $this->redis);
 
         $connection->cleanup();
         $connection->setup();
@@ -137,7 +170,8 @@ class RedisExtIntegrationTest extends TestCase
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(
             getenv('MESSENGER_REDIS_DSN'),
-            ['redeliver_timeout' => 0, 'claim_interval' => 500],
+            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')],
+
             $this->redis
         );
 
@@ -161,22 +195,174 @@ class RedisExtIntegrationTest extends TestCase
         );
 
         // Queue will return the pending message first because redeliver_timeout = 0
-        $encoded = $connection->get();
-        $this->assertEquals($body1, $encoded['body']);
-        $this->assertEquals($headers, $encoded['headers']);
-        $connection->ack($encoded['id']);
+        $message = $connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => $body1,
+                'headers' => $headers,
+            ]),
+        ], $message['data']);
+        $connection->ack($message['id']);
 
         // Queue will return the second message
-        $encoded = $connection->get();
-        $this->assertEquals($body2, $encoded['body']);
-        $this->assertEquals($headers, $encoded['headers']);
-        $connection->ack($encoded['id']);
+        $message = $connection->get();
+        $this->assertEquals([
+            'message' => json_encode([
+                'body' => $body2,
+                'headers' => $headers,
+            ]),
+        ], $message['data']);
+        $connection->ack($message['id']);
+    }
+
+    public function testLazySentinel()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'),
+            ['lazy' => true,
+             'delete_after_ack' => true,
+             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER'), ], $this->redis);
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame([
+            'message' => json_encode([
+                'body' => '1',
+                'headers' => [],
+            ]),
+        ], $message['data']);
+        $connection->reject($message['id']);
+        $connection->cleanup();
+    }
+
+    public function testLazyCluster()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $connection = new Connection(
+            ['lazy' => true],
+            ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))],
+            []
+        );
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame([
+            'message' => json_encode([
+                'body' => '1',
+                'headers' => [],
+            ]),
+        ], $message['data']);
+        $connection->reject($message['id']);
+        $connection->cleanup();
+    }
+
+    public function testLazy()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame([
+            'message' => json_encode([
+                'body' => '1',
+                'headers' => [],
+            ]),
+        ], $message['data']);
+        $connection->reject($message['id']);
+        $redis->del('messenger-lazy');
+    }
+
+    public function testDbIndex()
+    {
+        $redis = new \Redis();
+
+        Connection::fromDsn('redis://localhost/queue?dbindex=2', [], $redis);
+
+        $this->assertSame(2, $redis->getDbNum());
+    }
+
+    public function testFromDsnWithMultipleHosts()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $hosts = explode(' ', getenv('REDIS_CLUSTER_HOSTS'));
+
+        $dsn = array_map(function ($host) {
+            return 'redis://'.$host;
+        }, $hosts);
+        $dsn = implode(',', $dsn);
+
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')]));
+    }
+
+    public function testJsonError()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
+        try {
+            $connection->add("\xB1\x31", []);
+        } catch (TransportException $e) {
+        }
+
+        $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
+    }
+
+    public function testGetNonBlocking()
+    {
+        $redis = new \Redis();
+
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['sentinel_master' => null], $redis);
+
+        $this->assertNull($connection->get()); // no message, should return null immediately
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $connection->reject($message['id']);
+        $redis->del('messenger-getnonblocking');
+    }
+
+    public function testGetAfterReject()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
+
+        $connection->add('1', []);
+        $connection->add('2', []);
+
+        $failing = $connection->get();
+        $connection->reject($failing['id']);
+
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null]);
+
+        $this->assertNotNull($connection->get());
+
+        $redis->del('messenger-rejectthenget');
+    }
+
+    public function testItCountMessages()
+    {
+        $this->assertSame(0, $this->connection->getMessageCount());
+
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
+
+        $this->assertSame(3, $this->connection->getMessageCount());
+
+        $message = $this->connection->get();
+        $this->connection->ack($message['id']);
+
+        $this->assertSame(2, $this->connection->getMessageCount());
+
+        $message = $this->connection->get();
+        $this->connection->reject($message['id']);
+
+        $this->assertSame(1, $this->connection->getMessageCount());
     }
 
     private function getConnectionGroup(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('group');
-        $property->setAccessible(true);
 
         return $property->getValue($connection);
     }
@@ -184,8 +370,16 @@ class RedisExtIntegrationTest extends TestCase
     private function getConnectionStream(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('stream');
-        $property->setAccessible(true);
 
         return $property->getValue($connection);
+    }
+
+    private function skipIfRedisClusterUnavailable()
+    {
+        try {
+            new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
     }
 }

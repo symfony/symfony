@@ -38,9 +38,6 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         $this->fallbackNameConverter = $fallbackNameConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
     {
         if (null === $class) {
@@ -54,9 +51,6 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$normalizeCache[$class][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
     {
         if (null === $class) {

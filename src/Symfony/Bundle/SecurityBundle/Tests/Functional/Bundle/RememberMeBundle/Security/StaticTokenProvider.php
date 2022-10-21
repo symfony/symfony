@@ -23,13 +23,13 @@ class StaticTokenProvider implements TokenProviderInterface
     public function __construct($kernel)
     {
         // only reset the "internal db" for new tests
-        if (self::$kernelClass !== \get_class($kernel)) {
-            self::$kernelClass = \get_class($kernel);
+        if (self::$kernelClass !== $kernel::class) {
+            self::$kernelClass = $kernel::class;
             self::$db = [];
         }
     }
 
-    public function loadTokenBySeries(string $series)
+    public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
         $token = self::$db[$series] ?? false;
         if (!$token) {
@@ -49,11 +49,9 @@ class StaticTokenProvider implements TokenProviderInterface
         $token = $this->loadTokenBySeries($series);
         $refl = new \ReflectionClass($token);
         $tokenValueProp = $refl->getProperty('tokenValue');
-        $tokenValueProp->setAccessible(true);
         $tokenValueProp->setValue($token, $tokenValue);
 
         $lastUsedProp = $refl->getProperty('lastUsed');
-        $lastUsedProp->setAccessible(true);
         $lastUsedProp->setValue($token, $lastUsed);
 
         self::$db[$series] = $token;

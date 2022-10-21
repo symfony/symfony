@@ -27,10 +27,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class IsbnValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Isbn) {
             throw new UnexpectedTypeException($constraint, Isbn::class);
@@ -40,7 +37,7 @@ class IsbnValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -95,7 +92,7 @@ class IsbnValidator extends ConstraintValidator
         }
     }
 
-    protected function validateIsbn10($isbn)
+    protected function validateIsbn10(string $isbn)
     {
         // Choose an algorithm so that ERROR_INVALID_CHARACTERS is preferred
         // over ERROR_TOO_SHORT/ERROR_TOO_LONG
@@ -135,7 +132,7 @@ class IsbnValidator extends ConstraintValidator
         return 0 === $checkSum % 11 ? true : Isbn::CHECKSUM_FAILED_ERROR;
     }
 
-    protected function validateIsbn13($isbn)
+    protected function validateIsbn13(string $isbn)
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS
@@ -169,7 +166,7 @@ class IsbnValidator extends ConstraintValidator
         return 0 === $checkSum % 10 ? true : Isbn::CHECKSUM_FAILED_ERROR;
     }
 
-    protected function getMessage($constraint, $type = null)
+    protected function getMessage(Isbn $constraint, string $type = null)
     {
         if (null !== $constraint->message) {
             return $constraint->message;

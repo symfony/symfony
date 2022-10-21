@@ -16,19 +16,25 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "psr/container": "^1.1"
+        "php": ">=8.1",
+        "psr/container": "^2.0"
+    },
+    "conflict": {
+        "ext-psr": "<1.1|>=2"
     },
     "suggest": {
         "symfony/service-implementation": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Contracts\\Service\\": "" }
+        "psr-4": { "Symfony\\Contracts\\Service\\": "" },
+        "exclude-from-classmap": [
+            "/Test/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-main": "2.4-dev"
+            "dev-main": "3.2-dev"
         },
         "thanks": {
             "name": "symfony/contracts",

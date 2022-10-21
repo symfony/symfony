@@ -24,9 +24,6 @@ class MoneyType extends AbstractType
 {
     protected static $patterns = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Values used in HTML5 number inputs should be formatted as in "1234.5", ie. 'en' format without grouping,
@@ -42,9 +39,6 @@ class MoneyType extends AbstractType
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['money_pattern'] = self::getPattern($options['currency']);
@@ -54,9 +48,6 @@ class MoneyType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -67,11 +58,7 @@ class MoneyType extends AbstractType
             'currency' => 'EUR',
             'compound' => false,
             'html5' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid money amount.';
-            },
+            'invalid_message' => 'Please enter a valid money amount.',
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [
@@ -97,10 +84,7 @@ class MoneyType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'money';
     }

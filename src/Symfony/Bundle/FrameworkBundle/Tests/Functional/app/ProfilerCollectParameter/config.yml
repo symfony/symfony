@@ -1,0 +1,9 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    http_method_override: false
+    profiler:
+        enabled: true
+        collect: false
+        collect_parameter: profile

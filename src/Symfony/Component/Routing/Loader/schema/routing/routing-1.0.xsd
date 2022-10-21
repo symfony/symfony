@@ -55,6 +55,7 @@
       <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="path" type="localized-path" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="host" type="localized-path" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:string" use="required" />
     <xsd:attribute name="path" type="xsd:string" />
@@ -66,6 +67,7 @@
     <xsd:attribute name="format" type="xsd:string" />
     <xsd:attribute name="utf8" type="xsd:boolean" />
     <xsd:attribute name="stateless" type="xsd:boolean" />
+    <xsd:attribute name="alias" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="import">
@@ -179,5 +181,14 @@
         <xsd:attribute name="key" type="xsd:string" use="required" />
       </xsd:extension>
     </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="deprecated">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="package" type="xsd:string" use="required" />
+        <xsd:attribute name="version" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
 </xsd:schema>

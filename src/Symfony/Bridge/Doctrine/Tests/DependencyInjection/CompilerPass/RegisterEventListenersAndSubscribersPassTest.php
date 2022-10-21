@@ -114,6 +114,8 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
     {
         $container = $this->createBuilder(true);
 
+        $container->setParameter('connection_param', 'second');
+
         $container
             ->register('a', 'stdClass')
             ->addTag('doctrine.event_listener', [
@@ -134,6 +136,14 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ->addTag('doctrine.event_listener', [
                 'event' => 'onFlush',
                 'connection' => 'second',
+            ])
+        ;
+
+        $container
+            ->register('d', 'stdClass')
+            ->addTag('doctrine.event_listener', [
+                'event' => 'onFlush',
+                'connection' => '%connection_param%',
             ])
         ;
 
@@ -167,6 +177,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             [
                 [['onFlush'], 'a'],
                 [['onFlush'], 'c'],
+                [['onFlush'], 'd'],
             ],
             $secondEventManagerDef->getArgument(1)
         );
@@ -178,6 +189,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             [
                 'a' => new ServiceClosureArgument(new Reference('a')),
                 'c' => new ServiceClosureArgument(new Reference('c')),
+                'd' => new ServiceClosureArgument(new Reference('d')),
             ],
             $serviceLocatorDef->getArgument(0)
         );
@@ -186,6 +198,8 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
     public function testProcessEventSubscribersWithMultipleConnections()
     {
         $container = $this->createBuilder(true);
+
+        $container->setParameter('connection_param', 'second');
 
         $container
             ->register('a', 'stdClass')
@@ -207,6 +221,14 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             ->addTag('doctrine.event_subscriber', [
                 'event' => 'onFlush',
                 'connection' => 'second',
+            ])
+        ;
+
+        $container
+            ->register('d', 'stdClass')
+            ->addTag('doctrine.event_subscriber', [
+                'event' => 'onFlush',
+                'connection' => '%connection_param%',
             ])
         ;
 
@@ -240,6 +262,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             [
                 'a',
                 'c',
+                'd',
             ],
             $eventManagerDef->getArgument(1)
         );
@@ -250,6 +273,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
             [
                 'a' => new ServiceClosureArgument(new Reference('a')),
                 'c' => new ServiceClosureArgument(new Reference('c')),
+                'd' => new ServiceClosureArgument(new Reference('d')),
             ],
             $serviceLocatorDef->getArgument(0)
         );

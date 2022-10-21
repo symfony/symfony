@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,11 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $this->getService = $this->getService(...);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => 'getTestServiceSubscriberService',
@@ -44,11 +44,10 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.DlIAmAe' => true,
-            '.service_locator.DlIAmAe.foo_service' => true,
-            '.service_locator.t5IGRMW' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            '.service_locator.0H1ht0q' => true,
+            '.service_locator.0H1ht0q.foo_service' => true,
+            '.service_locator.2hyyc9y' => true,
+            '.service_locator.KGUGnmw' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
         ];
     }

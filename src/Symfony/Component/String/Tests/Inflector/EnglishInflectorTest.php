@@ -67,6 +67,7 @@ class EnglishInflectorTest extends TestCase
             ['drivers', 'driver'],
             ['dwarves', ['dwarf', 'dwarve', 'dwarff']],
             ['echoes', ['echo', 'echoe']],
+            ['edges', 'edge'],
             ['elves', ['elf', 'elve', 'elff']],
             ['emphases', ['emphas', 'emphase', 'emphasis']],
             ['employees', 'employee'],
@@ -78,6 +79,7 @@ class EnglishInflectorTest extends TestCase
             ['focuses', ['focus', 'focuse', 'focusis']],
             ['formulae', 'formula'],
             ['formulas', 'formula'],
+            ['conspectuses', 'conspectus'],
             ['fungi', 'fungus'],
             ['funguses', ['fungus', 'funguse', 'fungusis']],
             ['garages', ['garag', 'garage']],
@@ -85,7 +87,7 @@ class EnglishInflectorTest extends TestCase
             ['halves', ['half', 'halve', 'halff']],
             ['hats', 'hat'],
             ['heroes', ['hero', 'heroe']],
-            ['hippopotamuses', ['hippopotamus', 'hippopotamuse', 'hippopotamusis']], //hippopotami
+            ['hippopotamuses', ['hippopotamus', 'hippopotamuse', 'hippopotamusis']], // hippopotami
             ['hoaxes', 'hoax'],
             ['hooves', ['hoof', 'hoove', 'hooff']],
             ['houses', ['hous', 'house', 'housis']],
@@ -128,7 +130,7 @@ class EnglishInflectorTest extends TestCase
             ['roses', ['ros', 'rose', 'rosis']],
             ['sandwiches', ['sandwich', 'sandwiche']],
             ['scarves', ['scarf', 'scarve', 'scarff']],
-            ['schemas', 'schema'], //schemata
+            ['schemas', 'schema'], // schemata
             ['seasons', 'season'],
             ['selfies', 'selfie'],
             ['series', 'series'],
@@ -150,6 +152,7 @@ class EnglishInflectorTest extends TestCase
             ['trees', 'tree'],
             ['waltzes', ['waltz', 'waltze']],
             ['wives', 'wife'],
+            ['zombies', 'zombie'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Men', 'Man'],
@@ -157,9 +160,9 @@ class EnglishInflectorTest extends TestCase
             ['SubTrees', 'SubTree'],
 
             // Known issues
-            //['insignia', 'insigne'],
-            //['insignias', 'insigne'],
-            //['rattles', 'rattle'],
+            // ['insignia', 'insigne'],
+            // ['insignias', 'insigne'],
+            // ['rattles', 'rattle'],
         ];
     }
 
@@ -173,7 +176,7 @@ class EnglishInflectorTest extends TestCase
             ['agenda', 'agendas'],
             ['alumnus', 'alumni'],
             ['analysis', 'analyses'],
-            ['antenna', 'antennas'], //antennae
+            ['antenna', 'antennas'], // antennae
             ['appendix', ['appendicies', 'appendixes']],
             ['arch', 'arches'],
             ['atlas', 'atlases'],
@@ -211,20 +214,22 @@ class EnglishInflectorTest extends TestCase
             ['driver', 'drivers'],
             ['dwarf', ['dwarfs', 'dwarves']],
             ['echo', 'echoes'],
+            ['edge', 'edges'],
             ['elf', ['elfs', 'elves']],
             ['emphasis', 'emphases'],
             ['fax', ['facies', 'faxes']],
             ['feedback', 'feedback'],
             ['focus', 'focuses'],
             ['foot', 'feet'],
-            ['formula', 'formulas'], //formulae
+            ['formula', 'formulas'], // formulae
+            ['conspectus', 'conspectuses'],
             ['fungus', 'fungi'],
             ['garage', 'garages'],
             ['goose', 'geese'],
             ['half', ['halfs', 'halves']],
             ['hat', 'hats'],
             ['hero', 'heroes'],
-            ['hippopotamus', 'hippopotami'], //hippopotamuses
+            ['hippopotamus', 'hippopotami'], // hippopotamuses
             ['hoax', 'hoaxes'],
             ['hoof', ['hoofs', 'hooves']],
             ['house', 'houses'],
@@ -264,7 +269,7 @@ class EnglishInflectorTest extends TestCase
             ['rose', 'roses'],
             ['sandwich', 'sandwiches'],
             ['scarf', ['scarfs', 'scarves']],
-            ['schema', 'schemas'], //schemata
+            ['schema', 'schemas'], // schemata
             ['season', 'seasons'],
             ['selfie', 'selfies'],
             ['series', 'series'],

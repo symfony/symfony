@@ -29,8 +29,8 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
 {
     public const UNDEFINED_DOMAIN = '_undefined';
 
-    private $enabled = false;
-    private $messages = [];
+    private bool $enabled = false;
+    private array $messages = [];
 
     public function enable(): void
     {
@@ -49,9 +49,6 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return $this->messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doEnterNode(Node $node, Environment $env): Node
     {
         if (!$this->enabled) {
@@ -69,12 +66,10 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
             ];
         } elseif (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof FunctionExpression &&
-            't' === $node->getNode('node')->getAttribute('name')
+            $node instanceof FunctionExpression &&
+            't' === $node->getAttribute('name')
         ) {
-            $nodeArguments = $node->getNode('node')->getNode('arguments');
+            $nodeArguments = $node->getNode('arguments');
 
             if ($nodeArguments->getIterator()->current() instanceof ConstantExpression) {
                 $this->messages[] = [
@@ -103,17 +98,11 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doLeaveNode(Node $node, Environment $env): ?Node
     {
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return 0;

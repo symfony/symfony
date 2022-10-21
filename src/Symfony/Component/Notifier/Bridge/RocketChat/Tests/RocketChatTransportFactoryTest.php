@@ -13,17 +13,13 @@ namespace Symfony\Component\Notifier\Bridge\RocketChat\Tests;
 
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
 final class RocketChatTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return RocketChatTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): RocketChatTransportFactory
     {
         return new RocketChatTransportFactory();
     }

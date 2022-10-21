@@ -21,7 +21,7 @@ class VariadicConstructorTypedArgsDummy
     }
 
     /** @return Dummy[] */
-    public function getFoo()
+    public function getFoo(): array
     {
         return $this->foo;
     }

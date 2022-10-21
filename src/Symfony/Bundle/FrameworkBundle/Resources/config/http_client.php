@@ -30,6 +30,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'http_client'])
+            ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
             ->tag('http_client.client')
 
         ->alias(HttpClientInterface::class, 'http_client')

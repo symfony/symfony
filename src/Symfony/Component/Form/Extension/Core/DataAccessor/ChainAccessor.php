@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormInterface;
  */
 class ChainAccessor implements DataAccessorInterface
 {
-    private $accessors;
+    private iterable $accessors;
 
     /**
      * @param DataAccessorInterface[]|iterable $accessors
@@ -30,10 +30,7 @@ class ChainAccessor implements DataAccessorInterface
         $this->accessors = $accessors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValue($data, FormInterface $form)
+    public function getValue(object|array $data, FormInterface $form): mixed
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isReadable($data, $form)) {
@@ -44,10 +41,7 @@ class ChainAccessor implements DataAccessorInterface
         throw new AccessException('Unable to read from the given form data as no accessor in the chain is able to read the data.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setValue(&$data, $value, FormInterface $form): void
+    public function setValue(object|array &$data, mixed $value, FormInterface $form): void
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isWritable($data, $form)) {
@@ -60,10 +54,7 @@ class ChainAccessor implements DataAccessorInterface
         throw new AccessException('Unable to write the given value as no accessor in the chain is able to set the data.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isReadable($data, FormInterface $form): bool
+    public function isReadable(object|array $data, FormInterface $form): bool
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isReadable($data, $form)) {
@@ -74,10 +65,7 @@ class ChainAccessor implements DataAccessorInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isWritable($data, FormInterface $form): bool
+    public function isWritable(object|array $data, FormInterface $form): bool
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isWritable($data, $form)) {

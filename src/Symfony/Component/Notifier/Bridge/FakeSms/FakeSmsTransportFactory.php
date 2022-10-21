@@ -11,37 +11,33 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeSms;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
  * @author Oskar Stark <oskarstark@googlemail.com>
+ * @author Antoine Makdessi <amakdessi@me.com>
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
-    protected $mailer;
+    private MailerInterface $mailer;
+    private LoggerInterface $logger;
 
-    public function __construct(MailerInterface $mailer)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger)
     {
         parent::__construct();
 
         $this->mailer = $mailer;
+        $this->logger = $logger;
     }
 
-    /**
-     * @return FakeSmsEmailTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FakeSmsEmailTransport|FakeSmsLoggerTransport
     {
         $scheme = $dsn->getScheme();
-
-        if (!\in_array($scheme, $this->getSupportedSchemes())) {
-            throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
-        }
 
         if ('fakesms+email' === $scheme) {
             $mailerTransport = $dsn->getHost();
@@ -50,10 +46,16 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
 
             return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
         }
+
+        if ('fakesms+logger' === $scheme) {
+            return new FakeSmsLoggerTransport($this->logger);
+        }
+
+        throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['fakesms+email'];
+        return ['fakesms+email', 'fakesms+logger'];
     }
 }

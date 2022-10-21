@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class GroupDummyParent
 {
-    #[Groups(["a"])]
+    #[Groups(['a'])]
     private $kevin;
     private $coopTilleuls;
 
@@ -37,7 +37,7 @@ class GroupDummyParent
         $this->coopTilleuls = $coopTilleuls;
     }
 
-    #[Groups(["a", "b"])]
+    #[Groups(['a', 'b'])]
     public function getCoopTilleuls()
     {
         return $this->coopTilleuls;

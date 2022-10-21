@@ -28,10 +28,7 @@ abstract class AnnotationLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;
 
-    /**
-     * @var AnnotationLoader
-     */
-    private $loader;
+    protected AnnotationLoader $loader;
 
     protected function setUp(): void
     {
@@ -123,6 +120,11 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->assertLoadedContexts($this->getNamespace().'\ContextDummy', $this->getNamespace().'\ContextDummyParent');
     }
 
+    public function testLoadContextsPropertiesPromoted()
+    {
+        $this->assertLoadedContexts($this->getNamespace().'\ContextDummyPromotedProperties', $this->getNamespace().'\ContextDummyParent');
+    }
+
     public function testThrowsOnContextOnInvalidMethod()
     {
         $class = $this->getNamespace().'\BadMethodContextDummy';
@@ -135,6 +137,39 @@ abstract class AnnotationLoaderTest extends TestCase
         $classMetadata = new ClassMetadata($class);
 
         $loader->loadClassMetadata($classMetadata);
+    }
+
+    public function testCanHandleUnrelatedIgnoredMethods()
+    {
+        $class = $this->getNamespace().'\Entity45016';
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', $class));
+
+        $metadata = new ClassMetadata($class);
+        $loader = $this->getLoaderForContextMapping();
+
+        $loader->loadClassMetadata($metadata);
+    }
+
+    public function testIgnoreGetterWirhRequiredParameterIfIgnoreAnnotationIsUsed()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetter');
+        $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
+
+        $attributes = $classMetadata->getAttributesMetadata();
+        self::assertArrayNotHasKey('extraValue', $attributes);
+        self::assertArrayHasKey('extraValue2', $attributes);
+    }
+
+    public function testIgnoreGetterWirhRequiredParameterIfIgnoreAnnotationIsNotUsed()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations');
+        $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
+
+        $attributes = $classMetadata->getAttributesMetadata();
+        self::assertArrayNotHasKey('extraValue', $attributes);
+        self::assertArrayHasKey('extraValue2', $attributes);
     }
 
     abstract protected function createLoader(): AnnotationLoader;

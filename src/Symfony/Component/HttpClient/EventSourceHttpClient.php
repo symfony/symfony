@@ -19,18 +19,19 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class EventSourceHttpClient implements HttpClientInterface
+final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
 {
     use AsyncDecoratorTrait, HttpClientTrait {
         AsyncDecoratorTrait::withOptions insteadof HttpClientTrait;
     }
 
-    private $reconnectionTime;
+    private float $reconnectionTime;
 
     public function __construct(HttpClientInterface $client = null, float $reconnectionTime = 10.0)
     {
@@ -52,10 +53,10 @@ final class EventSourceHttpClient implements HttpClientInterface
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $state = new class() {
-            public $buffer = null;
-            public $lastEventId = null;
-            public $reconnectionTime;
-            public $lastError = null;
+            public ?string $buffer = null;
+            public ?string $lastEventId = null;
+            public float $reconnectionTime;
+            public ?float $lastError = null;
         };
         $state->reconnectionTime = $this->reconnectionTime;
 
@@ -78,12 +79,12 @@ final class EventSourceHttpClient implements HttpClientInterface
             try {
                 $isTimeout = $chunk->isTimeout();
 
-                if (null !== $chunk->getInformationalStatus()) {
+                if (null !== $chunk->getInformationalStatus() || $context->getInfo('canceled')) {
                     yield $chunk;
 
                     return;
                 }
-            } catch (TransportExceptionInterface $e) {
+            } catch (TransportExceptionInterface) {
                 $state->lastError = $lastError ?? microtime(true);
 
                 if (null === $state->buffer || ($isTimeout && microtime(true) - $state->lastError < $state->reconnectionTime)) {

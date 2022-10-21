@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -32,10 +33,10 @@ final class TelegramTransport extends AbstractTransport
 {
     protected const HOST = 'api.telegram.org';
 
-    private $token;
-    private $chatChannel;
+    private string $token;
+    private ?string $chatChannel;
 
-    public function __construct(string $token, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->chatChannel = $channel;
@@ -79,15 +80,22 @@ final class TelegramTransport extends AbstractTransport
 
         $options['text'] = $message->getSubject();
 
-        if (!isset($options['parse_mode'])) {
+        if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
+            $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!])/', '\\\\$1', $message->getSubject());
         }
 
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Telegram server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             $result = $response->toArray(false);
 
             throw new TransportException('Unable to post the Telegram message: '.$result['description'].sprintf(' (code %s).', $result['error_code']), $response);

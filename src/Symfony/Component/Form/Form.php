@@ -22,6 +22,7 @@ use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
@@ -65,63 +66,46 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormInterface>
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
-    /**
-     * @var FormConfigInterface
-     */
-    private $config;
+    private FormConfigInterface $config;
+    private ?FormInterface $parent = null;
 
     /**
-     * @var FormInterface|null
+     * A map of FormInterface instances.
+     *
+     * @var OrderedHashMap<FormInterface>
      */
-    private $parent;
+    private OrderedHashMap $children;
 
     /**
-     * @var FormInterface[]|OrderedHashMap A map of FormInterface instances
+     * @var FormError[]
      */
-    private $children;
+    private array $errors = [];
+
+    private bool $submitted = false;
 
     /**
-     * @var FormError[] An array of FormError instances
+     * The button that was used to submit the form.
      */
-    private $errors = [];
+    private FormInterface|ClickableInterface|null $clickedButton = null;
+
+    private mixed $modelData = null;
+    private mixed $normData = null;
+    private mixed $viewData = null;
 
     /**
-     * @var bool
+     * The submitted values that don't belong to any children.
      */
-    private $submitted = false;
+    private array $extraData = [];
 
     /**
-     * @var FormInterface|ClickableInterface|null The button that was used to submit the form
+     * The transformation failure generated during submission, if any.
      */
-    private $clickedButton;
-
-    /**
-     * @var mixed
-     */
-    private $modelData;
-
-    /**
-     * @var mixed
-     */
-    private $normData;
-
-    /**
-     * @var mixed
-     */
-    private $viewData;
-
-    /**
-     * @var array The submitted values that don't belong to any children
-     */
-    private $extraData = [];
-
-    /**
-     * @var TransformationFailedException|null The transformation failure generated during submission, if any
-     */
-    private $transformationFailure;
+    private ?TransformationFailedException $transformationFailure = null;
 
     /**
      * Whether the form's data has been initialized.
@@ -132,32 +116,22 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      * lazily in order to save performance when {@link setData()} is called
      * manually, making the initialization with the configured default value
      * superfluous.
-     *
-     * @var bool
      */
-    private $defaultDataSet = false;
+    private bool $defaultDataSet = false;
 
     /**
      * Whether setData() is currently being called.
-     *
-     * @var bool
      */
-    private $lockSetData = false;
+    private bool $lockSetData = false;
+
+    private string $name = '';
 
     /**
-     * @var string
+     * Whether the form inherits its underlying data from its parent.
      */
-    private $name = '';
+    private bool $inheritData;
 
-    /**
-     * @var bool Whether the form inherits its underlying data from its parent
-     */
-    private $inheritData;
-
-    /**
-     * @var PropertyPathInterface|null
-     */
-    private $propertyPath;
+    private ?PropertyPathInterface $propertyPath = null;
 
     /**
      * @throws LogicException if a data mapper is not provided for a compound form
@@ -191,26 +165,17 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfig()
+    public function getConfig(): FormConfigInterface
     {
         return $this->config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPropertyPath()
+    public function getPropertyPath(): ?PropertyPathInterface
     {
         if ($this->propertyPath || $this->propertyPath = $this->config->getPropertyPath()) {
             return $this->propertyPath;
@@ -222,7 +187,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
         $parent = $this->parent;
 
-        while ($parent && $parent->getConfig()->getInheritData()) {
+        while ($parent?->getConfig()->getInheritData()) {
             $parent = $parent->getParent();
         }
 
@@ -235,10 +200,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->propertyPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isRequired()
+    public function isRequired(): bool
     {
         if (null === $this->parent || $this->parent->isRequired()) {
             return $this->config->getRequired();
@@ -247,10 +209,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isDisabled()
+    public function isDisabled(): bool
     {
         if (null === $this->parent || !$this->parent->isDisabled()) {
             return $this->config->getDisabled();
@@ -259,11 +218,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setParent(FormInterface $parent = null)
+    public function setParent(FormInterface $parent = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
+
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot set the parent of a submitted form.');
         }
@@ -277,34 +237,22 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?FormInterface
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoot()
+    public function getRoot(): FormInterface
     {
         return $this->parent ? $this->parent->getRoot() : $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isRoot()
+    public function isRoot(): bool
     {
         return null === $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setData($modelData)
+    public function setData(mixed $modelData): static
     {
         // If the form is submitted while disabled, it is set to submitted, but the data is not
         // changed. In such cases (i.e. when the form is not initialized yet) don't
@@ -348,7 +296,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         // Treat data as strings unless a transformer exists
-        if (is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
+        if (\is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
             $modelData = (string) $modelData;
         }
 
@@ -364,7 +312,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 $actualType = get_debug_type($viewData);
 
-                throw new LogicException('The form\'s view data is expected to be a ".'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');
+                throw new LogicException('The form\'s view data is expected to be a "'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');
             }
         }
 
@@ -390,10 +338,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getData()
+    public function getData(): mixed
     {
         if ($this->inheritData) {
             if (!$this->parent) {
@@ -414,10 +359,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->modelData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getNormData()
+    public function getNormData(): mixed
     {
         if ($this->inheritData) {
             if (!$this->parent) {
@@ -438,10 +380,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->normData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getViewData()
+    public function getViewData(): mixed
     {
         if ($this->inheritData) {
             if (!$this->parent) {
@@ -462,18 +401,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->viewData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtraData()
+    public function getExtraData(): array
     {
         return $this->extraData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initialize()
+    public function initialize(): static
     {
         if (null !== $this->parent) {
             throw new RuntimeException('Only root forms should be initialized.');
@@ -489,20 +422,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handleRequest($request = null)
+    public function handleRequest(mixed $request = null): static
     {
         $this->config->getRequestHandler()->handleRequest($this, $request);
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function submit($submittedData, bool $clearMissing = true)
+    public function submit(mixed $submittedData, bool $clearMissing = true): static
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once.');
@@ -533,14 +460,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // and radio buttons with empty values.
         if (false === $submittedData) {
             $submittedData = null;
-        } elseif (is_scalar($submittedData)) {
+        } elseif (\is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
         } elseif ($this->config->getRequestHandler()->isFileUpload($submittedData)) {
             if (!$this->config->getOption('allow_file_upload')) {
                 $submittedData = null;
                 $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
             }
-        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->hasOption('multiple')) {
+        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->getOption('multiple', false)) {
             $submittedData = null;
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }
@@ -704,10 +631,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addError(FormError $error)
+    public function addError(FormError $error): static
     {
         if (null === $error->getOrigin()) {
             $error->setOrigin($this);
@@ -722,34 +646,22 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return $this->submitted;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isSynchronized()
+    public function isSynchronized(): bool
     {
         return null === $this->transformationFailure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTransformationFailure()
+    public function getTransformationFailure(): ?Exception\TransformationFailedException
     {
         return $this->transformationFailure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         foreach ($this->children as $child) {
             if (!$child->isEmpty()) {
@@ -757,29 +669,18 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             }
         }
 
-        if (!method_exists($this->config, 'getIsEmptyCallback')) {
-            trigger_deprecation('symfony/form', '5.1', 'Not implementing the "%s::getIsEmptyCallback()" method in "%s" is deprecated.', FormConfigInterface::class, \get_class($this->config));
-
-            $isEmptyCallback = null;
-        } else {
-            $isEmptyCallback = $this->config->getIsEmptyCallback();
-        }
-
-        if (null !== $isEmptyCallback) {
+        if (null !== $isEmptyCallback = $this->config->getIsEmptyCallback()) {
             return $isEmptyCallback($this->modelData);
         }
 
         return FormUtil::isEmpty($this->modelData) ||
             // arrays, countables
-            ((\is_array($this->modelData) || $this->modelData instanceof \Countable) && 0 === \count($this->modelData)) ||
+            (is_countable($this->modelData) && 0 === \count($this->modelData)) ||
             // traversables that are not countable
             ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isValid()
+    public function isValid(): bool
     {
         if (!$this->submitted) {
             throw new LogicException('Cannot check if an unsubmitted form is valid. Call Form::isSubmitted() before Form::isValid().');
@@ -794,10 +695,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * Returns the button that was used to submit the form.
-     *
-     * @return FormInterface|ClickableInterface|null
      */
-    public function getClickedButton()
+    public function getClickedButton(): FormInterface|ClickableInterface|null
     {
         if ($this->clickedButton) {
             return $this->clickedButton;
@@ -806,10 +705,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this->parent && method_exists($this->parent, 'getClickedButton') ? $this->parent->getClickedButton() : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrors(bool $deep = false, bool $flatten = true)
+    public function getErrors(bool $deep = false, bool $flatten = true): FormErrorIterator
     {
         $errors = $this->errors;
 
@@ -840,12 +736,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return new FormErrorIterator($this, $errors);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return $this
-     */
-    public function clearErrors(bool $deep = false): self
+    public function clearErrors(bool $deep = false): static
     {
         $this->errors = [];
 
@@ -861,18 +752,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function all()
+    public function all(): array
     {
         return iterator_to_array($this->children);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function add($child, string $type = null, array $options = [])
+    public function add(FormInterface|string $child, string $type = null, array $options = []): static
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form.');
@@ -889,15 +774,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
             $child = (string) $child;
 
-            if (null !== $type && !\is_string($type)) {
-                throw new UnexpectedTypeException($type, 'string or null');
-            }
-
             // Never initialize child forms automatically
             $options['auto_initialize'] = false;
 
             if (null === $type && null === $this->config->getDataClass()) {
-                $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+                $type = TextType::class;
             }
 
             if (null === $type) {
@@ -940,10 +821,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function remove(string $name)
+    public function remove(string $name): static
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot remove children from a submitted form.');
@@ -960,18 +838,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return isset($this->children[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function get(string $name)
+    public function get(string $name): FormInterface
     {
         if (isset($this->children[$name])) {
             return $this->children[$name];
@@ -984,10 +856,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      * Returns whether a child with the given name exists (implements the \ArrayAccess interface).
      *
      * @param string $name The name of the child
-     *
-     * @return bool
      */
-    public function offsetExists($name)
+    public function offsetExists(mixed $name): bool
     {
         return $this->has($name);
     }
@@ -997,11 +867,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child
      *
-     * @return FormInterface The child form
-     *
      * @throws OutOfBoundsException if the named child does not exist
      */
-    public function offsetGet($name)
+    public function offsetGet(mixed $name): FormInterface
     {
         return $this->get($name);
     }
@@ -1017,7 +885,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @see self::add()
      */
-    public function offsetSet($name, $child)
+    public function offsetSet(mixed $name, mixed $child): void
     {
         $this->add($child);
     }
@@ -1029,7 +897,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
-    public function offsetUnset($name)
+    public function offsetUnset(mixed $name): void
     {
         $this->remove($name);
     }
@@ -1037,27 +905,22 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the iterator for this group.
      *
-     * @return \Traversable|FormInterface[]
+     * @return \Traversable<string, FormInterface>
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return $this->children;
     }
 
     /**
      * Returns the number of form children (implements the \Countable interface).
-     *
-     * @return int The number of embedded form children
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->children);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createView(FormView $parent = null)
+    public function createView(FormView $parent = null): FormView
     {
         if (null === $parent && $this->parent) {
             $parent = $this->parent->createView();
@@ -1112,11 +975,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Normalizes the underlying data if a model transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the underlying data cannot be transformed to "normalized" format
      */
-    private function modelToNorm($value)
+    private function modelToNorm(mixed $value): mixed
     {
         try {
             foreach ($this->config->getModelTransformers() as $transformer) {
@@ -1132,11 +993,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Reverse transforms a value if a model transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the value cannot be transformed to "model" format
      */
-    private function normToModel($value)
+    private function normToModel(mixed $value): mixed
     {
         try {
             $transformers = $this->config->getModelTransformers();
@@ -1154,11 +1013,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Transforms the value if a view transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the normalized value cannot be transformed to "view" format
      */
-    private function normToView($value)
+    private function normToView(mixed $value): mixed
     {
         // Scalar values should  be converted to strings to
         // facilitate differentiation between empty ("") and zero (0).
@@ -1166,7 +1023,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // compound forms is passed to the data mapper and thus should
         // not be converted to a string before.
         if (!($transformers = $this->config->getViewTransformers()) && !$this->config->getCompound()) {
-            return null === $value || is_scalar($value) ? (string) $value : $value;
+            return null === $value || \is_scalar($value) ? (string) $value : $value;
         }
 
         try {
@@ -1183,11 +1040,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Reverse transforms a value if a view transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the submitted value cannot be transformed to "normalized" format
      */
-    private function viewToNorm($value)
+    private function viewToNorm(mixed $value): mixed
     {
         if (!$transformers = $this->config->getViewTransformers()) {
             return '' === $value ? null : $value;

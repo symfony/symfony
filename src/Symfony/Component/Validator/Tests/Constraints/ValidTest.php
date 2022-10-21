@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -32,4 +34,31 @@ class ValidTest extends TestCase
 
         $this->assertNull($constraint->groups);
     }
+
+    public function testAttributes()
+    {
+        $metadata = new ClassMetaData(ValidDummy::class);
+        $loader = new AnnotationLoader();
+        self::assertTrue($loader->loadClassMetadata($metadata));
+
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        self::assertFalse($bConstraint->traverse);
+        self::assertSame(['traverse_group'], $bConstraint->groups);
+
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        self::assertSame(['my_group'], $cConstraint->groups);
+        self::assertSame('some attached data', $cConstraint->payload);
+    }
+}
+
+class ValidDummy
+{
+    #[Valid]
+    private $a;
+
+    #[Valid(groups: ['traverse_group'], traverse: false)] // Needs a group to work at all for this test
+    private $b;
+
+    #[Valid(groups: ['my_group'], payload: 'some attached data')]
+    private $c;
 }

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="Full\Qualified\Class3" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
+  <factory service="inline factory service (Full\Qualified\FactoryClass)" method="get"/>
+</definition>

@@ -20,6 +20,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -29,10 +30,10 @@ final class SlackTransport extends AbstractTransport
 {
     protected const HOST = 'slack.com';
 
-    private $accessToken;
-    private $chatChannel;
+    private string $accessToken;
+    private ?string $chatChannel;
 
-    public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         if (!preg_match('/^xox(b-|p-|a-2)/', $accessToken)) {
             throw new InvalidArgumentException('A valid Slack token needs to start with "xoxb-", "xoxp-" or "xoxa-2". See https://api.slack.com/authentication/token-types for further information.');
@@ -84,17 +85,31 @@ final class SlackTransport extends AbstractTransport
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/chat.postMessage', [
             'json' => array_filter($options),
             'auth_bearer' => $this->accessToken,
+            'headers' => [
+                'Content-Type' => 'application/json; charset=utf-8',
+            ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Slack server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
         if (!$result['ok']) {
-            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $result['error']), $response);
+            $errors = isset($result['errors']) ? ' ('.implode('|', $result['errors']).')' : '';
+
+            throw new TransportException(sprintf('Unable to post the Slack message: "%s"%s.', $result['error'], $errors), $response);
         }
 
-        return new SentMessage($message, (string) $this);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($result['ts']);
+
+        return $sentMessage;
     }
 }

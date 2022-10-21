@@ -2,11 +2,11 @@
 
 return [
     'Names' => [
-        'Hanb' => 'han con bopomofo',
+        'Gujr' => 'gujarati',
         'Hrkt' => 'katakana o hiragana',
         'Laoo' => 'lao',
         'Latn' => 'latín',
-        'Mlym' => 'malayalam',
+        'Mlym' => 'malabar',
         'Olck' => 'ol chiki',
     ],
 ];

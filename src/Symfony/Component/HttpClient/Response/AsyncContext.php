@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Response;
 
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -25,13 +26,16 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class AsyncContext
 {
     private $passthru;
-    private $client;
-    private $response;
-    private $info = [];
+    private HttpClientInterface $client;
+    private ResponseInterface $response;
+    private array $info = [];
     private $content;
-    private $offset;
+    private int $offset;
 
-    public function __construct(&$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
+    /**
+     * @param resource|null $content
+     */
+    public function __construct(?callable &$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
     {
         $this->passthru = &$passthru;
         $this->client = $client;
@@ -110,7 +114,7 @@ final class AsyncContext
     /**
      * Returns the current info of the response.
      */
-    public function getInfo(string $type = null)
+    public function getInfo(string $type = null): mixed
     {
         if (null !== $type) {
             return $this->info[$type] ?? $this->response->getInfo($type);
@@ -121,8 +125,10 @@ final class AsyncContext
 
     /**
      * Attaches an info to the response.
+     *
+     * @return $this
      */
-    public function setInfo(string $type, $value): self
+    public function setInfo(string $type, mixed $value): static
     {
         if ('canceled' === $type && $value !== $this->info['canceled']) {
             throw new \LogicException('You cannot set the "canceled" info directly.');
@@ -150,12 +156,17 @@ final class AsyncContext
      */
     public function replaceRequest(string $method, string $url, array $options = []): ResponseInterface
     {
-        $this->info['previous_info'][] = $this->response->getInfo();
+        $this->info['previous_info'][] = $info = $this->response->getInfo();
         if (null !== $onProgress = $options['on_progress'] ?? null) {
             $thisInfo = &$this->info;
             $options['on_progress'] = static function (int $dlNow, int $dlSize, array $info) use (&$thisInfo, $onProgress) {
                 $onProgress($dlNow, $dlSize, $thisInfo + $info);
             };
+        }
+        if (0 < ($info['max_duration'] ?? 0) && 0 < ($info['total_time'] ?? 0)) {
+            if (0 >= $options['max_duration'] = $info['max_duration'] - $info['total_time']) {
+                throw new TransportException(sprintf('Max duration was reached for "%s".', $info['url']));
+            }
         }
 
         return $this->response = $this->client->request($method, $url, ['buffer' => false] + $options);
@@ -173,9 +184,15 @@ final class AsyncContext
 
     /**
      * Replaces or removes the chunk filter iterator.
+     *
+     * @param ?callable(ChunkInterface, self): ?\Iterator $passthru
      */
     public function passthru(callable $passthru = null): void
     {
-        $this->passthru = $passthru;
+        $this->passthru = $passthru ?? static function ($chunk, $context) {
+            $context->passthru = null;
+
+            yield $chunk;
+        };
     }
 }

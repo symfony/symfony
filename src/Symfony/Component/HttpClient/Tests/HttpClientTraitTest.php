@@ -49,6 +49,25 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
     }
 
+    public function testPrepareRequestWithBodyIsArray()
+    {
+        $defaults = [
+            'base_uri' => 'http://example.com?c=c',
+            'query' => ['a' => 1, 'b' => 'b'],
+            'body' => []
+        ];
+        [, $defaults] = self::prepareRequest(null, null, $defaults);
+
+        [,$options] = self::prepareRequest(null, 'http://example.com', [
+            'body' => [1, 2],
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8'
+            ]
+        ], $defaults);
+
+        $this->assertContains('Content-Type: application/x-www-form-urlencoded; charset=utf-8', $options['headers']);
+    }
+
     /**
      * @dataProvider provideResolveUrl
      */
@@ -163,6 +182,8 @@ class HttpClientTraitTest extends TestCase
         yield [[null, null, 'bar', '?a%5Bb%5Bc%5D=d', null], 'bar?a[b[c]=d', []];
         yield [[null, null, 'bar', '?a%5Bb%5D%5Bc%5D=dd', null], 'bar?a[b][c]=d&e[f]=g', ['a' => ['b' => ['c' => 'dd']], 'e[f]' => null]];
         yield [[null, null, 'bar', '?a=b&a%5Bb%20c%5D=d&e%3Df=%E2%9C%93', null], 'bar?a=b', ['a' => ['b c' => 'd'], 'e=f' => '✓']];
+        // IDNA 2008 compliance
+        yield [['https:', '//xn--fuball-cta.test', null, null, null], 'https://fußball.test'];
     }
 
     /**

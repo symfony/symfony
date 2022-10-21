@@ -376,7 +376,7 @@
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Værdien skal overholde mindst én af følgende krav::</target>
+                <target>Værdien skal overholde mindst én af følgende krav:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
@@ -385,6 +385,22 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Værdien er ikke et gyldig International Securities Identification Number (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Værdien skal være et gyldigt udtryk.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Værdien skal være en gyldig CSS farve.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Værdien er ikke en gyldig CIDR notation.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Værdien af netmasken skal være mellem {{ min }} og {{ max }}.</target>
             </trans-unit>
         </body>
     </file>

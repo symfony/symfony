@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
@@ -28,7 +29,7 @@ class DumpDataCollectorTest extends TestCase
     {
         $data = new Data([[123]]);
 
-        $collector = new DumpDataCollector();
+        $collector = new DumpDataCollector(null, new FileLinkFormatter([]));
 
         $this->assertSame('dump', $collector->getName());
 
@@ -54,7 +55,11 @@ class DumpDataCollectorTest extends TestCase
 
         $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
         $this->assertSame(0, $collector->getDumpsCount());
-        $this->assertSame("O:60:\"Symfony\Component\HttpKernel\DataCollector\DumpDataCollector\":1:{s:7:\"\0*\0data\";a:2:{i:0;b:0;i:1;s:5:\"UTF-8\";}}", serialize($collector));
+
+        $serialized = serialize($collector);
+        $this->assertSame("O:60:\"Symfony\Component\HttpKernel\DataCollector\DumpDataCollector\":1:{s:7:\"\0*\0data\";a:2:{i:0;b:0;i:1;s:5:\"UTF-8\";}}", $serialized);
+
+        $this->assertInstanceOf(DumpDataCollector::class, unserialize($serialized));
     }
 
     public function testDumpWithServerConnection()

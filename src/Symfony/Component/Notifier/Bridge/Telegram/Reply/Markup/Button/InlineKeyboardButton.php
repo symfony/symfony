@@ -23,49 +23,70 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         $this->options['text'] = $text;
     }
 
-    public function url(string $url): self
+    /**
+     * @return $this
+     */
+    public function url(string $url): static
     {
         $this->options['url'] = $url;
 
         return $this;
     }
 
-    public function loginUrl(string $url): self
+    /**
+     * @return $this
+     */
+    public function loginUrl(string $url): static
     {
         $this->options['login_url']['url'] = $url;
 
         return $this;
     }
 
-    public function loginUrlForwardText(string $text): self
+    /**
+     * @return $this
+     */
+    public function loginUrlForwardText(string $text): static
     {
         $this->options['login_url']['forward_text'] = $text;
 
         return $this;
     }
 
-    public function requestWriteAccess(bool $bool): self
+    /**
+     * @return $this
+     */
+    public function requestWriteAccess(bool $bool): static
     {
         $this->options['login_url']['request_write_access'] = $bool;
 
         return $this;
     }
 
-    public function callbackData(string $data): self
+    /**
+     * @return $this
+     */
+    public function callbackData(string $data): static
     {
         $this->options['callback_data'] = $data;
 
         return $this;
     }
 
-    public function switchInlineQuery(string $query): self
+    /**
+     * @return $this
+     */
+    public function switchInlineQuery(string $query): static
     {
         $this->options['switch_inline_query'] = $query;
 
         return $this;
     }
 
-    public function payButton(bool $bool): self
+    /**
+     * @return $this
+     */
+    public function payButton(bool $bool): static
     {
         $this->options['pay'] = $bool;
 

@@ -178,6 +178,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_MS',
         'en_MT',
         'en_MU',
+        'en_MV',
         'en_MW',
         'en_MY',
         'en_NA',
@@ -367,6 +368,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'he_IL',
         'hi',
         'hi_IN',
+        'hi_Latn',
+        'hi_Latn_IN',
         'hr',
         'hr_BA',
         'hr_HR',
@@ -416,6 +419,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'ks',
         'ks_Arab',
         'ks_Arab_IN',
+        'ks_Deva',
+        'ks_Deva_IN',
         'ks_IN',
         'ku',
         'ku_TR',
@@ -538,6 +543,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'rw_RW',
         'sa',
         'sa_IN',
+        'sc',
+        'sc_IT',
         'sd',
         'sd_Arab',
         'sd_Arab_PK',
@@ -724,11 +731,18 @@ abstract class ResourceBundleTestCase extends TestCase
     ];
 
     private static $rootLocales;
+    private $defaultLocale;
 
     protected function setUp(): void
     {
+        $this->defaultLocale = \Locale::getDefault();
         Locale::setDefault('en');
         Locale::setDefaultFallback('en');
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function provideLocales()
@@ -771,7 +785,7 @@ abstract class ResourceBundleTestCase extends TestCase
         if (null === self::$rootLocales) {
             self::$rootLocales = array_filter($this->getLocales(), function ($locale) {
                 // no locales for which fallback is possible (e.g "en_GB")
-                return false === strpos($locale, '_');
+                return !str_contains($locale, '_');
             });
         }
 

@@ -16,33 +16,31 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/config": "^4.4|^5.0",
-        "symfony/twig-bridge": "^5.3",
-        "symfony/http-foundation": "^4.4|^5.0",
-        "symfony/http-kernel": "^5.0",
-        "symfony/polyfill-ctype": "~1.8",
+        "php": ">=8.1",
+        "composer-runtime-api": ">=2.1",
+        "symfony/config": "^6.1",
+        "symfony/dependency-injection": "^6.1",
+        "symfony/twig-bridge": "^6.2",
+        "symfony/http-foundation": "^5.4|^6.0",
+        "symfony/http-kernel": "^6.2",
         "twig/twig": "^2.13|^3.0.4"
     },
     "require-dev": {
-        "symfony/asset": "^4.4|^5.0",
-        "symfony/stopwatch": "^4.4|^5.0",
-        "symfony/dependency-injection": "^5.3",
-        "symfony/expression-language": "^4.4|^5.0",
-        "symfony/finder": "^4.4|^5.0",
-        "symfony/form": "^4.4|^5.0",
-        "symfony/routing": "^4.4|^5.0",
-        "symfony/translation": "^5.0",
-        "symfony/yaml": "^4.4|^5.0",
-        "symfony/framework-bundle": "^5.0",
-        "symfony/web-link": "^4.4|^5.0",
-        "doctrine/annotations": "^1.10.4",
-        "doctrine/cache": "~1.0"
+        "symfony/asset": "^5.4|^6.0",
+        "symfony/stopwatch": "^5.4|^6.0",
+        "symfony/expression-language": "^5.4|^6.0",
+        "symfony/finder": "^5.4|^6.0",
+        "symfony/form": "^5.4|^6.0",
+        "symfony/routing": "^5.4|^6.0",
+        "symfony/translation": "^5.4|^6.0",
+        "symfony/yaml": "^5.4|^6.0",
+        "symfony/framework-bundle": "^5.4|^6.0",
+        "symfony/web-link": "^5.4|^6.0",
+        "doctrine/annotations": "^1.10.4"
     },
     "conflict": {
-        "symfony/dependency-injection": "<5.3",
-        "symfony/framework-bundle": "<5.0",
-        "symfony/translation": "<5.0"
+        "symfony/framework-bundle": "<5.4",
+        "symfony/translation": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },

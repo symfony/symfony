@@ -330,6 +330,10 @@ return [
             0 => 'LRD',
             1 => 'Ego Dollar obodo Liberia',
         ],
+        'LSL' => [
+            0 => 'LSL',
+            1 => 'This is not a translation',
+        ],
         'LYD' => [
             0 => 'LYD',
             1 => 'Ego Dinar obodo Libya',

@@ -20,18 +20,31 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProgressIndicator
 {
-    private $output;
-    private $startTime;
-    private $format;
-    private $message;
-    private $indicatorValues;
-    private $indicatorCurrent;
-    private $indicatorChangeInterval;
-    private $indicatorUpdateTime;
-    private $started = false;
+    private const FORMATS = [
+        'normal' => ' %indicator% %message%',
+        'normal_no_ansi' => ' %message%',
 
-    private static $formatters;
-    private static $formats;
+        'verbose' => ' %indicator% %message% (%elapsed:6s%)',
+        'verbose_no_ansi' => ' %message% (%elapsed:6s%)',
+
+        'very_verbose' => ' %indicator% %message% (%elapsed:6s%, %memory:6s%)',
+        'very_verbose_no_ansi' => ' %message% (%elapsed:6s%, %memory:6s%)',
+    ];
+
+    private OutputInterface $output;
+    private int $startTime;
+    private ?string $format = null;
+    private ?string $message = null;
+    private array $indicatorValues;
+    private int $indicatorCurrent;
+    private int $indicatorChangeInterval;
+    private float $indicatorUpdateTime;
+    private bool $started = false;
+
+    /**
+     * @var array<string, callable>
+     */
+    private static array $formatters;
 
     /**
      * @param int        $indicatorChangeInterval Change interval in milliseconds
@@ -133,16 +146,10 @@ class ProgressIndicator
 
     /**
      * Gets the format for a given name.
-     *
-     * @return string|null A format string
      */
-    public static function getFormatDefinition(string $name)
+    public static function getFormatDefinition(string $name): ?string
     {
-        if (!self::$formats) {
-            self::$formats = self::initFormats();
-        }
-
-        return self::$formats[$name] ?? null;
+        return self::FORMATS[$name] ?? null;
     }
 
     /**
@@ -152,23 +159,17 @@ class ProgressIndicator
      */
     public static function setPlaceholderFormatterDefinition(string $name, callable $callable)
     {
-        if (!self::$formatters) {
-            self::$formatters = self::initPlaceholderFormatters();
-        }
+        self::$formatters ??= self::initPlaceholderFormatters();
 
         self::$formatters[$name] = $callable;
     }
 
     /**
      * Gets the placeholder formatter for a given name (including the delimiter char like %).
-     *
-     * @return callable|null A PHP callable
      */
-    public static function getPlaceholderFormatterDefinition(string $name)
+    public static function getPlaceholderFormatterDefinition(string $name): ?callable
     {
-        if (!self::$formatters) {
-            self::$formatters = self::initPlaceholderFormatters();
-        }
+        self::$formatters ??= self::initPlaceholderFormatters();
 
         return self::$formatters[$name] ?? null;
     }
@@ -185,21 +186,18 @@ class ProgressIndicator
             }
 
             return $matches[0];
-        }, $this->format));
+        }, $this->format ?? ''));
     }
 
     private function determineBestFormat(): string
     {
-        switch ($this->output->getVerbosity()) {
+        return match ($this->output->getVerbosity()) {
             // OutputInterface::VERBOSITY_QUIET: display is disabled anyway
-            case OutputInterface::VERBOSITY_VERBOSE:
-                return $this->output->isDecorated() ? 'verbose' : 'verbose_no_ansi';
-            case OutputInterface::VERBOSITY_VERY_VERBOSE:
-            case OutputInterface::VERBOSITY_DEBUG:
-                return $this->output->isDecorated() ? 'very_verbose' : 'very_verbose_no_ansi';
-            default:
-                return $this->output->isDecorated() ? 'normal' : 'normal_no_ansi';
-        }
+            OutputInterface::VERBOSITY_VERBOSE => $this->output->isDecorated() ? 'verbose' : 'verbose_no_ansi',
+            OutputInterface::VERBOSITY_VERY_VERBOSE,
+            OutputInterface::VERBOSITY_DEBUG => $this->output->isDecorated() ? 'very_verbose' : 'very_verbose_no_ansi',
+            default => $this->output->isDecorated() ? 'normal' : 'normal_no_ansi',
+        };
     }
 
     /**
@@ -220,6 +218,9 @@ class ProgressIndicator
         return round(microtime(true) * 1000);
     }
 
+    /**
+     * @return array<string, \Closure>
+     */
     private static function initPlaceholderFormatters(): array
     {
         return [
@@ -235,20 +236,6 @@ class ProgressIndicator
             'memory' => function () {
                 return Helper::formatMemory(memory_get_usage(true));
             },
-        ];
-    }
-
-    private static function initFormats(): array
-    {
-        return [
-            'normal' => ' %indicator% %message%',
-            'normal_no_ansi' => ' %message%',
-
-            'verbose' => ' %indicator% %message% (%elapsed:6s%)',
-            'verbose_no_ansi' => ' %message% (%elapsed:6s%)',
-
-            'very_verbose' => ' %indicator% %message% (%elapsed:6s%, %memory:6s%)',
-            'very_verbose_no_ansi' => ' %message% (%elapsed:6s%, %memory:6s%)',
         ];
     }
 }

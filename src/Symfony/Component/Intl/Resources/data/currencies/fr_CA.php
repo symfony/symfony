@@ -27,7 +27,7 @@ return [
             1 => 'dollar bélizéen',
         ],
         'CAD' => [
-            0 => '$ CA',
+            0 => '$',
             1 => 'dollar canadien',
         ],
         'CLP' => [

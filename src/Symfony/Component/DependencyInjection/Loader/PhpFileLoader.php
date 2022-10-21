@@ -15,6 +15,7 @@ use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -33,18 +34,15 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 class PhpFileLoader extends FileLoader
 {
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
-    private $generator;
+    private ?ConfigBuilderGeneratorInterface $generator;
 
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null, ?ConfigBuilderGeneratorInterface $generator = null)
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null, ConfigBuilderGeneratorInterface $generator = null)
     {
         parent::__construct($container, $locator, $env);
         $this->generator = $generator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load($resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         // the container and loader variables are exposed to the included file below
         $container = $this->container;
@@ -55,12 +53,12 @@ class PhpFileLoader extends FileLoader
         $this->container->fileExists($path);
 
         // the closure forbids access to the private scope in the included file
-        $load = \Closure::bind(function ($path) use ($container, $loader, $resource, $type) {
+        $load = \Closure::bind(function ($path, $env) use ($container, $loader, $resource, $type) {
             return include $path;
         }, $this, ProtectedPhpFileLoader::class);
 
         try {
-            $callback = $load($path);
+            $callback = $load($path, $this->env);
 
             if (\is_object($callback) && \is_callable($callback)) {
                 $this->executeCallback($callback, new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env), $path);
@@ -69,12 +67,11 @@ class PhpFileLoader extends FileLoader
             $this->instanceof = [];
             $this->registerAliasesForSinglyImplementedInterfaces();
         }
+
+        return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($resource, string $type = null)
+    public function supports(mixed $resource, string $type = null): bool
     {
         if (!\is_string($resource)) {
             return false;
@@ -92,17 +89,26 @@ class PhpFileLoader extends FileLoader
      */
     private function executeCallback(callable $callback, ContainerConfigurator $containerConfigurator, string $path)
     {
-        if (!$callback instanceof \Closure) {
-            $callback = \Closure::fromCallable($callback);
-        }
-
+        $callback = $callback(...);
         $arguments = [];
         $configBuilders = [];
-        $parameters = (new \ReflectionFunction($callback))->getParameters();
-        foreach ($parameters as $parameter) {
+        $r = new \ReflectionFunction($callback);
+
+        $attribute = null;
+        foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            if ($this->env === $attribute->newInstance()->env) {
+                $attribute = null;
+                break;
+            }
+        }
+        if (null !== $attribute) {
+            return;
+        }
+
+        foreach ($r->getParameters() as $parameter) {
             $reflectionType = $parameter->getType();
             if (!$reflectionType instanceof \ReflectionNamedType) {
-                throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $parameter->getName(), $path));
+                throw new \InvalidArgumentException(sprintf('Could not resolve argument "$%s" for "%s". You must typehint it (for example with "%s" or "%s").', $parameter->getName(), $path, ContainerConfigurator::class, ContainerBuilder::class));
             }
             $type = $reflectionType->getName();
 
@@ -117,16 +123,25 @@ class PhpFileLoader extends FileLoader
                 case self::class:
                     $arguments[] = $this;
                     break;
+                case 'string':
+                    if (null !== $this->env && 'env' === $parameter->getName()) {
+                        $arguments[] = $this->env;
+                        break;
+                    }
+                    // no break
                 default:
                     try {
                         $configBuilder = $this->configBuilder($type);
-                    } catch (InvalidArgumentException | \LogicException $e) {
-                        throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $type.' '.$parameter->getName(), $path), 0, $e);
+                    } catch (InvalidArgumentException|\LogicException $e) {
+                        throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $type.' $'.$parameter->getName(), $path), 0, $e);
                     }
                     $configBuilders[] = $configBuilder;
                     $arguments[] = $configBuilder;
             }
         }
+
+        // Force load ContainerConfigurator to make env(), param() etc available.
+        class_exists(ContainerConfigurator::class);
 
         $callback(...$arguments);
 
@@ -154,17 +169,21 @@ class PhpFileLoader extends FileLoader
             return new $namespace();
         }
 
-        // If it does not start with Symfony\Config\ we dont know how to handle this
-        if ('Symfony\\Config\\' !== substr($namespace, 0, 15)) {
-            throw new InvalidargumentException(sprintf('Could not find or generate class "%s".', $namespace));
+        // If it does not start with Symfony\Config\ we don't know how to handle this
+        if (!str_starts_with($namespace, 'Symfony\\Config\\')) {
+            throw new InvalidArgumentException(sprintf('Could not find or generate class "%s".', $namespace));
         }
 
         // Try to get the extension alias
         $alias = Container::underscore(substr($namespace, 15, -6));
 
+        if (str_contains($alias, '\\')) {
+            throw new InvalidArgumentException('You can only use "root" ConfigBuilders from "Symfony\\Config\\" namespace. Nested classes like "Symfony\\Config\\Framework\\CacheConfig" cannot be used.');
+        }
+
         if (!$this->container->hasExtension($alias)) {
             $extensions = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
-            throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s". Looked for namespace "%s", found "%s".', $namespace, $namespace, $extensions ? implode('", "', $extensions) : 'none'));
+            throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s". Looked for namespace "%s", found "%s".', $namespace, $alias, $extensions ? implode('", "', $extensions) : 'none'));
         }
 
         $extension = $this->container->getExtension($alias);

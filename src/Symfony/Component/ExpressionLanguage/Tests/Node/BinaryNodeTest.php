@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
+use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 class BinaryNodeTest extends AbstractNodeTest
 {
@@ -62,7 +65,13 @@ class BinaryNodeTest extends AbstractNodeTest
 
             [[1, 2, 3], new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
+            [true, new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('a'))],
+            [false, new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('b'))],
+            [true, new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('c'))],
+            [false, new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('b'))],
             [1, new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
+            [0, new BinaryNode('matches', new ConstantNode(''), new ConstantNode('/^[a-z]+$/'))],
+            [0, new BinaryNode('matches', new ConstantNode(null), new ConstantNode('/^[a-z]+$/'))],
         ];
     }
 
@@ -111,7 +120,10 @@ class BinaryNodeTest extends AbstractNodeTest
 
             ['range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
-            ['preg_match("/^[a-z]+/i\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+/i$/'))],
+            ['(static function ($regexp, $str) { set_error_handler(function ($t, $m) use ($regexp, $str) { throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12)); }); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })("/^[a-z]+\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
+
+            ['str_starts_with("abc", "a")', new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('a'))],
+            ['str_ends_with("abc", "a")', new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('a'))],
         ];
     }
 
@@ -160,7 +172,46 @@ class BinaryNodeTest extends AbstractNodeTest
 
             ['(1 .. 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
-            ['("abc" matches "/^[a-z]+/i$/")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+/i$/'))],
+            ['("abc" matches "/^[a-z]+$/")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
         ];
+    }
+
+    public function testEvaluateMatchesWithInvalidRegexp()
+    {
+        $node = new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('this is not a regexp'));
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
+        $node->evaluate([], []);
+    }
+
+    public function testEvaluateMatchesWithInvalidRegexpAsExpression()
+    {
+        $node = new BinaryNode('matches', new ConstantNode('abc'), new NameNode('regexp'));
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
+        $node->evaluate([], ['regexp' => 'this is not a regexp']);
+    }
+
+    public function testCompileMatchesWithInvalidRegexp()
+    {
+        $node = new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('this is not a regexp'));
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
+        $compiler = new Compiler([]);
+        $node->compile($compiler);
+    }
+
+    public function testCompileMatchesWithInvalidRegexpAsExpression()
+    {
+        $node = new BinaryNode('matches', new ConstantNode('abc'), new NameNode('regexp'));
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Regexp "this is not a regexp" passed to "matches" is not valid: Delimiter must not be alphanumeric');
+        $compiler = new Compiler([]);
+        $node->compile($compiler);
+        eval('$regexp = "this is not a regexp"; '.$compiler->getSource().';');
     }
 }

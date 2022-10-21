@@ -21,10 +21,10 @@ class RememberMeDetails
 {
     public const COOKIE_DELIMITER = ':';
 
-    private $userFqcn;
-    private $userIdentifier;
-    private $expires;
-    private $value;
+    private string $userFqcn;
+    private string $userIdentifier;
+    private int $expires;
+    private string $value;
 
     public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
     {
@@ -37,6 +37,9 @@ class RememberMeDetails
     public static function fromRawCookie(string $rawCookie): self
     {
         $cookieParts = explode(self::COOKIE_DELIMITER, base64_decode($rawCookie), 4);
+        if (4 !== \count($cookieParts)) {
+            throw new AuthenticationException('The cookie contains invalid data.');
+        }
         if (false === $cookieParts[1] = base64_decode($cookieParts[1], true)) {
             throw new AuthenticationException('The user identifier contains a character from outside the base64 alphabet.');
         }

@@ -49,40 +49,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceType extends AbstractType
 {
-    private $choiceListFactory;
-    private $translator;
+    private ChoiceListFactoryInterface $choiceListFactory;
+    private ?TranslatorInterface $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(ChoiceListFactoryInterface $choiceListFactory = null, $translator = null)
+    public function __construct(ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
     {
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(
             new PropertyAccessDecorator(
                 new DefaultChoiceListFactory()
             )
         );
-
-        // BC, to be removed in 6.0
-        if ($this->choiceListFactory instanceof CachingFactoryDecorator) {
-            return;
-        }
-
-        $ref = new \ReflectionMethod($this->choiceListFactory, 'createListFromChoices');
-
-        if ($ref->getNumberOfParameters() < 3) {
-            trigger_deprecation('symfony/form', '5.1', 'Not defining a third parameter "callable|null $filter" in "%s::%s()" is deprecated.', $ref->class, $ref->name);
-        }
-
-        if (null !== $translator && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be han instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $unknownValues = [];
@@ -194,7 +173,7 @@ class ChoiceType extends AbstractType
                 if (\count($unknownValues) > 0) {
                     $form = $event->getForm();
 
-                    $clientDataAsString = is_scalar($form->getViewData()) ? (string) $form->getViewData() : (\is_array($form->getViewData()) ? implode('", "', array_keys($unknownValues)) : \gettype($form->getViewData()));
+                    $clientDataAsString = \is_scalar($form->getViewData()) ? (string) $form->getViewData() : (\is_array($form->getViewData()) ? implode('", "', array_keys($unknownValues)) : \gettype($form->getViewData()));
 
                     if (null !== $this->translator) {
                         $message = $this->translator->trans($messageTemplate, ['{{ value }}' => $clientDataAsString], 'validators');
@@ -236,9 +215,6 @@ class ChoiceType extends AbstractType
         }, 256);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $choiceTranslationDomain = $options['choice_translation_domain'];
@@ -295,9 +271,6 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['expanded']) {
@@ -315,9 +288,6 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $emptyData = function (Options $options) {
@@ -390,11 +360,7 @@ class ChoiceType extends AbstractType
             'data_class' => null,
             'choice_translation_domain' => true,
             'trim' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'The selected choice is invalid.';
-            },
+            'invalid_message' => 'The selected choice is invalid.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -413,10 +379,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'choice';
     }

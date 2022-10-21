@@ -204,6 +204,32 @@ class DateTypeTest extends BaseTypeTest
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
+    public function testArrayDateWithReferenceDoesUseReferenceTimeOnZero()
+    {
+        // we test against "de_DE", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_DE');
+
+        $input = [
+            'day' => '0',
+            'month' => '0',
+            'year' => '0',
+        ];
+
+        $form = $this->factory->create(static::TESTED_TYPE, $input, [
+            'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'input' => 'array',
+            'widget' => 'single_text',
+        ]);
+
+        $this->assertSame($input, $form->getData());
+        $this->assertEquals('01.01.1970', $form->getViewData());
+    }
+
     public function testSubmitFromText()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -927,19 +953,15 @@ class DateTypeTest extends BaseTypeTest
         $this->assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
-    public function testYearsFor32BitsMachines()
+    public function testYears()
     {
-        if (4 !== \PHP_INT_SIZE) {
-            $this->markTestSkipped('PHP 32 bit is required.');
-        }
-
         $view = $this->factory->create(static::TESTED_TYPE, null, [
-            'years' => range(1900, 2040),
+            'years' => [1900, 2000, 2040],
         ])
             ->createView();
 
         $listChoices = [];
-        foreach (range(1902, 2037) as $y) {
+        foreach ([1900, 2000, 2040] as $y) {
             $listChoices[] = new ChoiceView($y, $y, $y);
         }
 

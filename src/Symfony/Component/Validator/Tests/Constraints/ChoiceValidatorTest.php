@@ -89,10 +89,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new Choice(['choices' => ['foo', 'bar']])];
         yield 'Doctrine default option' => [new Choice(['value' => ['foo', 'bar']])];
         yield 'first argument' => [new Choice(['foo', 'bar'])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\Choice(choices: ["foo", "bar"]);')];
-        }
+        yield 'named arguments' => [new Choice(choices: ['foo', 'bar'])];
     }
 
     /**
@@ -114,12 +111,9 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             },
         ])];
         yield 'doctrine style, static method' => [new Choice(['callback' => [__CLASS__, 'staticCallback']])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments, namespaced function' => [eval("return new \Symfony\Component\Validator\Constraints\Choice(callback: 'Symfony\Component\Validator\Tests\Constraints\choice_callback');")];
-            yield 'named arguments, closure' => [eval('return new \Symfony\Component\Validator\Constraints\Choice(callback: fn () => ["foo", "bar"]);')];
-            yield 'named arguments, static method' => [eval('return new \Symfony\Component\Validator\Constraints\Choice(callback: ["Symfony\Component\Validator\Tests\Constraints\ChoiceValidatorTest", "staticCallback"]);')];
-        }
+        yield 'named arguments, namespaced function' => [new Choice(callback: __NAMESPACE__.'\choice_callback')];
+        yield 'named arguments, closure' => [new Choice(callback: fn () => ['foo', 'bar'])];
+        yield 'named arguments, static method' => [new Choice(callback: [__CLASS__, 'staticCallback'])];
     }
 
     public function testValidChoiceCallbackContextMethod()
@@ -162,13 +156,10 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             'choices' => ['foo', 'bar', 'baz'],
             'multiple' => true,
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval("return new \Symfony\Component\Validator\Constraints\Choice(
-                choices: ['foo', 'bar', 'baz'],
-                multiple: true,
-            );")];
-        }
+        yield 'named arguments' => [new Choice(
+            choices: ['foo', 'bar', 'baz'],
+            multiple: true,
+        )];
     }
 
     /**
@@ -188,10 +179,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     public function provideConstraintsWithMessage(): iterable
     {
         yield 'Doctrine style' => [new Choice(['choices' => ['foo', 'bar'], 'message' => 'myMessage'])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\Choice(choices: ["foo", "bar"], message: "myMessage");')];
-        }
+        yield 'named arguments' => [new Choice(choices: ['foo', 'bar'], message: 'myMessage')];
     }
 
     public function testInvalidChoiceEmptyChoices()
@@ -234,14 +222,11 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             'multipleMessage' => 'myMessage',
             'multiple' => true,
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval("return new \Symfony\Component\Validator\Constraints\Choice(
-                choices: ['foo', 'bar'],
-                multipleMessage: 'myMessage',
-                multiple: true,
-            );")];
-        }
+        yield 'named arguments' => [new Choice(
+            choices: ['foo', 'bar'],
+            multipleMessage: 'myMessage',
+            multiple: true,
+        )];
     }
 
     /**
@@ -271,15 +256,12 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             'min' => 2,
             'minMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval("return new \Symfony\Component\Validator\Constraints\Choice(
-                choices: ['foo', 'bar', 'moo', 'maa'],
-                multiple: true,
-                min: 2,
-                minMessage: 'myMessage',
-            );")];
-        }
+        yield 'named arguments' => [new Choice(
+            choices: ['foo', 'bar', 'moo', 'maa'],
+            multiple: true,
+            min: 2,
+            minMessage: 'myMessage',
+        )];
     }
 
     /**
@@ -309,15 +291,12 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             'max' => 2,
             'maxMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval("return new \Symfony\Component\Validator\Constraints\Choice(
-                choices: ['foo', 'bar', 'moo', 'maa'],
-                multiple: true,
-                max: 2,
-                maxMessage: 'myMessage',
-            );")];
-        }
+        yield 'named arguments' => [new Choice(
+            choices: ['foo', 'bar', 'moo', 'maa'],
+            multiple: true,
+            max: 2,
+            maxMessage: 'myMessage',
+        )];
     }
 
     public function testStrictAllowsExactValue()
@@ -362,6 +341,36 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ choices }}', '1, 2, 3')
             ->setInvalidValue('3')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testMatchFalse()
+    {
+        $this->validator->validate('foo', new Choice([
+            'choices' => ['foo', 'bar'],
+            'match' => false,
+        ]));
+
+        $this->buildViolation('The value you selected is not a valid choice.')
+            ->setParameter('{{ value }}', '"foo"')
+            ->setParameter('{{ choices }}', '"foo", "bar"')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testMatchFalseWithMultiple()
+    {
+        $this->validator->validate(['ccc', 'bar', 'zzz'], new Choice([
+            'choices' => ['foo', 'bar'],
+            'multiple' => true,
+            'match' => false,
+        ]));
+
+        $this->buildViolation('One or more of the given values is invalid.')
+            ->setParameter('{{ value }}', '"bar"')
+            ->setParameter('{{ choices }}', '"foo", "bar"')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
+            ->setInvalidValue('bar')
             ->assertRaised();
     }
 }

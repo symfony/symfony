@@ -13,14 +13,9 @@ namespace Symfony\Component\Runtime\Resolver;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 5.3
  */
 class DebugClosureResolver extends ClosureResolver
 {
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(): array
     {
         [$closure, $arguments] = parent::resolve();

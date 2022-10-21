@@ -12,9 +12,11 @@
 namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -30,9 +32,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Firewall implements EventSubscriberInterface
 {
-    private $map;
-    private $dispatcher;
-    private $exceptionListeners;
+    private FirewallMapInterface $map;
+    private EventDispatcherInterface $dispatcher;
+
+    /**
+     * @var \SplObjectStorage<Request, ExceptionListener>
+     */
+    private \SplObjectStorage $exceptionListeners;
 
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
@@ -96,9 +102,6 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

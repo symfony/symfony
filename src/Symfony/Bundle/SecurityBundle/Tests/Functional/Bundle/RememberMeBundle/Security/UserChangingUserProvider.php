@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\Security;
 
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,33 +21,40 @@ class UserChangingUserProvider implements UserProviderInterface
 {
     private $inner;
 
+    public static $changePassword = false;
+
     public function __construct(InMemoryUserProvider $inner)
     {
         $this->inner = $inner;
     }
 
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
-        return $this->inner->loadUserByUsername($username);
+        return $this->changeUser($this->inner->loadUserByUsername($username));
     }
 
     public function loadUserByIdentifier(string $userIdentifier): UserInterface
     {
-        return $this->inner->loadUserByIdentifier($userIdentifier);
+        return $this->changeUser($this->inner->loadUserByIdentifier($userIdentifier));
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
-        $user = $this->inner->refreshUser($user);
-
-        $alterUser = \Closure::bind(function (User $user) { $user->password = 'foo'; }, null, User::class);
-        $alterUser($user);
-
-        return $user;
+        return $this->changeUser($this->inner->refreshUser($user));
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return $this->inner->supportsClass($class);
+    }
+
+    private function changeUser(UserInterface $user): UserInterface
+    {
+        if (self::$changePassword) {
+            $alterUser = \Closure::bind(function (InMemoryUser $user) { $user->password = 'changed!'; }, null, class_exists(User::class) ? User::class : InMemoryUser::class);
+            $alterUser($user);
+        }
+
+        return $user;
     }
 }

@@ -20,7 +20,10 @@ final class SlackContextBlock extends AbstractSlackBlock
         $this->options['type'] = 'context';
     }
 
-    public function text(string $text, bool $markdown = true, bool $emoji = true, bool $verbatim = false): self
+    /**
+     * @return $this
+     */
+    public function text(string $text, bool $markdown = true, bool $emoji = true, bool $verbatim = false): static
     {
         if (self::ELEMENT_LIMIT === \count($this->options['elements'] ?? [])) {
             throw new \LogicException(sprintf('Maximum number of elements should not exceed %d.', self::ELEMENT_LIMIT));
@@ -40,7 +43,10 @@ final class SlackContextBlock extends AbstractSlackBlock
         return $this;
     }
 
-    public function image(string $url, string $text): self
+    /**
+     * @return $this
+     */
+    public function image(string $url, string $text): static
     {
         if (self::ELEMENT_LIMIT === \count($this->options['elements'] ?? [])) {
             throw new \LogicException(sprintf('Maximum number of elements should not exceed %d.', self::ELEMENT_LIMIT));
@@ -55,7 +61,10 @@ final class SlackContextBlock extends AbstractSlackBlock
         return $this;
     }
 
-    public function id(string $id): self
+    /**
+     * @return $this
+     */
+    public function id(string $id): static
     {
         $this->options['block_id'] = $id;
 

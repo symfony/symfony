@@ -36,10 +36,7 @@ class EnableAutoMapping extends Constraint
         parent::__construct($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT];
     }

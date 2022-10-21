@@ -22,36 +22,30 @@ use Twig\TwigFilter;
  */
 final class CodeExtension extends AbstractExtension
 {
-    private $fileLinkFormat;
-    private $charset;
-    private $projectDir;
+    private string|FileLinkFormatter|array|false $fileLinkFormat;
+    private string $charset;
+    private string $projectDir;
 
-    /**
-     * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
-     */
-    public function __construct($fileLinkFormat, string $projectDir, string $charset)
+    public function __construct(string|FileLinkFormatter $fileLinkFormat, string $projectDir, string $charset)
     {
-        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->fileLinkFormat = $fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->projectDir = str_replace('\\', '/', $projectDir).'/';
         $this->charset = $charset;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFilters(): array
     {
         return [
-            new TwigFilter('abbr_class', [$this, 'abbrClass'], ['is_safe' => ['html']]),
-            new TwigFilter('abbr_method', [$this, 'abbrMethod'], ['is_safe' => ['html']]),
-            new TwigFilter('format_args', [$this, 'formatArgs'], ['is_safe' => ['html']]),
-            new TwigFilter('format_args_as_text', [$this, 'formatArgsAsText']),
-            new TwigFilter('file_excerpt', [$this, 'fileExcerpt'], ['is_safe' => ['html']]),
-            new TwigFilter('format_file', [$this, 'formatFile'], ['is_safe' => ['html']]),
-            new TwigFilter('format_file_from_text', [$this, 'formatFileFromText'], ['is_safe' => ['html']]),
-            new TwigFilter('format_log_message', [$this, 'formatLogMessage'], ['is_safe' => ['html']]),
-            new TwigFilter('file_link', [$this, 'getFileLink']),
-            new TwigFilter('file_relative', [$this, 'getFileRelative']),
+            new TwigFilter('abbr_class', $this->abbrClass(...), ['is_safe' => ['html']]),
+            new TwigFilter('abbr_method', $this->abbrMethod(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_args', $this->formatArgs(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_args_as_text', $this->formatArgsAsText(...)),
+            new TwigFilter('file_excerpt', $this->fileExcerpt(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_file', $this->formatFile(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_file_from_text', $this->formatFileFromText(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_log_message', $this->formatLogMessage(...), ['is_safe' => ['html']]),
+            new TwigFilter('file_link', $this->getFileLink(...)),
+            new TwigFilter('file_relative', $this->getFileRelative(...)),
         ];
     }
 
@@ -65,7 +59,7 @@ final class CodeExtension extends AbstractExtension
 
     public function abbrMethod(string $method): string
     {
-        if (false !== strpos($method, '::')) {
+        if (str_contains($method, '::')) {
             [$class, $method] = explode('::', $method, 2);
             $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
@@ -172,12 +166,7 @@ final class CodeExtension extends AbstractExtension
         return $text;
     }
 
-    /**
-     * Returns the link for a given file/line pair.
-     *
-     * @return string|false A link or false
-     */
-    public function getFileLink(string $file, int $line)
+    public function getFileLink(string $file, int $line): string|false
     {
         if ($fmt = $this->fileLinkFormat) {
             return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
@@ -190,7 +179,7 @@ final class CodeExtension extends AbstractExtension
     {
         $file = str_replace('\\', '/', $file);
 
-        if (null !== $this->projectDir && 0 === strpos($file, $this->projectDir)) {
+        if (null !== $this->projectDir && str_starts_with($file, $this->projectDir)) {
             return ltrim(substr($file, \strlen($this->projectDir)), '/');
         }
 
@@ -209,10 +198,10 @@ final class CodeExtension extends AbstractExtension
      */
     public function formatLogMessage(string $message, array $context): string
     {
-        if ($context && false !== strpos($message, '{')) {
+        if ($context && str_contains($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
-                if (is_scalar($val)) {
+                if (\is_scalar($val)) {
                     $replacements['{'.$key.'}'] = $val;
                 }
             }

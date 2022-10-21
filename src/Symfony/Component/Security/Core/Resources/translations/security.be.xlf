@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Спасылка для ўваходу несапраўдная або пратэрмінаваная.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Занадта шмат няўдалых спроб уваходу ў сістэму, паспрабуйце спробу праз %minutes% хвіліну.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Занадта шмат няўдалых спроб уваходу ў сістэму, паспрабуйце спробу праз %minutes% хвілін.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

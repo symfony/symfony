@@ -20,19 +20,18 @@ namespace Symfony\Component\Config\Builder;
  */
 class ClassBuilder
 {
-    /** @var string */
-    private $namespace;
-
-    /** @var string */
-    private $name;
+    private string $namespace;
+    private string $name;
 
     /** @var Property[] */
-    private $properties = [];
+    private array $properties = [];
 
     /** @var Method[] */
-    private $methods = [];
-    private $require = [];
-    private $implements = [];
+    private array $methods = [];
+    private array $require = [];
+    private array $use = [];
+    private array $implements = [];
+    private bool $allowExtraKeys = false;
 
     public function __construct(string $namespace, string $name)
     {
@@ -64,7 +63,11 @@ class ClassBuilder
                 }
                 unset($path[$key]);
             }
-            $require .= sprintf('require_once __DIR__.\'%s\';', \DIRECTORY_SEPARATOR.implode(\DIRECTORY_SEPARATOR, $path))."\n";
+            $require .= sprintf('require_once __DIR__.\DIRECTORY_SEPARATOR.\'%s\';', implode('\'.\DIRECTORY_SEPARATOR.\'', $path))."\n";
+        }
+        $use = $require ? "\n" : '';
+        foreach (array_keys($this->use) as $statement) {
+            $use .= sprintf('use %s;', $statement)."\n";
         }
 
         $implements = [] === $this->implements ? '' : 'implements '.implode(', ', $this->implements);
@@ -74,8 +77,8 @@ class ClassBuilder
         }
         foreach ($this->methods as $method) {
             $lines = explode("\n", $method->getContent());
-            foreach ($lines as $i => $line) {
-                $body .= '    '.$line."\n";
+            foreach ($lines as $line) {
+                $body .= ($line ? '    '.$line : '')."\n";
             }
         }
 
@@ -83,28 +86,30 @@ class ClassBuilder
 
 namespace NAMESPACE;
 
-REQUIRE
-
+REQUIREUSE
 /**
- * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
+ * This class is automatically generated to help in creating a config.
  */
 class CLASS IMPLEMENTS
 {
 BODY
 }
-', ['NAMESPACE' => $this->namespace, 'REQUIRE' => $require, 'CLASS' => $this->getName(), 'IMPLEMENTS' => $implements, 'BODY' => $body]);
+', ['NAMESPACE' => $this->namespace, 'REQUIRE' => $require, 'USE' => $use, 'CLASS' => $this->getName(), 'IMPLEMENTS' => $implements, 'BODY' => $body]);
 
         return $content;
     }
 
-    public function addRequire(self $class)
+    public function addRequire(self $class): void
     {
         $this->require[] = $class;
     }
 
-    public function addImplements(string $interface)
+    public function addUse(string $class): void
+    {
+        $this->use[$class] = true;
+    }
+
+    public function addImplements(string $interface): void
     {
         $this->implements[] = '\\'.ltrim($interface, '\\');
     }
@@ -114,14 +119,15 @@ BODY
         $this->methods[] = new Method(strtr($body, ['NAME' => $this->camelCase($name)] + $params));
     }
 
-    public function addProperty(string $name, string $classType = null): Property
+    public function addProperty(string $name, string $classType = null, string $defaultValue = null): Property
     {
-        $property = new Property($name, $this->camelCase($name));
+        $property = new Property($name, '_' !== $name[0] ? $this->camelCase($name) : $name);
         if (null !== $classType) {
             $property->setType($classType);
         }
         $this->properties[] = $property;
-        $property->setContent(sprintf('private $%s;', $property->getName()));
+        $defaultValue = null !== $defaultValue ? sprintf(' = %s', $defaultValue) : '';
+        $property->setContent(sprintf('private $%s%s;', $property->getName(), $defaultValue));
 
         return $property;
     }
@@ -148,8 +154,18 @@ BODY
         return $this->namespace;
     }
 
-    public function getFqcn()
+    public function getFqcn(): string
     {
         return '\\'.$this->namespace.'\\'.$this->name;
+    }
+
+    public function setAllowExtraKeys(bool $allowExtraKeys): void
+    {
+        $this->allowExtraKeys = $allowExtraKeys;
+    }
+
+    public function shouldAllowExtraKeys(): bool
+    {
+        return $this->allowExtraKeys;
     }
 }

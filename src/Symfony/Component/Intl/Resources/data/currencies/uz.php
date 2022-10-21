@@ -334,6 +334,10 @@ return [
             0 => 'LRD',
             1 => 'Liberiya dollari',
         ],
+        'LSL' => [
+            0 => 'LSL',
+            1 => 'Lesoto lotisi',
+        ],
         'LTL' => [
             0 => 'LTL',
             1 => 'Litva liti',

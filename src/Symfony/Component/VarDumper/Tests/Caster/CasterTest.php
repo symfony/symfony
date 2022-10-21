@@ -164,7 +164,7 @@ EOTXT
             , $c
         );
 
-        $c = eval('return new class implements \Countable { private $foo = "foo"; public function count() { return 0; } };');
+        $c = eval('return new class implements \Countable { private $foo = "foo"; public function count(): int { return 0; } };');
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'

@@ -1,10 +1,29 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Make `HttplugClient` implement `Psr\Http\Message\RequestFactoryInterface`, `StreamFactoryInterface` and `UriFactoryInterface`
+ * Deprecate implementing `Http\Message\RequestFactory`, `StreamFactory` and `UriFactory` on `HttplugClient`
+ * Add `withOptions()` to `HttplugClient` and `Psr18Client`
+
+6.1
+---
+
+ * Allow yielding `Exception` from MockResponse's `$body` to mock transport errors
+ * Remove credentials from requests redirected to same host but different port
+
+5.4
+---
+
+ * Add `MockHttpClient::setResponseFactory()` method to be able to set response factory after client creating
+
 5.3
 ---
 
  * Implement `HttpClientInterface::withOptions()` from `symfony/contracts` v2.4
+ * Add `DecoratorTrait` to ease writing simple decorators
 
 5.2.0
 -----

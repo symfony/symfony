@@ -98,12 +98,12 @@ class TestObjectLoader extends ObjectLoader
 {
     public $loaderMap = [];
 
-    public function supports($resource, string $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return 'service';
     }
 
-    protected function getObject(string $id)
+    protected function getObject(string $id): object
     {
         return $this->loaderMap[$id] ?? null;
     }

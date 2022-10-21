@@ -12,9 +12,7 @@
 namespace Symfony\Component\Security\Http\Authenticator;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\LogicException;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 /**
@@ -27,15 +25,9 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
     /**
      * Shortcut to create a PostAuthenticationToken for you, if you don't really
      * care about which authenticated token you're using.
-     *
-     * @return PostAuthenticationToken
      */
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        if (!$passport instanceof UserPassportInterface) {
-            throw new LogicException(sprintf('Passport does not contain a user, overwrite "createAuthenticatedToken()" in "%s" to create a custom authenticated token.', static::class));
-        }
-
         return new PostAuthenticationToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 }

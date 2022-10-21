@@ -40,6 +40,7 @@ final class ConnectionOptions
     public const DEBUG_LEVEL = 0x5001;
     public const TIMEOUT = 0x5002;
     public const NETWORK_TIMEOUT = 0x5005;
+    public const X_TLS_CACERTFILE = 0x6002;
     public const X_TLS_CACERTDIR = 0x6003;
     public const X_TLS_CERTFILE = 0x6004;
     public const X_TLS_CRL_ALL = 0x02;
@@ -52,8 +53,8 @@ final class ConnectionOptions
     public const X_TLS_RANDOM_FILE = 0x6009;
     public const X_TLS_CRLFILE = 0x6010;
     public const X_TLS_PACKAGE = 0x6011;
-    public const X_TLS_CRLCHECK = 0x600b;
-    public const X_TLS_DHFILE = 0x600e;
+    public const X_TLS_CRLCHECK = 0x600B;
+    public const X_TLS_DHFILE = 0x600E;
     public const X_SASL_MECH = 0x6100;
     public const X_SASL_REALM = 0x6101;
     public const X_SASL_AUTHCID = 0x6102;

@@ -13,9 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\Security\UserAuthenticator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
-use Symfony\Component\Security\Http\Authentication\NoopAuthenticationManager;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
@@ -44,6 +42,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('provider key'),
                 service('logger')->nullOnInvalid(),
                 param('security.authentication.manager.erase_credentials'),
+                param('security.authentication.hide_user_not_found'),
                 abstract_arg('required badges'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
@@ -58,9 +57,6 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
             ])
         ->alias(UserAuthenticatorInterface::class, 'security.user_authenticator')
-
-        ->set('security.authentication.manager', NoopAuthenticationManager::class)
-        ->alias(AuthenticationManagerInterface::class, 'security.authentication.manager')
 
         ->set('security.firewall.authenticator', AuthenticatorManagerListener::class)
             ->abstract()

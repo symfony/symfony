@@ -20,10 +20,13 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
  */
 class JsonEncode implements EncoderInterface
 {
+    /**
+     * Configure the JSON flags bitmask.
+     */
     public const OPTIONS = 'json_encode_options';
 
     private $defaultContext = [
-        self::OPTIONS => 0,
+        self::OPTIONS => \JSON_PRESERVE_ZERO_FRACTION,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -31,12 +34,7 @@ class JsonEncode implements EncoderInterface
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    /**
-     * Encodes PHP data to a JSON string.
-     *
-     * {@inheritdoc}
-     */
-    public function encode($data, string $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = []): string
     {
         $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
 
@@ -46,7 +44,7 @@ class JsonEncode implements EncoderInterface
             throw new NotEncodableValueException($e->getMessage(), 0, $e);
         }
 
-        if (\PHP_VERSION_ID >= 70300 && (\JSON_THROW_ON_ERROR & $options)) {
+        if (\JSON_THROW_ON_ERROR & $options) {
             return $encodedJson;
         }
 
@@ -57,10 +55,7 @@ class JsonEncode implements EncoderInterface
         return $encodedJson;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsEncoding(string $format)
+    public function supportsEncoding(string $format): bool
     {
         return JsonEncoder::FORMAT === $format;
     }

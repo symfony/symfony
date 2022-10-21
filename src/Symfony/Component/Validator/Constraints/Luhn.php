@@ -29,10 +29,15 @@ class Luhn extends Constraint
     public const INVALID_CHARACTERS_ERROR = 'dfad6d23-1b74-4374-929b-5cbb56fc0d9e';
     public const CHECKSUM_FAILED_ERROR = '4d760774-3f50-4cd5-a6d5-b10a3299d8d3';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'Invalid card number.';
 
@@ -40,7 +45,7 @@ class Luhn extends Constraint
         array $options = null,
         string $message = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 

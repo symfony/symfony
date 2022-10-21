@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
+
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
@@ -22,19 +24,16 @@ class RedisArrayStoreTest extends AbstractRedisStoreTest
     public static function setUpBeforeClass(): void
     {
         if (!class_exists(\RedisArray::class)) {
-            self::markTestSkipped('The RedisArray class is required.');
+            throw new SkippedTestSuiteError('The RedisArray class is required.');
         }
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
+            throw new SkippedTestSuiteError($e->getMessage());
         }
     }
 
-    /**
-     * @return \RedisArray
-     */
-    protected function getRedisConnection(): object
+    protected function getRedisConnection(): \RedisArray
     {
         $redis = new \RedisArray([getenv('REDIS_HOST')]);
 

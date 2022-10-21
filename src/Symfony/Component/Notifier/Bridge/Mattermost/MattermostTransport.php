@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -25,11 +26,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MattermostTransport extends AbstractTransport
 {
-    private $token;
-    private $channel;
-    private $path;
+    private string $token;
+    private string $channel;
+    private ?string $path;
 
-    public function __construct(string $token, string $channel, ?string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, string $channel, string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->channel = $channel;
@@ -71,7 +72,13 @@ final class MattermostTransport extends AbstractTransport
             'json' => array_filter($options),
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Mattermost server.', $response, 0, $e);
+        }
+
+        if (201 !== $statusCode) {
             $result = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);

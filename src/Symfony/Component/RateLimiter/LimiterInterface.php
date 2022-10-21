@@ -16,8 +16,6 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 interface LimiterInterface
 {
@@ -35,7 +33,7 @@ interface LimiterInterface
      * @throws ReserveNotSupportedException     if this limiter implementation doesn't support reserving tokens
      * @throws \InvalidArgumentException        if $tokens is larger than the maximum burst size
      */
-    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation;
+    public function reserve(int $tokens = 1, float $maxTime = null): Reservation;
 
     /**
      * Use this method if you intend to drop if the required number

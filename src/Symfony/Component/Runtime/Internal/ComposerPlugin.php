@@ -18,7 +18,6 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\ScriptEvents;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Runtime\RuntimeInterface;
 use Symfony\Component\Runtime\SymfonyRuntime;
 
 /**
@@ -85,7 +84,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         $projectDir = $fs->makePathRelative($projectDir, $vendorDir);
         $nestingLevel = 0;
 
-        while (0 === strpos($projectDir, '../')) {
+        while (str_starts_with($projectDir, '../')) {
             ++$nestingLevel;
             $projectDir = substr($projectDir, 3);
         }
@@ -93,14 +92,10 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         if (!$nestingLevel) {
             $projectDir = '__'.'DIR__.'.var_export('/'.$projectDir, true);
         } else {
-            $projectDir = 'dirname(__'."DIR__, $nestingLevel)".('' !== $projectDir ? var_export('/'.$projectDir, true) : '');
+            $projectDir = 'dirname(__'."DIR__, $nestingLevel)".('' !== $projectDir ? '.'.var_export('/'.$projectDir, true) : '');
         }
 
         $runtimeClass = $extra['class'] ?? SymfonyRuntime::class;
-
-        if (SymfonyRuntime::class !== $runtimeClass && !is_subclass_of($runtimeClass, RuntimeInterface::class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" listed under "extra.runtime.class" in your composer.json file '.(class_exists($runtimeClass) ? 'should implement "%s".' : 'not found.'), $runtimeClass, RuntimeInterface::class));
-        }
 
         unset($extra['class'], $extra['autoload_template']);
 

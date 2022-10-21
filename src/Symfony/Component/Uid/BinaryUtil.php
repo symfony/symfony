@@ -39,7 +39,7 @@ class BinaryUtil
     // https://tools.ietf.org/html/rfc4122#section-4.1.4
     // 0x01b21dd213814000 is the number of 100-ns intervals between the
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
-    private const TIME_OFFSET_INT = 0x01b21dd213814000;
+    private const TIME_OFFSET_INT = 0x01B21DD213814000;
     private const TIME_OFFSET_BIN = "\x01\xb2\x1d\xd2\x13\x81\x40\x00";
     private const TIME_OFFSET_COM1 = "\xfe\x4d\xe2\x2d\xec\x7e\xbf\xff";
     private const TIME_OFFSET_COM2 = "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00";

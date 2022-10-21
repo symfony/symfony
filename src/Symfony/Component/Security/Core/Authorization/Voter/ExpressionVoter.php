@@ -24,12 +24,12 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExpressionVoter implements VoterInterface
+class ExpressionVoter implements CacheableVoterInterface
 {
-    private $expressionLanguage;
-    private $trustResolver;
-    private $authChecker;
-    private $roleHierarchy;
+    private ExpressionLanguage $expressionLanguage;
+    private AuthenticationTrustResolverInterface $trustResolver;
+    private AuthorizationCheckerInterface $authChecker;
+    private ?RoleHierarchyInterface $roleHierarchy;
 
     public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, RoleHierarchyInterface $roleHierarchy = null)
     {
@@ -39,10 +39,17 @@ class ExpressionVoter implements VoterInterface
         $this->roleHierarchy = $roleHierarchy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function supportsAttribute(string $attribute): bool
+    {
+        return false;
+    }
+
+    public function supportsType(string $subjectType): bool
+    {
+        return true;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
         $variables = null;
@@ -64,7 +71,7 @@ class ExpressionVoter implements VoterInterface
         return $result;
     }
 
-    private function getVariables(TokenInterface $token, $subject): array
+    private function getVariables(TokenInterface $token, mixed $subject): array
     {
         $roleNames = $token->getRoleNames();
 

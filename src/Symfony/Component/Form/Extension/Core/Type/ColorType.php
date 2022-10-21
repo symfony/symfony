@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,16 +26,13 @@ class ColorType extends AbstractType
      */
     private const HTML5_PATTERN = '/^#[0-9a-f]{6}$/i';
 
-    private $translator;
+    private ?TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['html5']) {
@@ -55,7 +51,7 @@ class ColorType extends AbstractType
 
             $messageTemplate = 'This value is not a valid HTML5 color.';
             $messageParameters = [
-                '{{ value }}' => is_scalar($value) ? (string) $value : \gettype($value),
+                '{{ value }}' => \is_scalar($value) ? (string) $value : \gettype($value),
             ];
             $message = $this->translator ? $this->translator->trans($messageTemplate, $messageParameters, 'validators') : $messageTemplate;
 
@@ -63,35 +59,22 @@ class ColorType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'html5' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid color.';
-            },
+            'invalid_message' => 'Please select a valid color.',
         ]);
 
         $resolver->setAllowedTypes('html5', 'bool');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'color';
     }

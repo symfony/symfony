@@ -32,23 +32,21 @@ class CookieJar
      * this method returns the first cookie for the given name/path
      * (this behavior ensures a BC behavior with previous versions of
      * Symfony).
-     *
-     * @return Cookie|null A Cookie instance or null if the cookie does not exist
      */
-    public function get(string $name, string $path = '/', string $domain = null)
+    public function get(string $name, string $path = '/', string $domain = null): ?Cookie
     {
         $this->flushExpiredCookies();
 
         foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
             if ($cookieDomain && $domain) {
                 $cookieDomain = '.'.ltrim($cookieDomain, '.');
-                if ($cookieDomain !== substr('.'.$domain, -\strlen($cookieDomain))) {
+                if (!str_ends_with('.'.$domain, $cookieDomain)) {
                     continue;
                 }
             }
 
             foreach ($pathCookies as $cookiePath => $namedCookies) {
-                if (0 !== strpos($path, $cookiePath)) {
+                if (!str_starts_with($path, $cookiePath)) {
                     continue;
                 }
                 if (isset($namedCookies[$name])) {
@@ -124,7 +122,7 @@ class CookieJar
         foreach ($cookies as $cookie) {
             try {
                 $this->set(Cookie::fromString($cookie, $uri));
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // invalid cookies are just ignored
             }
         }
@@ -141,9 +139,9 @@ class CookieJar
     /**
      * Returns not yet expired cookies.
      *
-     * @return Cookie[] An array of cookies
+     * @return Cookie[]
      */
-    public function all()
+    public function all(): array
     {
         $this->flushExpiredCookies();
 
@@ -161,10 +159,8 @@ class CookieJar
 
     /**
      * Returns not yet expired cookie values for the given URI.
-     *
-     * @return array An array of cookie values
      */
-    public function allValues(string $uri, bool $returnsRawValue = false)
+    public function allValues(string $uri, bool $returnsRawValue = false): array
     {
         $this->flushExpiredCookies();
 
@@ -173,18 +169,18 @@ class CookieJar
         foreach ($this->cookieJar as $domain => $pathCookies) {
             if ($domain) {
                 $domain = '.'.ltrim($domain, '.');
-                if ($domain != substr('.'.$parts['host'], -\strlen($domain))) {
+                if (!str_ends_with('.'.$parts['host'], $domain)) {
                     continue;
                 }
             }
 
             foreach ($pathCookies as $path => $namedCookies) {
-                if ($path != substr($parts['path'], 0, \strlen($path))) {
+                if (!str_starts_with($parts['path'], $path)) {
                     continue;
                 }
 
                 foreach ($namedCookies as $cookie) {
-                    if ($cookie->isSecure() && 'https' != $parts['scheme']) {
+                    if ($cookie->isSecure() && 'https' !== $parts['scheme']) {
                         continue;
                     }
 
@@ -198,10 +194,8 @@ class CookieJar
 
     /**
      * Returns not yet expired raw cookie values for the given URI.
-     *
-     * @return array An array of cookie values
      */
-    public function allRawValues(string $uri)
+    public function allRawValues(string $uri): array
     {
         return $this->allValues($uri, true);
     }

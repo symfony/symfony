@@ -19,16 +19,12 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class DiscordTransportTest extends TransportTestCase
 {
-    /**
-     * @return DiscordTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): DiscordTransport
     {
         return (new DiscordTransport('testToken', 'testWebhookId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

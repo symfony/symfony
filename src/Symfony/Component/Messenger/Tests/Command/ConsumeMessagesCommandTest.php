@@ -13,16 +13,20 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Tests\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class ConsumeMessagesCommandTest extends TestCase
@@ -63,7 +67,7 @@ class ConsumeMessagesCommandTest extends TestCase
             '--limit' => 1,
         ]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
     }
 
@@ -96,7 +100,73 @@ class ConsumeMessagesCommandTest extends TestCase
             '--limit' => 1,
         ]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
+
+    public function provideRunWithResetServicesOption(): iterable
+    {
+        yield [true];
+        yield [false];
+    }
+
+    /**
+     * @dataProvider provideRunWithResetServicesOption
+     */
+    public function testRunWithResetServicesOption(bool $shouldReset)
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $receiver = new ResettableDummyReceiver([
+            [$envelope],
+            [/* idle */],
+            [$envelope, $envelope],
+        ]);
+        $msgCount = 3;
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $bus = $this->createMock(RoutableMessageBus::class);
+        $bus->expects($this->exactly($msgCount))->method('dispatch');
+
+        $servicesResetter = new ServicesResetter(new \ArrayIterator([$receiver]), ['reset']);
+
+        $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, [], new ResetServicesListener($servicesResetter));
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute(array_merge([
+            'receivers' => ['dummy-receiver'],
+            '--sleep' => '0.001', // do not sleep too long
+            '--limit' => $msgCount,
+        ], $shouldReset ? [] : ['--no-reset' => null]));
+
+        $this->assertEquals($shouldReset, $receiver->hasBeenReset(), '$receiver->reset() should have been called');
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $bus = $this->createMock(RoutableMessageBus::class);
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, ['async', 'async_high', 'failed'], null, ['messenger.bus.default']);
+        $tester = new CommandCompletionTester($command);
+        $suggestions = $tester->complete($input);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'receiver' => [[''], ['async', 'async_high', 'failed']];
+        yield 'receiver (value)' => [['async'], ['async', 'async_high', 'failed']];
+        yield 'receiver (no repeat)' => [['async', ''], ['async_high', 'failed']];
+        yield 'option --bus' => [['--bus', ''], ['messenger.bus.default']];
     }
 }

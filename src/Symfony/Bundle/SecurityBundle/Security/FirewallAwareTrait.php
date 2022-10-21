@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
+use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+
 /**
  * Provides basic functionality for services mapped by the firewall name
  * in a container locator.
@@ -21,15 +24,15 @@ namespace Symfony\Bundle\SecurityBundle\Security;
  */
 trait FirewallAwareTrait
 {
-    private $locator;
-    private $requestStack;
-    private $firewallMap;
+    private ContainerInterface $locator;
+    private RequestStack $requestStack;
+    private FirewallMap $firewallMap;
 
     private function getForFirewall(): object
     {
         $serviceIdentifier = str_replace('FirewallAware', '', static::class);
         if (null === $request = $this->requestStack->getCurrentRequest()) {
-            throw new \LogicException('Cannot determine the correct '.$serviceIdentifier.' to use: there is no active Request and so, the firewall cannot be determined. Try using a specific '.$serviceIdentifier().' service.');
+            throw new \LogicException('Cannot determine the correct '.$serviceIdentifier.' to use: there is no active Request and so, the firewall cannot be determined. Try using a specific '.$serviceIdentifier.' service.');
         }
 
         $firewall = $this->firewallMap->getFirewallConfig($request);

@@ -169,14 +169,28 @@ class AmazonSqsTransportTest extends TestCase
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)
     {
-        $serializer = $serializer ?? $this->createMock(SerializerInterface::class);
-        $connection = $connection ?? $this->createMock(Connection::class);
+        $serializer ??= $this->createMock(SerializerInterface::class);
+        $connection ??= $this->createMock(Connection::class);
 
         return new AmazonSqsTransport($connection, $serializer);
     }
 
     private function createHttpException(): HttpException
     {
-        return new ServerException($this->createMock(ResponseInterface::class));
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getInfo')->willReturnCallback(static function (string $type = null) {
+            $info = [
+                'http_code' => 500,
+                'url' => 'https://symfony.com',
+            ];
+
+            if (null === $type) {
+                return $info;
+            }
+
+            return $info[$type] ?? null;
+        });
+
+        return new ServerException($response);
     }
 }

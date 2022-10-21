@@ -61,7 +61,7 @@ class UnstructuredHeaderTest extends TestCase
         */
         $this->assertEquals(
             'X-Custom-Header: The quick brown fox jumped over the fence, he was a'.
-            ' very'."\r\n".//Folding
+            ' very'."\r\n".// Folding
             ' very scary brown fox with a bushy tail',
             $header->toString(), '%s: The header should have been folded at 76th char'
         );
@@ -149,10 +149,10 @@ class UnstructuredHeaderTest extends TestCase
 
         $nonAsciiChar = pack('C', 0x8F);
 
-        //Note that multi-line headers begin with LWSP which makes 75 + 1 = 76
-        //Note also that =?utf-8?q??= is 12 chars which makes 75 - 12 = 63
+        // Note that multi-line headers begin with LWSP which makes 75 + 1 = 76
+        // Note also that =?utf-8?q??= is 12 chars which makes 75 - 12 = 63
 
-        //* X-Test: is 8 chars
+        // * X-Test: is 8 chars
         $header = new UnstructuredHeader('X-Test', $nonAsciiChar);
         $header->setCharset('iso-8859-1');
         $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8F?=', $header->toString());
@@ -169,7 +169,7 @@ class UnstructuredHeaderTest extends TestCase
         // Note that multi-line headers begin with LWSP which makes 75 + 1 = 76
         // Note also that =?utf-8?q??= is 12 chars which makes 75 - 12 = 63
 
-        //* X-Test: is 8 chars
+        // * X-Test: is 8 chars
         $header = new UnstructuredHeader('X-Test', pack('C', 0x8F).'line_one_here'."\r\n".'line_two_here');
         $header->setCharset('iso-8859-1');
         $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8Fline=5Fone=5Fhere?='."\r\n".' =?'.$header->getCharset().'?Q?line=5Ftwo=5Fhere?=', $header->toString());

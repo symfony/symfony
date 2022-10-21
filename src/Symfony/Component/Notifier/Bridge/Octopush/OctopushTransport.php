@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,12 +28,12 @@ final class OctopushTransport extends AbstractTransport
 {
     protected const HOST = 'www.octopush-dm.com';
 
-    private $userLogin;
-    private $apiKey;
-    private $from;
-    private $type;
+    private string $userLogin;
+    private string $apiKey;
+    private string $from;
+    private string $type;
 
-    public function __construct(string $userLogin, string $apiKey, string $from, string $type, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $userLogin, string $apiKey, string $from, string $type, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->userLogin = $userLogin;
         $this->apiKey = $apiKey;
@@ -58,6 +59,8 @@ final class OctopushTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/api/sms/json', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
@@ -69,12 +72,18 @@ final class OctopushTransport extends AbstractTransport
                 'api_key' => $this->apiKey,
                 'sms_text' => $message->getSubject(),
                 'sms_recipients' => $message->getPhone(),
-                'sms_sender' => $this->from,
+                'sms_sender' => $from,
                 'sms_type' => $this->type,
             ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Octopush server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException('Unable to send the SMS: '.$error['error_code'], $response);

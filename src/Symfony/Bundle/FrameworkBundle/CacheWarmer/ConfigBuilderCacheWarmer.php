@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\BuildDebugContainerTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
@@ -28,10 +28,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 {
-    use BuildDebugContainerTrait;
-
-    private $kernel;
-    private $logger;
+    private KernelInterface $kernel;
+    private ?LoggerInterface $logger;
 
     public function __construct(KernelInterface $kernel, LoggerInterface $logger = null)
     {
@@ -40,11 +38,9 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string[]
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $generator = new ConfigBuilderGenerator($cacheDir);
 
@@ -57,9 +53,7 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
             try {
                 $this->dumpExtension($extension, $generator);
             } catch (\Exception $e) {
-                if ($this->logger) {
-                    $this->logger->warning('Failed to generate ConfigBuilder for extension {extensionClass}.', ['exception' => $e, 'extensionClass' => \get_class($extension)]);
-                }
+                $this->logger?->warning('Failed to generate ConfigBuilder for extension {extensionClass}.', ['exception' => $e, 'extensionClass' => $extension::class]);
             }
         }
 
@@ -69,21 +63,21 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 
     private function dumpExtension(ExtensionInterface $extension, ConfigBuilderGeneratorInterface $generator): void
     {
+        $configuration = null;
         if ($extension instanceof ConfigurationInterface) {
             $configuration = $extension;
         } elseif ($extension instanceof ConfigurationExtensionInterface) {
-            $configuration = $extension->getConfiguration([], $this->getContainerBuilder($this->kernel));
-        } else {
-            throw new \LogicException(sprintf('Could not get configuration for extension "%s".', \get_class($extension)));
+            $configuration = $extension->getConfiguration([], new ContainerBuilder($this->kernel->getContainer()->getParameterBag()));
+        }
+
+        if (!$configuration) {
+            return;
         }
 
         $generator->build($configuration);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

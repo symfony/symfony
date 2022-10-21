@@ -15,16 +15,6 @@ use Symfony\Component\Form\Console\Descriptor\JsonDescriptor;
 
 class JsonDescriptorTest extends AbstractDescriptorTest
 {
-    protected function setUp(): void
-    {
-        putenv('COLUMNS=121');
-    }
-
-    protected function tearDown(): void
-    {
-        putenv('COLUMNS');
-    }
-
     protected function getDescriptor()
     {
         return new JsonDescriptor();

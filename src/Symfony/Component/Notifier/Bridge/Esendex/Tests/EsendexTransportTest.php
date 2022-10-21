@@ -18,16 +18,13 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class EsendexTransportTest extends TransportTestCase
 {
-    /**
-     * @return EsendexTransport
-     */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): EsendexTransport
     {
         return (new EsendexTransport('email', 'password', 'testAccountReference', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
@@ -87,5 +84,27 @@ final class EsendexTransportTest extends TransportTestCase
         $this->expectExceptionMessage('Unable to send the SMS: error 500. Details from Esendex: accountreference_invalid: "Invalid Account Reference EX0000000".');
 
         $transport->send(new SmsMessage('phone', 'testMessage'));
+    }
+
+    public function testSendWithSuccessfulResponseDispatchesMessageEvent()
+    {
+        $messageId = Uuid::v4()->toRfc4122();
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
+
+        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
+            return $response;
+        });
+
+        $transport = $this->createTransport($client);
+
+        $sentMessage = $transport->send(new SmsMessage('phone', 'testMessage'));
+
+        $this->assertSame($messageId, $sentMessage->getMessageId());
     }
 }

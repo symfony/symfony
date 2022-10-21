@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\Context;
  */
 class BadMethodContextDummy extends ContextDummyParent
 {
-    #[Context([ "foo" => "bar" ])]
+    #[Context(['foo' => 'bar'])]
     public function badMethod()
     {
         return 'bad_method';

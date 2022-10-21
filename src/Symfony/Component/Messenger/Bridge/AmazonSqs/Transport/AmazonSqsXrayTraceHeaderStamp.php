@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 final class AmazonSqsXrayTraceHeaderStamp implements NonSendableStampInterface
 {
-    private $traceId;
+    private string $traceId;
 
     public function __construct(string $traceId)
     {

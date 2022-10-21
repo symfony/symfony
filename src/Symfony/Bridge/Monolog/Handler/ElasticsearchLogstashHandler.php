@@ -16,10 +16,13 @@ use Monolog\Formatter\LogstashFormatter;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\FormattableHandlerTrait;
 use Monolog\Handler\ProcessableHandlerTrait;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Push logs directly to Elasticsearch and format them according to Logstash specification.
@@ -38,21 +41,27 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * stack is recommended.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since Symfony 6.1
  */
 class ElasticsearchLogstashHandler extends AbstractHandler
 {
+    use CompatibilityHandler;
+
     use FormattableHandlerTrait;
     use ProcessableHandlerTrait;
 
-    private $endpoint;
-    private $index;
-    private $client;
-    private $responses;
+    private string $endpoint;
+    private string $index;
+    private HttpClientInterface $client;
+    private string $elasticsearchVersion;
 
     /**
-     * @param string|int $level The minimum logging level at which this handler will be triggered
+     * @var \SplObjectStorage<ResponseInterface, null>
      */
-    public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, $level = Logger::DEBUG, bool $bubble = true)
+    private \SplObjectStorage $responses;
+
+    public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, string|int|Level $level = Logger::DEBUG, bool $bubble = true, string $elasticsearchVersion = '1.0.0')
     {
         if (!interface_exists(HttpClientInterface::class)) {
             throw new \LogicException(sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
@@ -63,9 +72,10 @@ class ElasticsearchLogstashHandler extends AbstractHandler
         $this->index = $index;
         $this->client = $client ?: HttpClient::create(['timeout' => 1]);
         $this->responses = new \SplObjectStorage();
+        $this->elasticsearchVersion = $elasticsearchVersion;
     }
 
-    public function handle(array $record): bool
+    private function doHandle(array|LogRecord $record): bool
     {
         if (!$this->isHandling($record)) {
             return false;
@@ -78,7 +88,7 @@ class ElasticsearchLogstashHandler extends AbstractHandler
 
     public function handleBatch(array $records): void
     {
-        $records = array_filter($records, [$this, 'isHandling']);
+        $records = array_filter($records, $this->isHandling(...));
 
         if ($records) {
             $this->sendToElasticsearch($records);
@@ -100,18 +110,28 @@ class ElasticsearchLogstashHandler extends AbstractHandler
     {
         $formatter = $this->getFormatter();
 
+        if (version_compare($this->elasticsearchVersion, '7', '>=')) {
+            $headers = json_encode([
+                'index' => [
+                    '_index' => $this->index,
+                ],
+            ]);
+        } else {
+            $headers = json_encode([
+                'index' => [
+                    '_index' => $this->index,
+                    '_type' => '_doc',
+                ],
+            ]);
+        }
+
         $body = '';
         foreach ($records as $record) {
             foreach ($this->processors as $processor) {
                 $record = $processor($record);
             }
 
-            $body .= json_encode([
-                'index' => [
-                    '_index' => $this->index,
-                    '_type' => '_doc',
-                ],
-            ]);
+            $body .= $headers;
             $body .= "\n";
             $body .= $formatter->format($record);
             $body .= "\n";
@@ -129,7 +149,7 @@ class ElasticsearchLogstashHandler extends AbstractHandler
         $this->wait(false);
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

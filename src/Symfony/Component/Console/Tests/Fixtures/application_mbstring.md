@@ -1,12 +1,106 @@
 MbString åpplicätion
 ====================
 
+* [`completion`](#completion)
 * [`help`](#help)
 * [`list`](#list)
 
 **descriptor:**
 
 * [`descriptor:åèä`](#descriptoråèä)
+
+`completion`
+------------
+
+Dump the shell completion script
+
+### Usage
+
+* `completion [--debug] [--] [<shell>]`
+
+Dump the shell completion script
+
+### Arguments
+
+#### `shell`
+
+The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given
+
+* Is required: no
+* Is array: no
+* Default: `NULL`
+
+### Options
+
+#### `--debug`
+
+Tail the completion debug log
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--help|-h`
+
+Display help for the given command. When no command is given display help for the list command
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--verbose|-v|-vv|-vvv`
+
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--version|-V`
+
+Display this application version
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--ansi|--no-ansi`
+
+Force (or disable --no-ansi) ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: yes
+* Default: `NULL`
+
+#### `--no-interaction|-n`
+
+Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
 
 `help`
 ------
@@ -19,11 +113,11 @@ Display help for a command
 
 The help command displays help for a given command:
 
-  app/console help list
+  %%PHP_SELF%% help list
 
 You can also output the help in other formats by using the --format option:
 
-  app/console help --format=xml list
+  %%PHP_SELF%% help --format=xml list
 
 To display the list of available commands, please use the list command.
 
@@ -107,7 +201,7 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
-* Default: `false`
+* Default: `NULL`
 
 #### `--no-interaction|-n`
 
@@ -130,19 +224,19 @@ List commands
 
 The list command lists all commands:
 
-  app/console list
+  %%PHP_SELF%% list
 
 You can also display the commands for a specific namespace:
 
-  app/console list test
+  %%PHP_SELF%% list test
 
 You can also output the information in other formats by using the --format option:
 
-  app/console list --format=xml
+  %%PHP_SELF%% list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  app/console list --raw
+  %%PHP_SELF%% list --raw
 
 ### Arguments
 
@@ -234,7 +328,7 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
-* Default: `false`
+* Default: `NULL`
 
 #### `--no-interaction|-n`
 
@@ -325,7 +419,7 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
-* Default: `false`
+* Default: `NULL`
 
 #### `--no-interaction|-n`
 

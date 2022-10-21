@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Data\Bundle\Reader;
 
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
-use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
  * Reads .php resource bundles.
@@ -23,10 +22,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class PhpBundleReader implements BundleReaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function read(string $path, string $locale)
+    public function read(string $path, string $locale): mixed
     {
         $fileName = $path.'/'.$locale.'.php';
 

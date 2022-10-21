@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for Redis Sentinel
+
+6.0
+---
+
+ * Remove option `tls`
+ * Using invalid options will throw a `LogicException`
+ * The `delete_after_ack` config option now defaults to `true`
+
+5.4
+---
+
+ * Deprecate not setting the `delete_after_ack` config option (or DSN parameter),
+   its default value will change to `true` in 6.0
+
 5.3
 ---
 

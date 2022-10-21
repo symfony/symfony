@@ -18,7 +18,6 @@ use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
-use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 
 /**
@@ -35,10 +34,10 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  */
 class RememberMeListener implements EventSubscriberInterface
 {
-    private $rememberMeHandler;
-    private $logger;
+    private RememberMeHandlerInterface $rememberMeHandler;
+    private ?LoggerInterface $logger;
 
-    public function __construct(RememberMeHandlerInterface $rememberMeHandler, ?LoggerInterface $logger = null)
+    public function __construct(RememberMeHandlerInterface $rememberMeHandler, LoggerInterface $logger = null)
     {
         $this->rememberMeHandler = $rememberMeHandler;
         $this->logger = $logger;
@@ -48,9 +47,7 @@ class RememberMeListener implements EventSubscriberInterface
     {
         $passport = $event->getPassport();
         if (!$passport->hasBadge(RememberMeBadge::class)) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($event->getAuthenticator())]);
-            }
+            $this->logger?->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($event->getAuthenticator())]);
 
             return;
         }
@@ -61,16 +58,12 @@ class RememberMeListener implements EventSubscriberInterface
         /** @var RememberMeBadge $badge */
         $badge = $passport->getBadge(RememberMeBadge::class);
         if (!$badge->isEnabled()) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: the RememberMeBadge is not enabled.');
-            }
+            $this->logger?->debug('Remember me skipped: the RememberMeBadge is not enabled.');
 
             return;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Remember-me was requested; setting cookie.');
-        }
+        $this->logger?->debug('Remember-me was requested; setting cookie.');
 
         $this->rememberMeHandler->createRememberMeCookie($event->getUser());
     }

@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,8 +28,8 @@ final class GatewayApiTransport extends AbstractTransport
 {
     protected const HOST = 'gatewayapi.com';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -54,18 +55,25 @@ final class GatewayApiTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/rest/mtsms', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authToken, ''],
             'json' => [
-                'sender' => $this->from,
+                'sender' => $from,
                 'recipients' => [['msisdn' => $message->getPhone()]],
                 'message' => $message->getSubject(),
             ],
         ]);
 
-        $statusCode = $response->getStatusCode();
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote GatewayApi server.', $response, 0, $e);
+        }
+
         if (200 !== $statusCode) {
             throw new TransportException(sprintf('Unable to send the SMS: error %d.', $statusCode), $response);
         }

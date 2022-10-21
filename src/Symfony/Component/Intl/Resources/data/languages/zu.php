@@ -283,6 +283,7 @@ return [
         'quc' => 'isi-Kʼicheʼ',
         'rap' => 'isi-Rapanui',
         'rar' => 'isi-Rarotongan',
+        'rhg' => 'Rohingya',
         'rm' => 'isi-Romansh',
         'rn' => 'isi-Rundi',
         'ro' => 'isi-Romanian',

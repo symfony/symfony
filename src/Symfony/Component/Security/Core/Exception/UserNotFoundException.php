@@ -19,73 +19,39 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class UserNotFoundException extends AuthenticationException
 {
-    private $identifier;
+    private ?string $identifier = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Username could not be found.';
     }
 
     /**
-     * Get the user identifier (e.g. username or e-mailaddress).
+     * Get the user identifier (e.g. username or email address).
      */
-    public function getUserIdentifier(): string
+    public function getUserIdentifier(): ?string
     {
         return $this->identifier;
     }
 
     /**
-     * @return string
-     *
-     * @deprecated
-     */
-    public function getUsername()
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->identifier;
-    }
-
-    /**
-     * Set the user identifier (e.g. username or e-mailaddress).
+     * Set the user identifier (e.g. username or email address).
      */
     public function setUserIdentifier(string $identifier): void
     {
         $this->identifier = $identifier;
     }
 
-    /**
-     * @deprecated
-     */
-    public function setUsername(string $username)
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        $this->identifier = $username;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return ['{{ username }}' => $this->identifier, '{{ user_identifier }}' => $this->identifier];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         return [$this->identifier, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         [$this->identifier, $parentData] = $data;
@@ -93,4 +59,3 @@ class UserNotFoundException extends AuthenticationException
         parent::__unserialize($parentData);
     }
 }
-class_alias(UserNotFoundException::class, UsernameNotFoundException::class);

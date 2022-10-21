@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\UserWithoutEquatable;
@@ -29,7 +38,7 @@ class ArrayUserProvider implements UserProviderInterface
         return $this->users[$username];
     }
 
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
         return $this->loadUserByIdentifier($username);
     }
@@ -48,19 +57,19 @@ class ArrayUserProvider implements UserProviderInterface
         return $user;
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof UserInterface) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
 
         $storedUser = $this->getUser($user->getUserIdentifier());
-        $class = \get_class($storedUser);
+        $class = $storedUser::class;
 
         return new $class($storedUser->getUserIdentifier(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled());
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return InMemoryUser::class === $class || UserWithoutEquatable::class === $class;
     }

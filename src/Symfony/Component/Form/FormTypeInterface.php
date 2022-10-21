@@ -24,6 +24,8 @@ interface FormTypeInterface
      * This method is called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the form.
      *
+     * @param array<string, mixed> $options
+     *
      * @see FormTypeExtensionInterface::buildForm()
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
@@ -37,6 +39,8 @@ interface FormTypeInterface
      * A view of a form is built before the views of the child forms are built.
      * This means that you cannot access child views in this method. If you need
      * to do so, move your logic to {@link finishView()} instead.
+     *
+     * @param array<string, mixed> $options
      *
      * @see FormTypeExtensionInterface::buildView()
      */
@@ -53,6 +57,8 @@ interface FormTypeInterface
      * such logic in this method that actually accesses child views. For everything
      * else you are recommended to implement {@link buildView()} instead.
      *
+     * @param array<string, mixed> $options
+     *
      * @see FormTypeExtensionInterface::finishView()
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
@@ -68,14 +74,14 @@ interface FormTypeInterface
      * The block prefix defaults to the underscored short class name with
      * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
      *
-     * @return string The prefix of the template block name
+     * @return string
      */
     public function getBlockPrefix();
 
     /**
      * Returns the name of the parent type.
      *
-     * @return string|null The name of the parent type if any, null otherwise
+     * @return string|null
      */
     public function getParent();
 }

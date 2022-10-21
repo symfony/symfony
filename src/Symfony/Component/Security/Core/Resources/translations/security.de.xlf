@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Ungültiger oder abgelaufener Anmelde-Link.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Zu viele fehlgeschlagene Anmeldeversuche, bitte versuchen Sie es in einer Minute noch einmal.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Zu viele fehlgeschlagene Anmeldeversuche, bitte versuchen Sie es in %minutes% Minuten noch einmal.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

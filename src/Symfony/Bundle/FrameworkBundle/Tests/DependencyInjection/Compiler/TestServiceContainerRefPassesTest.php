@@ -55,11 +55,12 @@ class TestServiceContainerRefPassesTest extends TestCase
             'Test\private_used_shared_service' => new ServiceClosureArgument(new Reference('Test\private_used_shared_service')),
             'Test\private_used_non_shared_service' => new ServiceClosureArgument(new Reference('Test\private_used_non_shared_service')),
             'Test\soon_private_service' => new ServiceClosureArgument(new Reference('.container.private.Test\soon_private_service')),
-            'Psr\Container\ContainerInterface' => new ServiceClosureArgument(new Reference('service_container')),
-            'Symfony\Component\DependencyInjection\ContainerInterface' => new ServiceClosureArgument(new Reference('service_container')),
         ];
-        $this->assertEquals($expected, $container->getDefinition('test.private_services_locator')->getArgument(0));
-        $this->assertSame($container, $container->get('test.private_services_locator')->get('Psr\Container\ContainerInterface'));
+
+        $privateServices = $container->getDefinition('test.private_services_locator')->getArgument(0);
+        unset($privateServices['Symfony\Component\DependencyInjection\ContainerInterface'], $privateServices['Psr\Container\ContainerInterface']);
+
+        $this->assertEquals($expected, $privateServices);
         $this->assertFalse($container->getDefinition('Test\private_used_non_shared_service')->isShared());
     }
 }

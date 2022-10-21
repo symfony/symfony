@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Config\Tests\Builder\Fixtures;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Translation\Translator;
 
 class AddToList implements ConfigurationInterface
 {
@@ -26,6 +34,22 @@ class AddToList implements ConfigurationInterface
                             ->useAttributeAsKey('source_class')
                             ->prototype('scalar')->end()
                         ->end()
+                        ->arrayNode('books')
+                            ->children()
+                                ->arrayNode('page')
+                                    ->example('page 1')
+                                    ->defaultValue(['number' => 1, 'content' => ''])
+                                    ->prototype('array')
+                                        ->children()
+                                            ->integerNode('number')->end()
+                                            ->scalarNode('content')->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->info('looks for translation in old fashion way')
+                            ->setDeprecated('symfony/config', '6.0')
+                        ->end()
                     ->end()
                 ->end()
                 ->arrayNode('messenger')
@@ -35,6 +59,7 @@ class AddToList implements ConfigurationInterface
                             ->useAttributeAsKey('message_class')
                             ->prototype('array')
                                 ->performNoDeepMerging()
+                                ->fixXmlConfig('sender')
                                 ->children()
                                     ->arrayNode('senders')
                                         ->requiresAtLeastOneElement()

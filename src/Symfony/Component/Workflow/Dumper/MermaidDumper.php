@@ -39,23 +39,14 @@ class MermaidDumper implements DumperInterface
         self::TRANSITION_TYPE_WORKFLOW,
     ];
 
-    /**
-     * @var string
-     */
-    private $direction;
-
-    /**
-     * @var string
-     */
-    private $transitionType;
+    private string $direction;
+    private string $transitionType;
 
     /**
      * Just tracking the transition id is in some cases inaccurate to
      * get the link's number for styling purposes.
-     *
-     * @var int
      */
-    private $linkCount;
+    private int $linkCount = 0;
 
     public function __construct(string $transitionType, string $direction = self::DIRECTION_LEFT_TO_RIGHT)
     {
@@ -82,7 +73,7 @@ class MermaidDumper implements DumperInterface
                 $place,
                 $meta->getPlaceMetadata($place),
                 \in_array($place, $definition->getInitialPlaces()),
-                null !== $marking && $marking->has($place)
+                $marking?->has($place) ?? false
             );
 
             $output[] = $placeNode;

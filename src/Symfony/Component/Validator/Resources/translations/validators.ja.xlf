@@ -386,6 +386,22 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>この値は有効な国際証券識別番号（ISIN）ではありません。</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>式でなければなりません。</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>この値は有効なCSSカラーではありません。</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>この値は有効なCIDR表記ではありません。</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>ネットマスクの値は、{{ min }}から{{ max }}の間にある必要があります。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

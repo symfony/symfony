@@ -12,15 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class RoleVoterTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @dataProvider getVoteTests
      */
@@ -48,14 +47,32 @@ class RoleVoterTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @dataProvider provideAttributes
      */
-    public function testDeprecatedRolePreviousAdmin()
+    public function testSupportsAttribute(string $prefix, string $attribute, bool $expected)
     {
-        $this->expectDeprecation('Since symfony/security-core 5.1: The ROLE_PREVIOUS_ADMIN role is deprecated and will be removed in version 6.0, use the IS_IMPERSONATOR attribute instead.');
-        $voter = new RoleVoter();
+        $voter = new RoleVoter($prefix);
 
-        $voter->vote($this->getTokenWithRoleNames(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), null, ['ROLE_PREVIOUS_ADMIN']);
+        $this->assertSame($expected, $voter->supportsAttribute($attribute));
+    }
+
+    public function provideAttributes()
+    {
+        yield ['ROLE_', 'ROLE_foo', true];
+        yield ['ROLE_', 'ROLE_', true];
+        yield ['FOO_', 'FOO_bar', true];
+
+        yield ['ROLE_', '', false];
+        yield ['ROLE_', 'foo', false];
+    }
+
+    public function testSupportsType()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertTrue($voter->supportsType(get_debug_type('foo')));
+        $this->assertTrue($voter->supportsType(get_debug_type(null)));
+        $this->assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
     }
 
     protected function getTokenWithRoleNames(array $roles)

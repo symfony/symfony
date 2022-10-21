@@ -13,19 +13,22 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
 use Symfony\Component\HttpKernel\Controller\ErrorController;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
-use Symfony\Component\HttpKernel\EventListener\StreamedResponseListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 
 return static function (ContainerConfigurator $container) {
@@ -44,6 +47,15 @@ return static function (ContainerConfigurator $container) {
                 service('argument_metadata_factory'),
                 abstract_arg('argument value resolvers'),
             ])
+
+        ->set('argument_resolver.backed_enum_resolver', BackedEnumValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 100])
+
+        ->set('argument_resolver.uid', UidValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 100])
+
+        ->set('argument_resolver.datetime', DateTimeValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 100])
 
         ->set('argument_resolver.request_attribute', RequestAttributeValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => 100])
@@ -69,10 +81,8 @@ return static function (ContainerConfigurator $container) {
         ->set('response_listener', ResponseListener::class)
             ->args([
                 param('kernel.charset'),
+                abstract_arg('The "set_content_language_from_locale" config value'),
             ])
-            ->tag('kernel.event_subscriber')
-
-        ->set('streamed_response_listener', StreamedResponseListener::class)
             ->tag('kernel.event_subscriber')
 
         ->set('locale_listener', LocaleListener::class)
@@ -80,6 +90,8 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 param('kernel.default_locale'),
                 service('router')->ignoreOnInvalid(),
+                abstract_arg('The "set_locale_from_accept_language" config value'),
+                param('kernel.enabled_locales'),
             ])
             ->tag('kernel.event_subscriber')
 
@@ -102,8 +114,13 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.error_controller'),
                 service('logger')->nullOnInvalid(),
                 param('kernel.debug'),
+                abstract_arg('an exceptions to log & status code mapping'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'request'])
+
+        ->set('controller.cache_attribute_listener', CacheAttributeListener::class)
+            ->tag('kernel.event_subscriber')
+
     ;
 };

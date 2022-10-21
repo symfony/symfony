@@ -16,9 +16,9 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/lock": "^5.2",
-        "symfony/options-resolver": "^5.1"
+        "php": ">=8.1",
+        "symfony/lock": "^5.4|^6.0",
+        "symfony/options-resolver": "^5.4|^6.0"
     },
     "require-dev": {
         "psr/cache": "^1.0|^2.0|^3.0"

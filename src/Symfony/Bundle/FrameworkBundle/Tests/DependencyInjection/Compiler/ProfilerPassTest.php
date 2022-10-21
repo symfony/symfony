@@ -105,12 +105,12 @@ class ProfilerPassTest extends TestCase
         $profilerDefinition = $container->register('profiler', 'ProfilerClass');
 
         $container->registerForAutoconfiguration(DataCollectorInterface::class)->addTag('data_collector');
-        $container->register('mydatacollector', \get_class($dataCollector))->setAutoconfigured(true);
+        $container->register('mydatacollector', $dataCollector::class)->setAutoconfigured(true);
 
         (new ResolveInstanceofConditionalsPass())->process($container);
         (new ProfilerPass())->process($container);
 
-        $idForTemplate = \get_class($dataCollector);
+        $idForTemplate = $dataCollector::class;
         $this->assertSame(['mydatacollector' => [$idForTemplate, 'foo']], $container->getParameter('data_collector.templates'));
 
         // grab the method calls off of the "profiler" definition

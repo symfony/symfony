@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -112,5 +113,43 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
                 '/',
             ],
         ];
+    }
+
+    public function testTargetPathFromRequestWithInvalidUrl()
+    {
+        $httpUtils = $this->createMock(HttpUtils::class);
+        $options = ['target_path_parameter' => '_my_target_path'];
+        $token = $this->createMock(TokenInterface::class);
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->once())
+            ->method('get')->with('_my_target_path')
+            ->willReturn('some_route_name');
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('debug')
+            ->with('Ignoring query parameter "_my_target_path": not a valid URL.');
+
+        $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options, $logger);
+
+        $handler->onAuthenticationSuccess($request, $token);
+    }
+
+    public function testTargetPathWithAbsoluteUrlFromRequest()
+    {
+        $options = ['target_path_parameter' => '_my_target_path'];
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->once())
+            ->method('get')->with('_my_target_path')
+            ->willReturn('https://localhost/some-path');
+
+        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpUtils->expects($this->once())
+            ->method('createRedirectResponse')->with($request, 'https://localhost/some-path');
+
+        $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
+        $handler->onAuthenticationSuccess($request, $this->createMock(TokenInterface::class));
     }
 }

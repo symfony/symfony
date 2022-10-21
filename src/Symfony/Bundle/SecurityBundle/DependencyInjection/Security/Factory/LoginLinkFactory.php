@@ -20,13 +20,14 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 
 /**
  * @internal
  */
-class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
+class LoginLinkFactory extends AbstractFactory
 {
+    public const PRIORITY = -20;
+
     public function addConfiguration(NodeDefinition $node)
     {
         /** @var NodeBuilder $builder */
@@ -79,17 +80,13 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
         }
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'login-link';
     }
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        if (!class_exists(LoginLinkHandler::class)) {
-            throw new \LogicException('Login login link requires symfony/security-http:^5.2.');
-        }
-
         if (!$container->hasDefinition('security.authenticator.login_link')) {
             $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/../../Resources/config'));
             $loader->load('security_authenticator_login_link.php');
@@ -147,28 +144,8 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $authenticatorId;
     }
 
-    public function getPosition()
+    public function getPriority(): int
     {
-        return 'form';
-    }
-
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function getListenerId()
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
+        return self::PRIORITY;
     }
 }

@@ -19,12 +19,11 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeSmsEmailTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null, ?string $transportName = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $transportName = null): FakeSmsEmailTransport
     {
         $transport = (new FakeSmsEmailTransport($this->createMock(MailerInterface::class), 'recipient@email.net', 'sender@email.net', $client ?? $this->createMock(HttpClientInterface::class)));
 
@@ -97,6 +96,6 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBodyAsString());
+        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 }

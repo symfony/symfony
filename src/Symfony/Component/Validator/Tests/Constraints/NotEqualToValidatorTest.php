@@ -35,9 +35,6 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return NotEqualTo::IS_EQUAL_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisons(): array
     {
         return [
@@ -51,9 +48,6 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -61,9 +55,6 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideInvalidComparisons(): array
     {
         return [

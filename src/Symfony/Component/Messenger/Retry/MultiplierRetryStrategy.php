@@ -32,10 +32,10 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  */
 class MultiplierRetryStrategy implements RetryStrategyInterface
 {
-    private $maxRetries;
-    private $delayMilliseconds;
-    private $multiplier;
-    private $maxDelayMilliseconds;
+    private int $maxRetries;
+    private int $delayMilliseconds;
+    private float $multiplier;
+    private int $maxDelayMilliseconds;
 
     /**
      * @param int   $maxRetries           The maximum number of times to retry
@@ -86,6 +86,6 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
             return $this->maxDelayMilliseconds;
         }
 
-        return $delay;
+        return (int) ceil($delay);
     }
 }

@@ -30,19 +30,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransport extends AbstractTransport
 {
-    private $hub;
-    private $hubId;
-    private $topics;
+    private HubInterface $hub;
+    private string $hubId;
+    private string|array $topics;
 
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(HubInterface $hub, string $hubId, $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    public function __construct(HubInterface $hub, string $hubId, string|array $topics = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
-        if (null !== $topics && !\is_array($topics) && !\is_string($topics)) {
-            throw new \TypeError(sprintf('"%s()" expects parameter 3 to be an array of strings, a string or null, "%s" given.', __METHOD__, get_debug_type($topics)));
-        }
-
         $this->hub = $hub;
         $this->hubId = $hubId;
         $this->topics = $topics ?? 'https://symfony.com/notifier';
@@ -52,7 +48,7 @@ final class MercureTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mercure://%s?%s', $this->hubId, http_build_query(['topic' => $this->topics]));
+        return sprintf('mercure://%s?%s', $this->hubId, http_build_query(['topic' => $this->topics], '', '&'));
     }
 
     public function supports(MessageInterface $message): bool
@@ -91,7 +87,7 @@ final class MercureTransport extends AbstractTransport
             $sentMessage->setMessageId($messageId);
 
             return $sentMessage;
-        } catch (MercureRuntimeException | InvalidArgumentException $e) {
+        } catch (MercureRuntimeException|InvalidArgumentException $e) {
             throw new RuntimeException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
         }
     }

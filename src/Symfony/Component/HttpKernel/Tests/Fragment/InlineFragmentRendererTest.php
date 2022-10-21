@@ -155,7 +155,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('Foo', ob_get_clean());
     }
 
-    public function testLocaleAndFormatAreIsKeptInSubrequest()
+    public function testLocaleAndFormatAreKeptInSubrequest()
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->attributes->set('_format', 'foo');
@@ -261,13 +261,18 @@ class InlineFragmentRendererTest extends TestCase
     /**
      * Creates a Kernel expecting a request equals to $request.
      */
-    private function getKernelExpectingRequest(Request $request, $strict = false)
+    private function getKernelExpectingRequest(Request $expectedRequest)
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel
             ->expects($this->once())
             ->method('handle')
-            ->with($request)
+            ->with($this->callback(function (Request $request) use ($expectedRequest) {
+                $expectedRequest->server->remove('REQUEST_TIME_FLOAT');
+                $request->server->remove('REQUEST_TIME_FLOAT');
+
+                return $expectedRequest == $request;
+            }))
             ->willReturn(new Response('foo'));
 
         return $kernel;

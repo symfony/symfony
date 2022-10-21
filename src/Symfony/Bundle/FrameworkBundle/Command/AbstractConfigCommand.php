@@ -28,10 +28,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  */
 abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
-    /**
-     * @param OutputInterface|StyleInterface $output
-     */
-    protected function listBundles($output)
+    protected function listBundles(OutputInterface|StyleInterface $output)
     {
         $title = 'Available registered bundles with their extension alias if available';
         $headers = ['Bundle name', 'Extension alias'];
@@ -57,10 +54,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
-    /**
-     * @return ExtensionInterface
-     */
-    protected function findExtension(string $name)
+    protected function findExtension(string $name): ExtensionInterface
     {
         $bundles = $this->initializeBundles();
         $minScore = \INF;
@@ -96,24 +90,24 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
                 $guess = $bundle->getName();
                 $minScore = $distance;
             }
+        }
 
-            $extension = $bundle->getContainerExtension();
+        $container = $this->getContainerBuilder($kernel);
 
-            if ($extension) {
-                if ($name === $extension->getAlias()) {
-                    return $extension;
-                }
+        if ($container->hasExtension($name)) {
+            return $container->getExtension($name);
+        }
 
-                $distance = levenshtein($name, $extension->getAlias());
+        foreach ($container->getExtensions() as $extension) {
+            $distance = levenshtein($name, $extension->getAlias());
 
-                if ($distance < $minScore) {
-                    $guess = $extension->getAlias();
-                    $minScore = $distance;
-                }
+            if ($distance < $minScore) {
+                $guess = $extension->getAlias();
+                $minScore = $distance;
             }
         }
 
-        if ('Bundle' !== substr($name, -6)) {
+        if (!str_ends_with($name, 'Bundle')) {
             $message = sprintf('No extensions with configuration available for "%s".', $name);
         } else {
             $message = sprintf('No extension with alias "%s" is enabled.', $name);
@@ -126,7 +120,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         throw new LogicException($message);
     }
 
-    public function validateConfiguration(ExtensionInterface $extension, $configuration)
+    public function validateConfiguration(ExtensionInterface $extension, mixed $configuration)
     {
         if (!$configuration) {
             throw new \LogicException(sprintf('The extension with alias "%s" does not have its getConfiguration() method setup.', $extension->getAlias()));

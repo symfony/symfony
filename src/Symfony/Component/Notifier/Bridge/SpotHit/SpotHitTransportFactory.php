@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\SpotHit;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
  */
 final class SpotHitTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return SpotHitTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): SpotHitTransport
     {
         $scheme = $dsn->getScheme();
 

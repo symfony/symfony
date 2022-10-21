@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\RetryableException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -21,19 +20,18 @@ use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
-class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface, ListableReceiverInterface
+class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface
 {
     private const MAX_RETRIES = 3;
-    private $retryingSafetyCounter = 0;
-    private $connection;
-    private $serializer;
+    private int $retryingSafetyCounter = 0;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -41,9 +39,6 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         try {
@@ -59,7 +54,7 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
             }
 
             return [];
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
@@ -70,50 +65,38 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
         return [$this->createEnvelopeFromData($doctrineEnvelope)];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         try {
             $this->connection->ack($this->findDoctrineReceivedStamp($envelope)->getId());
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         try {
             $this->connection->reject($this->findDoctrineReceivedStamp($envelope)->getId());
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         try {
             return $this->connection->getMessageCount();
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all(int $limit = null): iterable
     {
         try {
             $doctrineEnvelopes = $this->connection->findAll($limit);
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
@@ -122,14 +105,11 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function find($id): ?Envelope
+    public function find(mixed $id): ?Envelope
     {
         try {
             $doctrineEnvelope = $this->connection->find($id);
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
@@ -171,4 +151,3 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
         );
     }
 }
-class_alias(DoctrineReceiver::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceiver::class);

@@ -32,7 +32,7 @@ return [
         ],
         'ANG' => [
             0 => 'ANG',
-            1 => 'Antillergulden',
+            1 => 'antillergulden',
         ],
         'AOA' => [
             0 => 'AOA',

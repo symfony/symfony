@@ -1,4 +1,5 @@
 framework:
+    http_method_override: false
     assets:
         version: SomeVersionScheme
         version_format: '%%s?version=%%s'
@@ -25,6 +26,9 @@ framework:
                 json_manifest_path: '%var_json_manifest_path%'
             env_manifest:
                 json_manifest_path: '%env(env_manifest)%'
+            strict_manifest_strategy:
+                json_manifest_path: '/path/to/manifest.json'
+                strict_mode: true
 
 parameters:
     var_json_manifest_path: 'https://cdn.example.com/manifest.json'

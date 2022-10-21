@@ -131,24 +131,24 @@
                 <target>Значение должно быть числом.</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>Значение не является допустимой страной.</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>Файл не является допустимым форматом изображения.</target>
             </trans-unit>
-            <trans-unit id="38">
+            <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
                 <target>Значение не является допустимым IP адресом.</target>
             </trans-unit>
-            <trans-unit id="39">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
                 <target>Значение не является допустимым языком.</target>
             </trans-unit>
-            <trans-unit id="40">
+            <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
                 <target>Значение не является допустимой локалью.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Значение не является допустимой страной.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -385,6 +385,22 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Значение не является корректным международным идентификационным номером ценных бумаг (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Это значение должно быть корректным выражением.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Значение не является корректным CSS цветом.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Значение не соответствует нотации CIDR.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Значение маски подсети должно быть от {{ min }} до {{ max }}.</target>
             </trans-unit>
         </body>
     </file>

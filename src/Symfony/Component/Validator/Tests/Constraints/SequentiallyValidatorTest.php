@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -19,6 +20,7 @@ use Symfony\Component\Validator\Constraints\SequentiallyValidator;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Validation;
 
 class SequentiallyValidatorTest extends ConstraintValidatorTestCase
 {
@@ -60,5 +62,27 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, new Sequentially($constraints));
 
         $this->assertCount(1, $this->context->getViolations());
+    }
+
+    public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch()
+    {
+        $validator = Validation::createValidator();
+
+        $violations = $validator->validate(50, new Sequentially([
+            'constraints' => [
+                new GreaterThan([
+                    'groups' => 'senior',
+                    'value' => 55,
+                ]),
+                new Range([
+                    'groups' => 'adult',
+                    'min' => 18,
+                    'max' => 55,
+                ]),
+            ],
+            'groups' => ['adult', 'senior'],
+        ]), 'adult');
+
+        $this->assertCount(0, $violations);
     }
 }

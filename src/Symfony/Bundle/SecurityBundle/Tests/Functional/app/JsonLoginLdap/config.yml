@@ -27,7 +27,6 @@ security:
         main:
             pattern:  ^/login
             stateless: true
-            anonymous: true
             json_login_ldap:
                 check_path: /login
                 require_previous_session: false

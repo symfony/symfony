@@ -16,70 +16,100 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
  */
 final class DiscordEmbed extends AbstractDiscordEmbed
 {
-    public function title(string $title): self
+    /**
+     * @return $this
+     */
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 
         return $this;
     }
 
-    public function description(string $description): self
+    /**
+     * @return $this
+     */
+    public function description(string $description): static
     {
         $this->options['description'] = $description;
 
         return $this;
     }
 
-    public function url(string $url): self
+    /**
+     * @return $this
+     */
+    public function url(string $url): static
     {
         $this->options['url'] = $url;
 
         return $this;
     }
 
-    public function timestamp(\DateTime $timestamp): self
+    /**
+     * @return $this
+     */
+    public function timestamp(\DateTimeInterface $timestamp): static
     {
         $this->options['timestamp'] = $timestamp->format(\DateTimeInterface::ISO8601);
 
         return $this;
     }
 
-    public function color(int $color): self
+    /**
+     * @return $this
+     */
+    public function color(int $color): static
     {
         $this->options['color'] = $color;
 
         return $this;
     }
 
-    public function footer(DiscordFooterEmbedObject $footer): self
+    /**
+     * @return $this
+     */
+    public function footer(DiscordFooterEmbedObject $footer): static
     {
         $this->options['footer'] = $footer->toArray();
 
         return $this;
     }
 
-    public function thumbnail(DiscordMediaEmbedObject $thumbnail): self
+    /**
+     * @return $this
+     */
+    public function thumbnail(DiscordMediaEmbedObject $thumbnail): static
     {
         $this->options['thumbnail'] = $thumbnail->toArray();
 
         return $this;
     }
 
-    public function image(DiscordMediaEmbedObject $image): self
+    /**
+     * @return $this
+     */
+    public function image(DiscordMediaEmbedObject $image): static
     {
         $this->options['image'] = $image->toArray();
 
         return $this;
     }
 
-    public function author(DiscordAuthorEmbedObject $author): self
+    /**
+     * @return $this
+     */
+    public function author(DiscordAuthorEmbedObject $author): static
     {
         $this->options['author'] = $author->toArray();
 
         return $this;
     }
 
-    public function addField(DiscordFieldEmbedObject $field): self
+    /**
+     * @return $this
+     */
+    public function addField(DiscordFieldEmbedObject $field): static
     {
         if (!isset($this->options['fields'])) {
             $this->options['fields'] = [];

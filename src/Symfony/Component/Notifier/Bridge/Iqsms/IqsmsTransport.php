@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -27,11 +28,11 @@ final class IqsmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.iqsms.ru';
 
-    private $login;
-    private $password;
-    private $from;
+    private string $login;
+    private string $password;
+    private string $from;
 
-    public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, #[\SensitiveParameter] string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;
@@ -56,13 +57,15 @@ final class IqsmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/messages/v2/send.json', [
             'json' => [
                 'messages' => [
                     [
                         'phone' => $message->getPhone(),
                         'text' => $message->getSubject(),
-                        'sender' => $this->from,
+                        'sender' => $from,
                         'clientId' => uniqid(),
                     ],
                 ],
@@ -71,7 +74,12 @@ final class IqsmsTransport extends AbstractTransport
             ],
         ]);
 
-        $result = $response->toArray(false);
+        try {
+            $result = $response->toArray(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Iqsms server.', $response, 0, $e);
+        }
+
         foreach ($result['messages'] as $msg) {
             if ('accepted' !== $msg['status']) {
                 throw new TransportException(sprintf('Unable to send the SMS: "%s".', $msg['status']), $response);

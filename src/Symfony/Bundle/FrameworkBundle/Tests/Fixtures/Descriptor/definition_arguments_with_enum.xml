@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="definition_with_enum" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+  <argument type="constant">Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum::FOO</argument>
+</definition>

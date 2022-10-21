@@ -24,11 +24,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ResponseListener implements EventSubscriberInterface
 {
-    private $charset;
+    private string $charset;
+    private bool $addContentLanguageHeader;
 
-    public function __construct(string $charset)
+    public function __construct(string $charset, bool $addContentLanguageHeader = false)
     {
         $this->charset = $charset;
+        $this->addContentLanguageHeader = $addContentLanguageHeader;
     }
 
     /**
@@ -44,6 +46,14 @@ class ResponseListener implements EventSubscriberInterface
 
         if (null === $response->getCharset()) {
             $response->setCharset($this->charset);
+        }
+
+        if ($this->addContentLanguageHeader && !$response->isInformational() && !$response->isEmpty() && !$response->headers->has('Content-Language')) {
+            $response->headers->set('Content-Language', $event->getRequest()->getLocale());
+        }
+
+        if ($event->getRequest()->attributes->get('_vary_by_language')) {
+            $response->setVary('Accept-Language', false);
         }
 
         $response->prepare($event->getRequest());

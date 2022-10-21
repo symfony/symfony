@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -41,8 +41,6 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
         ];
@@ -60,11 +58,11 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $instance->foo1 = ($this->services['foo1'] ?? null);
         $instance->foo2 = null;
         $instance->foo3 = ($this->privates['foo3'] ?? null);
-        $instance->closures = [0 => function () {
+        $instance->closures = [0 => #[\Closure(name: 'foo1', class: 'stdClass')] function () {
             return ($this->services['foo1'] ?? null);
-        }, 1 => function () {
+        }, 1 => #[\Closure(name: 'foo2')] function () {
             return null;
-        }, 2 => function () {
+        }, 2 => #[\Closure(name: 'foo3', class: 'stdClass')] function () {
             return ($this->privates['foo3'] ?? null);
         }];
         $instance->iter = new RewindableGenerator(function () {
@@ -93,7 +91,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     {
         $this->services['baz'] = $instance = new \stdClass();
 
-        $instance->foo3 = ($this->privates['foo3'] ?? ($this->privates['foo3'] = new \stdClass()));
+        $instance->foo3 = ($this->privates['foo3'] ??= new \stdClass());
 
         return $instance;
     }

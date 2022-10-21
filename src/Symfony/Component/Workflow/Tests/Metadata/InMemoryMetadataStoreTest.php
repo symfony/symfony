@@ -1,9 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Workflow\Tests\Metadata;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
 
@@ -74,12 +82,5 @@ class InMemoryMetadataStoreTest extends TestCase
         $this->assertSame('transition_1 title', $this->store->getMetadata('title', $this->transition));
         $this->assertNull($this->store->getMetadata('description', $this->transition));
         $this->assertNull($this->store->getMetadata('description', new Transition('transition_2', [], [])));
-    }
-
-    public function testGetMetadataWithUnknownType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Could not find a MetadataBag for the subject of type "bool".');
-        $this->store->getMetadata('title', true);
     }
 }

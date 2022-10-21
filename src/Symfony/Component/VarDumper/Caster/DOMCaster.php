@@ -82,7 +82,7 @@ class DOMCaster
         return $a;
     }
 
-    public static function castImplementation($dom, array $a, Stub $stub, bool $isNested)
+    public static function castImplementation(\DOMImplementation $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
             Caster::PREFIX_VIRTUAL.'Core' => '1.0',
@@ -203,43 +203,6 @@ class DOMCaster
     {
         $a += [
             'wholeText' => $dom->wholeText,
-        ];
-
-        return $a;
-    }
-
-    public static function castTypeinfo(\DOMTypeinfo $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'typeName' => $dom->typeName,
-            'typeNamespace' => $dom->typeNamespace,
-        ];
-
-        return $a;
-    }
-
-    public static function castDomError(\DOMDomError $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'severity' => $dom->severity,
-            'message' => $dom->message,
-            'type' => $dom->type,
-            'relatedException' => $dom->relatedException,
-            'related_data' => $dom->related_data,
-            'location' => $dom->location,
-        ];
-
-        return $a;
-    }
-
-    public static function castLocator(\DOMLocator $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'lineNumber' => $dom->lineNumber,
-            'columnNumber' => $dom->columnNumber,
-            'offset' => $dom->offset,
-            'relatedNode' => $dom->relatedNode,
-            'uri' => $dom->uri ? new LinkStub($dom->uri, $dom->lineNumber) : $dom->uri,
         ];
 
         return $a;

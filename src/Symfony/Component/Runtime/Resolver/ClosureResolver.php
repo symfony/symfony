@@ -15,8 +15,6 @@ use Symfony\Component\Runtime\ResolverInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 5.3
  */
 class ClosureResolver implements ResolverInterface
 {
@@ -29,9 +27,6 @@ class ClosureResolver implements ResolverInterface
         $this->arguments = $arguments;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(): array
     {
         return [$this->closure, ($this->arguments)()];

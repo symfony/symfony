@@ -15,14 +15,12 @@ use Symfony\Component\RateLimiter\RateLimit;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @experimental in 5.3
  */
 class RateLimitExceededException extends \RuntimeException
 {
-    private $rateLimit;
+    private RateLimit $rateLimit;
 
-    public function __construct(RateLimit $rateLimit, $code = 0, \Throwable $previous = null)
+    public function __construct(RateLimit $rateLimit, int $code = 0, \Throwable $previous = null)
     {
         parent::__construct('Rate Limit Exceeded', $code, $previous);
 

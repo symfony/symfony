@@ -29,9 +29,6 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class DebugExtension extends Extension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -59,7 +56,7 @@ class DebugExtension extends Extension
             $container->getDefinition('var_dumper.command.server_dump')
                 ->setClass(ServerDumpPlaceholderCommand::class)
             ;
-        } elseif (0 === strpos($config['dump_destination'], 'tcp://')) {
+        } elseif (str_starts_with($config['dump_destination'], 'tcp://')) {
             $container->getDefinition('debug.dump_listener')
                 ->replaceArgument(2, new Reference('var_dumper.server_connection'))
             ;
@@ -97,18 +94,12 @@ class DebugExtension extends Extension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/debug';
     }

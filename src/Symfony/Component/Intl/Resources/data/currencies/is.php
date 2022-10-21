@@ -432,7 +432,7 @@ return [
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'Lesotho Loti',
+            1 => 'lesótóskur lóti',
         ],
         'LTL' => [
             0 => 'LTL',

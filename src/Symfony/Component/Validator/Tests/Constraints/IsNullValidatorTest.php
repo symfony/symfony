@@ -47,12 +47,11 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getInvalidValues
      */
     public function testInvalidValuesNamed($value, $valueAsString)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\IsNull(message: "myMessage");');
+        $constraint = new IsNull(message: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 

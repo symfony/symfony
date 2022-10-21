@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class DelayStamp implements StampInterface
 {
-    private $delay;
+    private int $delay;
 
     /**
      * @param int $delay The delay in milliseconds
@@ -33,7 +33,7 @@ final class DelayStamp implements StampInterface
 
     public static function delayFor(\DateInterval $interval): self
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $end = $now->add($interval);
 
         return new self(($end->getTimestamp() - $now->getTimestamp()) * 1000);

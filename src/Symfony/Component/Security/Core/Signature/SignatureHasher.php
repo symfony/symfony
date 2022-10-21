@@ -12,10 +12,9 @@
 namespace Symfony\Component\Security\Core\Signature;
 
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
 use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
-use Symfony\Component\Security\Core\Signature\ExpiredSignatureStorage;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Creates and validates secure hashes used in login links and remember-me cookies.
@@ -25,18 +24,18 @@ use Symfony\Component\Security\Core\Signature\ExpiredSignatureStorage;
  */
 class SignatureHasher
 {
-    private $propertyAccessor;
-    private $signatureProperties;
-    private $secret;
-    private $expiredSignaturesStorage;
-    private $maxUses;
+    private PropertyAccessorInterface $propertyAccessor;
+    private array $signatureProperties;
+    private string $secret;
+    private ?ExpiredSignatureStorage $expiredSignaturesStorage;
+    private ?int $maxUses;
 
     /**
-     * @param array                        $signatureProperties      properties of the User; the hash is invalidated if these properties change
-     * @param ExpiredSignatureStorage|null $expiredSignaturesStorage if provided, secures a sequence of hashes that are expired
-     * @param int|null                     $maxUses                  used together with $expiredSignatureStorage to allow a maximum usage of a hash
+     * @param array                        $signatureProperties      Properties of the User; the hash is invalidated if these properties change
+     * @param ExpiredSignatureStorage|null $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
+     * @param int|null                     $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, ?ExpiredSignatureStorage $expiredSignaturesStorage = null, ?int $maxUses = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, #[\SensitiveParameter] string $secret, ExpiredSignatureStorage $expiredSignaturesStorage = null, int $maxUses = null)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->signatureProperties = $signatureProperties;
@@ -48,8 +47,8 @@ class SignatureHasher
     /**
      * Verifies the hash using the provided user and expire time.
      *
-     * @param int    $expires the expiry time as a unix timestamp
-     * @param string $hash    the plaintext hash provided by the request
+     * @param int    $expires The expiry time as a unix timestamp
+     * @param string $hash    The plaintext hash provided by the request
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
@@ -76,11 +75,11 @@ class SignatureHasher
     /**
      * Computes the secure hash for the provided user and expire time.
      *
-     * @param int $expires the expiry time as a unix timestamp
+     * @param int $expires The expiry time as a unix timestamp
      */
     public function computeSignatureHash(UserInterface $user, int $expires): string
     {
-        $signatureFields = [base64_encode(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername()), $expires];
+        $signatureFields = [base64_encode($user->getUserIdentifier()), $expires];
 
         foreach ($this->signatureProperties as $property) {
             $value = $this->propertyAccessor->getValue($user, $property) ?? '';
@@ -88,8 +87,8 @@ class SignatureHasher
                 $value = $value->format('c');
             }
 
-            if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-                throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, \get_class($user), get_debug_type($value)));
+            if (!\is_scalar($value) && !$value instanceof \Stringable) {
+                throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, $user::class, get_debug_type($value)));
             }
             $signatureFields[] = base64_encode($value);
         }

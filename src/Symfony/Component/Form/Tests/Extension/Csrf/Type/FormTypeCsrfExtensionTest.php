@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {
@@ -34,36 +34,21 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&CsrfTokenManagerInterface
      */
     protected $tokenManager;
-
-    /**
-     * @var MockObject
-     */
-    protected $translator;
 
     protected function setUp(): void
     {
         $this->tokenManager = $this->createMock(CsrfTokenManagerInterface::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->tokenManager = null;
-        $this->translator = null;
-
-        parent::tearDown();
     }
 
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), [
-            new CsrfExtension($this->tokenManager, $this->translator),
+            new CsrfExtension($this->tokenManager, new IdentityTranslator()),
         ]);
     }
 

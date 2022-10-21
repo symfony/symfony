@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionLis
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\CompressMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -109,6 +110,9 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('router'),
             ])
+
+        ->set('messenger.middleware.compress_middleware', CompressMiddleware::class)
+            ->abstract()
 
         // Discovery
         ->set('messenger.receiver_locator', ServiceLocator::class)

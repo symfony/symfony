@@ -64,11 +64,13 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         $body = $amqpEnvelope->getBody();
 
         try {
+            /*
             $contentEncoding = $amqpEnvelope->getContentEncoding();
             if ($contentEncoding) {
                 $compressor = CompressorFactory::createCompressor($contentEncoding);
                 $body = $compressor->decompress($body);
             }
+            */
 
             $envelope = $this->serializer->decode([
                 'body' => false === $body ? '' : $body, // workaround https://github.com/pdezwart/php-amqp/issues/351

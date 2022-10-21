@@ -335,12 +335,12 @@ class Connection
         $attributes['timestamp'] ??= time();
 
         $this->lastActivityTime = time();
-
+        /*
         if (isset($attributes['content_encoding'])) {
             $compressor = CompressorFactory::createCompressor($attributes['content_encoding']);
             $body = $compressor->compress($body);
         }
-
+        */
         $exchange->publish(
             $body,
             $routingKey,

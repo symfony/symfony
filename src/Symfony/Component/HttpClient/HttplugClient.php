@@ -99,6 +99,14 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         $this->waitLoop = new HttplugWaitLoop($this->client, $this->promisePool, $this->responseFactory, $this->streamFactory);
     }
 
+    public function withOptions(array $options): static
+    {
+        $clone = clone $this;
+        $clone->client = $clone->client->withOptions($options);
+
+        return $clone;
+    }
+
     public function sendRequest(RequestInterface $request): Psr7ResponseInterface
     {
         try {

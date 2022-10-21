@@ -57,34 +57,35 @@ class Psr4DirectoryLoaderTest extends TestCase
     }
 
     /**
-     * @dataProvider provideResourceTypesThatNeedTrimming
+     * @dataProvider provideNamespacesThatNeedTrimming
      */
-    public function testPsr4NamespaceTrim(string $resourceType)
+    public function testPsr4NamespaceTrim(string $namespace)
     {
         $route = $this->getLoader()
-            ->load('Psr4Controllers', $resourceType)
+            ->load(
+                ['path' => 'Psr4Controllers', 'namespace' => $namespace],
+                'attribute',
+            )
             ->get('my_route');
 
         $this->assertSame('/my/route', $route->getPath());
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
     }
 
-    public function provideResourceTypesThatNeedTrimming(): array
+    public function provideNamespacesThatNeedTrimming(): array
     {
         return [
-            ['attribute@ Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'],
-            ['attribute@\\Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'],
-            ['attribute@Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\\'],
-            ['attribute@\\Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\\'],
-            ['attribute@   \\Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'],
+            ['\\Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'],
+            ['Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\\'],
+            ['\\Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\\'],
         ];
     }
 
     private function loadPsr4Controllers(): RouteCollection
     {
         return $this->getLoader()->load(
-            'Psr4Controllers',
-            'attribute@Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'
+            ['path' => 'Psr4Controllers', 'namespace' => 'Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers'],
+            'attribute'
         );
     }
 

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpClient;
 
+use FriendsOfPHP\WellKnownImplementations\WellKnownPsr17Factory;
+use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Request;
+use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Uri;
 use GuzzleHttp\Promise\Promise as GuzzlePromise;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Promise\Utils;
@@ -81,12 +84,12 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         $this->promisePool = class_exists(Utils::class) ? new \SplObjectStorage() : null;
 
         if (null === $responseFactory || null === $streamFactory) {
-            if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
+            if (!class_exists(Psr17Factory::class) && !class_exists(WellKnownPsr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
             }
 
             try {
-                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
+                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : (class_exists(WellKnownPsr17Factory::class, false) ? new WellKnownPsr17Factory() : null);
                 $responseFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
                 $streamFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
             } catch (NotFoundException $e) {
@@ -167,6 +170,8 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
             $request = $this->responseFactory->createRequest($method, $uri);
         } elseif (class_exists(Request::class)) {
             $request = new Request($method, $uri);
+        } elseif (class_exists(WellKnownPsr7Request::class)) {
+            $request = new WellKnownPsr7Request($method, $uri);
         } elseif (class_exists(Psr17FactoryDiscovery::class)) {
             $request = Psr17FactoryDiscovery::findRequestFactory()->createRequest($method, $uri);
         } else {
@@ -242,6 +247,10 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
 
         if (class_exists(Uri::class)) {
             return new Uri($uri);
+        }
+
+        if (class_exists(WellKnownPsr7Uri::class)) {
+            return new WellKnownPsr7Uri($uri);
         }
 
         if (class_exists(Psr17FactoryDiscovery::class)) {

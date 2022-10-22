@@ -242,9 +242,19 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
         return $this->lazyObjectReal->eval(...\func_get_args());
     }
 
+    public function eval_ro($script, $args = [], $num_keys = 0): mixed
+    {
+        return $this->lazyObjectReal->eval_ro(...\func_get_args());
+    }
+
     public function evalsha($script_sha, $args = [], $num_keys = 0): mixed
     {
         return $this->lazyObjectReal->evalsha(...\func_get_args());
+    }
+
+    public function evalsha_ro($script_sha, $args = [], $num_keys = 0): mixed
+    {
+        return $this->lazyObjectReal->evalsha_ro(...\func_get_args());
     }
 
     public function exec(): array|false

@@ -242,14 +242,24 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->echo(...\func_get_args());
     }
 
-    public function eval($script, $keys = null, $num_keys = 0): mixed
+    public function eval($script, $args = [], $num_keys = 0): mixed
     {
         return $this->lazyObjectReal->eval(...\func_get_args());
     }
 
-    public function evalsha($sha1, $keys = null, $num_keys = 0): mixed
+    public function eval_ro($script_sha, $args = [], $num_keys = 0): mixed
+    {
+        return $this->lazyObjectReal->eval_ro(...\func_get_args());
+    }
+
+    public function evalsha($sha1, $args = [], $num_keys = 0): mixed
     {
         return $this->lazyObjectReal->evalsha(...\func_get_args());
+    }
+
+    public function evalsha_ro($sha1, $args = [], $num_keys = 0): mixed
+    {
+        return $this->lazyObjectReal->evalsha_ro(...\func_get_args());
     }
 
     public function exec(): \Redis|array|false

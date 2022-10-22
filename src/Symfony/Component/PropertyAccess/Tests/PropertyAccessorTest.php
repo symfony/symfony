@@ -561,17 +561,17 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    public function getValidReadPropertyPaths()
+    public function getValidReadPropertyPaths(): iterable
     {
-        $testCases = $this->getValidWritePropertyPaths();
+        yield from $this->getValidWritePropertyPaths();
 
         // Optional paths can only be read and can't be written to.
-        $testCases[] = [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?', null];
-        $testCases[] = [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?.baz?', null];
-        $testCases[] = [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?]', null];
-        $testCases[] = [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?][baz?]', null];
-
-        return $testCases;
+        yield [(object) [], 'foo?', null];
+        yield [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?', null];
+        yield [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?.baz?', null];
+        yield [[], '[foo?]', null];
+        yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?]', null];
+        yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?][baz?]', null];
     }
 
     public function testTicket5755()

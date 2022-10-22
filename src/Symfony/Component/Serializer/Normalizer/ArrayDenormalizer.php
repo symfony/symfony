@@ -89,7 +89,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         }
 
         if (Serializer::class !== debug_backtrace()[1]['class'] ?? null) {
-            trigger_deprecation('symfony/serializer', '5.3', 'Calling "%s" is deprecated. Please call setDenormalizer() instead.');
+            trigger_deprecation('symfony/serializer', '5.3', 'Calling "%s()" is deprecated. Please call setDenormalizer() instead.', __METHOD__);
         }
 
         $this->setDenormalizer($serializer);

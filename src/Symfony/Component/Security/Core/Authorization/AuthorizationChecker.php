@@ -80,7 +80,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             // @deprecated since Symfony 5.4
             if ($this->alwaysAuthenticate || !$authenticated = $token->isAuthenticated(false)) {
                 if (!($authenticated ?? true)) {
-                    trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s()" is deprecated, return null from "getUser()" instead.');
+                    trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s::isAuthenticated()" is deprecated, return null from "getUser()" instead.', get_debug_type($token));
                 }
                 $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
             }

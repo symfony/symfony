@@ -11,16 +11,24 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
+use Symfony\Component\Notifier\Exception\LengthException;
+
 /**
  * @author Karoly Gossler <connor@connor.hu>
  */
 final class DiscordFooterEmbedObject extends AbstractDiscordEmbedObject
 {
+    private const TEXT_LIMIT = 2048;
+
     /**
      * @return $this
      */
     public function text(string $text): static
     {
+        if (\strlen($text) > self::TEXT_LIMIT) {
+            throw new LengthException(sprintf('Maximum length for the text is %d characters.', self::TEXT_LIMIT));
+        }
+
         $this->options['text'] = $text;
 
         return $this;

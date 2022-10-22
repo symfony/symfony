@@ -91,6 +91,7 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
@@ -2664,8 +2665,11 @@ class FrameworkExtension extends Extension
         $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
 
         if (null !== $limiterConfig['lock_factory']) {
+            if (!interface_exists(LockInterface::class)) {
+                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
+            }
             if (!self::$lockConfigEnabled) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed and configured.', $name));
+                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
             }
 
             $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));

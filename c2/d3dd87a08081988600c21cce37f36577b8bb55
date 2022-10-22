@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-10-14T07:02:19Z
+
+@alamirault thanks for this contribution.
+
+I said the following before and folks didn't think it was an issue, but let me tell you again in case we can reconsider this:
+
+(1) I think it's a mistake to add Discord (or any other third-party) validation logic in Symfony code. The reason is that Discord can change these rules at any time, making Symfony code outdated. (e.g. in this PR we validate that `25` is the max number of fields passed ... what if tomorrow or next week Discord increases or decreases that number?)
+
+(2) We should fix/report obvious errors (e.g. you pass a string where a boolean is required) but we should not try to over-validate things. For example, if today's Discord field limit is `25` and developer sends `50` fields, let Discord fail and pass the API error message to the developer.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-15T06:08:57Z
+
+I agree with @javiereguiluz and I think we should instead make the error message better if possible (the current one is indeed not helpful: `Handling "Unable to post the Discord message: "" (embeds: 0).`. Notice the empty error message from the server, that's probably a bug in how we parse the response from Discord.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-10-15T09:25:56Z
+
+@javiereguiluz I understand, it's logic !
+
+However, what do you think about adding a warning that checks are not all covered by  Symfony on component's README ? And add link to official API docs ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-15T09:45:48Z
+
+I don't think there is a need for additional docs or links; the error messages coming from the API should be enough.

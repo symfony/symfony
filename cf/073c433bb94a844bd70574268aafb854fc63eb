@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-05-02T09:41:50Z
+
+Hey!
+
+I think @michaelKaefer has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-10-07T15:24:11Z
+
+@wouterj or @chalasr what do you think of this proposal? Thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-09T16:00:24Z
+
+This feature looks common enough and useful for being part of core to me.
+It's not obvious to me what `hash_mapping` means though, I had to double-check the code to make sure it's about the property on which the hashed password should be set. It would be nice to find it a clearer name, maybe`hash_property`? or `hash_property_path`? I'm not very familiar with that component though so I may be wrong.
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-10-09T16:10:12Z
+
+Hello @chalasr
+
+I used the name `hash_mapping` to be consistant with the [`error_mapping`](https://symfony.com/doc/current/reference/forms/types/form.html#error-mapping) option.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-09T16:14:35Z
+
+@Seb33300 Alright but as opposed to `error_mapping`, `hash_mapping` doesn't expect a mapping as value but a single property name (string) isn't it?
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-10-09T16:18:58Z
+
+Oh right, I will rename it to `hash_property_path` tomorrow. Thanks
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-10-10T10:03:40Z
+
+@chalasr done.
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-10-10T11:17:44Z
+
+> To double check: we should make sure this doesn't create any significant timing-based vulnerabilities. E.g. when used together with something like `@UniqueEntity` to avoid duplicate usernames, will this still trigger hashing the password?
+
+The password is set in the user object (in the related `hash_property_path` field) only when the **root** form is valid.
+https://github.com/symfony/symfony/blob/dacda5de4f989ded9fae62294fcbc63b6b96740f/src/Symfony/Component/Form/Extension/PasswordHasher/EventListener/PasswordHasherListener.php#L72-L76
+
+If a `@UniqueEntity` constraint fails, form will not be valid, and no hash will be set into the user object.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-10-20T11:36:18Z
+
+Some tests failures seem to be related https://github.com/symfony/symfony/actions/runs/3274200868/jobs/5387417225#step:7:2208
+
+can you check?
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-10-20T12:36:50Z
+
+Fixed in https://github.com/symfony/symfony/pull/46224/commits/e765a9bf032c8b11fe7cabae9cc0517b64eed9d1
+
+All green now 🚀
+Thanks for your review 🙏🏻
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-10-21T03:55:36Z
+
+@chalasr I force pushed to change `!$parentForm || !($user = $parentForm->getData())` into `!($user = $parentForm?->getData())` and fix static analysis related to undefined `$user`

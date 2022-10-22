@@ -136,7 +136,11 @@ abstract class FileLoader extends Loader
         try {
             $loader = $this->resolve($resource, $type);
 
-            if ($loader instanceof self && null !== $this->currentDir) {
+            if (!$loader instanceof self) {
+                return $loader->load($resource, $type);
+            }
+
+            if (null !== $this->currentDir) {
                 $resource = $loader->getLocator()->locate($resource, $this->currentDir, false);
             }
 

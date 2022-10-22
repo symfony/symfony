@@ -4,6 +4,7 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <import resource="./Psr4Controllers" prefix="/my-prefix"
-            type="attribute@Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers" />
+    <import prefix="/my-prefix" type="attribute">
+        <resource path="./Psr4Controllers" namespace="Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers" />
+    </import>
 </routes>

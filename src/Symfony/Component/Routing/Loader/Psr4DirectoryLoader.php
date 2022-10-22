@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -20,27 +20,31 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Alexander M. Turek <me@derrabus.de>
  */
-final class Psr4DirectoryLoader extends FileLoader
+final class Psr4DirectoryLoader extends Loader
 {
-    public function __construct(FileLocatorInterface $locator)
-    {
+    public function __construct(
+        private readonly FileLocatorInterface $locator,
+    ) {
         // PSR-4 directory loader has no env-aware logic, so we drop the $env constructor parameter.
-        parent::__construct($locator);
+        parent::__construct();
     }
 
+    /**
+     * @param array{path: string, namespace: string} $resource
+     */
     public function load(mixed $resource, string $type = null): ?RouteCollection
     {
-        $path = $this->locator->locate($resource);
+        $path = $this->locator->locate($resource['path']);
         if (!is_dir($path)) {
             return new RouteCollection();
         }
 
-        return $this->loadFromDirectory($path, trim(substr($type, 10), ' \\'));
+        return $this->loadFromDirectory($path, trim($resource['namespace'], '\\'));
     }
 
     public function supports(mixed $resource, string $type = null): bool
     {
-        return \is_string($resource) && null !== $type && str_starts_with($type, 'attribute@');
+        return ('attribute' === $type || 'annotation' === $type) && \is_array($resource) && isset($resource['path'], $resource['namespace']);
     }
 
     private function loadFromDirectory(string $directory, string $psr4Prefix): RouteCollection

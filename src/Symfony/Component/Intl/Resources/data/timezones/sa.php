@@ -238,5 +238,6 @@ return [
         'Pacific/Honolulu' => 'संयुक्त राज्य: समय: (Honolulu)',
     ],
     'Meta' => [
+        'GmtFormat' => 'जी.एम.टी. %s',
     ],
 ];

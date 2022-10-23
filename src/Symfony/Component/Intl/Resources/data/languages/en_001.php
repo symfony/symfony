@@ -2,8 +2,8 @@
 
 return [
     'Names' => [
+        'bla' => 'Siksika',
         'mus' => 'Creek',
-        'sah' => 'Yakut',
     ],
     'LocalizedNames' => [
         'nds_NL' => 'West Low German',

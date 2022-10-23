@@ -2,6 +2,7 @@
 
 return [
     'Names' => [
+        'Adlm' => 'adlam',
         'Afak' => 'afaka',
         'Arab' => 'arabisk',
         'Aran' => 'nastaliq',
@@ -19,7 +20,7 @@ return [
         'Brai' => 'punktskrift',
         'Bugi' => 'buginesisk',
         'Buhd' => 'buhid',
-        'Cakm' => 'cakm',
+        'Cakm' => 'chakma',
         'Cans' => 'oprindelige canadiske symboler',
         'Cari' => 'kariansk',
         'Cham' => 'cham',
@@ -117,6 +118,7 @@ return [
         'Prti' => 'prti',
         'Qaag' => 'zawgyi',
         'Rjng' => 'rejang',
+        'Rohg' => 'hanifi',
         'Roro' => 'rongo-rongo',
         'Runr' => 'runer',
         'Samr' => 'samaritansk',

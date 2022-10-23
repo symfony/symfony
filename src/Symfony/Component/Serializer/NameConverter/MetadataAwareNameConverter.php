@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\NameConverter;
 
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -76,6 +77,10 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return null;
         }
 
+        if (null !== $attributesMetadata[$propertyName]->getSerializedName() && null !== $attributesMetadata[$propertyName]->getSerializedPath()) {
+            throw new LogicException(sprintf('Found SerializedName and SerializedPath annotations on property "%s" of class "%s".', $propertyName, $class));
+        }
+
         return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
     }
 
@@ -111,6 +116,10 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
             if (null === $metadata->getSerializedName()) {
                 continue;
+            }
+
+            if (null !== $metadata->getSerializedName() && null !== $metadata->getSerializedPath()) {
+                throw new LogicException(sprintf('Found SerializedName and SerializedPath annotations on property "%s" of class "%s".', $name, $class));
             }
 
             $groups = $metadata->getGroups();

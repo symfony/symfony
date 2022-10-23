@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -157,6 +159,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $stack = [];
         $attributes = $this->getAttributes($object, $format, $context);
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
+        $classMetadata = $this->classMetadataFactory?->getMetadataFor($class);
         $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($class)->getAttributesMetadata();
         if (isset($context[self::MAX_DEPTH_HANDLER])) {
             $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER];
@@ -199,7 +202,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $stack[$attribute] = $attributeValue;
             }
 
-            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $attributeContext);
+            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $attributeContext, $attributesMetadata, $classMetadata);
         }
 
         foreach ($stack as $attribute => $attributeValue) {
@@ -210,7 +213,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
             $childContext = $this->createChildContext($attributeContext, $attribute, $format);
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $attributeContext);
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $attributeContext, $attributesMetadata, $classMetadata);
         }
 
         $preserveEmptyObjects = $context[self::PRESERVE_EMPTY_OBJECTS] ?? $this->defaultContext[self::PRESERVE_EMPTY_OBJECTS] ?? false;
@@ -320,9 +323,26 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
 
+        $nestedAttributes = $this->getNestedAttributes($resolvedClass);
+        $nestedData = [];
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($nestedAttributes as $property => $serializedPath) {
+            if (null === $value = $propertyAccessor->getValue($normalizedData, $serializedPath)) {
+                continue;
+            }
+            $nestedData[$property] = $value;
+            $normalizedData = $this->removeNestedValue($serializedPath->getElements(), $normalizedData);
+        }
+
+        $normalizedData = array_merge($normalizedData, $nestedData);
+
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
+                $notConverted = $attribute;
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
+                if (isset($nestedData[$notConverted]) && !isset($nestedData[$attribute])) {
+                    throw new LogicException(sprintf('Duplicate values for key "%s" found. One value is set via the SerializedPath annotation: "%s", the other one is set via the SerializedName annotation: "%s".', $notConverted, implode('->', $nestedAttributes[$notConverted]->getElements()), $attribute));
+                }
             }
 
             $attributeContext = $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context);
@@ -623,9 +643,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets an attribute and apply the name converter if necessary.
      */
-    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context): array
+    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, ?array $attributesMetadata, ?ClassMetadataInterface $classMetadata): array
     {
         if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
+            return $data;
+        }
+
+        if (null !== $classMetadata && null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath()) {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            if ($propertyAccessor->isReadable($data, $serializedPath) && null !== $propertyAccessor->getValue($data, $serializedPath)) {
+                throw new LogicException(sprintf('The element you are trying to set is already populated: "%s".', (string) $serializedPath));
+            }
+            $propertyAccessor->setValue($data, $serializedPath, $attributeValue);
+
             return $data;
         }
 
@@ -718,5 +748,48 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         return str_starts_with($e->getMessage(), 'Typed property')
             && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
+    }
+
+    /**
+     * Returns all attributes with a SerializedPath annotation and the respective path.
+     */
+    private function getNestedAttributes(string $class): array
+    {
+        if (!$this->classMetadataFactory || !$this->classMetadataFactory->hasMetadataFor($class)) {
+            return [];
+        }
+
+        $properties = [];
+        $serializedPaths = [];
+        $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
+        foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
+            if (!$serializedPath = $metadata->getSerializedPath()) {
+                continue;
+            }
+            $serializedPath = $metadata->getSerializedPath();
+            $pathIdentifier = implode(',', $serializedPath->getElements());
+            if (isset($serializedPaths[$pathIdentifier])) {
+                throw new LogicException(sprintf('Duplicate serialized path: "%s" used for properties "%s" and "%s".', $pathIdentifier, $serializedPaths[$pathIdentifier], $name));
+            }
+            $serializedPaths[$pathIdentifier] = $name;
+            $properties[$name] = $serializedPath;
+        }
+
+        return $properties;
+    }
+
+    private function removeNestedValue(array $path, array $data): array
+    {
+        $element = array_shift($path);
+        if ([] === $path) {
+            unset($data[$element]);
+        } else {
+            $data[$element] = $this->removeNestedValue($path, $data[$element]);
+            if ([] === $data[$element]) {
+                unset($data[$element]);
+            }
+        }
+
+        return $data;
     }
 }

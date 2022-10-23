@@ -89,7 +89,7 @@ class ArrayDenormalizerTest extends TestCase
 
         $denormalizer = new ArrayDenormalizer();
 
-        $this->expectDeprecation('Since symfony/serializer 5.3: Calling "%s" is deprecated. Please call setDenormalizer() instead.');
+        $this->expectDeprecation('Since symfony/serializer 5.3: Calling "Symfony\Component\Serializer\Normalizer\ArrayDenormalizer::setSerializer()" is deprecated. Please call setDenormalizer() instead.');
         $denormalizer->setSerializer($serializer);
 
         $result = $denormalizer->denormalize(

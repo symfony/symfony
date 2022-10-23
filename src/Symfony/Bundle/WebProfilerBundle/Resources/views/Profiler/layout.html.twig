@@ -128,7 +128,7 @@
                                     </div>
                                 {% endblock sidebar_shortcuts_links %}
 
-                                {{ render(controller('web_profiler.controller.profiler::searchBarAction', request.query.all)) }}
+                                {{ render(controller('web_profiler.controller.profiler::searchBarAction', query=request.query.all)) }}
                             </div>
 
                             {% if templates is defined %}

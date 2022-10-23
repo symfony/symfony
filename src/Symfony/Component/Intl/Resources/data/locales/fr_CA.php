@@ -18,6 +18,8 @@ return [
         'en_UM' => 'anglais (îles mineures éloignées des États-Unis)',
         'en_VG' => 'anglais (îles Vierges britanniques)',
         'en_VI' => 'anglais (îles Vierges américaines)',
+        'ff_Adlm_LR' => 'peul (adlam, Libéria)',
+        'ff_Adlm_NG' => 'peul (adlam, Nigéria)',
         'ff_Latn_LR' => 'peul (latin, Libéria)',
         'ff_Latn_NG' => 'peul (latin, Nigéria)',
         'fo_FO' => 'féroïen (îles Féroé)',

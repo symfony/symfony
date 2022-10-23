@@ -406,6 +406,7 @@ return [
         'sa' => 'sanskrito',
         'sa_IN' => 'sanskrito (Hindujo)',
         'sd' => 'sinda',
+        'sd_IN' => 'sinda (Hindujo)',
         'sd_PK' => 'sinda (Pakistano)',
         'sg' => 'sangoa',
         'sg_CF' => 'sangoa (Centr-Afrika Respubliko)',

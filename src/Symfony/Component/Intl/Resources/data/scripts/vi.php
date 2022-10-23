@@ -2,6 +2,7 @@
 
 return [
     'Names' => [
+        'Adlm' => 'Chữ Adlam',
         'Afak' => 'Chữ Afaka',
         'Arab' => 'Chữ Ả Rập',
         'Aran' => 'Chữ Nastaliq',
@@ -117,6 +118,7 @@ return [
         'Prti' => 'Chữ Parthia Văn bia',
         'Qaag' => 'Chữ Zawgyi',
         'Rjng' => 'Chữ Rejang',
+        'Rohg' => 'Chữ Hanifi',
         'Roro' => 'Chữ Rongorongo',
         'Runr' => 'Chữ Runic',
         'Samr' => 'Chữ Samaritan',

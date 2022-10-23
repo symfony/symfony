@@ -332,7 +332,7 @@ return [
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'This is not a translation',
+            1 => 'Ego loti obodo Lesotho',
         ],
         'LYD' => [
             0 => 'LYD',

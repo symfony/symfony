@@ -5,6 +5,5 @@ return [
         'bn' => 'Bengali',
     ],
     'LocalizedNames' => [
-        'ro_MD' => 'Moldavian',
     ],
 ];

@@ -308,7 +308,7 @@ return [
         'Atlantic/South_Georgia' => 'جنوبی جارجیا ٹائم',
         'Atlantic/St_Helena' => 'گرین وچ کا اصل وقت (سینٹ ہیلینا)',
         'Atlantic/Stanley' => 'فاک لینڈ آئلینڈز کا وقت (اسٹینلے)',
-        'Australia/Adelaide' => 'سنٹرل آسٹریلیا ٹائم (اڈیلائڈ)',
+        'Australia/Adelaide' => 'سنٹرل آسٹریلیا ٹائم (ایڈیلیڈ)',
         'Australia/Brisbane' => 'ایسٹرن آسٹریلیا ٹائم (برسبین)',
         'Australia/Broken_Hill' => 'سنٹرل آسٹریلیا ٹائم (بروکن ہِل)',
         'Australia/Currie' => 'ایسٹرن آسٹریلیا ٹائم (کیوری)',

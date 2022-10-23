@@ -345,7 +345,7 @@ return [
         'Europe/Istanbul' => 'トルコ時間（イスタンブール）',
         'Europe/Jersey' => 'グリニッジ標準時（ジャージー）',
         'Europe/Kaliningrad' => '東ヨーロッパ時間（カリーニングラード）',
-        'Europe/Kiev' => '東ヨーロッパ時間（キエフ）',
+        'Europe/Kiev' => '東ヨーロッパ時間（キーウ）',
         'Europe/Kirov' => 'ロシア時間（キーロフ）',
         'Europe/Lisbon' => '西ヨーロッパ時間（リスボン）',
         'Europe/Ljubljana' => '中央ヨーロッパ時間（リュブリャナ）',

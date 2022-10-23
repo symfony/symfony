@@ -2,9 +2,9 @@
 
 return [
     'Names' => [
-        'SLL' => [
+        'SLE' => [
             0 => 'Le',
-            1 => 'Lewoon Seraa Liyon',
+            1 => 'SLE',
         ],
     ],
 ];

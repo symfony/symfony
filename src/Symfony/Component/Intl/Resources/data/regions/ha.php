@@ -165,7 +165,7 @@ return [
         'NC' => 'Kaledoniya Sabuwa',
         'NE' => 'Nijar',
         'NF' => 'Tsibirin Narfalk',
-        'NG' => 'Najeriya',
+        'NG' => 'Nijeriya',
         'NI' => 'Nikaraguwa',
         'NL' => 'Holan',
         'NO' => 'Norwe',

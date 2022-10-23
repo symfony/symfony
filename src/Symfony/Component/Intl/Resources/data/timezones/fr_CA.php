@@ -90,6 +90,7 @@ return [
         'Arctic/Longyearbyen' => 'heure de l’Europe centrale (Longyearbyen)',
         'Asia/Amman' => 'heure de l’Europe de l’Est (Amman)',
         'Asia/Beirut' => 'heure de l’Europe de l’Est (Beyrouth)',
+        'Asia/Brunei' => 'heure du Brunéi (Brunei)',
         'Asia/Damascus' => 'heure de l’Europe de l’Est (Damas)',
         'Asia/Dhaka' => 'heure du Bangladesh (Dacca)',
         'Asia/Famagusta' => 'heure de l’Europe de l’Est (Famagouste)',
@@ -158,6 +159,8 @@ return [
         'PST8PDT' => 'heure du Pacifique',
         'Pacific/Honolulu' => 'heure d’Hawaï-Aléoutiennes (Honolulu)',
         'Pacific/Johnston' => 'heure d’Hawaï-Aléoutiennes (Johnston)',
+        'Pacific/Niue' => 'heure de Nioué (Niue)',
+        'Pacific/Palau' => 'heure des Palaos (Palau)',
     ],
     'Meta' => [
     ],

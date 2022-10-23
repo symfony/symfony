@@ -4,6 +4,7 @@ return [
     'Names' => [
         'Africa/Cairo' => 'hora de Europa del Este (El Cairo)',
         'Africa/Casablanca' => 'hora de Europa del Oeste (Casablanca)',
+        'Africa/Conakry' => 'hora del meridiano de Greenwich (Conakry)',
         'Africa/El_Aaiun' => 'hora de Europa del Oeste (El Aaiún)',
         'Africa/Tripoli' => 'hora de Europa del Este (Trípoli)',
         'America/Boise' => 'hora de la montaña (Boise)',
@@ -28,6 +29,7 @@ return [
         'Asia/Famagusta' => 'hora de Europa del Este (Famagusta)',
         'Asia/Gaza' => 'hora de Europa del Este (Gaza)',
         'Asia/Hebron' => 'hora de Europa del Este (Hebrón)',
+        'Asia/Khandyga' => 'hora de Yakutsk (Khandyga)',
         'Asia/Nicosia' => 'hora de Europa del Este (Nicosia)',
         'Asia/Rangoon' => 'hora de Myanmar (Birmania) (Yangón (Rangún))',
         'Atlantic/Canary' => 'hora de Europa del Oeste (Islas Canarias)',

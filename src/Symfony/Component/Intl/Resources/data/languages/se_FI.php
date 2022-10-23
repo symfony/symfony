@@ -33,6 +33,5 @@ return [
         'pt_PT' => 'portugálalaš portugálagiella',
         'ro_MD' => 'moldávialaš romániagiella',
         'zh_Hans' => 'álkes kiinnágiella',
-        'zh_Hant' => 'árbevirolaš kiinnágiella',
     ],
 ];

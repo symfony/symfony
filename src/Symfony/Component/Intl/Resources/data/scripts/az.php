@@ -2,7 +2,9 @@
 
 return [
     'Names' => [
+        'Adlm' => 'adlam',
         'Arab' => 'ərəb',
+        'Aran' => 'aran',
         'Armi' => 'armi',
         'Armn' => 'erməni',
         'Avst' => 'avestan',
@@ -15,7 +17,7 @@ return [
         'Brai' => 'brayl',
         'Bugi' => 'buqin',
         'Buhd' => 'buhid',
-        'Cakm' => 'kakm',
+        'Cakm' => 'çakma',
         'Cans' => 'birləşmiş kanada yerli yazısı',
         'Cari' => 'kariyan',
         'Cham' => 'çam',
@@ -94,6 +96,7 @@ return [
         'Plrd' => 'polard fonetik',
         'Prti' => 'prti',
         'Rjng' => 'recəng',
+        'Rohg' => 'hanifi',
         'Roro' => 'ronqoronqo',
         'Runr' => 'runik',
         'Samr' => 'samaritan',

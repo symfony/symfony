@@ -724,7 +724,7 @@ return [
         ],
         'PLN' => [
             0 => 'PLN',
-            1 => 'złoty polacco',
+            1 => 'zloty polacco',
         ],
         'PLZ' => [
             0 => 'PLZ',

@@ -70,7 +70,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
                     return !str_starts_with($current->getBasename(), '.');
                 }
             ),
-            \RecursiveIteratorIterator::LEAVES_ONLY
+            \RecursiveIteratorIterator::SELF_FIRST
         ));
         usort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
             return (string) $a > (string) $b ? 1 : -1;

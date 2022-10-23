@@ -972,9 +972,14 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
         return $this->lazyObjectReal->zpopmin(...\func_get_args());
     }
 
-    public function zrange($key, $start, $end, $options_withscores = null): \RedisCluster|array|bool
+    public function zrange($key, $start, $end, $options = null): \RedisCluster|array|bool
     {
         return $this->lazyObjectReal->zrange(...\func_get_args());
+    }
+
+    public function zrangestore($dstkey, $srckey, $start, $end, $options = null): \RedisCluster|false|int
+    {
+        return $this->lazyObjectReal->zrangestore(...\func_get_args());
     }
 
     public function zrangebylex($key, $min, $max, $offset = -1, $count = -1): \RedisCluster|array|false

@@ -1127,7 +1127,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->lazyObjectReal->zPopMin(...\func_get_args());
     }
 
-    public function zRange($key, $start, $end, $scores = null): \Redis|array|false
+    public function zRange($key, $start, $end, $options = null): \Redis|array|false
     {
         return $this->lazyObjectReal->zRange(...\func_get_args());
     }
@@ -1140,6 +1140,11 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function zRangeByScore($key, $start, $end, $options = []): \Redis|array|false
     {
         return $this->lazyObjectReal->zRangeByScore(...\func_get_args());
+    }
+
+    public function zrangestore($dstkey, $srckey, $start, $end, $options = null): \Redis|false|int
+    {
+        return $this->lazyObjectReal->zrangestore(...\func_get_args());
     }
 
     public function zRandMember($key, $options = null): \Redis|array|string

@@ -24,8 +24,7 @@
         "predis/predis": "~1.0"
     },
     "conflict": {
-        "doctrine/dbal": "<2.13",
-        "symfony/cache": "<6.2"
+        "doctrine/dbal": "<2.13"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Lock\\": "" },

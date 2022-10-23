@@ -29,9 +29,6 @@
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/rate-limiter": "^5.2|^6.0"
     },
-    "conflict": {
-        "symfony/cache": "<6.2"
-    },
     "suggest" : {
         "symfony/mime": "To use the file extension guesser"
     },

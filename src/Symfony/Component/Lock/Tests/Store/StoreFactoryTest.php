@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -47,6 +48,9 @@ class StoreFactoryTest extends TestCase
     {
         if (class_exists(\Redis::class)) {
             yield [new \Redis(), RedisStore::class];
+        }
+        if (class_exists(RedisProxy::class)) {
+            yield [$this->createMock(RedisProxy::class), RedisStore::class];
         }
         yield [new \Predis\Client(), RedisStore::class];
         if (class_exists(\Memcached::class)) {

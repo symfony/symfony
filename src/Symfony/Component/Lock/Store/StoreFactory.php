@@ -13,6 +13,8 @@ namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Traits\RedisClusterProxy;
+use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
@@ -30,6 +32,8 @@ class StoreFactory
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
             case $connection instanceof \Predis\ClientInterface:
+            case $connection instanceof RedisProxy:
+            case $connection instanceof RedisClusterProxy:
                 return new RedisStore($connection);
 
             case $connection instanceof \Memcached:

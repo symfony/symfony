@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-15T17:53:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-16T13:57:21Z
+
+Hey!
+
+I think @jeroennoten has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by boenner at 2021-11-17T10:38:20Z
+
+I tried rebasing this from 5.4 to 6.0 by following the [contribution guidelines](https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request) but it seems like I screwed that up as things got a little messy ... is there any way I can salvage this PR or do I need to create a new one based on the 6.0 branch?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-11-17T20:45:18Z
+
+@boenner You only forgot to change the base branch of the pull request. I did it for you and squashed your commits to trigger the CI.
+
+---------------------------------------------------------------------------
+
+by boenner at 2022-02-15T15:10:30Z
+
+Thanks for reviewing this, @dunglas! I've reverted the changes in other compenents. Always enabling this feature makes the normalizer a bit slower and there could be unwanted side effects if the `FLATTENER` is part of an attribute name. That's why I wasn't sure if it's a good idea.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-04-20T09:00:42Z
+
+How does it work if I want a key with a dot inside? Shouldn't we pass an array as a parameter of `SerializedName` instead of a dot-separated string? This will also simplify the code and improve performance.
+
+---------------------------------------------------------------------------
+
+by boenner at 2022-04-26T10:14:50Z
+
+> How does it work if I want a key with a dot inside? Shouldn't we pass an array as a parameter of `SerializedName` instead of a dot-separated string? This will also simplify the code and improve performance.
+
+I've created a new `SerializedPath` annotation to handle nested attributes. The `XMLFileLoader` is still broken, though. I'll try to fix that later today.
+
+---------------------------------------------------------------------------
+
+by boenner at 2022-05-09T10:26:11Z
+
+All test for the `SerializedPath` have been fixed in https://github.com/symfony/symfony/commit/8b07f78f065312c9ac59e0573a463b06337c2b5a. Are you ok with using the new annotation instead of changing the `SerializedPath` annotation, @dunglas?
+
+---------------------------------------------------------------------------
+
+by boenner at 2022-08-09T19:19:10Z
+
+Thanks for reviewing this again, @nicolas-grekas! The branch is rebased on 6.2 and all your requested changes are incorporated. In addition, the "borderline cases" when mixing the `SerializedPath` and `SerializedName` annotations are now caught to avoid any strange behavior.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-18T16:50:34Z
+
+@boenner I just force-pushed on your fork to fix all comments from @mtarld but one. Can you please have a look?
+
+---------------------------------------------------------------------------
+
+by boenner at 2022-10-22T11:51:16Z
+
+The  review is finished and the `SerializedPath` annotation now uses the `PropertyAccess` component. Thanks for your help with the code changes, @mtarld!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-22T12:16:16Z
+
+Can you please update the PR's description if it's not in sync?

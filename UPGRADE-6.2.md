@@ -100,6 +100,7 @@ Serializer
  * Deprecate calling `AttributeMetadata::setSerializedName()`, `ClassMetadata::setClassDiscriminatorMapping()` without arguments
  * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
  * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
+ * Add `PropertyValueNormalizer` to `AbstractObjectNormalizer` to enabled code reusability in custom `ObjectNormalizer`
 
 Translation
 -----------

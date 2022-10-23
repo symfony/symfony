@@ -76,5 +76,8 @@
         <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" port="8000" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUserIdentifier() matches '/^admin/'" path="/blog/524" />
+        <rule role="ROLE_ADMIN" route="admin">
+            <attribute key="_controller">AdminController::index</attribute>
+        </rule>
     </config>
 </srv:container>

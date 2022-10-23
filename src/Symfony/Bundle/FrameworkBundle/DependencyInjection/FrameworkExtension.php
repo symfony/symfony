@@ -2653,12 +2653,20 @@ class FrameworkExtension extends Extension
         $loader->load('rate_limiter.php');
 
         foreach ($config['limiters'] as $name => $limiterConfig) {
-            self::registerRateLimiter($container, $name, $limiterConfig);
+            self::registerRateLimiter($container, $name, $limiterConfig, false);
         }
     }
 
+    /**
+     * @deprecated since Symfony 6.2, to be made private in 7.0
+     */
     public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
     {
+        if (\func_num_args() < 4 || false !== func_get_arg(3)) {
+            // in Symfony 7.0: convert the method in private non-static, remove this trigger_deprecation and change the call from the registerRateLimiterConfiguration method
+            trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated, to be made private in 7.0.', __METHOD__);
+        }
+
         // default configuration (when used by other DI extensions)
         $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
 
@@ -2676,14 +2684,12 @@ class FrameworkExtension extends Extension
         }
         unset($limiterConfig['lock_factory']);
 
-        $storageId = $limiterConfig['storage_service'] ?? null;
-        if (null === $storageId) {
+        if (null === $storageId = $limiterConfig['storage_service'] ?? null) {
             $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
         }
 
         $limiter->replaceArgument(1, new Reference($storageId));
-        unset($limiterConfig['storage_service']);
-        unset($limiterConfig['cache_pool']);
+        unset($limiterConfig['storage_service'], $limiterConfig['cache_pool']);
 
         $limiterConfig['id'] = $name;
         $limiter->replaceArgument(0, $limiterConfig);

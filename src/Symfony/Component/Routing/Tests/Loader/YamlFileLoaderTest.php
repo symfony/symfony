@@ -463,7 +463,10 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yaml'), $routes);
     }
 
-    public function testImportAttributesWithPsr4Prefix()
+    /**
+     * @dataProvider providePsr4ConfigFiles
+     */
+    public function testImportAttributesWithPsr4Prefix(string $configFile)
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
         new LoaderResolver([
@@ -477,9 +480,17 @@ class YamlFileLoaderTest extends TestCase
             },
         ]);
 
-        $route = $loader->load('psr4-attributes.yaml')->get('my_route');
+        $route = $loader->load($configFile)->get('my_route');
         $this->assertSame('/my-prefix/my/route', $route->getPath());
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
+    }
+
+    public function providePsr4ConfigFiles(): array
+    {
+        return [
+            ['psr4-attributes.yaml'],
+            ['psr4-controllers-redirection.yaml'],
+        ];
     }
 
     public function testImportAttributesFromClass()

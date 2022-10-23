@@ -12,7 +12,9 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Config\Loader\DirectoryAwareLoaderInterface;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -20,8 +22,10 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Alexander M. Turek <me@derrabus.de>
  */
-final class Psr4DirectoryLoader extends Loader
+final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderInterface
 {
+    private ?string $currentDirectory = null;
+
     public function __construct(
         private readonly FileLocatorInterface $locator,
     ) {
@@ -34,7 +38,7 @@ final class Psr4DirectoryLoader extends Loader
      */
     public function load(mixed $resource, string $type = null): ?RouteCollection
     {
-        $path = $this->locator->locate($resource['path']);
+        $path = $this->locator->locate($resource['path'], $this->currentDirectory);
         if (!is_dir($path)) {
             return new RouteCollection();
         }
@@ -47,12 +51,33 @@ final class Psr4DirectoryLoader extends Loader
         return ('attribute' === $type || 'annotation' === $type) && \is_array($resource) && isset($resource['path'], $resource['namespace']);
     }
 
+    public function forDirectory(string $currentDirectory): static
+    {
+        $loader = clone $this;
+        $loader->currentDirectory = $currentDirectory;
+
+        return $loader;
+    }
+
     private function loadFromDirectory(string $directory, string $psr4Prefix): RouteCollection
     {
         $collection = new RouteCollection();
+        $collection->addResource(new DirectoryResource($directory, '/\.php$/'));
+        $files = iterator_to_array(new \RecursiveIteratorIterator(
+            new \RecursiveCallbackFilterIterator(
+                new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
+                function (\SplFileInfo $current) {
+                    return !str_starts_with($current->getBasename(), '.');
+                }
+            ),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        ));
+        usort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
+            return (string) $a > (string) $b ? 1 : -1;
+        });
 
         /** @var \SplFileInfo $file */
-        foreach (new \FilesystemIterator($directory) as $file) {
+        foreach ($files as $file) {
             if ($file->isDir()) {
                 $collection->addCollection($this->loadFromDirectory($file->getPathname(), $psr4Prefix.'\\'.$file->getFilename()));
 

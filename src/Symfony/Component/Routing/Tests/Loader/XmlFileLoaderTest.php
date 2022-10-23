@@ -597,7 +597,10 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }
 
-    public function testImportAttributesWithPsr4Prefix()
+    /**
+     * @dataProvider providePsr4ConfigFiles
+     */
+    public function testImportAttributesWithPsr4Prefix(string $configFile)
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
         new LoaderResolver([
@@ -611,9 +614,17 @@ class XmlFileLoaderTest extends TestCase
             },
         ]);
 
-        $route = $loader->load('psr4-attributes.xml')->get('my_route');
+        $route = $loader->load($configFile)->get('my_route');
         $this->assertSame('/my-prefix/my/route', $route->getPath());
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
+    }
+
+    public function providePsr4ConfigFiles(): array
+    {
+        return [
+            ['psr4-attributes.xml'],
+            ['psr4-controllers-redirection.xml'],
+        ];
     }
 
     public function testImportAttributesFromClass()

@@ -99,4 +99,14 @@ final class TelegramOptions implements MessageOptionsInterface
 
         return $this;
     }
+
+    /**
+     * @return $this
+     */
+    public function edit(int $messageId): static
+    {
+        $this->options['message_id'] = $messageId;
+
+        return $this;
+    }
 }

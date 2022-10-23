@@ -72,7 +72,6 @@ final class TelegramTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, TelegramOptions::class));
         }
 
-        $endpoint = sprintf('https://%s/bot%s/sendMessage', $this->getEndpoint(), $this->token);
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
         if (!isset($options['chat_id'])) {
             $options['chat_id'] = $message->getRecipientId() ?: $this->chatChannel;
@@ -84,6 +83,9 @@ final class TelegramTransport extends AbstractTransport
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
             $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!])/', '\\\\$1', $message->getSubject());
         }
+
+        $path = isset($options['message_id']) ? 'editMessageText' : 'sendMessage';
+        $endpoint = sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $path);
 
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
@@ -98,7 +100,7 @@ final class TelegramTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $result = $response->toArray(false);
 
-            throw new TransportException('Unable to post the Telegram message: '.$result['description'].sprintf(' (code %s).', $result['error_code']), $response);
+            throw new TransportException('Unable to '.(isset($options['message_id']) ? 'edit' : 'post').' the Telegram message: '.$result['description'].sprintf(' (code %d).', $result['error_code']), $response);
         }
 
         $success = $response->toArray(false);

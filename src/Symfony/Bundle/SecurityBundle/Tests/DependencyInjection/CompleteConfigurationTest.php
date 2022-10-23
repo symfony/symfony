@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
@@ -326,8 +327,15 @@ abstract class CompleteConfigurationTest extends TestCase
                 $this->assertEquals('IS_AUTHENTICATED_ANONYMOUSLY', $attributes[0]);
                 $expression = $container->getDefinition((string) $attributes[1])->getArgument(0);
                 $this->assertEquals("token.getUserIdentifier() matches '/^admin/'", $expression);
+            } elseif (4 === $i) {
+                $this->assertEquals(['ROLE_ADMIN'], $attributes);
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
+                $this->assertSame(AttributesRequestMatcher::class, $def->getClass());
+                $this->assertSame(['_controller' => 'AdminController::index', '_route' => 'admin'], $def->getArgument(0));
             }
         }
+
+        $this->assertCount(4, $matcherIds);
     }
 
     public function testMerge()

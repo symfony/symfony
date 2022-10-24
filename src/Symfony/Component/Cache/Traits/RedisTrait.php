@@ -571,7 +571,7 @@ trait RedisTrait
         }
 
         foreach ($ids as $k => $id) {
-            yield $id => $results[$k];
+            yield $id => is_array($results) ? $results[$k] : $results;
         }
     }
 

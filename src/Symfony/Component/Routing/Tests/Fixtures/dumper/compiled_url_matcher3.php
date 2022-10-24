@@ -8,8 +8,8 @@
 return [
     false, // $matchHost
     [ // $staticRoutes
-        '/rootprefix/test' => [[['_route' => 'static'], null, null, null, false, false, null]],
-        '/with-condition' => [[['_route' => 'with-condition'], null, null, null, false, false, -1]],
+        '/rootprefix/test' => [[['_route' => 'static', '_route_path' => '/rootprefix/test'], null, null, null, false, false, null]],
+        '/with-condition' => [[['_route' => 'with-condition', '_route_path' => '/with-condition'], null, null, null, false, false, -1]],
     ],
     [ // $regexpList
         0 => '{^(?'
@@ -18,9 +18,9 @@ return [
             .')/?$}sD',
     ],
     [ // $dynamicRoutes
-        27 => [[['_route' => 'dynamic'], ['var'], null, null, false, true, null]],
+        27 => [[['_route' => 'dynamic', '_route_path' => '/rootprefix/{var}'], ['var'], null, null, false, true, null]],
         56 => [
-            [['_route' => 'with-condition-dynamic'], ['id'], null, null, false, true, -2],
+            [['_route' => 'with-condition-dynamic', '_route_path' => '/with-condition/{id}'], ['id'], null, null, false, true, -2],
             [null, null, null, null, false, false, 0],
         ],
     ],

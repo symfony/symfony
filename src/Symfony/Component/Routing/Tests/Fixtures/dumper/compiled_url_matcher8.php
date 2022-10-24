@@ -21,10 +21,10 @@ return [
             .')/?$}sD',
     ],
     [ // $dynamicRoutes
-        11 => [[['_route' => 'a'], ['a'], null, null, false, true, null]],
-        22 => [[['_route' => 'b'], ['a'], null, null, false, true, null]],
+        11 => [[['_route' => 'a', '_route_path' => '/{a}'], ['a'], null, null, false, true, null]],
+        22 => [[['_route' => 'b', '_route_path' => '/{a}'], ['a'], null, null, false, true, null]],
         33 => [
-            [['_route' => 'c'], ['a'], null, null, false, true, null],
+            [['_route' => 'c', '_route_path' => '/{a}'], ['a'], null, null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
     ],

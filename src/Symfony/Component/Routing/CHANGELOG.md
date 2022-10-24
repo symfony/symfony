@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `Requirement::POSITIVE_INT` for common ids and pagination
+ * The request matcher now adds the path of the matched route as a `_route_path` attribute
 
 6.1
 ---

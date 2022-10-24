@@ -35,6 +35,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => 'foo',
+                '_route_path' => '/foo/',
             ],
             $matcher->match('/foo')
         );
@@ -55,6 +56,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => 'foo',
+                '_route_path' => '/foo',
             ],
             $matcher->match('/foo')
         );

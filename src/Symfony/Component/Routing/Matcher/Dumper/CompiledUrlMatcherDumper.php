@@ -430,7 +430,7 @@ EOF;
         }
 
         return [
-            ['_route' => $name] + $defaults,
+            ['_route' => $name, '_route_path' => $route->getPath()] + $defaults,
             $vars,
             array_flip($route->getMethods()) ?: null,
             array_flip($route->getSchemes()) ?: null,

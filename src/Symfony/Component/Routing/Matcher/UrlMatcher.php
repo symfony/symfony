@@ -201,6 +201,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             unset($defaults['_canonical_route']);
         }
         $attributes['_route'] = $name;
+        $attributes['_route_path'] = $route->getPath();
 
         return $this->mergeDefaults($attributes, $defaults);
     }

@@ -4,7 +4,7 @@ CHANGELOG
 6.2
 ---
 
-* Move `symfony/lock` to dev dependency in `composer.json`
+ * Move `symfony/lock` to dev dependency in `composer.json`
 
 5.4
 ---

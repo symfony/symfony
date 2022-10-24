@@ -55,6 +55,8 @@ class RedisProxiesTest extends TestCase
      */
     public function testRedis6Proxy($class, $stub)
     {
+        $this->markTestIncomplete('To be re-enabled when phpredis v6 becomes stable');
+
         $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
         $stub = preg_replace('/^class /m', 'return; \0', $stub);
         $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);

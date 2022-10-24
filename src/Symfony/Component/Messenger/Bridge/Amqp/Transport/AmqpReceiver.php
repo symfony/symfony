@@ -66,6 +66,9 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
             $envelope = $this->serializer->decode([
                 'body' => false === $body ? '' : $body, // workaround https://github.com/pdezwart/php-amqp/issues/351
                 'headers' => $amqpEnvelope->getHeaders(),
+                'extra' => [
+                    'routingKey' => $amqpEnvelope->getRoutingKey(),
+                ],
             ]);
         } catch (MessageDecodingFailedException $exception) {
             // invalid message of some type

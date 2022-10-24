@@ -74,6 +74,27 @@ class AmqpReceiverTest extends TestCase
         $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
     }
 
+    public function testItPassesExpectedDataToSerializerDecode()
+    {
+        $amqpEnvelope = $this->createAMQPEnvelope();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('decode')->with($this->equalTo([
+            'body' => $amqpEnvelope->getBody(),
+            'headers' => $amqpEnvelope->getHeaders(),
+            'extra' => [
+                'routingKey' => $amqpEnvelope->getRoutingKey(),
+            ],
+        ]))->willReturn(new Envelope(new DummyMessage('Hi')));
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        iterator_to_array($receiver->get());
+    }
+
     private function createAMQPEnvelope(): \AMQPEnvelope
     {
         $envelope = $this->createMock(\AMQPEnvelope::class);
@@ -81,6 +102,7 @@ class AmqpReceiverTest extends TestCase
         $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
         ]);
+        $envelope->method('getRoutingKey')->willReturn('Dummy_RoutingKey');
 
         return $envelope;
     }

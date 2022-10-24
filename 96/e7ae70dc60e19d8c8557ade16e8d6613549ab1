@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-06T09:52:10Z
+
+Hey!
+
+I think @VincentLanglet has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by DocFX at 2021-12-09T15:50:31Z
+
+Don't really feel like I broke any test, here. ^^
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-09T21:25:17Z
+
+should this `label` attribute be set when there is a placeholder provided ? Or should the `--` be the default text of the option instead ?
+
+---------------------------------------------------------------------------
+
+by DocFX at 2021-12-10T12:52:24Z
+
+That's an excellent question, @stof. My understanding so far is that the placeholder should provide a value, hence removing the need for the label attribute. (if I read everything correctly)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-21T08:10:17Z
+
+Not sure about this change, but that would be for 6.2.
+
+---------------------------------------------------------------------------
+
+by DocFX at 2022-07-28T11:11:43Z
+
+Haha I totally forgot about that PR. I just had to re-read it. XD
+
+Was just an ultra-low-priority suggestion.
+
+I can delete this and do a new one on 6.2, if not already done.
+
+---------------------------------------------------------------------------
+
+by DocFX at 2022-10-02T13:43:11Z
+
+> Can you please rebase for 6.2?
+
+Done! :)
+
+> Also, why not go with `: '--'` on the ternary op inside the tag? That'd make more sense to me.
+
+My brain is in slow mode today (rhinopharyngitis), not sure I understand what you mean ^^

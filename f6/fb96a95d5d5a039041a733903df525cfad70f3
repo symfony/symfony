@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2022-02-27T14:33:29Z
+
+hmm.. the `registerRateLimiter` method is statically used by the `SecurityBundle`.
+But this method also need to check if the `lock` config has been enabled, which makes `FrameworkExtension` with 2 issues:
+- global static state
+- order of loading bundles matters :/
+
+I'm not sure what is the best way to fix that: In `registerRateLimiter`, I think we should either
+- just check if the class Lock exists, and let the user enable the config
+- Or using a compiler pass to check if the service `lock.factory` exists instead of checking if the config is enabled
+
+ping @wouterj
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-26T15:56:29Z
+
+@jderusse Can you have a look at Nicolas's feedback?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-03-26T16:03:16Z
+
+The status is blocked: Security bundle should be fixed first.
+
+See my comment https://github.com/symfony/symfony/pull/45569#issuecomment-1053573767 Ping @wouterj
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-03-26T19:33:19Z
+
+> just check if the class Lock exists, and let the user enable the config
+
+Let's go for this option. The check (and exception) is "only" a DX improvement anyways: if lock isn't enabled/installed, you'll get an error because `lock.factory` is missing.
+If we get a lot more support questions about this after releasing 6.1, we can implement more advanced things for 6.2
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-28T10:46:04Z
+
+Friendly ping @jderusse this would be nice to have in 6.2.

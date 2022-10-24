@@ -16,18 +16,18 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 trait ResetLimiterTrait
 {
-    private LockInterface $lock;
+    private ?LockInterface $lock;
     private StorageInterface $storage;
     private string $id;
 
     public function reset(): void
     {
         try {
-            $this->lock->acquire(true);
+            $this->lock?->acquire(true);
 
             $this->storage->delete($this->id);
         } finally {
-            $this->lock->release();
+            $this->lock?->release();
         }
     }
 }

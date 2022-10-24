@@ -137,8 +137,14 @@ class XmlDumper extends Dumper
                 } else {
                     $tag->appendChild($this->document->createTextNode($name));
                 }
-                foreach ($attributes as $key => $value) {
-                    $tag->setAttribute($key, $value ?? '');
+
+                // Check if we have recursive attributes
+                if (array_filter($attributes, \is_array(...))) {
+                    $this->addTagRecursiveAttributes($tag, $attributes);
+                } else {
+                    foreach ($attributes as $key => $value) {
+                        $tag->setAttribute($key, $value ?? '');
+                    }
                 }
                 $service->appendChild($tag);
             }
@@ -259,6 +265,22 @@ class XmlDumper extends Dumper
             $this->addServiceAlias($alias, $id, $services);
         }
         $parent->appendChild($services);
+    }
+
+    private function addTagRecursiveAttributes(\DOMElement $parent, array $attributes)
+    {
+        foreach ($attributes as $name => $value) {
+            $attribute = $this->document->createElement('attribute');
+            $attribute->setAttribute('name', $name);
+
+            if (\is_array($value)) {
+                $this->addTagRecursiveAttributes($attribute, $value);
+            } else {
+                $attribute->appendChild($this->document->createTextNode($value));
+            }
+
+            $parent->appendChild($attribute);
+        }
     }
 
     private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key')

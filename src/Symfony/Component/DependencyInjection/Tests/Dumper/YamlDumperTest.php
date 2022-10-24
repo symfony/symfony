@@ -173,6 +173,14 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_abstract_argument.yml', $dumper->dump());
     }
 
+    public function testDumpNonScalarTags()
+    {
+        $container = include self::$fixturesPath.'/containers/container_non_scalar_tags.php';
+        $dumper = new YamlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_array_tags.yml'), $dumper->dump());
+    }
+
     private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')
     {
         $parser = new Parser();

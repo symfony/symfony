@@ -426,6 +426,15 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)), $container->getDefinition('foo')->getArgument(0));
     }
 
+    public function testParseServiceTagsWithArrayAttributes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_array_tags.xml');
+
+        $this->assertEquals(['foo_tag' => [['foo' => 'bar', 'bar' => ['foo' => 'bar', 'bar' => 'foo']]]], $container->getDefinition('foo')->getTags());
+    }
+
     public function testParseTagsWithoutNameThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

@@ -336,10 +336,13 @@ class XmlFileLoader extends FileLoader
         $tags = $this->getChildren($service, 'tag');
 
         foreach ($tags as $tag) {
-            $parameters = [];
-            $tagName = $tag->nodeValue;
+            if ('' === $tagName = $tag->hasChildNodes() || '' === $tag->nodeValue ? $tag->getAttribute('name') : $tag->nodeValue) {
+                throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', (string) $service->getAttribute('id'), $file));
+            }
+
+            $parameters = $this->getTagAttributes($tag, sprintf('The attribute name of tag "%s" for service "%s" in %s must be a non-empty string.', $tagName, (string) $service->getAttribute('id'), $file));
             foreach ($tag->attributes as $name => $node) {
-                if ('name' === $name && '' === $tagName) {
+                if ('name' === $name) {
                     continue;
                 }
 
@@ -348,10 +351,6 @@ class XmlFileLoader extends FileLoader
                 }
                 // keep not normalized key
                 $parameters[$name] = XmlUtils::phpize($node->nodeValue);
-            }
-
-            if ('' === $tagName && '' === $tagName = $tag->getAttribute('name')) {
-                throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', $service->getAttribute('id'), $file));
             }
 
             $definition->addTag($tagName, $parameters);
@@ -590,6 +589,30 @@ class XmlFileLoader extends FileLoader
         }
 
         return $children;
+    }
+
+    private function getTagAttributes(\DOMNode $node, string $missingName): array
+    {
+        $parameters = [];
+        $children = $this->getChildren($node, 'attribute');
+
+        foreach ($children as $childNode) {
+            if ('' === $name = $childNode->getAttribute('name')) {
+                throw new InvalidArgumentException($missingName);
+            }
+
+            if ($this->getChildren($childNode, 'attribute')) {
+                $parameters[$name] = $this->getTagAttributes($childNode, $missingName);
+            } else {
+                if (str_contains($name, '-') && !str_contains($name, '_') && !\array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
+                    $parameters[$normalizedName] = XmlUtils::phpize($childNode->nodeValue);
+                }
+                // keep not normalized key
+                $parameters[$name] = XmlUtils::phpize($childNode->nodeValue);
+            }
+        }
+
+        return $parameters;
     }
 
     /**

@@ -21,6 +21,8 @@ CHANGELOG
  * Deprecate `framework.form.legacy_error_messages` config node
  * Add a `framework.router.cache_dir` configuration option to configure the default `Router` `cache_dir` option
  * Add option `framework.messenger.buses.*.default_middleware.allow_no_senders` to enable throwing when a message doesn't have a sender
+ * Deprecate `AbstractController::renderForm()`, use `render()` instead
+ * Deprecate `FrameworkExtension::registerRateLimiter()`, to be made private in 7.0
 
 6.1
 ---

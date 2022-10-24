@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-11-21T07:57:14Z
+
+Related to #43164?
+
+> Draw back is, the signature of the method place is now place(mixed $value = []): self|\Symfony\Config\Framework\Workflows\WorkflowsConfig\PlaceConfig Is it an issue?
+
+IMHO it's a step back yes.
+
+Is shortcuts worth pursuing? Rather than fully qualified/explicit config?
+
+> But sadly lack the previous behavior. People have to enter the full configuration.
+
+works for me :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-11-21T13:22:09Z
+
+Actually, I converted a personal application to PHP configuration, and have to admit that I've been disappointed by the experience.
+
+Some really simple YAML configuration `framework.lock: flock` become obscure `$framework->lock()->resource('default', ['flock'])` <= why `resource`, why `default` why `flock` is wrapped into an array?
+
+Some configurations short `monolog.handler.main.excluded_http_codes: [403, 404]` become super verbose with intermediate varianbles
+```php
+    $mainHandler = $monolog->handler('main');
+    $mainHandler->excludedHttpCode()->code(403);
+    $mainHandler->excludedHttpCode()->code(404);
+
+```
+
+Moreover, when I switched my configuration, the symfony documentation was not-yet updated, and I had to dig into the `Configuration.php` file to understand how to convert my yaml file into PHP... Now this will be easier for symfony (because most of config are now documented) but this is not the case for many other bundles.
+
+If the issue is only about the double return signature `xxx(): self|child` we could keep the current behavior, and throw an exception when people try to update a property inside the shortcut value
+```
+$framework->lock('redis://localhost')->resource(...); <== InvalidConfigurationException
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-05-17T13:04:56Z
+
+Rebase needed, in case there is anything left after  #46328
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-28T09:52:16Z
+
+Friendly ping @jderusse
+/cc @HypeMC
+
+Is this PR still needed after https://github.com/symfony/symfony/pull/46328?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-07-28T10:07:09Z
+
+@nicolas-grekas This PR provides some additional features that #46328 doesn't have, eg allowed type hints on generated methods:
+https://github.com/symfony/symfony/blob/962834b63066c1be04bed19cbc6762d3136bcfa3/src/Symfony/Component/Config/Tests/Builder/Fixtures/ScalarNormalizedTypes/Symfony/Config/ScalarNormalizedTypesConfig.php#L25
+
+Currently `mixed` is used in these situations:
+https://github.com/symfony/symfony/blob/5bf31c57c3d07ab6a04bdeb8fdc2957e0591dcb5/src/Symfony/Component/Config/Tests/Builder/Fixtures/ScalarNormalizedTypes/Symfony/Config/ScalarNormalizedTypesConfig.php#L31
+
+My PR only covers using scalars with the `beforeNormalization` hook.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-28T10:11:56Z
+
+Would you be able to take over the PR @HypeMC? I feel like @jderusse would appreciate :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-07-28T10:44:20Z
+
+This PR also adds an (opiniated) change in the returned object:
+When people configure an entry with a scalar value, then, the returned value is the object and not the child object.
+This allows chaining "aliases". ie
+```diff
+     $subscriptionWorkflow = $framework->workflows()->workflows('subscription');
+
+     $subscriptionWorkflow->place(Subscription::STATUS_SUBMITTED);
+-    $subscriptionWorkflow->place(Subscription::STATUS_CANCELED);
+-    $subscriptionWorkflow->place(Subscription::STATUS_ACCEPTED);
+-    $subscriptionWorkflow->place(Subscription::STATUS_VALIDATED);
++      ->place(Subscription::STATUS_CANCELED)
++      ->place(Subscription::STATUS_ACCEPTED)
++      ->place(Subscription::STATUS_VALIDATED);
+```
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-07-28T10:50:56Z
+
+> Would you be able to take over the PR @HypeMC? I feel like @jderusse would appreciate :)
+
+Sure, if @jderusse doesn't mind, I'll take over.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-07-28T13:14:33Z
+
+> if @jderusse doesn't mind,
+
+no issue at all, thanks for your help
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-10-23T17:08:55Z
+
+PR rebased and duplicated logic with #46328 removed

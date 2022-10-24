@@ -12,7 +12,6 @@
 namespace Symfony\Component\RateLimiter;
 
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\NoLock;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
@@ -45,7 +44,7 @@ final class RateLimiterFactory
     public function create(string $key = null): LimiterInterface
     {
         $id = $this->config['id'].'-'.$key;
-        $lock = $this->lockFactory ? $this->lockFactory->createLock($id) : new NoLock();
+        $lock = $this->lockFactory?->createLock($id);
 
         return match ($this->config['policy']) {
             'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock),

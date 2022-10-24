@@ -12,7 +12,6 @@
 namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Lock\NoLock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
@@ -35,7 +34,7 @@ final class TokenBucketLimiter implements LimiterInterface
         $this->maxBurst = $maxBurst;
         $this->rate = $rate;
         $this->storage = $storage;
-        $this->lock = $lock ?? new NoLock();
+        $this->lock = $lock;
     }
 
     /**
@@ -57,7 +56,7 @@ final class TokenBucketLimiter implements LimiterInterface
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the burst size of the rate limiter (%d).', $tokens, $this->maxBurst));
         }
 
-        $this->lock->acquire(true);
+        $this->lock?->acquire(true);
 
         try {
             $bucket = $this->storage->fetch($this->id);
@@ -97,7 +96,7 @@ final class TokenBucketLimiter implements LimiterInterface
                 $this->storage->save($bucket);
             }
         } finally {
-            $this->lock->release();
+            $this->lock?->release();
         }
 
         return $reservation;

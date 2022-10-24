@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate the "loose" e-mail validation mode, use "html5" instead
  * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
  * Add the `extensions` option to the `File` constraint as an alternative to `mimeTypes` which checks the mime type of the file, its extension, and the consistency between them
+ * Add padding for enhanced privacy to the `NotCompromisedPasswordValidator`
 
 6.1
 ---

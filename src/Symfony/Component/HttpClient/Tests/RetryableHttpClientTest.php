@@ -62,21 +62,22 @@ class RetryableHttpClientTest extends TestCase
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
-                new MockResponse('', ['http_code' => 500]),
-                new MockResponse('', ['http_code' => 200]),
+                new MockResponse('abc', ['http_code' => 500]),
+                new MockResponse('def', ['http_code' => 200]),
             ]),
             new class(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 0) extends GenericRetryStrategy {
                 public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
                 {
-                    return null === $responseContent ? null : 200 !== $context->getStatusCode();
+                    return 500 === $context->getStatusCode() && null === $responseContent ? null : 200 !== $context->getStatusCode();
                 }
             },
-            1
+            2
         );
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertSame('def', $response->getContent());
     }
 
     public function testRetryWithBodyKeepContent()

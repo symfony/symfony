@@ -49,7 +49,7 @@ trait TranslationTrait
         // extract intl-icu messages only
         $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
         if ($intlMessages = $catalogue->all($intlDomain)) {
-            $filteredCatalogue->add($intlMessages, $intlDomain);
+            $filteredCatalogue->add($intlMessages, $domain);
         }
 
         // extract all messages and subtract intl-icu messages

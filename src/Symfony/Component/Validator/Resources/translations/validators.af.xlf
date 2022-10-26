@@ -382,6 +382,22 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Hierdie waarde is nie 'n geldige Internasionale veiligheidsidentifikasienommer (ISIN) nie.</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Hierdie waarde moet 'n geldige uitdrukking wees.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Hierdie waarde is nie 'n geldige CSS-kleur nie.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Hierdie waarde is nie 'n geldige CIDR-notasie nie.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Die waarde van die netmasker moet tussen {{ min }} en {{ max }} wees.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -276,7 +276,9 @@ class Application implements ResetInterface
             $alternative = $alternatives[0];
 
             $style = new SymfonyStyle($input, $output);
-            $style->block(sprintf('Command "%s" is not defined.', $name), null, 'error', ' ', true);
+            $output->writeln('');
+            $formattedBlock = (new FormatterHelper())->formatBlock(sprintf('Command "%s" is not defined.', $name), 'error', true);
+            $output->writeln($formattedBlock);
             if (!$style->confirm(sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
                 if (null !== $this->dispatcher) {
                     $event = new ConsoleErrorEvent($input, $output, $e);

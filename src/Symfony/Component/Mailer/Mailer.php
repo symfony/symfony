@@ -13,7 +13,6 @@ namespace Symfony\Component\Mailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
-use Symfony\Component\Mailer\Event\QueuingMessageEvent;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -54,7 +53,7 @@ final class Mailer implements MailerInterface
             // Listeners should act depending on the `$queued` argument of the `MessageEvent` instance.
             $clonedMessage = clone $message;
             $clonedEnvelope = null !== $envelope ? clone $envelope : Envelope::create($clonedMessage);
-            $event = new QueuingMessageEvent($clonedMessage, $clonedEnvelope, (string) $this->transport);
+            $event = new MessageEvent($clonedMessage, $clonedEnvelope, (string) $this->transport, true);
             $this->dispatcher->dispatch($event);
             $stamps = $event->getStamps();
         }

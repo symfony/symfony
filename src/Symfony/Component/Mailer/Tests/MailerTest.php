@@ -13,7 +13,7 @@ namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Mailer\Event\QueuingMessageEvent;
+use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport\NullTransport;
@@ -54,7 +54,7 @@ class MailerTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(self::callback(static function (QueuingMessageEvent $event) use ($stamp) {
+            ->with(self::callback(static function (MessageEvent $event) use ($stamp) {
                 $event->addStamp($stamp);
 
                 return 'Time for Symfony Mailer!' === $event->getMessage()->getSubject();

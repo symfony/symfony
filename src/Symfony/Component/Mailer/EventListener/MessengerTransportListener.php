@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mailer\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Mailer\Event\QueuingMessageEvent;
+use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Mime\Message;
 
@@ -23,8 +23,12 @@ use Symfony\Component\Mime\Message;
  */
 final class MessengerTransportListener implements EventSubscriberInterface
 {
-    public function onMessage(QueuingMessageEvent $event): void
+    public function onMessage(MessageEvent $event): void
     {
+        if (!$event->isQueued()) {
+            return;
+        }
+
         $message = $event->getMessage();
         if (!$message instanceof Message || !$message->getHeaders()->has('X-Bus-Transport')) {
             return;
@@ -39,7 +43,7 @@ final class MessengerTransportListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            QueuingMessageEvent::class => 'onMessage',
+            MessageEvent::class => 'onMessage',
         ];
     }
 }

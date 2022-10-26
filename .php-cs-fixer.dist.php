@@ -31,6 +31,7 @@ return (new PhpCsFixer\Config())
         'protected_to_private' => false,
         'native_constant_invocation' => ['strict' => false],
         'nullable_type_declaration_for_default_null_value' => ['use_nullable_type_declaration' => false],
+        'global_namespace_import' => ['import_classes' => false, 'import_constants' => false, 'import_functions' => false],
         'header_comment' => ['header' => $fileHeaderComment],
     ])
     ->setRiskyAllowed(true)

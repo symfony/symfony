@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-10-26T12:55:56Z
+
+Instead of this, could you please try to increase a bit the input size here:
+
+https://github.com/symfony/symfony/blob/3b4cda14d4fce524b29afa0602cb465c0fe7aadb/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/profiler.css.twig#L1021
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-10-26T12:59:26Z
+
+yup, 215px works.
+
+<img width="250" alt="Screenshot 2022-10-26 at 13 59 44" src="https://user-images.githubusercontent.com/400092/198032222-8d710a88-cb53-47d4-bc83-261eb470794a.png">
+
+210px is still clipping
+
+<img width="246" alt="Screenshot 2022-10-26 at 13 58 43" src="https://user-images.githubusercontent.com/400092/198032126-19888dbd-cbbd-407b-9144-d90b97e886f2.png">
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-10-26T15:43:13Z
+
+@PhilETaylor if you can, please update this PR to keep the original text but apply the longer width. Thanks.
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-10-26T15:46:34Z
+
+yes sorry - School is out and kid had dentist, will do that now :)
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-10-26T15:52:07Z
+
+@javiereguiluz Done :)
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-10-26T15:58:11Z
+
+Failing tests are not my fault :) honest :-)

@@ -274,7 +274,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->exactly(3))->method('xreadgroup')
             ->withConsecutive(
                 ['symfony', 'consumer', ['queue' => '0'], 1, null], // first call for pending messages
-                ['symfony', 'consumer', ['queue' => '0'], 1, null], // sencond call because of claimed message (redisid-123)
+                ['symfony', 'consumer', ['queue' => '0'], 1, null], // second call because of claimed message (redisid-123)
                 ['symfony', 'consumer', ['queue' => '>'], 1, null] // third call because of no result (other consumer claimed message redisid-123)
             )
             ->willReturnOnConsecutiveCalls([], [], []);
@@ -300,11 +300,11 @@ class ConnectionTest extends TestCase
         $redis->expects($this->exactly(2))->method('xreadgroup')
             ->withConsecutive(
                 ['symfony', 'consumer', ['queue' => '0'], 1, null], // first call for pending messages
-                ['symfony', 'consumer', ['queue' => '0'], 1, null] // sencond call because of claimed message (redisid-123)
+                ['symfony', 'consumer', ['queue' => '0'], 1, null] // second call because of claimed message (redisid-123)
             )
             ->willReturnOnConsecutiveCalls(
                 [], // first call returns no result
-                ['queue' => [['message' => '{"body":"1","headers":[]}']]] // second call returns clamed message (redisid-123)
+                ['queue' => [['message' => '{"body":"1","headers":[]}']]] // second call returns claimed message (redisid-123)
             );
 
         $redis->expects($this->once())->method('xpending')->willReturn([[

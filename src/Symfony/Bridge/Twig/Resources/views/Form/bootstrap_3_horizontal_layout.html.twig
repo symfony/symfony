@@ -1,7 +1,7 @@
 {% use "bootstrap_3_layout.html.twig" %}
 
 {% block form_start -%}
-    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-horizontal')|trim}) %}
+    {% set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' form-horizontal')|trim}) %}
     {{- parent() -}}
 {%- endblock form_start %}
 

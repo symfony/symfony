@@ -404,7 +404,7 @@
     {%- else -%}
         {% set form_method = "POST" %}
     {%- endif -%}
-    <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{{ block('attributes') }}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+    <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% with { attr: row_attr} %}{{ block('attributes') }}{% endwith %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}

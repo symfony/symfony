@@ -103,7 +103,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get">', $html);
+        $this->assertSame('<form name="form" method="get" id="form_form">', $html);
     }
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
@@ -115,7 +115,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="0">', $html);
+        $this->assertSame('<form name="form" method="get" action="0" id="form_form">', $html);
     }
 
     public static function isRootFormProvider(): array

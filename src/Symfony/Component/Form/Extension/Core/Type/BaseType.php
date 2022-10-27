@@ -65,14 +65,16 @@ abstract class BaseType extends AbstractType
             }
 
             $rootFormAttrOption = $form->getRoot()->getConfig()->getOption('form_attr');
+            $rootFormName = $form->getRoot()->getName();
             if ($options['form_attr'] || $rootFormAttrOption) {
-                $options['attr']['form'] = \is_string($rootFormAttrOption) ? $rootFormAttrOption : $form->getRoot()->getName();
-                if (empty($options['attr']['form'])) {
+                if (true === $rootFormAttrOption && empty($rootFormName)) {
                     throw new LogicException('"form_attr" option must be a string identifier on root form when it has no id.');
                 }
+
+                $options['attr']['form'] = \is_string($rootFormAttrOption) ? $rootFormAttrOption : 'form_'.$rootFormName;
             }
         } else {
-            $id = \is_string($options['form_attr']) ? $options['form_attr'] : $name;
+            $id = $name;
             $fullName = $name;
             $uniqueBlockPrefix = '_'.$blockName;
 
@@ -80,6 +82,8 @@ abstract class BaseType extends AbstractType
             // form names, but not in HTML4 ID attributes.
             // https://www.w3.org/TR/html401/struct/global#adef-id
             $id = ltrim($id, '_0123456789');
+
+            $options['row_attr'] += ['id' => \is_string($options['form_attr']) ? $options['form_attr'] : 'form_'.$id];
         }
 
         $blockPrefixes = [];

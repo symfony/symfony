@@ -38,7 +38,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
 
         $html = $this->renderStart($form->createView());
 
-        self::assertSame('<form name="form" method="get">', $html);
+        self::assertSame('<form name="form" method="get" id="form_form">', $html);
     }
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
@@ -50,7 +50,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
 
         $html = $this->renderStart($form->createView());
 
-        self::assertSame('<form name="form" method="get" action="0">', $html);
+        self::assertSame('<form name="form" method="get" action="0" id="form_form">', $html);
     }
 
     public function testMoneyWidgetInIso()

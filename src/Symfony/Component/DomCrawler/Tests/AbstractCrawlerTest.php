@@ -1072,8 +1072,6 @@ HTML;
             $this->assertTrue(true, '->children() does not trigger a notice if the node has no children');
         } catch (\PHPUnit\Framework\Error\Notice $e) {
             $this->fail('->children() does not trigger a notice if the node has no children');
-        } catch (\PHPUnit\Framework\Error\Notice $e) {
-            $this->fail('->children() does not trigger a notice if the node has no children');
         }
     }
 

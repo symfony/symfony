@@ -40,6 +40,8 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         '273CA8A2A78C9B2D724144F4FAF4D221C86:6', // ISO-8859-5 leaked password: мама
         '3686792BBC66A72D40D928ED15621124CFE:7',
         '36EEC709091B810AA240179A44317ED415C:2',
+        'EE6EB9C0DFA0F07098CEDB11ECC7AFF9D4E:0', // UTF-8 not leaked password: ]<0585"%sb^5aa$w6!b38",,72?dp3r4\45b28Hy
+        'FC9F37E51AACD6B692A62769267590D46B8:0', // ISO-8859-5 non leaked password: м<в0dp3r4\45b28Hy
     ];
 
     protected function createValidator()

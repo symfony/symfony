@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use stdClass;
 use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Constraints\UlidValidator;
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UlidValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new UlidValidator();
     }

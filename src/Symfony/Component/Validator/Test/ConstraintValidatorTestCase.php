@@ -295,6 +295,11 @@ abstract class ConstraintValidatorTestCase extends TestCase
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
 
+    /**
+     * @return ConstraintValidatorInterface
+     *
+     * @psalm-return T
+     */
     abstract protected function createValidator();
 }
 

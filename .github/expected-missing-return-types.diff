@@ -468,17 +468,17 @@ index da401930d7..15d6219259 100644
      {
          return FormType::class;
 diff --git a/src/Symfony/Component/Form/DataTransformerInterface.php b/src/Symfony/Component/Form/DataTransformerInterface.php
-index edb3f83c0b..c54659f95e 100644
+index 85fb99d218..6cc654f681 100644
 --- a/src/Symfony/Component/Form/DataTransformerInterface.php
 +++ b/src/Symfony/Component/Form/DataTransformerInterface.php
-@@ -63,5 +63,5 @@ interface DataTransformerInterface
+@@ -65,5 +65,5 @@ interface DataTransformerInterface
       * @throws TransformationFailedException when the transformation fails
       */
 -    public function transform(mixed $value);
 +    public function transform(mixed $value): mixed;
  
      /**
-@@ -92,4 +92,4 @@ interface DataTransformerInterface
+@@ -96,4 +96,4 @@ interface DataTransformerInterface
       * @throws TransformationFailedException when the transformation fails
       */
 -    public function reverseTransform(mixed $value);
@@ -1078,6 +1078,17 @@ index ee1d68c78f..9baaabb04c 100644
 +    public function getTargets(): string|array
      {
          return self::PROPERTY_CONSTRAINT;
+diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
+index d9bb9bd390..b981038042 100644
+--- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
++++ b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
+@@ -301,5 +301,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
+      * @psalm-return T
+      */
+-    abstract protected function createValidator();
++    abstract protected function createValidator(): ConstraintValidatorInterface;
+ }
+ 
 diff --git a/src/Symfony/Component/VarExporter/Internal/Exporter.php b/src/Symfony/Component/VarExporter/Internal/Exporter.php
 index 57c229eb14..b9aa92fcb7 100644
 --- a/src/Symfony/Component/VarExporter/Internal/Exporter.php

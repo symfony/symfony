@@ -131,7 +131,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         return $em;
     }
 
-    protected function createValidator()
+    protected function createValidator(): UniqueEntityValidator
     {
         return new UniqueEntityValidator($this->registry);
     }

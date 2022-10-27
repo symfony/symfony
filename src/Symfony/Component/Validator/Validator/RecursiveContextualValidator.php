@@ -377,7 +377,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * Validates a class node.
      *
      * A class node is a combination of an object with a {@link ClassMetadataInterface}
-     * instance. Each class node (conceptionally) has zero or more succeeding
+     * instance. Each class node (conceptually) has zero or more succeeding
      * property nodes:
      *
      *     (Article:class node)

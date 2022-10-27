@@ -590,7 +590,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->cacheConfig['stale_while_revalidate'] = 10;
 
-        // The prescence of Last-Modified makes this cacheable (because Response::isValidateable() then).
+        // The presence of Last-Modified makes this cacheable (because Response::isValidateable() then).
         $this->setNextResponse(200, ['Cache-Control' => 'public, s-maxage=5', 'Last-Modified' => 'some while ago'], 'Old response');
         $this->request('GET', '/'); // warm the cache
 

@@ -100,7 +100,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.token_storage'),
             ])
-            ->tag('controller.argument_value_resolver', ['priority' => 40])
+            ->tag('controller.argument_value_resolver', ['priority' => 120])
 
         // Authentication related services
         ->set('security.authentication.trust_resolver', AuthenticationTrustResolver::class)

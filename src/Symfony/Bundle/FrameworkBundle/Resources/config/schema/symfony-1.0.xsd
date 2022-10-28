@@ -114,6 +114,7 @@
         <xsd:attribute name="strict-requirements" type="xsd:string" />
         <xsd:attribute name="utf8" type="xsd:boolean" />
         <xsd:attribute name="default-uri" type="xsd:string" />
+        <xsd:attribute name="cache-dir" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="session">

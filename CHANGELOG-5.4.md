@@ -7,6 +7,24 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.15 (2022-10-28)
+
+ * bug #47990 [HttpClient] Fix retrying requests when the content is used by the strategy (nicolas-grekas)
+ * bug #48005 [ErrorHandler] s/</br>/<br> (PhilETaylor)
+ * bug #47907 [Console] Update Application.php (aleksandr-shevchenko)
+ * bug #47955 [Security][Serializer] Add missing args to trigger_deprecation (alamirault)
+ * bug #47932 Throw LogicException instead of Error when trying to generate logout-… (addiks)
+ * bug #47918 [Intl] Update the ICU data to 72.1 - 5.4 (jderusse)
+ * bug #47857 [HttpKernel] Fix empty request stack when terminating with exception (krzyc)
+ * bug #47879 [HttpClient] Fix buffering after calling AsyncContext::passthru() (nicolas-grekas, lubo13)
+ * bug #47878 [HttpKernel] Remove EOL when using error_log() in HttpKernel Logger (cyve)
+ * bug #47883 [Console] Fix error output on windows cli (Maximilian.Beckers)
+ * bug #47884 [Cache] Reserve numeric keys when doing memory leak prevention (simoheinonen)
+ * bug #47831 [Messenger] Fix amqp socket lost (GurvanVgx)
+ * bug #47855 [Routing] TypeError in Router when using UrlGenerator (Maximilian.Beckers)
+ * bug #47822 [Mailer] fix: use message object from event (rogamoore)
+ * bug #47858 [DoctrineBridge] Implement `EventManager::getAllListeners()` (derrabus)
+
 * 5.4.14 (2022-10-12)
 
  * bug #47621 [Serializer] Allow getting discriminated type by class name (TamasSzigeti)

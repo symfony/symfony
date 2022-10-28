@@ -7,6 +7,15 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.0-BETA2 (2022-10-28)
+
+ * bug #48020 [FrameworkBundle] add router cache directory option to XML schema (xabbuh)
+ * feature #47976 Add padding to HIBP check (rullzer)
+ * bug #47990 [HttpClient] Fix retrying requests when the content is used by the strategy (nicolas-grekas)
+ * bug #48005 [ErrorHandler] s/</br>/<br> (PhilETaylor)
+ * bug #47907 [Console] Update Application.php (aleksandr-shevchenko)
+ * bug #47992 [Mailer] Fix BC breaking event name change (chalasr)
+
 * 6.2.0-BETA1 (2022-10-24)
 
  * feature #47364 [DependencyInjection] Allow array attributes for service tags (aschempp)

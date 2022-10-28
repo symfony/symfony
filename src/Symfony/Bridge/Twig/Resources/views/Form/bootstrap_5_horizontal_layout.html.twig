@@ -3,9 +3,7 @@
 {# Labels #}
 
 {% block form_label -%}
-    {%- if label is same as(false) -%}
-        <div class="{{ block('form_label_class') }}"></div>
-    {%- else -%}
+    {%- if label is not same as(false) -%}
         {%- set row_class = row_class|default(row_attr.class|default('')) -%}
         {%- if 'form-floating' not in row_class and 'input-group' not in row_class -%}
             {%- if expanded is not defined or not expanded -%}
@@ -20,6 +18,13 @@
 {% block form_label_class -%}
     col-sm-2
 {%- endblock form_label_class %}
+
+{% block form_label_offset_class -%}
+    {%- set form_label_class = block('form_label_class')|trim -%}
+    {% if  form_label_class starts with 'col-' -%}
+        {{ form_label_class|replace({"col-": "offset-"}) }}
+    {%- endif %}
+{%- endblock %}
 
 {# Rows #}
 
@@ -38,8 +43,7 @@
         {%- set row_class = row_class|replace({'form-floating': '', 'input-group': ''}) -%}
         <div{% with {attr: row_attr|merge({class: (row_class ~ ' row' ~ ((not compound or force_error|default(false)) and not valid ? ' is-invalid'))|trim})} %}{{ block('attributes') }}{% endwith %}>
             {%- if is_form_floating or is_input_group -%}
-                <div class="{{ block('form_label_class') }}"></div>
-                <div class="{{ block('form_group_class') }}">
+                <div class="{{ block('form_group_class')  ~ ' ' ~ block('form_label_offset_class') }}">
                     {%- if is_form_floating -%}
                         <div class="form-floating">
                             {{- form_widget(form, widget_attr) -}}
@@ -60,7 +64,7 @@
                 </div>
             {%- else -%}
                 {{- form_label(form) -}}
-                <div class="{{ block('form_group_class') }}">
+                <div class="{{ block('form_group_class') ~ (label is same as(false) ? ' ' ~ block('form_label_offset_class') ) }}">
                     {{- form_widget(form, widget_attr) -}}
                     {{- form_help(form) -}}
                     {{- form_errors(form) -}}
@@ -78,7 +82,7 @@
     <fieldset{% with {attr: row_attr|merge({class: row_attr.class|default('mb-3')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="row{% if (not compound or force_error|default(false)) and not valid %} is-invalid{% endif %}">
             {{- form_label(form) -}}
-            <div class="{{ block('form_group_class') }}">
+            <div class="{{ block('form_group_class')  ~ ' ' ~ block('form_label_offset_class') }}">
                 {{- form_widget(form, widget_attr) -}}
                 {{- form_help(form) -}}
                 {{- form_errors(form) -}}
@@ -89,8 +93,7 @@
 
 {% block submit_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('mb-3') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>{#--#}
-        <div class="{{ block('form_label_class') }}"></div>{#--#}
-        <div class="{{ block('form_group_class') }}">
+        <div class="{{ block('form_group_class') ~ ' ' ~ block('form_label_offset_class') }}">
             {{- form_widget(form) -}}
         </div>{#--#}
     </div>
@@ -98,8 +101,7 @@
 
 {% block reset_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('mb-3') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>{#--#}
-        <div class="{{ block('form_label_class') }}"></div>{#--#}
-        <div class="{{ block('form_group_class') }}">
+        <div class="{{ block('form_group_class')  ~ ' ' ~ block('form_label_offset_class') }}">
             {{- form_widget(form) -}}
         </div>{#--#}
     </div>
@@ -107,8 +109,7 @@
 
 {% block button_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('mb-3') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>{#--#}
-        <div class="{{ block('form_label_class') }}"></div>{#--#}
-        <div class="{{ block('form_group_class') }}">
+        <div class="{{ block('form_group_class')  ~ ' ' ~ block('form_label_offset_class') }}">
             {{- form_widget(form) -}}
         </div>{#--#}
     </div>
@@ -116,8 +117,7 @@
 
 {% block checkbox_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('mb-3') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>{#--#}
-        <div class="{{ block('form_label_class') }}"></div>{#--#}
-        <div class="{{ block('form_group_class') }}">
+        <div class="{{ block('form_group_class')  ~ ' ' ~ block('form_label_offset_class') }}">
             {{- form_widget(form) -}}
             {{- form_help(form) -}}
             {{- form_errors(form) -}}

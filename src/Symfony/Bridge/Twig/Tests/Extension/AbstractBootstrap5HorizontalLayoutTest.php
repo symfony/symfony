@@ -229,7 +229,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5
         $view = $form->createView();
         $html = $this->renderRow($view, ['label' => 'foo']);
 
-        $this->assertMatchesXpath($html, '/div[@class="mb-3 row"]/div[@class="col-sm-2" or @class="col-sm-10"]', 2);
+        $this->assertMatchesXpath($html, '/div[@class="mb-3 row"]/div[@class="col-sm-10 offset-sm-2"]');
     }
 
     public function testCheckboxRowWithHelp()
@@ -242,8 +242,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5
             '/div
     [@class="mb-3 row"]
     [
-        ./div[@class="col-sm-2" or @class="col-sm-10"]
-        /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
+        ./div[@class="col-sm-10 offset-sm-2"]
         [
             ./p
                 [@class="form-text mb-0 help-text"]
@@ -263,8 +262,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5
             '/div
     [@class="mb-3 row"]
     [
-        ./div[@class="col-sm-2" or @class="col-sm-10"]
-        /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
+        ./div[@class="col-sm-10 offset-sm-2"]
         [
             ./p
                 [@class="form-text mb-0 help-text"]
@@ -293,9 +291,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5
     [@class="mb-3 row"]
     [
         ./div
-            [@class="col-sm-2"]
-        /following-sibling::div
-            [@class="col-sm-10"]
+            [@class="col-sm-10 offset-sm-2"]
             [
                 ./div
                     [@class="input-group"]
@@ -332,9 +328,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5
     [@class="mb-3 row"]
     [
         ./div
-            [@class="col-sm-2"]
-        /following-sibling::div
-            [@class="col-sm-10"]
+            [@class="col-sm-10 offset-sm-2"]
             [
                 ./div
                     [@class="form-floating"]

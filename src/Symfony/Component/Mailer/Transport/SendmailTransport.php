@@ -23,9 +23,9 @@ use Symfony\Component\Mime\RawMessage;
 /**
  * SendmailTransport for sending mail through a Sendmail/Postfix (etc..) binary.
  *
- * Transport can be instanciated through SendmailTransportFactory or NativeTransportFactory:
+ * Transport can be instantiated through SendmailTransportFactory or NativeTransportFactory:
  *
- * - SendmailTransportFactory to use most common sendmail path and recommanded options
+ * - SendmailTransportFactory to use most common sendmail path and recommended options
  * - NativeTransportFactory when configuration is set via php.ini
  *
  * @author Fabien Potencier <fabien@symfony.com>

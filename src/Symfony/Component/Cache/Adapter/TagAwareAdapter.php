@@ -25,7 +25,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  * Implements simple and robust tag-based invalidation suitable for use with volatile caches.
  *
  * This adapter works by storing a version for each tags. When saving an item, it is stored together with its tags and
- * their corresponding versions. When retrieveing an item, those tag versions are compared to the current version of
+ * their corresponding versions. When retrieving an item, those tag versions are compared to the current version of
  * each tags. Invalidation is achieved by deleting tags, thereby ensuring that their versions change even when the
  * storage is out of space. When versions of non-existing tags are requested for item commits, this adapter assigns a
  * new random version to them.

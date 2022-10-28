@@ -864,7 +864,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                 document.querySelector(`#log-filter-type input[value="${selectedType}"]`).parentElement.classList.add('active');
             },
             
-             createFilters: function() {
+            createFilters: function() {
                 document.querySelectorAll('[data-filters] [data-filter]').forEach(function (filter) {
                     var filters = filter.closest('[data-filters]'),
                         type = 'choice',

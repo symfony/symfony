@@ -610,6 +610,8 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
     }
 
+    // Note: blank separator produces non standard HTML (option text should not be empty),
+    // but better not let Twig fix this automatically, user-side problem.
     public function testSingleChoiceWithPreferredAndBlankSeparator()
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
@@ -667,7 +669,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
     [@class="my&class form-select"]
     [not(@required)]
     [
-        ./option[@value=""][.=""]
+        ./option[@value=""][.="" or .="--"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -691,7 +693,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
     [@class="my&class form-select"]
     [not(@required)]
     [
-        ./option[@value=""][.=""]
+        ./option[@value=""][.="" or .="--"]
         /following-sibling::option[@value="&a"][not(@selected)][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -750,6 +752,8 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
     }
 
+    // Note: blank placeholder produces non standard HTML (option text should not be empty),
+    // but better not let Twig fix this automatically, user-side problem.
     public function testSingleChoiceRequiredWithPlaceholderViaView()
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
@@ -765,7 +769,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
     [@class="my&class form-select"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][not(@disabled)][.=""]
+        ./option[@value=""][not(@selected)][not(@disabled)][.="" or .="--"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -1392,6 +1396,8 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
     }
 
+    // Note: blank placeholder produces non standard HTML (option text should not be empty),
+    // but better not let Twig fix this automatically, user-side problem.
     public function testBirthDayWithPlaceholder()
     {
         $form = $this->factory->createNamed('name', BirthdayType::class, '1950-01-01', [
@@ -1410,17 +1416,17 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
                 ./select
                     [@id="name_month"]
                     [@class="form-select"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="" or .="--"]]
                     [./option[@value="1"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_day"]
                     [@class="form-select"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="" or .="--"]]
                     [./option[@value="1"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_year"]
                     [@class="form-select"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="" or .="--"]]
                     [./option[@value="1950"][@selected="selected"]]
             ]
             [count(./select)=3]

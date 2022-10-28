@@ -98,7 +98,7 @@ jobs:
         ports:
           - 9092:9092
         env:
-          KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
           KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
           KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
           KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
@@ -177,6 +177,7 @@ jobs:
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
+          MESSENGER_KAFKA_DSN: kafka://localhost:9092
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
 

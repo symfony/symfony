@@ -51,7 +51,7 @@ class TagAwareMarshaller implements MarshallerInterface
                     $serialized[$id][9] = "\x5F";
                 }
             } else {
-                // other arbitratry values are serialized using the decorated marshaller below
+                // other arbitrary values are serialized using the decorated marshaller below
                 $notSerialized[$id] = $value;
             }
         }

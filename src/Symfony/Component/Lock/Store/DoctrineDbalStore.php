@@ -248,7 +248,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     }
 
     /**
-     * Checks wether current platform supports table creation within transaction.
+     * Checks whether current platform supports table creation within transaction.
      */
     private function platformSupportsTableCreationInTransaction(): bool
     {

@@ -1950,17 +1950,17 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         ./select
             [@id="name_month"]
             [@class="form-control"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_day"]
             [@class="form-control"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_year"]
             [@class="form-control"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
             [./option[@value="1950"][@selected="selected"]]
     ]
     [count(./select)=3]

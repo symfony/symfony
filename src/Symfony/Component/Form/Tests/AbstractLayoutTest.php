@@ -1700,15 +1700,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_month"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_day"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_year"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
             [./option[@value="1950"][@selected="selected"]]
     ]
     [count(./select)=3]

@@ -1410,17 +1410,17 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
                 ./select
                     [@id="name_month"]
                     [@class="form-select"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
                     [./option[@value="1"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_day"]
                     [@class="form-select"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
                     [./option[@value="1"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_year"]
                     [@class="form-select"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="--"]]
                     [./option[@value="1950"][@selected="selected"]]
             ]
             [count(./select)=3]

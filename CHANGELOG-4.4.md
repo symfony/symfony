@@ -7,6 +7,17 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.48 (2022-10-28)
+
+ * bug #47907 [Console] Update Application.php (aleksandr-shevchenko)
+ * bug #47932 Throw LogicException instead of Error when trying to generate logout-… (addiks)
+ * bug #47857 [HttpKernel] Fix empty request stack when terminating with exception (krzyc)
+ * bug #47878 [HttpKernel] Remove EOL when using error_log() in HttpKernel Logger (cyve)
+ * bug #47883 [Console] Fix error output on windows cli (Maximilian.Beckers)
+ * bug #47884 [Cache] Reserve numeric keys when doing memory leak prevention (simoheinonen)
+ * bug #47822 [Mailer] fix: use message object from event (rogamoore)
+ * bug #47858 [DoctrineBridge] Implement `EventManager::getAllListeners()` (derrabus)
+
 * 4.4.47 (2022-10-12)
 
  * bug #47621 [Serializer] Allow getting discriminated type by class name (TamasSzigeti)

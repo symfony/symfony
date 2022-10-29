@@ -48,7 +48,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
+          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           extensions: "${{ env.extensions }}"
           tools: flex

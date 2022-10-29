@@ -72,7 +72,14 @@ class FirewallMap implements FirewallMapInterface
             if (null === $requestMatcher || $requestMatcher->matches($request)) {
                 $request->attributes->set('_firewall_context', $contextId);
 
-                return $this->container->get($contextId);
+                /** @var FirewallContext $context */
+                $context = $this->container->get($contextId);
+
+                if ($context->getConfig()?->isStateless()) {
+                    $request->attributes->set('_stateless', true);
+                }
+
+                return $context;
             }
         }
 

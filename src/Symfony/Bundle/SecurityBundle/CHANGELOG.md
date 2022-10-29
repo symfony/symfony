@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate enabling bundle and not configuring it
+ * Add `_stateless` attribute to the request when firewall is stateless
 
 6.2
 ---

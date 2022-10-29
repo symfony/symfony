@@ -848,6 +848,22 @@ class SecurityExtensionTest extends TestCase
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testNothingDoneWithEmptyConfiguration()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security');
+
+        $this->expectDeprecation('Since symfony/security-bundle 6.3: Enabling bundle "Symfony\Bundle\SecurityBundle\SecurityBundle" and not configuring it is deprecated.');
+
+        $container->compile();
+
+        $this->assertFalse($container->has('security.authorization_checker'));
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

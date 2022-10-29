@@ -291,7 +291,6 @@ if (typeof Sfjs === 'undefined') {
     Sfjs.addEventListener(document, 'DOMContentLoaded', function() {
         Sfjs.createTabs();
         Sfjs.createToggles();
-        Sfjs.createFilters();
     });
 }
 /*]]>*/

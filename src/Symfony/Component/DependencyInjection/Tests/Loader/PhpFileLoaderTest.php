@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
 class PhpFileLoaderTest extends TestCase
 {
@@ -163,6 +165,19 @@ class PhpFileLoaderTest extends TestCase
         $loader->load('env_configurator.php');
 
         $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
+    }
+
+    public function testEnumeration()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator($fixtures.'/config'));
+        $loader->load('services_with_enumeration.php');
+
+        $container->compile();
+
+        $definition = $container->getDefinition(FooClassWithEnumAttribute::class);
+        $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
     public function testNestedBundleConfigNotAllowed()

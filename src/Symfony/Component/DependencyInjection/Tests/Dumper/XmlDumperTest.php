@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 class XmlDumperTest extends TestCase
 {
@@ -210,6 +211,7 @@ class XmlDumperTest extends TestCase
 
         $container->register('foo', 'Foo')->addTag('foo_tag');
         $container->register('baz', 'Baz')->addTag('foo_tag');
+        $container->register('fux', 'Fux')->addTag('foo_tag', ['kex' => StringBackedEnum::Bar]);
         $container->register('qux', 'Qux')->addTag('foo_tag');
 
         $container->register('foo_tagged_iterator', 'Bar')

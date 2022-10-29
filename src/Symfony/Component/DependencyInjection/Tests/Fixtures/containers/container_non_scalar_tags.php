@@ -5,6 +5,7 @@ require_once __DIR__.'/../includes/foo.php';
 
 use Bar\FooClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use \Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 $container = new ContainerBuilder();
 $container
@@ -12,7 +13,7 @@ $container
     ->addTag('foo_tag', [
         'foo' => 'bar',
         'bar' => [
-            'foo' => 'bar',
+            'foo' => StringBackedEnum::Bar,
             'bar' => 'foo'
         ]])
 ;

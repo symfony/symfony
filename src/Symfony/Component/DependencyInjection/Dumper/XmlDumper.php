@@ -143,6 +143,10 @@ class XmlDumper extends Dumper
                     $this->addTagRecursiveAttributes($tag, $attributes);
                 } else {
                     foreach ($attributes as $key => $value) {
+                        if ($value instanceof \BackedEnum) {
+                            $value = $value->value;
+                        }
+
                         $tag->setAttribute($key, $value ?? '');
                     }
                 }
@@ -272,6 +276,10 @@ class XmlDumper extends Dumper
         foreach ($attributes as $name => $value) {
             $attribute = $this->document->createElement('attribute');
             $attribute->setAttribute('name', $name);
+
+            if ($value instanceof \BackedEnum) {
+                $value = $value->value;
+            }
 
             if (\is_array($value)) {
                 $this->addTagRecursiveAttributes($attribute, $value);

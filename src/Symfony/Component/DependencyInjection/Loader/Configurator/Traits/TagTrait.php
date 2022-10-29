@@ -36,10 +36,14 @@ trait TagTrait
     private function validateAttributes(string $tagName, array $attributes, string $prefix = ''): void
     {
         foreach ($attributes as $attribute => $value) {
+            if ($value instanceof \BackedEnum){
+                $value = $value->value;
+            }
+
             if (\is_array($value)) {
                 $this->validateAttributes($tagName, $value, $attribute.'.');
             } elseif (!\is_scalar($value ?? '')) {
-                throw new InvalidArgumentException(sprintf('A tag attribute must be of a scalar-type or an array of scalar-types for service "%s", tag "%s", attribute "%s".', $this->id, $tagName, $prefix.$attribute));
+                throw new InvalidArgumentException(sprintf('A tag attribute must be of a scalar-type or BackedEnum or an array of scalar-types or BackedEnums for service "%s", tag "%s", attribute "%s".', $this->id, $tagName, $prefix.$attribute));
             }
         }
     }

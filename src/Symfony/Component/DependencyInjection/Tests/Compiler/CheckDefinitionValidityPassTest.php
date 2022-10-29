@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 class CheckDefinitionValidityPassTest extends TestCase
 {
@@ -76,7 +77,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     public function testValidTags()
     {
         $container = new ContainerBuilder();
-        $container->register('a', 'class')->addTag('foo', ['bar' => 'baz']);
+        $container->register('a', 'class')->addTag('foo', ['bar' => StringBackedEnum::Bar]);
         $container->register('b', 'class')->addTag('foo', ['bar' => null]);
         $container->register('c', 'class')->addTag('foo', ['bar' => 1]);
         $container->register('d', 'class')->addTag('foo', ['bar' => 1.1]);

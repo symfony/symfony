@@ -63,8 +63,12 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
             foreach ($definition->getTags() as $name => $tags) {
                 foreach ($tags as $attributes) {
                     foreach ($attributes as $attribute => $value) {
+                        if ($value instanceof \BackedEnum){
+                            $value = $value->value;
+                        }
+
                         if (!\is_scalar($value) && null !== $value) {
-                            throw new RuntimeException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $id, $name, $attribute));
+                            throw new RuntimeException(sprintf('A "tags" attribute must be of a scalar-type or BackedEnum for service "%s", tag "%s", attribute "%s".', $id, $name, $attribute));
                         }
                     }
                 }

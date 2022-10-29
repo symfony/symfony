@@ -88,6 +88,10 @@ trait PriorityTaggedServiceTrait
                 }
                 $index ??= $defaultIndex ??= $serviceId;
 
+                if ($index instanceof \BackedEnum) {
+                    $index = $index->value;
+                }
+
                 $services[] = [$priority, ++$i, $index, $serviceId, $class];
             }
         }

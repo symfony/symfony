@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedForInvalidDefaultMethodClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\IntTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
@@ -117,7 +118,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
     public function testOnlyTheIndexedTagsAreListed()
     {
         $container = new ContainerBuilder();
-        $container->register('service1')->addTag('my_custom_tag', ['foo' => 'bar']);
+        $container->register('service1')->addTag('my_custom_tag', ['foo' => StringBackedEnum::Bar]);
 
         $definition = $container->register('service2', BarTagClass::class);
         $definition->addTag('my_custom_tag', ['priority' => 100]);

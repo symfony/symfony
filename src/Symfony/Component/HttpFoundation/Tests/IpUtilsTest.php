@@ -73,6 +73,10 @@ class IpUtilsTest extends TestCase
             [false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'],
             [false, '', '::1'],
             [false, null, '::1'],
+            [false, '127.0.0.1', '::1'],
+            [false, '0.0.0.0/8', '::1'],
+            [false,  '::1', '127.0.0.1'],
+            [false,  '::1', '0.0.0.0/8'],
         ];
     }
 

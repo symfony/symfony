@@ -468,15 +468,17 @@ class Application implements ResetInterface
      */
     public function getLongVersion()
     {
-        if ('UNKNOWN' !== $this->getName()) {
-            if ('UNKNOWN' !== $this->getVersion()) {
-                return sprintf('%s <info>%s</info>', $this->getName(), $this->getVersion());
-            }
+        $name = 'Console Tool';
 
-            return $this->getName();
+        if ('UNKNOWN' !== $this->getName()) {
+            $name = $this->getName();
         }
 
-        return 'Console Tool';
+        if ('UNKNOWN' !== $this->getVersion()) {
+            $name .= sprintf(' <info>%s</info>', $this->getVersion());
+        }
+
+        return $name;
     }
 
     /**

@@ -31,42 +31,42 @@ abstract class Monolog implements LoggerInterface
         $this->monologLogger->emergency($message, $context);
     }
 
-    public function alert(string|\Stringable $message, array $context = []): void
+    public function alert($message, array $context = []): void
     {
         $this->monologLogger->alert($message, $context);
     }
 
-    public function critical(string|\Stringable $message, array $context = []): void
+    public function critical($message, array $context = []): void
     {
         $this->monologLogger->critical($message, $context);
     }
 
-    public function error(string|\Stringable $message, array $context = []): void
+    public function error($message, array $context = []): void
     {
         $this->monologLogger->error($message, $context);
     }
 
-    public function warning(string|\Stringable $message, array $context = []): void
+    public function warning($message, array $context = []): void
     {
         $this->monologLogger->warning($message, $context);
     }
 
-    public function notice(string|\Stringable $message, array $context = []): void
+    public function notice($message, array $context = []): void
     {
         $this->monologLogger->notice($message, $context);
     }
 
-    public function info(string|\Stringable $message, array $context = []): void
+    public function info($message, array $context = []): void
     {
         $this->monologLogger->info($message, $context);
     }
 
-    public function debug(string|\Stringable $message, array $context = []): void
+    public function debug($message, array $context = []): void
     {
         $this->monologLogger->debug($message, $context);
     }
 
-    public function log($level, string|\Stringable $message, array $context = []): void
+    public function log($level, $message, array $context = []): void
     {
         $this->monologLogger->log($level, $message, $context);
     }

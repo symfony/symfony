@@ -21,8 +21,8 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
-use Symfony\Component\Mime\Part\BodyFile;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -105,7 +105,7 @@ class SmtpTransportTest extends TestCase
         $message = new Email();
         $message->to('recipient@example.org');
         $message->from('sender@example.org');
-        $message->addPart(new DataPart(new BodyFile('/does_not_exists')));
+        $message->addPart(new DataPart(new File('/does_not_exists')));
 
         try {
             $transport->send($message);

@@ -15,8 +15,8 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Part\BodyFile;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
@@ -463,8 +463,8 @@ class EmailTest extends TestCase
         $att = DataPart::fromPath($name, 'test');
         $inline = DataPart::fromPath($name, 'test')->asInline();
         $e = new Email();
-        $e->addPart(new DataPart(new BodyFile($name)));
-        $e->addPart((new DataPart(new BodyFile($name)))->asInline());
+        $e->addPart(new DataPart(new File($name)));
+        $e->addPart((new DataPart(new File($name)))->asInline());
         $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(function (DataPart $a) { return $a->bodyToString(); }, $e->getAttachments()));
         $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(function (DataPart $a) { return $a->getPreparedHeaders(); }, $e->getAttachments()));
     }

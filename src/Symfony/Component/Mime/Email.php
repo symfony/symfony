@@ -13,8 +13,8 @@ namespace Symfony\Component\Mime;
 
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Part\AbstractPart;
-use Symfony\Component\Mime\Part\BodyFile;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
@@ -335,7 +335,7 @@ class Email extends Message
      */
     public function attachFromPath(string $path, string $name = null, string $contentType = null): static
     {
-        return $this->addPart(new DataPart(new BodyFile($path), $name, $contentType));
+        return $this->addPart(new DataPart(new File($path), $name, $contentType));
     }
 
     /**
@@ -353,7 +353,7 @@ class Email extends Message
      */
     public function embedFromPath(string $path, string $name = null, string $contentType = null): static
     {
-        return $this->addPart((new DataPart(new BodyFile($path), $name, $contentType))->asInline());
+        return $this->addPart((new DataPart(new File($path), $name, $contentType))->asInline());
     }
 
     /**

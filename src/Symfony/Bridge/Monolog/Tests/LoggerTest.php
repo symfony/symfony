@@ -15,7 +15,6 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger as Monolog;
 use Monolog\ResettableInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\HttpFoundation\Request;

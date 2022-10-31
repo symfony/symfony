@@ -11,11 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\SchemaListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Event\SchemaCreateTableEventArgs;
 use Doctrine\DBAL\Events;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
-use Doctrine\ORM\Tools\ToolEvents;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -24,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscriber
+final class MessengerTransportDoctrineSchemaSubscriber extends AbstractSchemaSubscriber
 {
     private const PROCESSING_TABLE_FLAG = self::class.':processing';
 
@@ -40,13 +38,14 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
-        $dbalConnection = $event->getEntityManager()->getConnection();
+        $connection = $event->getEntityManager()->getConnection();
+
         foreach ($this->transports as $transport) {
             if (!$transport instanceof DoctrineTransport) {
                 continue;
             }
 
-            $transport->configureSchema($event->getSchema(), $dbalConnection);
+            $transport->configureSchema($event->getSchema(), $connection, $this->getIsSameDatabaseChecker($connection));
         }
     }
 
@@ -89,11 +88,7 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
 
     public function getSubscribedEvents(): array
     {
-        $subscribedEvents = [];
-
-        if (class_exists(ToolEvents::class)) {
-            $subscribedEvents[] = ToolEvents::postGenerateSchema;
-        }
+        $subscribedEvents = parent::getSubscribedEvents();
 
         if (class_exists(Events::class)) {
             $subscribedEvents[] = Events::onSchemaCreateTable;

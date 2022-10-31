@@ -11,9 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\SchemaListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
-use Doctrine\ORM\Tools\ToolEvents;
 use Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider;
 use Symfony\Component\Security\Http\RememberMe\PersistentRememberMeHandler;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
@@ -23,7 +21,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-final class RememberMeTokenProviderDoctrineSchemaSubscriber implements EventSubscriber
+final class RememberMeTokenProviderDoctrineSchemaSubscriber extends AbstractSchemaSubscriber
 {
     private iterable $rememberMeHandlers;
 
@@ -37,26 +35,15 @@ final class RememberMeTokenProviderDoctrineSchemaSubscriber implements EventSubs
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
-        $dbalConnection = $event->getEntityManager()->getConnection();
+        $connection = $event->getEntityManager()->getConnection();
 
         foreach ($this->rememberMeHandlers as $rememberMeHandler) {
             if (
                 $rememberMeHandler instanceof PersistentRememberMeHandler
                 && ($tokenProvider = $rememberMeHandler->getTokenProvider()) instanceof DoctrineTokenProvider
             ) {
-                $tokenProvider->configureSchema($event->getSchema(), $dbalConnection);
+                $tokenProvider->configureSchema($event->getSchema(), $connection, $this->getIsSameDatabaseChecker($connection));
             }
         }
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        if (!class_exists(ToolEvents::class)) {
-            return [];
-        }
-
-        return [
-            ToolEvents::postGenerateSchema,
-        ];
     }
 }

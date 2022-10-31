@@ -11,9 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\SchemaListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
-use Doctrine\ORM\Tools\ToolEvents;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
 /**
@@ -22,7 +20,7 @@ use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-final class DoctrineDbalCacheAdapterSchemaSubscriber implements EventSubscriber
+final class DoctrineDbalCacheAdapterSchemaSubscriber extends AbstractSchemaSubscriber
 {
     private $dbalAdapters;
 
@@ -36,20 +34,10 @@ final class DoctrineDbalCacheAdapterSchemaSubscriber implements EventSubscriber
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
-        $dbalConnection = $event->getEntityManager()->getConnection();
+        $connection = $event->getEntityManager()->getConnection();
+
         foreach ($this->dbalAdapters as $dbalAdapter) {
-            $dbalAdapter->configureSchema($event->getSchema(), $dbalConnection);
+            $dbalAdapter->configureSchema($event->getSchema(), $connection, $this->getIsSameDatabaseChecker($connection));
         }
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        if (!class_exists(ToolEvents::class)) {
-            return [];
-        }
-
-        return [
-            ToolEvents::postGenerateSchema,
-        ];
     }
 }

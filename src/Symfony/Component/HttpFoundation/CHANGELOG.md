@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Create migration for session table when pdo handler is used
+
 6.2
 ---
 

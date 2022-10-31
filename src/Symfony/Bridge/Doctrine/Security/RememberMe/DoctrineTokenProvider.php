@@ -188,15 +188,18 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
 
     /**
      * Adds the Table to the Schema if "remember me" uses this Connection.
+     *
+     * @param \Closure $isSameDatabase
      */
-    public function configureSchema(Schema $schema, Connection $forConnection): void
+    public function configureSchema(Schema $schema, Connection $forConnection/* , \Closure $isSameDatabase */): void
     {
-        // only update the schema for this connection
-        if ($forConnection !== $this->conn) {
+        if ($schema->hasTable('rememberme_token')) {
             return;
         }
 
-        if ($schema->hasTable('rememberme_token')) {
+        $isSameDatabase = 2 < \func_num_args() ? func_get_arg(2) : static fn () => false;
+
+        if ($forConnection !== $this->conn && !$isSameDatabase($this->conn->executeStatement(...))) {
             return;
         }
 

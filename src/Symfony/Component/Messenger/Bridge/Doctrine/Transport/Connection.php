@@ -324,14 +324,13 @@ class Connection implements ResetInterface
     /**
      * @internal
      */
-    public function configureSchema(Schema $schema, DBALConnection $forConnection): void
+    public function configureSchema(Schema $schema, DBALConnection $forConnection, \Closure $isSameDatabase): void
     {
-        // only update the schema for this connection
-        if ($forConnection !== $this->driverConnection) {
+        if ($schema->hasTable($this->configuration['table_name'])) {
             return;
         }
 
-        if ($schema->hasTable($this->configuration['table_name'])) {
+        if ($forConnection !== $this->driverConnection && !$isSameDatabase($this->executeStatement(...))) {
             return;
         }
 

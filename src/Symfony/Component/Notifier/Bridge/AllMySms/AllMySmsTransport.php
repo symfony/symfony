@@ -32,7 +32,7 @@ final class AllMySmsTransport extends AbstractTransport
     private string $apiKey;
     private ?string $from;
 
-    public function __construct(string $login, string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, #[\SensitiveParameter] string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->apiKey = $apiKey;

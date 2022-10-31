@@ -34,7 +34,7 @@ final class SmsapiTransport extends AbstractTransport
     private bool $fast = false;
     private bool $test = false;
 
-    public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->authToken = $authToken;
         $this->from = $from;

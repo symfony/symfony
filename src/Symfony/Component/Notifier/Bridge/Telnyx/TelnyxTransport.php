@@ -33,7 +33,7 @@ final class TelnyxTransport extends AbstractTransport
     private string $from;
     private ?string $messagingProfileId;
 
-    public function __construct(string $apiKey, string $from, ?string $messagingProfileId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $apiKey, string $from, ?string $messagingProfileId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->from = $from;

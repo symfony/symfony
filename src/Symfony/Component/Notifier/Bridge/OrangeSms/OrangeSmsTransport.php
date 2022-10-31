@@ -29,7 +29,7 @@ final class OrangeSmsTransport extends AbstractTransport
     private string $from;
     private ?string $senderName;
 
-    public function __construct(string $clientID, string $clientSecret, string $from, string $senderName = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $clientID, #[\SensitiveParameter] string $clientSecret, string $from, string $senderName = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->clientID = $clientID;
         $this->clientSecret = $clientSecret;

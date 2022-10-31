@@ -204,6 +204,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
         ],
+        'twitter' => [
+            'class' => Bridge\Twitter\TwitterTransportFactory::class,
+            'package' => 'symfony/twitter-notifier',
+        ],
         'vonage' => [
             'class' => Bridge\Vonage\VonageTransportFactory::class,
             'package' => 'symfony/vonage-notifier',

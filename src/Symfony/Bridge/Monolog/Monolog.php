@@ -1,14 +1,13 @@
 <?php
 
 /*
-* This file is part of the Symfony package.
-*
-* (c) Fabien Potencier <fabien@symfony.com>
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
-
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Symfony\Bridge\Monolog;
 
 use DateTimeZone;
@@ -27,7 +26,7 @@ abstract class Monolog implements LoggerInterface
         array $processors = [],
         DateTimeZone $timezone = null
     ) {
-        $this->monologLogger = new Logger($name, $handlers,  $processors,  $timezone);
+        $this->monologLogger = new Logger($name, $handlers, $processors, $timezone);
     }
 
     public function pushProcessor(callable $callback): Logger

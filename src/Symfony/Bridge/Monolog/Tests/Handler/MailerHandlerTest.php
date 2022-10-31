@@ -13,11 +13,11 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Logger as Monolog;
 use Monolog\LogRecord;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\MailerHandler;
-use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -43,7 +43,7 @@ class MailerHandlerTest extends TestCase
                 return 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody();
             }))
         ;
-        $handler->handle($this->getRecord(Logger::WARNING, 'message'));
+        $handler->handle($this->getRecord(Monolog::WARNING, 'message'));
     }
 
     public function testHandleBatch()
@@ -70,11 +70,11 @@ class MailerHandlerTest extends TestCase
         $callback = function () {
             throw new \RuntimeException('Email creation callback should not have been called in this test');
         };
-        $handler = new MailerHandler($this->mailer, $callback, Logger::ALERT);
+        $handler = new MailerHandler($this->mailer, $callback, Monolog::ALERT);
 
         $records = [
-            $this->getRecord(Logger::DEBUG),
-            $this->getRecord(Logger::INFO),
+            $this->getRecord(Monolog::DEBUG),
+            $this->getRecord(Monolog::INFO),
         ];
         $handler->handleBatch($records);
     }
@@ -90,10 +90,10 @@ class MailerHandlerTest extends TestCase
                 return 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody();
             }))
         ;
-        $handler->handle($this->getRecord(Logger::WARNING, 'message'));
+        $handler->handle($this->getRecord(Monolog::WARNING, 'message'));
     }
 
-    protected function getRecord($level = Logger::WARNING, $message = 'test', $context = []): array|LogRecord
+    protected function getRecord($level = Monolog::WARNING, $message = 'test', $context = []): array|LogRecord
     {
         return RecordFactory::create($level, $message, context: $context);
     }
@@ -101,11 +101,11 @@ class MailerHandlerTest extends TestCase
     protected function getMultipleRecords(): array
     {
         return [
-            $this->getRecord(Logger::DEBUG, 'debug message 1'),
-            $this->getRecord(Logger::DEBUG, 'debug message 2'),
-            $this->getRecord(Logger::INFO, 'information'),
-            $this->getRecord(Logger::WARNING, 'warning'),
-            $this->getRecord(Logger::ERROR, 'error'),
+            $this->getRecord(Monolog::DEBUG, 'debug message 1'),
+            $this->getRecord(Monolog::DEBUG, 'debug message 2'),
+            $this->getRecord(Monolog::INFO, 'information'),
+            $this->getRecord(Monolog::WARNING, 'warning'),
+            $this->getRecord(Monolog::ERROR, 'error'),
         ];
     }
 }

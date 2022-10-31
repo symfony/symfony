@@ -30,10 +30,6 @@ class PhpFileLoader extends FileLoader
             return require $resource;
         }
 
-        if (isset(self::$cache[$resource])) {
-            return self::$cache[$resource];
-        }
-
-        return self::$cache[$resource] = require $resource;
+        return self::$cache[$resource] ??= require $resource;
     }
 }

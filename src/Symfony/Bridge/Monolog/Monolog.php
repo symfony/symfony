@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Stringable;
 
-class Monolog implements LoggerInterface
+abstract class Monolog implements LoggerInterface
 {
     protected Logger $monologLogger;
     protected array $handlers = [];

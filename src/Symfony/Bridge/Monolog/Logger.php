@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Monolog;
 
-use Monolog\Logger as BaseLogger;
 use Monolog\ResettableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -20,7 +19,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
+class Logger extends Monolog implements DebugLoggerInterface, ResetInterface
 {
     public function getLogs(Request $request = null): array
     {
@@ -52,23 +51,14 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         $this->clear();
 
         if ($this instanceof ResettableInterface) {
-            parent::reset();
+            $this->monologLogger->reset();
         }
     }
 
     public function removeDebugLogger()
     {
-        foreach ($this->processors as $k => $processor) {
-            if ($processor instanceof DebugLoggerInterface) {
-                unset($this->processors[$k]);
-            }
-        }
-
-        foreach ($this->handlers as $k => $handler) {
-            if ($handler instanceof DebugLoggerInterface) {
-                unset($this->handlers[$k]);
-            }
-        }
+        $this->removeDebugLoggerProcessors();
+        $this->removeDebugLoggerHandlers();
     }
 
     /**
@@ -76,12 +66,14 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
      */
     private function getDebugLogger(): ?DebugLoggerInterface
     {
+        $this->processors = $this->monologLogger->getProcessors();
         foreach ($this->processors as $processor) {
             if ($processor instanceof DebugLoggerInterface) {
                 return $processor;
             }
         }
 
+        $this->handlers = $this->monologLogger->getHandlers();
         foreach ($this->handlers as $handler) {
             if ($handler instanceof DebugLoggerInterface) {
                 return $handler;
@@ -89,5 +81,25 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         }
 
         return null;
+    }
+
+    private function removeDebugLoggerProcessors()
+    {
+        $this->processors = $this->monologLogger->getProcessors();
+        foreach ($this->processors as $k => $processor) {
+            if ($processor instanceof DebugLoggerInterface) {
+                unset($this->processors[$k]);
+            }
+        }
+    }
+
+    private function removeDebugLoggerHandlers()
+    {
+        $this->handlers = $this->monologLogger->getHandlers();
+        foreach ($this->handlers as $k => $handler) {
+            if ($handler instanceof DebugLoggerInterface) {
+                unset($this->handlers[$k]);
+            }
+        }
     }
 }

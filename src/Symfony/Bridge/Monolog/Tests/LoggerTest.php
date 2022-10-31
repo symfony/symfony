@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Tests;
 
 use Monolog\Handler\TestHandler;
+use Monolog\Logger as Monolog;
 use Monolog\ResettableInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -79,7 +80,7 @@ class LoggerTest extends TestCase
         [$record] = $logger->getLogs();
 
         $this->assertEquals('test', $record['message']);
-        $this->assertEquals(\Monolog\Logger::INFO, $record['priority']);
+        $this->assertEquals(Monolog::INFO, $record['priority']);
     }
 
     public function testGetLogsWithDebugProcessor3()

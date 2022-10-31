@@ -3,8 +3,8 @@
 namespace Symfony\Bridge\Monolog;
 
 use DateTimeZone;
-use Psr\Log\LoggerInterface;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 abstract class Monolog implements LoggerInterface
 {
@@ -26,7 +26,7 @@ abstract class Monolog implements LoggerInterface
         return $this->monologLogger->pushProcessor($callback);
     }
 
-    public function emergency(string|\Stringable $message, array $context = []): void
+    public function emergency($message, array $context = []): void
     {
         $this->monologLogger->emergency($message, $context);
     }

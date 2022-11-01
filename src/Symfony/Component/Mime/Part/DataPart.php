@@ -34,7 +34,7 @@ class DataPart extends TextPart
         unset($this->_parent);
 
         if ($body instanceof File && !$filename) {
-            $filename = basename($body->getPath());
+            $filename = $body->getFilename();
         }
 
         if (null === $contentType) {

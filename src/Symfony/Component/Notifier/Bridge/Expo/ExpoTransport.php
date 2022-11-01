@@ -32,7 +32,7 @@ final class ExpoTransport extends AbstractTransport
     /** @var string|null */
     private $token;
 
-    public function __construct(string $token = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->client = $client;

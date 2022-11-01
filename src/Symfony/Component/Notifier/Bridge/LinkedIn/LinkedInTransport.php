@@ -37,7 +37,7 @@ final class LinkedInTransport extends AbstractTransport
     private string $authToken;
     private string $accountId;
 
-    public function __construct(string $authToken, string $accountId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $authToken, string $accountId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->authToken = $authToken;
         $this->accountId = $accountId;

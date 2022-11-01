@@ -33,7 +33,7 @@ final class ContactEveryoneTransport extends AbstractTransport
     private ?string $diffusionName;
     private ?string $category;
 
-    public function __construct(string $token, ?string $diffusionName, ?string $category, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, ?string $diffusionName, ?string $category, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->diffusionName = $diffusionName;

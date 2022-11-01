@@ -47,7 +47,7 @@ final class SmsBiurasTransport extends AbstractTransport
         999 => 'Unknown Error',
     ];
 
-    public function __construct(string $uid, string $apiKey, string $from, bool $testMode, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $uid, #[\SensitiveParameter] string $apiKey, string $from, bool $testMode, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->uid = $uid;
         $this->apiKey = $apiKey;

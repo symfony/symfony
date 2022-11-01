@@ -32,7 +32,7 @@ final class FortySixElksTransport extends AbstractTransport
     private string $apiPassword;
     private string $from;
 
-    public function __construct(string $apiUsername, string $apiPassword, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiUsername, #[\SensitiveParameter] string $apiPassword, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiUsername = $apiUsername;
         $this->apiPassword = $apiPassword;

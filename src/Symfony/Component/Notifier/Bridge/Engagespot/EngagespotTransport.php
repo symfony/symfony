@@ -32,7 +32,7 @@ final class EngagespotTransport extends AbstractTransport
     private $apiKey;
     private $campaignName;
 
-    public function __construct(string $apiKey, string $campaignName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $apiKey, string $campaignName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->campaignName = $campaignName;

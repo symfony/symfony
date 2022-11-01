@@ -37,7 +37,7 @@ final class TurboSmsTransport extends AbstractTransport
     private string $authToken;
     private string $from;
 
-    public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->assertValidFrom($from);
 

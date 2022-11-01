@@ -32,7 +32,7 @@ final class SinchTransport extends AbstractTransport
     private string $authToken;
     private string $from;
 
-    public function __construct(string $accountSid, string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accountSid, #[\SensitiveParameter] string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;

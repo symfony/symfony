@@ -33,7 +33,7 @@ final class OneSignalTransport extends AbstractTransport
     private $apiKey;
     private $defaultRecipientId;
 
-    public function __construct(string $appId, string $apiKey, string $defaultRecipientId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $appId, #[\SensitiveParameter] string $apiKey, string $defaultRecipientId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->appId = $appId;
         $this->apiKey = $apiKey;

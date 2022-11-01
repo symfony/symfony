@@ -31,7 +31,7 @@ final class Sms77Transport extends AbstractTransport
     private $apiKey;
     private $from;
 
-    public function __construct(string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->from = $from;

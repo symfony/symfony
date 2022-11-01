@@ -183,11 +183,7 @@ final class Cursor
     {
         static $isTtySupported;
 
-        if (null === $isTtySupported) {
-            $isTtySupported = ('/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT));
-        }
-
-        if (!$isTtySupported) {
+        if (!$isTtySupported ??= '/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT)) {
             return [1, 1];
         }
 

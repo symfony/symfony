@@ -194,9 +194,7 @@ class TextDescriptor extends Descriptor
 
     private function formatClassLink(string $class, string $text = null): string
     {
-        if (null === $text) {
-            $text = $class;
-        }
+        $text ??= $class;
 
         if ('' === $fileLink = $this->getFileLink($class)) {
             return $text;

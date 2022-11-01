@@ -54,9 +54,7 @@ abstract class BaseType extends AbstractType
                 $uniqueBlockPrefix = '_'.$blockName;
             }
 
-            if (null === $translationDomain) {
-                $translationDomain = $view->parent->vars['translation_domain'];
-            }
+            $translationDomain ??= $view->parent->vars['translation_domain'];
 
             $labelTranslationParameters = array_merge($view->parent->vars['label_translation_parameters'], $labelTranslationParameters);
             $attrTranslationParameters = array_merge($view->parent->vars['attr_translation_parameters'], $attrTranslationParameters);

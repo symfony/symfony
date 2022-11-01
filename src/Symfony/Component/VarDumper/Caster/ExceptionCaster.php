@@ -352,9 +352,7 @@ class ExceptionCaster
             $pad = null;
             for ($i = $srcContext << 1; $i >= 0; --$i) {
                 if (isset($src[$i][$ltrim]) && "\r" !== ($c = $src[$i][$ltrim]) && "\n" !== $c) {
-                    if (null === $pad) {
-                        $pad = $c;
-                    }
+                    $pad ??= $c;
                     if ((' ' !== $c && "\t" !== $c) || $pad !== $c) {
                         break;
                     }

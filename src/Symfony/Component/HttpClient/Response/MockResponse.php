@@ -153,7 +153,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
             throw new InvalidArgumentException('MockResponse instances must be issued by MockHttpClient before processing.');
         }
 
-        $multi = self::$mainMulti ?? self::$mainMulti = new ClientState();
+        $multi = self::$mainMulti ??= new ClientState();
 
         if (!isset($runningResponses[0])) {
             $runningResponses[0] = [$multi, []];

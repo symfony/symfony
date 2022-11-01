@@ -73,11 +73,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     {
         $this->setLocale($locale);
 
-        if (null === $formatter) {
-            $formatter = new MessageFormatter();
-        }
-
-        $this->formatter = $formatter;
+        $this->formatter = $formatter ??= new MessageFormatter();
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
         $this->cacheVary = $cacheVary;
@@ -109,9 +105,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
     {
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        $domain ??= 'messages';
 
         $this->assertValidLocale($locale);
         $locale ?: $locale = class_exists(\Locale::class) ? \Locale::getDefault() : 'en';
@@ -171,9 +165,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
             return '';
         }
 
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        $domain ??= 'messages';
 
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();

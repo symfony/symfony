@@ -69,9 +69,7 @@ final class MercureTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, MercureOptions::class));
         }
 
-        if (null === $options) {
-            $options = new MercureOptions($this->topics);
-        }
+        $options ??= new MercureOptions($this->topics);
 
         // @see https://www.w3.org/TR/activitystreams-core/#jsonld
         $update = new Update($options->getTopics() ?? $this->topics, json_encode([

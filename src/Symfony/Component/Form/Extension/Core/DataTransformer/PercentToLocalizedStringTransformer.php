@@ -48,9 +48,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      */
     public function __construct(int $scale = null, string $type = null, int $roundingMode = \NumberFormatter::ROUND_HALFUP, bool $html5Format = false)
     {
-        if (null === $type) {
-            $type = self::FRACTIONAL;
-        }
+        $type ??= self::FRACTIONAL;
 
         if (!\in_array($type, self::$types, true)) {
             throw new UnexpectedTypeException($type, implode('", "', self::$types));

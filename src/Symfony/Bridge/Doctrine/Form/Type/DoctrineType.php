@@ -258,6 +258,6 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
     {
         $hash = CachingFactoryDecorator::generateHash($vary);
 
-        return $this->entityLoaders[$hash] ?? ($this->entityLoaders[$hash] = $this->getLoader($manager, $queryBuilder, $class));
+        return $this->entityLoaders[$hash] ??= $this->getLoader($manager, $queryBuilder, $class);
     }
 }

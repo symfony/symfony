@@ -819,11 +819,7 @@ class Request
      */
     public function getPathInfo(): string
     {
-        if (null === $this->pathInfo) {
-            $this->pathInfo = $this->preparePathInfo();
-        }
-
-        return $this->pathInfo;
+        return $this->pathInfo ??= $this->preparePathInfo();
     }
 
     /**
@@ -840,11 +836,7 @@ class Request
      */
     public function getBasePath(): string
     {
-        if (null === $this->basePath) {
-            $this->basePath = $this->prepareBasePath();
-        }
-
-        return $this->basePath;
+        return $this->basePath ??= $this->prepareBasePath();
     }
 
     /**
@@ -877,11 +869,7 @@ class Request
      */
     private function getBaseUrlReal(): string
     {
-        if (null === $this->baseUrl) {
-            $this->baseUrl = $this->prepareBaseUrl();
-        }
-
-        return $this->baseUrl;
+        return $this->baseUrl ??= $this->prepareBaseUrl();
     }
 
     /**
@@ -982,11 +970,7 @@ class Request
      */
     public function getRequestUri(): string
     {
-        if (null === $this->requestUri) {
-            $this->requestUri = $this->prepareRequestUri();
-        }
-
-        return $this->requestUri;
+        return $this->requestUri ??= $this->prepareRequestUri();
     }
 
     /**
@@ -1315,9 +1299,7 @@ class Request
      */
     public function getRequestFormat(?string $default = 'html'): ?string
     {
-        if (null === $this->format) {
-            $this->format = $this->attributes->get('_format');
-        }
+        $this->format ??= $this->attributes->get('_format');
 
         return $this->format ?? $default;
     }
@@ -2037,9 +2019,7 @@ class Request
                 unset($clientIps[$key]);
 
                 // Fallback to this when the client IP falls into the range of trusted proxies
-                if (null === $firstTrustedIp) {
-                    $firstTrustedIp = $clientIp;
-                }
+                $firstTrustedIp ??= $clientIp;
             }
         }
 

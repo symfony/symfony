@@ -79,10 +79,7 @@ class AccessListener extends AbstractListener
             return;
         }
 
-        $token = $this->tokenStorage->getToken();
-        if (null === $token) {
-            $token = new NullToken();
-        }
+        $token = $this->tokenStorage->getToken() ?? new NullToken();
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {
             throw $this->createAccessDeniedException($request, $attributes);

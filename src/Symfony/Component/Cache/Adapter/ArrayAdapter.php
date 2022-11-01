@@ -57,7 +57,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         $this->storeSerialized = $storeSerialized;
         $this->maxLifetime = $maxLifetime;
         $this->maxItems = $maxItems;
-        self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
+        self::$createCacheItem ??= \Closure::bind(
             static function ($key, $value, $isHit, $tags) {
                 $item = new CacheItem();
                 $item->key = $key;

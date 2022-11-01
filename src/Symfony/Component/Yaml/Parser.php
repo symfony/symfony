@@ -107,10 +107,7 @@ class Parser
         $this->lines = explode("\n", $value);
         $this->numberOfParsedLines = \count($this->lines);
         $this->locallySkippedLineNumbers = [];
-
-        if (null === $this->totalNumberOfLines) {
-            $this->totalNumberOfLines = $this->numberOfParsedLines;
-        }
+        $this->totalNumberOfLines ??= $this->numberOfParsedLines;
 
         if (!$this->moveToNextLine()) {
             return null;

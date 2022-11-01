@@ -48,9 +48,7 @@ class ExpressionLanguageSyntaxValidator extends ConstraintValidator
             throw new UnexpectedValueException($expression, 'string');
         }
 
-        if (null === $this->expressionLanguage) {
-            $this->expressionLanguage = new ExpressionLanguage();
-        }
+        $this->expressionLanguage ??= new ExpressionLanguage();
 
         try {
             $this->expressionLanguage->lint($expression, $constraint->allowedVariables);

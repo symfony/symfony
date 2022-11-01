@@ -479,9 +479,7 @@ class HttpKernelTest extends TestCase
 
     private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false)
     {
-        if (null === $controller) {
-            $controller = function () { return new Response('Hello'); };
-        }
+        $controller ??= function () { return new Response('Hello'); };
 
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
         $controllerResolver

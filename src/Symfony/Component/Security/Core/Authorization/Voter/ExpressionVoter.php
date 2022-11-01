@@ -58,9 +58,7 @@ class ExpressionVoter implements CacheableVoterInterface
                 continue;
             }
 
-            if (null === $variables) {
-                $variables = $this->getVariables($token, $subject);
-            }
+            $variables ??= $this->getVariables($token, $subject);
 
             $result = VoterInterface::ACCESS_DENIED;
             if ($this->expressionLanguage->evaluate($attribute, $variables)) {

@@ -1204,11 +1204,7 @@ class Process implements \IteratorAggregate
     {
         static $isTtySupported;
 
-        if (null === $isTtySupported) {
-            $isTtySupported = ('/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT));
-        }
-
-        return $isTtySupported;
+        return $isTtySupported ??= ('/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT));
     }
 
     /**

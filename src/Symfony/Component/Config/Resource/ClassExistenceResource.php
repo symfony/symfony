@@ -96,9 +96,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             }
         }
 
-        if (null === $this->exists) {
-            $this->exists = $exists;
-        }
+        $this->exists ??= $exists;
 
         return $this->exists[0] xor !$exists[0];
     }

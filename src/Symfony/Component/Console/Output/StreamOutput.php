@@ -47,9 +47,7 @@ class StreamOutput extends Output
 
         $this->stream = $stream;
 
-        if (null === $decorated) {
-            $decorated = $this->hasColorSupport();
-        }
+        $decorated ??= $this->hasColorSupport();
 
         parent::__construct($verbosity, $decorated, $formatter);
     }

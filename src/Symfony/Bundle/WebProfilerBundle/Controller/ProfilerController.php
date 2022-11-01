@@ -369,11 +369,7 @@ class ProfilerController
 
     protected function getTemplateManager(): TemplateManager
     {
-        if (null === $this->templateManager) {
-            $this->templateManager = new TemplateManager($this->profiler, $this->twig, $this->templates);
-        }
-
-        return $this->templateManager;
+        return $this->templateManager ??= new TemplateManager($this->profiler, $this->twig, $this->templates);
     }
 
     private function denyAccessIfProfilerDisabled()

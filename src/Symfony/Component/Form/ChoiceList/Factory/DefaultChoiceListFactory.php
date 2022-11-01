@@ -74,9 +74,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
 
         // The names are generated from an incrementing integer by default
-        if (null === $index) {
-            $index = 0;
-        }
+        $index ??= 0;
 
         // If $groupBy is a callable returning a string
         // choices are added to the group with the name returned by the callable.

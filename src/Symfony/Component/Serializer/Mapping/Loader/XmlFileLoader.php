@@ -35,11 +35,7 @@ class XmlFileLoader extends FileLoader
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromXml();
-        }
-
-        if (!$this->classes) {
+        if (!$this->classes ??= $this->getClassesFromXml()) {
             return false;
         }
 
@@ -128,11 +124,7 @@ class XmlFileLoader extends FileLoader
      */
     public function getMappedClasses(): array
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromXml();
-        }
-
-        return array_keys($this->classes);
+        return array_keys($this->classes ??= $this->getClassesFromXml());
     }
 
     /**

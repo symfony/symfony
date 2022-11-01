@@ -27,11 +27,7 @@ class CheckboxListMapper implements DataMapperInterface
 {
     public function mapDataToForms(mixed $choices, \Traversable $checkboxes)
     {
-        if (null === $choices) {
-            $choices = [];
-        }
-
-        if (!\is_array($choices)) {
+        if (!\is_array($choices ??= [])) {
             throw new UnexpectedTypeException($choices, 'array');
         }
 

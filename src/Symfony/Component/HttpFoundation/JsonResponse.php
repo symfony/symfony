@@ -44,9 +44,7 @@ class JsonResponse extends Response
             throw new \TypeError(sprintf('"%s": If $json is set to true, argument $data must be a string or object implementing __toString(), "%s" given.', __METHOD__, get_debug_type($data)));
         }
 
-        if (null === $data) {
-            $data = new \ArrayObject();
-        }
+        $data ??= new \ArrayObject();
 
         $json ? $this->setJson($data) : $this->setData($data);
     }

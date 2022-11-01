@@ -150,8 +150,8 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                 }
             } elseif ($class instanceof Definition) {
                 $class = $class->getClass();
-            } elseif (null === $class) {
-                $class = $definition->getClass();
+            } else {
+                $class ??= $definition->getClass();
             }
 
             return $this->getReflectionMethod(new Definition($class), $method);

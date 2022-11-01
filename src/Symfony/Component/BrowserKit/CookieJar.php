@@ -67,9 +67,7 @@ class CookieJar
      */
     public function expire(string $name, ?string $path = '/', string $domain = null)
     {
-        if (null === $path) {
-            $path = '/';
-        }
+        $path ??= '/';
 
         if (empty($domain)) {
             // an empty domain means any domain

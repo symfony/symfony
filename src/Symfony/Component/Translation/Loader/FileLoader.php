@@ -34,9 +34,7 @@ abstract class FileLoader extends ArrayLoader
         $messages = $this->loadResource($resource);
 
         // empty resource
-        if (null === $messages) {
-            $messages = [];
-        }
+        $messages ??= [];
 
         // not an array
         if (!\is_array($messages)) {

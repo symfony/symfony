@@ -37,9 +37,7 @@ class DataPart extends TextPart
             $filename = basename($body->getPath());
         }
 
-        if (null === $contentType) {
-            $contentType = $body instanceof File ? $body->getContentType() : 'application/octet-stream';
-        }
+        $contentType ??= $body instanceof File ? $body->getContentType() : 'application/octet-stream';
         [$this->mediaType, $subtype] = explode('/', $contentType);
 
         parent::__construct($body, null, $subtype, $encoding);

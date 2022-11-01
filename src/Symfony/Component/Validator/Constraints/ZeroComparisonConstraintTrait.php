@@ -23,9 +23,7 @@ trait ZeroComparisonConstraintTrait
 {
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {
-        if (null === $options) {
-            $options = [];
-        }
+        $options ??= [];
 
         if (isset($options['propertyPath'])) {
             throw new ConstraintDefinitionException(sprintf('The "propertyPath" option of the "%s" constraint cannot be set.', static::class));

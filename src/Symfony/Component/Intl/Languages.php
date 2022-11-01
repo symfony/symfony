@@ -126,9 +126,7 @@ final class Languages extends ResourceBundle
             return true;
         } catch (MissingResourceException) {
             static $cache;
-            if (null === $cache) {
-                $cache = array_flip(self::getAlpha3Codes());
-            }
+            $cache ??= array_flip(self::getAlpha3Codes());
 
             return isset($cache[$language]);
         }

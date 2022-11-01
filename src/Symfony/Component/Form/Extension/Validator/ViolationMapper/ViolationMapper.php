@@ -176,8 +176,8 @@ class ViolationMapper implements ViolationMapperInterface
                 if (false !== $label) {
                     if (null === $label && null !== $this->formRenderer) {
                         $label = $this->formRenderer->humanize($scope->getName());
-                    } elseif (null === $label) {
-                        $label = $scope->getName();
+                    } else {
+                        $label ??= $scope->getName();
                     }
 
                     if (null !== $this->translator) {

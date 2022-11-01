@@ -27,10 +27,7 @@ class LinkStub extends ConstStub
     {
         $this->value = $label;
 
-        if (null === $href) {
-            $href = $label;
-        }
-        if (!\is_string($href)) {
+        if (!\is_string($href ??= $label)) {
             return;
         }
         if (str_starts_with($href, 'file://')) {

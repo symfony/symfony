@@ -1700,9 +1700,7 @@ EOF;
 
     private function getDefinitionsFromArguments(array $arguments, \SplObjectStorage $definitions = null, array &$calls = [], bool $byConstructor = null): \SplObjectStorage
     {
-        if (null === $definitions) {
-            $definitions = new \SplObjectStorage();
-        }
+        $definitions ??= new \SplObjectStorage();
 
         foreach ($arguments as $argument) {
             if (\is_array($argument)) {

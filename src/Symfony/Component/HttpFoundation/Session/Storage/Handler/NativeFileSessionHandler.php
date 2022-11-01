@@ -30,11 +30,7 @@ class NativeFileSessionHandler extends \SessionHandler
      */
     public function __construct(string $savePath = null)
     {
-        if (null === $savePath) {
-            $savePath = \ini_get('session.save_path');
-        }
-
-        $baseDir = $savePath;
+        $baseDir = $savePath ??= \ini_get('session.save_path');
 
         if ($count = substr_count($savePath, ';')) {
             if ($count > 2) {

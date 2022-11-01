@@ -30,11 +30,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
 
     public function transform(mixed $array): mixed
     {
-        if (null === $array) {
-            $array = [];
-        }
-
-        if (!\is_array($array)) {
+        if (!\is_array($array ??= [])) {
             throw new TransformationFailedException('Expected an array.');
         }
 

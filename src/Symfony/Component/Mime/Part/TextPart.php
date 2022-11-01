@@ -40,7 +40,7 @@ class TextPart extends AbstractPart
     private $seekable;
 
     /**
-     * @param resource|string|BodyFile $body Use a BodyFile instance to defer loading the file until rendering
+     * @param resource|string|File $body Use a File instance to defer loading the file until rendering
      */
     public function __construct($body, ?string $charset = 'utf-8', string $subtype = 'plain', string $encoding = null)
     {
@@ -48,11 +48,11 @@ class TextPart extends AbstractPart
 
         parent::__construct();
 
-        if (!\is_string($body) && !\is_resource($body) && !$body instanceof BodyFile) {
-            throw new \TypeError(sprintf('The body of "%s" must be a string, a resource, or an instance of "%s" (got "%s").', self::class, BodyFile::class, get_debug_type($body)));
+        if (!\is_string($body) && !\is_resource($body) && !$body instanceof File) {
+            throw new \TypeError(sprintf('The body of "%s" must be a string, a resource, or an instance of "%s" (got "%s").', self::class, File::class, get_debug_type($body)));
         }
 
-        if ($body instanceof BodyFile) {
+        if ($body instanceof File) {
             $path = $body->getPath();
             if ((is_file($path) && !is_readable($path)) || is_dir($path)) {
                 throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
@@ -118,7 +118,7 @@ class TextPart extends AbstractPart
 
     public function getBody(): string
     {
-        if ($this->body instanceof BodyFile) {
+        if ($this->body instanceof File) {
             return file_get_contents($this->body->getPath());
         }
 
@@ -140,7 +140,7 @@ class TextPart extends AbstractPart
 
     public function bodyToIterable(): iterable
     {
-        if ($this->body instanceof BodyFile) {
+        if ($this->body instanceof File) {
             $path = $this->body->getPath();
             if (false === $handle = @fopen($path, 'r', false)) {
                 throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));

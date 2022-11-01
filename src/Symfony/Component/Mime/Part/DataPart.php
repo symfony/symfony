@@ -27,18 +27,18 @@ class DataPart extends TextPart
     private $cid;
 
     /**
-     * @param resource|string|BodyFile $body Use a BodyFile instance to defer loading the file until rendering
+     * @param resource|string|File $body Use a File instance to defer loading the file until rendering
      */
     public function __construct($body, string $filename = null, string $contentType = null, string $encoding = null)
     {
         unset($this->_parent);
 
-        if ($body instanceof BodyFile && !$filename) {
+        if ($body instanceof File && !$filename) {
             $filename = basename($body->getPath());
         }
 
         if (null === $contentType) {
-            $contentType = $body instanceof BodyFile ? $body->getContentType() : 'application/octet-stream';
+            $contentType = $body instanceof File ? $body->getContentType() : 'application/octet-stream';
         }
         [$this->mediaType, $subtype] = explode('/', $contentType);
 
@@ -53,7 +53,7 @@ class DataPart extends TextPart
 
     public static function fromPath(string $path, string $name = null, string $contentType = null): self
     {
-        return new self(new BodyFile($path), $name, $contentType);
+        return new self(new File($path), $name, $contentType);
     }
 
     /**

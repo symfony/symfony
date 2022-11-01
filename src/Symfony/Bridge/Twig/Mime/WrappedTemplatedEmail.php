@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Twig\Mime;
 
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Part\BodyFile;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Twig\Environment;
 
 /**
@@ -40,7 +40,7 @@ final class WrappedTemplatedEmail
     public function image(string $image, string $contentType = null): string
     {
         $file = $this->twig->getLoader()->getSourceContext($image);
-        $body = $file->getPath() ? new BodyFile($file->getPath()) : $file->getCode();
+        $body = $file->getPath() ? new File($file->getPath()) : $file->getCode();
         $this->message->addPart((new DataPart($body, $image, $contentType))->asInline());
 
         return 'cid:'.$image;
@@ -49,7 +49,7 @@ final class WrappedTemplatedEmail
     public function attach(string $file, string $name = null, string $contentType = null): void
     {
         $file = $this->twig->getLoader()->getSourceContext($file);
-        $body = $file->getPath() ? new BodyFile($file->getPath()) : $file->getCode();
+        $body = $file->getPath() ? new File($file->getPath()) : $file->getCode();
         $this->message->addPart(new DataPart($body, $name, $contentType));
     }
 

@@ -70,6 +70,18 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
     }
 
     /**
+     * Registers classes under PSR-4 namespaces from a Composer file.
+     *
+     * @throws \JsonException
+     */
+    final public function loadFromComposer(string $composerFile): ComposerConfigurator
+    {
+        $this->__destruct();
+
+        return $this->parent->loadFromComposer($composerFile);
+    }
+
+    /**
      * Gets an already defined service definition.
      *
      * @throws ServiceNotFoundException if the service definition does not exist

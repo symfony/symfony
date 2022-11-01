@@ -88,9 +88,9 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $namespace The namespace prefix of classes in the scanned directory
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
-     * @param string|null          $source    The path to the file that defines the auto-discovery rule
+     * @param (callable(\ReflectionClass): bool)|null $classFilter
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null, callable $classFilter = null */)
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
@@ -108,9 +108,10 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         $source = \func_num_args() > 4 ? func_get_arg(4) : null;
+        $classFilter = \func_num_args() > 5 ? func_get_arg(5) : null;
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
         $autoconfigureAttributes = $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null;
-        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes, $source);
+        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes, $source, $classFilter);
         // prepare for deep cloning
         $serializedPrototype = serialize($prototype);
 
@@ -177,7 +178,10 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses(string $namespace, string $pattern, array $excludePatterns, ?RegisterAutoconfigureAttributesPass $autoconfigureAttributes, ?string $source): array
+    /**
+     * @param (callable(\ReflectionClass): bool)|null $filter
+     */
+    private function findClasses(string $namespace, string $pattern, array $excludePatterns, ?RegisterAutoconfigureAttributesPass $autoconfigureAttributes, ?string $source, ?callable $filter): array
     {
         $parameterBag = $this->container->getParameterBag();
 
@@ -229,6 +233,10 @@ abstract class FileLoader extends BaseFileLoader
             // check to make sure the expected class exists
             if (!$r) {
                 throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
+            }
+
+            if ($filter && !$filter($r)) {
+                continue;
             }
 
             if ($r->isInstantiable() || $r->isInterface()) {

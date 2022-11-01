@@ -40,6 +40,10 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
     private PhpFileLoader $loader;
     private string $resource;
     private ?array $excludes = null;
+    /**
+     * @var (callable(\ReflectionClass): bool)
+     */
+    private $classFilter = null;
     private bool $allowParent;
     private ?string $path;
 
@@ -68,7 +72,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         parent::__destruct();
 
         if (isset($this->loader)) {
-            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->excludes, $this->path);
+            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->excludes, $this->path, $this->classFilter);
         }
         unset($this->loader);
     }
@@ -83,6 +87,18 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
     final public function exclude(array|string $excludes): static
     {
         $this->excludes = (array) $excludes;
+
+        return $this;
+    }
+
+    /**
+     * @param (callable(\ReflectionClass): bool) $filter
+     *
+     * @return $this
+     */
+    final public function classFilter(callable $filter): static
+    {
+        $this->classFilter = $filter;
 
         return $this;
     }

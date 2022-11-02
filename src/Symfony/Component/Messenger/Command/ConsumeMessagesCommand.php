@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -163,7 +164,11 @@ EOF
         }
 
         $stopsWhen = [];
-        if ($limit = $input->getOption('limit')) {
+        if (null !== ($limit = $input->getOption('limit'))) {
+            if (!is_numeric($limit) || 0 >= $limit) {
+                throw new InvalidOptionException(sprintf('Option "limit" must be a positive integer, "%s" passed.', $limit));
+            }
+
             $stopsWhen[] = "processed {$limit} messages";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
         }
@@ -174,6 +179,10 @@ EOF
         }
 
         if (null !== ($timeLimit = $input->getOption('time-limit'))) {
+            if (!is_numeric($timeLimit) || 0 >= $limit) {
+                throw new InvalidOptionException(sprintf('Option "time-limit" must be a positive integer, "%s" passed.', $timeLimit));
+            }
+
             $stopsWhen[] = "been running for {$timeLimit}s";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }

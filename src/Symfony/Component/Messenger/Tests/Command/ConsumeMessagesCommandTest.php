@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -171,5 +172,38 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $this->assertSame(0, $tester->getStatusCode());
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider getInvalidOptions
+     */
+    public function testRunWithInvalidOption(string $option, string $value, string $expectedMessage)
+    {
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            $option => $value,
+        ]);
+    }
+
+    public function getInvalidOptions()
+    {
+        yield 'Zero message limit' => ['--limit', '0', 'Option "limit" must be a positive integer, "0" passed.'];
+        yield 'Non-numeric message limit' => ['--limit', 'whatever', 'Option "limit" must be a positive integer, "whatever" passed.'];
+
+        yield 'Zero second time limit' => ['--time-limit', '0', 'Option "time-limit" must be a positive integer, "0" passed.'];
+        yield 'Non-numeric time limit' => ['--time-limit', 'whatever', 'Option "time-limit" must be a positive integer, "whatever" passed.'];
     }
 }

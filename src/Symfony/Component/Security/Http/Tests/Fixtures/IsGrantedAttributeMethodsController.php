@@ -62,4 +62,14 @@ class IsGrantedAttributeMethodsController
     public function withNestedExpressionInSubject($post, $arg2Name)
     {
     }
+
+    #[IsGranted(attribute: 'SOME_VOTER', subject: 'request')]
+    public function withRequestAsSubjectAndNoArgument()
+    {
+    }
+
+    #[IsGranted(attribute: 'SOME_VOTER', subject: 'request')]
+    public function withRequestAsSubjectAndArgument($request)
+    {
+    }
 }

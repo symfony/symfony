@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -42,6 +43,7 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
             return;
         }
 
+        $request = $event->getRequest();
         $arguments = $event->getNamedArguments();
 
         foreach ($attributes as $attribute) {
@@ -50,10 +52,10 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
             if ($subjectRef = $attribute->subject) {
                 if (\is_array($subjectRef)) {
                     foreach ($subjectRef as $refKey => $ref) {
-                        $subject[\is_string($refKey) ? $refKey : (string) $ref] = $this->getIsGrantedSubject($ref, $arguments);
+                        $subject[\is_string($refKey) ? $refKey : (string) $ref] = $this->getIsGrantedSubject($ref, $request, $arguments);
                     }
                 } else {
-                    $subject = $this->getIsGrantedSubject($subjectRef, $arguments);
+                    $subject = $this->getIsGrantedSubject($subjectRef, $request, $arguments);
                 }
             }
 
@@ -78,17 +80,21 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
         return [KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 10]];
     }
 
-    private function getIsGrantedSubject(string|Expression $subjectRef, array $arguments): mixed
+    private function getIsGrantedSubject(string|Expression $subjectRef, Request $request, array $arguments): mixed
     {
         if ($subjectRef instanceof Expression) {
             $this->expressionLanguage ??= new ExpressionLanguage();
 
             return $this->expressionLanguage->evaluate($subjectRef, [
+                'request' => $request,
                 'args' => $arguments,
             ]);
         }
 
         if (!\array_key_exists($subjectRef, $arguments)) {
+            if ('request' === $subjectRef) {
+                return $request;
+            }
             throw new RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $subjectRef, $subjectRef));
         }
 

@@ -28,9 +28,7 @@ class PushChannel extends AbstractChannel
             $message = $notification->asPushMessage($recipient, $transportName);
         }
 
-        if (null === $message) {
-            $message = PushMessage::fromNotification($notification);
-        }
+        $message ??= PushMessage::fromNotification($notification);
 
         if (null !== $transportName) {
             $message->transport($transportName);

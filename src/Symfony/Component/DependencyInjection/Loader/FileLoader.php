@@ -186,9 +186,7 @@ abstract class FileLoader extends BaseFileLoader
         $excludePatterns = $parameterBag->unescapeValue($parameterBag->resolveValue($excludePatterns));
         foreach ($excludePatterns as $excludePattern) {
             foreach ($this->glob($excludePattern, true, $resource, true, true) as $path => $info) {
-                if (null === $excludePrefix) {
-                    $excludePrefix = $resource->getPrefix();
-                }
+                $excludePrefix ??= $resource->getPrefix();
 
                 // normalize Windows slashes and remove trailing slashes
                 $excludePaths[rtrim(str_replace('\\', '/', $path), '/')] = true;

@@ -1336,12 +1336,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function resolveEnvPlaceholders(mixed $value, string|bool $format = null, array &$usedEnvs = null): mixed
     {
-        if (null === $format) {
-            $format = '%%env(%s)%%';
-        }
-
         $bag = $this->getParameterBag();
-        if (true === $format) {
+        if (true === $format ??= '%%env(%s)%%') {
             $value = $bag->resolveValue($value);
         }
 

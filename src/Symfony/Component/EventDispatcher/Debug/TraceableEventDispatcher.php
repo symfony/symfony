@@ -110,9 +110,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     {
         $eventName ??= $event::class;
 
-        if (null === $this->callStack) {
-            $this->callStack = new \SplObjectStorage();
-        }
+        $this->callStack ??= new \SplObjectStorage();
 
         $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 

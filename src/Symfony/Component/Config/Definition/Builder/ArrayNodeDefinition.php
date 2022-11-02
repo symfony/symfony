@@ -338,9 +338,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      */
     protected function getNodeBuilder(): NodeBuilder
     {
-        if (null === $this->nodeBuilder) {
-            $this->nodeBuilder = new NodeBuilder();
-        }
+        $this->nodeBuilder ??= new NodeBuilder();
 
         return $this->nodeBuilder->setParent($this);
     }

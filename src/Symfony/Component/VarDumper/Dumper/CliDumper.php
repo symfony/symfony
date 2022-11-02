@@ -261,9 +261,7 @@ class CliDumper extends AbstractDumper
 
     public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
     {
-        if (null === $this->colors) {
-            $this->colors = $this->supportsColors();
-        }
+        $this->colors ??= $this->supportsColors();
 
         $this->dumpKey($cursor);
         $attr = $cursor->attr;
@@ -417,9 +415,7 @@ class CliDumper extends AbstractDumper
      */
     protected function style(string $style, string $value, array $attr = []): string
     {
-        if (null === $this->colors) {
-            $this->colors = $this->supportsColors();
-        }
+        $this->colors ??= $this->supportsColors();
 
         $this->handlesHrefGracefully ??= 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR')
             && (!getenv('KONSOLE_VERSION') || (int) getenv('KONSOLE_VERSION') > 201100);

@@ -38,11 +38,7 @@ class YamlFileLoader extends FileLoader
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromYaml();
-        }
-
-        if (!$this->classes) {
+        if (!$this->classes ??= $this->getClassesFromYaml()) {
             return false;
         }
 
@@ -153,11 +149,7 @@ class YamlFileLoader extends FileLoader
      */
     public function getMappedClasses(): array
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromYaml();
-        }
-
-        return array_keys($this->classes);
+        return array_keys($this->classes ??= $this->getClassesFromYaml());
     }
 
     private function getClassesFromYaml(): array
@@ -166,9 +158,7 @@ class YamlFileLoader extends FileLoader
             throw new MappingException(sprintf('This is not a local file "%s".', $this->file));
         }
 
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new Parser();
-        }
+        $this->yamlParser ??= new Parser();
 
         $classes = $this->yamlParser->parseFile($this->file, Yaml::PARSE_CONSTANT);
 

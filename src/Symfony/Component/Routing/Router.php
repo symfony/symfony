@@ -176,11 +176,7 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     public function getRouteCollection()
     {
-        if (null === $this->collection) {
-            $this->collection = $this->loader->load($this->resource, $this->options['resource_type']);
-        }
-
-        return $this->collection;
+        return $this->collection ??= $this->loader->load($this->resource, $this->options['resource_type']);
     }
 
     public function setContext(RequestContext $context)

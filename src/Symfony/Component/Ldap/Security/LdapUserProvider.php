@@ -45,13 +45,8 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
 
     public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, #[\SensitiveParameter] string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
     {
-        if (null === $uidKey) {
-            $uidKey = 'sAMAccountName';
-        }
-
-        if (null === $filter) {
-            $filter = '({uid_key}={user_identifier})';
-        }
+        $uidKey ??= 'sAMAccountName';
+        $filter ??= '({uid_key}={user_identifier})';
 
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;

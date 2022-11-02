@@ -92,10 +92,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
 
     public function refresh(float $ttlInSecond = null)
     {
-        if (null === $ttlInSecond) {
-            $ttlInSecond = $this->ttlInSecond;
-        }
-        if (!$ttlInSecond) {
+        if (!$ttlInSecond ??= $this->ttlInSecond) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
         }
 

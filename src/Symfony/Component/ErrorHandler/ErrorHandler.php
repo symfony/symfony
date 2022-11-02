@@ -212,9 +212,7 @@ class ErrorHandler
                 }
             }
         } else {
-            if (null === $levels) {
-                $levels = \E_ALL;
-            }
+            $levels ??= \E_ALL;
             foreach ($this->loggers as $type => $log) {
                 if (($type & $levels) && (empty($log[0]) || $replace || $log[0] === $this->bootstrappingLogger)) {
                     $log[0] = $logger;

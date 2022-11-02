@@ -221,9 +221,7 @@ class ExceptionListenerTest extends TestCase
 
     private function createEvent(\Exception $exception, $kernel = null)
     {
-        if (null === $kernel) {
-            $kernel = $this->createMock(HttpKernelInterface::class);
-        }
+        $kernel ??= $this->createMock(HttpKernelInterface::class);
 
         return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }

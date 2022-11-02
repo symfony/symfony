@@ -2252,9 +2252,7 @@ class OptionsResolverTest extends TestCase
         });
         // defined by subclass
         $this->resolver->setNormalizer('foo', function (Options $options, $resolvedValue) {
-            if (null === $resolvedValue['bar']) {
-                $resolvedValue['bar'] = 'baz';
-            }
+            $resolvedValue['bar'] ??= 'baz';
 
             return $resolvedValue;
         });

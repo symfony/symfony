@@ -33,9 +33,7 @@ class File
     public function getContentType(): string
     {
         $ext = strtolower(pathinfo($this->path, \PATHINFO_EXTENSION));
-        if (null === self::$mimeTypes) {
-            self::$mimeTypes = new MimeTypes();
-        }
+        self::$mimeTypes ??= new MimeTypes();
 
         return self::$mimeTypes->getMimeTypes($ext)[0] ?? 'application/octet-stream';
     }

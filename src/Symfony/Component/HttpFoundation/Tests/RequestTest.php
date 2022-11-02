@@ -2341,9 +2341,7 @@ class RequestTest extends TestCase
      */
     public function testNonstandardRequests($requestUri, $queryString, $expectedPathInfo, $expectedUri, $expectedBasePath = '', $expectedBaseUrl = null)
     {
-        if (null === $expectedBaseUrl) {
-            $expectedBaseUrl = $expectedBasePath;
-        }
+        $expectedBaseUrl ??= $expectedBasePath;
 
         $server = [
             'HTTP_HOST' => 'host:8080',

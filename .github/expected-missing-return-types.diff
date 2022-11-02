@@ -7,7 +7,7 @@ head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
 git checkout composer.json src/
 
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
-index 32bac9c42f..df89815902 100644
+index bb5560a7b5..be86cbf98e 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
 @@ -88,5 +88,5 @@ abstract class KernelTestCase extends TestCase
@@ -92,10 +92,10 @@ index e3ca1d49c4..526d350484 100644
 +    public function locate(string $name, string $currentPath = null, bool $first = true): string|array;
  }
 diff --git a/src/Symfony/Component/Config/Loader/FileLoader.php b/src/Symfony/Component/Config/Loader/FileLoader.php
-index c479f75d34..0d16baaff7 100644
+index 30034e55a5..d6a57be190 100644
 --- a/src/Symfony/Component/Config/Loader/FileLoader.php
 +++ b/src/Symfony/Component/Config/Loader/FileLoader.php
-@@ -69,5 +69,5 @@ abstract class FileLoader extends Loader
+@@ -67,5 +67,5 @@ abstract class FileLoader extends Loader
       * @throws FileLocatorFileNotFoundException
       */
 -    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, string|array $exclude = null)
@@ -156,52 +156,52 @@ index 6b1c6c5fbe..bb80ed461e 100644
 +    public function isFresh(ResourceInterface $resource, int $timestamp): bool;
  }
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index c8991a81ee..3be8925a68 100644
+index 3a3d4da744..0a825fc1ee 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
-@@ -220,5 +220,5 @@ class Application implements ResetInterface
+@@ -215,5 +215,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    public function doRun(InputInterface $input, OutputInterface $output)
 +    public function doRun(InputInterface $input, OutputInterface $output): int
      {
          if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-@@ -465,5 +465,5 @@ class Application implements ResetInterface
+@@ -462,5 +462,5 @@ class Application implements ResetInterface
       * @return string
       */
 -    public function getLongVersion()
 +    public function getLongVersion(): string
      {
          if ('UNKNOWN' !== $this->getName()) {
-@@ -508,5 +508,5 @@ class Application implements ResetInterface
+@@ -505,5 +505,5 @@ class Application implements ResetInterface
       * @return Command|null
       */
 -    public function add(Command $command)
 +    public function add(Command $command): ?Command
      {
          $this->init();
-@@ -545,5 +545,5 @@ class Application implements ResetInterface
+@@ -542,5 +542,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When given command name does not exist
       */
 -    public function get(string $name)
 +    public function get(string $name): Command
      {
          $this->init();
-@@ -652,5 +652,5 @@ class Application implements ResetInterface
+@@ -649,5 +649,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When command name is incorrect or ambiguous
       */
 -    public function find(string $name)
 +    public function find(string $name): Command
      {
          $this->init();
-@@ -762,5 +762,5 @@ class Application implements ResetInterface
+@@ -759,5 +759,5 @@ class Application implements ResetInterface
       * @return Command[]
       */
 -    public function all(string $namespace = null)
 +    public function all(string $namespace = null): array
      {
          $this->init();
-@@ -961,5 +961,5 @@ class Application implements ResetInterface
+@@ -968,5 +968,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
@@ -265,7 +265,7 @@ index 2762cdf05c..737334268a 100644
 +    public function getName(): string;
  }
 diff --git a/src/Symfony/Component/Console/Helper/Table.php b/src/Symfony/Component/Console/Helper/Table.php
-index e21aee2c00..4d1bc22bee 100644
+index 893b3192e9..94822ed191 100644
 --- a/src/Symfony/Component/Console/Helper/Table.php
 +++ b/src/Symfony/Component/Console/Helper/Table.php
 @@ -193,5 +193,5 @@ class Table
@@ -301,7 +301,7 @@ index 3af991a76f..742e2508f3 100644
  
      /**
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
-index afc8183571..2cd43ea0af 100644
+index 08bab02ee4..1181f0795e 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 @@ -68,5 +68,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
@@ -584,7 +584,7 @@ index 1cb865fd66..f6f4efe7a7 100644
 +    public function getName(): string;
  }
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-index f3302952a9..a5be1dc2f0 100644
+index bf2d6efb63..ae9c354971 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 @@ -457,5 +457,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
@@ -792,7 +792,7 @@ index b63dc5c85e..e53bb49369 100644
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
 diff --git a/src/Symfony/Component/Routing/Router.php b/src/Symfony/Component/Routing/Router.php
-index 88e4e3f2ef..3736bf8c00 100644
+index f7f2454062..73fbc8eb54 100644
 --- a/src/Symfony/Component/Routing/Router.php
 +++ b/src/Symfony/Component/Routing/Router.php
 @@ -175,5 +175,5 @@ class Router implements RouterInterface, RequestMatcherInterface
@@ -801,7 +801,7 @@ index 88e4e3f2ef..3736bf8c00 100644
 -    public function getRouteCollection()
 +    public function getRouteCollection(): RouteCollection
      {
-         if (null === $this->collection) {
+         return $this->collection ??= $this->loader->load($this->resource, $this->options['resource_type']);
 diff --git a/src/Symfony/Component/Routing/RouterInterface.php b/src/Symfony/Component/Routing/RouterInterface.php
 index 6912f8a15b..caf18c886a 100644
 --- a/src/Symfony/Component/Routing/RouterInterface.php
@@ -936,10 +936,10 @@ index 12c778cb80..4ad55fb3e1 100644
      {
          if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index febe70bb47..bf4ca2e325 100644
+index 7c4c5fb41b..840dd2bcdb 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-@@ -137,10 +137,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -139,10 +139,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @param array $context
       */
 -    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
@@ -952,21 +952,21 @@ index febe70bb47..bf4ca2e325 100644
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
          if (!isset($context['cache_key'])) {
-@@ -222,5 +222,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -225,5 +225,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      }
  
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
      {
          if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
-@@ -284,5 +284,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -287,5 +287,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
  
      /**
-@@ -291,15 +291,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -294,15 +294,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);

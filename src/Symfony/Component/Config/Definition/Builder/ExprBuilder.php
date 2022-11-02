@@ -44,7 +44,7 @@ class ExprBuilder
      */
     public function always(\Closure $then = null): static
     {
-        $this->ifPart = static function () { return true; };
+        $this->ifPart = static fn () => true;
         $this->allowedTypes = self::TYPE_ANY;
 
         if (null !== $then) {
@@ -63,11 +63,7 @@ class ExprBuilder
      */
     public function ifTrue(\Closure $closure = null): static
     {
-        if (null === $closure) {
-            $closure = static function ($v) { return true === $v; };
-        }
-
-        $this->ifPart = $closure;
+        $this->ifPart = $closure ?? static fn ($v) => true === $v;
         $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
@@ -80,7 +76,7 @@ class ExprBuilder
      */
     public function ifString(): static
     {
-        $this->ifPart = static function ($v) { return \is_string($v); };
+        $this->ifPart = \is_string(...);
         $this->allowedTypes = self::TYPE_STRING;
 
         return $this;
@@ -93,7 +89,7 @@ class ExprBuilder
      */
     public function ifNull(): static
     {
-        $this->ifPart = static function ($v) { return null === $v; };
+        $this->ifPart = \is_null(...);
         $this->allowedTypes = self::TYPE_NULL;
 
         return $this;
@@ -106,7 +102,7 @@ class ExprBuilder
      */
     public function ifEmpty(): static
     {
-        $this->ifPart = static function ($v) { return empty($v); };
+        $this->ifPart = static fn ($v) => empty($v);
         $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
@@ -119,7 +115,7 @@ class ExprBuilder
      */
     public function ifArray(): static
     {
-        $this->ifPart = static function ($v) { return \is_array($v); };
+        $this->ifPart = \is_array(...);
         $this->allowedTypes = self::TYPE_ARRAY;
 
         return $this;
@@ -132,7 +128,7 @@ class ExprBuilder
      */
     public function ifInArray(array $array): static
     {
-        $this->ifPart = static function ($v) use ($array) { return \in_array($v, $array, true); };
+        $this->ifPart = static fn ($v) => \in_array($v, $array, true);
         $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
@@ -145,7 +141,7 @@ class ExprBuilder
      */
     public function ifNotInArray(array $array): static
     {
-        $this->ifPart = static function ($v) use ($array) { return !\in_array($v, $array, true); };
+        $this->ifPart = static fn ($v) => !\in_array($v, $array, true);
         $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
@@ -158,9 +154,9 @@ class ExprBuilder
      */
     public function castToArray(): static
     {
-        $this->ifPart = static function ($v) { return !\is_array($v); };
+        $this->ifPart = static fn ($v) => !\is_array($v);
         $this->allowedTypes = self::TYPE_ANY;
-        $this->thenPart = static function ($v) { return [$v]; };
+        $this->thenPart = static fn ($v) => [$v];
 
         return $this;
     }
@@ -184,7 +180,7 @@ class ExprBuilder
      */
     public function thenEmptyArray(): static
     {
-        $this->thenPart = static function () { return []; };
+        $this->thenPart = static fn () => [];
 
         return $this;
     }
@@ -200,7 +196,7 @@ class ExprBuilder
      */
     public function thenInvalid(string $message): static
     {
-        $this->thenPart = static function ($v) use ($message) { throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
+        $this->thenPart = static fn ($v) => throw new \InvalidArgumentException(sprintf($message, json_encode($v)));
 
         return $this;
     }
@@ -214,7 +210,7 @@ class ExprBuilder
      */
     public function thenUnset(): static
     {
-        $this->thenPart = static function () { throw new UnsetKeyException('Unsetting key.'); };
+        $this->thenPart = static fn () => throw new UnsetKeyException('Unsetting key.');
 
         return $this;
     }
@@ -247,9 +243,7 @@ class ExprBuilder
             if ($expr instanceof self) {
                 $if = $expr->ifPart;
                 $then = $expr->thenPart;
-                $expressions[$k] = static function ($v) use ($if, $then) {
-                    return $if($v) ? $then($v) : $v;
-                };
+                $expressions[$k] = static fn ($v) => $if($v) ? $then($v) : $v;
             }
         }
 

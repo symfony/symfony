@@ -168,9 +168,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function removeCookie(string $name, ?string $path = '/', string $domain = null)
     {
-        if (null === $path) {
-            $path = '/';
-        }
+        $path ??= '/';
 
         unset($this->cookies[$domain][$path][$name]);
 

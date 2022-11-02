@@ -348,11 +348,7 @@ class YamlFileLoader extends FileLoader
             $service = ['arguments' => $service];
         }
 
-        if (null === $service) {
-            $service = [];
-        }
-
-        if (!\is_array($service)) {
+        if (!\is_array($service ??= [])) {
             throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but "%s" found for service "%s" in "%s". Check your YAML syntax.', get_debug_type($service), $id, $file));
         }
 

@@ -184,10 +184,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
 
     public function refresh(float $ttl = null)
     {
-        if (null === $ttl) {
-            $ttl = $this->ttl;
-        }
-        if (!$ttl) {
+        if (!$ttl ??= $this->ttl) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
         }
 

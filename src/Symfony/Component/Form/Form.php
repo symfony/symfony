@@ -488,11 +488,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             // since forms without children may also be compound.
             // (think of empty collection forms)
             if ($this->config->getCompound()) {
-                if (null === $submittedData) {
-                    $submittedData = [];
-                }
-
-                if (!\is_array($submittedData)) {
+                if (!\is_array($submittedData ??= [])) {
                     throw new TransformationFailedException('Compound forms expect an array or NULL on submission.');
                 }
 

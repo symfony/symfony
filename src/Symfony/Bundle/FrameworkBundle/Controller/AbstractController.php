@@ -251,10 +251,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
         $content = $this->renderView($view, $parameters);
-
-        if (null === $response) {
-            $response = new Response();
-        }
+        $response ??= new Response();
 
         if (200 === $response->getStatusCode()) {
             foreach ($parameters as $v) {

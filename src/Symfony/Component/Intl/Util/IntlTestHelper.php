@@ -32,9 +32,7 @@ class IntlTestHelper
      */
     public static function requireIntl(TestCase $testCase, string $minimumIcuVersion = null)
     {
-        if (null === $minimumIcuVersion) {
-            $minimumIcuVersion = Intl::getIcuStubVersion();
-        }
+        $minimumIcuVersion ??= Intl::getIcuStubVersion();
 
         // We only run tests if the version is *one specific version*.
         // This condition is satisfied if

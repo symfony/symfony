@@ -319,9 +319,7 @@ class StoreTest extends TestCase
 
     protected function storeSimpleEntry($path = null, $headers = [])
     {
-        if (null === $path) {
-            $path = '/test';
-        }
+        $path ??= '/test';
 
         $this->request = Request::create($path, 'get', [], [], [], $headers);
         $this->response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);

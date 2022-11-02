@@ -66,9 +66,7 @@ class RememberMeListenerTest extends TestCase
 
     private function createLoginSuccessfulEvent(Passport $passport = null)
     {
-        if (null === $passport) {
-            $passport = $this->createPassport();
-        }
+        $passport ??= $this->createPassport();
 
         return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
     }

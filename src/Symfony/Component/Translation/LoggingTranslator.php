@@ -96,9 +96,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
      */
     private function log(string $id, ?string $domain, ?string $locale)
     {
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        $domain ??= 'messages';
 
         $catalogue = $this->translator->getCatalogue($locale);
         if ($catalogue->defines($id, $domain)) {

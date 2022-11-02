@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-11-02T16:06:06Z
+
+This fixes the deprecation warnings for https://github.blog/changelog/2022-09-22-github-actions-all-actions-will-begin-running-on-node16-instead-of-node12/
+
+But we also need to account for https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/ (maybe separately, as it is about updating different parts of the config)

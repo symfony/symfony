@@ -4,6 +4,8 @@ CHANGELOG
 6.2
 ---
 
+ * Add `File`
+ * Deprecate `Email::attachPart()`, use `addPart()` instead
  * Deprecate calling `Message::setBody()` without arguments
 
 6.1

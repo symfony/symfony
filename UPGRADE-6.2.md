@@ -66,6 +66,7 @@ Mailer
 Mime
 ----
 
+ * Deprecate `Email::attachPart()`, use `addPart()` instead
  * Deprecate calling `Message::setBody()` without arguments
 
 PropertyAccess

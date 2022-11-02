@@ -82,7 +82,7 @@
     <fieldset{% with {attr: row_attr|merge({class: row_attr.class|default('mb-3')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="row{% if (not compound or force_error|default(false)) and not valid %} is-invalid{% endif %}">
             {{- form_label(form) -}}
-            <div class="{{ block('form_group_class')  ~ ' ' ~ block('form_label_offset_class') }}">
+            <div class="{{ block('form_group_class') ~ (label is same as(false) ? ' ' ~ block('form_label_offset_class') ) }}">
                 {{- form_widget(form, widget_attr) -}}
                 {{- form_help(form) -}}
                 {{- form_errors(form) -}}

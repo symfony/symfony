@@ -23,12 +23,6 @@ class IsJsonRequestMatcher implements RequestMatcherInterface
 {
     public function matches(Request $request): bool
     {
-        try {
-            json_decode($request->getContent(), true, 512, \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            return false;
-        }
-
-        return true;
+        return json_validate($request->getContent());
     }
 }

@@ -63,13 +63,8 @@ class IsGrantedAttributeMethodsController
     {
     }
 
-    #[IsGranted(attribute: 'SOME_VOTER', subject: 'request')]
-    public function withRequestAsSubjectAndNoArgument()
-    {
-    }
-
-    #[IsGranted(attribute: 'SOME_VOTER', subject: 'request')]
-    public function withRequestAsSubjectAndArgument($request)
+    #[IsGranted(attribute: 'SOME_VOTER', subject: new Expression('request'))]
+    public function withRequestAsSubject()
     {
     }
 }

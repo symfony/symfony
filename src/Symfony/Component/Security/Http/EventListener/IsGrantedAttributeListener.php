@@ -92,9 +92,6 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
         }
 
         if (!\array_key_exists($subjectRef, $arguments)) {
-            if ('request' === $subjectRef) {
-                return $request;
-            }
             throw new RuntimeException(sprintf('Could not find the subject "%s" for the #[IsGranted] attribute. Try adding a "$%s" argument to your controller method.', $subjectRef, $subjectRef));
         }
 

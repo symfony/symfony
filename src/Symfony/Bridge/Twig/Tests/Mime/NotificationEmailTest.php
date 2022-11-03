@@ -46,6 +46,7 @@ class NotificationEmailTest extends TestCase
             ->importance(NotificationEmail::IMPORTANCE_HIGH)
             ->action('Bar', 'http://example.com/')
             ->context(['a' => 'b'])
+            ->theme('example')
         ));
         $this->assertEquals([
             'importance' => NotificationEmail::IMPORTANCE_HIGH,
@@ -57,6 +58,8 @@ class NotificationEmailTest extends TestCase
             'raw' => true,
             'a' => 'b',
         ], $email->getContext());
+
+        $this->assertSame('@email/example/notification/body.html.twig', $email->getHtmlTemplate());
     }
 
     public function testTheme()

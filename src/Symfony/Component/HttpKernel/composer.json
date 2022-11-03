@@ -26,6 +26,7 @@
     },
     "require-dev": {
         "symfony/browser-kit": "^5.4|^6.0",
+        "symfony/clock": "^6.2",
         "symfony/config": "^6.1",
         "symfony/console": "^5.4|^6.0",
         "symfony/css-selector": "^5.4|^6.0",

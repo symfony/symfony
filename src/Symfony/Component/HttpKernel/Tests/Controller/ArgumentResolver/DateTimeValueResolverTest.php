@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapDateTime;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
@@ -34,9 +35,12 @@ class DateTimeValueResolverTest extends TestCase
 
     public static function getTimeZones()
     {
-        yield ['UTC'];
-        yield ['Etc/GMT+9'];
-        yield ['Etc/GMT-14'];
+        yield ['UTC', false];
+        yield ['Etc/GMT+9', false];
+        yield ['Etc/GMT-14', false];
+        yield ['UTC', true];
+        yield ['Etc/GMT+9', true];
+        yield ['Etc/GMT-14', true];
     }
 
     public static function getClasses()
@@ -78,10 +82,10 @@ class DateTimeValueResolverTest extends TestCase
     /**
      * @dataProvider getTimeZones
      */
-    public function testFullDate(string $timezone)
+    public function testFullDate(string $timezone, bool $withClock)
     {
         date_default_timezone_set($timezone);
-        $resolver = new DateTimeValueResolver();
+        $resolver = new DateTimeValueResolver($withClock ? new MockClock() : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00']);
@@ -97,10 +101,10 @@ class DateTimeValueResolverTest extends TestCase
     /**
      * @dataProvider getTimeZones
      */
-    public function testUnixTimestamp(string $timezone)
+    public function testUnixTimestamp(string $timezone, bool $withClock)
     {
         date_default_timezone_set($timezone);
-        $resolver = new DateTimeValueResolver();
+        $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '989541720']);
@@ -127,21 +131,46 @@ class DateTimeValueResolverTest extends TestCase
     }
 
     /**
-     * @dataProvider getTimeZones
+     * @param class-string<\DateTimeInterface> $class
+     *
+     * @dataProvider getClasses
      */
-    public function testNow(string $timezone)
+    public function testNow(string $class)
     {
-        date_default_timezone_set($timezone);
+        date_default_timezone_set($timezone = 'Etc/GMT+9');
         $resolver = new DateTimeValueResolver();
 
-        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null, false);
+        $argument = new ArgumentMetadata('dummy', $class, false, false, null, false);
         $request = self::requestWithAttributes(['dummy' => null]);
 
         $results = $resolver->resolve($request, $argument);
 
         $this->assertCount(1, $results);
-        $this->assertEquals('0', $results[0]->diff(new \DateTimeImmutable())->format('%s'));
+        $this->assertInstanceOf($class, $results[0]);
         $this->assertSame($timezone, $results[0]->getTimezone()->getName(), 'Default timezone');
+        $this->assertEquals('0', $results[0]->diff(new \DateTimeImmutable())->format('%s'));
+    }
+
+    /**
+     * @param class-string<\DateTimeInterface> $class
+     *
+     * @dataProvider getClasses
+     */
+    public function testNowWithClock(string $class)
+    {
+        date_default_timezone_set('Etc/GMT+9');
+        $clock = new MockClock('2022-02-20 22:20:02');
+        $resolver = new DateTimeValueResolver($clock);
+
+        $argument = new ArgumentMetadata('dummy', $class, false, false, null, false);
+        $request = self::requestWithAttributes(['dummy' => null]);
+
+        $results = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $results);
+        $this->assertInstanceOf($class, $results[0]);
+        $this->assertSame('UTC', $results[0]->getTimezone()->getName(), 'Default timezone');
+        $this->assertEquals($clock->now(), $results[0]);
     }
 
     /**
@@ -181,10 +210,10 @@ class DateTimeValueResolverTest extends TestCase
     /**
      * @dataProvider getTimeZones
      */
-    public function testDateTimeImmutable(string $timezone)
+    public function testDateTimeImmutable(string $timezone, bool $withClock)
     {
         date_default_timezone_set($timezone);
-        $resolver = new DateTimeValueResolver();
+        $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '2016-09-08 00:00:00 +05:00']);
@@ -200,10 +229,10 @@ class DateTimeValueResolverTest extends TestCase
     /**
      * @dataProvider getTimeZones
      */
-    public function testWithFormat(string $timezone)
+    public function testWithFormat(string $timezone, bool $withClock)
     {
         date_default_timezone_set($timezone);
-        $resolver = new DateTimeValueResolver();
+        $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeInterface::class, false, false, null, false, [
             MapDateTime::class => new MapDateTime('m-d-y H:i:s'),

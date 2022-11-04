@@ -13,12 +13,12 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeController;
@@ -363,7 +363,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedWithRequestAsSubjectAndNoArgument()
+    public function testIsGrantedWithRequestAsSubject()
     {
         $request = new Request();
 
@@ -375,33 +375,13 @@ class IsGrantedAttributeListenerTest extends TestCase
 
         $event = new ControllerArgumentsEvent(
             $this->createMock(HttpKernelInterface::class),
-            [new IsGrantedAttributeMethodsController(), 'withRequestAsSubjectAndNoArgument'],
+            [new IsGrantedAttributeMethodsController(), 'withRequestAsSubject'],
             [],
             $request,
             null
         );
 
-        $listener = new IsGrantedAttributeListener($authChecker);
-        $listener->onKernelControllerArguments($event);
-    }
-
-    public function testIsGrantedWithRequestAsSubjectAndArgument()
-    {
-        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authChecker->expects($this->once())
-            ->method('isGranted')
-            ->with('SOME_VOTER', 'foobar')
-            ->willReturn(true);
-
-        $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
-            [new IsGrantedAttributeMethodsController(), 'withRequestAsSubjectAndArgument'],
-            ['foobar'],
-            new Request(),
-            null
-        );
-
-        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage());
         $listener->onKernelControllerArguments($event);
     }
 }

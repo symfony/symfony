@@ -74,6 +74,10 @@ class IpUtilsTest extends TestCase
             [false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'],
             [false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'],
             [false, '', '::1'],
+            [false, '127.0.0.1', '::1'],
+            [false, '0.0.0.0/8', '::1'],
+            [false,  '::1', '127.0.0.1'],
+            [false,  '::1', '0.0.0.0/8'],
         ];
     }
 

@@ -129,7 +129,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 foreach ($instanceofTags[$i] as $k => $v) {
                     if (null === $definition->getDecoratedService() || \in_array($k, $tagsToKeep, true)) {
                         foreach ($v as $v) {
-                            if ($definition->hasTag($k) && \in_array($v, $definition->getTag($k))) {
+                            if ($definition->hasTag($k) && (!$v || \in_array($v, $definition->getTag($k)))) {
                                 continue;
                             }
                             $definition->addTag($k, $v);

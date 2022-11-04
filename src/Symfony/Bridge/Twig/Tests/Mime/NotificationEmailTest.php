@@ -47,6 +47,7 @@ class NotificationEmailTest extends TestCase
             ->importance(NotificationEmail::IMPORTANCE_HIGH)
             ->action('Bar', 'http://example.com/')
             ->context(['a' => 'b'])
+            ->theme('example')
         ));
         $this->assertEquals([
             'importance' => NotificationEmail::IMPORTANCE_HIGH,
@@ -59,6 +60,8 @@ class NotificationEmailTest extends TestCase
             'a' => 'b',
             'footer_text' => 'Notification e-mail sent by Symfony',
         ], $email->getContext());
+
+        $this->assertSame('@email/example/notification/body.html.twig', $email->getHtmlTemplate());
     }
 
     public function testTheme()

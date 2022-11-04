@@ -254,12 +254,17 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
                 $body->seek(0);
             }
 
-            return $this->client->request($request->getMethod(), (string) $request->getUri(), [
+            $options = [
                 'headers' => $request->getHeaders(),
                 'body' => $body->getContents(),
-                'http_version' => '1.0' === $request->getProtocolVersion() ? '1.0' : null,
                 'buffer' => $buffer,
-            ]);
+            ];
+
+            if ('1.0' === $request->getProtocolVersion()) {
+                $options['http_version'] = '1.0';
+            }
+
+            return $this->client->request($request->getMethod(), (string) $request->getUri(), $options);
         } catch (\InvalidArgumentException $e) {
             throw new RequestException($e->getMessage(), $request, $e);
         } catch (TransportExceptionInterface $e) {

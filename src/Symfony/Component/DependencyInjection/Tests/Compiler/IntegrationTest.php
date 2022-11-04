@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -152,7 +153,7 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
 
-    public function testCanDecorateServiceSubscriber()
+    public function testCanDecorateServiceSubscriberUsingBinding()
     {
         $container = new ContainerBuilder();
         $container->register(ServiceSubscriberStub::class)
@@ -160,11 +161,33 @@ class IntegrationTest extends TestCase
             ->setPublic(true);
 
         $container->register(DecoratedServiceSubscriber::class)
+            ->setProperty('inner', new Reference(DecoratedServiceSubscriber::class.'.inner'))
             ->setDecoratedService(ServiceSubscriberStub::class);
 
         $container->compile();
 
         $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+        $this->assertInstanceOf(ServiceSubscriberStub::class, $container->get(ServiceSubscriberStub::class)->inner);
+        $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
+    }
+
+    public function testCanDecorateServiceSubscriberReplacingArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(ServiceSubscriberStub::class)
+            ->setArguments([new Reference(ContainerInterface::class)])
+            ->addTag('container.service_subscriber')
+            ->setPublic(true);
+
+        $container->register(DecoratedServiceSubscriber::class)
+            ->setProperty('inner', new Reference(DecoratedServiceSubscriber::class.'.inner'))
+            ->setDecoratedService(ServiceSubscriberStub::class);
+
+        $container->compile();
+
+        $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+        $this->assertInstanceOf(ServiceSubscriberStub::class, $container->get(ServiceSubscriberStub::class)->inner);
+        $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
     }
 
     public function testCanDecorateServiceLocator()
@@ -826,6 +849,7 @@ class IntegrationTest extends TestCase
                 $definition->addTag('app.custom_tag', get_object_vars($attribute) + ['class' => $reflector->getName()]);
             }
         );
+        $container->registerForAutoconfiguration(TaggedService1::class)->addTag('app.custom_tag');
 
         $container->register('one', TaggedService1::class)
             ->setPublic(true)
@@ -1043,6 +1067,13 @@ class IntegrationTest extends TestCase
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface
 {
+    public $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public static function getSubscribedServices(): array
     {
         return [];
@@ -1051,6 +1082,7 @@ class ServiceSubscriberStub implements ServiceSubscriberInterface
 
 class DecoratedServiceSubscriber
 {
+    public $inner;
 }
 
 class DecoratedServiceLocator implements ServiceProviderInterface

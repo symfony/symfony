@@ -29,12 +29,12 @@ jobs:
           coverage: none
 
       - name: Checkout target branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.base_ref }}
 
       - name: Checkout PR
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |

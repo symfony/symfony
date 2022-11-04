@@ -266,8 +266,8 @@ abstract class AbstractDoctrineExtension extends Extension
             }
             $container->fileExists($resource, false);
 
-            if ($container->fileExists($dir.'/'.$this->getMappingObjectDefaultName(), false)) {
-                return $this->detectMappingType($dir, $container);
+            if ($container->fileExists($discoveryPath = $dir.'/'.$this->getMappingObjectDefaultName(), false)) {
+                return $this->detectMappingType($discoveryPath, $container);
             }
 
             return null;

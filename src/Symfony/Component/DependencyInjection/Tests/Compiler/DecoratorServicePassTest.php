@@ -249,7 +249,7 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setTags(['container.service_subscriber' => [], 'bar' => ['attr' => 'baz']])
+            ->setTags(['container.service_subscriber' => [], 'container.service_subscriber.locator' => [], 'bar' => ['attr' => 'baz']])
         ;
         $container
             ->register('baz')
@@ -259,7 +259,7 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(['container.service_subscriber' => []], $container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals(['container.service_subscriber' => [], 'container.service_subscriber.locator' => []], $container->getDefinition('baz.inner')->getTags());
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
     }
 

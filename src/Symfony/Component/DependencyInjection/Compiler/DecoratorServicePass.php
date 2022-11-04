@@ -42,7 +42,7 @@ class DecoratorServicePass implements CompilerPassInterface
 
         $tagsToKeep = $container->hasParameter('container.behavior_describing_tags')
             ? $container->getParameter('container.behavior_describing_tags')
-            : ['container.do_not_inline', 'container.service_locator', 'container.service_subscriber'];
+            : ['container.do_not_inline', 'container.service_locator', 'container.service_subscriber', 'container.service_subscriber.locator'];
 
         foreach ($definitions as [$id, $definition]) {
             $decoratedService = $definition->getDecoratedService();

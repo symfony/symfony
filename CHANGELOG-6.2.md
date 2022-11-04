@@ -12,7 +12,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #48020 [FrameworkBundle] add router cache directory option to XML schema (xabbuh)
  * feature #47976 Add padding to HIBP check (rullzer)
  * bug #47990 [HttpClient] Fix retrying requests when the content is used by the strategy (nicolas-grekas)
- * bug #48005 [ErrorHandler] s/</br>/<br> (PhilETaylor)
+ * bug #48005 [ErrorHandler] s/\</br\>/\<br\> (PhilETaylor)
  * bug #47907 [Console] Update Application.php (aleksandr-shevchenko)
  * bug #47992 [Mailer] Fix BC breaking event name change (chalasr)
 

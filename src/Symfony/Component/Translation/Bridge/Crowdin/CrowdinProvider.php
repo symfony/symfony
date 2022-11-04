@@ -110,7 +110,6 @@ final class CrowdinProvider implements ProviderInterface
         $fileList = $this->getFileList();
 
         $translatorBag = new TranslatorBag();
-        $responses = [];
 
         foreach ($domains as $domain) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
@@ -126,45 +125,36 @@ final class CrowdinProvider implements ProviderInterface
                     $response = $this->downloadSourceFile($fileId);
                 }
 
-                $responses[] = [$response, $locale, $domain];
-            }
-        }
+                if (204 === $response->getStatusCode()) {
+                    $this->logger->error(sprintf('No content in exported file: "%s".', $response->getContent(false)));
 
-        /* @var ResponseInterface $response */
-        $downloads = [];
-        foreach ($responses as [$response, $locale, $domain]) {
-            if (204 === $response->getStatusCode()) {
-                $this->logger->error(sprintf('No content in exported file: "%s".', $response->getContent(false)));
-
-                continue;
-            }
-
-            if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(sprintf('Unable to export file: "%s".', $response->getContent(false)));
-
-                if (500 <= $statusCode) {
-                    throw new ProviderException('Unable to export file.', $response);
+                    continue;
                 }
 
-                continue;
-            }
+                if (200 !== $statusCode = $response->getStatusCode()) {
+                    $this->logger->error(sprintf('Unable to export file: "%s".', $response->getContent(false)));
 
-            $response = $this->client->request('GET', $response->toArray()['data']['url']);
-            $downloads[] = [$response, $locale, $domain];
-        }
+                    if (500 <= $statusCode) {
+                        throw new ProviderException('Unable to export file.', $response);
+                    }
 
-        foreach ($downloads as [$response, $locale, $domain]) {
-            if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(sprintf('Unable to download file content: "%s".', $response->getContent(false)));
-
-                if (500 <= $statusCode) {
-                    throw new ProviderException('Unable to download file content.', $response);
+                    continue;
                 }
 
-                continue;
-            }
+                $response = $this->client->request('GET', $response->toArray()['data']['url']);
 
-            $translatorBag->addCatalogue($this->loader->load($response->getContent(), $locale, $domain));
+                if (200 !== $statusCode = $response->getStatusCode()) {
+                    $this->logger->error(sprintf('Unable to download file content: "%s".', $response->getContent(false)));
+
+                    if (500 <= $statusCode) {
+                        throw new ProviderException('Unable to download file content.', $response);
+                    }
+
+                    continue;
+                }
+
+                $translatorBag->addCatalogue($this->loader->load($response->getContent(), $locale, $domain));
+            }
         }
 
         return $translatorBag;

@@ -106,7 +106,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install system dependencies
         run: |
@@ -135,7 +135,7 @@ jobs:
         with:
           coverage: "none"
           extensions: "json,couchbase-3.2.2,memcached,mongodb-1.12.0,redis,rdkafka,xsl,ldap"
-          ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
+          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           tools: pecl
 

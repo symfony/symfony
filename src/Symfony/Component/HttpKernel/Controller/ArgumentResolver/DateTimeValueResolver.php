@@ -60,8 +60,6 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
             $format = $attribute->format;
         }
 
-        $date = false;
-
         if (null !== $format) {
             $date = $class::createFromFormat($format, $value);
 
@@ -73,7 +71,7 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
                 $value = '@'.$value;
             }
             try {
-                $date = new $class($value);
+                $date = new $class($value ?? 'now');
             } catch (\Exception) {
                 $date = false;
             }

@@ -41,4 +41,12 @@ class ResponseCookieValueSameTest extends TestCase
 
         $this->fail();
     }
+
+    public function testCookieWithNullValueIsComparedAsEmptyString()
+    {
+        $response = new Response();
+        $response->headers->setCookie(Cookie::create('foo', null, 0, '/path'));
+
+        $this->assertTrue((new ResponseCookieValueSame('foo', '', '/path'))->evaluate($response, '', true));
+    }
 }

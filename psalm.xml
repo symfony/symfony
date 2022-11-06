@@ -16,6 +16,7 @@
             <directory name="src/Symfony/*/*/*/*/Tests" />
             <directory name="src/Symfony/Component/Intl/Resources/emoji/" />
             <directory name="vendor" />
+            <file name=".phpstorm.meta.php" />
         </ignoreFiles>
     </projectFiles>
 

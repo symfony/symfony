@@ -64,6 +64,10 @@ class Dumper
                     $output .= "\n";
                 }
 
+                if (\is_int($key) && Yaml::DUMP_NUMERIC_KEY_AS_STRING & $flags) {
+                    $key = (string) $key;
+                }
+
                 if (Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value) && str_contains($value, "\n") && !str_contains($value, "\r")) {
                     // If the first line starts with a space character, the spec requires a blockIndicationIndicator
                     // http://www.yaml.org/spec/1.2/spec.html#id2793979

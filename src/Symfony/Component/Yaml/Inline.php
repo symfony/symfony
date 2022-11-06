@@ -239,6 +239,10 @@ class Inline
     {
         $output = [];
         foreach ($value as $key => $val) {
+            if (\is_int($key) && Yaml::DUMP_NUMERIC_KEY_AS_STRING & $flags) {
+                $key = (string) $key;
+            }
+
             $output[] = sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
         }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Psr\Container\ContainerInterface;
+use Psr\Link\EvolvableLinkInterface;
 use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -42,6 +43,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
@@ -92,6 +94,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
+            'web_link.http_header_serializer' => '?'.HttpHeaderSerializer::class,
         ];
     }
 
@@ -401,5 +404,31 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         $request->attributes->set('_links', $linkProvider->withLink($link));
+    }
+
+    /**
+     * @param LinkInterface[] $links
+     */
+    protected function sendEarlyHints(iterable $links, Response $response = null): Response
+    {
+        if (!$this->container->has('web_link.http_header_serializer')) {
+            throw new \LogicException('You cannot use the "sendEarlyHints" method if the WebLink component is not available. Try running "composer require symfony/web-link".');
+        }
+
+        $response ??= new Response();
+
+        $populatedLinks = [];
+        foreach ($links as $link) {
+            if ($link instanceof EvolvableLinkInterface && !$link->getRels()) {
+                $link = $link->withRel('preload');
+            }
+
+            $populatedLinks[] = $link;
+        }
+
+        $response->headers->set('Link', $this->container->get('web_link.http_header_serializer')->serialize($populatedLinks), false);
+        $response->sendHeaders(103);
+
+        return $response;
     }
 }

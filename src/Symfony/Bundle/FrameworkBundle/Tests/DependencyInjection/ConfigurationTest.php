@@ -365,6 +365,31 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testLockCanBeDisabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [
+            ['lock' => ['enabled' => false]],
+        ]);
+
+        $this->assertFalse($config['lock']['enabled']);
+    }
+
+    public function testEnabledLockNeedsResources()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
+
+        $processor->processConfiguration($configuration, [
+            ['lock' => ['enabled' => true]],
+        ]);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

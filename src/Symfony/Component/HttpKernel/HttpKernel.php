@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\RequestRouteEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -137,6 +138,14 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         // request
         $event = new RequestEvent($this, $request, $type);
         $this->dispatcher->dispatch($event, KernelEvents::REQUEST);
+
+        if ($event->hasResponse()) {
+            return $this->filterResponse($event->getResponse(), $request, $type);
+        }
+
+        // request route
+        $event = new RequestRouteEvent($this, $request, $type);
+        $this->dispatcher->dispatch($event, KernelEvents::REQUEST_ROUTE);
 
         if ($event->hasResponse()) {
             return $this->filterResponse($event->getResponse(), $request, $type);

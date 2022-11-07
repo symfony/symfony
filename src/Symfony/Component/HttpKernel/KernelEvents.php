@@ -39,6 +39,16 @@ final class KernelEvents
     public const REQUEST = 'kernel.request';
 
     /**
+     * The REQUEST_ROUTE event occurs after the request route has been matched and found.
+     *
+     * This event allows you to create a dedicated response for a specific request route
+     * before any other code in the framework is executed.
+     *
+     * @Event("Symfony\Component\HttpKernel\Event\RequestRouteEvent")
+     */
+    public const REQUEST_ROUTE = 'kernel.request_route';
+
+    /**
      * The EXCEPTION event occurs when an uncaught exception appears.
      *
      * This event allows you to create a response for a thrown exception or

@@ -4,7 +4,7 @@
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->
-| Tickets       | Fix #... <!-- prefix each issue number with "Fix #", no need to create an issue if none exist, explain below instead -->
+| Tickets       | Fix #... <!-- prefix each issue number with "Fix #", no need to create an issue if none exists, explain below instead -->
 | License       | MIT
 | Doc PR        | symfony/symfony-docs#... <!-- required for new features -->
 <!--

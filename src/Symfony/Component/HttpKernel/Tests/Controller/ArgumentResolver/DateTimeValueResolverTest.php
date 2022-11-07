@@ -119,6 +119,26 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertNull($results[0]);
     }
 
+    /**
+     * @dataProvider getTimeZones
+     */
+    public function testNow(string $timezone)
+    {
+        date_default_timezone_set($timezone);
+        $resolver = new DateTimeValueResolver();
+
+        $argument = new ArgumentMetadata('dummy', \DateTime::class, false, false, null, false);
+        $request = self::requestWithAttributes(['dummy' => null]);
+
+        /** @var \Generator $results */
+        $results = $resolver->resolve($request, $argument);
+        $results = iterator_to_array($results);
+
+        $this->assertCount(1, $results);
+        $this->assertEquals('0', $results[0]->diff(new \DateTimeImmutable())->format('%s'));
+        $this->assertSame($timezone, $results[0]->getTimezone()->getName(), 'Default timezone');
+    }
+
     public function testPreviouslyConvertedAttribute()
     {
         $resolver = new DateTimeValueResolver();

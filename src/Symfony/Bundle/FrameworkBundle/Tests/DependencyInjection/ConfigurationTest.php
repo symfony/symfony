@@ -433,7 +433,10 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
 
         $config = $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => false]],
+            [
+                'http_method_override' => false,
+                'lock' => ['enabled' => false],
+            ],
         ]);
 
         $this->assertFalse($config['lock']['enabled']);
@@ -448,7 +451,10 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
 
         $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => true]],
+            [
+                'http_method_override' => false,
+                'lock' => ['enabled' => true],
+            ],
         ]);
     }
 

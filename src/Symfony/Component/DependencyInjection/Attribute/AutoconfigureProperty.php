@@ -11,21 +11,15 @@
 
 namespace Symfony\Component\DependencyInjection\Attribute;
 
-use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\ExpressionLanguage\Expression;
-
 /**
- * Attribute to tell a parameter how to be autowired.
+ * An attribute to tell how a property is to be set.
  *
- * @author Kevin Bond <kevinbond@gmail.com>
+ * @author Aleksey Polyvanyi <aleksey.polyvanyi@eonx.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
-class Autowire
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+class AutoconfigureProperty extends Autoconfigure
 {
     use Traits\ValueTrait;
-
-    public readonly string|array|Expression|Reference $value;
 
     /**
      * Use only ONE of the following.
@@ -37,12 +31,18 @@ class Autowire
      * @param string|null       $param      Parameter name (ie 'some.parameter.name')
      */
     public function __construct(
+        string $name,
         string|array $value = null,
         string $service = null,
         string $expression = null,
         string $env = null,
         string $param = null,
-    ) {
-        $this->value = $this->normalizeValue($value, $service, $expression, $env, $param);
+    )
+    {
+        parent::__construct(
+            properties: [
+                $name => $this->normalizeValue($value, $service, $expression, $env, $param),
+            ]
+        );
     }
 }

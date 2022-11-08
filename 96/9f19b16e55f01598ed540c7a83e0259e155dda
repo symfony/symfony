@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-02T17:36:28Z
+
+Tests please. 🤓
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-02T17:37:31Z
+
+@derrabus okay, wasn’t sure because in the end an exception would be thrown anyway!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-02T18:56:30Z
+
+> in the end an exception would be thrown anyway!
+
+Doesn't matter. If we feel like this issue is a bug is worth fixing, we should have tests that make sure it stays fixed.

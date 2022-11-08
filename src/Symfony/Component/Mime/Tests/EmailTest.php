@@ -483,6 +483,7 @@ class EmailTest extends TestCase
         $name = __DIR__.'/Fixtures/mimetypes/test';
         $file = fopen($name, 'r');
         $e->addPart(new DataPart($file, 'test'));
+        $e->attachFromPath($name, 'same_test');
         $expected = clone $e;
         $n = unserialize(serialize($e));
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());

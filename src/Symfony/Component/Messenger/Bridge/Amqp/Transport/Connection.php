@@ -65,6 +65,7 @@ class Connection
         'binding_arguments',
         'flags',
         'arguments',
+        'arguments_delay',
     ];
 
     private const AVAILABLE_EXCHANGE_OPTIONS = [
@@ -388,7 +389,8 @@ class Connection
         $queue = $this->amqpFactory->createQueue($this->channel());
         $queue->setName($this->getRoutingKeyForDelay($delay, $routingKey, $isRetryAttempt));
         $queue->setFlags(\AMQP_DURABLE);
-        $queue->setArguments([
+
+        $arguments = [
             'x-message-ttl' => $delay,
             // delete the delay queue 10 seconds after the message expires
             // publishing another message redeclares the queue which renews the lease
@@ -399,7 +401,13 @@ class Connection
             // after being released from to DLX, make sure the original routing key will be used
             // we must use an empty string instead of null for the argument to be picked up
             'x-dead-letter-routing-key' => $routingKey ?? '',
-        ]);
+        ];
+
+        if (!empty($this->queuesOptions[$routingKey]['arguments_delay'])) {
+            $arguments = array_merge($this->queuesOptions[$routingKey]['arguments_delay'], $arguments);
+        }
+
+        $queue->setArguments($arguments);
 
         return $queue;
     }

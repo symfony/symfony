@@ -7,6 +7,7 @@ CHANGELOG
  * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs
  * Automatically resolve handled message type when method different from `__invoke` is used as handler
  * Allow `#[AsMessageHandler]` attribute on methods
+ * Add config option `arguments_delay` for delay queues
 
 6.0
 ---

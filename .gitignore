@@ -8,3 +8,6 @@ composer.phar
 package.tar
 /packages.json
 /.phpunit
+.idea
+phpunit.stderr
+phpunit.stdout

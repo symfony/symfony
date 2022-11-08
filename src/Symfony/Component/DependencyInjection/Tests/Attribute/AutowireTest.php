@@ -19,11 +19,14 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AutowireTest extends TestCase
 {
-    public function testCanOnlySetOneParameter()
+    /**
+     * @dataProvider provideMultipleParameters
+     */
+    public function testCanOnlySetOneParameter(array $parameters)
     {
         $this->expectException(LogicException::class);
 
-        new Autowire(service: 'id', expression: 'expr');
+        new Autowire(...$parameters);
     }
 
     public function testMustSetOneParameter()
@@ -56,5 +59,27 @@ class AutowireTest extends TestCase
     public function testCanUseValueWithAtAndEqualSign()
     {
         $this->assertInstanceOf(Expression::class, (new Autowire(value: '@=service'))->value);
+    }
+
+    public function testCanUseEnv()
+    {
+        $this->assertSame('%env(SOME_ENV_VAR)%', (new Autowire(env: 'SOME_ENV_VAR'))->value);
+    }
+
+    public function testCanUseParam()
+    {
+        $this->assertSame('%some.param%', (new Autowire(param: 'some.param'))->value);
+    }
+
+    /**
+     * @see testCanOnlySetOneParameter
+     */
+    private function provideMultipleParameters(): iterable
+    {
+        yield [['service' => 'id', 'expression' => 'expr']];
+
+        yield [['env' => 'ENV', 'param' => 'param']];
+
+        yield [['value' => 'some-value', 'expression' => 'expr']];
     }
 }

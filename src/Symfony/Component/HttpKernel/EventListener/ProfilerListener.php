@@ -97,7 +97,7 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
-        $session = $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
+        $session = $request->hasPreviousSession() ? $request->getSession() : null;
 
         if ($session instanceof Session) {
             $usageIndexValue = $usageIndexReference = &$session->getUsageIndex();

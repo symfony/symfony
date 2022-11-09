@@ -39,7 +39,7 @@ class SessionStrategyListener implements EventSubscriberInterface
         $request = $event->getRequest();
         $token = $event->getAuthenticatedToken();
 
-        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+        if (!$request->hasPreviousSession()) {
             return;
         }
 

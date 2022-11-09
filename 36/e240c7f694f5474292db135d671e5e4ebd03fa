@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-10-27T13:13:20Z
+
+Do we need to add the changed file in the list of excluded classes in `patch-types.php`?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-10-27T13:16:10Z
+
+indeed, we should (and ideally, we should update the patcher to account for `@template`)
+
+---------------------------------------------------------------------------
+
+by stof at 2022-10-27T13:34:59Z
+
+Looking at it, the patcher handles template type only when the method has a native return type.
+
+Maybe this should be typed like that for now, to account for adding a native return type in Symfony 7.0:
+
+```php
+    /**
+     * @return ConstraintValidatorInterface
+     * @psalm-return T
+     */
+    abstract protected function createValidator();
+```
+
+This way, in 7.0, we can add `ConstraintValidatorInterface` as a native return type (and switch to `@return T` for the template).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-28T16:19:41Z
+
+@stof that'd make sense to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-02T15:25:37Z
+
+I updated the PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-02T16:22:12Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-08T15:16:40Z
+
+@nicolas-grekas The rebase is done

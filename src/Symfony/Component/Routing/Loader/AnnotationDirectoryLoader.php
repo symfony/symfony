@@ -51,9 +51,9 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
                 continue;
             }
 
-            if ($class = $this->findClass($file)) {
-                $refl = new \ReflectionClass($class);
-                if ($refl->isAbstract()) {
+            if ($className = $this->findClass($file)) {
+                $class = new \ReflectionClass($className);
+                if ($class->isAbstract()) {
                     continue;
                 }
 

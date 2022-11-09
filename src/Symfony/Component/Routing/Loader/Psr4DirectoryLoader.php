@@ -87,7 +87,12 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
                 continue;
             }
 
-            $collection->addCollection($this->import($className, 'attribute'));
+            $class = new \ReflectionClass($className);
+            if ($class->isAbstract()) {
+                continue;
+            }
+
+            $collection->addCollection($this->import($class, 'attribute'));
         }
 
         return $collection;

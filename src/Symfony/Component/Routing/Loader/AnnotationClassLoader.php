@@ -106,11 +106,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     public function load(mixed $class, string $type = null): RouteCollection
     {
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+        if (!$class instanceof \ReflectionClass) {
+            if (!class_exists($class)) {
+                throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+            }
+
+            $class = new \ReflectionClass($class);
         }
 
-        $class = new \ReflectionClass($class);
         if ($class->isAbstract()) {
             throw new \InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class->getName()));
         }
@@ -227,7 +230,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     public function supports(mixed $resource, string $type = null): bool
     {
-        return \is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || \in_array($type, ['annotation', 'attribute'], true));
+        return ($resource instanceof \ReflectionClass || \is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource)) && (!$type || \in_array($type, ['annotation', 'attribute'], true));
     }
 
     public function setResolver(LoaderResolverInterface $resolver)

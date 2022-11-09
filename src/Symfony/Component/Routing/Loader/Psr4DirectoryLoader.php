@@ -83,7 +83,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
 
                 continue;
             }
-            if ('php' !== $file->getExtension() || !class_exists($className = $psr4Prefix.'\\'.$file->getBasename('.php'))) {
+            if ('php' !== $file->getExtension() || !class_exists($className = $psr4Prefix.'\\'.$file->getBasename('.php')) || (new \ReflectionClass($className))->isAbstract()) {
                 continue;
             }
 

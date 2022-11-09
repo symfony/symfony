@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\SubNamespace\EvenDeeperNamespace\MyOtherController;
+use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\SubNamespace\MyChildController;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\SubNamespace\MyControllerWithATrait;
 
 class Psr4DirectoryLoaderTest extends TestCase
@@ -54,6 +55,14 @@ class Psr4DirectoryLoaderTest extends TestCase
 
         $this->assertSame('/my/controller/with/a/trait/a/route/from/a/trait', $route->getPath());
         $this->assertSame(MyControllerWithATrait::class.'::someAction', $route->getDefault('_controller'));
+    }
+
+    public function testAbstractController()
+    {
+        $route = $this->loadPsr4Controllers()->get('my_child_controller_from_abstract');
+
+        $this->assertSame('/my/child/controller/a/route/from/an/abstract/controller', $route->getPath());
+        $this->assertSame(MyChildController::class.'::someAction', $route->getDefault('_controller'));
     }
 
     /**

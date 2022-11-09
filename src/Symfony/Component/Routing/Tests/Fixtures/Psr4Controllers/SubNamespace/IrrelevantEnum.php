@@ -11,6 +11,14 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\SubNamespace;
 
-interface IrrelevantInterface
+/**
+ * An irrelevant enum.
+ *
+ * This fixture is not referenced anywhere. Its presence makes sure, enums are silently ignored when loading routes
+ * from a directory.
+ */
+enum IrrelevantEnum
 {
+    case Foo;
+    case Bar;
 }

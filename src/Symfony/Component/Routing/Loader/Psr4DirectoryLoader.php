@@ -43,7 +43,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
             return new RouteCollection();
         }
 
-        return $this->loadFromDirectory($path, trim($resource['namespace'], '\\'));
+        return $this->loadFromDirectory($path, trim($resource['namespace'], '\\'), $type);
     }
 
     public function supports(mixed $resource, string $type = null): bool
@@ -59,7 +59,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
         return $loader;
     }
 
-    private function loadFromDirectory(string $directory, string $psr4Prefix): RouteCollection
+    private function loadFromDirectory(string $directory, string $psr4Prefix, string $type): RouteCollection
     {
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($directory, '/\.php$/'));
@@ -79,7 +79,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
         /** @var \SplFileInfo $file */
         foreach ($files as $file) {
             if ($file->isDir()) {
-                $collection->addCollection($this->loadFromDirectory($file->getPathname(), $psr4Prefix.'\\'.$file->getFilename()));
+                $collection->addCollection($this->loadFromDirectory($file->getPathname(), $psr4Prefix.'\\'.$file->getFilename(), $type));
 
                 continue;
             }
@@ -92,7 +92,7 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
                 continue;
             }
 
-            $collection->addCollection($this->import($class, 'attribute'));
+            $collection->addCollection($this->import($class, $type));
         }
 
         return $collection;

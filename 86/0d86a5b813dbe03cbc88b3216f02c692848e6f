@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-29T16:41:53Z
+
+Hey!
+
+I think @johnkrovitch has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-09T14:23:07Z
+
+The impact would be that if you have a parameter typehinted as `UserInterface` or tagged as `CurrentUser` that has the same name than a request attribute, the UserValueResolver would now apply instead of the RequestAttributeResolver. But this is more likely to fix bugs (or at least fix DX confusion) than to introduce it (if you tag as `CurrentUser`, you make the intent clear that you expect the current user and not the request attribute named `user`)

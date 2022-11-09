@@ -15,11 +15,12 @@ use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\CompoundValidator;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CompoundValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new CompoundValidator();
     }

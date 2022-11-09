@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Constraints\NotEqualToValidator;
@@ -20,7 +21,7 @@ use Symfony\Component\Validator\Constraints\NotEqualToValidator;
  */
 class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new NotEqualToValidator();
     }

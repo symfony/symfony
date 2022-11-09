@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\LanguageValidator;
@@ -35,7 +36,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new LanguageValidator();
     }

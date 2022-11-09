@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -24,7 +25,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 {
     use ExpectDeprecationTrait;
 
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new EmailValidator(Email::VALIDATION_MODE_HTML5);
     }
@@ -84,6 +85,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getValidEmails
      * @dataProvider getEmailsOnlyValidInLooseMode
      */
@@ -125,6 +127,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getValidEmailsWithWhitespaces
      * @dataProvider getEmailsWithWhitespacesOnlyValidInLooseMode
      */

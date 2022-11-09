@@ -14,13 +14,14 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new EqualToValidator();
     }

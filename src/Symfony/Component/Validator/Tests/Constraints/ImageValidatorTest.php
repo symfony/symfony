@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -32,7 +33,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     protected $imageCorrupted;
     protected $notAnImage;
 
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new ImageValidator();
     }

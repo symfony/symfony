@@ -30,10 +30,19 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class PropertyPathAccessor implements DataAccessorInterface
 {
     private $propertyAccessor;
+    private $dataAccessor;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    /**
+     * @param DataAccessorInterface|callable $dataAccessor The chain accessor instance or a callable that should return it
+     */
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null, $dataAccessor = null)
     {
+        if (null !== $dataAccessor && !\is_callable($dataAccessor) && !$dataAccessor instanceof DataAccessorInterface) {
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be an instance of "%s" or a callable, "%s" given.', __METHOD__, DataAccessorInterface::class, get_debug_type($dataAccessor)));
+        }
+
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
+        $this->dataAccessor = $dataAccessor ?? $this;
     }
 
     /**
@@ -57,15 +66,17 @@ class PropertyPathAccessor implements DataAccessorInterface
             throw new AccessException('Unable to write the given value as no property path is defined.');
         }
 
+        $dataAccessor = \is_callable($this->dataAccessor) ? ($this->dataAccessor)() : $this->dataAccessor;
+
         // If the field is of type DateTimeInterface and the data is the same skip the update to
         // keep the original object hash
-        if ($propertyValue instanceof \DateTimeInterface && $propertyValue == $this->getPropertyValue($data, $propertyPath)) {
+        if ($propertyValue instanceof \DateTimeInterface && $propertyValue == $dataAccessor->getValue($data, $form)) {
             return;
         }
 
         // If the data is identical to the value in $data, we are
         // dealing with a reference
-        if (!\is_object($data) || !$form->getConfig()->getByReference() || $propertyValue !== $this->getPropertyValue($data, $propertyPath)) {
+        if (!\is_object($data) || !$form->getConfig()->getByReference() || $propertyValue !== $dataAccessor->getValue($data, $form)) {
             $this->propertyAccessor->setValue($data, $propertyPath, $propertyValue);
         }
     }

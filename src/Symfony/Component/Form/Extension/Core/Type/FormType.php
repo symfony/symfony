@@ -23,7 +23,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -33,9 +32,9 @@ class FormType extends BaseType
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->dataMapper = new DataMapper(new ChainAccessor([
+        $this->dataMapper = new DataMapper($chainAccessor = new ChainAccessor([
             new CallbackAccessor(),
-            new PropertyPathAccessor($propertyAccessor ?? PropertyAccess::createPropertyAccessor()),
+            new PropertyPathAccessor($propertyAccessor, static function () use (&$chainAccessor) { return $chainAccessor; }),
         ]));
     }
 

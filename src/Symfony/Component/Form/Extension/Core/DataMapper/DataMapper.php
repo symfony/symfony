@@ -31,7 +31,7 @@ class DataMapper implements DataMapperInterface
     {
         $this->dataAccessor = $dataAccessor ?? new ChainAccessor([
             new CallbackAccessor(),
-            new PropertyPathAccessor(),
+            new PropertyPathAccessor(null, function () { return $this->dataAccessor; }),
         ]);
     }
 

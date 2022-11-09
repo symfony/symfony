@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
@@ -393,6 +394,22 @@ class DataMapperTest extends TestCase
         self::assertSame('Jane Doe', $person->myName());
     }
 
+    public function testSubmitWithGetterCallbackAndPropertyPathAccessor()
+    {
+        $person = new DummyPerson('John Doe');
+        $form = (new FormFactoryBuilder())->getFormFactory()->createBuilder(FormType::class, $person)
+            ->add('name', null, [
+                'getter' => static function (DummyPerson $person) {
+                    return $person->myName();
+                },
+            ])
+            ->getForm();
+
+        $form->submit(['name' => 'Jane Doe']);
+
+        self::assertSame('Jane Doe', $person->myName());
+    }
+
     public function testMapFormsToDataMapsDateTimeInstanceToArrayIfNotSetBefore()
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
@@ -452,6 +469,11 @@ class DummyPerson
     }
 
     public function rename($name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

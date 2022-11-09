@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Ip;
 use Symfony\Component\Validator\Constraints\IpValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -20,7 +19,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IpValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): IpValidator
     {
         return new IpValidator();
     }

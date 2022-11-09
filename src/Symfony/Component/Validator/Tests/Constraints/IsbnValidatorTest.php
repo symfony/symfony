@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -22,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IsbnValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): IsbnValidator
     {
         return new IsbnValidator();
     }

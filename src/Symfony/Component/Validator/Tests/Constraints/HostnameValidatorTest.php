@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Hostname;
 use Symfony\Component\Validator\Constraints\HostnameValidator;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -208,7 +207,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): HostnameValidator
     {
         return new HostnameValidator();
     }

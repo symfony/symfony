@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\When;
 use Symfony\Component\Validator\Constraints\WhenValidator;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -212,7 +211,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('foo', new When('true', $constraints));
     }
 
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): WhenValidator
     {
         return new WhenValidator();
     }

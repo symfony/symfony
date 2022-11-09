@@ -45,7 +45,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
      */
     protected $hasherFactory;
 
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): UserPasswordValidator
     {
         return new UserPasswordValidator($this->tokenStorage, $this->hasherFactory);
     }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -19,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class TimeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): TimeValidator
     {
         return new TimeValidator();
     }

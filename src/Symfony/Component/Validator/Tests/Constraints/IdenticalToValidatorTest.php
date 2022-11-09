@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\IdenticalToValidator;
@@ -21,7 +20,7 @@ use Symfony\Component\Validator\Constraints\IdenticalToValidator;
  */
 class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): IdenticalToValidator
     {
         return new IdenticalToValidator();
     }

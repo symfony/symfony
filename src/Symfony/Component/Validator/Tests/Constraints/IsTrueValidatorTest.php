@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\IsTrueValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IsTrueValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): IsTrueValidator
     {
         return new IsTrueValidator();
     }

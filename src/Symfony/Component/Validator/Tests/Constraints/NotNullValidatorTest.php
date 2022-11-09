@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotNullValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotNullValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): NotNullValidator
     {
         return new NotNullValidator();
     }

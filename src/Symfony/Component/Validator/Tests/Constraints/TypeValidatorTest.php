@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -20,7 +19,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 {
     protected static $file;
 
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): TypeValidator
     {
         return new TypeValidator();
     }

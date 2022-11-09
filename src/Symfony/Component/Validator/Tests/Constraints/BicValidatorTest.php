@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\BicValidator;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -22,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): BicValidator
     {
         return new BicValidator();
     }

@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\CountValidator;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -23,7 +22,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 abstract class CountValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): CountValidator
     {
         return new CountValidator();
     }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Isin;
 use Symfony\Component\Validator\Constraints\IsinValidator;
 use Symfony\Component\Validator\Constraints\Luhn;
@@ -19,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IsinValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): IsinValidator
     {
         return new IsinValidator();
     }

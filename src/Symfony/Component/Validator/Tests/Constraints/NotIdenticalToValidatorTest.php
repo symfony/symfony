@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotIdenticalTo;
 use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
@@ -21,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): NotIdenticalToValidator
     {
         return new NotIdenticalToValidator();
     }

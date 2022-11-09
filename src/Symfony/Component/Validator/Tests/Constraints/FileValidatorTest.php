@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -25,7 +24,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     protected $file;
 
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): FileValidator
     {
         return new FileValidator();
     }

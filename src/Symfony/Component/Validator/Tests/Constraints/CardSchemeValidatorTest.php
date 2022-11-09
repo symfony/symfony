@@ -13,12 +13,11 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\CardScheme;
 use Symfony\Component\Validator\Constraints\CardSchemeValidator;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): CardSchemeValidator
     {
         return new CardSchemeValidator();
     }

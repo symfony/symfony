@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-10-29T09:52:50Z
+
+This would be a BC break or am I wrong?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-10-29T10:29:18Z
+
+@maxbeckers how? Are compiler passes configurators part of Symfony’s public API?
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-10-29T11:19:18Z
+
+My two thoughts were renaming the class and changing the priorities. It's only debug compiler passes, but wanted to at least note it. That's why I'm not sure if it's a BC break or not.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-05T10:36:50Z
+
+@fabpot I see you changed the milestone to 6.3 but this PR is supposed to be a fix for a feature introduced in 6.2. Is that alright?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-11-06T17:42:16Z
+
+In that case, 6.2 is indeed the right target.

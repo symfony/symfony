@@ -20,7 +20,7 @@ use Symfony\Component\Translation\TranslatorBag;
  */
 trait TranslationTrait
 {
-    private function readLocalTranslations(array $locales, array $domains, array $transPaths): TranslatorBag
+    private function readLocalTranslations(array $locales, array $domains, array $transPaths, bool $mergeIntlIcu = false): TranslatorBag
     {
         $bag = new TranslatorBag();
 
@@ -32,7 +32,7 @@ trait TranslationTrait
 
             if ($domains) {
                 foreach ($domains as $domain) {
-                    $bag->addCatalogue($this->filterCatalogue($catalogue, $domain));
+                    $bag->addCatalogue($this->filterCatalogue($catalogue, $domain, $mergeIntlIcu));
                 }
             } else {
                 $bag->addCatalogue($catalogue);
@@ -42,14 +42,14 @@ trait TranslationTrait
         return $bag;
     }
 
-    private function filterCatalogue(MessageCatalogue $catalogue, string $domain): MessageCatalogue
+    private function filterCatalogue(MessageCatalogue $catalogue, string $domain, bool $mergeIntlIcu): MessageCatalogue
     {
         $filteredCatalogue = new MessageCatalogue($catalogue->getLocale());
 
         // extract intl-icu messages only
         $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
         if ($intlMessages = $catalogue->all($intlDomain)) {
-            $filteredCatalogue->add($intlMessages, $domain);
+            $filteredCatalogue->add($intlMessages, $mergeIntlIcu ? $domain : $intlDomain);
         }
 
         // extract all messages and subtract intl-icu messages

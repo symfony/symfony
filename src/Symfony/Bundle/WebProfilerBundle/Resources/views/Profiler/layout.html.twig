@@ -89,7 +89,7 @@
                 {% if request_collector and request_collector.forwardtoken -%}
                     {% set forward_profile = profile.childByToken(request_collector.forwardtoken) %}
                     {% set controller = forward_profile ? forward_profile.collector('request').controller : 'n/a' %}
-                    <div class="status status-compact">
+                    <div class="status status-compact status-compact-forward">
                         <span class="icon icon-forward">{{ source('@WebProfiler/Icon/forward.svg') }}</span>
 
                         Forwarded to

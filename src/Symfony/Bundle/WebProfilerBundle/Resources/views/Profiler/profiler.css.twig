@@ -1053,8 +1053,8 @@ tr.status-warning td {
     padding: 13px 15px 10px;
     position: relative;
 }
-#summary .status-compact:before {
-    top: 0;
+#summary .status-compact.status-compact-forward {
+    padding: 10px 15px;
 }
 #summary .status + .status {
     margin-top: 10px;
@@ -1538,7 +1538,7 @@ tr.status-warning td {
     display: inline-flex;
     flex-wrap: wrap;
     margin: 0 0 15px;
-    padding: 2px;
+    padding: 0;
     user-select: none;
     -webkit-user-select: none;
 }
@@ -1547,11 +1547,13 @@ tr.status-warning td {
     margin: 0 0 10px;
 }
 .tab-navigation li {
+    box-shadow: none;
+    transition: box-shadow .05s ease-in, background-color .05s ease-in;
     cursor: pointer;
     font-weight: 500;
     list-style: none;
     margin: 0;
-    padding: 3.5px 14px;
+    padding: 4px 14px;
     position: relative;
     text-align: center;
     z-index: 1;
@@ -1591,11 +1593,14 @@ tr.status-warning td {
 }
 .tab-navigation li.active {
     background-color: var(--tab-active-background);
-    border-radius: 4px;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.15), 0 3px 1px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1.5px var(--tab-active-border-color);
     color: var(--tab-active-color);
     position: relative;
     z-index: 1;
+}
+.theme-dark .tab-navigation li.active {
+    box-shadow: inset 0 0 0 1px var(--tab-border-color);
 }
 .tab-content > *:first-child {
     margin-top: 0;

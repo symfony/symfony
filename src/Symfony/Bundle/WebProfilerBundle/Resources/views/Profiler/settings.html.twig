@@ -110,32 +110,40 @@
     margin-top: 30px;
 }
 .modal-content .settings-group {
+    border: 1px solid var(--settings-option-border-color);
+    border-radius: 4px;
     display: flex;
     margin-bottom: 15px;
 }
-.modal-content label {
+.modal-content .settings-group label {
     cursor: pointer;
     display: flex;
     flex: 1;
     font-size: 16px;
     margin: 0;
 }
-.modal-content label input {
-    display: none;
+.modal-content .settings-group label input {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+    opacity: 0;
 }
-.modal-content label input:checked + p {
+.modal-content .settings-group:has(input:focus-visible) {
+    outline: 2px dotted var(--settings-option-active-border-color);
+    outline-offset: 2px;
+}
+.modal-content .settings-group label input:checked + p {
     box-shadow: inset 0 0 0 2px var(--settings-option-active-border-color);
     background-color: var(--settings-option-active-background);
     color: var(--settings-option-active-color);
 }
-.modal-content label input:checked + p svg {
+.modal-content .settings-group label input:checked + p svg {
     color: var(--settings-option-active-icon-color);
 }
-.modal-content label p {
+.modal-content .settings-group label p {
     align-items: center;
     background: var(--settings-option-background);
-    border-radius: 4px;
-    box-shadow: inset 0 0 0 1px var(--settings-option-border-color);
+
     color: var(--settings-option-color);
     flex: 1;
     font-size: 14px;
@@ -143,8 +151,16 @@
     padding: 10px 15px;
     text-align: center;
 }
-.modal-content label + label {
-    margin-left: 15px;
+.modal-content .settings-group label:first-child p {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.modal-content .settings-group label:last-child p {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.modal-content .settings-group label + label p {
+    border-left: 1px solid var(--settings-option-border-color);
 }
 .modal-content label p span {
     display: block;

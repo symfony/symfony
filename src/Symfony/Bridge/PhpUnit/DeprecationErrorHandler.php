@@ -139,7 +139,7 @@ class DeprecationErrorHandler
             $msg = $trace[1]['args'][0];
         }
 
-        $deprecation = new Deprecation($msg, $trace, $file);
+        $deprecation = new Deprecation($msg, $trace, $file, \E_DEPRECATED === $type);
         if ($deprecation->isMuted()) {
             return null;
         }

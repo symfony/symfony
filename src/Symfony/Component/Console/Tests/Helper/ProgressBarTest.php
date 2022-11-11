@@ -861,6 +861,29 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
+    public function testAddingInstancePlaceholderFormatter()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
+        $bar->setFormat(' %countdown% [%bar%]');
+        $bar->setPlaceholderFormatter('countdown', $function = function (ProgressBar $bar) {
+            return $bar->getMaxSteps() - $bar->getProgress();
+        });
+
+        $this->assertSame($function, $bar->getPlaceholderFormatter('countdown'));
+
+        $bar->start();
+        $bar->advance();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 3 [>---------------------------]'.
+            $this->generateOutput(' 2 [=========>------------------]').
+            $this->generateOutput(' 0 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testMultilineFormat()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);

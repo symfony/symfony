@@ -179,7 +179,7 @@ EOF
         }
 
         if (null !== ($timeLimit = $input->getOption('time-limit'))) {
-            if (!is_numeric($timeLimit) || 0 >= $limit) {
+            if (!is_numeric($timeLimit) || 0 >= $timeLimit) {
                 throw new InvalidOptionException(sprintf('Option "time-limit" must be a positive integer, "%s" passed.', $timeLimit));
             }
 

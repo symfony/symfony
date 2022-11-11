@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-10-26T07:55:40Z
+
+Build failures are unrelated to the change.
+
+Should be added to Milestone 5.4, had the wrong target branch when i created the PR.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-29T16:32:01Z
+
+Hey!
+
+I think @CesarScur has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-11-04T11:07:29Z
+
+To reproduce i added a zip with the fix in vendor:
+[test-47998.zip](https://github.com/symfony/symfony/files/9937590/test-47998.zip)
+Just run `php testcommand.php` in root.
+
+Output without the fix:
+```
+Progress bar having only one line:
+Foo!
+[----->----------------------]
+=-=-=-=
+Progress bar having two lines:
+[----->----------------------]
+Processing "foobar"...
+============================
+foobar
+```
+
+Output with the fix:
+```
+
+Progress bar having only one line:
+Foo!
+[----->----------------------]
+=-=-=-=
+Progress bar having two lines:
+Foo!
+[----->----------------------]
+Processing "foobar"...
+=-=-=-=
+============================
+foobar
+```

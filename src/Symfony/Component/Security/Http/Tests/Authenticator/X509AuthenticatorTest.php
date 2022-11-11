@@ -120,6 +120,35 @@ class X509AuthenticatorTest extends TestCase
         $this->assertEquals('cert@example.com', $passport->getUser()->getUserIdentifier());
     }
 
+    /**
+     * @dataProvider provideServerVarsUserIdentifier
+     */
+    public function testAuthenticationCustomCredentialsUserIdentifier($username, $credentials)
+    {
+        $authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main', 'SSL_CLIENT_S_DN_Email', 'SSL_CLIENT_S_DN', null, 'CN');
+
+        $request = $this->createRequest([
+            'SSL_CLIENT_S_DN' => $credentials,
+        ]);
+        $this->assertTrue($authenticator->supports($request));
+
+        $this->userProvider->createUser(new InMemoryUser($username, null));
+
+        $passport = $authenticator->authenticate($request);
+        $this->assertEquals($username, $passport->getUser()->getUserIdentifier());
+    }
+
+    public static function provideServerVarsUserIdentifier()
+    {
+        yield ['Sample certificate DN', 'CN=Sample certificate DN/emailAddress=cert@example.com'];
+        yield ['Sample certificate DN', 'CN=Sample certificate DN/emailAddress=cert+something@example.com'];
+        yield ['Sample certificate DN', 'CN=Sample certificate DN,emailAddress=cert@example.com'];
+        yield ['Sample certificate DN', 'CN=Sample certificate DN,emailAddress=cert+something@example.com'];
+        yield ['Sample certificate DN', 'emailAddress=cert+something@example.com,CN=Sample certificate DN'];
+        yield ['Firstname.Lastname', 'emailAddress=firstname.lastname@mycompany.co.uk,CN=Firstname.Lastname,OU=london,OU=company design and engineering,OU=Issuer London,OU=Roaming,OU=Interactive,OU=Users,OU=Standard,OU=Business,DC=england,DC=core,DC=company,DC=co,DC=uk'];
+        yield ['user1', 'C=FR, O=My Organization, CN=user1, emailAddress=user1@myorg.fr'];
+    }
+
     private function createRequest(array $server)
     {
         return new Request([], [], [], [], [], $server);

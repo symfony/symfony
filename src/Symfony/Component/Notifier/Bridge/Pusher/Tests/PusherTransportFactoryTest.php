@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Bridge\Pusher\Tests;
 
 use Symfony\Component\Notifier\Bridge\Pusher\PusherTransportFactory;
@@ -12,6 +21,7 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
  * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
  *
  * @internal
+ *
  * @coversNothing
  */
 final class PusherTransportFactoryTest extends TransportFactoryTestCase

@@ -55,17 +55,17 @@ final class PusherTransportTest extends TransportTestCase
         yield [$this->createMock(MessageInterface::class)];
     }
 
-    public function testCanSetCustomHost(): void
+    public function testCanSetCustomHost()
     {
         static::markTestSkipped('Does not apply for this provider.');
     }
 
-    public function testCanSetCustomPort(): void
+    public function testCanSetCustomPort()
     {
         static::markTestSkipped('Does not apply for this provider.');
     }
 
-    public function testCanSetCustomHostAndPort(): void
+    public function testCanSetCustomHostAndPort()
     {
         static::markTestSkipped('Does not apply for this provider.');
     }

@@ -29,7 +29,7 @@ final class PusherOptionsTest extends TestCase
      * @dataProvider toArrayProvider
      * @dataProvider toArraySimpleOptionsProvider
      */
-    public function testToArray(array $options, array $expected = null): void
+    public function testToArray(array $options, array $expected = null)
     {
         static::assertSame($expected ?? $options, (new PusherOptions($options))->toArray());
     }

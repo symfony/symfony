@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 /*
@@ -67,7 +76,7 @@ final class PusherTransport extends AbstractTransport
         try {
             $this->pusherClient->trigger($options->getChannels(), $message->getSubject(), $message->getContent(), [], true);
         } catch (Throwable) {
-            throw new RuntimeException('An error occurred at Pusher Notifier Transport');
+            throw new RuntimeException('An error occurred at Pusher Notifier Transport.');
         }
 
         return new SentMessage($message, $this->__toString());

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -19,8 +20,9 @@ use Symfony\Component\Yaml\Yaml;
 
 class ParserTest extends TestCase
 {
-    /** @var Parser */
-    protected $parser;
+    use ExpectDeprecationTrait;
+
+    private ?Parser $parser;
 
     protected function setUp(): void
     {
@@ -1557,6 +1559,7 @@ EOT;
     /**
      * @param $lineNumber
      * @param $yaml
+     *
      * @dataProvider parserThrowsExceptionWithCorrectLineNumberProvider
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
@@ -2482,6 +2485,17 @@ YAML;
         $this->expectExceptionMessage('Missing value for tag "php/const:App\Kernel::SEMART_VERSION" at line 1 (near "!php/const:App\Kernel::SEMART_VERSION").');
 
         $this->parser->parse('!php/const:App\Kernel::SEMART_VERSION', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedPhpConstantSyntaxAsScalarKey()
+    {
+        $this->expectDeprecation('Since symfony/yaml 6.2: YAML syntax for key "!php/const:Symfony\Component\Yaml\Tests\B::BAR" is deprecated and replaced by "!php/const Symfony\Component\Yaml\Tests\B::BAR".');
+        $actual = $this->parser->parse('!php/const:Symfony\Component\Yaml\Tests\B::BAR: value', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
+
+        $this->assertSame(['bar' => 'value'], $actual);
     }
 
     public function testPhpConstantTagMappingAsScalarKey()

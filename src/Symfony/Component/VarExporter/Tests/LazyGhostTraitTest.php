@@ -210,20 +210,39 @@ class LazyGhostTraitTest extends TestCase
     public function testPartialInitialization()
     {
         $counter = 0;
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
-            ++$counter;
+        $instance = ChildTestClass::createLazyGhost([
+            'public' => static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+                ++$counter;
 
-            return match ($property) {
-                'public' => 4 === $default ? 123 : -1,
-                'publicReadonly' => 234,
-                'protected' => 5 === $default ? 345 : -1,
-                'protectedReadonly' => 456,
-                'private' => match ($scope) {
-                    TestClass::class => 3 === $default ? 567 : -1,
-                    ChildTestClass::class => 6 === $default ? 678 : -1,
-                },
-            };
-        });
+                return 4 === $default ? 123 : -1;
+            },
+            'publicReadonly' => static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+                ++$counter;
+
+                return 234;
+            },
+            "\0*\0protected" => static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+                ++$counter;
+
+                return 5 === $default ? 345 : -1;
+            },
+            "\0*\0protectedReadonly" => static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+                ++$counter;
+
+                return 456;
+            },
+            "\0".TestClass::class."\0private" => static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+                ++$counter;
+
+                return 3 === $default ? 567 : -1;
+            },
+            "\0".ChildTestClass::class."\0private" => static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+                ++$counter;
+
+                return 6 === $default ? 678 : -1;
+            },
+            'dummyProperty' => fn () => 123,
+        ]);
 
         $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $this->assertFalse($instance->isLazyObjectInitialized());
@@ -246,9 +265,14 @@ class LazyGhostTraitTest extends TestCase
 
     public function testPartialInitializationWithReset()
     {
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) {
+        $initializer = static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) {
             return 234;
-        });
+        };
+        $instance = ChildTestClass::createLazyGhost([
+            'public' => $initializer,
+            'publicReadonly' => $initializer,
+            "\0*\0protected" => $initializer,
+        ]);
 
         $r = new \ReflectionProperty($instance, 'public');
         $r->setValue($instance, 123);
@@ -262,9 +286,7 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(234, $instance->publicReadonly);
         $this->assertSame(234, $instance->public);
 
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) {
-            return 234;
-        });
+        $instance = ChildTestClass::createLazyGhost(['public' => $initializer]);
 
         $instance->resetLazyObject();
 
@@ -277,9 +299,9 @@ class LazyGhostTraitTest extends TestCase
 
     public function testPartialInitializationWithNastyPassByRef()
     {
-        $instance = ChildTestClass::createLazyGhost(function (ChildTestClass $instance, string &$property, ?string &$scope, mixed $default) {
+        $instance = ChildTestClass::createLazyGhost(['public' => function (ChildTestClass $instance, string &$property, ?string &$scope, mixed $default) {
             return $property = $scope = 123;
-        });
+        }]);
 
         $this->assertSame(123, $instance->public);
     }

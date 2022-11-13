@@ -146,11 +146,10 @@ class ChoiceType extends AbstractType
                         }
                     }
                 } else {
-                    foreach ($data as $value) {
-                        if ($choiceList->getChoicesForValues([$value])) {
-                            $knownValues[] = $value;
-                            unset($unknownValues[$value]);
-                        }
+                    foreach (array_keys($choiceList->getChoicesForValues($data)) as $index) {
+                        $value = $data[$index];
+                        $knownValues[] = $value;
+                        unset($unknownValues[$value]);
                     }
                 }
 

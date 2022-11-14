@@ -65,7 +65,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     public function testRunWithBusOption()
@@ -98,7 +98,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     /**
@@ -134,7 +134,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     /**
@@ -171,7 +171,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     /**
@@ -235,6 +235,6 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 }

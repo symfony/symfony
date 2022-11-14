@@ -206,4 +206,35 @@ class ConsumeMessagesCommandTest extends TestCase
         yield 'Zero second time limit' => ['--time-limit', '0', 'Option "time-limit" must be a positive integer, "0" passed.'];
         yield 'Non-numeric time limit' => ['--time-limit', 'whatever', 'Option "time-limit" must be a positive integer, "whatever" passed.'];
     }
+
+    public function testRunWithTimeLimit()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+        $busLocator->method('has')->with('dummy-bus')->willReturn(true);
+        $busLocator->method('get')->with('dummy-bus')->willReturn($bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--time-limit' => 1,
+        ]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
 }

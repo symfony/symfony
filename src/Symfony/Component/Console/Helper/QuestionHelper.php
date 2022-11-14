@@ -430,7 +430,7 @@ class QuestionHelper extends Helper
 
         $value = fgets($inputStream, 4096);
 
-        if (4095 === strlen($value)) {
+        if (4095 === \strlen($value)) {
             $errOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
             $errOutput->warning('The value was possibly truncated by your shell or terminal emulator');
         }

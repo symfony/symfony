@@ -97,7 +97,7 @@ class ClockMock
         if ($asNumber) {
             $number = sprintf('%d%d', (int) self::$now, $ns);
 
-            return PHP_INT_SIZE === 8 ? (int) $number : (float) $number;
+            return \PHP_INT_SIZE === 8 ? (int) $number : (float) $number;
         }
 
         return [(int) self::$now, (int) $ns];

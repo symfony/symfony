@@ -130,6 +130,24 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware());
     }
 
+    public function testMessageAlreadyHandled()
+    {
+        $handler = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        $envelope = new Envelope(new DummyMessage('Hey'));
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock());
+        $handledStamp = $envelope->all(HandledStamp::class);
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock());
+
+        $this->assertSame($envelope->all(HandledStamp::class), $handledStamp);
+    }
+
     public function testAllowNoHandlers()
     {
         $middleware = new HandleMessageMiddleware(new HandlersLocator([]), true);

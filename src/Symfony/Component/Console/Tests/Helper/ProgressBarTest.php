@@ -875,8 +875,10 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
-            "\x1B[1G\x1B[2K\x1B[1A\x1B[1G\x1B[2K".
-            $this->generateOutput("============================\nfoobar"),
+            "\x1B[1G\x1B[2K\x1B[1A".
+            $this->generateOutput('').
+            $this->generateOutput('============================').
+            "\nfoobar",
             stream_get_contents($output->getStream())
         );
     }
@@ -1184,6 +1186,31 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput("1/3\nABC\nFoo").
             $this->generateOutput("2/3\nA\nFoo").
             $this->generateOutput("3/3\nA\nFoo"),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testMultiLineFormatIsFullyCorrectlyWithManuallyCleanup()
+    {
+        ProgressBar::setFormatDefinition('normal_nomax', "[%bar%]\n%message%");
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setMessage('Processing "foobar"...');
+        $bar->start();
+        $bar->clear();
+        $output->writeln('Foo!');
+        $bar->display();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            "[>---------------------------]\n".
+            'Processing "foobar"...'.
+            "\x1B[1G\x1B[2K\x1B[1A".
+            $this->generateOutput('').
+            'Foo!'.\PHP_EOL.
+            $this->generateOutput('[--->------------------------]').
+            "\nProcessing \"foobar\"...".
+            $this->generateOutput("[----->----------------------]\nProcessing \"foobar\"..."),
             stream_get_contents($output->getStream())
         );
     }

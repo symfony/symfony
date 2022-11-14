@@ -96,8 +96,6 @@ class MemcachedAdapter extends AbstractAdapter
     {
         if (\is_string($servers)) {
             $servers = [$servers];
-        } elseif (!\is_array($servers)) {
-            throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, "%s" given.', get_debug_type($servers)));
         }
         if (!static::isSupported()) {
             throw new CacheException('Memcached > 3.1.5 is required.');

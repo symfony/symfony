@@ -69,7 +69,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     public function testRunWithBusOption()
@@ -102,7 +102,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     public function provideRunWithResetServicesOption(): iterable
@@ -147,7 +147,7 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $this->assertEquals($shouldReset, $receiver->hasBeenReset(), '$receiver->reset() should have been called');
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     /**
@@ -211,7 +211,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     /**

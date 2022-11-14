@@ -134,7 +134,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        if ($this->receiverNames && 0 === \count($input->getArgument('receivers'))) {
+        if ($this->receiverNames && !$input->getArgument('receivers')) {
             $io->block('Which transports/receivers do you want to consume?', null, 'fg=white;bg=blue', ' ', true);
 
             $io->writeln('Choose which receivers you want to consume messages from in order of priority.');
@@ -148,7 +148,7 @@ EOF
             $input->setArgument('receivers', $io->askQuestion($question));
         }
 
-        if (0 === \count($input->getArgument('receivers'))) {
+        if (!$input->getArgument('receivers')) {
             throw new RuntimeException('Please pass at least one receiver.');
         }
     }
@@ -177,7 +177,7 @@ EOF
         }
 
         $stopsWhen = [];
-        if (null !== ($limit = $input->getOption('limit'))) {
+        if (null !== $limit = $input->getOption('limit')) {
             if (!is_numeric($limit) || 0 >= $limit) {
                 throw new InvalidOptionException(sprintf('Option "limit" must be a positive integer, "%s" passed.', $limit));
             }
@@ -196,7 +196,7 @@ EOF
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
         }
 
-        if (null !== ($timeLimit = $input->getOption('time-limit'))) {
+        if (null !== $timeLimit = $input->getOption('time-limit')) {
             if (!is_numeric($timeLimit) || 0 >= $timeLimit) {
                 throw new InvalidOptionException(sprintf('Option "time-limit" must be a positive integer, "%s" passed.', $timeLimit));
             }
@@ -208,7 +208,7 @@ EOF
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
-        $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 0 ? 's' : '', implode(', ', $receiverNames)));
+        $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 1 ? 's' : '', implode(', ', $receiverNames)));
 
         if ($stopsWhen) {
             $last = array_pop($stopsWhen);

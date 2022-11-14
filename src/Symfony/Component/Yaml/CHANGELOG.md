@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `!php/enum` and `!php/enum *->value`
+ * Deprecate the `!php/const:` tag in key which will be replaced by the `!php/const` tag (without the colon) since 3.4
 
 6.1
 ---

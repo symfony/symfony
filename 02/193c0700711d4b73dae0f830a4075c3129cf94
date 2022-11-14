@@ -1,0 +1,140 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-10T14:21:58Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2022-11-10T14:25:56Z
+
+I figured it's a bit late to get this into 6.2, which is why I targeted 6.3 even though the branch is not there yet.
+
+I know there were intense discussions about what should be part of the Clock in the original PR already, so feel free to close this if this functionality was omitted intentionally.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-11-11T08:30:26Z
+
+Thanks for this proposal @dbrumann.
+
+In theory this addition looks reasonable ... but the Clock component has just been added. When things are so new, I think it's better to let people use it for some time. If something is annoying and requires a DX improvement, many people will complain about it and some will even report it here.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-11T08:43:48Z
+
+I think it makes sense to add this to the `MockClock` for 6.2. The DX looks much better :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-11T09:08:34Z
+
+I'm wondering if it wouldn't make more sense to expose a function that modifies the "now" while still using it as a reference.
+It looks strange to me, and maybe not super useful, to pass a full datetime object. Eg your example in the description is not correct: it does not advance by 3 weeks. It sets the clock in three weeks from the current time.
+In order to do what you describe, you should write this instead:
+```php
+$this->clock->setTo($this->clock->now()->modify('3 weeks'));
+```
+
+If the first example is confusion already, maybe the API is not the best :)
+
+What about a modify function instead?
+
+```php
+function modify(string $modifier): void
+{
+	$this->now = $this->now->modifiy($modifier);
+}
+```
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-11T09:44:53Z
+
+> What about a modify function instead?
+
+I think both `setNow()` and `modify()` could be helpful.
+
+Lets say you want to test, that on Christmas Eve an email is send and not before, its more handy to use the `setNow()`, as you know the specific time, while `modify()` could be used if you want to check something gets executed every X hours/days
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-11-11T09:50:33Z
+
+The `DateTimeImmutable::modify` function accepts absolute values too.
+
+```php
+var_dump((new DateTimeImmutable())->modify('2022-12-24'));
+// 2022-12-24 10:49:34.003795
+```
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-11T10:09:59Z
+
+> The DateTimeImmutable::modify function accepts absolute values too.
+
+TIL; thanks
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2022-11-11T10:30:06Z
+
+With `modify` we will have to handle invalid string inputs. I probably should introduce a custom Exception for this, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-11T11:08:30Z
+
+True. `\InvalidArgumentException` :muscle:
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2022-11-11T15:08:39Z
+
+I used `modify`. I discovered that `DateTimeImmutable::modify('Halloween')`, i.e. with an invalid string, will throw an Error/Warning, which is why also added a `try`-block around it. Let me know, if you prefer having the internal message instead. It looks like this:
+
+```
+Testing /Users/dbr/Projects/symfony/symfony/src/Symfony/Component/Clock
+.....E.........                                                   15 / 15 (100%)
+
+Time: 00:01.527, Memory: 8.00 MB
+
+There was 1 error:
+
+1) Symfony\Component\Clock\Tests\MockClockTest::testModifyThrowsOnInvalidString
+DateTimeImmutable::modify(): Failed to parse time string (Halloween) at position 0 (H): The timezone could not be found in the database
+
+/Users/dbr/Projects/symfony/symfony/src/Symfony/Component/Clock/MockClock.php:52
+/Users/dbr/Projects/symfony/symfony/src/Symfony/Component/Clock/Tests/MockClockTest.php:93
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-11-11T16:44:08Z
+
+To fuel the discussion, I'm using something similar to the new clock component for some time and I never have to alter the current date after initialization.
+- For unit tests, the `MockClock` is initialized with the expected value.
+- For functional test (involving the kernel and clock as a service), I use an environment variable that is updated for the tests that need a specific value.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-11T20:09:58Z
+
+Can you please add a CHANGELOG entry?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-12T09:37:25Z
+
+Can you please also update the PR description btw?

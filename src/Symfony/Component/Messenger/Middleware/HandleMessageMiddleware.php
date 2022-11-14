@@ -57,8 +57,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
         ];
 
         $exceptions = [];
+        $alreadyHandled = false;
         foreach ($this->handlersLocator->getHandlers($envelope) as $handlerDescriptor) {
             if ($this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
+                $alreadyHandled = true;
                 continue;
             }
 
@@ -116,7 +118,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
             }
         }
 
-        if (null === $handler) {
+        if (null === $handler && !$alreadyHandled) {
             if (!$this->allowNoHandlers) {
                 throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $context['class']));
             }

@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -176,7 +177,11 @@ EOF
         }
 
         $stopsWhen = [];
-        if ($limit = $input->getOption('limit')) {
+        if (null !== ($limit = $input->getOption('limit'))) {
+            if (!is_numeric($limit) || 0 >= $limit) {
+                throw new InvalidOptionException(sprintf('Option "limit" must be a positive integer, "%s" passed.', $limit));
+            }
+
             $stopsWhen[] = "processed {$limit} messages";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
         }
@@ -192,6 +197,10 @@ EOF
         }
 
         if (null !== ($timeLimit = $input->getOption('time-limit'))) {
+            if (!is_numeric($timeLimit) || 0 >= $timeLimit) {
+                throw new InvalidOptionException(sprintf('Option "time-limit" must be a positive integer, "%s" passed.', $timeLimit));
+            }
+
             $stopsWhen[] = "been running for {$timeLimit}s";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }
@@ -254,11 +263,11 @@ EOF
 
         switch (substr(rtrim($memoryLimit, 'b'), -1)) {
             case 't': $max *= 1024;
-                // no break
+            // no break
             case 'g': $max *= 1024;
-                // no break
+            // no break
             case 'm': $max *= 1024;
-                // no break
+            // no break
             case 'k': $max *= 1024;
         }
 

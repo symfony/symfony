@@ -142,6 +142,7 @@
         "predis/predis": "~1.1",
         "psr/http-client": "^1.0",
         "psr/simple-cache": "^1.0|^2.0|^3.0",
+        "pusher/pusher-php-server": "^7.0",
         "symfony/mercure-bundle": "^0.3",
         "symfony/phpunit-bridge": "^5.4|^6.0",
         "symfony/runtime": "self.version",

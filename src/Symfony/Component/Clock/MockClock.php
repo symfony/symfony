@@ -47,6 +47,15 @@ final class MockClock implements ClockInterface
         $this->now = (new \DateTimeImmutable($now, $timezone))->setTimezone($timezone);
     }
 
+    public function modify(string $modifier): void
+    {
+        if (false === $modifiedNow = @$this->now->modify($modifier)) {
+            throw new \InvalidArgumentException(sprintf('Invalid modifier: "%s". Could not modify MockClock.', $modifier));
+        }
+
+        $this->now = $modifiedNow;
+    }
+
     public function withTimeZone(\DateTimeZone|string $timezone): static
     {
         $clone = clone $this;

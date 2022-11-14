@@ -63,6 +63,59 @@ class MockClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
+    public function provideValidModifyStrings(): iterable
+    {
+        yield 'absolute datetime value' => [
+            '2112-09-17 23:53:03.001',
+            '2112-09-17 23:53:03.001000',
+        ];
+
+        yield 'relative modified date' => [
+            '+2 days',
+            '2112-09-19 23:53:00.999000',
+        ];
+    }
+
+    /**
+     * @dataProvider provideValidModifyStrings
+     */
+    public function testModifyWithSpecificDateTime(string $modifiedNow, string $expectedNow)
+    {
+        $clock = new MockClock((new \DateTimeImmutable('2112-09-17 23:53:00.999Z'))->setTimezone(new \DateTimeZone('UTC')));
+        $tz = $clock->now()->getTimezone()->getName();
+
+        $clock->modify($modifiedNow);
+
+        $this->assertSame($expectedNow, $clock->now()->format('Y-m-d H:i:s.u'));
+        $this->assertSame($tz, $clock->now()->getTimezone()->getName());
+    }
+
+    public function provideInvalidModifyStrings(): iterable
+    {
+        yield 'Named holiday is not recognized' => [
+            'Halloween',
+            'Invalid modifier: "Halloween". Could not modify MockClock.',
+        ];
+
+        yield 'empty string' => [
+            '',
+            'Invalid modifier: "". Could not modify MockClock.',
+        ];
+    }
+
+    /**
+     * @dataProvider provideInvalidModifyStrings
+     */
+    public function testModifyThrowsOnInvalidString(string $modifiedNow, string $expectedMessage)
+    {
+        $clock = new MockClock((new \DateTimeImmutable('2112-09-17 23:53:00.999Z'))->setTimezone(new \DateTimeZone('UTC')));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $clock->modify($modifiedNow);
+    }
+
     public function testWithTimeZone()
     {
         $clock = new MockClock();

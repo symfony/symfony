@@ -466,10 +466,13 @@ final class ProgressBar
                     }
                     $this->output->clear($lineCount);
                 } else {
-                    for ($i = 0; $i < $this->formatLineCount; ++$i) {
-                        $this->cursor->moveToColumn(1);
-                        $this->cursor->clearLine();
-                        $this->cursor->moveUp();
+                    if ('' !== $this->previousMessage) {
+                        // only clear upper lines when last call was not a clear
+                        for ($i = 0; $i < $this->formatLineCount; ++$i) {
+                            $this->cursor->moveToColumn(1);
+                            $this->cursor->clearLine();
+                            $this->cursor->moveUp();
+                        }
                     }
 
                     $this->cursor->moveToColumn(1);

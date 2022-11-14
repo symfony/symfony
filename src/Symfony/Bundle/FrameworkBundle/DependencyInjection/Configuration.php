@@ -1092,7 +1092,7 @@ class Configuration implements ConfigurationInterface
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->scalarNode('default_lifetime')
                                         ->info('Default lifetime of the pool')
-                                        ->example('"600" for 5 minutes expressed in seconds, "PT5M" for five minutes expressed as ISO 8601 time interval, or "5 minutes" as a date expression')
+                                        ->example('"300" for 5 minutes expressed in seconds, "PT5M" for five minutes expressed as ISO 8601 time interval, or "5 minutes" as a date expression')
                                     ->end()
                                     ->scalarNode('provider')
                                         ->info('Overwrite the setting from the default provider for this adapter.')

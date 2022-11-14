@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -68,7 +69,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     public function testRunWithBusOption()
@@ -101,7 +102,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     public function provideRunWithResetServicesOption(): iterable
@@ -146,7 +147,71 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $this->assertEquals($shouldReset, $receiver->hasBeenReset(), '$receiver->reset() should have been called');
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider getInvalidOptions
+     */
+    public function testRunWithInvalidOption(string $option, string $value, string $expectedMessage)
+    {
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            $option => $value,
+        ]);
+    }
+
+    public function getInvalidOptions()
+    {
+        yield 'Zero message limit' => ['--limit', '0', 'Option "limit" must be a positive integer, "0" passed.'];
+        yield 'Non-numeric message limit' => ['--limit', 'whatever', 'Option "limit" must be a positive integer, "whatever" passed.'];
+
+        yield 'Zero second time limit' => ['--time-limit', '0', 'Option "time-limit" must be a positive integer, "0" passed.'];
+        yield 'Non-numeric time limit' => ['--time-limit', 'whatever', 'Option "time-limit" must be a positive integer, "whatever" passed.'];
+    }
+
+    public function testRunWithTimeLimit()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+        $busLocator->method('has')->with('dummy-bus')->willReturn(true);
+        $busLocator->method('get')->with('dummy-bus')->willReturn($bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--time-limit' => 1,
+        ]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
     /**

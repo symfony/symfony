@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
@@ -16,6 +15,9 @@ namespace Symfony\Component\Notifier\Bridge\Pusher;
 
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
+/**
+ * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
+ */
 class PusherRecipient implements RecipientInterface
 {
     private array $channels;

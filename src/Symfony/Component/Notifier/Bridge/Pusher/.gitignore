@@ -1,8 +1,3 @@
 vendor/
 composer.lock
 phpunit.xml
-.phpunit.result.cache
-.php-cs-fixer
-.php-cs-fixer.cache
-.phpcs-cache
-phpcs.xml

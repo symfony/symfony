@@ -84,7 +84,7 @@ class Dummy extends ParentDummy
     public $h;
 
     /**
-     * @var ?string|int
+     * @var string|int|null
      */
     public $i;
 

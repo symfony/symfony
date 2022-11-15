@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderTest extends ProviderTestCase
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, bool $intlIcuEnabled = false): ProviderInterface
     {
         return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint);
     }

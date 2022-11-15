@@ -1482,6 +1482,8 @@ class FrameworkExtension extends Extension
         ;
 
         $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
+
+        $container->getDefinition('translation.provider_factory.lokalise')->setArgument(4, $config['providers']['lokalise']['intl_icu_enabled']);
     }
 
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)

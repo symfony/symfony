@@ -37,14 +37,16 @@ final class LokaliseProvider implements ProviderInterface
     private $logger;
     private $defaultLocale;
     private $endpoint;
+    private $intlIcuEnabled;
 
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
+    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, bool $intlIcuEnabled = false)
     {
         $this->client = $client;
         $this->loader = $loader;
         $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
         $this->endpoint = $endpoint;
+        $this->intlIcuEnabled = $intlIcuEnabled;
     }
 
     public function __toString(): string
@@ -102,7 +104,12 @@ final class LokaliseProvider implements ProviderInterface
 
         foreach ($translations as $locale => $files) {
             foreach ($files as $filename => $content) {
-                $translatorBag->addCatalogue($this->loader->load($content['content'], $locale, str_replace('.xliff', '', $filename)));
+                $domain = str_replace('.xliff', '', $filename);
+                if ($this->intlIcuEnabled) {
+                    $domain .= MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+                }
+
+                $translatorBag->addCatalogue($this->loader->load($content['content'], $locale, $domain));
             }
         }
 
@@ -151,6 +158,7 @@ final class LokaliseProvider implements ProviderInterface
                 'filter_langs' => array_values($locales),
                 'filter_filenames' => array_map([$this, 'getLokaliseFilenameFromDomain'], $domains),
                 'export_empty_as' => 'skip',
+                'placeholder_format' => $this->intlIcuEnabled ? 'icu' : 'symfony',
             ],
         ]);
 

@@ -30,13 +30,15 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
     private $logger;
     private $defaultLocale;
     private $loader;
+    private $intlIcuEnabled;
 
-    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader)
+    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader, bool $intlIcuEnabled = false)
     {
         $this->client = $client;
         $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
         $this->loader = $loader;
+        $this->intlIcuEnabled = $intlIcuEnabled;
     }
 
     /**
@@ -58,7 +60,7 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
             ],
         ]);
 
-        return new LokaliseProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint);
+        return new LokaliseProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint, $this->intlIcuEnabled);
     }
 
     protected function getSupportedSchemes(): array

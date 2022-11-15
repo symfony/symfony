@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-11-15T11:04:06Z
+
+The alternative solution would be to conflict with the upcoming minor releases of both package or see if https://github.com/phpDocumentor/ReflectionDocBlock/pull/343#issuecomment-1315059624 can be fixed over there instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-15T11:10:17Z
+
+Fixing that makes sense to me as it is only a test fixture anyway.
+
+However, I think phpDocumentor should still fix this before release their new version (or make it a new major version if they break some supported types)

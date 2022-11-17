@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp
+ * Add the `pattern` parameter in violations of the `Regex` constraint
 
 6.2
 ---

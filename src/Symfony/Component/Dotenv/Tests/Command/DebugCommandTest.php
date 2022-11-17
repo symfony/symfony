@@ -127,21 +127,21 @@ class DebugCommandTest extends TestCase
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario4', 'prod');
 
         // Scanned Files
-        $this->assertStringContainsString('✓ sub/path/.env.local.php', $output);
-        $this->assertStringContainsString('⨯ sub/path/.env.prod.local', $output);
-        $this->assertStringContainsString('⨯ sub/path/.env.prod', $output);
-        $this->assertStringContainsString('✓ sub/path/.env.local', $output);
-        $this->assertStringContainsString('⨯ sub/path/.env'.\PHP_EOL, $output);
+        $this->assertStringContainsString('✓ sub/path/custom.env.local.php', $output);
+        $this->assertStringContainsString('⨯ sub/path/custom.env.prod.local', $output);
+        $this->assertStringContainsString('⨯ sub/path/custom.env.prod', $output);
+        $this->assertStringContainsString('✓ sub/path/custom.env.local', $output);
+        $this->assertStringContainsString('⨯ sub/path/custom.env'.\PHP_EOL, $output);
 
         // Skipped Files
-        $this->assertStringNotContainsString('.env.dist', $output);
-        $this->assertStringNotContainsString('.env.dev', $output);
-        $this->assertStringNotContainsString('.env.test', $output);
+        $this->assertStringNotContainsString('custom.env.dist', $output);
+        $this->assertStringNotContainsString('custom.env.dev', $output);
+        $this->assertStringNotContainsString('custom.env.test', $output);
 
         // Variables
-        $this->assertStringContainsString('Variable   Value   .env.local.php   .env.local', $output);
-        $this->assertStringContainsString('FOO        BaR     BaR              n/a', $output);
-        $this->assertStringContainsString('TEST       1234    1234             1111', $output);
+        $this->assertStringContainsString('Variable   Value   custom.env.local.php   custom.env.local', $output);
+        $this->assertStringContainsString('FOO        BaR     BaR                    n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234                   1111', $output);
     }
 
     public function testWarningOnEnvAndEnvDistFile()

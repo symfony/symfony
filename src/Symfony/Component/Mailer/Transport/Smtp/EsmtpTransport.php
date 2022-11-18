@@ -41,6 +41,7 @@ class EsmtpTransport extends SmtpTransport
             new Auth\CramMd5Authenticator(),
             new Auth\LoginAuthenticator(),
             new Auth\PlainAuthenticator(),
+            new Auth\NtlmAuthenticator(),
             new Auth\XOAuth2Authenticator(),
         ];
 

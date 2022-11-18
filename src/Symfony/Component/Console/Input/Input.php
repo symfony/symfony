@@ -61,6 +61,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     {
         $definition = $this->definition;
         $givenArguments = $this->arguments;
+        $givenOptions = $this->options;
 
         $missingArguments = array_filter(array_keys($definition->getArguments()), function ($argument) use ($definition, $givenArguments) {
             return !\array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired();
@@ -68,6 +69,14 @@ abstract class Input implements InputInterface, StreamableInputInterface
 
         if (\count($missingArguments) > 0) {
             throw new RuntimeException(sprintf('Not enough arguments (missing: "%s").', implode(', ', $missingArguments)));
+        }
+
+        $missingOptions = array_filter(array_keys($definition->getOptions()), function ($option) use ($definition, $givenOptions) {
+            return !\array_key_exists($option, $givenOptions) && $definition->getOption($option)->isRequired();
+        });
+
+        if (\count($missingOptions) > 0) {
+            throw new RuntimeException(sprintf('Missing options (missing: "%s").', implode(', ', $missingOptions)));
         }
     }
 

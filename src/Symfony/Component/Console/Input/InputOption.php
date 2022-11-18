@@ -50,6 +50,11 @@ class InputOption
      */
     public const VALUE_NEGATABLE = 16;
 
+    /**
+     * The option aka "named parameter" must be passed.
+     */
+    public const REQUIRED = 32;
+
     private string $name;
     private string|array|null $shortcut;
     private int $mode;
@@ -94,7 +99,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
+        } elseif ($mode >= (self::REQUIRED << 1) || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -131,6 +136,16 @@ class InputOption
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * Returns true if the argument is required.
+     *
+     * @return bool true if parameter mode is self::REQUIRED, false otherwise
+     */
+    public function isRequired(): bool
+    {
+        return self::REQUIRED === (self::REQUIRED & $this->mode);
     }
 
     /**
@@ -247,6 +262,7 @@ class InputOption
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
+            && $option->isRequired() === $this->isRequired()
         ;
     }
 }

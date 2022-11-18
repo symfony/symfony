@@ -67,26 +67,37 @@ class InputOptionTest extends TestCase
         $this->assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
         $this->assertFalse($option->isValueRequired(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
         $this->assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        $this->assertFalse($option->isRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', null);
         $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->isRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
         $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
         $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->isRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_REQUIRED);
         $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
         $this->assertTrue($option->isValueRequired(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
         $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
+        $this->assertFalse($option->isRequired(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL);
         $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertTrue($option->isValueOptional(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+        $this->assertFalse($option->isRequired(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+
+        $option = new InputOption('foo', 'f', InputOption::REQUIRED);
+        $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::REQUIRED" as its mode');
+        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::REQUIRED" as its mode');
+        $this->assertTrue($option->isValueOptional(), '__construct() can take "InputOption::REQUIRED" as its mode');
+        $this->assertTrue($option->isRequired(), '__construct() can take "InputOption::REQUIRED" as its mode');
     }
 
     public function testInvalidModes()
@@ -145,6 +156,9 @@ class InputOptionTest extends TestCase
 
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
         $this->assertFalse($option->getDefault(), '->getDefault() returns false if the option does not take a value');
+
+        $option = new InputOption('foo', null, InputOption::REQUIRED);
+        $this->assertFalse($option->getDefault(), '->getDefault() returns false if the option is required');
     }
 
     public function testSetDefault()

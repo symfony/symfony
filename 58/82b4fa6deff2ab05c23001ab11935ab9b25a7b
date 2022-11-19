@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-10T13:21:51Z
+
+Hey!
+
+I think @remicollet has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-11-11T21:08:40Z
+
+Hi @Chi-teck, can you provide an example of "bash function", so that we can test your change?
+
+---------------------------------------------------------------------------
+
+by Chi-teck at 2022-11-12T03:52:49Z
+
+@GromNaN It could be a simple wrapper around any Symfony app that already have completions dumped.
+
+1. Dump completions for some existing application.
+` /var/www/vendor/bin/some-app bash >> ~/.bash_completion`
+2. Add the following Bash function to `~/.bashrc` file.
+```bash
+function some-app() {
+  /var/www/vendor/bin/some-app
+}
+```
+3. Log in and log out for the change to take effect.
+
+Check if completions work for `/var/www/vendor/bin/some-app`  and for `some-app`.

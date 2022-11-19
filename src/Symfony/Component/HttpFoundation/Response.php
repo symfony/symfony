@@ -306,6 +306,13 @@ class Response
             $this->setProtocolVersion('1.1');
         }
 
+        // Fix protocol (Apache mod_fcgid)
+        if ('HTTP/1.0' == $request->server->get('SERVER_PROTOCOL')
+            && $request->server->has('GATEWAY_INTERFACE') && 'CGI/1.1' == $request->server->get('GATEWAY_INTERFACE')
+            && $request->server->has('SERVER_SOFTWARE') && 0 === stripos($request->server->get('SERVER_SOFTWARE'), 'Apache')) {
+            $this->setProtocolVersion('1.1');
+        }
+
         // Check if we need to send extra expire info headers
         if ('1.0' == $this->getProtocolVersion() && str_contains($headers->get('Cache-Control', ''), 'no-cache')) {
             $headers->set('pragma', 'no-cache');

@@ -9,6 +9,7 @@ CHANGELOG
  * Add request matchers under the `Symfony\Component\HttpFoundation\RequestMatcher` namespace
  * Deprecate `RequestMatcher` in favor of `ChainRequestMatcher`
  * Deprecate `Symfony\Component\HttpFoundation\ExpressionRequestMatcher` in favor of `Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher`
+ * Fix server protocol version for apache mod_fastcgid HTTP\1.0
 
 6.1
 ---

@@ -292,13 +292,13 @@ EOLUA;
         foreach ($hosts as $host) {
             $info = $host->info('Memory');
 
-            if ($info instanceof ErrorInterface) {
+            if (false === $info || null === $info || $info instanceof ErrorInterface) {
                 continue;
             }
 
             $info = $info['Memory'] ?? $info;
 
-            return $this->redisEvictionPolicy = $info['maxmemory_policy'];
+            return $this->redisEvictionPolicy = $info['maxmemory_policy'] ?? '';
         }
 
         return $this->redisEvictionPolicy = '';

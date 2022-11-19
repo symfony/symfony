@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2022-11-16T13:37:43Z
+
+Failures are unrelated.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-11-16T15:18:44Z
+
+Related to https://github.com/symfony/symfony/pull/45368, I think both PR are needed to fix the issue of ICU translations pulling from Lokalise.

@@ -51,7 +51,7 @@ class InputOption
     public const VALUE_NEGATABLE = 16;
 
     /**
-     * The option aka "named parameter" must be passed.
+     * The option aka "named argument" must be passed.
      */
     public const REQUIRED = 32;
 

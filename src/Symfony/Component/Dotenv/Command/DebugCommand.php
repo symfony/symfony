@@ -74,9 +74,7 @@ final class DebugCommand extends Command
 
         $io->section('Variables');
         $io->table(
-            array_merge(['Variable', 'Value'], array_map(static function (string $availableFile) {
-                return basename($availableFile);
-            }, $availableFiles)),
+            array_merge(['Variable', 'Value'], array_map('basename', $availableFiles)),
             $this->getVariables($availableFiles)
         );
 

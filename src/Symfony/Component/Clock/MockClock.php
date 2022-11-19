@@ -44,7 +44,7 @@ final class MockClock implements ClockInterface
         $now = substr_replace(sprintf('@%07.0F', $now), '.', -6, 0);
         $timezone = $this->now->getTimezone();
 
-        $this->now = (new \DateTimeImmutable($now, $timezone))->setTimezone($timezone);
+        $this->now = (new \DateTimeImmutable($now))->setTimezone($timezone);
     }
 
     public function modify(string $modifier): void

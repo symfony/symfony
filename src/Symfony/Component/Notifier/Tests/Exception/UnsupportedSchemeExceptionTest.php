@@ -29,6 +29,7 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
@@ -88,6 +89,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             GoogleChatTransportFactory::class => false,
             InfobipTransportFactory::class => false,
             IqsmsTransportFactory::class => false,
+            IsendproTransportFactory::class => false,
             LightSmsTransportFactory::class => false,
             LinkedInTransportFactory::class => false,
             MailjetTransportFactory::class => false,
@@ -152,6 +154,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['googlechat', 'symfony/google-chat-notifier'];
         yield ['infobip', 'symfony/infobip-notifier'];
         yield ['iqsms', 'symfony/iqsms-notifier'];
+        yield ['isendpro', 'symfony/isendpro-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
         yield ['mailjet', 'symfony/mailjet-notifier'];

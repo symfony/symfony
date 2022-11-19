@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-16T18:16:04Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-17T12:17:30Z
+
+https://github.com/symfony/symfony/pull/41869 was merged into `4.4` branch, what about this one?
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2022-11-17T12:21:49Z
+
+@OskarStark wasn't sure about this, but totally fine by me. Rebase is easy here :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-17T13:09:45Z
+
+friendly ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-11-19T14:41:50Z
+
+That's the kind of changes we used to do in lower branches, but not anymore. I'm going to merge it in 6.2.

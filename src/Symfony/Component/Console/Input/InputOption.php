@@ -139,7 +139,7 @@ class InputOption
     }
 
     /**
-     * Returns true if the argument is required.
+     * Returns true if the option is required.
      *
      * @return bool true if parameter mode is self::REQUIRED, false otherwise
      */

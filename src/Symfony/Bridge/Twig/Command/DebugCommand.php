@@ -107,7 +107,7 @@ EOF
             default => throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format'))),
         };
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

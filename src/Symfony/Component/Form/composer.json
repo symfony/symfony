@@ -29,7 +29,7 @@
         "symfony/service-contracts": "^1.1|^2|^3"
     },
     "require-dev": {
-        "doctrine/collections": "~1.0",
+        "doctrine/collections": "^1.0|^2.0",
         "symfony/validator": "^4.4.17|^5.1.9|^6.0",
         "symfony/dependency-injection": "^4.4|^5.0|^6.0",
         "symfony/expression-language": "^4.4|^5.0|^6.0",

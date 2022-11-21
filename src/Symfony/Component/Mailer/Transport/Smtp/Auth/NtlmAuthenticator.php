@@ -330,8 +330,6 @@ class NtlmAuthenticator implements AuthenticatorInterface
      * Create LMv2 response.
      *
      * @param string $challenge NTLM Challenge
-     *
-     * @return string
      */
     protected function createLMv2Password(string $password, string $username, string $domain, string $challenge, string $nonce): string
     {
@@ -475,8 +473,6 @@ class NtlmAuthenticator implements AuthenticatorInterface
      * DES Encryption.
      *
      * @param string $value An 8-byte string
-     *
-     * @return string
      */
     protected function desEncrypt(string $value, string $key): string
     {

@@ -68,6 +68,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             && !str_contains((method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType()) ?? '', 'json')
         ) {
             $this->errorBadFormatMessage($request);
+            
             return false;
         }
 
@@ -172,10 +173,12 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         return $credentials;
     }
 
-    private function isNotLoginPath(Request $request):bool {
-        if(isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+    private function isNotLoginPath(Request $request):bool 
+    {
+        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
             return true;
         }
+
         return false;
     }
 
@@ -183,8 +186,9 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
      * Check is the user wants to login.
      * It will detected by check the body content. If the array see a key called password and the type is wrong the Exception will be display.
      */
-    private function errorBadFormatMessage($request):void {
-        if($this->isNotLoginPath($request)) {
+    private function errorBadFormatMessage($request):void 
+    {
+        if ($this->isNotLoginPath($request)) {
             return;
         }
         if(method_exists(Request::class, 'getContentTypeFormat')) {
@@ -193,7 +197,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             $contentType = $request->getContentType();
         }
         $data = json_decode($request->getContent(), true);
-        if(is_array($data) && array_key_exists($this->options['password_path'], $data)) {
+        if(\is_array($data) && \array_key_exists($this->options['password_path'], $data)) {
             throw new BadRequestHttpException(sprintf('Content type was detected as "%s". Request format was detected as "%s". Please use "json" as request format or content type. ', $contentType, $request->getRequestFormat()));
         }        
     }

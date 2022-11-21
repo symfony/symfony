@@ -11,6 +11,7 @@ CHANGELOG
  * Add `$lifetime` parameter to `LoginLinkHandlerInterface::createLoginLink()`
  * Add RFC6750 Access Token support to allow token-based authentication
  * Allow using expressions as `#[IsGranted()]` attribute and subject
+ * Add error exception method if user wants to JsonLogin with wrong content type `JsonLoginAuthenticator::errorBadFormatException()`
 
 6.0
 ---

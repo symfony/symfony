@@ -67,11 +67,11 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             !str_contains($request->getRequestFormat() ?? '', 'json')
             && !str_contains((method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType()) ?? '', 'json')
         ) {
-            $this->errorBadFormatException($request);
+            $this->errorBadFormatMessage($request);
             return false;
         }
 
-        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+        if ($this->isNotLoginPath($request)) {
             return false;
         }
 
@@ -171,11 +171,22 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 
         return $credentials;
     }
+
+    private function isNotLoginPath(Request $request):bool {
+        if(isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Check is the user wants to login.
      * It will detected by check the body content. If the array see a key called password and the type is wrong the Exception will be display.
      */
-    private function errorBadFormatException(Request $request) {
+    private function errorBadFormatMessage($request):void {
+        if($this->isNotLoginPath($request)) {
+            return;
+        }
         if(method_exists(Request::class, 'getContentTypeFormat')) {
             $contentType = $request->getContentTypeFormat();
         } else {

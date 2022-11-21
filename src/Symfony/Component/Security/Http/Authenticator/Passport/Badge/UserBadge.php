@@ -34,6 +34,7 @@ class UserBadge implements BadgeInterface
     /** @var callable|null */
     private $userLoader;
     private UserInterface $user;
+    private ?array $attributes;
 
     /**
      * Initializes the user badge.
@@ -48,7 +49,7 @@ class UserBadge implements BadgeInterface
      * is thrown). If this is not set, the default user provider will be used with
      * $userIdentifier as username.
      */
-    public function __construct(string $userIdentifier, callable $userLoader = null)
+    public function __construct(string $userIdentifier, callable $userLoader = null, array $attributes = null)
     {
         if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Username too long.');
@@ -56,11 +57,17 @@ class UserBadge implements BadgeInterface
 
         $this->userIdentifier = $userIdentifier;
         $this->userLoader = $userLoader;
+        $this->attributes = $attributes;
     }
 
     public function getUserIdentifier(): string
     {
         return $this->userIdentifier;
+    }
+
+    public function getAttributes(): ?array
+    {
+        return $this->attributes;
     }
 
     /**
@@ -76,7 +83,11 @@ class UserBadge implements BadgeInterface
             throw new \LogicException(sprintf('No user loader is configured, did you forget to register the "%s" listener?', UserProviderListener::class));
         }
 
-        $user = ($this->userLoader)($this->userIdentifier);
+        if (null === $this->getAttributes()) {
+            $user = ($this->userLoader)($this->userIdentifier);
+        } else {
+            $user = ($this->userLoader)($this->userIdentifier, $this->getAttributes());
+        }
 
         // No user has been found via the $this->userLoader callback
         if (null === $user) {

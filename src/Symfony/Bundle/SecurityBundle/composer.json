@@ -48,7 +48,13 @@
         "symfony/twig-bridge": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",
         "symfony/yaml": "^5.4|^6.0",
-        "twig/twig": "^2.13|^3.0.4"
+        "twig/twig": "^2.13|^3.0.4",
+        "web-token/jwt-checker": "^3.1",
+        "web-token/jwt-signature-algorithm-hmac": "^3.1",
+        "web-token/jwt-signature-algorithm-ecdsa": "^3.1",
+        "web-token/jwt-signature-algorithm-rsa": "^3.1",
+        "web-token/jwt-signature-algorithm-eddsa": "^3.1",
+        "web-token/jwt-signature-algorithm-none": "^3.1"
     },
     "conflict": {
         "symfony/browser-kit": "<5.4",

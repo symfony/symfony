@@ -199,6 +199,6 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         $data = json_decode($request->getContent(), true);
         if (\is_array($data) && \array_key_exists($this->options['password_path'], $data)) {
             throw new BadRequestHttpException(sprintf('Content type was detected as "%s". Request format was detected as "%s". Please use "json" as request format or content type. ', $contentType, $request->getRequestFormat()));
-        }        
+        }
     }
 }

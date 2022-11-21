@@ -61,7 +61,7 @@ class NtlmAuthenticator implements AuthenticatorInterface
         }
     }
 
-    protected function si2bin(string $si, int $bits = 32): string|null
+    protected function si2bin(string $si, int $bits = 32): ?string
     {
         $bin = null;
         if ($si >= -2 ** ($bits - 1) && ($si <= 2 ** ($bits - 1))) {
@@ -333,7 +333,7 @@ class NtlmAuthenticator implements AuthenticatorInterface
      *
      * @return string
      */
-    protected function createLMv2Password(string $password, string $username, string $domain, string $challenge, string $nonce)
+    protected function createLMv2Password(string $password, string $username, string $domain, string $challenge, string $nonce): string
     {
         $lmPass = '00'; // by default 00
         // if $password > 15 than we can't use this method
@@ -478,7 +478,7 @@ class NtlmAuthenticator implements AuthenticatorInterface
      *
      * @return string
      */
-    protected function desEncrypt(string $value, string $key)
+    protected function desEncrypt(string $value, string $key): string
     {
         return substr(openssl_encrypt($value, 'DES-ECB', $key, \OPENSSL_RAW_DATA), 0, 8);
     }

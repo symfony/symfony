@@ -34,7 +34,7 @@ class DebugProcessorTest extends TestCase
 
     public static function providerDatetimeFormatTests(): array
     {
-        $record = $this->getRecord();
+        $record = self::getRecord();
 
         return [
             [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), 1546300860],
@@ -99,7 +99,7 @@ class DebugProcessorTest extends TestCase
         $debugProcessorChild->countErrors();
     }
 
-    private function getRecord($level = Logger::WARNING, $message = 'test'): array
+    private static function getRecord($level = Logger::WARNING, $message = 'test'): array
     {
         return [
             'message' => $message,

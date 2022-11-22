@@ -37,18 +37,18 @@ class NotFoundActivationStrategyTest extends TestCase
     {
         return [
             ['/test',      ['level' => Logger::DEBUG], false],
-            ['/foo',       ['level' => Logger::DEBUG, 'context' => $this->getContextException(404)], false],
-            ['/baz/bar',   ['level' => Logger::ERROR, 'context' => $this->getContextException(404)], false],
-            ['/foo',       ['level' => Logger::ERROR, 'context' => $this->getContextException(404)], false],
-            ['/foo',       ['level' => Logger::ERROR, 'context' => $this->getContextException(500)], true],
+            ['/foo',       ['level' => Logger::DEBUG, 'context' => self::getContextException(404)], false],
+            ['/baz/bar',   ['level' => Logger::ERROR, 'context' => self::getContextException(404)], false],
+            ['/foo',       ['level' => Logger::ERROR, 'context' => self::getContextException(404)], false],
+            ['/foo',       ['level' => Logger::ERROR, 'context' => self::getContextException(500)], true],
 
             ['/test',      ['level' => Logger::ERROR], true],
-            ['/baz',       ['level' => Logger::ERROR, 'context' => $this->getContextException(404)], true],
-            ['/baz',       ['level' => Logger::ERROR, 'context' => $this->getContextException(500)], true],
+            ['/baz',       ['level' => Logger::ERROR, 'context' => self::getContextException(404)], true],
+            ['/baz',       ['level' => Logger::ERROR, 'context' => self::getContextException(500)], true],
         ];
     }
 
-    protected function getContextException($code)
+    protected static function getContextException($code)
     {
         return ['exception' => new HttpException($code)];
     }

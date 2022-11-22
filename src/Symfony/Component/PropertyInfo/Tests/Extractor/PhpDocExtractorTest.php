@@ -58,8 +58,8 @@ class PhpDocExtractorTest extends TestCase
         return [
             'pub' => ['pub', null, null],
             'stat' => ['stat', null, null],
-            'foo' => ['foo', $this->isPhpDocumentorV5() ? 'Foo.' : null, null],
-            'bar' => ['bar', $this->isPhpDocumentorV5() ? 'Bar.' : null, null],
+            'foo' => ['foo', self::isPhpDocumentorV5() ? 'Foo.' : null, null],
+            'bar' => ['bar', self::isPhpDocumentorV5() ? 'Bar.' : null, null],
         ];
     }
 
@@ -356,7 +356,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'scalar')], $this->extractor->getTypes(PseudoTypeDummy::class, 'unknownPseudoType'));
     }
 
-    protected function isPhpDocumentorV5()
+    protected static function isPhpDocumentorV5()
     {
         if (class_exists(InvalidTag::class)) {
             return true;

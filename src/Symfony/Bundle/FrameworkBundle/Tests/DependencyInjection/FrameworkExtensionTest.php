@@ -1468,7 +1468,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(EventDispatcherInterface::class, $container->get('foo')->dispatcher);
     }
 
-    public static function testCacheDefaultRedisProvider()
+    public function testCacheDefaultRedisProvider()
     {
         $container = $this->createContainerFromFile('cache');
 

@@ -50,9 +50,9 @@ final class SmsBiurasTransportTest extends TransportTestCase
     /**
      * @dataProvider provideTestMode()
      */
-    public function testTestMode(array $expected, array $provided)
+    public function testTestMode(int $expected, bool $testMode)
     {
-        $message = new SmsMessage($provided['phone'], $provided['message']);
+        $message = new SmsMessage('+37012345678',  'Hello World!');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->atLeast(1))
@@ -62,15 +62,15 @@ final class SmsBiurasTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('OK: 519545');
 
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expected): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $message, $testMode, $expected): ResponseInterface {
             $this->assertSame('GET', $method);
             $this->assertSame(sprintf(
                 'https://savitarna.smsbiuras.lt/api?uid=uid&apikey=api_key&message=%s&from=from&test=%s&to=%s',
-                rawurlencode($expected['message']),
-                $expected['transport']['test_mode'],
-                rawurlencode($expected['phone']),
+                rawurlencode($message->getSubject()),
+                $expected,
+                rawurlencode($message->getPhone()),
             ), $url);
-            $this->assertSame($expected['transport']['test_mode'], $options['query']['test']);
+            $this->assertSame($expected, $options['query']['test']);
 
             $this->assertSame(200, $response->getStatusCode());
             $this->assertSame('OK: 519545', $response->getContent());
@@ -78,48 +78,16 @@ final class SmsBiurasTransportTest extends TransportTestCase
             return $response;
         });
 
-        $transport = new SmsBiurasTransport('uid', 'api_key', 'from', $provided['transport']['test_mode'], $client);
+        $transport = new SmsBiurasTransport('uid', 'api_key', 'from', $testMode, $client);
 
         $sentMessage = $transport->send($message);
 
         $this->assertSame('519545', $sentMessage->getMessageId());
     }
 
-    public static function provideTestMode(): array
+    public static function provideTestMode(): iterable
     {
-        return [
-            [
-                [
-                    'phone' => '+37012345678',
-                    'message' => 'Hello world!',
-                    'transport' => [
-                        'test_mode' => 0,
-                    ],
-                ],
-                [
-                    'phone' => '+37012345678',
-                    'message' => 'Hello world!',
-                    'transport' => [
-                        'test_mode' => 0,
-                    ],
-                ],
-            ],
-            [
-                [
-                    'phone' => '+37012345678',
-                    'message' => 'Hello world!',
-                    'transport' => [
-                        'test_mode' => 1,
-                    ],
-                ],
-                [
-                    'phone' => '+37012345678',
-                    'message' => 'Hello world!',
-                    'transport' => [
-                        'test_mode' => 1,
-                    ],
-                ],
-            ],
-        ];
+        yield [1, true];
+        yield [0, false];
     }
 }

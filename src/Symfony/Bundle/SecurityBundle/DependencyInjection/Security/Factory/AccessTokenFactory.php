@@ -79,9 +79,9 @@ final class AccessTokenFactory extends AbstractFactory
 
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.access_token'))
-            ->replaceArgument(0, $userProvider)
-            ->replaceArgument(1, new Reference($config['token_handler']))
-            ->replaceArgument(2, new Reference($extractorId))
+            ->replaceArgument(0, new Reference($config['token_handler']))
+            ->replaceArgument(1, new Reference($extractorId))
+            ->replaceArgument(2, $userProvider)
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])

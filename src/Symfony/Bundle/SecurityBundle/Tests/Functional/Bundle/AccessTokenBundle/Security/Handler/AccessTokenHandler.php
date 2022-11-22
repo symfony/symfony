@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AccessTokenBundl
 
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 class AccessTokenHandler implements AccessTokenHandlerInterface
 {
@@ -20,10 +21,10 @@ class AccessTokenHandler implements AccessTokenHandlerInterface
     {
     }
 
-    public function getUserIdentifierFrom(string $accessToken): string
+    public function getUserBadgeFrom(string $accessToken): UserBadge
     {
         return match ($accessToken) {
-            'VALID_ACCESS_TOKEN' => 'dunglas',
+            'VALID_ACCESS_TOKEN' => new UserBadge('dunglas'),
             default => throw new BadCredentialsException('Invalid credentials.'),
         };
     }

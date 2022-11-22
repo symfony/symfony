@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -142,5 +143,17 @@ class ServiceLocatorTagPassTest extends TestCase
 
         $this->assertSame(['foo'], array_keys($locator->getBindings()));
         $this->assertInstanceOf(BoundArgument::class, $locator->getBindings()['foo']);
+    }
+
+    public function testBindingsAreProcessed()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register('foo')
+            ->setBindings(['foo' => new ServiceLocatorArgument()]);
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        $this->assertInstanceOf(Reference::class, $definition->getBindings()['foo']->getValues()[0]);
     }
 }

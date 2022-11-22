@@ -99,7 +99,7 @@ class AuthenticationProviderManagerTest extends TestCase
         $this->assertSame($expected, $token);
     }
 
-    public static function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
+    public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
     {
         $second = $this->createMock(AuthenticationProviderInterface::class);
         $second

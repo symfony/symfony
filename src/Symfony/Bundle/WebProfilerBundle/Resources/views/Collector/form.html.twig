@@ -714,7 +714,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for variable, value in data.view_vars %}
+        {% for variable, value in data.view_vars ?? [] %}
             <tr>
                 <th scope="row">{{ variable }}</th>
                 <td>{{ profiler_dump(value) }}</td>

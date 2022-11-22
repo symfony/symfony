@@ -104,7 +104,7 @@ CHANGELOG
    make sure to run `ALTER TABLE sessions MODIFY sess_lifetime INTEGER UNSIGNED NOT NULL` to
    update your database.
  * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
-    make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
+    make sure to run `CREATE INDEX expiry ON sessions (sess_lifetime)` to update your database
     to speed up garbage collection of expired sessions.
  * added `SessionHandlerFactory` to create session handlers with a DSN
  * added `IpUtils::anonymize()` to help with GDPR compliance.
